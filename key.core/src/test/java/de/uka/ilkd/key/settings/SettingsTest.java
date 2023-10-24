@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,7 +43,8 @@ class SettingsTest {
         assertEquals(1241, config.getInt("integer"));
         assertEquals(145122343214L, config.getLong("long"));
         assertEquals("this is a string", config.getString("string"));
-        assertEquals("this is a multi\n        linestring\n        string", config.getString("mlstring"));
+        assertEquals("this is a multi\n        linestring\n        string",
+            config.getString("mlstring"));
         assertEquals(List.of("a", "b", "c"), config.getStringList("stringlist"));
         var s = config.getTable("subconfig");
         assertNotNull(s);

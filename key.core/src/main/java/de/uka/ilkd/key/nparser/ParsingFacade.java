@@ -199,10 +199,11 @@ public final class ParsingFacade {
     // region configuration
     /**
      * Parses a the configuration determined by the given {@code file}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     *
      * @param file non-null {@link Path} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable. 
+     * @throws IOException if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(Path file) throws IOException {
@@ -218,10 +219,11 @@ public final class ParsingFacade {
 
     /**
      * Parses a the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     *
      * @param file non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable. 
+     * @throws IOException if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
@@ -231,12 +233,13 @@ public final class ParsingFacade {
         return new KeyAst.ConfigurationFile(ctx);
     }
 
-     /**
+    /**
      * Parses a the configuration determined by the given {@code stream}.
-     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
+     *
      * @param file non-null {@link CharStream} object
      * @return a configration object with the data deserialize from the given file
-     * @throws IOException if the file is not found or not readable. 
+     * @throws IOException if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static Configuration readConfigurationFile(CharStream input) throws IOException {

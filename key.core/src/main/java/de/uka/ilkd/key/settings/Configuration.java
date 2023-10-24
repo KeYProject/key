@@ -17,12 +17,13 @@ import de.uka.ilkd.key.util.Position;
 import org.antlr.v4.runtime.CharStream;
 
 /**
- * A container to hold parsed configurations. Configurations are a mapping between a property name 
+ * A container to hold parsed configurations. Configurations are a mapping between a property name
  * and a value plus additional meta information (line number, documentation etc.).
  * <p>
- * Helper functions allow to accesss the values in a type safe fashion. 
- * Note that configuration are also nested, use {@link #getTable(String)}  to receive a sub configuration.
- * 
+ * Helper functions allow to accesss the values in a type safe fashion.
+ * Note that configuration are also nested, use {@link #getTable(String)} to receive a sub
+ * configuration.
+ *
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  */
@@ -39,7 +40,8 @@ public class Configuration {
     }
 
     /**
-     * Loads a configuration using the given file. 
+     * Loads a configuration using the given file.
+     *
      * @param file existsing file path
      * @return a configuration based on the file contents
      * @throws IOException if file does not exists or i/o error
@@ -49,11 +51,12 @@ public class Configuration {
     }
 
     /**
-     * Loads a configuration using the given char stream.  
+     * Loads a configuration using the given char stream.
+     *
      * @param file existsing file path
      * @return a configuration based on the file contents
      * @throws IOException i/o error on the steram
-     */    
+     */
     public static Configuration load(CharStream input) throws IOException {
         return ParsingFacade.readConfigurationFile(input);
     }
@@ -66,8 +69,9 @@ public class Configuration {
     }
 
     /**
-     * Returns true if an entry for the given name exists and is also compatible 
-     * with the given class. 
+     * Returns true if an entry for the given name exists and is also compatible
+     * with the given class.
+     *
      * @see #getBool(String)
      * @see #getInt(String)
      * @see #getLong(String)
@@ -79,11 +83,12 @@ public class Configuration {
     }
 
     /**
-     * Returns the stored value for the given name casted to the given clazz if possible. 
+     * Returns the stored value for the given name casted to the given clazz if possible.
      * If no value exists, or value is not compatible to {@code clazz}, {@code null} is returned.
+     *
      * @param <T> an arbitrary class, exptected return type
-     * @param name property name 
-     * @param clazz data type because of missing reified generics. 
+     * @param name property name
+     * @param clazz data type because of missing reified generics.
      */
     @Nullable
     public <T> T get(String name, Class<T> clazz) {
@@ -95,7 +100,8 @@ public class Configuration {
 
     /**
      * The same as {@link #get(String, Class)} but returns the {@code defaultValue} instead
-     * of a {@code null} reference. 
+     * of a {@code null} reference.
+     *
      * @param <T> the expected return type compatible to the {@code defaultValue}
      * @param name property name
      * @param defaultValue the returned instead of {@code null}.
@@ -110,6 +116,7 @@ public class Configuration {
 
     /**
      * Get the value for the entry named {@code name}. Null if no such entry exists.
+     *
      * @see #exists(String)
      */
     @Nullable
@@ -119,19 +126,22 @@ public class Configuration {
 
     /**
      * Returns an integer or {@code null} if not such entry exists.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public int getInt(String name) {
         return (int) getLong(name);
     }
 
     /**
-     * Returns an integer value for the given name. {@code defaultValue} if no such value is present.
+     * Returns an integer value for the given name. {@code defaultValue} if no such value is
+     * present.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public int getInt(String name, int defaultValue) {
         return (int) getLong(name, defaultValue);
@@ -139,9 +149,10 @@ public class Configuration {
 
     /**
      * Returns a long value for the given name. {@code null} if no such value is present.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
         return get(name, Long.class);
@@ -149,9 +160,10 @@ public class Configuration {
 
     /**
      * Returns a long value for the given name. {@code defaultValue} if no such value is present.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
         var value = get(name, Long.class);
@@ -160,9 +172,10 @@ public class Configuration {
 
     /**
      * Returns a boolean value for the given name.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
         return get(name, Boolean.class);
@@ -170,19 +183,22 @@ public class Configuration {
 
     /**
      * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name, boolean defaultValue) {
         return get(name, defaultValue);
     }
 
     /**
-     * Returns an integer value for the given name. {@code defaultValue} if no such value is present.
+     * Returns an integer value for the given name. {@code defaultValue} if no such value is
+     * present.
+     *
      * @param name property name
-     * @throw ClassCastException    if the entry is not an {@link #Long}
-     * @throw NullPointerException  if no such value entry exists 
+     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
         return get(name, Double.class);
@@ -190,6 +206,7 @@ public class Configuration {
 
     /**
      * Returns an string value for the given name. {@code null} if no such value is present.
+     *
      * @param name property name
      */
     @Nullable
@@ -199,14 +216,16 @@ public class Configuration {
 
     /**
      * Returns an string value for the given name. {@code defaultValue} if no such value is present.
+     *
      * @param name property name
-     */    
+     */
     public String getString(String name, String defaultValue) {
         return get(name, defaultValue);
     }
 
     /**
      * Returns an sub configuration for the given name. {@code null} if no such value is present.
+     *
      * @param name property name
      */
     @Nullable
@@ -216,6 +235,7 @@ public class Configuration {
 
     /**
      * Returns a list of objects for the given name. {@code null} if no such value is present.
+     *
      * @param name property name
      */
     @Nullable
@@ -225,8 +245,9 @@ public class Configuration {
 
     /**
      * Returns a list of strings for the given name.
+     *
      * @param name property name
-     * @throws ClassCastException if the list contains non-strings 
+     * @throws ClassCastException if the list contains non-strings
      */
     @Nonnull
     public List<String> getStringList(String name) {
@@ -239,7 +260,9 @@ public class Configuration {
     }
 
     /**
-     * Returns string array for the requested entry. {@code defaultValue} is returned if no such entry exists.
+     * Returns string array for the requested entry. {@code defaultValue} is returned if no such
+     * entry exists.
+     *
      * @param name a string identifying the entry
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
@@ -327,10 +350,11 @@ public class Configuration {
     }
 
     /**
-     * Interprets the given entry as an enum value. 
-     * @param <T> the enum 
+     * Interprets the given entry as an enum value.
+     *
+     * @param <T> the enum
      * @param name a name identifying an entry
-     * @param defaultValue the default value to be returned 
+     * @param defaultValue the default value to be returned
      */
     public <T extends Enum<T>> T getEnum(String name, T defaultValue) {
         var idx = getString(name);
@@ -343,6 +367,7 @@ public class Configuration {
 
     /**
      * Serializes this configuration instance into the given writer.
+     *
      * @param writer a writer
      * @param comment a comment
      */
@@ -497,8 +522,10 @@ public class Configuration {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Configuration that)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Configuration that))
+            return false;
         return Objects.equals(data, that.data);
     }
 
