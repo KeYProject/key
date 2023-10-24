@@ -1452,7 +1452,7 @@ public class TermLabelManager {
          */
         public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
             final LinkedHashSet<TermLabelRefactoring> result =
-                    new LinkedHashSet<>(childAndGrandchildRefactoringsAndParents);
+                    new LinkedHashSet<>(childAndGrandchildRefactorings);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
         }
