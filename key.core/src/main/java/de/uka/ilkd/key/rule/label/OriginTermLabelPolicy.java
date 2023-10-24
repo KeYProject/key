@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -38,8 +37,7 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             return label;
         }
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                .getUseOriginLabels()) {
+        if (services.getTermBuilder().getOriginFactory() == null) {
             return null;
         }
 

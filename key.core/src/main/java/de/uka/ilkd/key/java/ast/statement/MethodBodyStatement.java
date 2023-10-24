@@ -131,7 +131,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.resultVar = resultVar;
         this.bodySource = bodySource;
         this.methodReference = methodReference;
-        //TODO weigl default value of this parameter on main?
+        // TODO weigl default value of this parameter on main?
         this.useSpecification = true;
     }
 

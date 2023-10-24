@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -49,7 +49,7 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-        polyTerm = TermLabel.removeIrrelevantLabels(polyTerm, services);
+        polyTerm = TermLabelManager.removeIrrelevantLabels(polyTerm, services);
 
         Polynomial res;
         synchronized (cache) {

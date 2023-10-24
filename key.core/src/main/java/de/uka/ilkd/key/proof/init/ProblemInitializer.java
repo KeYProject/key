@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -543,8 +545,11 @@ public final class ProblemInitializer {
         }
     }
 
-    private InitConfig prepare(EnvInput envInput, InitConfig initConfig)
+    private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
+        // create initConfig
+        InitConfig initConfig = referenceConfig.copy();
+
         // read Java
         readJava(envInput, initConfig);
 
@@ -555,26 +560,29 @@ public final class ProblemInitializer {
         final Namespace<Function> functions = services.getNamespaces().functions();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-
-        for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-            final Type type = kjt.getJavaType();
-            if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
-                for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
-                    final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                    if (pv instanceof LocationVariable) {
-                        heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                            services);
+        if (javaInfo != null) {
+            for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+                final Type type = kjt.getJavaType();
+                if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
+                    for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
+                        final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+                        if (pv instanceof LocationVariable) {
+                            heapLDT.getFieldSymbolForPV((LocationVariable) pv,
+                                services);
+                        }
+                    }
+                }
+                for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                    if (pm == null) {
+                        continue; // weigl 2021-11-10
+                    }
+                    if (!(pm.isVoid() || pm.isConstructor())) {
+                        functions.add(pm);
                     }
                 }
             }
-            for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                if (pm == null) {
-                    continue; // weigl 2021-11-10
-                }
-                if (!(pm.isVoid() || pm.isConstructor())) {
-                    functions.add(pm);
-                }
-            }
+        } else {
+            throw new ProofInputException("Problem initialization without JavaInfo!");
         }
 
         // read envInput
@@ -598,6 +606,13 @@ public final class ProblemInitializer {
         try {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
+
+            // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
+            initConfig.getServices().setOriginFactory(
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                        .getUseOriginLabels()
+                                ? new OriginTermLabelFactory()
+                                : null);
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");

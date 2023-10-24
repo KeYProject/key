@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;

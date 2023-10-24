@@ -13,11 +13,11 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.java.CollectionUtil;
@@ -86,6 +86,8 @@ public class Services implements TermServices {
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
+    private OriginTermLabelFactory originFactory;
+
     private final Profile profile;
 
     private final ServiceCaches caches;
@@ -147,6 +149,7 @@ public class Services implements TermServices {
         this.javaService = s.javaService;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.originFactory = s.originFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -246,6 +249,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -273,7 +277,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -292,10 +296,6 @@ public class Services implements TermServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
-                || !proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
-            profile.getTermLabelManager().disableOriginLabelRefactorings();
-        }
     }
 
 
@@ -364,6 +364,21 @@ public class Services implements TermServices {
     }
 
     /**
+     * returns the {@link JavaModel} with all path information
+     *
+     * @return the {@link JavaModel} on which this services is based on
+     */
+    public JavaModel getJavaModel() {
+        return javaModel;
+    }
+
+
+    public void setJavaModel(JavaModel javaModel) {
+        assert this.javaModel == null;
+        this.javaModel = javaModel;
+    }
+
+    /**
      * Returns the used {@link ServiceCaches}.
      *
      * @return The used {@link ServiceCaches}.
@@ -410,26 +425,39 @@ public class Services implements TermServices {
         return factory;
     }
 
-
     public void setFactory(ITermProgramVariableCollectorFactory factory) {
         this.factory = factory;
     }
 
 
+    // =================================================================================================================
+    // =================================================================================================================
+
+    // Origin label specific methods; these should eventually be moved out of the services class
+    // when doing that we must take care not to introduce dependencies to ProofSettings or similar
+    // in places
+    // where that should not occur
+
     /**
-     * returns the {@link JavaModel} with all path information
+     * sets the factory for origin term labels
      *
-     * @return the {@link JavaModel} on which this services is based on
+     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
+     *        should not be created
      */
-    public JavaModel getJavaModel() {
-        return javaModel;
+    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+        this.originFactory = originFactory;
     }
 
-
-    public void setJavaModel(JavaModel javaModel) {
-        assert this.javaModel == null;
-        this.javaModel = javaModel;
+    /**
+     * return the factory for origin term labels
+     *
+     * @return the OriginTermLabelFactory to use or null if origin labels should not be created
+     */
+    public OriginTermLabelFactory getOriginFactory() {
+        return originFactory;
     }
+    // =================================================================================================================
+    // =================================================================================================================
 
     @Nonnull
     public JavaService getJavaService() {
