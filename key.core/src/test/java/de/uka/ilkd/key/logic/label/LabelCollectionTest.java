@@ -109,5 +109,6 @@ class LabelCollectionTest {
     @Test
     void getFirst() {
         assertFalse(collection.isModified(), "Initial collection should not be marked as modified");
+        assertEquals(collection.getFirst(ParameterlessTermLabel.class), paramA);
     }
 }

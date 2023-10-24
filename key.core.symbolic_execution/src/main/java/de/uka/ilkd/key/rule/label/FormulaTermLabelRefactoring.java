@@ -167,7 +167,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorSpecificationApplication(Term term, Services services,
-                                                  LabelCollection labels, Object hint) {
+            LabelCollection labels, Object hint) {
         if (TruthValueTracingUtil.isPredicate(term)
                 || (CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint)
                         && TruthValueTracingUtil.isLogicOperator(term))) {
@@ -215,7 +215,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorBelowUpdates(PosInOccurrence applicationPosInOccurrence, Term term,
-                                      LabelCollection labels) {
+            LabelCollection labels) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
@@ -246,7 +246,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
-                                         LabelCollection labels) {
+            LabelCollection labels) {
         Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
         if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
