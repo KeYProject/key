@@ -396,6 +396,7 @@ public final class ProblemInitializer {
         }
 
         // register non-built-in rules
+        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
@@ -515,10 +516,20 @@ public final class ProblemInitializer {
     // public interface
     // -------------------------------------------------------------------------
 
+    private void configureTermLabelSupport(InitConfig initConfig) {
+        initConfig.getServices().setOriginFactory(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
+    }
+
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
+
+        configureTermLabelSupport(initConfig);
 
         // read Java
         readJava(envInput, initConfig);
@@ -571,12 +582,7 @@ public final class ProblemInitializer {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
 
-            // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
-            initConfig.getServices().setOriginFactory(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                        .getUseOriginLabels()
-                                ? new OriginTermLabelFactory()
-                                : null);
+
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
