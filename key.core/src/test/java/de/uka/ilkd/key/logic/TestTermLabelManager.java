@@ -725,7 +725,7 @@ public class TestTermLabelManager {
                 PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
-            boolean changed = labels.hasChanged();
+            boolean changed = labels.isModified();
             for (TermLabel label : labels.getLabels()) {
                 if (label.name().toString().endsWith("-CHANGED")) {
                     changedLabels.add(label);

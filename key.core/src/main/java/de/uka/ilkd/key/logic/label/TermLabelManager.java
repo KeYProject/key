@@ -1749,7 +1749,7 @@ public class TermLabelManager {
             refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm, term, newLabels);
         }
-        if (newLabels.hasChanged()) {
+        if (newLabels.isModified()) {
             return new ImmutableArray<>(newLabels.getLabels());
         } else {
             return term.getLabels();
