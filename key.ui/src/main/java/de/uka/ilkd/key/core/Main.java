@@ -445,7 +445,7 @@ public final class Main {
                     break;
                 }
             }
-            if (macro.equals("") || autoMacro instanceof SkipMacro) {
+            if (macro.isEmpty() || autoMacro instanceof SkipMacro) {
                 LOGGER.warn("No automatic proof macro specified.");
             }
         }

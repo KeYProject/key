@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -94,7 +95,7 @@ public class LDTInput implements EnvInput {
     // no class path elements here
     @Override
     public List<File> readClassPath() {
-        return null;
+        return new ArrayList<>();
     }
 
 

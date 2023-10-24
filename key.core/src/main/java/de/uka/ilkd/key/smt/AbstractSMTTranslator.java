@@ -747,7 +747,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // make sure, no sort is added twice!!
                 boolean alreadyIn = false;
                 for (StringBuilder stringBuilder : toReturn) {
-                    if (stringBuilder.equals(newSort)) {
+                    if (stringBuilder.compareTo(newSort) == 0) {
                         alreadyIn = true;
                         break;
                     }

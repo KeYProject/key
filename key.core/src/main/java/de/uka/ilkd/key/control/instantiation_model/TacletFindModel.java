@@ -28,7 +28,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
@@ -236,7 +235,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
@@ -266,7 +265,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
@@ -285,14 +284,10 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     private Term addOrigin(Term term) {
-        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
-            return services.getTermBuilder().addLabelToAllSubs(
-                OriginTermLabel.removeOriginLabels(term, services),
-                new OriginTermLabel(new NodeOrigin(SpecType.USER_INTERACTION,
-                    originalApp.rule().displayName(), goal.node().serialNr())));
-        } else {
-            return term;
-        }
+        return services.getTermBuilder().addLabelToAllSubs(
+            OriginTermLabel.removeOriginLabels(term, services),
+            new NodeOrigin(SpecType.USER_INTERACTION,
+                originalApp.rule().displayName(), goal.node().serialNr()));
     }
 
     /**

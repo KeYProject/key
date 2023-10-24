@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -29,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import static org.key_project.util.Strings.formatAsList;
 
 
 /**
@@ -76,12 +77,6 @@ import org.key_project.util.collection.ImmutableSet;
 public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
-
-    /**
-     * The proof node that added this taclet to the set of available taclets.
-     * May be null if this taclet wasn't added by another proof step.
-     */
-    private Node addedBy = null;
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -593,7 +588,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
             sb = sb.append("\\varcond(");
 
@@ -616,14 +610,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
                 --countVarsNotFreeIn;
             }
 
-            int countVariableConditions = variableConditions.size();
-            for (final VariableCondition vc : variableConditions) {
-                sb.append(vc);
-                if (countVariableConditions > 0) {
-                    sb.append(", ");
-                }
-                --countVariableConditions;
-            }
+            sb.append(formatAsList(variableConditions, "", ", ", ""));
+
             sb = sb.append(")\n");
         }
         return sb;
@@ -633,29 +621,14 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         if (goalTemplates.isEmpty()) {
             sb.append("\\closegoal");
         } else {
-            Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
-            while (it.hasNext()) {
-                sb = sb.append(it.next());
-                if (it.hasNext()) {
-                    sb = sb.append(";");
-                }
-                sb = sb.append("\n");
-            }
+            sb.append(formatAsList(goalTemplates, "", ";\n", "\n"));
         }
         return sb;
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-        Iterator<RuleSet> itRS = ruleSets();
-        if (itRS.hasNext()) {
-            sb = sb.append("\\heuristics(");
-            while (itRS.hasNext()) {
-                sb = sb.append(itRS.next());
-                if (itRS.hasNext()) {
-                    sb = sb.append(", ");
-                }
-            }
-            sb = sb.append(")");
+        if (!ruleSets.isEmpty()) {
+            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
         }
         return sb;
     }
@@ -673,15 +646,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             sb.append("} ");
             sb.append(trigger.getTerm());
             if (trigger.hasAvoidConditions()) {
-                Iterator<Term> itTerms = trigger.avoidConditions().iterator();
                 sb.append(" \\avoid ");
-                while (itTerms.hasNext()) {
-                    Term cond = itTerms.next();
-                    sb.append(cond);
-                    if (itTerms.hasNext()) {
-                        sb.append(", ");
-                    }
-                }
+                sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
             }
         }
         return sb;
@@ -823,9 +789,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
 
         /**
-         * Constructor.
+         * Constructor creating a hint indicating
+         * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param tacletOperation The currently performed operation.
          * @param term The optional replace {@link Term} of the taclet.
          */
         public TacletLabelHint(Term term) {
@@ -1012,13 +978,5 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     public void setOrigin(@Nullable String origin) {
         this.origin = origin;
-    }
-
-    public void setAddedBy(Node addedBy) {
-        this.addedBy = addedBy;
-    }
-
-    public Node getAddedBy() {
-        return addedBy;
     }
 }

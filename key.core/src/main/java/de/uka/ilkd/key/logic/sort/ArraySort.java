@@ -151,13 +151,13 @@ public final class ArraySort extends AbstractSort {
     private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
                            Sort javaLangSerializable) {
         public boolean equals(Object o) {
-                if (!(o instanceof SortKey sk)) {
-                    return false;
-                }
-                return elemSort == sk.elemSort && elemType == sk.elemType
-                        && javaLangObjectSort == sk.javaLangObjectSort
-                        && javaLangSerializable == sk.javaLangSerializable
-                        && javaLangCloneable == sk.javaLangCloneable;
+            if (!(o instanceof SortKey sk)) {
+                return false;
             }
+            return elemSort == sk.elemSort && elemType == sk.elemType
+                    && javaLangObjectSort == sk.javaLangObjectSort
+                    && javaLangSerializable == sk.javaLangSerializable
+                    && javaLangCloneable == sk.javaLangCloneable;
+        }
     }
 }

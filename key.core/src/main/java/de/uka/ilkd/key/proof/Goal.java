@@ -366,12 +366,6 @@ public final class Goal {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        // sci.hasChanged() can be true for added: f, removed: f
-        // This afaik only ever happens in TestApplyTaclet.testBugBrokenApply
-        // Since SequentChangeInfo does not filter this we have to
-        // work with maybe sci.original.equals(sci.sequent)
-        // Checking this is probably too expensive for what it's worth
-        assert sci.sequent() != sci.getOriginalSequent();
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         var time = System.nanoTime();

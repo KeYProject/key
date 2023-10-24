@@ -645,7 +645,6 @@ public final class ProofManagementDialog extends JDialog {
     // inner classes
     // -------------------------------------------------------------------------
     private record ProofWrapper(Proof proof) {
-
         @Override
             public String toString() {
                 return proof.name().toString();
@@ -653,7 +652,12 @@ public final class ProofManagementDialog extends JDialog {
 
             @Override
             public boolean equals(Object o) {
-                return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
+                return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
+            }
+
+            @Override
+            public int hashCode() {
+                return 3*proof.hashCode();
             }
 
     }
