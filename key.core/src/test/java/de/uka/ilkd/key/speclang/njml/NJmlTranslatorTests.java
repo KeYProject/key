@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -37,8 +38,9 @@ public class NJmlTranslatorTests {
         JavaInfo javaInfo =
             new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
+        services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        preParser = new PreParser();
+        preParser = new PreParser(services.getOriginFactory() != null);
     }
 
     @Test

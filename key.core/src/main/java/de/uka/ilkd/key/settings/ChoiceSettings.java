@@ -4,14 +4,6 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
