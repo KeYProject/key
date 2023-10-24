@@ -91,6 +91,7 @@ public final class RuleAppIndex {
     private void setNewRuleListeners() {
         interactiveTacletAppIndex.setNewRuleListener(newRuleListener);
         automatedTacletAppIndex.setNewRuleListener(newRuleListener);
+        builtInRuleAppIndex.setNewRuleListener(newRuleListener);
     }
 
     /**
@@ -235,7 +236,8 @@ public final class RuleAppIndex {
      * constraint and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, PosInOccurrence pos) {
-        return builtInRuleAppIndex.getBuiltInRule(g, pos);
+
+        return builtInRuleAppIndex().getBuiltInRule(g, pos);
     }
 
 
@@ -293,9 +295,11 @@ public final class RuleAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        interactiveTacletAppIndex.sequentChanged(sci);
+        if (!autoMode) {
+            interactiveTacletAppIndex.sequentChanged(sci);
+        }
         automatedTacletAppIndex.sequentChanged(sci);
-        builtInRuleAppIndex.sequentChanged(sci);
+        builtInRuleAppIndex.sequentChanged(goal, sci, newRuleListener);
     }
 
     /**
@@ -314,7 +318,6 @@ public final class RuleAppIndex {
         // Currently this only applies to the taclet index
         interactiveTacletAppIndex.clearIndexes();
         automatedTacletAppIndex.clearIndexes();
-        builtInRuleAppIndex.resetSequentChanges();
     }
 
     /**
@@ -325,16 +328,18 @@ public final class RuleAppIndex {
             interactiveTacletAppIndex.fillCache();
         }
         automatedTacletAppIndex.fillCache();
-        builtInRuleAppIndex.flushSequentChanges(goal, newRuleListener);
     }
 
     /**
      * Report all rule applications that are supposed to be applied automatically, and that are
      * currently stored by the index
+     *
+     * @param l the NewRuleListener
+     * @param services the Services
      */
-    public void reportAutomatedRuleApps() {
-        automatedTacletAppIndex.reportRuleApps(newRuleListener, goal.proof().getServices());
-        builtInRuleAppIndex.reportRuleApps(goal, newRuleListener);
+    public void reportAutomatedRuleApps(NewRuleListener l, Services services) {
+        automatedTacletAppIndex.reportRuleApps(l, services);
+        builtInRuleAppIndex.reportRuleApps(l, goal);
     }
 
     /**
@@ -343,7 +348,7 @@ public final class RuleAppIndex {
      * @param p_goal the Goal which to scan
      */
     public void scanBuiltInRules(Goal p_goal) {
-        builtInRuleAppIndex.scanApplicableRules(p_goal, newRuleListener);
+        builtInRuleAppIndex().scanApplicableRules(p_goal, newRuleListener);
     }
 
     /**
@@ -377,7 +382,7 @@ public final class RuleAppIndex {
         TacletAppIndex copiedAutomatedTacletAppIndex =
             automatedTacletAppIndex.copyWith(copiedTacletIndex, goal);
         return new RuleAppIndex(copiedTacletIndex, copiedInteractiveTacletAppIndex,
-            copiedAutomatedTacletAppIndex, builtInRuleAppIndex.copy(), goal, autoMode);
+            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), goal, autoMode);
     }
 
 

@@ -10,7 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -59,9 +60,10 @@ public class ContractFactoryTest {
             javaInfo =
                 new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
+            services.setOriginFactory(new OriginTermLabelFactory());
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        preParser = new PreParser();
+        preParser = new PreParser(services.getOriginFactory() != null);
     }
 
     /**
@@ -182,6 +184,6 @@ public class ContractFactoryTest {
 
         // remove origin labels
         Term combinedMod = singleContract.getMod();
-        return TermLabel.removeIrrelevantLabels(combinedMod, services);
+        return TermLabelManager.removeIrrelevantLabels(combinedMod, services);
     }
 }
