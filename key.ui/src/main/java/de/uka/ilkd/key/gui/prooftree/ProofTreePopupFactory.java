@@ -30,7 +30,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
-public class ProofTreePopupFactory {
+/**
+ * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
+ */
+public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
     private ProofTreePopupFactory() {
