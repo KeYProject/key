@@ -489,7 +489,7 @@ public class ContractFactory {
                             Set<Origin> origins = new HashSet<>();
                             origins.add(o1);
                             origins.add(o2);
-                            uol = new OriginTermLabel(origins);
+                            uol = tb.getOriginFactory().createOriginTermLabel(origins);
                             newLabels.add(uol);
                             break;
                         }

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -433,15 +432,20 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof UpdateLabelPair) {
-                    return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
-                            .equals(((UpdateLabelPair) obj).updateApplicationlabels());
-                } else {
-                    return false;
-                }
+        public boolean equals(Object obj) {
+            if (obj instanceof UpdateLabelPair) {
+                return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
+                        .equals(((UpdateLabelPair) obj).updateApplicationlabels());
+            } else {
+                return false;
             }
         }
+
+        @Override
+        public int hashCode() {
+            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+        }
+    }
 
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {
@@ -537,9 +541,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (inst instanceof TermImpl) {
-                if (!((TermImpl) inst)
-                        .equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof Term instAsTerm) {
+                if (!instAsTerm.equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -568,9 +571,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (inst instanceof TermImpl) {
-                if (!((TermImpl) inst)
-                        .equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof Term instAsTerm) {
+                if (!instAsTerm.equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {

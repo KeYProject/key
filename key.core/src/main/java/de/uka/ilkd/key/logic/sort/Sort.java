@@ -20,22 +20,22 @@ public interface Sort extends Named, HasOrigin {
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    Sort FORMULA = new SortImpl(new Name("Formula"));
+    Sort FORMULA = new SortImpl(new Name("Formula"), null, "", "");
 
     /**
      * Updates are represented as "terms" of this sort.
      */
-    Sort UPDATE = new SortImpl(new Name("Update"));
+    Sort UPDATE = new SortImpl(new Name("Update"), null, "", "");
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    Sort TERMLABEL = new SortImpl(new Name("TermLabel"), null, "", "");
 
     /**
      * Any is a supersort of all sorts.
      */
-    Sort ANY = new SortImpl(new Name("any"));
+    Sort ANY = new SortImpl(new Name("any"), null, "", "");
 
     /**
      * Name of {@link #getCastSymbol(TermServices)}.

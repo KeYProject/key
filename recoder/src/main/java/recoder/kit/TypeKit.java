@@ -406,8 +406,7 @@ public class TypeKit {
         Debug.assertNonnull(xr, ni, type, newName);
         Debug.assertNonnull(type.getName());
         if (!newName.equals(type.getName())) {
-            List<TypeReference> refs = new ArrayList<>();
-            refs.addAll(xr.getReferences(type));
+            List<TypeReference> refs = new ArrayList<>(xr.getReferences(type));
             List<? extends Constructor> cons = type.getConstructors();
             Type atype = ni.getArrayType(type);
             while (atype != null) {
@@ -661,8 +660,7 @@ public class TypeKit {
      */
     public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi,
             List<? extends ClassType> list) {
-        List<ClassType> copy = new ArrayList<>();
-        copy.addAll(list);
+        List<ClassType> copy = new ArrayList<>(list);
         return removeCoveredSubtypes(pmi, copy);
     }
 

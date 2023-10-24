@@ -25,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -1500,18 +1501,11 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
-            boolean afterFirst = false;
-            for (Goal goal : startingGoals) {
-                if (afterFirst) {
-                    sb.append(", ");
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(goal.node().serialNr());
-            }
+            sb.append(Strings.formatAsList(startingGoals, "", ", ", "",
+                ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr)));
             return sb.toString();
         }
     }

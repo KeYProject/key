@@ -347,7 +347,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.VARIABLE) {
-            if (basename == null || "".equals(basename)) {
+            if (basename == null || basename.isEmpty()) {
                 basename = DEFAULT_BASENAME;
             }
             int cnt =
@@ -396,7 +396,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal
      */
     public ProgramElementName getTemporaryNameProposal(String basename) {
-        if (basename == null || "".equals(basename)) {
+        if (basename == null || basename.isEmpty()) {
             basename = DEFAULT_BASENAME;
         }
         int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();

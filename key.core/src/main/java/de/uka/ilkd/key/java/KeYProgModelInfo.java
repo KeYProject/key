@@ -483,9 +483,9 @@ public class KeYProgModelInfo {
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
-            if (member instanceof IProgramMethod
-                    && ((IProgramMethod) member).getMethodDeclaration().getName().equals(name)) {
-                return (IProgramMethod) member;
+            if (member instanceof IProgramMethod pm
+                    && pm.getMethodDeclaration().getName().equals(name)) {
+                return pm;
             }
         }
         LOGGER.debug("keyprogmodelinfo: implicit method {} not found in {}", name, ct);

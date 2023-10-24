@@ -53,7 +53,7 @@ public class TermNavigator {
 
     /**
      * top element on stack contains always the pair whose first component is the element to be
-     * returned by {@link #next()} while the second points to the child to be visited next (or
+     * returned by {@link #gotoNext()} while the second points to the child to be visited next (or
      * equals the arity of the first component if no such child exists) For all elements on the
      * stack that are not the top element the second component is less than the arity of the term in
      * the first component

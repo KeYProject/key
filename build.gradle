@@ -57,8 +57,10 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    java {
+        sourceCompatibility = 17
+        targetCompatibility = 17
+    }
 
     repositories {
         mavenCentral()

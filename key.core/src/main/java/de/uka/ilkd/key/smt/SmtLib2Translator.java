@@ -289,7 +289,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private void createSortDeclaration(ArrayList<StringBuilder> types, StringBuilder result) {
         result.append("\n" + GAP + "; Declaration of sorts.\n");
         for (StringBuilder type : types) {
-            if (!(type == INTSTRING || type.equals(INTSTRING))) {
+            if (!(type == INTSTRING || type.compareTo(INTSTRING) == 0)) {
                 createSortDeclaration(type, result);
             }
         }
