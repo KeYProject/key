@@ -255,7 +255,7 @@ public final class Goal {
     private void setNode(Node p_node) {
         if (node().sequent() != p_node.sequent()) {
             node = p_node;
-            resetTagManager();
+            tagManager = new FormulaTagManager(this);
         } else {
             node = p_node;
         }
@@ -458,18 +458,6 @@ public final class Goal {
         ruleAppIndex.clearAndDetachCache();
     }
 
-    // @Deprecated
-    // public void setProgramVariables(Namespace ns) {
-    // // final Iterator<Named> it=ns.elements().iterator();
-    // // ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-    // // while (it.hasNext()) {
-    // // s = s.add((ProgramVariable)it.next());
-    // // }
-    // // node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-    // // proof().getNamespaces().programVariables().set(s);
-    // // setGlobalProgVars(s);
-    // }
-
     public void addProgramVariable(ProgramVariable pv) {
         localNamespaces.programVariables().addSafely(pv);
     }
@@ -532,6 +520,7 @@ public final class Goal {
      * creates n new nodes as children of the referenced node and new n goals that have references
      * to these new nodes.
      *
+     * @param n number of goals to create
      * @return the list of new created goals.
      */
     @Nonnull
@@ -571,10 +560,6 @@ public final class Goal {
         return goalList;
     }
 
-    private void resetTagManager() {
-        tagManager = new FormulaTagManager(this);
-    }
-
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
     }
@@ -600,13 +585,20 @@ public final class Goal {
         localNamespaces = newNS.copyWithParent();
     }
 
+    /**
+     * Perform the provided rule application on this goal.
+     * Returns the new goal(s), if any.
+     * This will also populate a {@link RuleAppInfo} object and fire the corresponding event.
+     * The state of the proof is also updated.
+     *
+     * @param ruleApp the rule app
+     * @return new goal(s)
+     */
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
-
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-
 
         final Node n = node;
 
@@ -630,19 +622,14 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) { // TODO: can goalList be null?
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
-                if (ruleApp instanceof SMTRuleApp) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
+                    || ruleApp instanceof SMTRuleApp) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
             }
         }
 
@@ -680,6 +667,7 @@ public final class Goal {
         }
     }
 
+    @Override
     public String toString() {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
@@ -711,9 +699,6 @@ public final class Goal {
         this.localNamespaces = ns.copyWithParent().copyWithParent();
     }
 
-    /**
-     *
-     */
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();

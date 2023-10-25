@@ -457,6 +457,13 @@ public class Node implements Iterable<Node> {
     }
 
     /**
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
      * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {
