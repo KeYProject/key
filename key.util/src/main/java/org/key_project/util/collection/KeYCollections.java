@@ -1,5 +1,6 @@
 package org.key_project.util.collection;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -24,10 +25,11 @@ public class KeYCollections {
      * Concatenates two arrays. The second array may have an entry type that is a subtype of the
      * first one.
      */
-    public static <S extends @Nullable Object, T extends S> S[] concat(S[] s1, T[] s2) {
-        S[] res = Arrays.copyOf(s1, s1.length + s2.length);
+    public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+        @Nullable S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
-        return res;
+        // After arraycopy, all elements of res are NonNull.
+        return NullnessUtil.castNonNullDeep(res);
     }
 
     // =======================================================
