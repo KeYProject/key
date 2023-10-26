@@ -86,7 +86,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
     }
 
-    /** name of the taclet */
+    /** unique name of the taclet */
     private final Name name;
 
     /** name displayed by the pretty printer */
