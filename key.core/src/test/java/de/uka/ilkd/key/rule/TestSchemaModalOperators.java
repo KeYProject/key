@@ -119,15 +119,20 @@ public class TestSchemaModalOperators {
 
         SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
         ImmutableSet<Modality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
-        modalities = modalities.add(Modality.JavaModalityKind.DIA).add(Modality.JavaModalityKind.BOX);
+        modalities =
+            modalities.add(Modality.JavaModalityKind.DIA).add(Modality.JavaModalityKind.BOX);
         SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name("diabox"),
             JavaDLTheory.FORMULA, modalities);
         Term tpost = TB.tf().createTerm(fsv);
 
-        Term find = TB.tf().createTerm(Modality.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK), new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
+        Term find = TB.tf().createTerm(
+            Modality.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
+            new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         Term replace =
-            TB.tf().createTerm(Modality.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK), new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
+            TB.tf().createTerm(
+                Modality.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
+                new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
@@ -249,15 +254,15 @@ public class TestSchemaModalOperators {
         Assertions.assertEquals(antec0.get(0), seq0.antecedent().get(0),
             "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(antec0.get(0), seq1.antecedent().get(0),
-                "Wrong antecedent after testSchemaModal3");
+            "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(antec0.get(0), seq2.antecedent().get(0),
-                "Wrong antecedent after testSchemaModal3");
+            "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(succ0.get(0), seq0.succedent().getFirst(),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
         Assertions.assertEquals(succ1.get(0), seq1.succedent().getFirst(),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
         Assertions.assertEquals(succ2.get(0), seq2.succedent().getFirst(),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
 
         // Debug.ENABLE_DEBUG = false;
 

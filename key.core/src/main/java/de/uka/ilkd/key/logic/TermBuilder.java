@@ -415,13 +415,13 @@ public class TermBuilder {
         return tf.createTerm(f, s, boundVars, null);
     }
 
-//    public Term prog(Modality mod, Term t) {
-//        return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock());
-//    }
-//
-//    public Term prog(Modality mod, Term t, ImmutableArray<TermLabel> labels) {
-//        return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock(), labels);
-//    }
+    // public Term prog(Modality mod, Term t) {
+    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock());
+    // }
+    //
+    // public Term prog(Modality mod, Term t, ImmutableArray<TermLabel> labels) {
+    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock(), labels);
+    // }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
         return tf.createTerm(Modality.modality(modKind, jb), new Term[] { t }, null, jb);

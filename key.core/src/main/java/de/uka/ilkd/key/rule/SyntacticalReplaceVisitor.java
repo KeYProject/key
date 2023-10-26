@@ -237,9 +237,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV)
                     || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
-                        instantiatedOp =
-                            (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
-                    }
+                instantiatedOp =
+                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+            }
         }
         assert instantiatedOp != null;
 

@@ -260,7 +260,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         // in box modalities, diamond contracts may be applied as well
         if (modalityKind == Modality.JavaModalityKind.BOX) {
             result = result.union(
-                services.getSpecificationRepository().getOperationContracts(kjt, pm, Modality.JavaModalityKind.DIA));
+                services.getSpecificationRepository().getOperationContracts(kjt, pm,
+                    Modality.JavaModalityKind.DIA));
         } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
             result = result.union(services.getSpecificationRepository().getOperationContracts(kjt,
                 pm, Modality.JavaModalityKind.DIA_TRANSACTION));
@@ -541,7 +542,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         // contract can be applied if modality is box and needs no termination
         // argument
         // see #1417, BOX_TRANSACTION added according to Wojciech's proposal.
-        if (inst.mod.kind() == Modality.JavaModalityKind.BOX || inst.mod.kind() == Modality.JavaModalityKind.BOX_TRANSACTION) {
+        if (inst.mod.kind() == Modality.JavaModalityKind.BOX
+                || inst.mod.kind() == Modality.JavaModalityKind.BOX_TRANSACTION) {
             return true;
         }
 
@@ -727,7 +729,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
             final Term mbyOk;
             // see #1417
-            if (inst.mod.kind() != Modality.JavaModalityKind.BOX && inst.mod.kind() != Modality.JavaModalityKind.BOX_TRANSACTION
+            if (inst.mod.kind() != Modality.JavaModalityKind.BOX
+                    && inst.mod.kind() != Modality.JavaModalityKind.BOX_TRANSACTION
                     && po != null
                     && mby != null) {
                 // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),

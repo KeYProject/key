@@ -148,8 +148,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind, Services services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind) {}, services);
+    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
+            Services services) throws SortException {
+        return add(sv, new InstantiationEntry<>(kind) {
+        }, services);
     }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {

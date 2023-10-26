@@ -354,7 +354,9 @@ public class ContractFactory {
             Map<LocationVariable, Term> freeMods, Map<ProgramVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
             ProgramVariableCollection pv) {
-        return func(baseName, pm, terminates ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, pres, freePres, mby,
+        return func(baseName, pm,
+            terminates ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, pres,
+            freePres, mby,
             posts, freePosts, axioms, mods, freeMods, accessibles, hasMod, hasFreeMod, pv, false,
             mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
@@ -408,7 +410,8 @@ public class ContractFactory {
                         : "unknown modality " + otherKind + " in contract";
                 // do nothing
             } else {
-                assert kind == Modality.JavaModalityKind.DIA : "unknown modality " + kind + " in contract";
+                assert kind == Modality.JavaModalityKind.DIA
+                        : "unknown modality " + kind + " in contract";
                 kind = Modality.JavaModalityKind.BOX;
             }
         }

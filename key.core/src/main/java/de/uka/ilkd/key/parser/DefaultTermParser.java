@@ -39,11 +39,11 @@ public final class DefaultTermParser {
      * @param sort The expected sort of the term.
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if the input could not be parsed
-     *                         correctly or the term has an invalid sort.
+     *         correctly or the term has an invalid sort.
      */
     public Term parse(Reader in, Sort sort, Services services,
             Namespace<QuantifiableVariable> var_ns,
-                      Namespace<Function> func_ns,
+            Namespace<Function> func_ns,
             Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,

@@ -433,7 +433,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1, NameAbstractionTable nat) {
+    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
+            NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
             if (!jb0.equalsModRenaming(jb1, nat)) {

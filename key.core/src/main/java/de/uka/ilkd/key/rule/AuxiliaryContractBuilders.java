@@ -1262,10 +1262,12 @@ public final class AuxiliaryContractBuilders {
                     decreasesCheck, anonOut, post, postNext, postAfterTail, pre, brokeLoop,
                     notBrokeLoop, abrupt, notAbrupt, tb);
 
-                term = tb.apply(update, tb.imp(pre, tb.apply(remember, tb.prog(modality.kind(), unfold,
-                    tb.and(tb.imp(exceptionNeqNull, post),
-                        tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail), tb.imp(
-                            tb.and(exceptionEqNull, cond), tb.prog(modality.kind(), body, postBody)))))));
+                term = tb.apply(update,
+                    tb.imp(pre, tb.apply(remember, tb.prog(modality.kind(), unfold,
+                        tb.and(tb.imp(exceptionNeqNull, post),
+                            tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail), tb.imp(
+                                tb.and(exceptionEqNull, cond),
+                                tb.prog(modality.kind(), body, postBody)))))));
             }
             return term;
         }
@@ -1298,12 +1300,14 @@ public final class AuxiliaryContractBuilders {
                     tb.and(notBrokeLoop, notAbrupt),
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt,
+                            tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
             } else {
                 postBody = tb.and(tb.imp(abrupt, post), tb.imp(notAbrupt,
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt,
+                            tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
             }
             return postBody;
         }

@@ -166,15 +166,19 @@ public final class NotationInfo {
         tbl.put(Modality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(ModalOperatorSV.class,
-                new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
-            PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.TOUT,
+            new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION,
+            new Notation.ModalityNotation("\\diamond_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION,
+            new Notation.ModalityNotation("\\box_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION,
+            new Notation.ModalityNotation("\\throughout_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
         tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
         tbl.put(WarySubstOp.SUBST, new Notation.Subst());

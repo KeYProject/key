@@ -201,7 +201,8 @@ public final class SpecificationRepository {
     private static Modality.JavaModalityKind getMatchModalityKind(
             final Modality.JavaModalityKind kind) {
         if (kind.transaction()) {
-            return kind == Modality.JavaModalityKind.DIA_TRANSACTION ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX;
+            return kind == Modality.JavaModalityKind.DIA_TRANSACTION ? Modality.JavaModalityKind.DIA
+                    : Modality.JavaModalityKind.BOX;
         } else {
             return kind;
         }
@@ -763,7 +764,9 @@ public final class SpecificationRepository {
         final boolean transactionModality =
             modalityKind.transaction();
         final Modality.JavaModalityKind matchModality = transactionModality
-                ? ((modalityKind == Modality.JavaModalityKind.DIA_TRANSACTION) ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX)
+                ? ((modalityKind == Modality.JavaModalityKind.DIA_TRANSACTION)
+                        ? Modality.JavaModalityKind.DIA
+                        : Modality.JavaModalityKind.BOX)
                 : modalityKind;
         for (FunctionalOperationContract contract : result) {
             if (!contract.getModalityKind().equals(matchModality)

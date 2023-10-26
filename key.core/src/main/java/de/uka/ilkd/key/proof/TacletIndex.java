@@ -304,8 +304,8 @@ public abstract class TacletIndex {
      *
      * @param map the map to select the NoPosTacletApps from
      * @param pe the program element that is used to retrieve the taclets
-     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occurring prefix
-     *        elements
+     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occurring
+     *        prefix elements
      */
     private ImmutableList<NoPosTacletApp> getJavaTacletList(
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,

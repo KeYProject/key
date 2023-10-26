@@ -33,9 +33,11 @@ public abstract class ElementMatcher<T extends Operator> {
                 return (ElementMatcher<? super T>) programSVMatcher;
             } else if (o instanceof UpdateSV) {
                 return (ElementMatcher<? super T>) updateSVMatcher;
-            } /* TODO: else if (o instanceof ModalOperatorSV) {
-                return (ElementMatcher<? super T>) modalSVMatcher;
-            } */else if (o instanceof VariableSV) {
+            } /*
+               * TODO: else if (o instanceof ModalOperatorSV) {
+               * return (ElementMatcher<? super T>) modalSVMatcher;
+               * }
+               */else if (o instanceof VariableSV) {
                 return (ElementMatcher<? super T>) variableSVMatcher;
             } else if (o instanceof SkolemTermSV) {
                 return (ElementMatcher<? super T>) skolemSVMatcher;
@@ -60,7 +62,7 @@ public abstract class ElementMatcher<T extends Operator> {
     private static final TermSVMatcher termSVMatcher = new TermSVMatcher();
     private static final FormulaSVMatcher formulaSVMatcher = new FormulaSVMatcher();
     private static final ProgramSVMatcher programSVMatcher = new ProgramSVMatcher();
-    //private static final ModalOperatorSVMatcher modalSVMatcher = new ModalOperatorSVMatcher();
+    // private static final ModalOperatorSVMatcher modalSVMatcher = new ModalOperatorSVMatcher();
     private static final UpdateSVMatcher updateSVMatcher = new UpdateSVMatcher();
     private static final SkolemTermSVMatcher skolemSVMatcher = new SkolemTermSVMatcher();
     private static final TermLabelSVMatcher termLabelSVMatcher = new TermLabelSVMatcher();
@@ -222,34 +224,36 @@ public abstract class ElementMatcher<T extends Operator> {
     }
 
 
-    /*private static class ModalOperatorSVMatcher extends AbstractSVMatcher<ModalOperatorSV> {
-
-        @Override
-        public MatchConditions match(ModalOperatorSV op, SVSubstitute subst, MatchConditions mc,
-                Services services) {
-            if (subst instanceof Modality m) {
-                if (op.getModalities().contains(m.kind())) {
-                    Operator o = (Operator) mc.getInstantiations().getInstantiation(op);
-                    if (o == null) {
-                        return mc.setInstantiations(mc.getInstantiations().add(op, m, services));
-                    } else if (o != m) {
-                        LOGGER.debug("FAILED. Already instantiated with a different operator.");
-                        return null;
-                    } else {
-                        return mc;
-                    }
-                }
-
-                LOGGER.debug("FAILED. template is a schema operator,"
-                    + " term is an operator, but not a matching one");
-            } else {
-                LOGGER.debug(
-                    "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}", op,
-                    subst);
-            }
-            return null;
-        }
-    }*/
+    /*
+     * private static class ModalOperatorSVMatcher extends AbstractSVMatcher<ModalOperatorSV> {
+     *
+     * @Override
+     * public MatchConditions match(ModalOperatorSV op, SVSubstitute subst, MatchConditions mc,
+     * Services services) {
+     * if (subst instanceof Modality m) {
+     * if (op.getModalities().contains(m.kind())) {
+     * Operator o = (Operator) mc.getInstantiations().getInstantiation(op);
+     * if (o == null) {
+     * return mc.setInstantiations(mc.getInstantiations().add(op, m, services));
+     * } else if (o != m) {
+     * LOGGER.debug("FAILED. Already instantiated with a different operator.");
+     * return null;
+     * } else {
+     * return mc;
+     * }
+     * }
+     *
+     * LOGGER.debug("FAILED. template is a schema operator,"
+     * + " term is an operator, but not a matching one");
+     * } else {
+     * LOGGER.debug(
+     * "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}", op,
+     * subst);
+     * }
+     * return null;
+     * }
+     * }
+     */
 
 
     private static class ProgramSVMatcher extends AbstractSVMatcher<ProgramSV> {

@@ -406,8 +406,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         // TODO (DD): HACK
         final Instantiation inst =
             new Instantiation(tb.skip(), tb.tt(), Modality.modality(
-                    contract.getModalityKind(), JavaBlock.createJavaBlock(new StatementBlock())),
-                    selfTerm, getBlock(), ec);
+                contract.getModalityKind(), JavaBlock.createJavaBlock(new StatementBlock())),
+                selfTerm, getBlock(), ec);
 
         return new GoalsConfigurator(null, termLabelState, inst,
             contract.getAuxiliaryContract().getLabels(), variables, null, services, null);

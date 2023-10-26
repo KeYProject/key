@@ -60,10 +60,11 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
         // TODO: handle exception!
         final Modality.JavaModalityKind modalityKind =
-                (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         boolean hasInv = false;
-        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind, services)) {
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
+            services)) {
             final Optional<Term> maybeInvInst = Optional.ofNullable(
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
             final Optional<Term> maybeFreeInvInst = Optional.ofNullable(

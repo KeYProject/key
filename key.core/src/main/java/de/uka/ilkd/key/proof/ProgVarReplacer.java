@@ -240,7 +240,7 @@ public final class ProgVarReplacer {
 
         Operator op = t.op();
 
-        //TODO (DD): Clean up
+        // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
         if (op instanceof Modality mod) {

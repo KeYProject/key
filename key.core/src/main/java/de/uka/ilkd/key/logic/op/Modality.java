@@ -24,10 +24,10 @@ import org.key_project.util.collection.Pair;
  */
 public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
     /*
-       keeps track of created modalities
+     * keeps track of created modalities
      */
     private static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
-            new HashMap<>();
+        new HashMap<>();
 
 
     /**
@@ -134,7 +134,8 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
     public static class JavaModalityKind extends Kind implements SVSubstitute {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
         /**
-         * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after processing
+         * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after
+         * processing
          * the program alpha there exists a state such that Phi holds.
          */
         public static final JavaModalityKind DIA = new JavaModalityKind(new Name("diamond"));
@@ -150,7 +151,8 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
         public static final JavaModalityKind DIA_TRANSACTION =
             new JavaModalityKind(new Name("diamond_transaction"));
         /**
-         * A Java Card transaction version of the box modality. Means that a transaction is currently
+         * A Java Card transaction version of the box modality. Means that a transaction is
+         * currently
          * underway.
          */
         public static final JavaModalityKind BOX_TRANSACTION =

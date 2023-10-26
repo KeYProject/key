@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.util.collection.Pair;
 
 public class NamespaceSet {
 
@@ -31,7 +27,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-                        Namespace<Function> funcNS,
+            Namespace<Function> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
@@ -57,7 +53,7 @@ public class NamespaceSet {
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(new Namespace<>(variables()),
-                new Namespace<>(functions()), new Namespace<>(sorts()),
+            new Namespace<>(functions()), new Namespace<>(sorts()),
             new Namespace<>(ruleSets()), new Namespace<>(choices()),
             new Namespace<>(programVariables()));
     }

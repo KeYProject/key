@@ -127,9 +127,11 @@ public class TacletMatchProgram {
             if (kind instanceof SchemaVariable sv) {
                 program.add((termPosition, matchConditions, services) -> {
                     Term t = termPosition.getCurrentSubterm();
-                    if (t.op() instanceof Modality mod1 && ((ModalOperatorSV) kind).getModalities().contains(mod1.kind())) {
+                    if (t.op() instanceof Modality mod1
+                            && ((ModalOperatorSV) kind).getModalities().contains(mod1.kind())) {
                         SVInstantiations inst = matchConditions.getInstantiations();
-                        return matchConditions.setInstantiations(inst.add(sv, mod1.<Modality.JavaModalityKind>kind(), services));
+                        return matchConditions.setInstantiations(
+                            inst.add(sv, mod1.<Modality.JavaModalityKind>kind(), services));
                     } else {
                         return null;
                     }

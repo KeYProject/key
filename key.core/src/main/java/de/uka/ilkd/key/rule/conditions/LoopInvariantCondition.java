@@ -69,7 +69,7 @@ public class LoopInvariantCondition implements VariableCondition {
 
         // TODO: handle exception
         final Modality.JavaModalityKind modalityKind =
-                (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         Term invInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,

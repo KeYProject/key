@@ -205,8 +205,9 @@ public final class WhileInvariantTransformer {
         }
 
         var loopBodyModalityKind = modality.kind();
-        final boolean transaction = (loopBodyModalityKind == Modality.JavaModalityKind.DIA_TRANSACTION
-                || loopBodyModalityKind == Modality.JavaModalityKind.BOX_TRANSACTION);
+        final boolean transaction =
+            (loopBodyModalityKind == Modality.JavaModalityKind.DIA_TRANSACTION
+                    || loopBodyModalityKind == Modality.JavaModalityKind.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
@@ -323,7 +324,7 @@ public final class WhileInvariantTransformer {
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        Term executeReturn = services.getTermBuilder().prog(modality.kind(),returnJavaBlock, post,
+        Term executeReturn = services.getTermBuilder().prog(modality.kind(), returnJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
                 tf.createTerm(modality,
