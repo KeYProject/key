@@ -842,7 +842,14 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder Identifier to a KeY Identifier */
     public ProgramElementName convert(recoder.java.Identifier id) {
-        return VariableNamer.parseName(id.getText(), collectComments(id).collect(Comment.class));
+        final NonTerminalProgramElement parent = id.getParent();
+        if (parent instanceof recoder.java.reference.VariableReference ||
+                parent instanceof recoder.java.declaration.VariableSpecification) {
+            return VariableNamer.parseName(id.getText(),
+                collectComments(id).collect(Comment.class));
+        } else {
+            return new ProgramElementName(id.getText(), collectComments(id).collect(Comment.class));
+        }
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {
