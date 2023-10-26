@@ -46,9 +46,7 @@ public abstract class Modality<S extends Sort<S>> extends AbstractSortedOperator
 
         @Override
         public String toString() {
-            return "Kind{" +
-                "name=" + name() +
-                '}';
+            return name().toString();
         }
 
         @Override
