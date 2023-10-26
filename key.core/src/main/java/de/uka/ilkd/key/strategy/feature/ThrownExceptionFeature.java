@@ -68,8 +68,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
-            return fstActive instanceof Throw && blockedExceptions(
-                ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+            return fstActive instanceof Throw fstThrow && blockedExceptions(
+                    fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }

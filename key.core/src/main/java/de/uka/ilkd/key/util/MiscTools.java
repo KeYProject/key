@@ -94,8 +94,7 @@ public final class MiscTools {
         assert pe instanceof StatementBlock;
         assert pe.getFirstElement() instanceof LoopStatement;
 
-        final LoopStatement loop = //
-            (LoopStatement) pe.getFirstElement();
+        final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
         return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
     }
