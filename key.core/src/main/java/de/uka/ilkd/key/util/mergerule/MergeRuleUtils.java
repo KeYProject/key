@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util.mergerule;
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +138,7 @@ public class MergeRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @Nonnull
+            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {

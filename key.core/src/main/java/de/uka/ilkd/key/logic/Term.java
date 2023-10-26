@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -15,6 +12,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -75,7 +75,7 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
     /**
      * The Java block at top level.
      */
-    @Nonnull
+    @NonNull
     JavaBlock javaBlock();
 
     /**

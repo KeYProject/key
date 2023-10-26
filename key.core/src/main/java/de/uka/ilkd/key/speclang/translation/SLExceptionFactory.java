@@ -6,7 +6,6 @@ package de.uka.ilkd.key.speclang.translation;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class SLExceptionFactory {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLExceptionFactory(@Nonnull Parser parser, URI fileName, Position offsetPos) {
+    public SLExceptionFactory(@NonNull Parser parser, URI fileName, Position offsetPos) {
         this.line = parser.getInputStream().LT(1).getLine();
         this.column = parser.getInputStream().LT(1).getCharPositionInLine();
         this.fileName = fileName;

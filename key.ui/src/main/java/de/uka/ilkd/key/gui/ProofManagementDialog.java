@@ -14,8 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -46,6 +44,8 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -372,7 +372,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Selects the contract by the given {@link ContractId}
      */
-    private void select(@Nonnull ContractId cid) {
+    private void select(@NonNull ContractId cid) {
         Services servicesLocal = initConfig.getServices();
         String keyJavaTypeName = cid.keyJavaTypeName;
         Optional<KeYJavaType> allJavaTypes =
@@ -440,7 +440,7 @@ public final class ProofManagementDialog extends JDialog {
      *         lemmas and then just any proof or {@code null} if there is no proof for the contract
      */
     @Nullable
-    private Proof findPreferablyClosedProof(@Nonnull Contract contract) {
+    private Proof findPreferablyClosedProof(@NonNull Contract contract) {
         // will the contracts here always be atomic?
         // it seems that way, but not completely sure
         ImmutableSet<Proof> proofs =
@@ -462,7 +462,7 @@ public final class ProofManagementDialog extends JDialog {
         return fallback;
     }
 
-    private void findOrStartProof(@Nonnull Contract contract) {
+    private void findOrStartProof(@NonNull Contract contract) {
         Proof proof = findPreferablyClosedProof(contract);
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();

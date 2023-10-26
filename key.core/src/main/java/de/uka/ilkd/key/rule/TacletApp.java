@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,6 +23,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A TacletApp object contains information required for a concrete application. These information

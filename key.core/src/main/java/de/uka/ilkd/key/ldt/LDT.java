@@ -5,7 +5,6 @@ package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
 import java.util.TreeMap;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file shipped with KeY.

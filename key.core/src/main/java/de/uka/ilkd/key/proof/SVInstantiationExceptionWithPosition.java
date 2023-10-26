@@ -4,11 +4,13 @@
 package de.uka.ilkd.key.proof;
 
 
-import javax.annotation.Nullable;
+import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an exception with position information. The row position is absolut this means, if in
@@ -60,7 +62,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
 
     @Nullable
     @Override
-    public Location getLocation() {
+    public Location getLocation() throws MalformedURLException {
         return new Location(null, position);
     }
 }
