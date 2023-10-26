@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProblemInformation;
@@ -69,6 +70,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
+        // TODO: This is a quick fix; find proper solution!
+        Modality.operators.clear();
     }
 
     /**
@@ -84,6 +87,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYUserProblemFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
+        // TODO: This is a quick fix; find proper solution!
+        Modality.operators.clear();
     }
 
     // -------------------------------------------------------------------------

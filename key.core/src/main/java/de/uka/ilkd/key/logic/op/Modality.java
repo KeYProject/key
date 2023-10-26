@@ -26,7 +26,7 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
     /*
      * keeps track of created modalities
      */
-    private static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
+    public static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
         new HashMap<>();
 
 
