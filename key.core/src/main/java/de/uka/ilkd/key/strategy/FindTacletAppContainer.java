@@ -130,8 +130,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
                         changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
                     if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
-                        return beforeChangeMod.kind() == afterChangeMod.kind() && beforeChangeTerm.sub(0)
-                                .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));
+                        return beforeChangeMod.kind() == afterChangeMod.kind()
+                                && beforeChangeTerm.sub(0)
+                                        .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));
                     } else {
                         return false;
                     }

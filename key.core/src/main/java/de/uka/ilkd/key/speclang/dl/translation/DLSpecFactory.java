@@ -121,7 +121,8 @@ public final class DLSpecFactory {
     }
 
 
-    private Modality.JavaModalityKind extractModalityKind(UseOperationContractRule.Instantiation inst)
+    private Modality.JavaModalityKind extractModalityKind(
+            UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         return inst.mod.kind();
     }

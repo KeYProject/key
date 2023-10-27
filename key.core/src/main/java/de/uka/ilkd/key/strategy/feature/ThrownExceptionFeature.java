@@ -69,7 +69,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
-                    fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+                fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }
