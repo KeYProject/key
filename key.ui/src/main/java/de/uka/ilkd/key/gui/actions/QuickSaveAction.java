@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -53,8 +54,9 @@ public final class QuickSaveAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
-
-            String status = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+            final Node selectedNode = mainWindow.getMediator().getSelectedNode();
+            String status =
+                new ProofSaver(proof, selectedNode, filename, KeYConstants.INTERNAL_VERSION).save();
 
             if (status == null) {
                 // success case

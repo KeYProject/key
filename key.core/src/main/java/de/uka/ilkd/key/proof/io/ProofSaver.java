@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
 import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
@@ -37,16 +38,16 @@ public class ProofSaver extends OutputStreamProofSaver {
      */
     private static final List<ProofSaverListener> listeners = new LinkedList<>();
 
-    public ProofSaver(Proof proof, String fileName, String internalVersion) {
-        this(proof, new File(fileName), internalVersion);
+    public ProofSaver(Proof proof, Node selectedNdode, String fileName, String internalVersion) {
+        this(proof, selectedNdode, new File(fileName), internalVersion);
     }
 
-    public ProofSaver(Proof proof, File file) {
-        this(proof, file, KeYConstants.INTERNAL_VERSION);
+    public ProofSaver(Proof proof, Node selectedNode, File file) {
+        this(proof, selectedNode, file, KeYConstants.INTERNAL_VERSION);
     }
 
-    public ProofSaver(Proof proof, File file, String internalVersion) {
-        super(proof, internalVersion);
+    public ProofSaver(Proof proof, Node selectedNode, File file, String internalVersion) {
+        super(proof, selectedNode, internalVersion);
         this.file = file;
     }
 
@@ -57,8 +58,8 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param file file to save proof into
      * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
      */
-    public ProofSaver(Proof proof, File file, boolean saveProofSteps) {
-        this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
+    public ProofSaver(Proof proof, Node selectedNode, File file, boolean saveProofSteps) {
+        this(proof, selectedNode, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
     }
 
     /**
@@ -69,8 +70,9 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param internalVersion version of KeY to add to the proof log
      * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
      */
-    public ProofSaver(Proof proof, File file, String internalVersion, boolean saveProofSteps) {
-        super(proof, internalVersion, saveProofSteps);
+    public ProofSaver(Proof proof, Node selectedNode, File file, String internalVersion,
+            boolean saveProofSteps) {
+        super(proof, selectedNode, internalVersion, saveProofSteps);
         this.file = file;
     }
 

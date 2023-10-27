@@ -16,6 +16,9 @@ public class AppNodeIntermediate extends NodeIntermediate {
     private boolean scriptRuleApplication = false;
     /** user-provided notes for the node */
     private String notes = null;
+    /** true if this node was the one selected at the time of saving the proof */
+    private boolean selectedNode;
+    private int openGoalChildSelected = -1;
 
     public AppIntermediate getIntermediateRuleApp() {
         return ruleApp;
@@ -39,6 +42,26 @@ public class AppNodeIntermediate extends NodeIntermediate {
 
     public void setScriptRuleApplication(boolean scriptRuleApplication) {
         this.scriptRuleApplication = scriptRuleApplication;
+    }
+
+    public void setSelectedNode(boolean selectedNode, int openGoalChildSelected) {
+        this.selectedNode = selectedNode;
+        this.openGoalChildSelected = openGoalChildSelected;
+    }
+
+    public boolean getSelectedNode() {
+        return selectedNode;
+    }
+
+    /**
+     * return the index of a selected child that is an open goal
+     * if the node itself is selected -1 is returned
+     *
+     * @return the index of an open child (if a goal was selected when saving), -1 if the node
+     *         itself is selected
+     */
+    public int getOpenChildSelected() {
+        return openGoalChildSelected;
     }
 
     public void setNotes(String notes) {

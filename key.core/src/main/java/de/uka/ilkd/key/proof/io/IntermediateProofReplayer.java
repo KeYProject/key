@@ -116,12 +116,15 @@ public class IntermediateProofReplayer {
     /** The current open goal */
     private Goal currGoal = null;
 
+    /** the node selected at time of saving, or null if information is not available */
+    private Node savedSelectedNode = null;
+
     /**
      * Constructs a new {@link IntermediateProofReplayer}.
      *
-     * @param loader The problem loader, for reporting errors.
-     * @param proof The proof object into which to load the replayed proof.
-     * @param parserResult the result of the proof file parser to be replayed
+     * @param loader the problem loader, for reporting errors.
+     * @param proof the proof object into which to load the replayed proof.
+     * @param parserResult the result of the intermediate parser to be replayed
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
@@ -222,6 +225,7 @@ public class IntermediateProofReplayer {
                     // Register name proposals
                     proof.getServices().getNameRecorder()
                             .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
+
 
                     if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
                         TacletAppIntermediate appInterm =
@@ -358,6 +362,21 @@ public class IntermediateProofReplayer {
                             }
                         }
                     }
+                    // set information if this node was the last selected node at the time of saving
+                    // the
+                    // proof
+                    if (currInterm.getSelectedNode()) {
+                        // check whether the node itself was selected or a child that is an open
+                        // goal
+                        int openChildSelected = currInterm.getOpenChildSelected();
+                        if (openChildSelected < 0
+                                || openChildSelected >= currNode.childrenCount()) {
+                            savedSelectedNode = currNode;
+                        } else {
+                            savedSelectedNode = currNode.child(openChildSelected);
+                        }
+                    }
+
                 }
             } catch (Throwable throwable) {
                 // Default exception catcher -- proof should not stop loading
@@ -374,7 +393,7 @@ public class IntermediateProofReplayer {
             progressMonitor.setProgress(max);
         }
         LOGGER.debug("Proof replay took " + PerfScope.formatTime(System.nanoTime() - time));
-        return new Result(status, errors, currGoal);
+        return new Result(status, errors, currGoal, savedSelectedNode);
     }
 
     /**
@@ -1057,27 +1076,6 @@ public class IntermediateProofReplayer {
      *
      * @author Dominic Scheurer
      */
-    public static class Result {
-        private final String status;
-        private final List<Throwable> errors;
-        private Goal lastSelectedGoal = null;
-
-        public Result(String status, List<Throwable> errors, Goal lastSelectedGoal) {
-            this.status = status;
-            this.errors = errors;
-            this.lastSelectedGoal = lastSelectedGoal;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public List<Throwable> getErrors() {
-            return errors;
-        }
-
-        public Goal getLastSelectedGoal() {
-            return lastSelectedGoal;
-        }
-    }
+    public record Result(String status, List<Throwable> errors, Goal lastSelectedGoal,
+            Node savedSelectedNode) {}
 }

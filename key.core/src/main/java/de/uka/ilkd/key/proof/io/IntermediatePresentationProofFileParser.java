@@ -74,6 +74,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode;
     private final LinkedList<Throwable> errors = new LinkedList<>();
+    private boolean parsingOpenGoal = false;
 
     /**
      * @param proof Proof object for storing meta information about the parsed proof.
@@ -220,6 +221,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             }
         }
         case SOLVERTYPE -> ((BuiltinRuleInformation) ruleInfo).solver = str;
+        case OPEN_GOAL -> {
+            parsingOpenGoal = true;
+        }
         default -> {
         }
         }
@@ -233,6 +237,24 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case USER_INTERACTION -> {
             if (currNode != null) {
                 ((AppNodeIntermediate) currNode).setInteractiveRuleApplication(true);
+            }
+        }
+        case SELECTED_NODE -> {
+            int openGoalChildSelected = -1;
+            if (parsingOpenGoal) {
+                if (currNode instanceof BranchNodeIntermediate branchNode) {
+                    if (!stack.isEmpty()) {
+                        if (stack.peek() instanceof AppNodeIntermediate parentAppNode) {
+                            openGoalChildSelected = parentAppNode.getChildren().size() - 1;
+                            parentAppNode.setSelectedNode(true, openGoalChildSelected);
+                        }
+                    }
+                } else {
+                    openGoalChildSelected = 0;
+                }
+            }
+            if (currNode != null && currNode instanceof AppNodeIntermediate appNode) {
+                appNode.setSelectedNode(true, openGoalChildSelected);
             }
         }
         case PROOF_SCRIPT -> {
@@ -253,6 +275,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             builtinInfo.builtinIfInsts =
                 builtinInfo.builtinIfInsts.append(new Pair<>(
                     builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
+        }
+        case OPEN_GOAL -> {
+            parsingOpenGoal = false;
         }
         default -> {
         }

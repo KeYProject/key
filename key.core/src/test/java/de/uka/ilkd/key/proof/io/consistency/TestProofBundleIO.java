@@ -216,7 +216,7 @@ public class TestProofBundleIO {
 
         // save (closed) proof as a bundle
         Path target = testDir.resolve(dirName).resolve("test.zproof");
-        ProofBundleSaver saver = new ProofBundleSaver(proof, target.toFile());
+        ProofBundleSaver saver = new ProofBundleSaver(proof, null, target.toFile());
         saver.save();
 
         // check if target file exists and has minimum size

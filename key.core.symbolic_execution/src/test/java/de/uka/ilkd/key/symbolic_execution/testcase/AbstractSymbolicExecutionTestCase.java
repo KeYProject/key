@@ -1678,7 +1678,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         KeYEnvironment<DefaultUserInterfaceControl> reloadedEnv = null;
         SymbolicExecutionTreeBuilder reloadedBuilder = null;
         try {
-            ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(),
+            ProofSaver saver = new ProofSaver(env.getProof(), null, tempFile.getAbsolutePath(),
                 KeYConstants.INTERNAL_VERSION);
             assertNull(saver.save());
             // Load proof from saved *.proof file

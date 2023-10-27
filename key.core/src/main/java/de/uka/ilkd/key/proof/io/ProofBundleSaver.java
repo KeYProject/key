@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
@@ -30,10 +31,11 @@ public class ProofBundleSaver extends ProofSaver {
      * Creates a new ProofBundleSaver.
      *
      * @param proof the proof to save
+     * @param selectedNode the Node selected at time of saving or null if no information available
      * @param saveFile the target filename
      */
-    public ProofBundleSaver(Proof proof, File saveFile) {
-        super(proof, saveFile);
+    public ProofBundleSaver(Proof proof, Node selectedNode, File saveFile) {
+        super(proof, selectedNode, saveFile);
     }
 
     @Override

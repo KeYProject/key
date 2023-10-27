@@ -78,7 +78,7 @@ public class ProveSMTLemmasTest {
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
             if (!loadedProof.closed()) {
                 File saveFile = new File(file.getAbsoluteFile() + ".proof");
-                ProofSaver saver = new ProofSaver(loadedProof, saveFile);
+                ProofSaver saver = new ProofSaver(loadedProof, null, saveFile);
                 saver.save();
                 Assertions.fail("Proof does not close. See " + file + " and " + saveFile);
             } else {

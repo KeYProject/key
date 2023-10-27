@@ -152,7 +152,7 @@ public class LemmataHandler implements TacletFilter {
 
     private void saveProof(Proof p) throws IOException {
         ProofSaver saver =
-            new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
+            new ProofSaver(p, null, options.createProofPath(p), options.getInternalVersion());
         saver.save();
     }
 

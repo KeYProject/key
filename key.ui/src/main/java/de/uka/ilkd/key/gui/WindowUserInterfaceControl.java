@@ -26,6 +26,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -387,7 +388,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
-    public File saveProof(Proof proof, String fileExtension) {
+
+    public File saveProof(Proof proof, Node selectedNode, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
@@ -400,9 +402,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             final String filename = file.getAbsolutePath();
             ProofSaver saver;
             if (fc.useCompression()) {
-                saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+                saver = new GZipProofSaver(proof, selectedNode, filename,
+                    KeYConstants.INTERNAL_VERSION);
             } else {
-                saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+                saver =
+                    new ProofSaver(proof, selectedNode, filename, KeYConstants.INTERNAL_VERSION);
             }
             String errorMsg;
             try {
@@ -438,7 +442,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
-            final ProofSaver saver = new ProofBundleSaver(proof, file);
+            final ProofSaver saver =
+                new ProofBundleSaver(proof, getMediator().getSelectedNode(), file);
             final String errorMsg = saver.save();
 
             if (errorMsg != null) {
@@ -538,6 +543,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
+        getMediator().getSelectionModel().setSelectedNode(result.getNode());
     }
 
 

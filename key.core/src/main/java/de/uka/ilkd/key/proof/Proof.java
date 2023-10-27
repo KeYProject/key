@@ -1344,7 +1344,7 @@ public class Proof implements Named {
     }
 
     public void saveToFile(File file) throws IOException {
-        ProofSaver saver = new ProofSaver(this, file);
+        ProofSaver saver = new ProofSaver(this, null, file);
         saver.save();
     }
 
@@ -1356,7 +1356,7 @@ public class Proof implements Named {
      * @throws IOException on any I/O error
      */
     public void saveProofObligationToFile(File file) throws IOException {
-        ProofSaver saver = new ProofSaver(this, file, false);
+        ProofSaver saver = new ProofSaver(this, null, file, false);
         saver.save();
     }
 

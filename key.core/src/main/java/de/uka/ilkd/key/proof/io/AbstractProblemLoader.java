@@ -740,15 +740,17 @@ public abstract class AbstractProblemLoader {
             replayResult =
                 replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
 
-            lastTouchedNode = replayResult.getLastSelectedGoal() != null
-                    ? replayResult.getLastSelectedGoal().node()
-                    : proof.root();
+            lastTouchedNode =
+                replayResult.savedSelectedNode() != null ? replayResult.savedSelectedNode()
+                        : replayResult.lastSelectedGoal() != null
+                                ? replayResult.lastSelectedGoal().node()
+                                : proof.root();
 
         } catch (Exception e) {
             if (parserResult == null || parserResult.errors() == null
                     || parserResult.errors().isEmpty() || replayer == null
-                    || replayResult == null || replayResult.getErrors() == null
-                    || replayResult.getErrors().isEmpty()) {
+                    || replayResult == null || replayResult.errors() == null
+                    || replayResult.errors().isEmpty()) {
                 // this exception was something unexpected
                 errors.add(e);
             }
@@ -758,10 +760,10 @@ public abstract class AbstractProblemLoader {
                 errors.addAll(parserResult.errors());
             }
             status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
-                    + (replayResult != null ? replayResult.getStatus()
+                    + (replayResult != null ? replayResult.status()
                             : "Error while loading proof.");
             if (replayResult != null) {
-                errors.addAll(replayResult.getErrors());
+                errors.addAll(replayResult.errors());
             }
 
             StrategyProperties newProps =

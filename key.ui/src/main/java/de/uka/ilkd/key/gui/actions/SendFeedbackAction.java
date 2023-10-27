@@ -212,7 +212,8 @@ public class SendFeedbackAction extends AbstractAction {
         byte[] retrieveFileData() throws IOException {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Proof proof = mediator.getSelectedProof();
-            OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
+            OutputStreamProofSaver saver =
+                new OutputStreamProofSaver(proof, mediator.getSelectedNode());
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             saver.save(stream);
             return stream.toByteArray();

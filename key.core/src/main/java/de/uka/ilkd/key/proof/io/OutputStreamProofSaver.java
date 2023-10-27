@@ -74,6 +74,10 @@ public class OutputStreamProofSaver {
      */
     protected final boolean saveProofSteps;
 
+    /**
+     * The currently selected node if available, otherwise null
+     */
+    protected final Node selectedNode;
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -95,27 +99,28 @@ public class OutputStreamProofSaver {
         return null;
     }
 
-    public OutputStreamProofSaver(Proof proof) {
-        this(proof, KeYConstants.INTERNAL_VERSION);
+    public OutputStreamProofSaver(Proof proof, Node selectedNode) {
+        this(proof, selectedNode, KeYConstants.INTERNAL_VERSION);
     }
 
-    public OutputStreamProofSaver(Proof proof, String internalVersion) {
-        this.proof = proof;
-        this.internalVersion = internalVersion;
-        this.saveProofSteps = true;
+    public OutputStreamProofSaver(Proof proof, Node selectedNode, String internalVersion) {
+        this(proof, selectedNode, internalVersion, true);
     }
 
     /**
      * Create a new OutputStreamProofSaver.
      *
      * @param proof the proof to save
+     * @param selectedNode the Node selected at time of saving or null if no information available
      * @param internalVersion currently running KeY version
      * @param saveProofSteps whether to save the performed proof steps
      */
-    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+    public OutputStreamProofSaver(Proof proof, Node selectedNode, String internalVersion,
+            boolean saveProofSteps) {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = saveProofSteps;
+        this.selectedNode = selectedNode;
     }
 
     /**
@@ -589,7 +594,11 @@ public class OutputStreamProofSaver {
 
             printer.printSequent(node.sequent());
             output.append(escapeCharacters(printer.result().replace('\n', ' ')));
-            output.append("\")\n");
+            output.append("\"");
+            if (node == selectedNode) {
+                output.append(" (" + ProofElementID.SELECTED_NODE.getRawName() + ")");
+            }
+            output.append(")\n");
             return;
         }
 
@@ -653,10 +662,13 @@ public class OutputStreamProofSaver {
      */
     private void userInteraction2Proof(Node node, Appendable output) throws IOException {
         if (node.getNodeInfo().getInteractiveRuleApplication()) {
-            output.append(" (userinteraction)");
+            output.append(" (" + ProofElementID.USER_INTERACTION.getRawName() + ")");
+        }
+        if (node == selectedNode) {
+            output.append(" (" + ProofElementID.SELECTED_NODE.getRawName() + ")");
         }
         if (node.getNodeInfo().getScriptRuleApplication()) {
-            output.append(" (proofscript)");
+            output.append(" (" + ProofElementID.PROOF_SCRIPT.getRawName() + ")");
         }
     }
 

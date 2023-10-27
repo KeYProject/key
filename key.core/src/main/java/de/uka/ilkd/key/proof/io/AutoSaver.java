@@ -147,7 +147,7 @@ public class AutoSaver implements ProverTaskListener {
         // there may be concurrent changes to the proof... whatever
         final Runnable r = () -> {
             try {
-                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+                new ProofSaver(proof, null, filename, KeYConstants.INTERNAL_VERSION).save();
                 LOGGER.info("File saved: {}", filename);
             } catch (Exception e) {
                 LOGGER.error("Autosaving file  {} failed.", filename, e);

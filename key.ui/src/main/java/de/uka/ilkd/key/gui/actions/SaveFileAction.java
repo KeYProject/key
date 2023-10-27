@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -31,7 +32,8 @@ public final class SaveFileAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             // Try to save back to file where proof was initially loaded from
             final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
-            mainWindow.getUserInterface().saveProof(selectedProof, ".proof");
+            final Node selectedNode = mainWindow.getMediator().getSelectedNode();
+            mainWindow.getUserInterface().saveProof(selectedProof, selectedNode, ".proof");
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

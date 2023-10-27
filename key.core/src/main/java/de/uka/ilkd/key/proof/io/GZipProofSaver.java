@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -22,11 +23,13 @@ public class GZipProofSaver extends ProofSaver {
      * Instantiates a new proof saver.
      *
      * @param proof the non-<code>null</code> proof to save
+     * @param selectedNode the Node selected at time of saving or <code>null</code> if no
+     *        information available
      * @param fileName the name of the file to write to
      * @param internalVersion the internal version
      */
-    public GZipProofSaver(Proof proof, String fileName, String internalVersion) {
-        super(proof, fileName, internalVersion);
+    public GZipProofSaver(Proof proof, Node selectedNode, String fileName, String internalVersion) {
+        super(proof, selectedNode, fileName, internalVersion);
     }
 
     /**

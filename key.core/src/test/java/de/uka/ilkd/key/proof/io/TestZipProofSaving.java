@@ -37,7 +37,7 @@ public class TestZipProofSaving {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toFile());
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
         GZipProofSaver proofSaver =
-            new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
+            new GZipProofSaver(env.getLoadedProof(), null, fileTarget.toString(), "n/a");
         proofSaver.save();
     }
 

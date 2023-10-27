@@ -304,7 +304,8 @@ public class ShowProofStatistics extends MainWindowAction {
 
             JButton saveButton = new JButton("Save proof");
             saveButton.addActionListener(
-                e -> mainWindow.getUserInterface().saveProof(proof, ".proof"));
+                e -> mainWindow.getUserInterface().saveProof(proof,
+                    mainWindow.getMediator().getSelectedNode(), ".proof"));
             JButton saveBundleButton = new JButton("Save proof bundle");
             saveBundleButton
                     .addActionListener(e -> mainWindow.getUserInterface().saveProofBundle(proof));
