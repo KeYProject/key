@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.net.MalformedURLException;
@@ -5,8 +8,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 
+import org.jspecify.annotations.Nullable;
 import recoder.java.SourceElement;
 
 /**

@@ -1,9 +1,7 @@
-/*
- * Created on 31.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import java.util.*;
@@ -102,8 +100,7 @@ public class ReplaceEnums extends TwoPassTransformation {
             ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<>();
             for (int i = 0; i < ed.getMembers().size(); i++) {
                 MemberDeclaration md = ed.getMembers().get(i);
-                if (md instanceof EnumConstantDeclaration) {
-                    EnumConstantDeclaration ec = (EnumConstantDeclaration) md;
+                if (md instanceof EnumConstantDeclaration ec) {
                     EnumConstantSpecification ecs = ec.getEnumConstantSpecification();
 
                     // create replacement for current constant
@@ -284,11 +281,10 @@ public class ReplaceEnums extends TwoPassTransformation {
                 Do repl = f.createDo(f.createBooleanLiteral(false), sb);
                 for (int i = 0; i < sw.getBranchCount(); i++) {
                     Branch b = sw.getBranchAt(i);
-                    if (b instanceof Default) {
+                    if (b instanceof Default d) {
                         if (i != sw.getBranchCount() - 1) {
                             throw new ModelException("case after default is illegal");
                         }
-                        Default d = (Default) b;
                         ASTArrayList<Statement> defaultStmnt = new ASTArrayList<>();
                         StatementBlock sb2 = f.createStatementBlock(defaultStmnt);
                         LogicalOr cond = f.createLogicalOr(

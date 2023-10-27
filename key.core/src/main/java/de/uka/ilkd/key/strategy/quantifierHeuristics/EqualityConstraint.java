@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Collections;
@@ -530,7 +533,7 @@ public class EqualityConstraint implements Constraint {
 
     /**
      * checks for cycles and adds additional constraints if necessary
-     *
+     * <p>
      * PRECONDITION: the sorts of mv and t match; if t is also a metavariable with same sort as mv,
      * the order of mv and t is correct (using Metavariable.compareTo)
      *
@@ -577,8 +580,7 @@ public class EqualityConstraint implements Constraint {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Constraint) {
-            Constraint c = (Constraint) obj;
+        if (obj instanceof Constraint c) {
             if (c instanceof EqualityConstraint) {
                 return map.keySet().equals(((EqualityConstraint) c).map.keySet())
                         && join(c, null) == this && c.join(this, null) == c;
@@ -811,10 +813,9 @@ public class EqualityConstraint implements Constraint {
         private int hash;
 
         public boolean equals(Object o) {
-            if (!(o instanceof ECPair)) {
+            if (!(o instanceof ECPair e)) {
                 return false;
             }
-            final ECPair e = (ECPair) o;
             return first == e.first && second == e.second;
         }
 

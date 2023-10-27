@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.*;
@@ -754,8 +757,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         sig.append(pm.getName());
         sig.append("(");
         for (SVSubstitute subst : originalParamVars) {
-            if (subst instanceof Named) {
-                Named named = (Named) subst;
+            if (subst instanceof Named named) {
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,

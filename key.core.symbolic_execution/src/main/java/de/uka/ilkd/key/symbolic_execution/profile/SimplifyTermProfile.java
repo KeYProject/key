@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.profile;
 
 import de.uka.ilkd.key.logic.Name;
@@ -60,8 +63,8 @@ public class SimplifyTermProfile extends JavaProfile {
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil()
                     .prepend((state, services, applicationPosInOccurrence, applicationTerm, rule,
-                            goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars,
-                            newTermJavaBlock, newTermOriginalLabels, label) -> label);
+                            goal, hint, tacletTerm,
+                            newTerm, label) -> label);
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
             new SingletonLabelFactory<>(SymbolicExecutionUtil.RESULT_LABEL), null,
             symExcPolicies, null, null, null, null, null));

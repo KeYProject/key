@@ -36,7 +36,7 @@ decls
 
 problem
 :
-  ( PROBLEM LBRACE a=term RBRACE
+  ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
   )
@@ -650,6 +650,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISCONSTANT
   | HASLABEL
   | ISSTATICFIELD
+  | ISMODELFIELD
   | HASSUBFORMULAS
   | FIELDTYPE
   | NEW

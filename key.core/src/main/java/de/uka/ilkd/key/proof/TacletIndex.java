@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.*;
@@ -376,7 +379,7 @@ public abstract class TacletIndex {
      * @param second the second list
      * @return the merged list
      */
-    private final ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
+    private ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
             final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
             return first;
@@ -576,9 +579,7 @@ public abstract class TacletIndex {
          * resets the occurred field to 'nothing has occurred'
          */
         public void reset() {
-            for (int i = 0; i < PREFIXTYPES; i++) {
-                occurred[i] = false;
-            }
+            Arrays.fill(occurred, 0, PREFIXTYPES, false);
         }
 
         /**

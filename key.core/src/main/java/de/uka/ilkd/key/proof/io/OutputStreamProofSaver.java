@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,7 +42,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
@@ -69,8 +73,6 @@ public class OutputStreamProofSaver {
      * Whether the proof steps should be output (usually true).
      */
     protected final boolean saveProofSteps;
-
-    private LogicPrinter printer;
 
 
     /**
@@ -150,6 +152,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
+        proof.copyCachedGoals(null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -277,7 +280,7 @@ public class OutputStreamProofSaver {
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
+                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
                     relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
                             .append("\"");
                     i = j + 1;
@@ -490,7 +493,7 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
-    private void printSingleSMTRuleApp(RuleAppSMT smtApp, Node node, String prefix,
+    private void printSingleSMTRuleApp(SMTRuleApp smtApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
                 .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
@@ -513,7 +516,7 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -539,6 +542,17 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             printRuleJustification(appliedRuleApp, output);
+
+            // for operation contract rules we add the modality under which the rule was applied
+            // -> needed for proof management tool
+            if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+                if (appliedRuleApp instanceof ContractRuleApp app) {
+                    Modality modality = (Modality) app.programTerm().op();
+                    output.append(" (modality \"");
+                    output.append(modality.toString());
+                    output.append("\")");
+                }
+            }
         }
         if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
             printSingleMergeRuleApp((MergeRuleBuiltInRuleApp) appliedRuleApp, node, prefix, output);
@@ -547,8 +561,8 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
-        } else if (appliedRuleApp instanceof RuleAppSMT) {
-            printSingleSMTRuleApp((RuleAppSMT) appliedRuleApp, node, prefix, output);
+        } else if (appliedRuleApp instanceof SMTRuleApp) {
+            printSingleSMTRuleApp((SMTRuleApp) appliedRuleApp, node, prefix, output);
         }
 
         output.append("");
@@ -567,7 +581,7 @@ public class OutputStreamProofSaver {
      */
     private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
+        if (appliedRuleApp == null && (proof.getOpenGoal(node) != null)) {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");

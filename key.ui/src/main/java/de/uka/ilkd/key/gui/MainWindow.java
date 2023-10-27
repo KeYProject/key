@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
@@ -59,6 +62,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -268,8 +272,9 @@ public final class MainWindow extends JFrame {
      * This class should only be instantiated once!
      */
     private MainWindow() {
-        getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
-            HelpFacade.ACTION_OPEN_HELP);
+        InputMap inputMap =
+            getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(), HelpFacade.ACTION_OPEN_HELP);
         getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP, HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
@@ -286,6 +291,12 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+
+        Config.DEFAULT.setDefaultFonts();
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
+
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
@@ -371,6 +382,15 @@ public final class MainWindow extends JFrame {
             LOGGER.error("Please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
+        }
+        // always construct MainWindow on event dispatch thread
+        if (!EventQueue.isDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(MainWindow::getInstance);
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            return instance;
         }
         if (instance == null) {
             instance = new MainWindow();
@@ -524,8 +544,6 @@ public final class MainWindow extends JFrame {
         selectionBackAction.update();
         selectionForwardAction.update();
 
-        Config.DEFAULT.setDefaultFonts();
-
         // create menubar
         JMenuBar bar = createMenuBar();
         setJMenuBar(bar);
@@ -610,16 +628,6 @@ public final class MainWindow extends JFrame {
         loadPreferences(this);
     }
 
-    /*
-     * private JToggleButton createHeatmapToggle() { return new JToggleButton(new
-     * HeatmapToggleAction(this)); }
-     */
-
-    /*
-     * private JButton createHeatmapMenuOpener() { return new JButton(new
-     * HeatmapSettingsAction(this)); }
-     */
-
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.setFloatable(false);
@@ -653,8 +661,6 @@ public final class MainWindow extends JFrame {
         toolBar.add(act.getUndoButton().getAction());
         toolBar.add(act.getUndoUptoButton());
         toolBar.addSeparator();
-        // toolBar.add(createHeatmapToggle());
-        // toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
     }
@@ -699,8 +705,7 @@ public final class MainWindow extends JFrame {
          */
         smtComponent.addListener(e -> {
             DropdownSelectionButton but = (DropdownSelectionButton) e.getSource();
-            if (but.getAction() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) but.getAction();
+            if (but.getAction() instanceof SMTInvokeAction action) {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                         .setActiveSolverUnion(action.getSolverUnion());
             }
@@ -770,6 +775,14 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
     }
 
+    /**
+     * Hide the progress bar if it is currently visible.
+     */
+    public void hideStatusProgress() {
+        getStatusLine().setProgress(0);
+        statusLine.setProgressPanelVisible(false);
+    }
+
     private void setStatusLineImmediately(String str, int max) {
         // statusLine.reset();
         statusLine.setStatusText(str);
@@ -791,14 +804,9 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(() -> setStatusLineImmediately(str, max));
     }
 
-    @Deprecated
-    public void selectFirstTab() {
-        // weigl disable: this.mainWindowTabbedPane.setSelectedIndex(0);
-    }
-
     /**
-     * Freeze the main window by blocking all input events, except those for the status line (i.e.
-     * the abort button within the status line)
+     * Freeze the main window by blocking all input events, except those for the toolbar (i.e.
+     * the abort button within the toolbar)
      */
     public void freezeExceptAutoModeButton() {
         if (!frozen) {

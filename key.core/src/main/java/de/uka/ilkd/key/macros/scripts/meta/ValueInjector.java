@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private final Map<Class, StringConverter> converters = new HashMap<>();
+    private final Map<Class<?>, StringConverter<?>> converters = new HashMap<>();
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
@@ -160,7 +163,7 @@ public class ValueInjector {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(String.format(
                     "Argument %s:%s is required, but %s was given. " + "For comamnd class: '%s'",
-                    meta.getName(), meta.getField().getType(), val, meta.getCommand().getClass()),
+                    meta.getName(), meta.getField().getType(), null, meta.getCommand().getClass()),
                     meta);
             }
         } else {

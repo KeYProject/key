@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+
+import org.key_project.util.Strings;
 
 /**
  * This class implements ImmMap<S,T> and provides a persistent Map. It is a simple implementation
@@ -220,16 +225,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     }
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder("[");
-        final Iterator<ImmutableMapEntry<S, T>> it = iterator();
-        while (it.hasNext()) {
-            sb.append(it.next());
-            if (it.hasNext()) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @SuppressWarnings("unchecked")
@@ -335,131 +331,140 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
     }
 
-    /** inner class for the entries */
-    private static class MapEntry<S, T> implements ImmutableMapEntry<S, T> {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -6785625761293313622L;
-        // the key
-        private final S key;
-        // the value
-        private final T value;
+    /**
+     * inner class for the entries
+     *
+     * @param key   the key
+     * @param value the value
+     */
+        private record MapEntry<S,T>(
+    S key, T value)implements ImmutableMapEntry<S,T>
+    {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6785625761293313622L;
 
-        /** creates a new map entry that contains key and value */
-        MapEntry(S key, T value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        /** @return the key stored in this entry */
-        public S key() {
-            return key;
-        }
-
-        /** @return the value stored in this entry */
-        public T value() {
-            return value;
-        }
-
-        /**
-         * @return true iff both objects have equal pairs of key and value
-         */
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof ImmutableMapEntry)) {
-                return false;
-            }
-            @SuppressWarnings("unchecked")
-            final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
-            final S cmpKey = cmp.key();
-            final T cmpVal = cmp.value();
-            return (key == cmpKey && value == cmpVal)
-                    || (key.equals(cmpKey) && value.equals(cmpVal));
-        }
-
-        public int hashCode() {
-            return key.hashCode() * 7 + value.hashCode();
-        }
-
-        public String toString() {
-            return key + "->" + value;
-        }
+    /**
+     * creates a new map entry that contains key and value
+     */
+    private MapEntry
+    {
     }
 
-    /** iterator for the values */
-    private static abstract class MapIterator<S, T> {
-        // stores the entry iterator
-        private DefaultImmutableMap<S, T> map;
-
-        // creates the iterator
-        MapIterator(DefaultImmutableMap<S, T> map) {
-            this.map = map;
-        }
-
-        /** @return true iff there are more elements */
-        public boolean hasNext() {
-            return !map.isEmpty();
-        }
-
-        /** @return next value in list */
-        protected final ImmutableMapEntry<S, T> nextEntry() {
-            final ImmutableMapEntry<S, T> entry = map.entry;
-            map = map.parent;
-            return entry;
-        }
-
-        /**
-         * throws an unsupported operation exception as removing elements is not allowed on
-         * immutable maps
-         */
-        public void remove() {
-            throw new UnsupportedOperationException(
-                "Removing elements via an iterator" + " is not supported for immutable maps.");
-        }
+    /**
+     * @return the key stored in this entry
+     */
+    @Override
+    public S key() {
+        return key;
     }
 
-    /** iterator for the values */
-    private static final class MapEntryIterator<S, T> extends MapIterator<S, T>
-            implements Iterator<ImmutableMapEntry<S, T>> {
-
-        MapEntryIterator(DefaultImmutableMap<S, T> map) {
-            super(map);
-        }
-
-        /** @return next value in list */
-        public ImmutableMapEntry<S, T> next() {
-            return nextEntry();
-        }
+    /**
+     * @return the value stored in this entry
+     */
+    @Override
+    public T value() {
+        return value;
     }
 
-
-    private static final class MapValueIterator<S, T> extends MapIterator<S, T>
-            implements Iterator<T> {
-
-        MapValueIterator(DefaultImmutableMap<S, T> map) {
-            super(map);
+    /**
+     * @return true iff both objects have equal pairs of key and value
+     */
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
         }
-
-        /** @return next value in list */
-        public T next() {
-            return nextEntry().value();
+        if (!(obj instanceof ImmutableMapEntry)) {
+            return false;
         }
+        @SuppressWarnings("unchecked")
+        final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
+        final S cmpKey = cmp.key();
+        final T cmpVal = cmp.value();
+        return (key == cmpKey && value == cmpVal)
+                || (key.equals(cmpKey) && value.equals(cmpVal));
     }
 
-    private static final class MapKeyIterator<S, T> extends MapIterator<S, T>
-            implements Iterator<S> {
-
-        MapKeyIterator(DefaultImmutableMap<S, T> map) {
-            super(map);
-        }
-
-        /** @return next value in list */
-        public S next() {
-            return nextEntry().key();
-        }
+    public String toString() {
+        return key + "->" + value;
     }
+}
+
+
+/** iterator for the values */
+private static abstract class MapIterator<S, T> {
+    // stores the entry iterator
+    private DefaultImmutableMap<S, T> map;
+
+    // creates the iterator
+    MapIterator(DefaultImmutableMap<S, T> map) {
+        this.map = map;
+    }
+
+    /** @return true iff there are more elements */
+    public boolean hasNext() {
+        return !map.isEmpty();
+    }
+
+    /** @return next value in list */
+    protected final ImmutableMapEntry<S, T> nextEntry() {
+        final ImmutableMapEntry<S, T> entry = map.entry;
+        map = map.parent;
+        return entry;
+    }
+
+    /**
+     * throws an unsupported operation exception as removing elements is not allowed on
+     * immutable maps
+     */
+    public void remove() {
+        throw new UnsupportedOperationException(
+            "Removing elements via an iterator" + " is not supported for immutable maps.");
+    }
+}
+
+
+/** iterator for the values */
+private static final class MapEntryIterator<S, T> extends MapIterator<S, T>
+        implements Iterator<ImmutableMapEntry<S, T>> {
+
+    MapEntryIterator(DefaultImmutableMap<S, T> map) {
+        super(map);
+    }
+
+    /** @return next value in list */
+    public ImmutableMapEntry<S, T> next() {
+        return nextEntry();
+    }
+}
+
+
+private static final class MapValueIterator<S, T> extends MapIterator<S, T>
+        implements Iterator<T> {
+
+    MapValueIterator(DefaultImmutableMap<S, T> map) {
+        super(map);
+    }
+
+    /** @return next value in list */
+    public T next() {
+        return nextEntry().value();
+    }
+}
+
+
+private static final class MapKeyIterator<S, T> extends MapIterator<S, T>
+        implements Iterator<S> {
+
+    MapKeyIterator(DefaultImmutableMap<S, T> map) {
+        super(map);
+    }
+
+    /** @return next value in list */
+    public S next() {
+        return nextEntry().key();
+    }
+}
 
 }

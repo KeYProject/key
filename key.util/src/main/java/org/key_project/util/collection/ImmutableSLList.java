@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
@@ -16,6 +19,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.LogManager;
 import java.util.stream.Collector;
+
+import org.key_project.util.Strings;
 
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation allows
@@ -297,7 +302,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          */
         @Override
         public ImmutableList<S> append(S e) {
-            return new Cons<S>(e).prepend(this);
+            return new Cons<>(e).prepend(this);
         }
 
         /**
@@ -466,16 +471,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public String toString() {
-            Iterator<S> it = this.iterator();
-            StringBuilder str = new StringBuilder("[");
-            while (it.hasNext()) {
-                str.append(it.next());
-                if (it.hasNext()) {
-                    str.append(",");
-                }
-            }
-            str.append("]");
-            return str.toString();
+            return Strings.formatAsList(this, "[", ",", "]");
         }
     }
 

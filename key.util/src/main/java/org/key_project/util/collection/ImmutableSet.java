@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.*;
@@ -8,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
@@ -43,6 +47,9 @@ public interface ImmutableSet<T extends @Nullable Object>
         return DefaultImmutableSet.nil();
     }
 
+    static <T> ImmutableSet<T> fromCollection(Collection<? extends T> seq) {
+        return fromSet(new HashSet<>(seq));
+    }
 
     /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}

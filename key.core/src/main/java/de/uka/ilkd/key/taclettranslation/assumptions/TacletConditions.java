@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.logic.Term;
@@ -106,9 +109,8 @@ class TacletConditions {
     private boolean containsAbstractInterfaceCondition(Sort s, boolean negated) {
         for (AbstractOrInterfaceType cond : abstractInterfaceCondition) {
             if ((negated && cond.isNegated()) || (!negated && !cond.isNegated())) {
-                if (cond.getTypeResolver() instanceof GenericSortResolver) {
+                if (cond.getTypeResolver() instanceof GenericSortResolver res) {
 
-                    GenericSortResolver res = (GenericSortResolver) cond.getTypeResolver();
                     if (res.getGenericSort().equals(s)) {
                         return true;
                     }
@@ -203,9 +205,8 @@ class TacletConditions {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver
-                        && tcc.getFirstResolver() instanceof GenericSortResolver) {
+                        && tcc.getFirstResolver() instanceof GenericSortResolver first) {
 
-                    GenericSortResolver first = (GenericSortResolver) tcc.getFirstResolver();
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =
                             ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();

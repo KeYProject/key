@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
@@ -10,7 +13,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
 
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
@@ -49,10 +51,9 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLDepends)) {
+        if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }
-        TextualJMLDepends a = (TextualJMLDepends) o;
         return mods.equals(a.mods) && depends.equals(a.depends);
     }
 

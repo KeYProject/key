@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.util.ArrayList;
@@ -22,18 +25,19 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
         + "which are rules with less priority in the taclet menu";
-    private static final String LOOK_AND_FEEL_INFO = "Look and feel used by KeY.\n"
-        + "'System' tries to mimic the default looks, 'Metal' is the Java default.\n"
-        + "KeY must be restarted to apply changes.";
+    private static final String LOOK_AND_FEEL_INFO = """
+            Look and feel used by KeY.
+            'System' tries to mimic the default looks, 'Metal' is the Java default.
+            KeY must be restarted to apply changes.""";
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
-    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("System"));
+    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("Metal"));
     /**
      * Classnames corresponding to the labels in {@link #LAF_LABELS}.
      */
     private static final List<String> LAF_CLASSES =
-        new ArrayList<>(List.of(UIManager.getSystemLookAndFeelClassName()));
+        new ArrayList<>(List.of(UIManager.getCrossPlatformLookAndFeelClassName()));
 
     private final JComboBox<String> lookAndFeel;
     private final JSpinner spFontSizeGlobal;
@@ -60,8 +64,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         // load all available look and feels
         if (LAF_LABELS.size() == 1) {
             for (UIManager.LookAndFeelInfo it : UIManager.getInstalledLookAndFeels()) {
-                LAF_LABELS.add(it.getName());
-                LAF_CLASSES.add(it.getClassName());
+                if (!LAF_LABELS.contains(it.getName())) {
+                    LAF_LABELS.add(it.getName());
+                    LAF_CLASSES.add(it.getClassName());
+                }
             }
         }
 
@@ -78,9 +84,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
-        String info = "Maximum size (line count) of the tooltips of applicable rules\n"
-            + "<br> with schema variable instantiations displayed.\n"
-            + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
+        String info = """
+                Maximum size (line count) of the tooltips of applicable rules
+                <br> with schema variable instantiations displayed.
+                In case of longer <br>tooltips the instantiation will be suppressed.
+                """;
         txtMaxTooltipLines =
             addNumberField("Maximum line number for tooltips", 1, 100, 5, info, emptyValidator());
 
@@ -187,8 +195,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
         vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
-        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.setDefaultFonts();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.fireConfigChange();
     }
 

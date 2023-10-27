@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import org.jspecify.annotations.NonNull;
@@ -40,7 +43,7 @@ public class TopRuleAppCost implements RuleAppCost {
 
     /**
      * Multiply the TOP costs with given cost. TOP times any other costs results into TOP cost.
-     *
+     * <p>
      * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
      *
      * @param cost - non-null {@link RuleAppCost}

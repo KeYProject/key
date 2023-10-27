@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.BufferedInputStream;
@@ -49,7 +52,12 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
+<<<<<<< HEAD
     public static <T extends ParserRuleContext> T getParseRuleContext(KeyAst<T> ast) {
+=======
+    @NonNull
+    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
+>>>>>>> upstream/main
         return ast.ctx;
     }
 
@@ -79,7 +87,11 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
+<<<<<<< HEAD
     public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
+=======
+    public static @NonNull ChoiceInformation getChoices(@NonNull List<KeyAst.File> ctxs) {
+>>>>>>> upstream/main
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -163,7 +175,12 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
+<<<<<<< HEAD
     public static String getValueDocumentation(KeYParser.String_valueContext ctx) {
+=======
+    public static @NonNull String getValueDocumentation(
+            KeYParser.@NonNull String_valueContext ctx) {
+>>>>>>> upstream/main
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }

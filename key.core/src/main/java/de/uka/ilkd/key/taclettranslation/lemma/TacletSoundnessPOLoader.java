@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
@@ -307,8 +310,7 @@ public class TacletSoundnessPOLoader {
 
 
     public void registerProofs(ProofAggregate aggregate, ProofEnvironment proofEnv) {
-        if (aggregate instanceof CompoundProof) {
-            CompoundProof cp = (CompoundProof) aggregate;
+        if (aggregate instanceof CompoundProof cp) {
             for (ProofAggregate child : cp.getChildren()) {
                 registerProofs(child, proofEnv);
             }

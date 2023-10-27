@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NonNull;
@@ -15,14 +20,12 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Pair;
 
-
-
 /*
  * Search bar implementing search function for SequentView.
  */
 
 public class SequentViewSearchBar extends SearchBar {
-
+    @Serial
     private static final long serialVersionUID = 9102464983776181771L;
     public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_1 =
         ColorSettings.define("[sequentSearchBar]highlight_1", "", new Color(0, 140, 255, 178));
@@ -97,24 +100,22 @@ public class SequentViewSearchBar extends SearchBar {
         searchModeBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 // search always does a repaint, therefore don't force update in setFilter
-                switch ((SearchMode) searchModeBox.getSelectedItem()) {
-                case HIDE:
+                switch ((SearchMode) Objects.requireNonNull(searchModeBox.getSelectedItem())) {
+                case HIDE -> {
                     sequentView.setFilter(new HideSequentPrintFilter(
                         sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                     search();
-                    break;
-                case REGROUP:
+                }
+                case REGROUP -> {
                     sequentView.setFilter(new RegroupSequentPrintFilter(
                         sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                     search();
-                    break;
-                case HIGHLIGHT:
+                }
+                case HIGHLIGHT -> {
                     sequentView.setFilter(new IdentitySequentPrintFilter(), false);
                     search();
-                    break;
-                default:
-                    sequentView.setFilter(new IdentitySequentPrintFilter(), true);
-                    break;
+                }
+                default -> sequentView.setFilter(new IdentitySequentPrintFilter(), true);
                 }
             }
         });
@@ -168,16 +169,14 @@ public class SequentViewSearchBar extends SearchBar {
     public boolean search(@NonNull String search) {
         clearSearchResults();
 
-        if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
-            SearchSequentPrintFilter searchSequentPrintFilter =
-                (SearchSequentPrintFilter) sequentView.getFilter();
+        if (sequentView.getFilter() instanceof SearchSequentPrintFilter searchSequentPrintFilter) {
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }
 
         sequentView.printSequent();
 
-        if (sequentView == null || sequentView.getText() == null || search.equals("")
+        if (sequentView == null || sequentView.getText() == null || search.isEmpty()
                 || !this.isVisible()) {
             return true;
         }
@@ -197,17 +196,17 @@ public class SequentViewSearchBar extends SearchBar {
             return false;
         }
 
-        Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
+        Matcher m = p.matcher(sequentView.getText().replace("\u00A0", " "));
 
-        boolean loopEnterd = false;
+        boolean loopEntered = false;
         while (m.find()) {
             int foundAt = m.start();
             Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
             searchResults.add(new Pair<>(foundAt, highlight));
             sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
-            loopEnterd = true;
+            loopEntered = true;
         }
-        return loopEnterd;
+        return loopEntered;
     }
 
     /**
@@ -218,7 +217,7 @@ public class SequentViewSearchBar extends SearchBar {
     public void searchFor(String searchTerm) {
         if (regExpCheckBox.isSelected()) {
             // https://stackoverflow.com/questions/60160/how-to-escape-text-for-regular-expression-in-java
-            String escaped = searchTerm.replaceAll("[-\\[\\]{}()*+?.,\\\\\\\\^$|#\\\\s]", "\\\\$0");
+            String escaped = searchTerm.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");
             searchField.setText(escaped);
         } else {
             searchField.setText(searchTerm);

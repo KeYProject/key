@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
@@ -37,6 +40,8 @@ public class SettingsUi extends JPanel {
         this.frame = frame;
         this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        // TODO: scale this with the global font factor too
+        treeSettingsPanels.setFont(treeSettingsPanels.getFont().deriveFont(16.0f));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
             private static final long serialVersionUID = 1770380144400699946L;
 
@@ -50,11 +55,9 @@ public class SettingsUi extends JPanel {
                     // root entry
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, "KeY Settings", sel,
                         expanded, leaf, row, hasFocus);
-                    lbl.setFont(lbl.getFont().deriveFont(16f));
                 } else {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(),
                         sel, expanded, leaf, row, hasFocus);
-                    lbl.setFont(lbl.getFont().deriveFont(16f));
 
                     if (node.isLeaf()) {
                         lbl.setIcon(panel.getIcon());
@@ -104,6 +107,7 @@ public class SettingsUi extends JPanel {
     }
 
     private void setSettingsPanel(JComponent comp) {
+        SwingUtilities.updateComponentTreeUI(comp);
         root.setRightComponent(comp);
 
         // set divider location slightly more to the right to avoid horizontal scroll bar

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Collection;
@@ -330,8 +333,6 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 neededInstances = neededInstances.add(gsc, services);
             }
 
-            tacletToAdd.setAddedBy(goal.node().parent());
-
             goal.addTaclet(tacletToAdd, neededInstances, true);
         }
     }
@@ -357,10 +358,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             goal.addProgramVariable(renamedInst);
             services.addNameProposal(renamedInst.name());
 
-            HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            final HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {
                 // execute renaming
-                final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);
 
                 // globals
                 // we do not need to do the old assignment

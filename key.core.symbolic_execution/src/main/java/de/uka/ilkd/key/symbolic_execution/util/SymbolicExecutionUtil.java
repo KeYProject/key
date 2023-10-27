@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.*;
@@ -742,9 +745,9 @@ public final class SymbolicExecutionUtil {
     public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node,
             Node proofNode, PosInOccurrence modalityPIO, Term condition)
             throws ProofInputException {
-        if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
+        if (node.getSettings().variablesAreOnlyComputedFromUpdates()) {
             ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode,
-                modalityPIO, node, condition, node.getSettings().isSimplifyConditions());
+                modalityPIO, node, condition, node.getSettings().simplifyConditions());
             return extractor.analyse();
         } else {
             return createAllExecutionVariables(node, proofNode, modalityPIO, condition);
@@ -772,9 +775,8 @@ public final class SymbolicExecutionUtil {
             // Add method parameters
             Node callNode = findMethodCallNode(proofNode, modalityPIO);
             if (callNode != null
-                    && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
-                MethodBodyStatement mbs =
-                    (MethodBodyStatement) callNode.getNodeInfo().getActiveStatement();
+                    && callNode.getNodeInfo()
+                            .getActiveStatement() instanceof MethodBodyStatement mbs) {
                 for (Expression e : mbs.getArguments()) {
                     if (e instanceof IProgramVariable) {
                         variables.add((IProgramVariable) e);
@@ -909,8 +911,7 @@ public final class SymbolicExecutionUtil {
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
             Term locationTerm) {
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function) {
-            Function function = (Function) locationTerm.op();
+        if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -1286,7 +1287,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the maximal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
      * @param sequent The {@link Sequent} to search in.
@@ -1305,7 +1306,7 @@ public final class SymbolicExecutionUtil {
                         getSymbolicExecutionLabel(nextAntecedent.subTerm());
                     SymbolicExecutionTermLabel succedentLabel =
                         getSymbolicExecutionLabel(nextSuccedent.subTerm());
-                    return antecedentLabel.getId() > succedentLabel.getId() ? nextAntecedent
+                    return antecedentLabel.id() > succedentLabel.id() ? nextAntecedent
                             : nextSuccedent;
                 } else {
                     return nextAntecedent;
@@ -1320,7 +1321,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
-     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+     * {@link SymbolicExecutionTermLabel#id()} in the given {@link Semisequent}.
      *
      * @param semisequent The {@link Semisequent} to search in.
      * @param inAntec {@code true} antecedent, {@code false} succedent.
@@ -1336,9 +1337,9 @@ public final class SymbolicExecutionUtil {
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
-                    if (maxPio == null || label.getId() > maxId) {
+                    if (maxPio == null || label.id() > maxId) {
                         maxPio = pio;
-                        maxId = label.getId();
+                        maxId = label.id();
                     }
                 }
             }
@@ -1350,7 +1351,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInTerm} with the maximal {@link SymbolicExecutionTermLabel}
-     * ID {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+     * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
      * @param term The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
@@ -1369,7 +1370,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the minimal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
      * @param sequent The {@link Sequent} to search in.
@@ -1388,7 +1389,7 @@ public final class SymbolicExecutionUtil {
                         getSymbolicExecutionLabel(nextAntecedent.subTerm());
                     SymbolicExecutionTermLabel succedentLabel =
                         getSymbolicExecutionLabel(nextSuccedent.subTerm());
-                    return antecedentLabel.getId() < succedentLabel.getId() ? nextAntecedent
+                    return antecedentLabel.id() < succedentLabel.id() ? nextAntecedent
                             : nextSuccedent;
                 } else {
                     return nextAntecedent;
@@ -1403,7 +1404,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the minimal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Semisequent}.
      *
      * @param semisequent The {@link Semisequent} to search in.
@@ -1421,9 +1422,9 @@ public final class SymbolicExecutionUtil {
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
-                    if (minPio == null || label.getId() < maxId) {
+                    if (minPio == null || label.id() < maxId) {
                         minPio = pio;
-                        maxId = label.getId();
+                        maxId = label.id();
                     }
                 }
             }
@@ -1435,7 +1436,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInTerm} with the minimal {@link SymbolicExecutionTermLabel}
-     * ID {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+     * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
      * @param term The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
@@ -1498,9 +1499,9 @@ public final class SymbolicExecutionUtil {
             SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
             if (label != null) {
                 if (posInTerm == null
-                        || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
+                        || (maximum ? label.id() > maxId : label.id() < maxId)) {
                     posInTerm = currentPosInTerm;
-                    maxId = label.getId();
+                    maxId = label.id();
                 }
             }
         }
@@ -2479,12 +2480,11 @@ public final class SymbolicExecutionUtil {
      */
     private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify,
             boolean improveReadability) throws ProofInputException {
-        if (!(parent.getAppliedRuleApp() instanceof TacletApp)) {
+        if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
                     + parent.getAppliedRuleApp() + "\" was found.");
         }
-        TacletApp app = (TacletApp) parent.getAppliedRuleApp();
         Services services = node.proof().getServices();
         // List new sequent formulas in the child node.
         ImmutableList<Term> newAntecedents =
@@ -3574,8 +3574,7 @@ public final class SymbolicExecutionUtil {
      */
     public static String getDisplayString(IProgramVariable pv) {
         if (pv != null) {
-            if (pv.name() instanceof ProgramElementName) {
-                ProgramElementName name = (ProgramElementName) pv.name();
+            if (pv.name() instanceof ProgramElementName name) {
                 if (SymbolicExecutionUtil.isStaticVariable(pv)) {
                     return name.toString();
                 } else {
@@ -3635,16 +3634,14 @@ public final class SymbolicExecutionUtil {
                 }
                 if (tryStatement != null) {
                     if (tryStatement.getBranchCount() == 1
-                            && tryStatement.getBranchList().get(0) instanceof Catch) {
-                        Catch catchStatement = (Catch) tryStatement.getBranchList().get(0);
+                            && tryStatement.getBranchList()
+                                    .get(0) instanceof Catch catchStatement) {
                         if (catchStatement.getBody() instanceof StatementBlock) {
                             StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
-                                    && catchBlock.getBody().get(0) instanceof Assignment) {
-                                Assignment assignment = (Assignment) catchBlock.getBody().get(0);
-                                if (assignment.getFirstElement() instanceof IProgramVariable) {
-                                    IProgramVariable var =
-                                        (IProgramVariable) assignment.getFirstElement();
+                                    && catchBlock.getBody()
+                                            .get(0) instanceof Assignment assignment) {
+                                if (assignment.getFirstElement() instanceof IProgramVariable var) {
                                     return var;
                                 }
                             }
@@ -3728,9 +3725,8 @@ public final class SymbolicExecutionUtil {
      */
     public static boolean isLoopBodyTermination(final Node node, RuleApp ruleApp) {
         boolean result = false;
-        if (ruleApp instanceof OneStepSimplifierRuleApp) {
+        if (ruleApp instanceof OneStepSimplifierRuleApp simplifierApp) {
             // Check applied rules in protocol
-            OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp) ruleApp;
             if (simplifierApp.getProtocol() != null) {
                 RuleApp terminationApp =
                     CollectionUtil.search(simplifierApp.getProtocol(),
@@ -3861,7 +3857,7 @@ public final class SymbolicExecutionUtil {
             logicPrinter.printTerm(term);
             return logicPrinter.result();
         } else {
-            return term != null ? TermLabel.removeIrrelevantLabels(term, services).toString()
+            return term != null ? TermLabelManager.removeIrrelevantLabels(term, services).toString()
                     : null;
         }
     }
@@ -4198,8 +4194,7 @@ public final class SymbolicExecutionUtil {
             Term term,
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
-        if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate update = (ElementaryUpdate) term.op();
+        if (term.op() instanceof ElementaryUpdate update) {
             if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.LinkedHashMap;
@@ -277,7 +280,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }
 
@@ -333,8 +336,7 @@ public abstract class ProgramSVSort extends AbstractSort {
                 return true;
             }
 
-            if (pe instanceof FieldReference) {
-                FieldReference fr = (FieldReference) pe;
+            if (pe instanceof FieldReference fr) {
 
                 // we allow only static field references with a
                 // sequence of PVs or TypeRef
@@ -365,11 +367,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         public ProgramVariableSort() {
             super(new Name("Variable"));
-        }
-
-        @Override
-        public boolean canStandFor(Term t) {
-            return t.op() instanceof ProgramVariable;
         }
 
         @Override
@@ -463,11 +460,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
-            return true;
-        }
-
-        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             if (pe instanceof Negative) {
                 return ((Negative) pe).getChildAt(0) instanceof Literal;
@@ -491,8 +483,7 @@ public abstract class ProgramSVSort extends AbstractSort {
                     || pe instanceof SeqSingleton || pe instanceof SeqConcat
                     || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
                     || pe instanceof SeqSub || pe instanceof SeqReverse) {
-                if (pe instanceof NonTerminalProgramElement) {
-                    final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;
+                if (pe instanceof NonTerminalProgramElement npe) {
                     for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
                         if (!canStandFor(npe.getChildAt(i), services)) {
                             return false;
@@ -833,8 +824,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (pe instanceof MethodReference) {
-                MethodReference mr = (MethodReference) pe;
+            if (pe instanceof MethodReference mr) {
                 // FIX to bug #1223 (according to CS)
                 /*
                  * if (mr.getReferencePrefix() instanceof SuperReference || mr.getReferencePrefix()

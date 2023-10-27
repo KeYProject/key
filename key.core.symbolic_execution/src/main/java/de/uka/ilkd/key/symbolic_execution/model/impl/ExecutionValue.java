@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedList;
@@ -134,9 +137,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                     KeYJavaType keyType = services.getJavaInfo().getKeYJavaType(valueSort);
                     if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
                         Type javaType = keyType.getJavaType();
-                        if (javaType instanceof ArrayDeclaration) {
+                        if (javaType instanceof ArrayDeclaration ad) {
                             // Array value
-                            ArrayDeclaration ad = (ArrayDeclaration) javaType;
                             Set<IProgramVariable> pvs =
                                 SymbolicExecutionUtil.getProgramVariables(ad.length());
                             if (pvs.size() == 1) {
@@ -149,7 +151,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                                 if (!ArrayUtil.isEmpty(lengthValues)) {
                                     for (ExecutionValue lengthValue : lengthValues) {
                                         try {
-                                            int length = getSettings().isUsePrettyPrinting()
+                                            int length = getSettings().usePrettyPrinting()
                                                     ? Integer.valueOf(lengthValue.getValueString())
                                                     : Integer.valueOf(SymbolicExecutionUtil
                                                             .formatTerm(lengthValue.getValue(),

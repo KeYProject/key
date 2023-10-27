@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -71,8 +74,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
             LabeledParserRuleContext originalSpec) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
+        assert name != null && !name.isEmpty();
+        assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
         assert inv != null;
         this.name = name;

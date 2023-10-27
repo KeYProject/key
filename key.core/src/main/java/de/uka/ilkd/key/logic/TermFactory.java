@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
@@ -10,6 +13,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -61,7 +66,7 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
-        return doCreateTerm(op, subs, boundVars, javaBlock, labels);
+        return doCreateTerm(op, subs, boundVars, javaBlock, labels, "");
     }
 
     public Term createTerm(Operator op, ImmutableArray<Term> subs,
@@ -123,10 +128,12 @@ public final class TermFactory {
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            ImmutableArray<TermLabel> labels) {
+            ImmutableArray<TermLabel> labels, String origin) {
         final Term newTerm =
-            (labels == null || labels.isEmpty() ? new TermImpl(op, subs, boundVars, javaBlock)
-                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+            (labels == null || labels.isEmpty()
+                    ? new TermImpl(op, subs, boundVars, javaBlock, origin)
+                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin))
+                            .checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -165,5 +172,9 @@ public final class TermFactory {
             return reduce.get();
         }
         throw new IllegalArgumentException("list of terms is empty.");
+    }
+
+    public Term createTermWithOrigin(Term t, String origin) {
+        return doCreateTerm(t.op(), t.subs(), t.boundVars(), t.javaBlock(), t.getLabels(), origin);
     }
 }

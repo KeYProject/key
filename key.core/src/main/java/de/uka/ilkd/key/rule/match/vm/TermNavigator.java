@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayDeque;
@@ -50,7 +53,7 @@ public class TermNavigator {
 
     /**
      * top element on stack contains always the pair whose first component is the element to be
-     * returned by {@link #next()} while the second points to the child to be visited next (or
+     * returned by {@link #gotoNext()} while the second points to the child to be visited next (or
      * equals the arity of the first component if no such child exists) For all elements on the
      * stack that are not the top element the second component is less than the arity of the term in
      * the first component

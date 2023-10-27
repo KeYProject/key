@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -39,12 +42,10 @@ public class SortComparisonFeature extends BinaryFeature {
      * @param sort2
      */
     protected boolean compare(final Sort sort1, final Sort sort2) {
-        switch (comparator) {
-        case SUBSORT:
+        if (comparator == SUBSORT) {
             return sort1.extendsTrans(sort2);
-        default:
-            return false;
         }
+        return false;
     }
 
 }

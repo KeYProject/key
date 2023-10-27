@@ -1,6 +1,6 @@
-/**
- * represents a name that is part of a program
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.*;
@@ -12,6 +12,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * represents a name that is part of a program
+ */
 public class ProgramElementName extends Name
         implements TerminalProgramElement, Label, ReferenceSuffix, MethodName {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramElementName.class);

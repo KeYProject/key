@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.core.Main;
 
@@ -190,6 +189,66 @@ public final class CommandLine {
     }
 
     /**
+     * It is sufficient to store a single subcommand here, since only one can be active at a time.
+     * Note that all options and parameters given after the subcommand are handled by the
+     * CommandLine corresponding to the subcommand. I.e., in the example below, the main CommandLine
+     * "sees" only "check", the rest is forwarded to the CommandLine of check and handled
+     * there. Subcommands can be nested, however, it is assumed that the subcommand is always the
+     * first token (so no options are allowed for the main CommandLine).
+     *
+     * <pre>
+     * pm check --settings --report rep.html bundle.zproof
+     * </pre>
+     */
+    private String usedSubCommand = "";
+
+    /**
+     * The available subcommands that can be used with this CommandLine.
+     */
+    private final Map<String, CommandLine> subcommands = new HashMap<>();
+
+    /**
+     * Adds a new subcommand with the given name. To be able to configure this subcommand (e.g., by
+     * adding options to the subcommand), the method returns the newly created CommandLine.
+     *
+     * @param name The name of the subcommand name to add. Must not start with '--' and must not
+     *        already be registered as a subcommand.
+     * @return the CommandLine of the newly created subcommand.
+     */
+    public CommandLine addSubCommand(String name) {
+        if (name.startsWith(MINUS)) {
+            throw new IllegalArgumentException(
+                "Subcommands must not start with '" + MINUS + "': " + name);
+        }
+        if (subcommands.containsKey(name)) {
+            throw new IllegalArgumentException(name + " has already been registered");
+        }
+        CommandLine subCommand = new CommandLine();
+        subcommands.put(name, subCommand);
+        return subCommand;
+    }
+
+    /**
+     * Returns the CommandLine for the given subcommand name if existing.
+     *
+     * @param name the name of the subcommand
+     * @return the CommandLine for the subcommand with the given name or null
+     */
+    public CommandLine getSubCommand(String name) {
+        return subcommands.get(name);
+    }
+
+    /**
+     * Check if a subcommand with the given name has been used.
+     *
+     * @param name the name of the subcommand
+     * @return true iff the subcommand was the one given
+     */
+    public boolean subCommandUsed(String name) {
+        return name.equals(usedSubCommand);
+    }
+
+    /**
      * Adds a command line option to this handler.
      *
      * @param image the image of the option (e.g. {@code -help})
@@ -227,7 +286,7 @@ public final class CommandLine {
      */
     public void addText(String description, boolean identToDescriptionColumn) {
         AdditionalHelpText text = new AdditionalHelpText();
-        text.description = description;
+        text.description = description + "\n";
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
@@ -243,7 +302,7 @@ public final class CommandLine {
     public void addTextPart(String command, String description, boolean identToDescriptionColumn) {
         AdditionalHelpTextParts text = new AdditionalHelpTextParts();
         text.command = command;
-        text.description = description;
+        text.description = description + "\n";
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
@@ -269,6 +328,27 @@ public final class CommandLine {
      */
     public void parse(String[] args) throws CommandLineException {
         int cnt = 0;
+
+        // assumption: only single subcommand, only at first position
+        if (args.length > 0 && !args[cnt].startsWith(MINUS)) {
+            // test for subcommand:
+            CommandLine subcli = getSubCommand(args[cnt]);
+            if (subcli != null) {
+                // parse options for subcommand
+                usedSubCommand = args[cnt];
+                subcli.parse(Arrays.copyOfRange(args, cnt + 1, args.length));
+                /*
+                 * the main command can only see the subcommand, options given after the subcommand
+                 * are handled by the CommandLine of the subcommand
+                 */
+                return;
+            } /*
+               * else {
+               * // continue without subcommand
+               * }
+               */
+        }
+
         while (cnt < args.length && args[cnt].startsWith(MINUS)) {
 
             if ("--".equals(args[cnt])) {
@@ -301,6 +381,10 @@ public final class CommandLine {
             arguments.add(args[cnt]);
             cnt++;
         }
+    }
+
+    public List<String> getArguments() {
+        return arguments;
     }
 
     /**
@@ -536,5 +620,9 @@ public final class CommandLine {
      */
     public void setLineLength(int lineLength) {
         this.lineLength = lineLength;
+        // propagate to all subcommands
+        for (Map.Entry<String, CommandLine> subcommand : subcommands.entrySet()) {
+            subcommand.getValue().setLineLength(lineLength);
+        }
     }
 }

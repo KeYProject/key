@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -405,7 +408,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
+        public void endElement(String uri, String localName, String qName) {
             if (isConstraint(uri, localName, qName)) {
                 // Nothing to do.
             } else if (isCallStateVariable(uri, localName, qName)) {
@@ -1820,7 +1823,7 @@ public class ExecutionNodeReader {
          * @param name The name of this node.
          * @param formatedPathCondition The formated path condition.
          * @param pathConditionChanged Is the path condition changed compared to parent?
-         * @param exceptionalTermination Exceptional termination?
+         * @param terminationKind kind of termination
          * @param branchVerified The branch verified flag.
          */
         public KeYlessTermination(IExecutionNode<?> parent, String name,
@@ -2884,7 +2887,7 @@ public class ExecutionNodeReader {
         /**
          * Constructor.
          *
-         * @param parentVariable The parent {@link IExecutionValue} if available.
+         * @param parentValue The parent {@link IExecutionValue} if available.
          * @param isArrayIndex The is array flag.
          * @param arrayIndexString The array index.
          * @param name The name.
@@ -3023,7 +3026,7 @@ public class ExecutionNodeReader {
         /**
          * Sets the source.
          *
-         * @param target The source to set.
+         * @param source The source to set.
          */
         public void setSource(IExecutionNode<?> source) {
             this.source = source;
@@ -3156,7 +3159,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getChildVariables() throws ProofInputException {
+        public IExecutionVariable[] getChildVariables() {
             return childVariables.toArray(new IExecutionVariable[0]);
         }
 
@@ -3213,7 +3216,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionConstraint[] getConstraints() throws ProofInputException {
+        public IExecutionConstraint[] getConstraints() {
             return constraints.toArray(new IExecutionConstraint[0]);
         }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
@@ -58,7 +61,7 @@ public class SVInstantiationCP implements Feature {
     private SchemaVariable findSVWithName(TacletApp app) {
 
         if (svToInstantiate == null) {
-            return app.taclet().getTrigger().getTriggerVar();
+            return app.taclet().getTrigger().triggerVar();
         }
 
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
@@ -90,11 +93,12 @@ public class SVInstantiationCP implements Feature {
         }
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            if (!(oldApp instanceof TacletApp)) {
-                Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got "
-                    + oldApp);
+            if (!(oldApp instanceof final TacletApp tapp)) {
+                Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
+                    oldApp);
+                throw new IllegalArgumentException(
+                    "Rule application must be a taclet application, but is " + oldApp);
             }
-            final TacletApp tapp = (TacletApp) oldApp;
 
             final SchemaVariable sv = findSVWithName(tapp);
             final Term instTerm = value.toTerm(app, pos, goal);

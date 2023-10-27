@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -29,11 +32,12 @@ public class ContainsTermFeature implements Feature {
 
 
     /**
-     * @param proj the ProjectionToTerm to the instantiation is supposed to be inspected
-     * @param termFeature the term feature to use
-     * @param noInstCost result if <code>schemaVar</code> is not instantiated
-     * @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
-     *        not instantiated (otherwise: return <code>noInstCost</code>)
+     * checks whether the second term is a subterm of the first one
+     *
+     * @param proj1 the ProjectionToTerm resolving to the term in which to search for the second
+     *        term
+     * @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a subterm
+     *        of the first one
      */
     private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         this.proj1 = proj1;

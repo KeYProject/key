@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -118,8 +121,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof CopyAssignment) {
-            final CopyAssignment ca = (CopyAssignment) activeStatement;
+        } else if (activeStatement instanceof CopyAssignment ca) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -167,8 +169,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     private static IProgramMethod getProgramMethod(MethodOrConstructorReference mr,
             KeYJavaType staticType, ExecutionContext ec, Services services) {
         IProgramMethod result;
-        if (mr instanceof MethodReference) { // from MethodCall.java
-            MethodReference methRef = (MethodReference) mr;
+        if (mr instanceof MethodReference methRef) { // from MethodCall.java
             if (ec != null) {
                 result = methRef.method(services, staticType, ec);
                 if (result == null) {
@@ -336,8 +337,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix) {
-            ProgramPrefix curPrefix = (ProgramPrefix) pe;
+        if (pe instanceof ProgramPrefix curPrefix) {
 
             final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
@@ -367,7 +367,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    private static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
+    public static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
         PosInProgram pos = getPosInProgram(jb);
         int lastPos = pos.last();
         ContextStatementBlockInstantiation csbi = new ContextStatementBlockInstantiation(pos,
@@ -523,6 +523,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         // abort if inside of transformer
         if (Transformer.inTransformer(pio)) {
+            return false;
+        }
+
+        // cannot be applied on model methods
+        if (inst.pm.isModel()) {
             return false;
         }
 
@@ -761,8 +766,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
-                    inst.progPost.getLabels())),
+                    tb.tf().createTerm(inst.mod,
+                        new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
+                        inst.progPost.getLabels()))),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
@@ -779,9 +785,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
-                this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
-                inst.progPost.getLabels())),
+                this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
+                tb.tf().createTerm(inst.mod,
+                    new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
+                    inst.progPost.getLabels()))),
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.proof.Statistics;
@@ -38,7 +41,7 @@ public final class SideProofStatistics extends Statistics {
             int totalRuleApps, int smtSolverApps, int dependencyContractApps,
             int operationContractApps, int blockLoopContractApps, int loopInvApps,
             long autoModeTime) {
-        super(nodes, branches, interactiveSteps, symbExApps, quantifierInstantiations, ossApps,
+        super(nodes, branches, 0, interactiveSteps, symbExApps, quantifierInstantiations, ossApps,
             mergeRuleApps, totalRuleApps, smtSolverApps, dependencyContractApps,
             operationContractApps, blockLoopContractApps, loopInvApps, autoModeTime, -1,
             nodes <= sideProofs ? .0f : (autoModeTime / (float) (nodes - sideProofs)));

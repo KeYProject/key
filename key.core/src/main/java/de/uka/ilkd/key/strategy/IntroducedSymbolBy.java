@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.Name;
@@ -39,8 +42,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
         Node n = goal.node();
         while (n != root) {
             final RuleApp ra = n.getAppliedRuleApp();
-            if (ra instanceof TacletApp) {
-                final TacletApp ta = (TacletApp) ra;
+            if (ra instanceof TacletApp ta) {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
                     if (svInstValue instanceof Term) {

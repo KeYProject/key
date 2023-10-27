@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -53,6 +57,9 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -563,6 +570,7 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
+        MainWindow.getInstance().getAutoModeAction().setEnabled(true);
         if (getSelectedProof() != null) {
             if (b) {
                 getSelectedProof().setRuleAppIndexToInteractiveMode();
@@ -802,9 +810,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -821,9 +826,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {

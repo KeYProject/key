@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -95,13 +98,14 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      */
     final SequentTerms createSeqTerms(POTerms po, Variables vars, Term leadingUpdate,
             Term localAnon, Services services) {
-        final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
-        final Term post = getPost(po.post, vars.result, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest);
+        final Term pre =
+            getPre(po.pre(), vars.self, vars.heap, vars.params, false, services).term();
+        final Term post = getPost(po.post(), vars.result, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,
-            getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services));
+            getUpdates(po.mod(), vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost,
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod(), po.rest(), uPost,
             services);
     }
 

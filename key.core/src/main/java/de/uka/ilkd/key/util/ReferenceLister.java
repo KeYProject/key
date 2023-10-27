@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -52,8 +55,7 @@ public class ReferenceLister {
             TreeWalker walker = new TreeWalker(cu);
             while (walker.next()) {
                 ProgramElement pe = walker.getProgramElement();
-                if (pe instanceof TypeReference) {
-                    TypeReference typeRef = (TypeReference) pe;
+                if (pe instanceof TypeReference typeRef) {
                     if (si.getType(typeRef) == null && !typeRef.getName().equals("void")) {
                         LOGGER.info("Unresolvable type: {}", typeRef.toSource());
                     }

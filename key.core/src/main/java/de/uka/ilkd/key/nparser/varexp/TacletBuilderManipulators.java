@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
 import java.util.ArrayList;
@@ -273,6 +276,8 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("subFormulas", SubFormulaCondition.class, FSV);
     public static final AbstractConditionBuilder STATIC_FIELD =
         new ConstructorBasedBuilder("isStaticField", StaticFieldCondition.class, FSV);
+    public static final AbstractConditionBuilder MODEL_FIELD =
+        new ConstructorBasedBuilder("isModelField", ModelFieldCondition.class, FSV);
     public static final AbstractConditionBuilder SUBFORMULA =
         new ConstructorBasedBuilder("hasSubFormulas", SubFormulaCondition.class, FSV);
     public static final TacletBuilderCommand DROP_EFFECTLESS_STORES = new ConstructorBasedBuilder(
@@ -365,7 +370,8 @@ public class TacletBuilderManipulators {
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,
             CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS, SAME_OBSERVER,
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
-            STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE, META_DISJOINT,
+            STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
+            META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);

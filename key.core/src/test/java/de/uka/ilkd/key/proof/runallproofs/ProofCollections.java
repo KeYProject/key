@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
 
@@ -92,7 +95,8 @@ public class ProofCollections {
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-        // runOnlyOn = group1,group2
+        // runOnlyOn = group1, group2 (the space after each comma is mandatory)
+        // settings.setRunOnlyOn("performance, performancePOConstruction");
 
         settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
 
@@ -1032,7 +1036,9 @@ public class ProofCollections {
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-        // runOnlyOn = group1,group2
+        // runOnlyOn = group1, group2 (the space after each comma is mandatory)
+        // settings.setRunOnlyOn("performance, performancePOConstruction");
+
 
         // // Tests for information flow
 

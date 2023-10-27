@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
@@ -135,8 +138,7 @@ public class JmlIO {
     }
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
-        return services.getTermBuilder().addLabel(term,
-            new OriginTermLabel(new OriginTermLabel.Origin(type)));
+        return services.getTermBuilder().addLabel(term, new OriginTermLabel.Origin(type));
     }
 
 
@@ -212,7 +214,7 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
-        OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
+        OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
         } else {
@@ -378,9 +380,9 @@ public class JmlIO {
      * Sets class type, spec math mode and self var.
      */
     public JmlIO context(Context context) {
-        this.classType(context.classType);
-        this.specMathMode(context.specMathMode);
-        this.selfVar(context.selfVar);
+        this.classType(context.classType());
+        this.specMathMode(context.specMathMode());
+        this.selfVar(context.selfVar());
         return this;
     }
 

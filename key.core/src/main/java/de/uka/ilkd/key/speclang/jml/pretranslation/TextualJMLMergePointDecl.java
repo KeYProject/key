@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.Objects;
@@ -8,6 +11,8 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.jspecify.annotations.NullMarked;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A JML merge point declaration in textual form.
  * <p>
@@ -17,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 @NullMarked
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
+
     private final JmlParser.Merge_point_statementContext mergeProc;
 
     public TextualJMLMergePointDecl(ImmutableList<JMLModifier> mods, JmlParser.Merge_point_statementContext mergeProc) {
@@ -40,10 +46,9 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TextualJMLMergePointDecl)) {
+        if (!(o instanceof TextualJMLMergePointDecl that)) {
             return false;
         }
-        TextualJMLMergePointDecl that = (TextualJMLMergePointDecl) o;
         return getMergeProc().equals(that.getMergeProc());
     }
 

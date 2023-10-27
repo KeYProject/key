@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -24,7 +27,7 @@ import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -316,11 +319,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     }
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
-                    if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        var ex = (SVInstantiationExceptionWithPosition) exc;
+                    if (exc instanceof SVInstantiationExceptionWithPosition ex) {
                         errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
                             ex.getPosition().column(), ex.inIfSequent());
                     }
+                    LOGGER.error("", exc);
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;
                 }
@@ -702,7 +705,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         final NotationInfo ni = new NotationInfo();
 
         Services services = mediator.getServices();
-        final Term t = TermLabel.removeIrrelevantLabels(term, services);
+        final Term t = TermLabelManager.removeIrrelevantLabels(term, services);
         LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);

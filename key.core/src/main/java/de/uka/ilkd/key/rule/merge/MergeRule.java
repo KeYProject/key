@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
@@ -393,33 +396,33 @@ public class MergeRule implements BuiltInRule {
                         state1, state2, distinguishingFormula, services);
 
                     newElementaryUpdates =
-                        newElementaryUpdates.prepend(tb.elementary(v, mergedHeaps.getMergeVal()));
+                        newElementaryUpdates.prepend(tb.elementary(v, mergedHeaps.mergeVal()));
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints = tb.and(mergedHeaps.getNewConstraints());
+                        newAdditionalConstraints = tb.and(mergedHeaps.newConstraints());
                     } else {
                         newAdditionalConstraints = tb.and(newAdditionalConstraints,
-                            tb.and(mergedHeaps.getNewConstraints()));
+                            tb.and(mergedHeaps.newConstraints()));
                     }
 
-                    newNames.addAll(mergedHeaps.getNewNames());
-                    sideConditionsToProve.addAll(mergedHeaps.getSideConditions());
+                    newNames.addAll(mergedHeaps.newNames());
+                    sideConditionsToProve.addAll(mergedHeaps.sideConditions());
 
                 } else {
 
                     ValuesMergeResult mergedVal = mergeRule.mergeValuesInStates(tb.var(v), state1,
                         rightSide1, state2, rightSide2, distinguishingFormula, services);
 
-                    newNames.addAll(mergedVal.getNewNames());
-                    sideConditionsToProve.addAll(mergedVal.getSideConditions());
+                    newNames.addAll(mergedVal.newNames());
+                    sideConditionsToProve.addAll(mergedVal.sideConditions());
 
                     newElementaryUpdates =
-                        newElementaryUpdates.prepend(tb.elementary(v, mergedVal.getMergeVal()));
+                        newElementaryUpdates.prepend(tb.elementary(v, mergedVal.mergeVal()));
 
                     if (newAdditionalConstraints == null) {
-                        newAdditionalConstraints = tb.and(mergedVal.getNewConstraints());
+                        newAdditionalConstraints = tb.and(mergedVal.newConstraints());
                     } else {
                         newAdditionalConstraints =
-                            tb.and(newAdditionalConstraints, tb.and(mergedVal.getNewConstraints()));
+                            tb.and(newAdditionalConstraints, tb.and(mergedVal.newConstraints()));
                     }
 
                 } // end else of if (v.sort().equals(heapSort))
@@ -511,9 +514,9 @@ public class MergeRule implements BuiltInRule {
 
                 ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar, subHeap1, subHeap2,
                     state1, state2, distinguishingFormula, services);
-                newConstraints = newConstraints.union(mergedSubHeap.getNewConstraints());
-                newNames.addAll(mergedSubHeap.getNewNames());
-                sideConditionsToProve.addAll(mergedSubHeap.getSideConditions());
+                newConstraints = newConstraints.union(mergedSubHeap.newConstraints());
+                newNames.addAll(mergedSubHeap.newNames());
+                sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 Term mergedVal = null;
 
@@ -526,15 +529,15 @@ public class MergeRule implements BuiltInRule {
                     ValuesMergeResult mergedValAndConstr = mergeRule.mergeValuesInStates(field1,
                         state1, value1, state2, value2, distinguishingFormula, services);
 
-                    newConstraints = newConstraints.union(mergedValAndConstr.getNewConstraints());
-                    newNames.addAll(mergedValAndConstr.getNewNames());
-                    sideConditionsToProve.addAll(mergedValAndConstr.getSideConditions());
-                    mergedVal = mergedValAndConstr.getMergeVal();
+                    newConstraints = newConstraints.union(mergedValAndConstr.newConstraints());
+                    newNames.addAll(mergedValAndConstr.newNames());
+                    sideConditionsToProve.addAll(mergedValAndConstr.sideConditions());
+                    mergedVal = mergedValAndConstr.mergeVal();
 
                 }
 
                 return new ValuesMergeResult(newConstraints, tb.func((Function) heap1.op(),
-                    mergedSubHeap.getMergeVal(), heap1.sub(1), field1, mergedVal), newNames,
+                    mergedSubHeap.mergeVal(), heap1.sub(1), field1, mergedVal), newNames,
                     sideConditionsToProve);
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
@@ -556,12 +559,12 @@ public class MergeRule implements BuiltInRule {
 
                 ValuesMergeResult mergedSubHeap = mergeHeaps(mergeRule, heapVar, subHeap1, subHeap2,
                     state1, state2, distinguishingFormula, services);
-                newConstraints = newConstraints.union(mergedSubHeap.getNewConstraints());
-                newNames.addAll(mergedSubHeap.getNewNames());
-                sideConditionsToProve.addAll(mergedSubHeap.getSideConditions());
+                newConstraints = newConstraints.union(mergedSubHeap.newConstraints());
+                newNames.addAll(mergedSubHeap.newNames());
+                sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                    tb.func((Function) heap1.op(), mergedSubHeap.getMergeVal(), pointer1), newNames,
+                    tb.func((Function) heap1.op(), mergedSubHeap.mergeVal(), pointer1), newNames,
                     sideConditionsToProve);
             }
 

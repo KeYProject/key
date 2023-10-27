@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
@@ -15,10 +18,10 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
  * that were modified after a certain point of time
- *
+ * <p>
  * Hashmaps of the particular lists of formulas; the keys of the maps is the point of time that
  * separates old from new (modified) formulas
- *
+ * <p>
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 public class IfInstantiationCachePool {
@@ -56,7 +59,7 @@ public class IfInstantiationCachePool {
     }
 
     public void release(Node n) {
-        IfInstantiationCache cache = null;
+        IfInstantiationCache cache;
         synchronized (cacheMgr) {
             cache = cacheMgr.remove(n);
         }

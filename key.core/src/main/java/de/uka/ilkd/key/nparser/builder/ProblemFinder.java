@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation) of
@@ -16,7 +20,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
  * @author weigl
  */
 public class ProblemFinder extends ExpressionBuilder {
-    private @Nullable Term problemTerm;
+    private @Nullable Sequent problem;
     private @Nullable String chooseContract;
     private @Nullable String proofObligation;
 
@@ -56,8 +60,18 @@ public class ProblemFinder extends ExpressionBuilder {
             }
         }
         if (ctx.PROBLEM() != null) {
-            problemTerm = accept(ctx.term());
+            problem = accept(ctx.termorseq());
         }
+        return null;
+    }
+
+    @Override
+    public Sequent visitTermorseq(KeYParser.TermorseqContext ctx) {
+        var obj = super.visitTermorseq(ctx);
+        if (obj instanceof Sequent s)
+            return s;
+        if (obj instanceof Term t)
+            return Sequent.createSuccSequent(new Semisequent(new SequentFormula(t)));
         return null;
     }
 
@@ -72,7 +86,7 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Nullable
-    public Term getProblemTerm() {
-        return problemTerm;
+    public Sequent getProblem() {
+        return problem;
     }
 }

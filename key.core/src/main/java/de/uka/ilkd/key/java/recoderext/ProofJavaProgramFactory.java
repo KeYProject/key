@@ -1,7 +1,6 @@
-// This file is partially taken from the RECODER library, which is protected by
-// the LGPL, and modified.
-
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
@@ -144,12 +143,11 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 }
                 pe = pe.getASTParent();
             }
-            if (!(pe instanceof StatementBlock)) {
+            if (!(pe instanceof StatementBlock block)) {
                 // -- conservative with old behavior of postWork --
                 // Rest assured, KeY does probably some magic later
                 return commentIndex;
             }
-            StatementBlock block = (StatementBlock) pe;
             while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
                 if (current.getText().contains("@")) {
                     // append new empty statement to statement block

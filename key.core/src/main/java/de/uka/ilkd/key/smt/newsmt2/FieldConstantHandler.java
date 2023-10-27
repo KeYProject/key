@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Map;
@@ -65,6 +68,8 @@ public class FieldConstantHandler implements SMTHandler {
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Operator op = term.op();
+
+        trans.addSort(((SortedOperator) op).sort());
 
         if (op == heapLDT.getArr()) {
             trans.introduceSymbol("arr");

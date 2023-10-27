@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.Name;
@@ -29,18 +32,18 @@ public class SVInstantiationProjection implements ProjectionToTerm {
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (!(app instanceof TacletApp)) {
+        if (!(app instanceof final TacletApp tapp)) {
             Debug.fail("Projection is only applicable to taclet apps," + " but got " + app);
+            throw new IllegalArgumentException(
+                "Projections can only be applied to taclet applications, not to " + app);
         }
-
-        final TacletApp tapp = (TacletApp) app;
         final Object instObj = tapp.instantiations().lookupValue(svName);
-        if (!(instObj instanceof Term)) {
+        if (!(instObj instanceof Term instantiation)) {
             Debug.assertFalse(demandInst, "Did not find schema variable " + svName
                 + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
             return null;
         }
-        return (Term) instObj;
+        return instantiation;
     }
 
 

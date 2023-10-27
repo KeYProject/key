@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
 import org.jspecify.annotations.NonNull;
@@ -154,8 +157,7 @@ public final class JMLInfoExtractor {
         int position = 0;
 
         for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md;
+            if (md instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {
@@ -214,7 +216,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure();
         }
     }
 
@@ -228,7 +230,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure();
         }
     }
 
@@ -243,7 +245,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault();
         }
     }
 
@@ -280,7 +282,7 @@ public final class JMLInfoExtractor {
         boolean nullable = checkFor("nullable", comments);
 
         if (!non_null && !nullable) {
-            return td.getJmlModifiers().nullableByDefault;
+            return td.getJmlModifiers().nullableByDefault();
         } else {
             return nullable;
         }
@@ -355,7 +357,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "pure".
      */
     public static boolean isPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().pure
+        return pm.getMethodDeclaration().getJmlModifiers().pure()
                 || isPureByDefault(pm.getContainerType());
     }
 
@@ -364,7 +366,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "helper".
      */
     public static boolean isHelper(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().helper;
+        return pm.getMethodDeclaration().getJmlModifiers().helper();
     }
 
     /**
@@ -372,7 +374,7 @@ public final class JMLInfoExtractor {
      * specified so.
      */
     public static boolean isStrictlyPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure
+        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure()
                 || isStrictlyPureByDefault(pm.getContainerType());
     }
 
@@ -384,7 +386,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
         }
     }
 
@@ -406,7 +408,11 @@ public final class JMLInfoExtractor {
      */
     @Nullable
     public static SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
+<<<<<<< HEAD
         var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode;
+=======
+        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
+>>>>>>> upstream/main
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
 

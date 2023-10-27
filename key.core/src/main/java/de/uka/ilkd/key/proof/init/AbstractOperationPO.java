@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -133,8 +136,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-                AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+            if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getUninterpretedPredicate();
                 }
@@ -153,8 +155,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-                AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+            if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getAdditionalUninterpretedPredicates();
                 }
@@ -177,8 +178,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Term addUninterpretedPredicateIfRequired(Services services, Term term) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
-        if (problem instanceof AbstractOperationPO) {
-            AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+        if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
             }
@@ -203,8 +203,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             ImmutableList<LocationVariable> variablesToProtect, Term exceptionVar) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
-        if (problem instanceof AbstractOperationPO) {
-            AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+        if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
                     exceptionVar, operationPO.getUninterpretedPredicateName(), services);
@@ -619,7 +618,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
             selfExactType, paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
+        return tb.addLabelToAllSubs(result, new Origin(SpecType.REQUIRES));
     }
 
     /**

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -34,10 +37,9 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLFieldDecl)) {
+        if (!(o instanceof TextualJMLFieldDecl fd)) {
             return false;
         }
-        TextualJMLFieldDecl fd = (TextualJMLFieldDecl) o;
         return mods.equals(fd.mods) && decl.equals(fd.decl);
     }
 

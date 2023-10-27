@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.help;
 
 import java.awt.*;
@@ -43,7 +46,7 @@ public class HelpFacade {
      *
      * @see #KEY_HELP_URL
      */
-    public static String HELP_BASE_URL = "https://key-project.org/docs/";
+    public static String HELP_BASE_URL = "https://keyproject.github.io/key-docs/";
 
     static {
         if (System.getProperty("KEY_HELP_URL") != null) {
@@ -138,12 +141,17 @@ public class HelpFacade {
         return new HelpAction();
     }
 
+    /*
+     * TODO: While a good idea in principle, this only works partially at the moment: The source
+     * component of the ActionEvent is always the root pane, which means that always the main docs
+     * page is opened.
+     */
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
         public OpenHelpAction() {
             setName("Open help");
-            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.CTRL_DOWN_MASK));
+            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             lookupAcceleratorKey();
         }
 

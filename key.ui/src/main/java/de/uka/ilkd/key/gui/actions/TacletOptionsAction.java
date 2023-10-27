@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
@@ -20,10 +22,8 @@ public class TacletOptionsAction extends MainWindowAction {
         super(mainWindow);
         setName("Show Taclet Options");
         setIcon(IconFactory.configure(16));
-        setAcceleratorLetter(KeyEvent.VK_T);
 
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
     }
 
     @Override

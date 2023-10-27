@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
 
 import java.util.ArrayList;
@@ -110,8 +114,7 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
                             .addAll(TypeKit.getRedundantSuperInterfaces(si, ((TypeDeclaration) p)));
                 } else if (removeExceptions && p instanceof Throws) {
                     references.addAll(TypeKit.getRedundantExceptions(si, (Throws) p));
-                } else if (removeTypeCasts && p instanceof TypeCast) {
-                    TypeCast tc = (TypeCast) p;
+                } else if (removeTypeCasts && p instanceof TypeCast tc) {
                     Type td = si.getType(tc.getTypeReference());
                     Type te = si.getType(tc.getExpressionAt(0));
                     ExpressionContainer parent = tc.getExpressionContainer();

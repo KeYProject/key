@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
@@ -116,8 +119,7 @@ public final class HeapLDT extends LDT {
         heaps = ImmutableSLList.<LocationVariable>nil()
                 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
                 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
-        if (services instanceof Services) {
-            Services s = (Services) services;
+        if (services instanceof Services s) {
             if (s.getProfile() instanceof JavaProfile) {
                 if (((JavaProfile) s.getProfile()).withPermissions()) {
                     heaps = heaps.append((LocationVariable) progVars.lookup(PERMISSION_HEAP_NAME));

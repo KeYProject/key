@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -408,9 +411,9 @@ public class KeYFile implements EnvInput {
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
         return issues.stream().map(w -> {
             try {
-                return new PositionedString(w.getMessage(),
+                return new PositionedString(w.message(),
                     new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
-                        w.getPosition()));
+                        w.position()));
             } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }

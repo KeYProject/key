@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.net.URI;
@@ -74,10 +77,9 @@ public class PositionedString {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PositionedString)) {
+        if (!(o instanceof PositionedString that)) {
             return false;
         }
-        PositionedString that = (PositionedString) o;
         return text.equals(that.text) && Objects.equals(location, that.location);
     }
 

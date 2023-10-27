@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.*;
@@ -14,9 +17,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 /**
  * This class is used to resolve arithmetic operations to {@link SLExpression}s. These are overladed
  * for different primitive types.
- *
+ * <p>
  * It delegates to the {@link JMLOperatorHandler}s registered in the class.
- *
+ * <p>
  * Numeric promotion plays into it, too.
  *
  * @author Alexander Weigl
@@ -172,23 +175,16 @@ public class OverloadedOperatorHandler {
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
-                switch (op) {
-                case ADD:
-                case BITWISE_OR:
-                    return new SLExpression(tb.union(l, r));
-                case SUBTRACT:
-                    return new SLExpression(tb.setMinus(l, r));
-                case BITWISE_AND:
-                    return new SLExpression(tb.intersect(l, r));
-                case LT:
-                    return new SLExpression(tb.subset(l, r));
-                case LTE:
-                    return new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                case GT:
-                    return new SLExpression(tb.subset(r, l));
-                case GTE:
-                    return new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
-                }
+                return switch (op) {
+                case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
+                case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
+                case BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                case LT -> new SLExpression(tb.subset(l, r));
+                case LTE -> new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
+                case GT -> new SLExpression(tb.subset(r, l));
+                case GTE -> new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
+                default -> null;
+                };
             }
             return null;
         }
@@ -205,21 +201,19 @@ public class OverloadedOperatorHandler {
 
         @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
-                throws SLTranslationException {
+        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
                     && (right.getTerm().sort() == sortBoolean
                             || right.getTerm().sort() == Sort.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
-                switch (op) {
-                case BITWISE_AND:
-                    return new SLExpression(tb.and(t1, t2));
-                case BITWISE_OR:
-                    return new SLExpression(tb.or(t1, t2));
-                case BITWISE_XOR:
-                    return new SLExpression(tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
-                }
+                return switch (op) {
+                case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
+                case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
+                case BITWISE_XOR -> new SLExpression(
+                    tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
+                default -> null;
+                };
             }
             return null;
         }

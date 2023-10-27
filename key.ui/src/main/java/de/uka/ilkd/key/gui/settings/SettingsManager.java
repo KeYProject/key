@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.event.ActionEvent;
@@ -12,7 +15,7 @@ import java.util.Properties;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.colors.ColorSettingsProvider;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -150,21 +153,22 @@ public class SettingsManager {
         return settingsProviders.remove(o);
     }
 
-    public Action getActionShowSettings(MainWindow window) {
-        class ShowSettingsAction extends KeyAction {
-            private static final long serialVersionUID = 153753479823919818L;
+    public class ShowSettingsAction extends MainWindowAction {
+        private static final long serialVersionUID = 153753479823919818L;
 
-            public ShowSettingsAction() {
-                setName("Show Settings");
-                setIcon(IconFactory.editFile(16));
-                lookupAcceleratorKey();
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSettingsDialog(window);
-            }
+        public ShowSettingsAction(MainWindow mainWindow) {
+            super(mainWindow);
+            setName("Show Settings");
+            setIcon(IconFactory.editFile(16));
         }
-        return new ShowSettingsAction();
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            showSettingsDialog(mainWindow);
+        }
+    }
+
+    public Action getActionShowSettings(MainWindow window) {
+        return new ShowSettingsAction(window);
     }
 }

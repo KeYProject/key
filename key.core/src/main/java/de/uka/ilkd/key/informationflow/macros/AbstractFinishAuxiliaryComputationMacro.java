@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Map;
@@ -12,7 +15,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -123,7 +126,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
             result = tb.and(result, tb.not(f.formula()));
         }
-        result = TermLabel.removeIrrelevantLabels(result, tf);
+        result = TermLabelManager.removeIrrelevantLabels(result, tf);
         return result;
     }
 

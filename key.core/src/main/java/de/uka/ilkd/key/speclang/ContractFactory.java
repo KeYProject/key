@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.*;
@@ -486,7 +489,7 @@ public class ContractFactory {
                             Set<Origin> origins = new HashSet<>();
                             origins.add(o1);
                             origins.add(o2);
-                            uol = new OriginTermLabel(origins);
+                            uol = tb.getOriginFactory().createOriginTermLabel(origins);
                             newLabels.add(uol);
                             break;
                         }

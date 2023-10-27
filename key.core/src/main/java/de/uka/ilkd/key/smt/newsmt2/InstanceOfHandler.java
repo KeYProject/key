@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Properties;
@@ -30,8 +33,7 @@ public class InstanceOfHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             return exactInstanceOfOp.isSimilar(sdf) || instanceOfOp.isSimilar(sdf);
         }
         return false;

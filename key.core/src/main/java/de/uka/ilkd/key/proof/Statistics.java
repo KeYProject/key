@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -7,9 +10,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -23,6 +28,7 @@ import de.uka.ilkd.key.util.Pair;
 public class Statistics {
     public final int nodes;
     public final int branches;
+    public final int cachedBranches;
     public final int interactiveSteps;
     public final int symbExApps;
     public final int quantifierInstantiations;
@@ -42,13 +48,15 @@ public class Statistics {
 
     private final HashMap<String, Integer> interactiveAppsDetails = new HashMap<>();
 
-    protected Statistics(int nodes, int branches, int interactiveSteps, int symbExApps,
+    protected Statistics(int nodes, int branches, int cachedBranches, int interactiveSteps,
+            int symbExApps,
             int quantifierInstantiations, int ossApps, int mergeRuleApps, int totalRuleApps,
             int smtSolverApps, int dependencyContractApps, int operationContractApps,
             int blockLoopContractApps, int loopInvApps, long autoModeTimeInMillis,
             long timeInMillis, float timePerStepInMillis) {
         this.nodes = nodes;
         this.branches = branches;
+        this.cachedBranches = cachedBranches;
         this.interactiveSteps = interactiveSteps;
         this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
@@ -65,6 +73,78 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
+    public Statistics(List<Node> startNodes) {
+        if (startNodes.isEmpty()) {
+            throw new IllegalArgumentException("can't generate statistics on zero nodes");
+        }
+
+        int nodes = 0;
+        int branches = 0;
+        int cachedBranches = 0;
+        int interactiveSteps = 0;
+        int symbExApps = 0;
+        int quantifierInstantiations = 0;
+        int ossApps = 0;
+        int mergeRuleApps = 0;
+        int totalRuleApps = 0;
+        int smtSolverApps = 0;
+        int dependencyContractApps = 0;
+        int operationContractApps = 0;
+        int blockLoopContractApps = 0;
+        int loopInvApps = 0;
+        long autoModeTimeInMillis = 0;
+        long timeInMillis = 0;
+
+        for (Node startNode : startNodes) {
+            final Iterator<Node> it = startNode.subtreeIterator();
+
+            TemporaryStatistics tmp = new TemporaryStatistics();
+
+            Node node;
+            while (it.hasNext()) {
+                node = it.next();
+                tmp.changeOnNode(node, interactiveAppsDetails);
+            }
+
+            nodes += tmp.nodes;
+            branches = tmp.branches;
+            cachedBranches = tmp.cachedBranches;
+            interactiveSteps = tmp.interactive;
+            symbExApps = tmp.symbExApps;
+            quantifierInstantiations = tmp.quant;
+            ossApps = tmp.oss;
+            mergeRuleApps = tmp.mergeApps;
+            totalRuleApps = tmp.nodes + tmp.ossCaptured - 1;
+            smtSolverApps = tmp.smt;
+            dependencyContractApps = tmp.dep;
+            operationContractApps = tmp.contr;
+            blockLoopContractApps = tmp.block;
+            loopInvApps = tmp.inv;
+            autoModeTimeInMillis = startNode.proof().getAutoModeTime();
+            timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
+        }
+
+        this.nodes = nodes;
+        this.branches = branches;
+        this.cachedBranches = cachedBranches;
+        this.interactiveSteps = interactiveSteps;
+        this.symbExApps = symbExApps;
+        this.quantifierInstantiations = quantifierInstantiations;
+        this.ossApps = ossApps;
+        this.mergeRuleApps = mergeRuleApps;
+        this.totalRuleApps = totalRuleApps;
+        this.smtSolverApps = smtSolverApps;
+        this.dependencyContractApps = dependencyContractApps;
+        this.operationContractApps = operationContractApps;
+        this.blockLoopContractApps = blockLoopContractApps;
+        this.loopInvApps = loopInvApps;
+        this.autoModeTimeInMillis = autoModeTimeInMillis;
+        this.timeInMillis = timeInMillis;
+        this.timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float) (nodes - 1));
+
+        generateSummary(startNodes.get(0).proof());
+    }
+
     Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
@@ -78,6 +158,7 @@ public class Statistics {
 
         this.nodes = tmp.nodes;
         this.branches = tmp.branches;
+        this.cachedBranches = tmp.cachedBranches;
         this.interactiveSteps = tmp.interactive;
         this.symbExApps = tmp.symbExApps;
         this.quantifierInstantiations = tmp.quant;
@@ -101,7 +182,8 @@ public class Statistics {
     }
 
     static Statistics create(Statistics side, long creationTime) {
-        return new Statistics(side.nodes, side.branches, side.interactiveSteps, side.symbExApps,
+        return new Statistics(side.nodes, side.branches, side.cachedBranches, side.interactiveSteps,
+            side.symbExApps,
             side.quantifierInstantiations, side.ossApps, side.mergeRuleApps, side.totalRuleApps,
             side.smtSolverApps, side.dependencyContractApps, side.operationContractApps,
             side.blockLoopContractApps, side.loopInvApps, side.autoModeTimeInMillis,
@@ -127,6 +209,11 @@ public class Statistics {
         summaryList.add(new Pair<>("Nodes", nodeString));
         summaryList.add(new Pair<>("Branches",
             EnhancedStringBuffer.format(stat.branches).toString()));
+        if (stat.cachedBranches > 0) {
+            summaryList.add(new Pair<>(
+                "Branches (cached) [tooltip: Number of goals resolved using the proof cache]",
+                EnhancedStringBuffer.format(stat.cachedBranches).toString()));
+        }
         summaryList.add(new Pair<>("Interactive steps", String.valueOf(stat.interactiveSteps)));
         summaryList.add(new Pair<>("Symbolic execution steps", String.valueOf(stat.symbExApps)));
 
@@ -199,6 +286,7 @@ public class Statistics {
     private static class TemporaryStatistics {
         int nodes = 0; // proof nodes
         int branches = 1; // proof branches
+        int cachedBranches = 0; // proof branches closed by cache
         int interactive = 0; // interactive steps
         int symbExApps = 0; // symbolic execution steps
         int quant = 0; // quantifier instantiations
@@ -223,6 +311,7 @@ public class Statistics {
             nodes++;
 
             branches += childBranches(node);
+            cachedBranches += cachedBranches(node);
             interactive += interactiveRuleApps(node, interactiveAppsDetails);
             symbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
 
@@ -231,7 +320,7 @@ public class Statistics {
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     oss++;
                     ossCaptured += tmpOssCaptured(ruleApp);
-                } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
+                } else if (ruleApp instanceof SMTRuleApp) {
                     smt++;
                 } else if (ruleApp instanceof UseDependencyContractApp) {
                     dep++;
@@ -262,6 +351,17 @@ public class Statistics {
                 return c - 1;
             }
             return 0;
+        }
+
+        /**
+         * Check whether this node is closed by cache.
+         *
+         * @param node a goal node
+         * @return 1 if the node is cached, 0 otherwise
+         */
+        private int cachedBranches(final Node node) {
+            // node has to be an open goal and needs to have cache info
+            return node.getAppliedRuleApp() == null && node.lookup(ClosedBy.class) != null ? 1 : 0;
         }
 
         /**

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -56,10 +59,9 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
+        if (!(app instanceof LoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {

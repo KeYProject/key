@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
 import java.beans.PropertyChangeListener;
@@ -12,6 +15,8 @@ import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The central place to store global information for Proof Exploration.

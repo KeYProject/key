@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.PrintWriter;
@@ -95,29 +98,9 @@ public class JunitXmlWriter implements AutoCloseable {
         SKIPPED
     }
 
-    private static class TestCase {
+    private record TestCase(TestCaseState state, String name, String classname, String error,
+            String failure,
+            String sout, String serr, double time) {
 
-        final String name, classname, error, failure, sout, serr;
-        final TestCaseState state;
-        final double time;
-
-        public TestCase(
-                TestCaseState state,
-                String name,
-                String classname,
-                String error,
-                String failure,
-                String sout,
-                String serr,
-                double time) {
-            this.name = name;
-            this.classname = classname;
-            this.state = state;
-            this.error = error;
-            this.failure = failure;
-            this.sout = sout;
-            this.serr = serr;
-            this.time = time;
-        }
     }
 }

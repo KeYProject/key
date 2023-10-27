@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
 import java.util.ArrayList;
@@ -46,7 +49,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         if (containingType == null) {
             return null;
         }
-        ImmutableList<SLExpression> ps = parameters.getParameters();
+        ImmutableList<SLExpression> ps = parameters.parameters();
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             while (ps.size() > 0
                     && ps.head().getTerm().op().name().toString().startsWith(h.name().toString())) {
@@ -89,7 +92,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             }
             heaps.add(h);
         }
-        ImmutableList<SLExpression> params = parameters.getParameters();
+        ImmutableList<SLExpression> params = parameters.parameters();
         int i = 0;
         Term[] subs = new Term[params.size() - pm.getHeapCount(services)
                 + pm.getStateCount() * pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1)];

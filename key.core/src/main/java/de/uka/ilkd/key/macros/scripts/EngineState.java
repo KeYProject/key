@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
-import java.io.StringReader;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.jspecify.annotations.NonNull;
@@ -13,7 +16,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
-import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -23,13 +26,14 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
  */
 public class EngineState {
-    private final static DefaultTermParser PARSER = new DefaultTermParser();
-    // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
@@ -156,20 +160,16 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0:
+            case 0 -> {
                 result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || result.isAutomatic()) {
+                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
                     // We found our goal
                     break loop;
                 }
                 node = choices.pollLast();
-                break;
-
-            case 1:
-                node = node.child(0);
-                break;
-
-            default:
+            }
+            case 1 -> node = node.child(0);
+            default -> {
                 Node next = null;
                 for (int i = 0; i < childCount; i++) {
                     Node child = node.child(i);
@@ -183,31 +183,39 @@ public class EngineState {
                 }
                 assert next != null;
                 node = next;
-                break;
+            }
             }
         }
 
         return result;
     }
 
+
     public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
-        StringReader reader = new StringReader(string);
-        Services services = proof.getServices();
-        return PARSER.parse(reader, sort, services,
-            getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+        final var io = getKeyIO();
+        var term = io.parseExpression(string);
+        if (sort == null || term.sort().equals(sort))
+            return term;
+        else
+            throw new IllegalStateException(
+                "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
-    public Sort toSort(String sortName) throws ParserException, ScriptException {
+    @NonNull
+    private KeyIO getKeyIO() throws ScriptException {
+        Services services = proof.getServices();
+        KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
+        io.setAbbrevMap(abbrevMap);
+        return io;
+    }
+
+    public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
     }
 
-    public Sequent toSequent(String sequent) throws ParserException, ScriptException {
-        StringReader reader = new StringReader(sequent);
-        Services services = proof.getServices();
-
-        return PARSER.parseSeq(reader, services,
-            getFirstOpenAutomaticGoal().getLocalNamespaces(), getAbbreviations());
+    public Sequent toSequent(String sequent) throws ScriptException {
+        return getKeyIO().parseSequent(CharStreams.fromString(sequent));
     }
 
     public int getMaxAutomaticSteps() {

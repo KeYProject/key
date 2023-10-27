@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.ByteArrayInputStream;
@@ -357,6 +360,7 @@ public abstract class AbstractProblemLoader {
             }
             OneStepSimplifier.refreshOSS(proof);
             result = replayProof(proof);
+            LOGGER.info("Replay result: {}", result.getStatus());
         }
     }
 
@@ -377,9 +381,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
         final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException) {
-            final org.antlr.runtime.RecognitionException re =
-                (org.antlr.runtime.RecognitionException) c0;
+        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
             final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
@@ -567,8 +569,7 @@ public abstract class AbstractProblemLoader {
     protected LoadedPOContainer createProofObligationContainer() throws IOException {
         final String chooseContract;
         final String proofObligation;
-        if (envInput instanceof KeYFile) {
-            KeYFile keyFile = (KeYFile) envInput;
+        if (envInput instanceof KeYFile keyFile) {
             chooseContract = keyFile.chooseContract();
             proofObligation = keyFile.getProofObligation();
         } else {
@@ -675,8 +676,7 @@ public abstract class AbstractProblemLoader {
      * @return <code>true</code> iff there is a proof script to run
      */
     public boolean hasProofScript() {
-        if (envInput instanceof KeYUserProblemFile) {
-            KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+        if (envInput instanceof KeYUserProblemFile kupf) {
             return kupf.hasProofScript();
         }
         return false;
@@ -705,9 +705,8 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private ReplayResult replayProof(Proof proof)
-            throws ProofInputException, ProblemLoaderException {
-        LOGGER.info("Replaying proof " + proof.name());
+    private ReplayResult replayProof(Proof proof) {
+        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
@@ -748,8 +747,8 @@ public abstract class AbstractProblemLoader {
                     : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null
-                    || parserResult.getErrors().isEmpty() || replayer == null
+            if (parserResult == null || parserResult.errors() == null
+                    || parserResult.errors().isEmpty() || replayer == null
                     || replayResult == null || replayResult.getErrors() == null
                     || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
@@ -757,12 +756,12 @@ public abstract class AbstractProblemLoader {
             }
         } finally {
             if (parserResult != null) {
-                status = parserResult.getStatus();
-                errors.addAll(parserResult.getErrors());
+                status = parserResult.status();
+                errors.addAll(parserResult.errors());
             }
-            status +=
-                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
-                        : "Error while loading proof.");
+            status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
+                    + (replayResult != null ? replayResult.getStatus()
+                            : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }

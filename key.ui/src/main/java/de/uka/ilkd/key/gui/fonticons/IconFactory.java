@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -47,6 +50,10 @@ public final class IconFactory {
     public static final IconFontProvider INTERACTIVE =
         new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
     public static final IconFontProvider SCRIPT = new IconFontProvider(FontAwesomeSolid.SCROLL);
+    public static final IconFontProvider BACKREFERENCE =
+        new IconFontProvider(FontAwesomeSolid.BACKWARD);
+    public static final IconFontProvider BACKREFERENCE_ARROW =
+        new IconFontProvider(FontAwesomeSolid.ARROWS_TO_EYE);
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.CUT);
     public static final IconFontProvider GOAL_BACK =
         new IconFontProvider(FontAwesomeSolid.BACKSPACE);
@@ -141,7 +148,7 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ANGLE_DOWN);
     public static final IconFontProvider SEARCH_HIGHLIGHT =
         new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
-    public static final IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
+    public static final IconFontProvider ABANDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
     public static final IconFontProvider SEARCH_HIDE =
         new IconFontProvider(FontAwesomeSolid.LOW_VISION);
     public static final IconFontProvider SEARCH_NEXT =
@@ -153,13 +160,13 @@ public final class IconFactory {
 
     private static final Image keyHole = getImage("images/ekey-mono.gif");
     private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
     private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static final Image keyHoleLinked = getImage("images/keylinked.gif");
     private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
     private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
     private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
@@ -204,12 +211,15 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
 
     public static Icon abandon(int x) {
-        return ABONDON.load(x);
+        return ABANDON.load(x);
     }
 
     public static Icon configure(int x) {
@@ -314,6 +324,10 @@ public final class IconFactory {
 
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
         return scaleIcon(keyHoleAlmostClosed, x, y);
+    }
+
+    public static ImageIcon keyCachedClosed(int x, int y) {
+        return scaleIcon(keyCachedClosed, x, y);
     }
 
     public static ImageIcon keyHoleInteractive(int x, int y) {

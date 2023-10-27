@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
@@ -92,7 +95,7 @@ public class AppliedRuleAppsNameCache {
 
     /**
      * Gets rule apps applied to any node before the given node with the given name.
-     *
+     * <p>
      * Multiple assumptions about nodes:
      * * The given node is a leaf, no children, no applied rule
      * * Only *new* nodes are appended to nodes

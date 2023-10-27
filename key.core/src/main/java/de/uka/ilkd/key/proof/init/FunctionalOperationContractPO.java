@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -14,7 +17,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -59,7 +61,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
     public static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;
 
@@ -131,7 +133,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
-        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(
+        final ImmutableArray<Expression> formalArray = new ImmutableArray<>(
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
 
         if (getContract().getTarget().isConstructor()) {
@@ -253,8 +255,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             }
         }
 
-        return tb.addLabelToAllSubs(frameTerm,
-            new OriginTermLabel(new Origin(SpecType.ASSIGNABLE)));
+        return tb.addLabelToAllSubs(frameTerm, new Origin(SpecType.ASSIGNABLE));
     }
 
     /**
@@ -321,10 +322,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalOperationContractPO)) {
+        if (!(po instanceof FunctionalOperationContractPO cPO)) {
             return false;
         }
-        FunctionalOperationContractPO cPO = (FunctionalOperationContractPO) po;
         return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
     }
 

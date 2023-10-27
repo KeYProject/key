@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
- *
+ * <p>
  * NB: this is a rather restricted version of term construction, one can think of also allowing
  * bound variables, etc to be specified
  */

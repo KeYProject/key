@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.HashSet;
@@ -9,6 +12,8 @@ import java.util.stream.StreamSupport;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import org.key_project.util.Strings;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
@@ -296,16 +301,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
     @Override
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("{");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("}");
-        return str.toString();
+        return Strings.formatAsList(this, "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */

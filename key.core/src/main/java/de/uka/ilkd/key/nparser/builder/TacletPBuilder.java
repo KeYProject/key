@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
@@ -87,11 +90,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             axiomMode = true;
         }
         ChoiceExpr choices = accept(ctx.choices);
-        if (choices != null) {
-            this.requiredChoices = choices;
-        } else {
-            this.requiredChoices = ChoiceExpr.TRUE;
-        }
+        this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
         List<Taclet> seq = mapOf(ctx.taclet());
         topLevelTaclets.addAll(seq);
         disableJavaSchemaMode();
@@ -304,22 +303,14 @@ public class TacletPBuilder extends ExpressionBuilder {
             return prevValue; // previous value is of suitable type, we do not re-evaluate
         }
 
-        switch (expectedType) {
-        case TYPE_RESOLVER:
-            return buildTypeResolver(ctx);
-        case SORT:
-            return visitSortId(ctx.term().getText(), ctx.term());
-        case JAVA_TYPE:
-            return getOrCreateJavaType(ctx.term().getText(), ctx);
-        case VARIABLE:
-            return varId(ctx, ctx.getText());
-        case STRING:
-            return ctx.getText();
-        case TERM:
-            return accept(ctx.term());
-        }
-        assert false;
-        return null;
+        return switch (expectedType) {
+        case TYPE_RESOLVER -> buildTypeResolver(ctx);
+        case SORT -> visitSortId(ctx.term().getText(), ctx.term());
+        case JAVA_TYPE -> getOrCreateJavaType(ctx.term().getText(), ctx);
+        case VARIABLE -> varId(ctx, ctx.getText());
+        case STRING -> ctx.getText();
+        case TERM -> accept(ctx.term());
+        };
     }
 
     private Sort visitSortId(String text, ParserRuleContext ctx) {
@@ -361,7 +352,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (t != null) {
             return t;
         }
-        return new KeYJavaType((Sort) visitSortId(sortId, ctx));
+        return new KeYJavaType(visitSortId(sortId, ctx));
     }
 
 
@@ -498,20 +489,19 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (find == null) {
             return new NoFindTacletBuilder();
         } else if (find instanceof Term) {
-            return new RewriteTacletBuilder().setFind((Term) find)
+            return new RewriteTacletBuilder<>().setFind((Term) find)
                     .setApplicationRestriction(applicationRestriction);
-        } else if (find instanceof Sequent) {
-            Sequent findSeq = (Sequent) find;
+        } else if (find instanceof Sequent findSeq) {
             if (findSeq.isEmpty()) {
                 return new NoFindTacletBuilder();
-            } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().size() == 0) {
+            } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
                 Term findFma = findSeq.antecedent().get(0).formula();
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
                     (applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
                 return b;
-            } else if (findSeq.antecedent().size() == 0 && findSeq.succedent().size() == 1) {
+            } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
                 Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
@@ -658,7 +648,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             s = accept(ctx.sortId());
         }
 
-        for (String id : ids) {
+        for (String id : Objects.requireNonNull(ids)) {
             declareSchemaVariable(ctx, id, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV,
                 mods);
         }

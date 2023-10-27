@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
@@ -75,10 +78,9 @@ public interface Operator extends Named, SVSubstitute, EqualsModProofIrrelevancy
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Operator)) {
+        if (!(obj instanceof Operator that)) {
             return false;
         }
-        Operator that = (Operator) obj;
         // assume name and arity uniquely identifies operator
         return arity() == that.arity() && name().equals(that.name());
     }

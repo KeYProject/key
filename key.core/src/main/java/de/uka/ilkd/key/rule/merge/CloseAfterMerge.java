@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.HashMap;
@@ -199,7 +202,7 @@ public class CloseAfterMerge implements BuiltInRule {
             new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
-            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());

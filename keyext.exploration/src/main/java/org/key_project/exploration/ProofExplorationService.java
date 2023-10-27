@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
 import java.util.Objects;
@@ -39,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  * @version 1 (20.08.19)
  */
 
+@SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
     private final @NonNull Proof proof;
     private final @NonNull Services services;

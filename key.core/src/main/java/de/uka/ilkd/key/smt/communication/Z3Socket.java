@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
@@ -29,7 +32,7 @@ public class Z3Socket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-        case WAIT_FOR_RESULT:
+        case WAIT_FOR_RESULT -> {
             if (msg.equals("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 // TODO: proof production is currently completely disabled, since it does not work
@@ -52,16 +55,15 @@ public class Z3Socket extends AbstractSolverSocket {
                 pipe.sendMessage("(exit)\n");
                 sc.setState(WAIT_FOR_DETAILS);
             }
-            break;
-
-        case WAIT_FOR_DETAILS:
-            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-            // not work in future, it may be that we have to forcibly close the pipe.
-            // if (msg.equals("success")) {
-            // pipe.sendMessage("(exit)");
-            // pipe.close();
-            // }
-            break;
+        }
+        case WAIT_FOR_DETAILS -> {
+        }
+        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+        // not work in future, it may be that we have to forcibly close the pipe.
+        // if (msg.equals("success")) {
+        // pipe.sendMessage("(exit)");
+        // pipe.close();
+        // }
         }
     }
 

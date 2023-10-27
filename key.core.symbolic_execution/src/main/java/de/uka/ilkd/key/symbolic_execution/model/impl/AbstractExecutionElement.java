@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
@@ -144,8 +147,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * @return The {@link String} representation of the given {@link Term}.
      */
     protected String formatTerm(Term term, Services services) {
-        return SymbolicExecutionUtil.formatTerm(term, services, settings.isUseUnicode(),
-            settings.isUsePrettyPrinting());
+        return SymbolicExecutionUtil.formatTerm(term, services, settings.useUnicode(),
+            settings.usePrettyPrinting());
     }
 
     /**

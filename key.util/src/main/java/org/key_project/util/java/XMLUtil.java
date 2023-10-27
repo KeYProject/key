@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
 import org.jspecify.annotations.NonNull;
@@ -175,24 +178,12 @@ public final class XMLUtil {
             StringBuilder sb = new StringBuilder();
             for (char sign : signs) {
                 switch (sign) {
-                case '"':
-                    sb.append("&quot;");
-                    break;
-                case '&':
-                    sb.append("&amp;");
-                    break;
-                case '\'':
-                    sb.append("&apos;");
-                    break;
-                case '<':
-                    sb.append("&lt;");
-                    break;
-                case '>':
-                    sb.append("&gt;");
-                    break;
-                default:
-                    sb.append(sign);
-                    break;
+                case '"' -> sb.append("&quot;");
+                case '&' -> sb.append("&amp;");
+                case '\'' -> sb.append("&apos;");
+                case '<' -> sb.append("&lt;");
+                case '>' -> sb.append("&gt;");
+                default -> sb.append(sign);
                 }
             }
             return sb.toString();

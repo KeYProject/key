@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.lang.reflect.Constructor;
@@ -54,17 +57,17 @@ import static java.lang.String.format;
 /**
  * Objects of this class can be used to transform an AST returned by the recoder library to the
  * corresponding yet immutable KeY data structures.
- *
+ * <p>
  * Call the method process() to convert an arbitrary object.
- *
+ * <p>
  * The method callConvert is used to perform a run-time dispatch upon the parameters.
- *
+ * <p>
  * The actual conversion is done in convert-methods which must be declared public due to the used
  * reflection method lookup function.
- *
+ * <p>
  * There is a general method {@link #callConvert(recoder.java.ProgramElement)} that does the job in
  * general. Several special cases must be treated separately.
- *
+ * <p>
  * This code used to be part of {@link Recoder2KeY} and has been 'out-sourced'.
  *
  * @author mattias ulbrich
@@ -213,10 +216,10 @@ public class Recoder2KeYConverter {
 
     /**
      * convert a recoder ProgramElement to a corresponding KeY data structure entity.
-     *
+     * <p>
      * Almost always the returned type carries the same Classname but in a KeY rather than a recoder
      * package.
-     *
+     * <p>
      * Determines the right convert method using reflection
      *
      * @param pe the recoder.java.JavaProgramElement to be converted, not null.
@@ -301,7 +304,7 @@ public class Recoder2KeYConverter {
     /**
      * iterate over all children and call convert upon them. Gather the resulting KeY structures in
      * an ExtList.
-     *
+     * <p>
      * In addition to the child ast-branches, all comments are gathered also.
      *
      * @param pe the NonTerminalProgramElement that needs its children before being converted
@@ -393,32 +396,24 @@ public class Recoder2KeYConverter {
      * @return a literal constant representing the value of <code>p_er</code>
      */
     private Literal getLiteralFor(recoder.service.ConstantEvaluator.EvaluationResult p_er) {
-        switch (p_er.getTypeCode()) {
-        case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
-            return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
-        case recoder.service.ConstantEvaluator.CHAR_TYPE:
-            return new CharLiteral(p_er.getChar());
-        case recoder.service.ConstantEvaluator.DOUBLE_TYPE:
-            return new DoubleLiteral(p_er.getDouble());
-        case recoder.service.ConstantEvaluator.FLOAT_TYPE:
-            return new FloatLiteral(p_er.getFloat());
-        case recoder.service.ConstantEvaluator.BYTE_TYPE:
-            return new IntLiteral(p_er.getByte());
-        case recoder.service.ConstantEvaluator.SHORT_TYPE:
-            return new IntLiteral(p_er.getShort());
-        case recoder.service.ConstantEvaluator.INT_TYPE:
-            return new IntLiteral(p_er.getInt());
-        case recoder.service.ConstantEvaluator.LONG_TYPE:
-            return new LongLiteral(p_er.getLong());
-        case recoder.service.ConstantEvaluator.STRING_TYPE:
-            if (p_er.getString() == null) {
-                return NullLiteral.NULL;
+        return switch (p_er.getTypeCode()) {
+            case recoder.service.ConstantEvaluator.BOOLEAN_TYPE -> BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
+            case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
+            case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
+            case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
+            case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
+            case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
+            case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
+            case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
+            case recoder.service.ConstantEvaluator.STRING_TYPE -> {
+                if (p_er.getString() == null) {
+                    yield NullLiteral.NULL;
+                }
+                yield new StringLiteral("\"" + p_er.getString() + "\"");
             }
-            return new StringLiteral("\"" + p_er.getString() + "\"");
-        default:
-            throw new ConvertException(
-                "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
-        }
+            default -> throw new ConvertException(
+                    "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
+        };
     }
 
 
@@ -461,9 +456,9 @@ public class Recoder2KeYConverter {
 
     /**
      * The default procedure.
-     *
+     * <p>
      * It iterates over all children, calls convert upon them
-     *
+     * <p>
      * collect all children, convert them. Create a new instance of the corresponding KeY class and
      * call its constructor with the list of children.
      *
@@ -564,7 +559,7 @@ public class Recoder2KeYConverter {
 
     /**
      * determines the right standard constructor of the KeYClass.
-     *
+     * <p>
      * Use a cache to only look up classes once.
      *
      * @param recoderClass the Class of the recoder AST object

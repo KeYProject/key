@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
 import javax.swing.*;
@@ -24,7 +26,6 @@ public class OpenFileAction extends MainWindowAction {
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
-        setAcceleratorLetter(KeyEvent.VK_O);
     }
 
     public void actionPerformed(ActionEvent e) {

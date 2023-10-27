@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
@@ -8,6 +11,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and

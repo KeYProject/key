@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -206,7 +209,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
+        term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
         Term result = or.replace(term);
 
         return result;

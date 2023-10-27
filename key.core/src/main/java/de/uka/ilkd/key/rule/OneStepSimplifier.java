@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
@@ -41,7 +44,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
-
 
 public final class OneStepSimplifier implements BuiltInRule {
 
@@ -337,8 +339,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             // missing)
             ImmutableArray<TermLabel> labels =
                 TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
-                    ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
-                    result.javaBlock(), result.getLabels());
+                    ruleApp, goal, null, null, result);
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);
             }
@@ -746,8 +747,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (obj instanceof TermReplacementKey) {
                 obj = ((TermReplacementKey) obj).term;
             }
-            if (obj instanceof Term) {
-                Term t = (Term) obj;
+            if (obj instanceof Term t) {
                 return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
                                                   // taclet rule does.
             } else {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
 import java.util.Arrays;
@@ -309,15 +312,11 @@ public final class StringUtil {
                 throw new IllegalArgumentException(String.format(
                     "Text \"%s\" with length %d is longer as %d.", text, text.length(), length));
             } else {
-                for (int i = 0; i < length - text.length(); i++) {
-                    sb.append(leadingCharacter);
-                }
+                sb.append(String.valueOf(leadingCharacter).repeat(length - text.length()));
                 sb.append(text);
             }
         } else {
-            for (int i = 0; i < length; i++) {
-                sb.append(leadingCharacter);
-            }
+            sb.append(String.valueOf(leadingCharacter).repeat(Math.max(0, length)));
         }
         return sb.toString();
     }
@@ -415,7 +414,6 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-
     public static @NonNull String trim(@NonNull String text, char c) {
         return trim(text, it -> it == c);
     }
@@ -425,7 +423,6 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-
     public static @NonNull String trim(@NonNull String text, @NonNull String chars) {
         return trim(text, it -> chars.indexOf(it) >= 0);
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
 import java.net.MalformedURLException;
@@ -13,6 +16,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -24,32 +28,13 @@ import org.antlr.v4.runtime.Token;
  * Both line and column numbers are assumed to be 1-based. That is the first character is on line 1,
  * column 1.
  *
+ * @param fileUri  The location of the resource of the Location. May be null!
+ * @param position The position in the file
  * @author Hubert Schmid
  */
 
-public final class Location implements Comparable<Location> {
-    /**
-     * The location of the resource of the Location. May be null!
-     */
-    private final URI fileUri;
-
-    /**
-     * The position in the file
-     */
-    private final Position position;
-
+public record Location(URI fileUri, Position position) implements Comparable<Location> {
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
-
-    /**
-     * Creates a new Location with the given resource location, line and column numbers.
-     *
-     * @param uri location of the resource
-     * @param position position of the Location
-     */
-    public Location(URI uri, Position position) {
-        this.fileUri = uri;
-        this.position = position;
-    }
 
     /**
      * Legacy constructor for creating a new Location from a String denoting the file path and line
@@ -64,7 +49,7 @@ public final class Location implements Comparable<Location> {
     public static Location fromFileName(String filename, Position position) {
         try {
             return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
-                position);
+                    position);
         } catch (MalformedURLException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +57,7 @@ public final class Location implements Comparable<Location> {
 
     public static Location fromToken(Token token) {
         return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),
-            Position.fromToken(token));
+                Position.fromToken(token));
     }
 
     public Optional<URI> getFileURI() {
@@ -83,7 +68,9 @@ public final class Location implements Comparable<Location> {
         return position;
     }
 
-    /** Internal string representation. Do not rely on format! */
+    /**
+     * Internal string representation. Do not rely on format!
+     */
     @Override
     public String toString() {
         var url = fileUri == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUri.toString();

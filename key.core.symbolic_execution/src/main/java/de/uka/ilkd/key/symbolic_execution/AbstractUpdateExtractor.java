@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.*;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -172,8 +176,7 @@ public abstract class AbstractUpdateExtractor {
             for (int i = 0; i < term.arity(); i++) {
                 fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
             }
-        } else if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) term.op();
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (eu.lhs() instanceof ProgramVariable) {
                 toFill.add(term.sub(0));
             }
@@ -252,14 +255,12 @@ public abstract class AbstractUpdateExtractor {
                 collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill,
                     updateValueObjectsToFill, objectsToIgnore);
             }
-        } else if (updateTerm.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) updateTerm.op();
+        } else if (updateTerm.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeapUpdate(getServices(), updateTerm)) {
                 collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill,
                     updateCreatedObjectsToFill, updateValueObjectsToFill);
-            } else if (eu.lhs() instanceof ProgramVariable) {
+            } else if (eu.lhs() instanceof ProgramVariable var) {
                 final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-                ProgramVariable var = (ProgramVariable) eu.lhs();
                 if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
                     if (!isImplicitProgramVariable(var)
                             && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))
@@ -1044,8 +1045,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExtractLocationParameter) {
-                ExtractLocationParameter other = (ExtractLocationParameter) obj;
+            if (obj instanceof ExtractLocationParameter other) {
                 return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
                         && Objects.equals(parentTerm, other.parentTerm)
@@ -1501,18 +1501,11 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
-            boolean afterFirst = false;
-            for (Goal goal : startingGoals) {
-                if (afterFirst) {
-                    sb.append(", ");
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(goal.node().serialNr());
-            }
+            sb.append(Strings.formatAsList(startingGoals, "", ", ", "",
+                ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr)));
             return sb.toString();
         }
     }
@@ -1781,8 +1774,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExecutionVariableValuePair) {
-                ExecutionVariableValuePair other = (ExecutionVariableValuePair) obj;
+            if (obj instanceof ExecutionVariableValuePair other) {
                 return isArrayRange()
                         ? (getArrayStartIndex().equals(other.getArrayStartIndex())
                                 && getArrayEndIndex().equals(other.getArrayEndIndex()))

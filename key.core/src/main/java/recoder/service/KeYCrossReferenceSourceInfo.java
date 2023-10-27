@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -283,14 +286,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         if ((context instanceof VariableReference
                 || context instanceof UncollatedReferenceQualifier)
                 && context.getASTParent() instanceof Case && getType(((Case) context.getASTParent())
-                        .getParent().getExpression()) instanceof EnumClassDeclaration) {
+                        .getParent().getExpression()) instanceof EnumClassDeclaration ecd) {
             /*
              * is it an enum class constant (after transformation)? Possible iff: 1) parent is
              * "case" and 2) switch-selector is an enum type (that way, the selector specifies the
              * scope!)
              */
-            EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
-                ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
             // must not resolve! qualifying enum constant in case-statements is forbidden!
             return vs;
@@ -478,8 +479,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     break;
                 }
             }
-            if (s instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) s;
+            if (s instanceof TypeDeclaration td) {
                 ClassType newResult = getInheritedType(name, td);
 
                 if (newResult != null) {

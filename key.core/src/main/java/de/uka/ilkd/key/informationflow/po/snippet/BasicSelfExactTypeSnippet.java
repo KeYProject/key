@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -19,11 +22,10 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
             throws UnsupportedOperationException {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        if (!(targetMethod instanceof IProgramMethod)) {
+        if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException("Tried to produce "
                 + "SELF_EXACT_TYPE for an observer " + "which is no IProgramMethod.");
         }
-        final IProgramMethod pm = (IProgramMethod) targetMethod;
         KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
         Term result = d.tb.tt();
         if (forClass != null) {

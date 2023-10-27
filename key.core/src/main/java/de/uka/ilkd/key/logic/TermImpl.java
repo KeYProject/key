@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
@@ -16,18 +19,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-public class TermImpl implements Term, EqualsModProofIrrelevancy {
+class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * A static empty list of terms used for memory reasons.
@@ -76,7 +83,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     private int hashcode2 = -1;
 
     /**
-     * This flag indicates that the {@link Term} itself or one of its children contains a non empty
+     * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
      * {@link JavaBlock}. {@link Term}s which provides a {@link JavaBlock} directly or indirectly
      * can't be cached because it is possible that the contained meta information inside the
      * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
@@ -98,16 +105,32 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
      * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
-        this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
+        this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
+        this.origin = origin;
     }
 
+    TermImpl(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+        this(op, subs, boundVars, javaBlock, "");
+    }
 
+    /**
+     * For which feature is this information needed?
+     * What is the difference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
+     */
+    private final String origin;
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
+    }
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -138,7 +161,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * Checks whether the Term is valid on the top level. If this is the case this method returns
-     * the Term unmodified. Otherwise a TermCreationException is thrown.
+     * the Term unmodified. Otherwise, a TermCreationException is thrown.
      */
     public Term checked() {
         op.validTopLevelException(this);
@@ -190,7 +213,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
 
     @Override
-    public JavaBlock javaBlock() {
+    public @NonNull JavaBlock javaBlock() {
         return javaBlock;
     }
 
@@ -478,11 +501,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -517,11 +538,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -541,11 +560,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult
@@ -639,26 +656,12 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
         } else {
             sb.append(op().name().toString());
             if (!boundVars.isEmpty()) {
-                sb.append("{");
-                for (int i = 0, n = boundVars.size(); i < n; i++) {
-                    sb.append(boundVars.get(i));
-                    if (i < n - 1) {
-                        sb.append(", ");
-                    }
-                }
-                sb.append("}");
+                sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }
             if (arity() == 0) {
                 return sb.toString();
             }
-            sb.append("(");
-            for (int i = 0, ar = arity(); i < ar; i++) {
-                sb.append(sub(i));
-                if (i < ar - 1) {
-                    sb.append(",");
-                }
-            }
-            sb.append(")");
+            sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
         }
 
         return sb.toString();
@@ -712,14 +715,5 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
     }
 
-    private String origin;
 
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
 }

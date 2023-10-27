@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
 
 import java.util.ArrayList;
@@ -81,8 +83,7 @@ public class TypeKit {
         TypeReference result = null;
         if (t instanceof PrimitiveType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
-        } else if (t instanceof ParameterizedType) {
-            ParameterizedType pt = ((ParameterizedType) t);
+        } else if (t instanceof ParameterizedType pt) {
             result = createTypeReference(f, pt.getGenericType());
             if (addTypeArgs) {
                 result.setTypeArguments(makeTypeArgRef(f, pt.getTypeArgs()));
@@ -204,8 +205,7 @@ public class TypeKit {
                     if (vars.size() > 0) {
                         imembers.add(d);
                     }
-                } else if (cmemd instanceof MethodDeclaration) {
-                    MethodDeclaration md = (MethodDeclaration) cmemd;
+                } else if (cmemd instanceof MethodDeclaration md) {
 
                     if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration)
                     // !!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
@@ -371,8 +371,7 @@ public class TypeKit {
         // Create an adapter interface with delegating methods
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
             MemberDeclaration member = classDecl.getMembers().get(i2);
-            if (member instanceof MethodDeclaration) {
-                MethodDeclaration method = (MethodDeclaration) member;
+            if (member instanceof MethodDeclaration method) {
                 if (method.isPublic()) {
                     Debug.info(2, "adapting public method " + method.getName());
                     MethodDeclaration clone =
@@ -407,8 +406,7 @@ public class TypeKit {
         Debug.assertNonnull(xr, ni, type, newName);
         Debug.assertNonnull(type.getName());
         if (!newName.equals(type.getName())) {
-            List<TypeReference> refs = new ArrayList<>();
-            refs.addAll(xr.getReferences(type));
+            List<TypeReference> refs = new ArrayList<>(xr.getReferences(type));
             List<? extends Constructor> cons = type.getConstructors();
             Type atype = ni.getArrayType(type);
             while (atype != null) {
@@ -523,8 +521,7 @@ public class TypeKit {
     public static List<Member> getMembers(ClassTypeContainer ctc) {
         List<Member> result = new ArrayList<>();
         List<? extends Member> mlist;
-        if (ctc instanceof ClassType) {
-            ClassType ct = (ClassType) ctc;
+        if (ctc instanceof ClassType ct) {
             mlist = ct.getConstructors();
             if (mlist != null) {
                 result.addAll(mlist);
@@ -663,8 +660,7 @@ public class TypeKit {
      */
     public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi,
             List<? extends ClassType> list) {
-        List<ClassType> copy = new ArrayList<>();
-        copy.addAll(list);
+        List<ClassType> copy = new ArrayList<>(list);
         return removeCoveredSubtypes(pmi, copy);
     }
 
@@ -712,8 +708,7 @@ public class TypeKit {
         // get all super interface references
         ClassType superclass = null;
         List<TypeReference> superinterfaces = new ArrayList<>(0);
-        if (td instanceof InterfaceDeclaration) {
-            InterfaceDeclaration id = (InterfaceDeclaration) td;
+        if (td instanceof InterfaceDeclaration id) {
             if (id.getExtendedTypes() != null) {
                 superinterfaces = id.getExtendedTypes().getSupertypes();
             }

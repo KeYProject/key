@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -40,6 +44,7 @@ public class Node implements Iterable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
+    private static final String CACHED_GOAL = "Closed goal (via cache)";
 
     private static final String NODES = "nodes";
 
@@ -452,6 +457,13 @@ public class Node implements Iterable<Node> {
     }
 
     /**
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
      * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {
@@ -592,8 +604,10 @@ public class Node implements Iterable<Node> {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                final Goal goal = proof().getGoal(this);
-                if (this.isClosed()) {
+                final Goal goal = proof().getOpenGoal(this);
+                if (this.isClosed() && lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
                     // should never happen (please check)
@@ -602,7 +616,7 @@ public class Node implements Iterable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal != null) {
+                } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
                 return cachedName;

@@ -1,7 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -12,6 +17,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -23,12 +29,12 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.util.Pair;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
-    private ProofTreePopupFactory() {}
+    private ProofTreePopupFactory() {
+    }
 
     /**
      * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
@@ -37,8 +43,7 @@ public class ProofTreePopupFactory {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
-        if (o instanceof GUIProofTreeNode) {
-            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+        if (o instanceof GUIProofTreeNode n) {
             if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 return false;
             }
@@ -174,34 +179,8 @@ public class ProofTreePopupFactory {
                             "If you wish to see the statistics "
                                 + "for a proof you have to load one first"));
             } else {
-                int openGoals = 0;
-
-                Iterator<Node> leavesIt = context.invokedNode.leavesIterator();
-                while (leavesIt.hasNext()) {
-                    if (proof.getGoal(leavesIt.next()) != null) {
-                        openGoals++;
-                    }
-                }
-
-                StringBuilder stats;
-                if (openGoals > 0) {
-                    stats =
-                        new StringBuilder(openGoals + " open goal" + (openGoals > 1 ? "s." : "."));
-                } else {
-                    stats = new StringBuilder("Closed.");
-                }
-                stats.append("\n\n");
-
-                for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
-                    if ("".equals(x.second)) {
-                        stats.append("\n");
-                    }
-                    stats.append(x.first).append(": ").append(x.second).append("\n");
-                }
-
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats.toString(),
-                    "Proof Statistics",
-                    JOptionPane.INFORMATION_MESSAGE);
+                new ShowProofStatistics.Window(MainWindow.getInstance(), context.invokedNode)
+                        .setVisible(true);
             }
         }
     }
@@ -389,7 +368,7 @@ public class ProofTreePopupFactory {
             if (context.proof != null) {
                 // disable pruning for goals and disable it for closed subtrees if the command line
                 // option "--no-pruning-closed" is set (saves memory)
-                if (!context.proof.isGoal(context.invokedNode)
+                if (!context.proof.isOpenGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed && context.proof
@@ -493,17 +472,23 @@ public class ProofTreePopupFactory {
             return context.proof.getSubtreeGoals(context.invokedNode);
         }
 
-        /*
+        /**
          * In addition to marking setting goals, update the tree model so that the label sizes are
          * recalculated
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.delegateModel.setBatchGoalStateChange(true);
+            var selectedNode = context.proofTreeView.getSelectedNode();
+            context.delegateModel.setBatchGoalStateChange(true, null);
             super.actionPerformed(e);
-            context.delegateModel.setBatchGoalStateChange(false);
-            // trigger repainting the tree after the completion of this event.
-            context.delegateView.repaint();
+            List<Node> goals = new ArrayList<>();
+            getGoalList().forEach(x -> goals.add(x.node()));
+            context.delegateModel.setBatchGoalStateChange(false, goals);
+            // make sure the node is selected again
+            if (selectedNode != null) {
+                context.proofTreeView.makeNodeVisible(selectedNode);
+            }
+            // repainting the tree after the completion of this event is done automatically
         }
     }
 

@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -56,7 +58,6 @@ public interface EnvInput {
         return null;
     }
 
-
     /**
      * gets the classpath elements to be considered here.
      */
@@ -65,10 +66,8 @@ public interface EnvInput {
 
     /**
      * gets the boot classpath element, null if none set.
-     *
-     * @throws
      */
-    File readBootClassPath() throws IOException;
+    File readBootClassPath();
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
@@ -12,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
-        return new PreParser().parseMethodLevel(ms, null, Position.newOneBased(1, 1));
+        return new PreParser(true).parseMethodLevel(ms, null, Position.newOneBased(1, 1));
     }
 
     private static void assertTextRepr(String input, String text) {

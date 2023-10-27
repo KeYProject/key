@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.io.*;
@@ -26,6 +29,7 @@ import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ModelException;
@@ -396,7 +400,7 @@ public class Recoder2KeY implements JavaReader {
             if (ex.getCause() instanceof UnresolvedReferenceException) {
                 String extraMsg = "Consider using a classpath in your input file if this is a "
                     + "classtype that cannot be resolved (see "
-                    + "https://key-project.org/docs/user/Classpath for more details).";
+                    + "https://keyproject.github.io/key-docs/user/Classpath for more details).";
                 String msg = String.format("%s%n%s", ex.getCause().getMessage(), extraMsg);
                 reportError(msg, ex);
             } else {
@@ -681,8 +685,7 @@ public class Recoder2KeY implements JavaReader {
 
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration methDecl = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration methDecl) {
                 if (!allowed && methDecl.getBody() != null) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", methDecl.getName(),
                         rcu.getDataLocation());
@@ -699,8 +702,7 @@ public class Recoder2KeY implements JavaReader {
              * +rcu.getDataLocation(), Recoder2KeY.class.getName()); }
              * fieldSpec.setInitializer(null); }
              */
-            if (pe instanceof ClassInitializer) {
-                ClassInitializer classInit = (ClassInitializer) pe;
+            if (pe instanceof ClassInitializer classInit) {
                 if (!allowed && classInit.getBody() != null) {
                     LOGGER.warn("There should be no class initializers: {}", rcu.getDataLocation());
                 }
@@ -897,9 +899,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         for (int i = 0, sz = memberList.size(); i < sz; i++) {
-            if (memberList.get(i) instanceof recoder.java.declaration.MethodDeclaration) {
-                recoder.java.declaration.MethodDeclaration olddecl =
-                    (recoder.java.declaration.MethodDeclaration) memberList.get(i);
+            if (memberList.get(i) instanceof MethodDeclaration olddecl) {
                 if (olddecl.getName().equals(mdecl.getName())) {
                     memberList.remove(i);
                 }

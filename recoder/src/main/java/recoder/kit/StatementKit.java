@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
 
 import java.util.ArrayList;
@@ -176,8 +178,7 @@ public class StatementKit {
     public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr,
             Statement s) {
         Debug.assertNonnull(xr, s);
-        if (s instanceof LocalVariableDeclaration) {
-            LocalVariableDeclaration lvd = (LocalVariableDeclaration) s;
+        if (s instanceof LocalVariableDeclaration lvd) {
             List<? extends VariableSpecification> vsl = lvd.getVariables();
             for (int j = vsl.size() - 1; j >= 0; j -= 1) {
                 Variable v = vsl.get(j);
@@ -299,8 +300,7 @@ public class StatementKit {
         String idText = s.getIdentifier().getText();
         NonTerminalProgramElement parent = s.getASTParent();
         while (parent != null) {
-            if (parent instanceof LabeledStatement) {
-                LabeledStatement lstat = (LabeledStatement) parent;
+            if (parent instanceof LabeledStatement lstat) {
                 if (idText.equals(lstat.getIdentifier().getText())) {
                     return lstat;
                 }

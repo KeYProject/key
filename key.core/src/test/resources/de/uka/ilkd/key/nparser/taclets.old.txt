@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 20 13:56:02 CET 2023
+# Date: Fri Oct 20 19:55:38 CEST 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -678,7 +678,7 @@ allocateInstance {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #lhs = #t.#allocate()@#t;
 ... }\] (post))
-\varcond(\hasSort(#t2 (program Type), alphaObj), )
+\varcond(\hasSort(#t2 (program Type), alphaObj))
 \add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),equals(boolean::select(heap,#lhs,java.lang.Object::<created>),FALSE))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(create(heap,#lhs)),#allmodal(post))]) 
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
@@ -688,7 +688,7 @@ allocateInstanceWithLength {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #lhs = #t.#allocate(#len)@#t;
 ... }\] (post))
-\varcond(\hasSort(#t2 (program Type), alphaObj), )
+\varcond(\hasSort(#t2 (program Type), alphaObj))
 \add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(boolean::select(heap,#lhs,java.lang.Object::<created>),FALSE),equals(length(#lhs),#len)))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::<transient>,Z(0(#))),#lhs,java.lang.Object::<transactionConditionallyUpdated>,FALSE)),#allmodal(post))]) 
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
@@ -938,7 +938,7 @@ Choices: true}
 == applyOnRigidFormula (applyOnRigidFormula) =========================================
 applyOnRigidFormula {
 \find(update-application(u,phi))
-\varcond(\applyUpdateOnRigid(u (update), phi (formula), result (formula)), )
+\varcond(\applyUpdateOnRigid(u (update), phi (formula), result (formula)))
 \replacewith(result) 
 \heuristics(update_apply)
 Choices: true}
@@ -946,7 +946,7 @@ Choices: true}
 == applyOnRigidTerm (applyOnRigidTerm) =========================================
 applyOnRigidTerm {
 \find(update-application(u,t))
-\varcond(\applyUpdateOnRigid(u (update), t (any term), result (any term)), )
+\varcond(\applyUpdateOnRigid(u (update), t (any term), result (any term)))
 \replacewith(result) 
 \heuristics(update_apply)
 Choices: true}
@@ -1156,7 +1156,7 @@ Choices: programRules:Java}
 array_store_known_dynamic_array_type {
 \assumes ([equals(J::exactInstance(array),TRUE)]==>[]) 
 \find(arrayStoreValid(array,obj))
-\sameUpdateLevel\varcond(\isReference[non_null]( J ), )
+\sameUpdateLevel\varcond(\isReference[non_null]( J ))
 \replacewith(or(equals(obj,null),equals(#arrayBaseInstanceOf(J::exactInstance(array),obj),TRUE))) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -1187,7 +1187,7 @@ assertSafe {
 \find(==>#allmodal ( (modal operator))\[{ ..
   assert #e1;
 ... }\] (b))
-\varcond(\new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), )
+\varcond(\new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ))
 \add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{
   method-frame (#ex) {
     #typeof(#e1) #condition = #e1;
@@ -1207,7 +1207,7 @@ assertSafeWithMessage {
 \find(==>#allmodal ( (modal operator))\[{ ..
   assert #e1 : #e2;
 ... }\] (b))
-\varcond(\new(#message (program Variable), \typeof(#e2 (program Expression))), \new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), \not \containsAssignment( #e2 ), )
+\varcond(\new(#message (program Variable), \typeof(#e2 (program Expression))), \new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), \not \containsAssignment( #e2 ))
 \add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{
   method-frame (#ex) {
     #typeof(#e1) #condition = #e1;
@@ -1223,6 +1223,14 @@ assertSafeWithMessage {
 \replacewith([]==>[#allmodal(b)]) 
 \heuristics(simplify_prog)
 Choices: (programRules:Java & assertions:safe)}
+-----------------------------------------------------
+== assignableDefinition (assignableDefinition) =========================================
+assignableDefinition {
+\find(assignable(heapNew,heapOld,locs))
+\varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f)))))) 
+\heuristics(delayedExpansion)
+Choices: programRules:Java}
 -----------------------------------------------------
 == assignment (assignment) =========================================
 assignment {
@@ -1256,7 +1264,7 @@ assignmentAdditionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 + #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1266,7 +1274,7 @@ assignmentAdditionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 + #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(addDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1276,7 +1284,7 @@ assignmentAdditionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 + #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1286,7 +1294,7 @@ assignmentAdditionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 + #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(addFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1460,7 +1468,7 @@ assignmentDivisionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 / #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaDivDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1470,7 +1478,7 @@ assignmentDivisionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 / #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(divDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1480,7 +1488,7 @@ assignmentDivisionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 / #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaDivFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1490,7 +1498,7 @@ assignmentDivisionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 / #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(divFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1596,7 +1604,7 @@ assignmentMultiplicationDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 * #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1606,7 +1614,7 @@ assignmentMultiplicationDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 * #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(mulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1616,7 +1624,7 @@ assignmentMultiplicationFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 * #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1626,7 +1634,7 @@ assignmentMultiplicationFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 * #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(mulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1726,7 +1734,7 @@ assignmentSubtractionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 - #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1736,7 +1744,7 @@ assignmentSubtractionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 - #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(subDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1746,7 +1754,7 @@ assignmentSubtractionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 - #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1756,7 +1764,7 @@ assignmentSubtractionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 - #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp)
 \replacewith(update-application(elem-update(#loc (program Variable))(subFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1820,7 +1828,7 @@ assignment_array2 {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v = #v0[#se];
 ... }\] (post))
-\varcond(\hasSort(\elemSort(#v0 (program Variable)), G), )
+\varcond(\hasSort(\elemSort(#v0 (program Variable)), G))
 \add [and(not(equals(#v0,null)),or(leq(length(#v0),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v0,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v (program Variable))(G::select(heap,#v0,arr(#se))),#allmodal(post))]) 
@@ -1832,7 +1840,7 @@ assignment_read_attribute {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#a;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -1843,7 +1851,7 @@ assignment_read_attribute_this {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#a;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)))
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
@@ -1853,7 +1861,7 @@ assignment_read_length {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#length;
 ... }\] (post))
-\varcond(\not\isThisReference (#v (program Variable)), )
+\varcond(\not\isThisReference (#v (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(length(#v)),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -1864,7 +1872,7 @@ assignment_read_length_this {
 \find(#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#length;
 ... }\] (post))
-\sameUpdateLevel\varcond(\isThisReference (#v (program Variable)), )
+\sameUpdateLevel\varcond(\isThisReference (#v (program Variable)))
 \replacewith(update-application(elem-update(#v0 (program Variable))(length(#v)),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -1874,7 +1882,7 @@ assignment_read_static_attribute {
 \find(#allmodal ( (modal operator))\[{ ..
   #v0 = @(#sv);
 ... }\] (post))
-\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), )
+\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G))
 \replacewith(update-application(elem-update(#v0 (program Variable))(G::select(heap,null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -1884,7 +1892,7 @@ assignment_read_static_attribute_with_variable_prefix {
 \find(#allmodal ( (modal operator))\[{ ..
   #loc = @(#v.#sv);
 ... }\] (post))
-\varcond(\hasSort(#sv (program StaticVariable), G), )
+\varcond(\hasSort(#sv (program StaticVariable), G))
 \replacewith(update-application(elem-update(#loc (program Variable))(G::select(heap,#v,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -1894,7 +1902,7 @@ assignment_to_primitive_array_component {
 \find(==>#normal ( (modal operator))\[{ ..
   #v[#se] = #se0;
 ... }\] (post))
-\varcond( \not \isReferenceArray(#v (program Variable)), )
+\varcond( \not \isReferenceArray(#v (program Variable)))
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),#normal(post))]) 
@@ -1906,7 +1914,7 @@ assignment_to_primitive_array_component_transaction {
 \find(==>#transaction ( (modal operator))\[{ ..
   #v[#se] = #se0;
 ... }\] (post))
-\varcond( \not \isReferenceArray(#v (program Variable)), )
+\varcond( \not \isReferenceArray(#v (program Variable)))
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))]) 
@@ -1918,7 +1926,7 @@ assignment_to_reference_array_component {
 \find(==>#normal ( (modal operator))\[{ ..
   #v[#se] = #se0;
 ... }\] (post))
-\varcond(\isReferenceArray(#v (program Variable)), )
+\varcond(\isReferenceArray(#v (program Variable)))
 \add [and(and(and(not(equals(#v,null)),lt(#se,length(#v))),geq(#se,Z(0(#)))),not(arrayStoreValid(#v,#se0)))]==>[] \replacewith([]==>[false]) ;
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
@@ -1931,7 +1939,7 @@ assignment_to_reference_array_component_transaction {
 \find(==>#transaction ( (modal operator))\[{ ..
   #v[#se] = #se0;
 ... }\] (post))
-\varcond(\isReferenceArray(#v (program Variable)), )
+\varcond(\isReferenceArray(#v (program Variable)))
 \add [and(and(and(not(equals(#v,null)),lt(#se,length(#v))),geq(#se,Z(0(#)))),not(arrayStoreValid(#v,#se0)))]==>[] \replacewith([]==>[false]) ;
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
@@ -1953,7 +1961,7 @@ assignment_write_attribute {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v.#a = #se;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)), \not\isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)), \not\isThisReference (#v (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,#memberPVToField(#a),#se)),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -1964,7 +1972,7 @@ assignment_write_attribute_this {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v.#a = #se;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)), \isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)), \isThisReference (#v (program Variable)))
 \replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,#memberPVToField(#a),#se)),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
@@ -3410,7 +3418,7 @@ Choices: true}
 castAdd2 {
 \assumes ([equals(cs,gt)]==>[]) 
 \find(gt)
-\sameUpdateLevel\varcond(\strict\sub(C, G), )
+\sameUpdateLevel\varcond(\strict\sub(C, G))
 \replacewith(C::cast(gt)) 
 
 Choices: true}
@@ -4706,6 +4714,19 @@ compound_reference_cast_expression {
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
+== compound_reference_cast_expression_primitive (cast) =========================================
+compound_reference_cast_expression_primitive {
+\find(#allmodal ( (modal operator))\[{ ..
+  #lhs = (#pit) #nse;
+... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\replacewith(#allmodal ( (modal operator))\[{ ..
+  #typeof(#nse) #v = #nse;
+  #lhs = (#pit) #v;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
 == compound_shiftleft_1 (shift) =========================================
 compound_shiftleft_1 {
 \find(#allmodal ( (modal operator))\[{ ..
@@ -5148,7 +5169,7 @@ Choices: programRules:Java}
 == createdInHeapWithObserver (createdInHeapWithObserver) =========================================
 createdInHeapWithObserver {
 \find(==>createdInHeap(obs,h))
-\varcond(\isObserver (obs (LocSet term), h (Heap term)), )
+\varcond(\isObserver (obs (LocSet term), h (Heap term)))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -5157,7 +5178,7 @@ Choices: programRules:Java}
 createdInHeapWithObserverEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
 \find(==>createdInHeap(EQ,h))
-\varcond(\isObserver (obs (LocSet term), h (Heap term)), )
+\varcond(\isObserver (obs (LocSet term), h (Heap term)))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -5486,7 +5507,7 @@ delete_unnecessary_cast {
 \find(#allmodal ( (modal operator))\[{ ..
   #lhs = (#npit) #se;
 ... }\] (post))
-\sameUpdateLevel\varcond(\hasSort(#npit (program NonPrimitiveType), G), \sub(\typeof(#se (program SimpleExpression)), G), )
+\sameUpdateLevel\varcond(\hasSort(#npit (program NonPrimitiveType), G), \sub(\typeof(#se (program SimpleExpression)), G))
 \add [or(equals(#se,null),equals(G::instance(#se),TRUE))]==>[] \replacewith(update-application(elem-update(#lhs (program LeftHandSide))(#addCast(#se,#lhs)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -5751,7 +5772,7 @@ Choices: programRules:Java}
 == dismissNonSelectedField (dismissNonSelectedField) =========================================
 dismissNonSelectedField {
 \find(alpha::select(store(h,o,f1,x),u,f2))
-\varcond(\differentFields (f1 (Field term), f2 (Field term)), )
+\varcond(\differentFields (f1 (Field term), f2 (Field term)))
 \replacewith(alpha::select(h,u,f2)) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -5760,7 +5781,7 @@ Choices: programRules:Java}
 dismissNonSelectedFieldEQ {
 \assumes ([equals(store(h,o,f1,x),EQ)]==>[]) 
 \find(alpha::select(EQ,u,f2))
-\sameUpdateLevel\varcond(\differentFields (f1 (Field term), f2 (Field term)), )
+\sameUpdateLevel\varcond(\differentFields (f1 (Field term), f2 (Field term)))
 \replacewith(alpha::select(h,u,f2)) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -6138,7 +6159,7 @@ doWhileUnwind {
   do #s
   while (#e);
 ... }\] (post))
-\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)), )
+\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #unwind-loop(do #s
   while (#e);)
@@ -6172,7 +6193,7 @@ Choices: true}
 == dropEffectlessStores (dropEffectlessStores) =========================================
 dropEffectlessStores {
 \find(store(h,o,f,x))
-\varcond(\dropEffectlessStores(h (Heap term), o (java.lang.Object term), f (Field term), x (any term), result (Heap term)), )
+\varcond(\dropEffectlessStores(h (Heap term), o (java.lang.Object term), f (Field term), x (any term), result (Heap term)))
 \replacewith(result) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -6253,7 +6274,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnion2Vars (elementOfInfiniteUnion2Vars) =========================================
 elementOfInfiniteUnion2Vars {
-\find(elementOf(o,f,infiniteUnion{av (variable), bv (variable)}(s)))
+\find(elementOf(o,f,infiniteUnion{av (variable),bv (variable)}(s)))
 \varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
 \replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf(o,f,s)))) 
 \heuristics(simplify)
@@ -6261,7 +6282,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnion2VarsEQ (elementOfInfiniteUnion2VarsEQ) =========================================
 elementOfInfiniteUnion2VarsEQ {
-\assumes ([equals(infiniteUnion{av (variable), bv (variable)}(s),EQ)]==>[]) 
+\assumes ([equals(infiniteUnion{av (variable),bv (variable)}(s),EQ)]==>[]) 
 \find(elementOf(o,f,EQ))
 \sameUpdateLevel\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
 \replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf(o,f,s)))) 
@@ -7079,7 +7100,7 @@ Choices: Strings:on}
 == equalUnique (equalUnique) =========================================
 equalUnique {
 \find(equals(f,f2))
-\varcond(\equalUnique (f (any term), f2 (any term), result (formula)), )
+\varcond(\equalUnique (f (any term), f2 (any term), result (formula)))
 \replacewith(result) 
 \heuristics(concrete)
 Choices: true}
@@ -7374,7 +7395,7 @@ eval_order_access4 {
 \find(#allmodal ( (modal operator))\[{ ..
   #v.#a = #nse;
 ... }\] (post))
-\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))),  \not \static(#a (program Variable)), )
+\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))),  \not \static(#a (program Variable)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#v) #v0 = #v;
   #typeof(#nse) #v1 = #nse;
@@ -7388,7 +7409,7 @@ eval_order_access4_this {
 \find(#allmodal ( (modal operator))\[{ ..
   #v.#a = #nse;
 ... }\] (post))
-\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))),  \not \static(#a (program Variable)), \isThisReference (#v (program Variable)), )
+\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))),  \not \static(#a (program Variable)), \isThisReference (#v (program Variable)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nse) #v1 = #nse;
   #v.#a = #v1;
@@ -7943,7 +7964,7 @@ Choices: programRules:Java}
 == exact_instance_for_interfaces_or_abstract_classes (interfaces or abstract classes have no exact instances) =========================================
 exact_instance_for_interfaces_or_abstract_classes {
 \find(G::exactInstance(obj))
-\varcond(\isAbstractOrInterface (G), )
+\varcond(\isAbstractOrInterface (G))
 \replacewith(FALSE) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -7952,7 +7973,7 @@ Choices: programRules:Java}
 exact_instance_known_dynamic_type {
 \assumes ([equals(G::exactInstance(a),TRUE)]==>[]) 
 \find(H::exactInstance(a))
-\sameUpdateLevel\varcond(\not\same(G, H), )
+\sameUpdateLevel\varcond(\not\same(G, H))
 \replacewith(FALSE) 
 \heuristics(evaluate_instanceof, simplify)
 Choices: true}
@@ -8147,7 +8168,7 @@ execBreakLabelEliminateBreakLabelNoMatch {
     #slist1
   }#cs
 ... }\] (post))
-\varcond(\different (#lb (program Label), #lb1 (program Label)), )
+\varcond(\different (#lb (program Label), #lb1 (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
     break;
@@ -8536,7 +8557,7 @@ execContinueLabelEliminateContinueLabelNoMatch {
     #slist1
   }#cs
 ... }\] (post))
-\varcond(\different (#lb (program Label), #lb1 (program Label)), )
+\varcond(\different (#lb (program Label), #lb1 (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
     continue;
@@ -8867,7 +8888,7 @@ execReturnVal {
     #slist1
   }#cs
 ... }\] (post))
-\varcond(\sub(\typeof(#se (program SimpleExpression)), \typeof(#v (program Variable))), )
+\varcond(\sub(\typeof(#se (program SimpleExpression)), \typeof(#v (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
     #t #v;
@@ -9032,7 +9053,7 @@ execReturnValNonMatchingType {
     #slist1
   }#cs
 ... }\] (post))
-\varcond(\not\sub(\typeof(#se (program SimpleExpression)), \typeof(#v (program Variable))), )
+\varcond(\not\sub(\typeof(#se (program SimpleExpression)), \typeof(#v (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
     return #se;
@@ -9207,6 +9228,34 @@ expIsZero {
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
+== expandInByte (expandInByte) =========================================
+expandInByte {
+\find(inByte(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInChar (expandInChar) =========================================
+expandInChar {
+\find(inChar(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInInt (expandInInt) =========================================
+expandInInt {
+\find(inInt(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInLong (expandInLong) =========================================
+expandInLong {
+\find(inLong(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expandInRangeByte (expandInRangeByte) =========================================
 expandInRangeByte {
 \find(inRangeByte(i))
@@ -9242,6 +9291,13 @@ expandInRangeShort {
 \heuristics(delayedExpansion, defOps_expandRanges)
 Choices: true}
 -----------------------------------------------------
+== expandInShort (expandInShort) =========================================
+expandInShort {
+\find(inShort(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
 \find(addJint(i,i1))
@@ -9269,41 +9325,6 @@ expand_divJlong {
 \replacewith(moduloLong(jdiv(i,i1))) 
 \heuristics(defOps_expandJNumericOp)
 Choices: true}
------------------------------------------------------
-== expandInByte (expandInByte) =========================================
-expandInByte {
-\find(inByte(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInChar (expandInChar) =========================================
-expandInChar {
-\find(inChar(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInInt (expandInInt) =========================================
-expandInInt {
-\find(inInt(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInLong (expandInLong) =========================================
-expandInLong {
-\find(inLong(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInShort (expandInShort) =========================================
-expandInShort {
-\find(inShort(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == expand_modJint (expand_modJint) =========================================
 expand_modJint {
@@ -9454,7 +9475,7 @@ for_to_while {
 \find(#allmodal ( (modal operator))\[{ ..
   #forloop
 ... }\] (post))
-\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)), )
+\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #for-to-while(#forloop)
 ... }\] (post)) 
@@ -11368,7 +11389,7 @@ Choices: programRules:Java}
 instanceof_known_dynamic_type {
 \assumes ([equals(G::exactInstance(a),TRUE)]==>[]) 
 \find(H::instance(a))
-\sameUpdateLevel\varcond(\sub(G, H), )
+\sameUpdateLevel\varcond(\sub(G, H))
 \replacewith(TRUE) 
 \heuristics(evaluate_instanceof, simplify)
 Choices: true}
@@ -11377,7 +11398,7 @@ Choices: true}
 instanceof_known_dynamic_type_2 {
 \assumes ([equals(G::exactInstance(a),TRUE)]==>[]) 
 \find(H::instance(a))
-\sameUpdateLevel\varcond(\not\sub(G, H), )
+\sameUpdateLevel\varcond(\not\sub(G, H))
 \replacewith(FALSE) 
 \heuristics(evaluate_instanceof, simplify)
 Choices: true}
@@ -11385,7 +11406,7 @@ Choices: true}
 == instanceof_not_compatible (instanceof disjoint type) =========================================
 instanceof_not_compatible {
 \find(equals(G::instance(a),TRUE))
-\varcond(\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))), )
+\varcond(\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))))
 \replacewith(equals(a,null)) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11393,7 +11414,7 @@ Choices: true}
 == instanceof_not_compatible_2 (instanceof disjoint type) =========================================
 instanceof_not_compatible_2 {
 \find(equals(G::instance(a),FALSE))
-\varcond(\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))), )
+\varcond(\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))))
 \replacewith(not(equals(a,null))) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11401,7 +11422,7 @@ Choices: true}
 == instanceof_not_compatible_3 (instanceof disjoint type) =========================================
 instanceof_not_compatible_3 {
 \find(equals(G::instance(a),TRUE))
-\varcond(\not\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))), )
+\varcond(\not\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))))
 \replacewith(false) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11409,7 +11430,7 @@ Choices: true}
 == instanceof_not_compatible_4 (instanceof disjoint type) =========================================
 instanceof_not_compatible_4 {
 \find(equals(G::instance(a),FALSE))
-\varcond(\not\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))), )
+\varcond(\not\sub(Null, G), \disjointModuloNull(G, \typeof(a (any term))))
 \replacewith(true) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11418,7 +11439,7 @@ Choices: true}
 instanceof_not_compatible_5 {
 \assumes ([equals(H::instance(a),TRUE)]==>[]) 
 \find(equals(G::instance(a),TRUE))
-\varcond(\sub(Null, G), \disjointModuloNull(G, H), )
+\varcond(\sub(Null, G), \disjointModuloNull(G, H))
 \replacewith(equals(a,null)) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11426,7 +11447,7 @@ Choices: true}
 == instanceof_static_type (instanceof static supertype) =========================================
 instanceof_static_type {
 \find(G::instance(a))
-\varcond(\sub(\typeof(a (any term)), G), )
+\varcond(\sub(\typeof(a (any term)), G))
 \replacewith(TRUE) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -11435,7 +11456,7 @@ Choices: true}
 instanceof_static_type_2 {
 \assumes ([equals(a2,a)]==>[]) 
 \find(G::instance(a))
-\sameUpdateLevel\varcond(\sub(\typeof(a2 (any term)), G), )
+\sameUpdateLevel\varcond(\sub(\typeof(a2 (any term)), G))
 \replacewith(TRUE) 
 \heuristics(evaluate_instanceof, concrete)
 Choices: true}
@@ -12532,8 +12553,12 @@ loopScopeInvBox {
   while (#nse) #body
 }\] (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #box ( (modal operator))\[{
   while (#nse) #body
-}\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #box ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #box ( (modal operator)), freeInv (formula)), )
-\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ ..
+}\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #box ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #box ( (modal operator)), freeInv (formula)))
+\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(#box ( (modal operator))\[{
+  #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
+  #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+}\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12543,7 +12568,7 @@ loopScopeInvBox {
       break;
     }
   }
-... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)))))))) ;
+... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}
@@ -12557,8 +12582,13 @@ loopScopeInvDia {
   while (#nse) #body
 }\] (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #dia ( (modal operator))\[{
   while (#nse) #body
-}\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #dia ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #dia ( (modal operator)), freeInv (formula)), \getVariant(#loopStmt (program Statement), variantTerm (any term)), )
-\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ ..
+}\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #dia ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #dia ( (modal operator)), freeInv (formula)), \getVariant(#loopStmt (program Statement), variantTerm (any term)))
+\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(#dia ( (modal operator))\[{
+  #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
+  #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+  #typeof(#variant) #variant;
+}\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12568,7 +12598,7 @@ loopScopeInvDia {
       break;
     }
   }
-... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant))))))))) ;
+... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant)))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}
@@ -12578,7 +12608,7 @@ loopUnwind {
 \find(#allmodal ( (modal operator))\[{ ..
   while (#e) #s
 ... }\] (post))
-\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)), )
+\varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #unwind-loop(while (#e) #s)
 ... }\] (post)) 
@@ -12654,7 +12684,7 @@ lsLblContinueNoMatch1 {
     continue;
     #slist
   }
-}\] (post))), \varcond (\not\isLabeled(#lsStmt (program Statement)), )
+}\] (post))), \varcond (\not\isLabeled(#lsStmt (program Statement)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #lhs = true;
   continue;
@@ -12671,7 +12701,7 @@ lsLblContinueNoMatch2 {
     #slist
   }
 ... }\] (post))
-\varcond(\different (#lb1 (program Label), #lb (program Label)), )
+\varcond(\different (#lb1 (program Label), #lb (program Label)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #lhs = true;
   continue;
@@ -12866,7 +12896,7 @@ methodCall {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #se.#mn(#selist);
 ... }\] (post))
-\varcond(\not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
+\varcond(\not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)))
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ( (modal operator))\[{ ..
   method-call(#se.#mn(#selist))
@@ -12912,7 +12942,7 @@ methodCallParamThrow {
     #slist
   }
 ... }\] (post))
-\varcond(\isLocalVariable (#se (program SimpleExpression)), )
+\varcond(\isLocalVariable (#se (program SimpleExpression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   throw #se;
 ... }\] (post)) 
@@ -12966,7 +12996,7 @@ methodCallThrow {
     #slist
   }
 ... }\] (post))
-\varcond(\isLocalVariable (#se (program SimpleExpression)), )
+\varcond(\isLocalVariable (#se (program SimpleExpression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   throw #se;
 ... }\] (post)) 
@@ -13003,7 +13033,7 @@ methodCallWithAssignment {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #lhs = #se.#mn(#selist);
 ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)))
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ( (modal operator))\[{ ..
   #typeof(#lhs) #v0;
@@ -13057,7 +13087,7 @@ methodCallWithAssignmentWithinClass {
 \find(#allmodal ( (modal operator))\[{ ..
   #lhs = #mn(#elist);
 ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#lhs) #v0;
   method-call(#mn(#elist))
@@ -13071,7 +13101,7 @@ methodCallWithinClass {
 \find(#allmodal ( (modal operator))\[{ ..
   #mn(#elist);
 ... }\] (post))
-\varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)), )
+\varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   method-call(#mn(#elist))
 ... }\] (post)) 
@@ -13436,7 +13466,7 @@ Choices: integerSimplificationRules:full}
 narrowSelectArrayType {
 \assumes ([wellFormed(h)]==>[equals(o,null)]) 
 \find(beta::select(h,o,arr(idx)))
-\sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta), )
+\sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta))
 \replacewith(alpha::select(h,o,arr(idx))) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -13445,7 +13475,7 @@ Choices: programRules:Java}
 narrowSelectType {
 \assumes ([wellFormed(h)]==>[]) 
 \find(beta::select(h,o,f))
-\varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta), )
+\varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
 \replacewith(alpha::select(h,o,f)) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -13747,7 +13777,7 @@ Choices: programRules:Java}
 == nonNull (nonNull) =========================================
 nonNull {
 \find(nonNull(heapSV,o,depth))
-\varcond(\notFreeIn(i (variable), depth (int term)), \notFreeIn(i (variable), heapSV (Heap term)), \notFreeIn(i (variable), o (java.lang.Object term)), \isReferenceArray(o (java.lang.Object term)), )
+\varcond(\notFreeIn(i (variable), depth (int term)), \notFreeIn(i (variable), heapSV (Heap term)), \notFreeIn(i (variable), o (java.lang.Object term)), \isReferenceArray(o (java.lang.Object term)))
 \replacewith(and(not(equals(o,null)),imp(gt(depth,Z(0(#))),all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,length(o))),nonNull(heapSV,java.lang.Object::select(heapSV,o,arr(i)),sub(depth,Z(1(#))))))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -13804,7 +13834,7 @@ Choices: true}
 null_can_always_be_stored_in_a_reference_type_array {
 \assumes ([]==>[equals(array,null)]) 
 \find(arrayStoreValid(array,null))
-\sameUpdateLevel\varcond(\isReferenceArray(array (GOS term)), )
+\sameUpdateLevel\varcond(\isReferenceArray(array (GOS term)))
 \replacewith(true) 
 \heuristics(simplify)
 Choices: programRules:Java}
@@ -13812,7 +13842,7 @@ Choices: programRules:Java}
 == observerDependency (observerDependency) =========================================
 observerDependency {
 \find(termWithLargeHeap)
-\inSequentState\varcond(\sameObserver (termWithLargeHeap (any term), termWithSmallHeap (any term)), )
+\inSequentState\varcond(\sameObserver (termWithLargeHeap (any term), termWithSmallHeap (any term)))
 \add []==>[#ObserverEquality(termWithLargeHeap,termWithSmallHeap)] ;
 \replacewith(termWithSmallHeap) 
 
@@ -13821,7 +13851,7 @@ Choices: programRules:Java}
 == observerDependencyEQ (observerDependencyEQ) =========================================
 observerDependencyEQ {
 \find(equals(t1,t2))
-\inSequentState\varcond(\sameObserver (t1 (any term), t2 (any term)), )
+\inSequentState\varcond(\sameObserver (t1 (any term), t2 (any term)))
 \add []==>[#ObserverEquality(t1,t2)] ;
 \replacewith(true) 
 
@@ -13830,7 +13860,7 @@ Choices: programRules:Java}
 == observerDependencyEquiv (observerDependencyEQ) =========================================
 observerDependencyEquiv {
 \find(equiv(t1,t2))
-\inSequentState\varcond(\sameObserver (t1 (formula), t2 (formula)), )
+\inSequentState\varcond(\sameObserver (t1 (formula), t2 (formula)))
 \add []==>[#ObserverEquality(t1,t2)] ;
 \replacewith(true) 
 
@@ -13839,7 +13869,7 @@ Choices: programRules:Java}
 == observerDependencyFormula (observerDependency) =========================================
 observerDependencyFormula {
 \find(termWithLargeHeap)
-\inSequentState\varcond(\sameObserver (termWithLargeHeap (formula), termWithSmallHeap (formula)), )
+\inSequentState\varcond(\sameObserver (termWithLargeHeap (formula), termWithSmallHeap (formula)))
 \add []==>[#ObserverEquality(termWithLargeHeap,termWithSmallHeap)] ;
 \replacewith(termWithSmallHeap) 
 
@@ -13864,7 +13894,7 @@ Choices: programRules:Java}
 == onlyCreatedObjectsAreObserved (onlyCreatedObjectsAreObserved) =========================================
 onlyCreatedObjectsAreObserved {
 \find(obs)
-\sameUpdateLevel\varcond(\isObserver (obs (deltaObject term), h (Heap term)), )
+\sameUpdateLevel\varcond(\isObserver (obs (deltaObject term), h (Heap term)))
 \add [or(equals(obs,null),equals(boolean::select(h,obs,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
@@ -13872,7 +13902,7 @@ Choices: programRules:Java}
 == onlyCreatedObjectsAreObservedInLocSets (onlyCreatedObjectsAreObservedInLocSets) =========================================
 onlyCreatedObjectsAreObservedInLocSets {
 \find(elementOf(o,f,obs)==>)
-\varcond(\isObserver (obs (LocSet term), h (Heap term)), )
+\varcond(\isObserver (obs (LocSet term), h (Heap term)))
 \add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
@@ -13881,7 +13911,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreObservedInLocSetsEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
 \find(elementOf(o,f,EQ)==>)
-\varcond(\isObserver (obs (LocSet term), h (Heap term)), )
+\varcond(\isObserver (obs (LocSet term), h (Heap term)))
 \add [or(equals(o,null),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
@@ -14905,7 +14935,7 @@ Choices: reach:on}
 == reachDependenciesStoreSimple (reachDependenciesStoreSimple) =========================================
 reachDependenciesStoreSimple {
 \find(reach(store(h,o3,f2,x),allObjects(f),o,o2,n))
-\varcond(\metaDisjoint f (Field term), f2 (Field term), )
+\varcond(\metaDisjoint f (Field term), f2 (Field term))
 \replacewith(reach(h,allObjects(f),o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -14914,7 +14944,7 @@ Choices: reach:on}
 reachDependenciesStoreSimpleEQ {
 \assumes ([equals(store(h,o3,f2,x),h2)]==>[]) 
 \find(reach(h2,allObjects(f),o,o2,n))
-\varcond(\metaDisjoint f (Field term), f2 (Field term), )
+\varcond(\metaDisjoint f (Field term), f2 (Field term))
 \replacewith(reach(h,allObjects(f),o,o2,n)) 
 \heuristics(simplify)
 Choices: reach:on}
@@ -14930,7 +14960,7 @@ Choices: reach:on}
 reachEndOfUniquePath {
 \assumes ([reach(h,allObjects(f),o,o2,n),equals(alpha::select(h,o2,f),null),equals(alpha::select(h,o3,f),null)]==>[]) 
 \find(reach(h,allObjects(f),o,o3,n2)==>)
-\varcond(\different (n (int term), n2 (int term)), )
+\varcond(\different (n (int term), n2 (int term)))
 \add [and(equals(o2,o3),equals(n,n2))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: reach:on}
@@ -14939,7 +14969,7 @@ Choices: reach:on}
 reachEndOfUniquePath2 {
 \assumes ([reach(h,allObjects(f),o,o2,n),equals(alpha::select(h,o2,f),null)]==>[]) 
 \find(reach(h,allObjects(f),o,o3,n2)==>)
-\varcond(\different (o (java.lang.Object term), o2 (java.lang.Object term)), \different (n (int term), n2 (int term)), )
+\varcond(\different (o (java.lang.Object term), o2 (java.lang.Object term)), \different (n (int term), n2 (int term)))
 \add [or(lt(n2,n),and(equals(o2,o3),equals(n,n2)))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: reach:on}
@@ -14969,7 +14999,7 @@ Choices: reach:on}
 reachUniquePathSameSteps {
 \assumes ([reach(h,allObjects(f),o,o2,n)]==>[]) 
 \find(reach(h,allObjects(f),o,o3,n)==>)
-\varcond(\different (o2 (java.lang.Object term), o3 (java.lang.Object term)), )
+\varcond(\different (o2 (java.lang.Object term), o3 (java.lang.Object term)))
 \add [equals(o2,o3)]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: reach:on}
@@ -15018,7 +15048,7 @@ reference_type_cast {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #lhs = (#npit) #se;
 ... }\] (post))
-\varcond(\hasSort(#npit (program NonPrimitiveType), G), \not\sub(\typeof(#se (program SimpleExpression)), G), )
+\varcond(\hasSort(#npit (program NonPrimitiveType), G), \not\sub(\typeof(#se (program SimpleExpression)), G))
 \add []==>[or(equals(#se,null),equals(G::instance(#se),TRUE))] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(#addCast(#se,#lhs)),#allmodal(post))]) 
 \heuristics(simplify_prog)
@@ -15429,7 +15459,7 @@ Choices: true}
 sameTypeFalse {
 \assumes ([equals(G::exactInstance(x1),TRUE),equals(H::exactInstance(x2),TRUE)]==>[]) 
 \find(sameType(x1,x2))
-\varcond(\not\same(G, H), )
+\varcond(\not\same(G, H))
 \replacewith(false) 
 \heuristics(concrete)
 Choices: true}
@@ -16135,7 +16165,7 @@ Choices: true}
 == simplifyIfThenElseUpdate1 (simplifyIfThenElse) =========================================
 simplifyIfThenElseUpdate1 {
 \find(if-then-else(phi,update-application(u1,t),update-application(u2,t)))
-\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result), )
+\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result))
 \replacewith(result) 
 
 Choices: true}
@@ -16143,7 +16173,7 @@ Choices: true}
 == simplifyIfThenElseUpdate2 (simplifyIfThenElse) =========================================
 simplifyIfThenElseUpdate2 {
 \find(if-then-else(phi,t,update-application(u2,t)))
-\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result), )
+\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result))
 \replacewith(result) 
 
 Choices: true}
@@ -16151,7 +16181,7 @@ Choices: true}
 == simplifyIfThenElseUpdate3 (simplifyIfThenElse) =========================================
 simplifyIfThenElseUpdate3 {
 \find(if-then-else(phi,update-application(u1,t),t))
-\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result), )
+\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result))
 \replacewith(result) 
 
 Choices: true}
@@ -16159,7 +16189,7 @@ Choices: true}
 == simplifyIfThenElseUpdate4 (simplifyIfThenElse) =========================================
 simplifyIfThenElseUpdate4 {
 \find(if-then-else(phi,t,t))
-\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result), )
+\varcond(\simplifyIfThenElseUpdate(phi, u1, u2, t, result))
 \replacewith(result) 
 
 Choices: true}
@@ -16259,7 +16289,7 @@ Choices: programRules:Java}
 == simplifyUpdate1 (simplifyUpdate1) =========================================
 simplifyUpdate1 {
 \find(update-application(u,t))
-\varcond(\dropEffectlessElementaries(u (update), t (any term), result (any term)), )
+\varcond(\dropEffectlessElementaries(u (update), t (any term), result (any term)))
 \replacewith(result) 
 \heuristics(update_elim)
 Choices: true}
@@ -16267,7 +16297,7 @@ Choices: true}
 == simplifyUpdate2 (simplifyUpdate2) =========================================
 simplifyUpdate2 {
 \find(update-application(u,phi))
-\varcond(\dropEffectlessElementaries(u (update), phi (formula), result (formula)), )
+\varcond(\dropEffectlessElementaries(u (update), phi (formula), result (formula)))
 \replacewith(result) 
 \heuristics(update_elim)
 Choices: true}
@@ -16275,7 +16305,7 @@ Choices: true}
 == simplifyUpdate3 (simplifyUpdate3) =========================================
 simplifyUpdate3 {
 \find(update-application(u,u2))
-\varcond(\dropEffectlessElementaries(u (update), u2 (update), result (update)), )
+\varcond(\dropEffectlessElementaries(u (update), u2 (update), result (update)))
 \replacewith(result) 
 \heuristics(update_elim)
 Choices: true}
@@ -16403,7 +16433,7 @@ Choices: true}
 == sortsDisjoint1 (sortsDisjoint1) =========================================
 sortsDisjoint1 {
 \find(equals(x,y))
-\varcond(\not\sub(Null, G), \disjointModuloNull(G, H), )
+\varcond(\not\sub(Null, G), \disjointModuloNull(G, H))
 \replacewith(false) 
 \heuristics(concrete)
 Choices: true}
@@ -16411,7 +16441,7 @@ Choices: true}
 == sortsDisjoint2 (sortsDisjoint2) =========================================
 sortsDisjoint2 {
 \find(equals(x,y))
-\varcond(\not\sub(Null, H), \disjointModuloNull(G, H), )
+\varcond(\not\sub(Null, H), \disjointModuloNull(G, H))
 \replacewith(false) 
 \heuristics(concrete)
 Choices: true}
@@ -16419,7 +16449,7 @@ Choices: true}
 == sortsDisjointModuloNull (sortsDisjointModuloNull) =========================================
 sortsDisjointModuloNull {
 \find(equals(x,y))
-\varcond(\strict\sub(Null, G), \strict\sub(Null, H), \disjointModuloNull(G, H), )
+\varcond(\strict\sub(Null, G), \strict\sub(Null, H), \disjointModuloNull(G, H))
 \replacewith(and(equals(x,null),equals(y,null))) 
 \heuristics(simplify)
 Choices: true}
@@ -16512,7 +16542,7 @@ staticMethodCall {
 \find(#allmodal ( (modal operator))\[{ ..
   #se.#mn(#elist);
 ... }\] (post))
-\varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
+\varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   method-call(#se.#mn(#elist))
 ... }\] (post)) 
@@ -16549,7 +16579,7 @@ staticMethodCallWithAssignment {
 \find(#allmodal ( (modal operator))\[{ ..
   #lhs = #se.#mn(#elist);
 ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#lhs) #v0;
   method-call(#se.#mn(#elist))
@@ -17082,7 +17112,7 @@ synchronizedBlockEmpty {
 \find(==>#allmodal ( (modal operator))\[{ ..
   synchronized(#se) {}
 ... }\] (post))
-\varcond(\isLocalVariable (#se (program SimpleExpression)), )
+\varcond(\isLocalVariable (#se (program SimpleExpression)))
 \replacewith([]==>[not(equals(#se,null))]) ;
 \replacewith([]==>[#allmodal(post)]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -17104,7 +17134,7 @@ synchronizedBlockEvalSync {
     #slist
   }
 ... }\] (post))
-\varcond(\new(#loc (program Variable), \typeof(#nsencr (program NonSimpleExpressionNoClassReference))), \isLocalVariable (#nsencr (program NonSimpleExpressionNoClassReference)), )
+\varcond(\new(#loc (program Variable), \typeof(#nsencr (program NonSimpleExpressionNoClassReference))), \isLocalVariable (#nsencr (program NonSimpleExpressionNoClassReference)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nsencr) #loc = #nsencr;
   synchronized(#loc) {
@@ -17212,7 +17242,7 @@ throwUnfoldMore {
 \find(#allmodal ( (modal operator))\[{ ..
   throw #se;
 ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#se (program SimpleExpression))), \isLocalVariable (#se (program SimpleExpression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#se (program SimpleExpression))), \isLocalVariable (#se (program SimpleExpression)))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#se) #v0 = #se;
   throw #v0;
@@ -18260,7 +18290,7 @@ unusedLabel {
   #lb:
   #s
 ... }\] (post))
-\varcond(\not\freeLabelIn (#lb,#s), )
+\varcond(\not\freeLabelIn (#lb,#s))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #s
 ... }\] (post)) 
@@ -18388,7 +18418,7 @@ Choices: programRules:Java}
 == wellFormedMemsetArrayObject (wellFormedMemsetArrayObject) =========================================
 wellFormedMemsetArrayObject {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), )
+\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha))
 \replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(ar,x))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18396,7 +18426,7 @@ Choices: programRules:Java}
 == wellFormedMemsetArrayPrimitive (wellFormedMemsetArrayPrimitive) =========================================
 wellFormedMemsetArrayPrimitive {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha), )
+\succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18404,7 +18434,7 @@ Choices: programRules:Java}
 == wellFormedStoreArray (wellFormedStoreArray) =========================================
 wellFormedStoreArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), )
+\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha))
 \replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(o,x))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18412,7 +18442,7 @@ Choices: programRules:Java}
 == wellFormedStoreLocSet (wellFormedStoreLocSet) =========================================
 wellFormedStoreLocSet {
 \find(wellFormed(store(h,o,f,x)))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha), )
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \sub(LocSet, alpha))
 \replacewith(and(wellFormed(h),createdInHeap(x,h))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18428,7 +18458,7 @@ Choices: programRules:Java}
 == wellFormedStoreObject (wellFormedStoreObject) =========================================
 wellFormedStoreObject {
 \find(wellFormed(store(h,o,f,x)))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), )
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha))
 \replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18437,7 +18467,7 @@ Choices: programRules:Java}
 wellFormedStoreObjectEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha), )
+\sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha))
 \replacewith(and(wellFormed(h),or(equals(x,null),and(equals(boolean::select(h,x,java.lang.Object::<created>),TRUE),equals(alpha::instance(x),TRUE))))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
@@ -18445,7 +18475,7 @@ Choices: programRules:Java}
 == wellFormedStorePrimitive (wellFormedStorePrimitive) =========================================
 wellFormedStorePrimitive {
 \find(wellFormed(store(h,o,f,x)))
-\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha), )
+\succedentPolarity\varcond(\fieldType(f (Field term), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -18453,7 +18483,7 @@ Choices: programRules:Java}
 == wellFormedStorePrimitiveArray (wellFormedStorePrimitiveArray) =========================================
 wellFormedStorePrimitiveArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
-\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha), )
+\succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), \sub(beta, alpha))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}
@@ -18462,7 +18492,7 @@ Choices: programRules:Java}
 wellFormedStorePrimitiveEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
-\sameUpdateLevel\succedentPolarity\varcond(\not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), )
+\sameUpdateLevel\succedentPolarity\varcond(\not\sub(beta, java.lang.Object), \not\sub(beta, LocSet))
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
 Choices: programRules:Java}

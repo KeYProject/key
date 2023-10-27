@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -560,8 +563,9 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-            "UseModality", null, inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
-            null, useJavaBlock, inst.progPost.getLabels());
+            "UseModality", null,
+            tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
+                null, useJavaBlock, inst.progPost.getLabels()));
         Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));

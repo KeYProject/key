@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
@@ -96,7 +99,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        goal.ruleAppIndex().reportAutomatedRuleApps();
+        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
+            goal.proof().getServices());
     }
 
     /**

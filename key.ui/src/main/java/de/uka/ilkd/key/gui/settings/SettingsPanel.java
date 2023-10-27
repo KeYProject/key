@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -176,12 +179,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     * @param info
-     * @param selectionIndex
-     * @param validator
-     * @param items
-     * @param <T>
-     * @return
+     * @param title label of the combo box
+     * @param info help text
+     * @param selectionIndex which item to initially select
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
+     * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
             @Nullable Validator<T> validator, T... items) {
@@ -202,7 +206,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
+        } else if (title != null) {
+            pCenter.add(new JLabel(title));
+            pCenter.add(comboBox, new CC().wrap());
         } else {
+            // TODO: this branch seems to always throw an exception
             add(comboBox, new CC().span(2).wrap());
         }
         return comboBox;

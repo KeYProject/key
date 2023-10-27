@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -156,8 +159,7 @@ public class NodeInfo {
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp pta) {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
@@ -307,8 +309,8 @@ public class NodeInfo {
             return;
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp) ruleApp; // XXX
+        if (ruleApp instanceof TacletApp tacletApp) {
+            // XXX
 
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
@@ -329,10 +331,10 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
-                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
                             node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
-                        val = TermLabel.removeIrrelevantLabels(
+                        val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
                     }

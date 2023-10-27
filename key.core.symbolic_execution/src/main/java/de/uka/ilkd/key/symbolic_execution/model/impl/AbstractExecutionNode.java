@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.HashMap;
@@ -483,7 +486,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
             // Add current branch condition to path
             Term condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
             }
             condition = SymbolicExecutionUtil.improveReadability(condition, services);

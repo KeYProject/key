@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -243,7 +246,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.nil();
+        private ImmutableSet<Term> literals;
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -251,10 +254,9 @@ public class PredictCostProver {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Clause)) {
+            if (!(o instanceof Clause other)) {
                 return false;
             }
-            final Clause other = (Clause) o;
             if (other.literals.size() != literals.size()) {
                 return false;
             }

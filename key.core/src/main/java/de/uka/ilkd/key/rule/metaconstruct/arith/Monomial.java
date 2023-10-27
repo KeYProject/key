@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -7,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
@@ -33,7 +36,7 @@ public class Monomial {
 
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
-        monoTerm = TermLabel.removeIrrelevantLabels(monoTerm, services);
+        monoTerm = TermLabelManager.removeIrrelevantLabels(monoTerm, services);
         Monomial res;
 
         synchronized (monomialCache) {
@@ -262,11 +265,9 @@ public class Monomial {
             return true;
         }
 
-        if (!(o instanceof Monomial)) {
+        if (!(o instanceof Monomial m)) {
             return false;
         }
-
-        final Monomial m = (Monomial) o;
 
         if (!coefficient.equals(m.coefficient)) {
             return false;

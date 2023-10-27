@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
@@ -7,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -328,7 +330,7 @@ public class KeyIO {
                 throw new IllegalStateException();
             }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
-                    .collect(Collectors.toList());
+                    .toList();
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {
