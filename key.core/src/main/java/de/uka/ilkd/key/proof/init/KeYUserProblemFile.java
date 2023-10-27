@@ -70,8 +70,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
-        // TODO: This is a quick fix; find proper solution!
-        Modality.operators.clear();
     }
 
     /**
@@ -87,8 +85,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYUserProblemFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
-        // TODO: This is a quick fix; find proper solution!
-        Modality.operators.clear();
     }
 
     // -------------------------------------------------------------------------

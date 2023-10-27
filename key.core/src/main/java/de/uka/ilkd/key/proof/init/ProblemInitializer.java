@@ -66,16 +66,17 @@ public final class ProblemInitializer {
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
     public ProblemInitializer(ProgressMonitor mon, Services services,
             ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
+        Modality.clearCache();
     }
-
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
 
     public ProblemInitializer(Profile profile) {
         if (profile == null) {
@@ -85,6 +86,7 @@ public final class ProblemInitializer {
         this.progMon = null;
         this.listener = null;
         this.services = new Services(Objects.requireNonNull(profile));
+        Modality.clearCache();
     }
 
     private void progressStarted(Object sender) {

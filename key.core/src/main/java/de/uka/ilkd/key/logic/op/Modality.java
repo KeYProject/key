@@ -26,7 +26,7 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
     /*
      * keeps track of created modalities
      */
-    public static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
+    private static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
         new HashMap<>();
 
 
@@ -45,6 +45,10 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
             Modality.operators().put(pair, mod);
         }
         return mod;
+    }
+
+    public static void clearCache() {
+        operators.clear();
     }
 
     /**
