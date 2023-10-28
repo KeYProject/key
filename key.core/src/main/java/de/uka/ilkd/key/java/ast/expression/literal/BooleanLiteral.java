@@ -17,7 +17,7 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;

@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.*;
 
 /**
@@ -362,7 +363,7 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
-    public Term var(@Nonnull ProgramVariable v) {
+    public Term var(@NonNull ProgramVariable v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
         // "Cannot create term for \"member\" "

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class JavaDLFieldNames {
     public static final char FIELD_PREFIX = '#';

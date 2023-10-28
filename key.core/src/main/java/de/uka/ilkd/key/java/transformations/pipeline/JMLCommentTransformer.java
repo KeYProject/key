@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
@@ -18,6 +18,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.utils.PositionUtils;
+import org.jspecify.annotations.NonNull;
 
 public class JMLCommentTransformer extends JavaTransformer {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
@@ -31,7 +32,7 @@ public class JMLCommentTransformer extends JavaTransformer {
      * @param services the CrossReferenceServiceConfiguration to access
      *        model information
      */
-    public JMLCommentTransformer(@Nonnull TransformationPipelineServices services) {
+    public JMLCommentTransformer(@NonNull TransformationPipelineServices services) {
         super(services);
     }
 

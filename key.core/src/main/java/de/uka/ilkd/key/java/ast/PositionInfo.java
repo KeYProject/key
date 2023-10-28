@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import de.uka.ilkd.key.java.Position;
 
@@ -32,13 +33,13 @@ public class PositionInfo {
     /**
      * The start position.
      */
-    @Nonnull
+    @NonNull
     private final Position startPos;
 
     /**
      * The end position.
      */
-    @Nonnull
+    @NonNull
     private final Position endPos;
 
     /**

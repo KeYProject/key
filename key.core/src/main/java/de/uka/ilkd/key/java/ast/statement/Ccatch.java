@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.CcatchNonstandardParameterDeclaration;
@@ -66,7 +67,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
         body = children.get(StatementBlock.class);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;

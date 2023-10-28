@@ -250,9 +250,8 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @NonNull
     @Override
-    public Optional<List<Path>> readClassPath() {
+    public @NonNull List<Path> readClassPath() {
         @NonNull
         ProblemInformation pi = getProblemInformation();
         var parentDirectory = file.file().getParent();
@@ -268,11 +267,11 @@ public class KeYFile implements EnvInput {
                 fileList.add(f);
             }
         }
-        return Optional.of(fileList);
+        return fileList;
     }
 
     @Override
-    public @Nonnull Optional<Path> readJavaPath() throws ProofInputException {
+    public @Nullable Path readJavaPath() throws ProofInputException {
         @NonNull
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
@@ -287,9 +286,9 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(
                     String.format("Declared Java source %s not found.", javaPath));
             }
-            return Optional.of(absFile.toAbsolutePath());
+            return absFile.toAbsolutePath();
         }
-        return Optional.empty();
+        return null;
     }
 
 

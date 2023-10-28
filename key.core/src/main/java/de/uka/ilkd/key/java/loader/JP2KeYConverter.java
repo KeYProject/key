@@ -7,8 +7,9 @@ import java.net.URI;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
@@ -81,7 +82,7 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
-public record JP2KeYConverter(Services services,KeYJPMapping mapping,@Nonnull Namespace<SchemaVariable>schemaVariables,JP2KeYTypeConverter typeConverter){
+public record JP2KeYConverter(Services services, KeYJPMapping mapping, @NonNull Namespace<SchemaVariable>schemaVariables, JP2KeYTypeConverter typeConverter){
 
 public de.uka.ilkd.key.java.ast.CompilationUnit processCompilationUnit(com.github.javaparser.ast.CompilationUnit cu){return(de.uka.ilkd.key.java.ast.CompilationUnit)process(cu);}
 
@@ -93,7 +94,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final Services services;
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
-    @Nonnull
+    @NonNull
     private final Namespace<SchemaVariable> schemaVariableNamespace;
     private final ConstantExpressionEvaluator evaluator;
     /**
@@ -105,9 +106,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final Map<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
         new LinkedHashMap<>();
 
-    JP2KeYVisitor(@Nonnull Services services,
-            @Nonnull KeYJPMapping mapping, @Nonnull JP2KeYTypeConverter typeConverter,
-            @Nonnull Namespace<SchemaVariable> schemaVariables) {
+    JP2KeYVisitor(@NonNull Services services,
+            @NonNull KeYJPMapping mapping, @NonNull JP2KeYTypeConverter typeConverter,
+            @NonNull Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = mapping;
         this.typeConverter = typeConverter;
@@ -125,7 +126,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy");
     }
 
-    @Nonnull
+    @NonNull
     private TypeReference requireTypeReference(Type type) {
         return accept(type);
     }
@@ -331,13 +332,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return addToMapping(n, td);
     }
 
-    @Nonnull
-    private <T> T accept(@Nonnull Node check) {
+    @NonNull
+    private <T> T accept(@NonNull Node check) {
         // noinspection unchecked
         return Objects.requireNonNull((T) check.accept(this, null));
     }
 
-    private boolean parentIsInterface(@Nonnull Node n) {
+    private boolean parentIsInterface(@NonNull Node n) {
         if (n.getParentNode().isPresent()) {
             var parent = n.getParentNode().get();
             if (parent instanceof ClassOrInterfaceDeclaration) {
@@ -347,7 +348,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return false;
     }
 
-    @Nonnull
+    @NonNull
     private static PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
             return PositionInfo.UNDEFINED;
@@ -927,7 +928,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         throw new IllegalArgumentException("Unexpected expression type: " + name.getClass());
     }
 
-    @Nonnull
+    @NonNull
     private PackageReference translatePackageReference(Name name) {
         // Translate recursively since PackageReference and Name are ordered differently
         var pen = new ProgramElementName(name.getIdentifier(),
@@ -942,7 +943,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new PackageReference(createProgramElementName(name), inner);
     }
 
-    @Nonnull
+    @NonNull
     private Object getKeYJavaType(ClassOrInterfaceType type) {
         if (type.getName().asString().startsWith("#")) {
             return lookupSchemaVariable(type.asString(), type);
@@ -1934,7 +1935,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return lookupSchemaVariable(name.asString(), name);
     }
 
-    @Nonnull
+    @NonNull
     private SchemaVariable lookupSchemaVariable(String name, Node context) {
         SchemaVariable n = schemaVariableNamespace.lookup(new de.uka.ilkd.key.logic.Name(name));
         if (n != null) {

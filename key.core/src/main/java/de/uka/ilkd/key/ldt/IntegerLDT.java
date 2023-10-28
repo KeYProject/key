@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -631,8 +630,6 @@ public final class IntegerLDT extends LDT {
     /**
      * Placeholder for the loop index variable in an enhanced for loop over arrays. Follows the
      * proposal by David Cok to adapt JML to Java5.
-     *
-     * @return
      */
     public Function getIndex() {
         return index;

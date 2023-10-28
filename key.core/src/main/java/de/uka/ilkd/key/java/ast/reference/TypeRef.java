@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 public class TypeRef extends TypeReferenceImp {
@@ -20,7 +21,7 @@ public class TypeRef extends TypeReferenceImp {
      * TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as last
      * argument.
      */
-    public TypeRef(@Nonnull KeYJavaType kjt) {
+    public TypeRef(@NonNull KeYJavaType kjt) {
         this(kjt, 0);
     }
 
@@ -30,7 +31,7 @@ public class TypeRef extends TypeReferenceImp {
      * constructor TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as
      * last argument.
      */
-    public TypeRef(@Nonnull KeYJavaType kjt, int dim) {
+    public TypeRef(@NonNull KeYJavaType kjt, int dim) {
         super(new ProgramElementName(kjt.getName()), dim, kjt.createPackagePrefix());
         this.kjt = kjt;
     }

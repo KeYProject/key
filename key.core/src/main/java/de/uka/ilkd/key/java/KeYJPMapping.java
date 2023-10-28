@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -162,11 +163,11 @@ public class KeYJPMapping {
         return this.superArrayType;
     }
 
-    public boolean isPackageName(@Nonnull String name) {
+    public boolean isPackageName(@NonNull String name) {
         return packageNames.contains(name);
     }
 
-    public void registerPackageName(@Nonnull String name) {
+    public void registerPackageName(@NonNull String name) {
         int onePastLastDot = 0;
         while (true) {
             int dot = name.indexOf('.', onePastLastDot);

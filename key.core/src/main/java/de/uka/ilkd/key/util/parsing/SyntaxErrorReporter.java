@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.*;
@@ -200,7 +201,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public @Nonnull Location getLocation() {
+        public @NonNull Location getLocation() {
             return location;
         }
     }

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
@@ -27,6 +27,7 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +39,20 @@ public class TransformationPipelineServices {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(TransformationPipelineServices.class);
 
-    @Nonnull
+    @NonNull
     private final TransformerCache cache;
 
-    @Nonnull
+    @NonNull
     private final JavaParserFactory javaParserFactory;
 
 
-    public TransformationPipelineServices(@Nonnull JavaParserFactory javaParserFactory,
-            @Nonnull TransformerCache cache) {
+    public TransformationPipelineServices(@NonNull JavaParserFactory javaParserFactory,
+            @NonNull TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
     }
 
-    @Nonnull
+    @NonNull
     public TransformerCache getCache() {
         return cache;
     }

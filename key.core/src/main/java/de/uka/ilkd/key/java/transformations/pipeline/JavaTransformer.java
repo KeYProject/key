@@ -1,26 +1,15 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-// Technical University Darmstadt, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import javax.annotation.Nonnull;
+
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The JavaDL requires some implicit fields, that are available in each
@@ -45,7 +34,7 @@ public abstract class JavaTransformer {
     /**
      * Further services and helper function for this pipeline step.
      */
-    @Nonnull
+    @NonNull
     protected final TransformationPipelineServices services;
 
     /**
@@ -54,8 +43,7 @@ public abstract class JavaTransformer {
      * compilation units, the declared classes, and information
      * for local classes.
      */
-    @Nonnull
-    protected final TransformationPipelineServices.TransformerCache cache;
+    protected final TransformationPipelineServices.@NonNull TransformerCache cache;
 
     /**
      * creates a transformer for the recoder model
@@ -63,7 +51,7 @@ public abstract class JavaTransformer {
      * @param services the CrossReferenceServiceConfiguration to access
      *        model information
      */
-    public JavaTransformer(@Nonnull TransformationPipelineServices services) {
+    public JavaTransformer(@NonNull TransformationPipelineServices services) {
         this.services = services;
         this.cache = services.getCache();
     }

@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
@@ -23,13 +19,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 
 /**
@@ -48,8 +46,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * the physical source of the input, and a graphical representation to call back in order to
      * report the progress while reading.
      *
-     * @param name the name of the file
-     * @param file the file to read from
+     * @param name    the name of the file
+     * @param file    the file to read from
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
@@ -60,29 +58,29 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /**
      * Instantiates a new user problem file.
      *
-     * @param name the name of the file
-     * @param file the file to read from
-     * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
+     * @param name       the name of the file
+     * @param file       the file to read from
+     * @param monitor    the possibly <tt>null</tt> monitor for progress
+     * @param profile    the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
-            boolean compressed) {
+                              boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
 
     /**
      * Instantiates a new user problem file.
      *
-     * @param name the name of the file
-     * @param file the file tp read from
-     * @param fileRepo the fileRepo which will store the file
-     * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
+     * @param name       the name of the file
+     * @param file       the file tp read from
+     * @param fileRepo   the fileRepo which will store the file
+     * @param monitor    the possibly <tt>null</tt> monitor for progress
+     * @param profile    the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
-            Profile profile, boolean compressed) {
+                              Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
 
@@ -108,8 +106,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         super.readExtendedSignature();
 
         // read in-code specifications
-        SLEnvInput slEnvInput =
-            new SLEnvInput(readJavaPath().orElse(null), readClassPath().orElse(null),
+        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(),
                 readBootClassPath(),
                 getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
@@ -141,7 +138,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
                     throw new ProofInputException(
-                        "No \\problem or \\chooseContract or \\proofObligation in the input file!");
+                            "No \\problem or \\chooseContract or \\proofObligation in the input file!");
                 }
             }
         } catch (Exception e) {
@@ -167,9 +164,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
-                file.file().toFile()),
-            name);
+                new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
+                        file.file().toFile()),
+                name);
     }
 
 
@@ -241,7 +238,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Tries to read the {@link Profile} from the file to load.
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
-     *         is defined by the file.
+     * is defined by the file.
      */
     private Profile readProfileFromFile() {
         @NonNull

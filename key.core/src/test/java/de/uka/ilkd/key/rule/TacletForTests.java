@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
@@ -149,7 +150,7 @@ public class TacletForTests {
         return rules;
     }
 
-    @Nonnull
+    @NonNull
     public static NoPosTacletApp lookupTaclet(String name) {
         var result = getRules().lookup(name);
         assertNotNull(result, "Failed to find taclet " + name);

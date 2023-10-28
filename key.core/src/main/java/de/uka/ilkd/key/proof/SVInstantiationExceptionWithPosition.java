@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -61,7 +62,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     }
 
     @Override
-    public @Nonnull Location getLocation() throws MalformedURLException {
+    public @NonNull Location getLocation() {
         return new Location(null, position);
     }
 }

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -37,7 +38,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     @Override
-    public @Nonnull Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 }

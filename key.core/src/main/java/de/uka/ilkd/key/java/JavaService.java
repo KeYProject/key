@@ -10,8 +10,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.TypeScope;
@@ -110,7 +111,7 @@ public class JavaService {
      * second category. A null value indicates that the boot classes are to
      * be read from an internal repository.
      */
-    @Nonnull
+    @NonNull
     private final Path bootClassPath;
 
 
@@ -118,11 +119,11 @@ public class JavaService {
      * A list of {@link File} objects that describes the classpath to be searched
      * for classes or Java files.
      */
-    @Nonnull
+    @NonNull
     private final Collection<Path> libraryPath;
 
-    public JavaService(Services services, @Nonnull Path bootClassPath,
-            @Nonnull Collection<Path> libraryPath) {
+    public JavaService(Services services, @NonNull Path bootClassPath,
+            @NonNull Collection<Path> libraryPath) {
         this.services = services;
         this.mapping = new KeYJPMapping();
         this.bootClassPath = bootClassPath;
@@ -160,22 +161,22 @@ public class JavaService {
      *
      * @return not null
      */
-    @Nonnull
+    @NonNull
     public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
     }
 
-    @Nonnull
+    @NonNull
     public KeYJPMapping getMapping() {
         return mapping;
     }
 
-    @Nonnull
+    @NonNull
     public Path getBootClassPath() {
         return bootClassPath;
     }
 
-    @Nonnull
+    @NonNull
     public Collection<Path> getLibraryPath() {
         return Collections.unmodifiableCollection(libraryPath);
     }
@@ -819,7 +820,7 @@ public class JavaService {
      * @param node the node
      * @return true if type name of the node matches "Key*SV".
      */
-    private boolean isSchemaJavaNode(@Nonnull Node node) {
+    private boolean isSchemaJavaNode(@NonNull Node node) {
         String typeName = node.getMetaModel().getTypeName();
         return typeName.startsWith("Key") && typeName.endsWith("SV");
     }
@@ -889,7 +890,7 @@ public class JavaService {
         return programFactory;
     }
 
-    @Nonnull
+    @NonNull
     private JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }

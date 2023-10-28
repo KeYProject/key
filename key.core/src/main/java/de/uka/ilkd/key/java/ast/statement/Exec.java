@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -127,13 +128,13 @@ public class Exec extends BranchStatement implements StatementContainer, Program
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();

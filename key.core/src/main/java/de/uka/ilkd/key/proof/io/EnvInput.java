@@ -49,7 +49,7 @@ public interface EnvInput {
      * Reads the Java path.
      */
     @Nullable
-    String readJavaPath() throws ProofInputException;
+    Path readJavaPath() throws ProofInputException;
 
     /**
      * Returns the file path to specific requested Java file.
@@ -63,8 +63,8 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @NotNull
-    List<File> readClassPath() throws ProofInputException;
+    @NonNull
+    List<Path> readClassPath();
 
     /**
      * gets the boot classpath element, null if none set.

@@ -5,12 +5,13 @@ package de.uka.ilkd.key.java.ast.reference;
 
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.jspecify.annotations.NonNull;
 
 
 public class FieldReference extends VariableReference
@@ -19,15 +20,15 @@ public class FieldReference extends VariableReference
     /**
      * Reference prefix.
      */
-    @Nonnull
+    @NonNull
     protected final ReferencePrefix prefix;
 
-    public FieldReference(@Nonnull ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(@NonNull ProgramVariable pv, ReferencePrefix prefix) {
         super(pv);
         this.prefix = constructPrefix(prefix, pv);
     }
 
-    public FieldReference(PositionInfo pi, List<Comment> c, @Nonnull ProgramVariable variable,
+    public FieldReference(PositionInfo pi, List<Comment> c, @NonNull ProgramVariable variable,
             ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());

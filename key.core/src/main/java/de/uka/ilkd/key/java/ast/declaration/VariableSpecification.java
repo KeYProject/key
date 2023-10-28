@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
@@ -246,13 +247,13 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         return getName();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return var;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getLastElement() {
         if (initializer != null) {

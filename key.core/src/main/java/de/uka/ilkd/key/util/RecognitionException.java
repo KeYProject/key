@@ -10,6 +10,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.IntStream;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -30,7 +31,7 @@ public class RecognitionException extends Exception implements HasLocation {
     }
 
     @Override
-    public @Nonnull Location getLocation() {
+    public @NonNull Location getLocation() {
         return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

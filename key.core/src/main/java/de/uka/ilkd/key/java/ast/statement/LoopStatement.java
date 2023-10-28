@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -37,14 +38,14 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Guard.
      */
-    @Nonnull
+    @NonNull
     protected final IGuard guard;
 
 
     /**
      * Body.
      */
-    @Nonnull
+    @NonNull
     protected final Statement body;
 
     /**
@@ -52,7 +53,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param body a statement.
      */
-    public LoopStatement(@Nonnull Expression guard, @Nonnull Statement body, ExtList comments) {
+    public LoopStatement(@NonNull Expression guard, @NonNull Statement body, ExtList comments) {
         super(comments);
         this.body = body;
         this.updates = null;
@@ -61,7 +62,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
-    public LoopStatement(Expression guard, @Nonnull Statement body, ExtList comments,
+    public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
             PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
@@ -76,14 +77,14 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param body a statement.
      */
-    public LoopStatement(Expression guard, @Nonnull Statement body) {
+    public LoopStatement(Expression guard, @NonNull Statement body) {
         this.body = body;
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
     }
 
-    public LoopStatement(Expression guard, @Nonnull Statement body, PositionInfo pos) {
+    public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
         super(pos);
         this.body = body;
         this.updates = null;
@@ -101,7 +102,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      */
     public LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
-            @Nonnull Statement body) {
+            @NonNull Statement body) {
         this.body = body;
         if (updates != null) {
             this.updates = new ForUpdates(new ImmutableArray<>(updates));
@@ -121,8 +122,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      * @param comments the comments attached to this statement.
      */
-    public LoopStatement(ILoopInit inits, @Nonnull IGuard guard, IForUpdates updates,
-            @Nonnull Statement body,
+    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
+            @NonNull Statement body,
             ExtList comments) {
         super(comments);
         this.body = body;
@@ -132,8 +133,8 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
-    public LoopStatement(ILoopInit inits, @Nonnull IGuard guard, IForUpdates updates,
-            @Nonnull Statement body,
+    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
+            @NonNull Statement body,
             ExtList comments, PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
@@ -152,8 +153,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      * @param pos the position of the loop
      */
-    public LoopStatement(ILoopInit inits, @Nonnull IGuard guard, IForUpdates updates,
-            @Nonnull Statement body,
+    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
+            @NonNull Statement body,
             PositionInfo pos) {
         super(pos);
         this.body = body;
@@ -171,8 +172,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param updates the updates of the loop
      * @param body the body of the loop
      */
-    public LoopStatement(ILoopInit inits, @Nonnull IGuard guard, IForUpdates updates,
-            @Nonnull Statement body) {
+    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
+            @NonNull Statement body) {
         this.body = body;
         this.updates = updates;
         this.inits = inits;
@@ -180,7 +181,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @Nonnull IGuard guard, @Nonnull Statement body) {
+            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
@@ -319,7 +320,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the expression.
      */
-    @Nonnull
+    @NonNull
     public IGuard getGuard() {
         return guard;
     }
@@ -339,7 +340,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the statement.
      */
-    @Nonnull
+    @NonNull
     public Statement getBody() {
         return body;
     }

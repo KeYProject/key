@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.parser.Location;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -44,7 +45,7 @@ public class LocatableException extends RuntimeException implements HasLocation 
     }
 
     @Override
-    public @Nonnull Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 }

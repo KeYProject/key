@@ -224,15 +224,14 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final JavaService javaService = initConfig.getServices().getJavaService();
 
-        final Path javaPath =
-            envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
-        final Optional<List<Path>> classPath = envInput.readClassPath();
+        final Path javaPath = envInput.readJavaPath();
+        final List<Path> classPath = envInput.readClassPath();
         final Path bootClassPath = javaService.getBootClassPath();
 
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
             fileRepo.setJavaPath(javaPath);
-            fileRepo.setClassPath(classPath.orElse(null));
+            fileRepo.setClassPath(classPath);
             fileRepo.setBootClassPath(bootClassPath);
         }
 
@@ -268,7 +267,7 @@ public final class ProblemInitializer {
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-            JavaModel.createJavaModel(javaPath, classPath.orElse(null), bootClassPath, includes,
+            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
                 initialFile));
     }
 
@@ -386,7 +385,7 @@ public final class ProblemInitializer {
             final ImmutableList<BuiltInRule> rules =
                 profile.getStandardRules().standardBuiltInRules();
             int j = 0;
-            final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
+            final int step = !rules.isEmpty() ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
                 proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
                 setProgress((++j) * step + 3 + i * proofs.length);
@@ -403,7 +402,7 @@ public final class ProblemInitializer {
 
     private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
         var bootClassPath = envInput.readBootClassPath();
-        var classPath = envInput.readClassPath().orElse(Collections.emptyList());
+        var classPath = envInput.readClassPath();
         config.getServices().activateJava(bootClassPath, classPath);
     }
 
@@ -575,29 +574,25 @@ public final class ProblemInitializer {
         final Namespace<Function> functions = services.getNamespaces().functions();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        if (javaInfo != null) {
-            for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-                final Type type = kjt.getJavaType();
-                if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
-                    for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
-                        final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                        if (pv instanceof LocationVariable) {
-                            heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                services);
-                        }
-                    }
-                }
-                for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if (pm == null) {
-                        continue; // weigl 2021-11-10
-                    }
-                    if (!(pm.isVoid() || pm.isConstructor())) {
-                        functions.add(pm);
+        for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+            final Type type = kjt.getJavaType();
+            if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
+                for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
+                    final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+                    if (pv instanceof LocationVariable) {
+                        heapLDT.getFieldSymbolForPV((LocationVariable) pv,
+                            services);
                     }
                 }
             }
-        } else {
-            throw new ProofInputException("Problem initialization without JavaInfo!");
+            for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                if (pm == null) {
+                    continue; // weigl 2021-11-10
+                }
+                if (!(pm.isVoid() || pm.isConstructor())) {
+                    functions.add(pm);
+                }
+            }
         }
 
         // read envInput

@@ -8,8 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
@@ -183,7 +184,7 @@ public class Services implements TermServices {
     /**
      * Returns the JavaInfo associated with this Services object.
      */
-    @Nonnull
+    @NonNull
     public JavaInfo getJavaInfo() {
         return Objects.requireNonNull(javaInfo);
     }
@@ -459,13 +460,13 @@ public class Services implements TermServices {
     // =================================================================================================================
     // =================================================================================================================
 
-    @Nonnull
+    @NonNull
     public JavaService getJavaService() {
         assert javaService != null;
         return javaService;
     }
 
-    private JavaService activateJavaPath(@Nonnull Path bootClassPath,
+    private JavaService activateJavaPath(@NonNull Path bootClassPath,
             Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {

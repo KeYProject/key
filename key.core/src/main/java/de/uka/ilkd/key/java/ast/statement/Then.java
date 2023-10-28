@@ -17,11 +17,12 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -53,12 +54,12 @@ public final class Then extends BranchImp {
      *
      * @param stmnt the statement part of Then.
      */
-    public Then(@Nonnull Statement stmnt) {
+    public Then(@NonNull Statement stmnt) {
         this(null, null, stmnt);
     }
 
 
-    @Nonnull
+    @NonNull
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
@@ -68,7 +69,7 @@ public final class Then extends BranchImp {
         return body.getFirstElementIncludingBlocks();
     }
 
-    @Nonnull
+    @NonNull
     public SourceElement getLastElement() {
         return body.getLastElement();
     }

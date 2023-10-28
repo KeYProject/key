@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
-
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -88,16 +88,15 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public @Nonnull Optional<Path> readJavaPath() {
-        return Optional.empty();
+    public @Nullable Path readJavaPath() {
+        return null;
     }
 
 
     // no class path elements here
-    @Nonnull
     @Override
-    public Optional<List<Path>> readClassPath() {
-        return Optional.empty();
+    public @NonNull List<Path> readClassPath() {
+        return Collections.emptyList();
     }
 
 

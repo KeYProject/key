@@ -11,6 +11,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -57,7 +58,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     @Override
-    public @Nonnull Location getLocation() {
+    public @NonNull Location getLocation() {
         if (offendingSymbol != null) {
             URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
             return new Location(uri, Position.fromToken(offendingSymbol));

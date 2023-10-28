@@ -5,8 +5,9 @@ package de.uka.ilkd.key.java.ast;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
@@ -33,7 +34,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Body.
      */
-    @Nonnull
+    @NonNull
     private final ImmutableArray<? extends Statement> body;
 
     private final int prefixLength;
@@ -43,7 +44,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @Nonnull ImmutableArray<? extends Statement> body) {
+            @NonNull ImmutableArray<? extends Statement> body) {
         super(pi, comments);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
@@ -72,7 +73,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
-    public StatementBlock(@Nonnull ImmutableArray<? extends Statement> as) {
+    public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
         super((PositionInfo) null, null);
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
@@ -124,7 +125,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the statement array wrapper.
      */
-    @Nonnull
+    @NonNull
     public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
@@ -233,7 +234,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
 
-    @Nonnull
+    @NonNull
     public SourceElement getFirstElement() {
         if (isEmpty()) {
             return this;
@@ -254,7 +255,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Override
     public boolean hasNextPrefixElement() {
-        return body.size() != 0 && (body.get(0) instanceof ProgramPrefix);
+        return !body.isEmpty() && (body.get(0) instanceof ProgramPrefix);
     }
 
     @Override

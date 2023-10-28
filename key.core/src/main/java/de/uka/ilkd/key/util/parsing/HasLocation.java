@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.parser.Location;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,6 +22,6 @@ public interface HasLocation {
      *
      * @return the location of the exception
      */
-    @Nonnull
+    @NonNull
     Location getLocation();
 }

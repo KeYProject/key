@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -30,7 +31,7 @@ public class DLEmbeddedExpression extends Operator {
 
     public DLEmbeddedExpression(
             PositionInfo pi, List<Comment> comments, Function functionSymbol,
-            @Nonnull ImmutableArray<Expression> children) {
+            @NonNull ImmutableArray<Expression> children) {
         super(pi, comments, children);
         this.functionSymbol = functionSymbol;
     }

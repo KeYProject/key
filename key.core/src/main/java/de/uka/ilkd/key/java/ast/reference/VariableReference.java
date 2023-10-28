@@ -18,7 +18,7 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -27,27 +27,27 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
+import org.jspecify.annotations.NonNull;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
         implements NameReference, Expression, ReferencePrefix {
 
-    @Nonnull
+    @NonNull
     protected final ProgramVariable variable;
 
     public VariableReference(PositionInfo pi, List<Comment> comments,
-            @Nonnull ProgramVariable variable) {
+            @NonNull ProgramVariable variable) {
         super(pi, comments);
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(@Nonnull ProgramVariable variable, PositionInfo pi) {
+    public VariableReference(@NonNull ProgramVariable variable, PositionInfo pi) {
         super(pi);
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(@Nonnull ProgramVariable variable) {
+    public VariableReference(@NonNull ProgramVariable variable) {
         this(variable, PositionInfo.UNDEFINED);
     }
 
@@ -92,7 +92,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
         return variable;
     }
 
-    @Nonnull
+    @NonNull
     public SourceElement getFirstElement() {
         return variable;
     }

@@ -17,7 +17,7 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Optional;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
@@ -30,6 +30,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.VoidType;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.*;
 import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER;
@@ -120,8 +121,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * @param typeDeclaration the TypeDeclaration<?> whose fields have to be prepared
      * @return the list of copy assignments
      */
-    @Nonnull
-    private NodeList<Statement> getInitializers(@Nonnull TypeDeclaration<?> typeDeclaration) {
+    @NonNull
+    private NodeList<Statement> getInitializers(@NonNull TypeDeclaration<?> typeDeclaration) {
         NodeList<Statement> result = new NodeList<>();
         for (Node childNode : typeDeclaration.getChildNodes()) {
             if (childNode instanceof InitializerDeclaration) {
@@ -169,8 +170,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * eventually thrown errors or exceptions and handles them in a
      * special way
      */
-    @Nonnull
-    private TryStmt createInitializerExecutionTryBlock(@Nonnull TypeDeclaration<?> td) {
+    @NonNull
+    private TryStmt createInitializerExecutionTryBlock(@NonNull TypeDeclaration<?> td) {
         // try block
         NodeList<Statement> initializerExecutionBody = getInitializers(td);
 

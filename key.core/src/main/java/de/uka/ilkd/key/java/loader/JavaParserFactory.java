@@ -7,8 +7,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
@@ -38,17 +39,17 @@ public class JavaParserFactory {
     @Nullable
     private ParserConfiguration config;
 
-    @Nonnull
+    @NonNull
     private final DynamicTypeSolver typeSolver = new DynamicTypeSolver();
 
-    @Nonnull
+    @NonNull
     private final JavaSymbolSolver symbolResolver = new JavaSymbolSolver(typeSolver);
 
-    @Nonnull
+    @NonNull
     private final List<CompilationUnit> bootClasses;
-    @Nonnull
+    @NonNull
     private final List<CompilationUnit> libraryClasses;
-    @Nonnull
+    @NonNull
     private final List<CompilationUnit> userClasses;
 
 
@@ -94,7 +95,7 @@ public class JavaParserFactory {
         typeSolver.lazyRebuild();
     }
 
-    @Nonnull
+    @NonNull
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();
@@ -104,17 +105,17 @@ public class JavaParserFactory {
         return config;
     }
 
-    @Nonnull
+    @NonNull
     public JavaParser createJavaParser() {
         return new JavaParser(getConfiguration());
     }
 
-    @Nonnull
+    @NonNull
     public TypeSolver getTypeSolver() {
         return typeSolver;
     }
 
-    @Nonnull
+    @NonNull
     public JavaSymbolSolver getSymbolSolver() {
         return symbolResolver;
     }

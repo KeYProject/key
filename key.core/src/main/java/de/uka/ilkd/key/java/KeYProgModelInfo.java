@@ -7,8 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
@@ -81,7 +82,7 @@ public class KeYProgModelInfo {
         return rec2key().keYTypes();
     }
 
-    @Nonnull
+    @NonNull
     private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
         if (type.isReferenceType()) {
@@ -328,7 +329,7 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     @Nullable
-    public IProgramMethod getProgramMethod(@Nonnull KeYJavaType ct, String name,
+    public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getImplicitMethod(ct, name);
@@ -365,7 +366,7 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     public IProgramMethod getProgramMethod(
-            @Nonnull KeYJavaType ct, String name,
+            @NonNull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
         // TODO javaparser implement resolution with context
         return getProgramMethod(ct, name, signature);

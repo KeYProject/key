@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.nio.file.Path;
+import java.util.List;
 
 
 /**
@@ -20,7 +20,7 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
     protected final Path javaPath;
-    protected final List<Path> classPath;
+    protected final @NonNull List<Path> classPath;
     protected final Path bootClassPath;
     protected final Includes includes;
     protected final Profile profile;
@@ -81,15 +81,14 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final @Nonnull Optional<Path> readJavaPath() {
-        return Optional.ofNullable(javaPath);
+    public final @Nullable Path readJavaPath() {
+        return javaPath;
     }
 
 
-    @Nonnull
     @Override
-    public final Optional<List<Path>> readClassPath() {
-        return Optional.ofNullable(classPath);
+    public final @NonNull List<Path> readClassPath() {
+        return classPath;
     }
 
 

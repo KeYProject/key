@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -56,7 +57,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     public TypeDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @Nonnull ImmutableArray<Modifier> modArray,
+            @NonNull ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
             boolean isLibrary) {
@@ -149,7 +150,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
             fullName, isLibrary);
     }
 
-    @Nonnull
+    @NonNull
     public SourceElement getFirstElement() {
         if (modArray != null && (!modArray.isEmpty())) {
             return modArray.get(0);
@@ -158,7 +159,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         }
     }
 
-    @Nonnull
+    @NonNull
     public SourceElement getLastElement() {
         // end of member block
         return this;

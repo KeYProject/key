@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;

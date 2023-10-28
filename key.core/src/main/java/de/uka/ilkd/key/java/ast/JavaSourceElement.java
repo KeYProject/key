@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public abstract class JavaSourceElement implements SourceElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaSourceElement.class);
 
-    @Nonnull
+    @NonNull
     private final PositionInfo posInfo;
 
 
@@ -65,7 +66,7 @@ public abstract class JavaSourceElement implements SourceElement {
      * @return if <tt>p</tt> is <tt>null</tt> the undefined position
      *         ({@link PositionInfo#UNDEFINED}) is returned otherwise <tt>p</tt>
      */
-    @Nonnull
+    @NonNull
     private static PositionInfo getPosInfo(@Nullable PositionInfo p) {
         return p == null ? PositionInfo.UNDEFINED : p;
     }

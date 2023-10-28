@@ -4,13 +4,14 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -44,8 +45,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @param comments collected comments
      * @param info position
      */
-    public EnhancedFor(@Nonnull LoopInit init, @Nonnull Guard guard, @Nonnull Statement statement,
-            ExtList comments, PositionInfo info) {
+    public EnhancedFor(@NonNull LoopInit init, @NonNull Guard guard, @NonNull Statement statement,
+                       ExtList comments, PositionInfo info) {
         this(info, null, init, null, guard, statement);
     }
 
@@ -64,7 +65,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see JavaSourceElement#getLastElement()
      */
     @Override
-    @Nonnull
+    @NonNull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }

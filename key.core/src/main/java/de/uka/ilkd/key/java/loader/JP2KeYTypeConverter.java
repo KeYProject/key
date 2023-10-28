@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.loader;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.AssertionFailure;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
 
@@ -124,7 +125,7 @@ public class JP2KeYTypeConverter {
      * @param type type to be converted, may be null
      * @return a keytype.
      */
-    @Nonnull
+    @NonNull
     public KeYJavaType getKeYJavaType(ResolvedType type) {
         // change from 2012-02-07: there must be a definite KJT
         if (type == null) {
@@ -299,7 +300,7 @@ public class JP2KeYTypeConverter {
         return new SortImpl(name, supers, isAbstract || ct.isInterface());
     }
 
-    @Nonnull
+    @NonNull
     private KeYJavaType getSuperArrayType() {
         var res = jp2KeY.getSuperArrayType();
         if (res == null) {
@@ -350,7 +351,7 @@ public class JP2KeYTypeConverter {
      * <p>
      * creates the field declaration for the public final integer field <code>length</code>
      */
-    @Nonnull
+    @NonNull
     private KeYJavaType createSuperArrayType() {
         KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
 

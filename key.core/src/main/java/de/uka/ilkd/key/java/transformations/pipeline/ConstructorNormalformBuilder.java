@@ -18,8 +18,9 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -74,8 +75,8 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      * @param cd the TypeDeclaration<?> where the cons is declared
      * @param cons the Constructor to be transformed
      */
-    private void normalform(@Nonnull ClassOrInterfaceDeclaration cd,
-            @Nonnull ConstructorDeclaration cons) {
+    private void normalform(@NonNull ClassOrInterfaceDeclaration cd,
+            @NonNull ConstructorDeclaration cons) {
         final var enclosingClass = getEnclosingClass(cd);
         NodeList<Modifier> mods = new NodeList<>();
 

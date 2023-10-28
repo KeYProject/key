@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -58,7 +59,7 @@ public class MethodDeclaration extends JavaDeclaration
 
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @Nonnull ImmutableArray<Modifier> modArray,
+            @NonNull ImmutableArray<Modifier> modArray,
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
@@ -171,14 +172,14 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();

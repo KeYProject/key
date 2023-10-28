@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -26,7 +27,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     private static final Comment[] NO_COMMENTS = new Comment[0];
 
-    @Nonnull
+    @NonNull
     private final Comment[] comments;
 
     private int hashCode = -1;
@@ -63,7 +64,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = extractComments(children);
     }
 
-    public JavaProgramElement(@Nonnull PositionInfo pi, @Nullable List<Comment> comments) {
+    public JavaProgramElement(@NonNull PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi);
         this.comments = comments == null ? NO_COMMENTS : comments.toArray(new Comment[0]);
     }

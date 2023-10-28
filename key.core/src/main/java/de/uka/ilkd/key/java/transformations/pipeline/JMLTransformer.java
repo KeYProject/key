@@ -18,7 +18,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nonnull;
+
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -28,6 +28,7 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
@@ -218,8 +219,7 @@ public final class JMLTransformer extends JavaTransformer {
         astParent.addStatement(childIndex, node);
     }
 
-    @Nonnull
-    private static Modifier.Keyword getModifier(TextualJMLFieldDecl decl)
+    private static Modifier.@NonNull Keyword getModifier(TextualJMLFieldDecl decl)
             throws SLTranslationException {
         // ghost or model?
         boolean isGhost = decl.getMods().contains(JMLModifier.GHOST);
@@ -231,7 +231,7 @@ public final class JMLTransformer extends JavaTransformer {
         return isGhost ? Modifier.Keyword.GHOST : Modifier.Keyword.MODEL;
     }
 
-    @Nonnull
+    @NonNull
     private FieldDeclaration transformClassFieldDecl(TextualJMLFieldDecl decl,
             List<Comment> originalComments)
             throws SLTranslationException {
@@ -282,7 +282,7 @@ public final class JMLTransformer extends JavaTransformer {
         return fieldDecl;
     }
 
-    @Nonnull
+    @NonNull
     private Statement transformVariableDecl(TextualJMLFieldDecl decl)
             throws SLTranslationException {
         // prepend Java modifiers
@@ -319,7 +319,7 @@ public final class JMLTransformer extends JavaTransformer {
                 s;
     }
 
-    @Nonnull
+    @NonNull
     private MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
             List<Comment> originalComments)
             throws SLTranslationException {
@@ -446,7 +446,8 @@ public final class JMLTransformer extends JavaTransformer {
         de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
 
         // call preparser
-        PreParser pp = new PreParser();
+        PreParser pp = new PreParser(
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ImmutableList<TextualJMLConstruct> constructs =
             pp.parseClassLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(pp.getWarnings());
@@ -481,7 +482,7 @@ public final class JMLTransformer extends JavaTransformer {
             astPos);
 
         // call preparser
-        var io = new PreParser();
+        var io = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         String concat = concatenate(comments);
         ImmutableList<TextualJMLConstruct> constructs =
             io.parseMethodLevel(concat, fileName, pos);

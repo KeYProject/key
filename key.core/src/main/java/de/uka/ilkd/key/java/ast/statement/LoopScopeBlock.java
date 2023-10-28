@@ -17,8 +17,9 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -42,7 +43,7 @@ public final class LoopScopeBlock extends JavaStatement
 
     @Nullable
     private final IProgramVariable indexPV;
-    @Nonnull
+    @NonNull
     private final StatementBlock body;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
@@ -246,7 +247,7 @@ public final class LoopScopeBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return body.getFirstElement();
