@@ -259,37 +259,19 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         MARK_END_JAVA_BLOCK,
     }
 
-    public static final class Mark {
-        public final MarkType type;
-        public final int parameter;
-
-        public Mark(MarkType type, int parameter) {
-            this.type = type;
-            this.parameter = parameter;
-        }
+    public record Mark(MarkType type, int parameter) {
     }
 
     /**
-     * Utility class for stack entries containing the position table and the position of the start
-     * of the subterm in the result.
-     */
-    private static class StackEntry {
-        final PositionTable posTbl;
-        final int p;
-
-        StackEntry(PositionTable posTbl, int p) {
-            this.posTbl = posTbl;
-            this.p = p;
-        }
-
-        PositionTable posTbl() {
-            return posTbl;
-        }
+         * Utility class for stack entries containing the position table and the position of the start
+         * of the subterm in the result.
+         */
+        private record StackEntry(PositionTable posTbl, int p) {
 
         int pos() {
-            return p;
+                return p;
+            }
         }
-    }
 
     /**
      * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a StringBuffer and builds
@@ -381,7 +363,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
             // MU refactored this using enums which makes it a little less ugly
             // and more flexible.
             switch (markType) {
-            case MARK_START_SUB:
+            case MARK_START_SUB -> {
                 if (parameter == -1) {
                     // no parameter means subterms in normal order
                     posTbl.setStart(count() - pos);
@@ -391,21 +373,16 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
                 }
                 stack.push(new StackEntry(posTbl, pos));
                 pos = count();
-                break;
-
-            case MARK_END_SUB:
+            }
+            case MARK_END_SUB -> {
                 StackEntry se = stack.peek();
                 stack.pop();
                 pos = se.pos();
                 se.posTbl().setEnd(count() - pos, posTbl);
                 posTbl = se.posTbl();
-                break;
-
-            case MARK_MOD_POS_TBL:
-                need_modPosTable = true;
-                break;
-
-            case MARK_START_TERM:
+            }
+            case MARK_MOD_POS_TBL -> need_modPosTable = true;
+            case MARK_START_TERM -> {
                 // This is sent by startTerm
                 if (need_modPosTable) {
                     posTbl = new ModalityPositionTable(parameter);
@@ -413,42 +390,26 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
                     posTbl = new PositionTable(parameter);
                 }
                 need_modPosTable = false;
-                break;
-
-            case MARK_START_FIRST_STMT:
-                firstStmtStart = count() - pos;
-                break;
-
-            case MARK_END_FIRST_STMT:
+            }
+            case MARK_START_FIRST_STMT -> firstStmtStart = count() - pos;
+            case MARK_END_FIRST_STMT -> {
                 if (posTbl instanceof ModalityPositionTable) {
                     Range firstStmtRange = new Range(firstStmtStart, count() - pos);
                     ((ModalityPositionTable) posTbl).setFirstStatementRange(firstStmtRange);
                 }
-                break;
-
-            case MARK_START_UPDATE:
-                updateStarts.push(count());
-                break;
-
-            case MARK_END_UPDATE:
+            }
+            case MARK_START_UPDATE -> updateStarts.push(count());
+            case MARK_END_UPDATE -> {
                 int updateStart = updateStarts.pop();
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
-                break;
-            case MARK_START_KEYWORD:
-                keywordStarts.push(count());
-                break;
-            case MARK_END_KEYWORD:
-                initPosTbl.addKeywordRange(new Range(keywordStarts.pop(), count()));
-                break;
-            case MARK_START_JAVA_BLOCK:
-                javaBlockStarts.push(count());
-                break;
-            case MARK_END_JAVA_BLOCK:
-                initPosTbl.addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
-                break;
-
-            default:
-                LOGGER.error("Unexpected mark: {}", markType);
+            }
+            case MARK_START_KEYWORD -> keywordStarts.push(count());
+            case MARK_END_KEYWORD -> initPosTbl
+                    .addKeywordRange(new Range(keywordStarts.pop(), count()));
+            case MARK_START_JAVA_BLOCK -> javaBlockStarts.push(count());
+            case MARK_END_JAVA_BLOCK -> initPosTbl
+                    .addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
+            default -> LOGGER.error("Unexpected mark: {}", markType);
             }
         }
     }

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -21,6 +20,8 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This visitor finds all contracts and invariant clauses in {@link KeyAst}.
@@ -41,11 +42,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         declarationBuilder = new DeclarationBuilder(services, nss);
     }
 
-    public @Nonnull List<Contract> getContracts() {
+    public @NonNull List<Contract> getContracts() {
         return contracts;
     }
 
-    public @Nonnull List<ClassInvariant> getInvariants() {
+    public @NonNull List<ClassInvariant> getInvariants() {
         return invariants;
     }
 

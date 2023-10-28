@@ -148,17 +148,13 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     private static Class<? extends AbstractPredicateAbstractionLattice> latticeTypeFromString(
             String latticeTypeStr) {
-        switch (latticeTypeStr) {
-        case "simple":
-            return SimplePredicateAbstractionLattice.class;
-        case "conjunctive":
-            return ConjunctivePredicateAbstractionLattice.class;
-        case "disjunctive":
-            return DisjunctivePredicateAbstractionLattice.class;
-        default:
-            throw new RuntimeException(
-                "PredicateAbstractionMergeContract: Unexpected lattice type: " + latticeTypeStr);
-        }
+        return switch (latticeTypeStr) {
+        case "simple" -> SimplePredicateAbstractionLattice.class;
+        case "conjunctive" -> ConjunctivePredicateAbstractionLattice.class;
+        case "disjunctive" -> DisjunctivePredicateAbstractionLattice.class;
+        default -> throw new RuntimeException(
+            "PredicateAbstractionMergeContract: Unexpected lattice type: " + latticeTypeStr);
+        };
     }
 
 }

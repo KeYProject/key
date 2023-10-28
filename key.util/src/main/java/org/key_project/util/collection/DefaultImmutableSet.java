@@ -10,7 +10,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
+
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
@@ -326,16 +329,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     @Override
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("{");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("}");
-        return str.toString();
+        return Strings.formatAsList(this, "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */

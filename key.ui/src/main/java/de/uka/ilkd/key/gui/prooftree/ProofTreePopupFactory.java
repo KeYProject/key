@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -470,17 +472,23 @@ public class ProofTreePopupFactory {
             return context.proof.getSubtreeGoals(context.invokedNode);
         }
 
-        /*
+        /**
          * In addition to marking setting goals, update the tree model so that the label sizes are
          * recalculated
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.delegateModel.setBatchGoalStateChange(true);
+            var selectedNode = context.proofTreeView.getSelectedNode();
+            context.delegateModel.setBatchGoalStateChange(true, null);
             super.actionPerformed(e);
-            context.delegateModel.setBatchGoalStateChange(false);
-            // trigger repainting the tree after the completion of this event.
-            context.delegateView.repaint();
+            List<Node> goals = new ArrayList<>();
+            getGoalList().forEach(x -> goals.add(x.node()));
+            context.delegateModel.setBatchGoalStateChange(false, goals);
+            // make sure the node is selected again
+            if (selectedNode != null) {
+                context.proofTreeView.makeNodeVisible(selectedNode);
+            }
+            // repainting the tree after the completion of this event is done automatically
         }
     }
 

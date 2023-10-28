@@ -186,7 +186,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals("")) {
+        if (termstr.isEmpty()) {
             return null;
         }
 
@@ -202,7 +202,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals("")) {
+        if (termstr.isEmpty()) {
             return null;
         }
         return new KeyIO(services(), set).parseExpression(termstr);

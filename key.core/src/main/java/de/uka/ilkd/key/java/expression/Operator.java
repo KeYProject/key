@@ -23,18 +23,11 @@ import org.key_project.util.collection.ImmutableArray;
 
 public abstract class Operator extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
-
-
-    /**
-     * Children.
-     */
     protected final ImmutableArray<Expression> children;
-
 
     /**
      * Relative positioning of the operator.
      */
-
     public static final int PREFIX = 0;
     public static final int INFIX = 1;
     public static final int POSTFIX = 2;
@@ -123,37 +116,25 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     }
 
     public SourceElement getFirstElement() {
-        switch (getNotation()) {
-        case INFIX:
-        case POSTFIX:
-            return children.get(0).getFirstElement();
-        case PREFIX:
-        default:
-            return this;
-        }
+        return switch (getNotation()) {
+        case INFIX, POSTFIX -> children.get(0).getFirstElement();
+        default -> this;
+        };
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        switch (getNotation()) {
-        case INFIX:
-        case POSTFIX:
-            return children.get(0).getFirstElementIncludingBlocks();
-        case PREFIX:
-        default:
-            return this;
-        }
+        return switch (getNotation()) {
+        case INFIX, POSTFIX -> children.get(0).getFirstElementIncludingBlocks();
+        default -> this;
+        };
     }
 
     public SourceElement getLastElement() {
-        switch (getNotation()) {
-        case INFIX:
-        case PREFIX:
-            return children.get(getArity() - 1).getLastElement();
-        case POSTFIX:
-        default:
-            return this;
-        }
+        return switch (getNotation()) {
+        case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
+        default -> this;
+        };
     }
 
     /**

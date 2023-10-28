@@ -418,12 +418,12 @@ public abstract class AbstractPO implements IPersistablePO {
         final StringBuilder sb = new StringBuilder();
 
         // bootclasspath
-        if (bootClassPath != null && !bootClassPath.equals("")) {
+        if (bootClassPath != null && !bootClassPath.isEmpty()) {
             sb.append("\\bootclasspath \"").append(bootClassPath).append("\";\n\n");
         }
 
         // classpath
-        if (classPath != null && !classPath.equals("")) {
+        if (classPath != null && !classPath.isEmpty()) {
             sb.append("\\classpath ").append(classPath).append(";\n\n");
         }
 
@@ -431,7 +431,7 @@ public abstract class AbstractPO implements IPersistablePO {
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
 
         // include
-        if (includedFiles != null && !includedFiles.equals("")) {
+        if (includedFiles != null && !includedFiles.isEmpty()) {
             sb.append("\\include ").append(includedFiles).append(";\n\n");
         }
 

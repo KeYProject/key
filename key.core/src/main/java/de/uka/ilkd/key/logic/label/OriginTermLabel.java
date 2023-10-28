@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +126,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @param origin the term's origin.
      */
-    public OriginTermLabel(Origin origin) {
+    OriginTermLabel(Origin origin) {
         this.origin = origin;
         this.subtermOrigins = new LinkedHashSet<>();
     }
@@ -137,7 +137,7 @@ public class OriginTermLabel implements TermLabel {
      * @param origin the term's origin.
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-    public OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+    OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
         this.subtermOrigins.addAll(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
@@ -150,7 +150,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-    public OriginTermLabel(Set<Origin> subtermOrigins) {
+    OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
         this.subtermOrigins = new LinkedHashSet<>(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);

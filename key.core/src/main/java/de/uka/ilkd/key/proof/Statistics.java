@@ -73,6 +73,78 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
+    public Statistics(List<Node> startNodes) {
+        if (startNodes.isEmpty()) {
+            throw new IllegalArgumentException("can't generate statistics on zero nodes");
+        }
+
+        int nodes = 0;
+        int branches = 0;
+        int cachedBranches = 0;
+        int interactiveSteps = 0;
+        int symbExApps = 0;
+        int quantifierInstantiations = 0;
+        int ossApps = 0;
+        int mergeRuleApps = 0;
+        int totalRuleApps = 0;
+        int smtSolverApps = 0;
+        int dependencyContractApps = 0;
+        int operationContractApps = 0;
+        int blockLoopContractApps = 0;
+        int loopInvApps = 0;
+        long autoModeTimeInMillis = 0;
+        long timeInMillis = 0;
+
+        for (Node startNode : startNodes) {
+            final Iterator<Node> it = startNode.subtreeIterator();
+
+            TemporaryStatistics tmp = new TemporaryStatistics();
+
+            Node node;
+            while (it.hasNext()) {
+                node = it.next();
+                tmp.changeOnNode(node, interactiveAppsDetails);
+            }
+
+            nodes += tmp.nodes;
+            branches = tmp.branches;
+            cachedBranches = tmp.cachedBranches;
+            interactiveSteps = tmp.interactive;
+            symbExApps = tmp.symbExApps;
+            quantifierInstantiations = tmp.quant;
+            ossApps = tmp.oss;
+            mergeRuleApps = tmp.mergeApps;
+            totalRuleApps = tmp.nodes + tmp.ossCaptured - 1;
+            smtSolverApps = tmp.smt;
+            dependencyContractApps = tmp.dep;
+            operationContractApps = tmp.contr;
+            blockLoopContractApps = tmp.block;
+            loopInvApps = tmp.inv;
+            autoModeTimeInMillis = startNode.proof().getAutoModeTime();
+            timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
+        }
+
+        this.nodes = nodes;
+        this.branches = branches;
+        this.cachedBranches = cachedBranches;
+        this.interactiveSteps = interactiveSteps;
+        this.symbExApps = symbExApps;
+        this.quantifierInstantiations = quantifierInstantiations;
+        this.ossApps = ossApps;
+        this.mergeRuleApps = mergeRuleApps;
+        this.totalRuleApps = totalRuleApps;
+        this.smtSolverApps = smtSolverApps;
+        this.dependencyContractApps = dependencyContractApps;
+        this.operationContractApps = operationContractApps;
+        this.blockLoopContractApps = blockLoopContractApps;
+        this.loopInvApps = loopInvApps;
+        this.autoModeTimeInMillis = autoModeTimeInMillis;
+        this.timeInMillis = timeInMillis;
+        this.timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float) (nodes - 1));
+
+        generateSummary(startNodes.get(0).proof());
+    }
+
     Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 

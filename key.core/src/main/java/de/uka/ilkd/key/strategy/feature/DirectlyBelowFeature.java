@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * top-level and the symbol immediately above the focus is <code>badSymbol</code>. Optionally, one
  * can also specify that zero should only be returned if the symbol immediately above the focus is
  * <code>badSymbol</code> and the focus has a certain subterm index.
- *
+ * <p>
  * TODO: eliminate this class and use term features instead
  */
 public abstract class DirectlyBelowFeature extends BinaryFeature {

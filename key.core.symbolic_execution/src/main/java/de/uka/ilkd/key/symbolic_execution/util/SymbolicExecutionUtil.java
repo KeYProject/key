@@ -3857,7 +3857,7 @@ public final class SymbolicExecutionUtil {
             logicPrinter.printTerm(term);
             return logicPrinter.result();
         } else {
-            return term != null ? TermLabel.removeIrrelevantLabels(term, services).toString()
+            return term != null ? TermLabelManager.removeIrrelevantLabels(term, services).toString()
                     : null;
         }
     }

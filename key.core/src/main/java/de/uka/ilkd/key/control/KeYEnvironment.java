@@ -318,5 +318,4 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     public Pair<String, Location> getProofScript() {
         return proofScript;
     }
-
 }

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -14,6 +13,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This facade provides facilities for the creation of lexer and parser of JML. It is the
@@ -35,7 +35,7 @@ public final class JmlFacade {
     /**
      * Creates an JML lexer for the give stream.
      */
-    public static @Nonnull JmlLexer createLexer(@Nonnull CharStream stream) {
+    public static @NonNull JmlLexer createLexer(@NonNull CharStream stream) {
         return new JmlLexer(stream);
     }
 
@@ -43,7 +43,7 @@ public final class JmlFacade {
      * Creates a JML lexer for the given string with position. The position information of the lexer
      * is changed accordingly.
      */
-    public static @Nonnull JmlLexer createLexer(@Nonnull PositionedString ps) {
+    public static @NonNull JmlLexer createLexer(@NonNull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text,
             ps.getLocation().getFileURI().map(URI::toString).orElse(null));
         JmlLexer lexer = createLexer(result);
@@ -58,7 +58,7 @@ public final class JmlFacade {
     /**
      * Creates a JML lexer for a given string.
      */
-    public static @Nonnull JmlLexer createLexer(@Nonnull String content) {
+    public static @NonNull JmlLexer createLexer(@NonNull String content) {
         return createLexer(CharStreams.fromString(content));
     }
 
@@ -66,7 +66,7 @@ public final class JmlFacade {
      * Parse the given string as an JML expr. Position information are updated accordingly to the
      * position given with the string.
      */
-    public static @Nonnull ParserRuleContext parseExpr(@Nonnull PositionedString expr) {
+    public static @NonNull ParserRuleContext parseExpr(@NonNull PositionedString expr) {
         return getExpressionContext(createLexer(expr));
     }
 
@@ -99,7 +99,7 @@ public final class JmlFacade {
      *
      * @see SyntaxErrorReporter
      */
-    public static @Nonnull JmlParser createParser(@Nonnull JmlLexer lexer) {
+    public static @NonNull JmlParser createParser(@NonNull JmlLexer lexer) {
         JmlParser p = new JmlParser(new CommonTokenStream(lexer));
         p.addErrorListener(p.getErrorReporter());
         return p;
@@ -108,7 +108,7 @@ public final class JmlFacade {
     /**
      * Parses a given clause, like {@code ensures} or {@code requires} and returns a parse tree.
      */
-    public static @Nonnull ParserRuleContext parseClause(@Nonnull String content) {
+    public static @NonNull ParserRuleContext parseClause(@NonNull String content) {
         JmlParser p = createParser(createLexer(content));
         JmlParser.ClauseContext ctx = p.clauseEOF().clause();
         p.getErrorReporter().throwException();

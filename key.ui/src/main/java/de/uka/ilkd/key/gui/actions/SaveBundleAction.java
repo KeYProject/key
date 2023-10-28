@@ -41,8 +41,6 @@ public final class SaveBundleAction extends MainWindowAction {
 
         // react to changes of proof selection
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {

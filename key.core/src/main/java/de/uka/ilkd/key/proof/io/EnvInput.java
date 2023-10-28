@@ -4,10 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -16,6 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -59,19 +59,16 @@ public interface EnvInput {
         return null;
     }
 
-
     /**
      * gets the classpath elements to be considered here.
      */
-    @Nonnull
+    @NonNull
     List<File> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.
-     *
-     * @throws
      */
-    File readBootClassPath() throws IOException;
+    File readBootClassPath();
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify

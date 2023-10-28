@@ -48,22 +48,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         return new SMTRuleApp(RULE, newPos, ifInsts, successfulSolverName);
     }
 
-    @Override
-    public boolean complete() {
-        return true;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public String getSuccessfulSolverName() {
         return successfulSolverName;
-    }
-
-    @Override
-    public PosInOccurrence posInOccurrence() {
-        return pio;
     }
 
     @Override

@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+
+import org.jspecify.annotations.NonNull;
 
 public class Z3Socket extends AbstractSolverSocket {
 
@@ -16,7 +17,7 @@ public class Z3Socket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         if (msg.startsWith("(error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
@@ -32,7 +33,7 @@ public class Z3Socket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-        case WAIT_FOR_RESULT:
+        case WAIT_FOR_RESULT -> {
             if (msg.equals("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 // TODO: proof production is currently completely disabled, since it does not work
@@ -55,16 +56,15 @@ public class Z3Socket extends AbstractSolverSocket {
                 pipe.sendMessage("(exit)\n");
                 sc.setState(WAIT_FOR_DETAILS);
             }
-            break;
-
-        case WAIT_FOR_DETAILS:
-            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-            // not work in future, it may be that we have to forcibly close the pipe.
-            // if (msg.equals("success")) {
-            // pipe.sendMessage("(exit)");
-            // pipe.close();
-            // }
-            break;
+        }
+        case WAIT_FOR_DETAILS -> {
+        }
+        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+        // not work in future, it may be that we have to forcibly close the pipe.
+        // if (msg.equals("success")) {
+        // pipe.sendMessage("(exit)");
+        // pipe.close();
+        // }
         }
     }
 

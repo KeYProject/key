@@ -37,7 +37,7 @@ decls
 
 problem
 :
-  ( PROBLEM LBRACE a=term RBRACE
+  ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
   )

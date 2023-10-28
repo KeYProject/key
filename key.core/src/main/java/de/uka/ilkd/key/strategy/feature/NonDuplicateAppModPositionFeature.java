@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
@@ -18,15 +17,6 @@ import org.key_project.util.collection.ImmutableList;
 public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
-
-    @Override
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        if (!app.ifInstsComplete()) {
-            return true;
-        }
-
-        return noDuplicateFindTaclet(app, pos, goal);
-    }
 
     @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
