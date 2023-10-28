@@ -46,15 +46,10 @@ public class MethodlevelTranslatorTest {
 
     @Test
     public void parseModelMethodsNullable() {
-        String modelMethodNullable = """
-                /*@ public model_behavior
-                    requires true;
-                    accessible n, this.a;
-                    model nullable Object foo(nullable Nullable n) {
-                                return null;
-                    }
-                @*/
-                """;
+        String modelMethodNullable =
+            "/*@ public model_behavior\n requires true;\n accessible n, this.a;\n" +
+                "model nullable Object foo(nullable Nullable n) {\n" +
+                "return null;} @*/";
         JmlLexer lexer = JmlFacade.createLexer(modelMethodNullable);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.Classlevel_commentsContext ctx = null;
@@ -94,15 +89,11 @@ public class MethodlevelTranslatorTest {
 
     @Test
     public void parseModelMethodsNonNull() {
-        String modelMethodNullable = """
-                /*@ public model_behavior
-                    requires true;
-                    accessible n, this.a;
-                    model non_null Object foo(non_null Nullable n) {
-                                return null;
-                    }
-                @*/
-                """;
+        String modelMethodNullable = "/*@ public model_behavior\n" +
+            "requires true;\n" +
+            "accessible n, this.a;\n" +
+            "model non_null Object foo(non_null Nullable n) {\n" +
+            "return null;}@*/";
         JmlLexer lexer = JmlFacade.createLexer(modelMethodNullable);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.Classlevel_commentsContext ctx = null;
