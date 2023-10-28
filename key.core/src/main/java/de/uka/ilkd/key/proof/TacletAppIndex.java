@@ -63,7 +63,7 @@ public class TacletAppIndex {
      * <code>succIndex</code> are up to date for the sequent <code>seq</code>
      */
     private Sequent seq;
-    
+
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TacletAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
