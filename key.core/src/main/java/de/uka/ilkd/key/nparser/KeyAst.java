@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URL;
+import java.util.List;
 
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;

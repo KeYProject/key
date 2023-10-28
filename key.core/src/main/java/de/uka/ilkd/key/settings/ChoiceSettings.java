@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;

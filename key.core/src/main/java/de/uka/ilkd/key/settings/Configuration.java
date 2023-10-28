@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
 import org.antlr.v4.runtime.CharStream;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A container to hold parsed configurations. Configurations are a mapping between a property name
@@ -106,8 +107,8 @@ public class Configuration {
      * @param name property name
      * @param defaultValue the returned instead of {@code null}.
      */
-    @Nonnull
-    public <T> T get(String name, @Nonnull T defaultValue) {
+    @NonNull
+    public <T> T get(String name, @NonNull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
             return (T) data.get(name);
         else
@@ -249,7 +250,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the list contains non-strings
      */
-    @Nonnull
+    @NonNull
     public List<String> getStringList(String name) {
         var seq = get(name, List.class);
         if (seq == null)
@@ -267,8 +268,8 @@ public class Configuration {
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
-    @Nonnull
-    public String[] getStringArray(String name, @Nonnull String[] defaultValue) {
+    @NonNull
+    public String[] getStringArray(String name, @NonNull String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(new String[0]);
         } else
@@ -286,7 +287,7 @@ public class Configuration {
     /**
      * Returns the meta data corresponding to the given entry, creates the entry if not existing.
      */
-    @Nonnull
+    @NonNull
     private ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }

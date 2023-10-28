@@ -6,10 +6,11 @@ package de.uka.ilkd.key.nparser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Translates the configuration grammar (something like JSON) into a {@link Configuration} object.
@@ -43,7 +44,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
         return sanitizeStringLiteral(text);
     }
 
-    @Nonnull
+    @NonNull
     private static String sanitizeStringLiteral(String text) {
         return text.substring(1, text.length() - 1)
                 .replace("\\\"", "\"")
