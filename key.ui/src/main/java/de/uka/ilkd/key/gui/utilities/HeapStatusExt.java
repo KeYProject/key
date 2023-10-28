@@ -117,7 +117,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
                 pathJConsole = findJConsole();
                 if (pathJConsole == null) {
                     setEnabled(false);
-                    setTooltip("Could not find the path to `jconsole` program, that is shipped by some JREs and JDKs.");
+                    setTooltip("Could not find `jconsole`, which is shipped by some JREs/JDKs.");
                 }
             }
 
