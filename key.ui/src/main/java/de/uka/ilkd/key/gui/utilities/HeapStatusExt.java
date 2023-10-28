@@ -1,12 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -16,14 +12,22 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (28.10.23)
  */
 @KeYGuiExtension.Info(name = "Heap-Indicator",
-        description = "Shows an indication of the current heap consumption in the status line of key",
-        experimental = false)
+    description = "Shows an indication of the current heap consumption in the status line of key",
+    experimental = false)
 public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     @Override
     public List<JComponent> getStatusLineComponents() {
@@ -81,12 +85,12 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             progressBar.setValue(used);
             progressBar.setString("%sM of %sM".formatted(used, max));
             progressBar.setStringPainted(true);
-            progressBar.setToolTipText("<html><table><tr><td>%s</td><td>%d MB</td></tr><tr><td>%s</td><td>%d MB</td></tr><tr><td>%s</td><td>%d MB</td></tr>"
-                    .formatted(
+            progressBar.setToolTipText(
+                "<html><table><tr><td>%s</td><td>%d MB</td></tr><tr><td>%s</td><td>%d MB</td></tr><tr><td>%s</td><td>%d MB</td></tr>"
+                        .formatted(
                             "max", max,
                             "free", free,
-                            "total", total
-                    ));
+                            "total", total));
         }
 
         private static class RunGcAction extends KeyAction {
@@ -98,14 +102,14 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             public void actionPerformed(ActionEvent actionEvent) {
                 Runtime rt = Runtime.getRuntime();
                 LOGGER.info("Before GC: total {} MB, max {} MB, free {} MB",
-                        rt.totalMemory() / 1048576.0,
-                        rt.maxMemory() / 1048576.0,
-                        rt.freeMemory() / 1048576.0);
+                    rt.totalMemory() / 1048576.0,
+                    rt.maxMemory() / 1048576.0,
+                    rt.freeMemory() / 1048576.0);
                 System.gc();
                 LOGGER.info("After GC: total {} MB, max {} MB, free {} MB",
-                        rt.totalMemory() / 1048576.0,
-                        rt.maxMemory() / 1048576.0,
-                        rt.freeMemory() / 1048576.0);
+                    rt.totalMemory() / 1048576.0,
+                    rt.maxMemory() / 1048576.0,
+                    rt.freeMemory() / 1048576.0);
             }
         }
 
@@ -137,7 +141,8 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             @Nullable
             private static String findJConsole() {
                 var executableLinux = Paths.get(System.getProperty("java.home"), "bin", "jconsole");
-                var executableWindows = Paths.get(System.getProperty("java.home"), "bin", "jconsole.exe");
+                var executableWindows =
+                    Paths.get(System.getProperty("java.home"), "bin", "jconsole.exe");
 
                 if (Files.exists(executableLinux)) {
                     return executableLinux.toString();
