@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -13,6 +11,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl

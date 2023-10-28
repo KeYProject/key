@@ -6,8 +6,6 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
@@ -51,6 +49,8 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
@@ -523,13 +523,13 @@ public class JMLSpecFactory {
 
     }
 
-    @Nonnull
+    @NonNull
     private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
-    @Nonnull
+    @NonNull
     private LabeledParserRuleContext getAssignableFreeNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
@@ -1004,9 +1004,9 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
-    public ClassInvariant createJMLClassInvariant(@Nonnull KeYJavaType kjt,
+    public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt,
             VisibilityModifier visibility, boolean isStatic,
-            @Nonnull LabeledParserRuleContext originalInv) {
+            @NonNull LabeledParserRuleContext originalInv) {
         var context = Context.inClass(kjt, isStatic, tb);
 
         // translateToTerm expression
@@ -1039,8 +1039,8 @@ public class JMLSpecFactory {
             context.selfVar(), textualInv.isFree());
     }
 
-    public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt,
-            VisibilityModifier visibility, @Nonnull LabeledParserRuleContext original) {
+    public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
+            VisibilityModifier visibility, @NonNull LabeledParserRuleContext original) {
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
@@ -1060,8 +1060,8 @@ public class JMLSpecFactory {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
     }
 
-    public ClassAxiom createJMLRepresents(@Nonnull KeYJavaType kjt, VisibilityModifier visibility,
-            @Nonnull LabeledParserRuleContext originalRep, boolean isStatic)
+    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, VisibilityModifier visibility,
+            @NonNull LabeledParserRuleContext originalRep, boolean isStatic)
             throws SLTranslationException {
 
         var context = Context.inClass(kjt, isStatic, tb);
@@ -1120,7 +1120,7 @@ public class JMLSpecFactory {
      * @param textual textual representation
      * @return created {@link ClassAxiom}
      */
-    public ClassAxiom createJMLClassAxiom(@Nonnull KeYJavaType kjt, TextualJMLClassAxiom textual) {
+    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
         if (originalRep == null) {
             throw new NullPointerException();

@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.parser;
 
 
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents an error of a parser.
@@ -33,7 +33,7 @@ public final class ParserException extends Exception implements HasLocation {
     /**
      * @return The location may be null.
      */
-    @Nonnull
+    @Nullable
     @Override
     public Location getLocation() {
         return location;

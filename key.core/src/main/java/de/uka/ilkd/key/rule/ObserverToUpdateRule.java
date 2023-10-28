@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.util.Union;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implements the rule which translates the toplevel formula
@@ -133,7 +134,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return true;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         Union<Instantiation, ModelFieldInstantiation> inst =
@@ -191,8 +192,9 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             tb.prog((Modality) inst.modality.op(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    inst.modality.op(), inst.modality.subs(), null, postJavaBlock,
-                    inst.modality.getLabels()));
+                    tb.tf().createTerm(inst.modality.op(), inst.modality.subs(), null,
+                        postJavaBlock,
+                        inst.modality.getLabels())));
         Term lhs = tb.var(inst.assignmentTarget);
 
         Term update = tb.elementary(lhs,
@@ -249,8 +251,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
-                    inst.progPost.getLabels()));
+                    tb.tf().createTerm(inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null,
+                        postJavaBlock, inst.progPost.getLabels())));
         Term lhs = tb.var((ProgramVariable) inst.actualResult);
         Term update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));

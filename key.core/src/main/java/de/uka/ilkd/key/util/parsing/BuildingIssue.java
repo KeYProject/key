@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 
 public record BuildingIssue(String message,@Nullable Throwable cause,boolean isWarning,Position position){
 

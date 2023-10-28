@@ -9,7 +9,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * List interface to be implemented by non-destructive lists
@@ -286,7 +287,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      *
      * @returns the filtered list
      */
-    default @Nonnull ImmutableList<T> filter(@Nonnull Predicate<T> predicate) {
+    default @NonNull ImmutableList<T> filter(@NonNull Predicate<T> predicate) {
         return Immutables.filter(this, predicate);
     }
 

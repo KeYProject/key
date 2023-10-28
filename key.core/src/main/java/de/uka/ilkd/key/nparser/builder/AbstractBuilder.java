@@ -5,8 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -17,6 +15,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class brings some nice features to the visitors of key's ast.
@@ -140,7 +140,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
-    public @Nonnull List<BuildingIssue> getBuildingIssues() {
+    public @NonNull List<BuildingIssue> getBuildingIssues() {
         if (buildingIssues == null) {
             buildingIssues = new LinkedList<>();
         }

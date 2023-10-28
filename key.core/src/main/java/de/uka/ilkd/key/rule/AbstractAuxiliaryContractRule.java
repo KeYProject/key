@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -36,6 +34,8 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -170,8 +170,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param context   The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-        public record Instantiation(@Nonnull Term update, @Nonnull Term formula, @Nonnull Modality modality, Term self,
-                                    @Nonnull JavaStatement statement,
+        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
+                                    @NonNull JavaStatement statement,
                                     ExecutionContext context) {
         public Instantiation {
             assert update != null;

@@ -392,7 +392,7 @@ public final class AuxiliaryContractBuilders {
          * Creates and registers copies of the remembrance variables and heaps.
          *
          * @param suffix a suffix for the new variables' names.
-         * @return a {@link Variables} object containing the new {@link ProgramVariables}.
+         * @return a {@link Variables} object containing the new {@link ProgramVariable}s.
          */
         public Variables createAndRegisterCopies(String suffix) {
             return new BlockContract.Variables(null, placeholderVariables.breakFlags,
@@ -1394,8 +1394,9 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    instantiation.modality(), new ImmutableArray<>(newPost), null, newJavaBlock,
-                    instantiation.formula().getLabels());
+                    tb.tf().createTerm(instantiation.modality(),
+                        new ImmutableArray<>(newPost), null, newJavaBlock,
+                        instantiation.formula().getLabels()));
 
                 term = tb.applySequential(updates,
                     tb.prog(instantiation.modality(), newJavaBlock, newPost, labels));
@@ -1618,9 +1619,11 @@ public final class AuxiliaryContractBuilders {
                 instantiation.formula().sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
-                    instantiation.modality(), new ImmutableArray<>(instantiation.formula().sub(0)),
-                    null, instantiation.formula().javaBlock(),
-                    instantiation.formula().getLabels()));
+                    services.getTermBuilder().tf().createTerm(
+                        instantiation.modality(),
+                        new ImmutableArray<>(instantiation.formula().sub(0)),
+                        null, instantiation.formula().javaBlock(),
+                        instantiation.formula().getLabels())));
         }
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,

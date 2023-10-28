@@ -6,12 +6,13 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
+
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

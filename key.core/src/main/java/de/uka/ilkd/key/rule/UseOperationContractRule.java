@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
@@ -75,6 +74,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
@@ -555,7 +556,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
@@ -766,8 +767,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
-                    inst.progPost.getLabels())),
+                    tb.tf().createTerm(inst.mod,
+                        new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
+                        inst.progPost.getLabels()))),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
@@ -784,9 +786,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
-                this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
-                inst.progPost.getLabels())),
+                this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
+                tb.tf().createTerm(inst.mod,
+                    new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
+                    inst.progPost.getLabels()))),
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);

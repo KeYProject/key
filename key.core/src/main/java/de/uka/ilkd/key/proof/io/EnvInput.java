@@ -5,9 +5,6 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -16,6 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -48,8 +48,8 @@ public interface EnvInput {
     /**
      * Reads the Java path.
      */
-    @Nonnull
-    Optional<Path> readJavaPath() throws ProofInputException;
+    @Nullable
+    String readJavaPath() throws ProofInputException;
 
     /**
      * Returns the file path to specific requested Java file.
@@ -63,7 +63,8 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    Optional<List<Path>> readClassPath();
+    @NotNull
+    List<File> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.

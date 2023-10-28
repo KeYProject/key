@@ -20,7 +20,6 @@ import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
@@ -74,6 +73,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1360,7 +1360,7 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@Nonnull String absolutePath) {
+    public void addRecentFile(@NonNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 

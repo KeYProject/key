@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -16,6 +15,8 @@ import javax.swing.event.DocumentListener;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import org.jspecify.annotations.NonNull;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
@@ -112,7 +113,7 @@ public abstract class SearchBar extends JPanel {
     /*
      * The boolean return value of this function indicates, whether search was successful or not.
      */
-    public abstract boolean search(@Nonnull String s);
+    public abstract boolean search(@NonNull String s);
 
     public void search() {
         boolean match = search(searchField.getText());

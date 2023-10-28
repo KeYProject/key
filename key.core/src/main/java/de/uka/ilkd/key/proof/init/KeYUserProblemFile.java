@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
@@ -30,6 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -244,7 +244,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      */
     private Profile readProfileFromFile() {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

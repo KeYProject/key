@@ -5,8 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -39,6 +37,8 @@ import org.key_project.util.collection.ImmutableSet;
 import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -487,7 +487,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return ImmutableList.fromList(taclets);
     }
 
-    @Nonnull
+    @NonNull
     private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction,
             ParserRuleContext ctx) {
         if (find == null) {

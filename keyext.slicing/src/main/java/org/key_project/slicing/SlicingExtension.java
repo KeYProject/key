@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -32,6 +31,8 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Proof slicing extension.
@@ -103,11 +104,11 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind,
-            @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -142,10 +143,10 @@ public class SlicingExtension implements KeYGuiExtension,
         });
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<TabPanel> getPanels(
-            @Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+            @NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             leftPanel = new SlicingLeftPanel(mediator, this);
             mediator.addKeYSelectionListener(leftPanel);

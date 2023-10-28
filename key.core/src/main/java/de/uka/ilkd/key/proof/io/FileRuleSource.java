@@ -9,17 +9,17 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class FileRuleSource extends RuleSource {
 
     /**
      * The non-<code>null</code> reference to the file from which rules are read.
      */
-    protected @Nonnull final Path ruleFile;
+    protected @NonNull final Path ruleFile;
 
     private final long numberOfChars;
 
@@ -40,7 +40,7 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public @Nonnull Path file() {
+    public @NonNull Path file() {
         return ruleFile;
     }
 

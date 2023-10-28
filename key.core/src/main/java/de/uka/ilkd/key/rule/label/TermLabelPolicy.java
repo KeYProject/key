@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
@@ -53,19 +52,13 @@ public interface TermLabelPolicy {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-     * @param newTermSubs The optional children of the {@link Term} to create.
-     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to
-     *        create.
-     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-     * @param newTermOriginalLabels The original {@link TermLabel}s.
+     * @param newTerm the template for the new {@link Term} to create
      * @param label The {@link TermLabel} to decide if it should be kept or dropped.
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
     TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
-            ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label);
+            Object hint, Term tacletTerm,
+            Term newTerm, TermLabel label);
 }

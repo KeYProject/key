@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+
+import org.jspecify.annotations.NonNull;
 
 public class CVC4Socket extends AbstractSolverSocket {
 
@@ -16,7 +17,7 @@ public class CVC4Socket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         if ("".equals(msg.trim())) {
             return;

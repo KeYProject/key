@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -52,6 +51,10 @@ import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.TokenSource;
+import org.jspecify.annotations.Nullable;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.

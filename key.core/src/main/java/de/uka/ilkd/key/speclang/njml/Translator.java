@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -49,6 +47,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 import static java.lang.String.format;
@@ -920,7 +920,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getThisReceiver();
     }
 
-    @Nonnull
+    @NonNull
     private SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
@@ -1609,7 +1609,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ctx.predicate(), ctx.storeref());
     }
 
-    @Nonnull
+    @NonNull
     private Object createInfiniteUnion(JmlParser.BoundvarmodifiersContext boundvarmodifiers,
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls,
             JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
@@ -2033,7 +2033,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @Nonnull
+        @NonNull
         Pair<Label, Term> t = termFactory.createBreaks(pred.getTerm(), label);
         contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
         return t;
@@ -2044,7 +2044,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @Nonnull
+        @NonNull
         Pair<Label, Term> t = termFactory.createContinues(pred.getTerm(), label);
         contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
         return t;
