@@ -6,12 +6,13 @@ package de.uka.ilkd.key.gui.prooftree;
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
 
-import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+
+import org.jspecify.annotations.NonNull;
 
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
@@ -90,7 +91,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         children = null;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getSearchString() {
         return toString();

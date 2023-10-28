@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -58,6 +57,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -864,7 +864,7 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    public static TacletApp constructInsts(@Nonnull TacletApp app, Goal currGoal,
+    public static TacletApp constructInsts(@NonNull TacletApp app, Goal currGoal,
             Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null) {
             return app;

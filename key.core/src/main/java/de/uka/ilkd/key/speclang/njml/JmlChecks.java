@@ -6,12 +6,12 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -46,7 +46,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
 
     @Override
-    public @Nonnull List<PositionedString> check(@Nonnull ParserRuleContext ctx) {
+    public @NonNull List<PositionedString> check(@NonNull ParserRuleContext ctx) {
         warnings.clear();
         ctx.accept(this);
         return warnings;

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -40,6 +39,7 @@ import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1517,7 +1517,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    private @Nullable Term[] visitArguments(@Nullable KeYParser.Argument_listContext call) {
+    private @Nullable Term[] visitArguments(KeYParser. @Nullable Argument_listContext call) {
         List<Term> arguments = accept(call);
         return arguments == null ? null : arguments.toArray(new Term[0]);
     }

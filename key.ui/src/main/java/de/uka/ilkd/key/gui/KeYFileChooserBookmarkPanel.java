@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -17,6 +16,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 public class KeYFileChooserBookmarkPanel extends JPanel {
     private static final long serialVersionUID = -6498548666886815605L;
 
-    private final @Nonnull JFileChooser chooser;
+    private final @NonNull JFileChooser chooser;
 
     private final ViewSettings viewSettings =
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
@@ -51,7 +52,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
      *
      * @param chooser non null {@link JFileChooser}
      */
-    public KeYFileChooserBookmarkPanel(@Nonnull JFileChooser chooser) {
+    public KeYFileChooserBookmarkPanel(@NonNull JFileChooser chooser) {
         this.chooser = chooser;
         // register ad the given file chooser
         chooser.setAccessory(this);
