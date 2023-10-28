@@ -407,7 +407,7 @@ public class LogicPrinter {
         if (sv.isDefinedByType()) {
             final var type = sv.getType();
             if (type.getJavaType() instanceof ArrayType) {
-                layouter.print(((ArrayType)type.getJavaType()).getAlternativeNameRepresentation());
+                layouter.print(((ArrayType) type.getJavaType()).getAlternativeNameRepresentation());
             } else {
                 layouter.print(type.getFullName());
             }
