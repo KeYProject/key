@@ -88,6 +88,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
             return;
         }
+        // exotic use case: registering a dependency tracker after the proof is loaded
+        if (proof.countNodes() > 1) {
+            graph.ensureProofIsTracked(proof);
+        }
         proof.addRuleAppListener(this);
     }
 

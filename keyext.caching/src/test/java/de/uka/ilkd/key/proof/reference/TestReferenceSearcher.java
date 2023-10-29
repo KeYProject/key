@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,11 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
         DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
@@ -77,6 +78,22 @@ class TestReferenceSearcher {
         assertTrue(p.closed());
         foundReference.proof().copyCachedGoals(p2, null, null);
         assertTrue(p.closed());
+        assertNotEquals(55, foundReference.serialNr());
+        // test that copying with slicing information works
+        //var depTracker = new DependencyTracker(p2);
+        Node n55 = p.findAny(x -> x.serialNr() == 55);
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(n55));
+            ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n55);
+            assertEquals(n55.serialNr(), c.node().serialNr());
+            ClosedBy n55Close = close;
+        int previousTotal = p.countNodes();
+        n55.register(n55Close, ClosedBy.class);
+        p.pruneProof(n55);
+        p.closeGoal(p.getOpenGoal(n55));
+        assertTrue(p.closed());
+        n55.proof().copyCachedGoals(p2, null, null);
+        assertTrue(p.closed());
+        assertEquals(previousTotal - 3, p.countNodes());
 
         GeneralSettings.noPruningClosed = true;
         p.dispose();
