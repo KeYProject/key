@@ -6,10 +6,9 @@ package org.keyproject.key.api.remoteapi;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.keyproject.key.api.NodeTextDesc;
-import org.keyproject.key.api.NodeTextId;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.KeyIdentifications.*;
+import org.keyproject.key.api.data.NodeTextDesc;
 
 /**
  * @author Alexander Weigl

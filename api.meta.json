@@ -1,0 +1,1144 @@
+{
+  "endpoints": [
+    {
+      "name": "examples/list",
+      "documentation": "",
+      "args": [],
+      "returnType": {
+        "type": {
+          "typeName": "ExampleDesc",
+          "fields": [
+            {
+              "name": "name",
+              "type": "STRING"
+            },
+            {
+              "name": "description",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "meta/version",
+      "documentation": "",
+      "args": [],
+      "returnType": "STRING"
+    },
+    {
+      "name": "meta/available_script_commands",
+      "documentation": "",
+      "args": [],
+      "returnType": {
+        "type": {
+          "typeName": "ProofScriptCommandDesc",
+          "fields": [],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "meta/available_macros",
+      "documentation": "",
+      "args": [],
+      "returnType": {
+        "type": {
+          "typeName": "ProofMacroDesc",
+          "fields": [
+            {
+              "name": "name",
+              "type": "STRING"
+            },
+            {
+              "name": "category",
+              "type": "STRING"
+            },
+            {
+              "name": "description",
+              "type": "STRING"
+            },
+            {
+              "name": "scriptCommandName",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "server/exit",
+      "documentation": "",
+      "args": []
+    },
+    {
+      "name": "server/shutdown",
+      "documentation": "",
+      "args": [],
+      "returnType": "BOOL"
+    },
+    {
+      "name": "server/setTrace",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "SetTraceParams"
+        }
+      ]
+    },
+    {
+      "name": "proofTree/root",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ProofId"
+        }
+      ],
+      "returnType": {
+        "typeName": "TreeNodeDesc",
+        "fields": [],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "proofTree/children",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ProofId"
+        },
+        {
+          "name": "arg1",
+          "type": "TreeNodeId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "TreeNodeDesc",
+          "fields": [],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "proofTree/subtree",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ProofId"
+        },
+        {
+          "name": "arg1",
+          "type": "TreeNodeId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "TreeNodeDesc",
+          "fields": [],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "goal/print",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "NodeId"
+        },
+        {
+          "name": "arg1",
+          "type": "PrintOptions"
+        }
+      ],
+      "returnType": {
+        "typeName": "NodeTextDesc",
+        "fields": [
+          {
+            "name": "id",
+            "type": "NodeTextId"
+          },
+          {
+            "name": "result",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "goal/actions",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "NodeTextId"
+        },
+        {
+          "name": "arg1",
+          "type": "INT"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "TermActionDesc",
+          "fields": [
+            {
+              "name": "commandId",
+              "type": "TermActionId"
+            },
+            {
+              "name": "displayName",
+              "type": "STRING"
+            },
+            {
+              "name": "description",
+              "type": "STRING"
+            },
+            {
+              "name": "category",
+              "type": "STRING"
+            },
+            {
+              "name": "kind",
+              "type": "TermActionKind"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "goal/apply_action",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "TermActionId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "TermActionDesc",
+          "fields": [
+            {
+              "name": "commandId",
+              "type": "TermActionId"
+            },
+            {
+              "name": "displayName",
+              "type": "STRING"
+            },
+            {
+              "name": "description",
+              "type": "STRING"
+            },
+            {
+              "name": "category",
+              "type": "STRING"
+            },
+            {
+              "name": "kind",
+              "type": "TermActionKind"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "goal/free",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "NodeTextId"
+        }
+      ]
+    },
+    {
+      "name": "env/functions",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "EnvironmentId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "FunctionDesc",
+          "fields": [
+            {
+              "name": "name",
+              "type": "STRING"
+            },
+            {
+              "name": "sort",
+              "type": "STRING"
+            },
+            {
+              "name": "retSort",
+              "type": "SortDesc"
+            },
+            {
+              "name": "argSorts",
+              "type": "List"
+            },
+            {
+              "name": "rigid",
+              "type": "BOOL"
+            },
+            {
+              "name": "unique",
+              "type": "BOOL"
+            },
+            {
+              "name": "skolemConstant",
+              "type": "BOOL"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "env/sorts",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "EnvironmentId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "SortDesc",
+          "fields": [
+            {
+              "name": "string",
+              "type": "STRING"
+            },
+            {
+              "name": "documentation",
+              "type": "STRING"
+            },
+            {
+              "name": "extendsSorts",
+              "type": "List"
+            },
+            {
+              "name": "anAbstract",
+              "type": "BOOL"
+            },
+            {
+              "name": "s",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "env/contracts",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "EnvironmentId"
+        }
+      ],
+      "returnType": {
+        "type": {
+          "typeName": "ContractDesc",
+          "fields": [
+            {
+              "name": "contractId",
+              "type": "ContractId"
+            },
+            {
+              "name": "name",
+              "type": "STRING"
+            },
+            {
+              "name": "displayName",
+              "type": "STRING"
+            },
+            {
+              "name": "typeName",
+              "type": "STRING"
+            },
+            {
+              "name": "htmlText",
+              "type": "STRING"
+            },
+            {
+              "name": "plainText",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "env/openContract",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ContractId"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId"
+          },
+          {
+            "name": "proofId",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/load",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "LoadParams"
+        }
+      ],
+      "returnType": {
+        "a": {
+          "typeName": "EnvironmentId",
+          "fields": [
+            {
+              "name": "envId",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "b": {
+          "typeName": "ProofId",
+          "fields": [
+            {
+              "name": "env",
+              "type": "EnvironmentId"
+            },
+            {
+              "name": "proofId",
+              "type": "STRING"
+            }
+          ],
+          "documentation": ""
+        },
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/loadKey",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "STRING"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId"
+          },
+          {
+            "name": "proofId",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/loadExample",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "STRING"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId"
+          },
+          {
+            "name": "proofId",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/loadProblem",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ProblemDefinition"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId"
+          },
+          {
+            "name": "proofId",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/loadTerm",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "STRING"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId"
+          },
+          {
+            "name": "proofId",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "client/sayHello",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "client/logTrace",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "LogTraceParams"
+        }
+      ]
+    },
+    {
+      "name": "client/sm",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ShowMessageParams"
+        }
+      ]
+    },
+    {
+      "name": "client/userResponse",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ShowMessageRequestParams"
+        }
+      ],
+      "returnType": {
+        "typeName": "MessageActionItem",
+        "fields": [
+          {
+            "name": "title",
+            "type": "STRING"
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "client/showDocument",
+      "documentation": "",
+      "args": [
+        {
+          "name": "arg0",
+          "type": "ShowDocumentParams"
+        }
+      ],
+      "returnType": {
+        "typeName": "ShowDocumentResult",
+        "fields": [
+          {
+            "name": "success",
+            "type": "BOOL"
+          }
+        ],
+        "documentation": ""
+      }
+    }
+  ],
+  "types": [
+    {
+      "typeName": "ExampleDesc",
+      "fields": [
+        {
+          "name": "name",
+          "type": "STRING"
+        },
+        {
+          "name": "description",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ProofScriptCommandDesc",
+      "fields": [],
+      "documentation": ""
+    },
+    {
+      "typeName": "ProofMacroDesc",
+      "fields": [
+        {
+          "name": "name",
+          "type": "STRING"
+        },
+        {
+          "name": "category",
+          "type": "STRING"
+        },
+        {
+          "name": "description",
+          "type": "STRING"
+        },
+        {
+          "name": "scriptCommandName",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TraceValue",
+      "values": [
+        "Off",
+        "Message",
+        "All"
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "SetTraceParams",
+      "fields": [
+        {
+          "name": "value",
+          "type": "TraceValue"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "EnvironmentId",
+      "fields": [
+        {
+          "name": "envId",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ProofId",
+      "fields": [
+        {
+          "name": "env",
+          "type": "EnvironmentId"
+        },
+        {
+          "name": "proofId",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TreeNodeDesc",
+      "fields": [],
+      "documentation": ""
+    },
+    {
+      "typeName": "TreeNodeId",
+      "fields": [
+        {
+          "name": "id",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "NodeId",
+      "fields": [
+        {
+          "name": "proofId",
+          "type": "ProofId"
+        },
+        {
+          "name": "nodeId",
+          "type": "INT"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "PrintOptions",
+      "fields": [
+        {
+          "name": "unicode",
+          "type": "BOOL"
+        },
+        {
+          "name": "width",
+          "type": "INT"
+        },
+        {
+          "name": "indentation",
+          "type": "INT"
+        },
+        {
+          "name": "pure",
+          "type": "BOOL"
+        },
+        {
+          "name": "termLabels",
+          "type": "BOOL"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "NodeTextId",
+      "fields": [
+        {
+          "name": "nodeId",
+          "type": "NodeId"
+        },
+        {
+          "name": "nodeTextId",
+          "type": "INT"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "NodeTextDesc",
+      "fields": [
+        {
+          "name": "id",
+          "type": "NodeTextId"
+        },
+        {
+          "name": "result",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TermActionId",
+      "fields": [
+        {
+          "name": "nodeId",
+          "type": "NodeId"
+        },
+        {
+          "name": "pio",
+          "type": "STRING"
+        },
+        {
+          "name": "id",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TermActionKind",
+      "values": [
+        "BuiltIn",
+        "Script",
+        "Macro",
+        "Taclet"
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TermActionDesc",
+      "fields": [
+        {
+          "name": "commandId",
+          "type": "TermActionId"
+        },
+        {
+          "name": "displayName",
+          "type": "STRING"
+        },
+        {
+          "name": "description",
+          "type": "STRING"
+        },
+        {
+          "name": "category",
+          "type": "STRING"
+        },
+        {
+          "name": "kind",
+          "type": "TermActionKind"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "List",
+      "fields": [],
+      "documentation": ""
+    },
+    {
+      "typeName": "SortDesc",
+      "fields": [
+        {
+          "name": "string",
+          "type": "STRING"
+        },
+        {
+          "name": "documentation",
+          "type": "STRING"
+        },
+        {
+          "name": "extendsSorts",
+          "type": "List"
+        },
+        {
+          "name": "anAbstract",
+          "type": "BOOL"
+        },
+        {
+          "name": "s",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "FunctionDesc",
+      "fields": [
+        {
+          "name": "name",
+          "type": "STRING"
+        },
+        {
+          "name": "sort",
+          "type": "STRING"
+        },
+        {
+          "name": "retSort",
+          "type": "SortDesc"
+        },
+        {
+          "name": "argSorts",
+          "type": "List"
+        },
+        {
+          "name": "rigid",
+          "type": "BOOL"
+        },
+        {
+          "name": "unique",
+          "type": "BOOL"
+        },
+        {
+          "name": "skolemConstant",
+          "type": "BOOL"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ContractId",
+      "fields": [
+        {
+          "name": "envId",
+          "type": "EnvironmentId"
+        },
+        {
+          "name": "contractId",
+          "type": "INT"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ContractDesc",
+      "fields": [
+        {
+          "name": "contractId",
+          "type": "ContractId"
+        },
+        {
+          "name": "name",
+          "type": "STRING"
+        },
+        {
+          "name": "displayName",
+          "type": "STRING"
+        },
+        {
+          "name": "typeName",
+          "type": "STRING"
+        },
+        {
+          "name": "htmlText",
+          "type": "STRING"
+        },
+        {
+          "name": "plainText",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "LoadParams",
+      "fields": [
+        {
+          "name": "keyFile",
+          "type": "STRING"
+        },
+        {
+          "name": "javaFile",
+          "type": "STRING"
+        },
+        {
+          "name": "classPath",
+          "type": "List"
+        },
+        {
+          "name": "bootClassPath",
+          "type": "STRING"
+        },
+        {
+          "name": "includes",
+          "type": "List"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ProblemDefinition",
+      "fields": [
+        {
+          "name": "sorts",
+          "type": "List"
+        },
+        {
+          "name": "functions",
+          "type": "List"
+        },
+        {
+          "name": "predicates",
+          "type": "List"
+        },
+        {
+          "name": "antecTerms",
+          "type": "List"
+        },
+        {
+          "name": "succTerms",
+          "type": "List"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "LogTraceParams",
+      "fields": [
+        {
+          "name": "messag",
+          "type": "STRING"
+        },
+        {
+          "name": "verbose",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "MessageType",
+      "values": [
+        "Unused",
+        "Error",
+        "Warning",
+        "Info",
+        "Log",
+        "Debug"
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ShowMessageParams",
+      "fields": [
+        {
+          "name": "type",
+          "type": "MessageType"
+        },
+        {
+          "name": "message",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "MessageActionItem[]",
+      "fields": [],
+      "documentation": ""
+    },
+    {
+      "typeName": "ShowMessageRequestParams",
+      "fields": [
+        {
+          "name": "type",
+          "type": "MessageType"
+        },
+        {
+          "name": "message",
+          "type": "STRING"
+        },
+        {
+          "name": "actions",
+          "type": "MessageActionItem[]"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "MessageActionItem",
+      "fields": [
+        {
+          "name": "title",
+          "type": "STRING"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "Range",
+      "fields": [
+        {
+          "name": "start",
+          "type": "INT"
+        },
+        {
+          "name": "end",
+          "type": "INT"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ShowDocumentParams",
+      "fields": [
+        {
+          "name": "uri",
+          "type": "STRING"
+        },
+        {
+          "name": "external",
+          "type": "BOOL"
+        },
+        {
+          "name": "takeFocus",
+          "type": "BOOL"
+        },
+        {
+          "name": "selection",
+          "type": "Range"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "ShowDocumentResult",
+      "fields": [
+        {
+          "name": "success",
+          "type": "BOOL"
+        }
+      ],
+      "documentation": ""
+    },
+    {
+      "typeName": "TaskFinishedInfo",
+      "fields": [],
+      "documentation": ""
+    },
+    {
+      "typeName": "TaskStartedInfo",
+      "fields": [],
+      "documentation": ""
+    }
+  ]
+}
