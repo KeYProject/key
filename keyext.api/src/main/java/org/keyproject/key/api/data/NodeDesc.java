@@ -6,12 +6,14 @@ package org.keyproject.key.api.data;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.10.23)
  */
-public record NodeDesc(KeyIdentifications.NodeId nodeid, String branchLabel,
+public record NodeDesc(KeyIdentifications.NodeId nodeid,
+        String branchLabel,
         boolean scriptRuleApplication,
         @Nullable List<NodeDesc> children) {
     public NodeDesc(KeyIdentifications.ProofId proofId, int serialNr, String branchLabel,
