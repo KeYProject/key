@@ -12,7 +12,6 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -25,7 +24,7 @@ import org.key_project.util.java.CollectionUtil;
  * proofs.
  * </p>
  * <p>
- * Side proofs are added via {@link #disposeOrStore(String, ApplyStrategyInfo)} when they are no
+ * Side proofs are added via {@link #addProof(String, Proof)} when they are no
  * longer needed. If the {@link SideProofStore} is enabled ({@link #isEnabled()}) the side
  * {@link Proof} is not disposed; instead it is added via {@link #addProof(String, Proof)} and
  * available for a later access until it is removed via {@link #removeEntries(Collection)}.

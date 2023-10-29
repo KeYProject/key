@@ -38,7 +38,8 @@ public abstract class AbstractElement implements ISymbolicElement {
     }
 
     /**
-     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+     * Converts the given {@link Term} into a {@link String} respecting
+     * {@link IModelSettings#isUsePrettyPrinting()}.
      *
      * @param term The {@link Term} to convert.
      * @param services The {@link Services} to use.
