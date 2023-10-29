@@ -1,6 +1,7 @@
 package org.keyproject.key.api.data;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

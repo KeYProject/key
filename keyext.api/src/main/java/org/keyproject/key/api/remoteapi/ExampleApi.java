@@ -10,5 +10,5 @@ import java.util.concurrent.CompletableFuture;
 @JsonSegment("examples")
 public interface ExampleApi {
     @JsonRequest("list")
-    CompletableFuture<List<Example>> examples();
+    CompletableFuture<List<ExampleDesc>> examples();
 }
