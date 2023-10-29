@@ -18,8 +18,8 @@ public class AnnotationUseInfo implements AnnotationUse {
     protected final String fullAnnotationTypeName;
 
     /**
-     * @param accessFlags
-     * @param name
+     * @param fullName name of the annotation
+     * @param evpl
      */
     public AnnotationUseInfo(String fullName, List<ElementValuePair> evpl) {
         super();

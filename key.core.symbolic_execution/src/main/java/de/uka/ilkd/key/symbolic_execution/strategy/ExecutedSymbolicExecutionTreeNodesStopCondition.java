@@ -25,7 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * <p>
  * If a {@link Node} in KeY's proof tree is also a node in a symbolic execution tree is computed via
- * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode(Node)}.
+ * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode}.
  * </p>
  * <p>
  * The auto mode is stopped exactly in the open goal {@link Node} which will become the next

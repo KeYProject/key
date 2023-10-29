@@ -46,10 +46,10 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     private Term methodReturnCondition;
 
     /**
-     * The human readable method return condition to reach this node from its calling
+     * The human-readable method return condition to reach this node from its calling
      * {@link IExecutionMethodCall}.
      */
-    private String formatedMethodReturnCondition;
+    private String formattedMethodReturnCondition;
 
     /**
      * The variable value pairs of the state when the method has been called.
@@ -95,7 +95,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * Computes the signature lazily when {@link #getSignature()} is called the first time.
      *
      * @return The name including the return value.
-     * @throws Occurred Exception.
+     * @throws ProofInputException
      */
     protected abstract String lazyComputeSignature() throws ProofInputException;
 
@@ -115,16 +115,16 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedMethodReturnCondition() throws ProofInputException {
+    public String getFormattedMethodReturnCondition() throws ProofInputException {
         if (methodReturnCondition == null) {
             lazyComputeMethodReturnCondition();
         }
-        return formatedMethodReturnCondition;
+        return formattedMethodReturnCondition;
     }
 
     /**
      * Computes the method return condition lazily when {@link #getMethodReturnCondition()} or
-     * {@link #getFormatedMethodReturnCondition()} is called the first time.
+     * {@link #getFormattedMethodReturnCondition()} is called the first time.
      *
      * @throws ProofInputException Occurred Exception
      */
@@ -151,7 +151,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
             methodReturnCondition =
                 SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
             // Format path condition
-            formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
+            formattedMethodReturnCondition = formatTerm(methodReturnCondition, services);
         }
     }
 

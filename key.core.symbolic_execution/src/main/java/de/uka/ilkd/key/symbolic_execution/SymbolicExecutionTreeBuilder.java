@@ -76,7 +76,6 @@ import org.key_project.util.java.ArrayUtil;
  * The following snippet shows the basic usage of this class to extract an symbolic execution tree:
  *
  * <pre>
- * {@code
  * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set
  * // addUninterpretedPredicate to true
  * // Start KeY's auto mode with SymbolicExecutionStrategy to do the proof
@@ -95,6 +94,7 @@ import org.key_project.util.java.ArrayUtil;
  * // ...
  * </pre>
  * </p>
+ *
  * @author Martin Hentschel
  *
  * @see FunctionalOperationContractPO#isAddUninterpretedPredicate()
@@ -188,8 +188,10 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the execution tree
      * model if they have at least one child. For this reason they are added to the model in
-     * {@link #completeTree()} after the whole proof tree of KeY was analyzed via
-     * {@link #visit(Proof, Node)}. The adding of {@link ExecutionBranchCondition} to the model must
+     * {@link AnalyzerProofVisitor#completeTree()} after the whole proof tree of KeY was analyzed
+     * via
+     * {@link AnalyzerProofVisitor#visit(Proof, Node)}. The adding of
+     * {@link ExecutionBranchCondition} to the model must
      * be done from leaf nodes to the root, but in correct child order. This {@link Deque} forms the
      * order in that the {@link ExecutionBranchCondition} must be applied. The contained
      * {@link List} makes sure that the children are applied in the same order as they occur in
@@ -232,7 +234,7 @@ public class SymbolicExecutionTreeBuilder {
 
     /**
      * <p>
-     * This method initializes {@link #methodCallStack} in case that the initial {@link Sequent}
+     * This method initializes {@link #getMethodCallStack} in case that the initial {@link Sequent}
      * contains {@link MethodFrame}s in its modality.
      * </p>
      * <p>
@@ -1054,7 +1056,7 @@ public class SymbolicExecutionTreeBuilder {
     }
 
     /**
-     * Updates the call stack ({@link #methodCallStack}) if the given {@link Node} in KeY's proof
+     * Updates the call stack ({@link #getMethodCallStack}) if the given {@link Node} in KeY's proof
      * tree is a method call.
      *
      * @param node The current {@link Node}.
@@ -1194,9 +1196,8 @@ public class SymbolicExecutionTreeBuilder {
      *
      * @param node The current {@link Node}.
      * @param blockStartNode The {@link AbstractExecutionNode} to add.
-     * @param secondPair The next element to end at.
-     * @return {@code false} block is definitively not opened, {@code true} block is or might be
-     *         opened.
+     * @param stackSize TODO
+     * @param sourceElements TODO
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode,
             int stackSize, SourceElement... sourceElements) {

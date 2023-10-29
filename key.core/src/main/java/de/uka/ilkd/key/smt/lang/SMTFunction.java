@@ -29,8 +29,7 @@ public class SMTFunction {
     protected SMTSort imageSort;
 
     /**
-     * @param id
-     * @param domainSorts
+     * creates an inital SMT function
      */
     public SMTFunction() {
         super();

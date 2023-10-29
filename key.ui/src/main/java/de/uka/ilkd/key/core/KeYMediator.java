@@ -519,7 +519,6 @@ public class KeYMediator {
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
     @Nullable
     public Proof getSelectedProof() {

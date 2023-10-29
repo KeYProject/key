@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -53,7 +52,6 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param loopSpec The {@link LoopSpecification}.
      * @param isTransaction set to true iff we're in a transaction modality (then, there are more
      *        heaps available).
      * @param isPermissions set to true if the permissions profile is active (then, the permissions
