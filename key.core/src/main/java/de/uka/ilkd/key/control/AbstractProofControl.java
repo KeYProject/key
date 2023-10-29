@@ -564,19 +564,12 @@ public abstract class AbstractProofControl implements ProofControl {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void startAutoMode(Proof proof) {
-        startAutoMode(proof, proof.openEnabledGoals());
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void startAndWaitForAutoMode(Proof proof) {
+    public void startAndWaitForAutoMode(Proof proof) throws InterruptedException {
         startAutoMode(proof);
         waitWhileAutoMode();
     }
@@ -585,7 +578,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals) {
+    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals)
+            throws InterruptedException {
         startAutoMode(proof, goals);
         waitWhileAutoMode();
     }
@@ -594,7 +588,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void stopAndWaitAutoMode() {
+    public void stopAndWaitAutoMode() throws InterruptedException {
         stopAutoMode();
         waitWhileAutoMode();
     }

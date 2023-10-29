@@ -1,16 +1,19 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.keyproject.key.api.data;
+package org.keyproject.key.api.remoteapi;
 
 import java.util.concurrent.CompletableFuture;
 
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.keyproject.key.api.data.KeyIdentifications.EnvironmentId;
+import org.keyproject.key.api.data.KeyIdentifications.ProofId;
+import org.keyproject.key.api.data.LoadParams;
+import org.keyproject.key.api.data.ProblemDefinition;
 
 /**
  * Functionalities for loading proofs either from a built-in example, or from a set of files.
@@ -19,7 +22,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
  * @since v1
  */
 @JsonSegment("loading")
-public interface ProofLoading {
+public interface ProofLoadApi {
     /**
      * I am not sure whether this is helpful. Mainly a feature for testing?!
      *
@@ -27,13 +30,22 @@ public interface ProofLoading {
      * @return
      */
     @JsonRequest
-    CompletableFuture<Proof> loadExample(String id);
+    CompletableFuture<ProofId> loadExample(String id);
 
     /**
      *
      */
     @JsonRequest
-    CompletableFuture<Proof> loadProblem(ProblemDefinition problem);
+    CompletableFuture<ProofId> loadProblem(ProblemDefinition problem);
+
+    /**
+     *
+     */
+    @JsonRequest
+    CompletableFuture<ProofId> loadKey(String content);
+
+    @JsonRequest
+    CompletableFuture<ProofId> loadTerm(String term);
 
     /**
      * Test!
@@ -43,5 +55,6 @@ public interface ProofLoading {
      * @throws ProblemLoaderException if something went wrong
      */
     @JsonRequest
-    CompletableFuture<KeYEnvironment<?>> load(LoadParams params) throws ProblemLoaderException;
+    CompletableFuture<Either<EnvironmentId, ProofId>> load(LoadParams params)
+            throws ProblemLoaderException;
 }
