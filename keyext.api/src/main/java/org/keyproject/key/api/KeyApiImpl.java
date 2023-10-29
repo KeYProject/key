@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.gui.Example;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.macros.ProofMacroFacade;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -47,6 +46,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.internal.NodeText;
+import org.keyproject.key.api.remoteapi.ExampleDesc;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.ClientApi;
@@ -78,14 +78,15 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     @JsonRequest
-    public CompletableFuture<List<Example>> examples() {
+    public CompletableFuture<List<ExampleDesc>> examples() {
         return CompletableFutures
-                .computeAsync((c) -> ExampleChooser.listExamples(ExampleChooser.lookForExamples()));
+                .computeAsync((c) -> ExampleChooser.listExamples(ExampleChooser.lookForExamples())
+                        .stream().map(it -> ExampleDesc.from(it)).toList());
     }
 
     @Override
-    public CompletableFuture<Void> shutdown() {
-        return CompletableFuture.completedFuture(null);
+    public CompletableFuture<Boolean> shutdown() {
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override
@@ -215,10 +216,12 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     private NodeDesc asNodeDescRecursive(ProofId proofId, Node root) {
+        final List<NodeDesc> list =
+            root.childrenStream().map(it -> asNodeDescRecursive(proofId, it)).toList();
         return new NodeDesc(new NodeId(proofId, root.serialNr()),
             root.getNodeInfo().getBranchLabel(),
             root.getNodeInfo().getScriptRuleApplication(),
-            root.childrenStream().map(it -> asNodeDescRecursive(proofId, it)).toList());
+            list);
     }
 
     @Override

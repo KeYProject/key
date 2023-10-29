@@ -1,13 +1,4 @@
-from keyapi.rpc import JsonRPCHandler, Client
-
-
-class KeyClient(Client):
-    def __int__(self):
-        pass
-
-    def handle(self, res):
-        print(res)
-
+from keyapi.rpc import *
 
 class KeyStub(JsonRPCHandler):
     def __init__(self, input, output):

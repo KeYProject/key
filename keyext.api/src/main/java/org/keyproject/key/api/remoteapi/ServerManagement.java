@@ -38,7 +38,7 @@ public interface ServerManagement {
      * error: code and message set in case an exception happens during shutdown request.
      */
     @JsonRequest
-    CompletableFuture<Void> shutdown();
+    CompletableFuture<Boolean> shutdown();
 
     /**
      * Exit Notification (:arrow_right:)

@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +18,6 @@ import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.keyproject.key.api.adapters.KeyAdapter;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
@@ -37,7 +35,7 @@ public class TestRpc {
         inClient.connect(outServer);
         outClient.connect(inServer);
 
-        KeyApiImpl impl = new KeyApiImpl(new KeyAdapter(null));
+        KeyApiImpl impl = new KeyApiImpl();
         Launcher<ClientApi> serverLauncher = StartServer.launch(outServer, inServer, impl);
         impl.setClientApi(serverLauncher.getRemoteProxy());
 
@@ -61,7 +59,7 @@ public class TestRpc {
     }
 
     @AfterEach
-    void teardown() throws ExecutionException, InterruptedException, TimeoutException {
+    void teardown() {
         serverListening.cancel(true);
         clientListening.cancel(true);
     }
