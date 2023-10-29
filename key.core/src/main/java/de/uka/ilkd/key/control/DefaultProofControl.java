@@ -16,8 +16,10 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.ProofStarter;
-
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default implementation of {@link ProofControl}.
@@ -36,14 +38,19 @@ public class DefaultProofControl extends AbstractProofControl {
     private Thread autoModeThread;
 
     /**
+     * A condition which is non-null during auto-mode. You can wait for end of macro/auto on it.
+     */
+    private Condition inAutoMode;
+
+    /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param ui                        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
-     *        to all started {@link ApplyStrategy} instances.
+     *                                  to all started {@link ApplyStrategy} instances.
      */
     public DefaultProofControl(UserInterfaceControl ui,
-            DefaultUserInterfaceControl defaultProverTaskListener) {
+                               DefaultUserInterfaceControl defaultProverTaskListener) {
         super(defaultProverTaskListener);
         this.ui = ui;
     }
@@ -51,21 +58,21 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param ui                        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
-     *        to all started {@link ApplyStrategy} instances.
-     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
+     *                                  to all started {@link ApplyStrategy} instances.
+     * @param ruleCompletionHandler     An optional {@link RuleCompletionHandler}.
      */
     public DefaultProofControl(UserInterfaceControl ui,
-            DefaultUserInterfaceControl defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+                               DefaultUserInterfaceControl defaultProverTaskListener,
+                               RuleCompletionHandler ruleCompletionHandler) {
         super(defaultProverTaskListener, ruleCompletionHandler);
         this.ui = ui;
     }
 
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
-            ProverTaskListener ptl) {
+                                           ProverTaskListener ptl) {
         if (!isInAutoMode()) {
             autoModeThread = new AutoModeThread(proof, goals, ptl);
             autoModeThread.start();
@@ -79,19 +86,17 @@ public class DefaultProofControl extends AbstractProofControl {
         }
     }
 
+
     @Override
-    public void waitWhileAutoMode() {
-        while (isInAutoMode()) { // Wait until auto mode has stopped.
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+    public void waitWhileAutoMode() throws InterruptedException {
+        if (inAutoMode != null) {
+            inAutoMode.await();
         }
     }
 
     @Override
     public boolean isInAutoMode() {
-        return autoModeThread != null;
+        return inAutoMode != null;
     }
 
     private class AutoModeThread extends Thread {
@@ -105,6 +110,9 @@ public class DefaultProofControl extends AbstractProofControl {
             this.proof = proof;
             this.goals = goals;
             this.ptl = ptl;
+
+            var lock = new ReentrantLock();
+            inAutoMode = lock.newCondition();
         }
 
         @Override
@@ -113,7 +121,7 @@ public class DefaultProofControl extends AbstractProofControl {
                 fireAutoModeStarted(new ProofEvent(proof));
                 ProofStarter starter = ptl != null
                         ? new ProofStarter(
-                            new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
+                        new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
                         : new ProofStarter(getDefaultProverTaskListener(), false);
                 starter.init(proof);
                 if (goals != null) {
@@ -122,6 +130,8 @@ public class DefaultProofControl extends AbstractProofControl {
                     starter.start();
                 }
             } finally {
+                inAutoMode.signalAll();
+                inAutoMode = null;
                 autoModeThread = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
@@ -150,6 +160,9 @@ public class DefaultProofControl extends AbstractProofControl {
             this.node = node;
             this.macro = macro;
             this.posInOcc = posInOcc;
+
+            var lock = new ReentrantLock();
+            inAutoMode = lock.newCondition();
         }
 
         @Override
@@ -172,7 +185,9 @@ public class DefaultProofControl extends AbstractProofControl {
                 if (ptl != null) {
                     ptl.taskFinished(info);
                 }
+                inAutoMode.signalAll();
                 autoModeThread = null;
+                inAutoMode = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
         }

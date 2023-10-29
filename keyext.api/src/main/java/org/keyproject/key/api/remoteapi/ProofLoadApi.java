@@ -1,10 +1,16 @@
-package org.keyproject.key.api.data;
+package org.keyproject.key.api.remoteapi;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.keyproject.key.api.data.KeyIdentifications;
+import org.keyproject.key.api.data.KeyIdentifications.EnvironmentId;
+import org.keyproject.key.api.data.KeyIdentifications.ProofId;
+import org.keyproject.key.api.data.LoadParams;
+import org.keyproject.key.api.data.ProblemDefinition;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -15,20 +21,29 @@ import java.util.concurrent.CompletableFuture;
  * @since v1
  */
 @JsonSegment("loading")
-public interface ProofLoading {
+public interface ProofLoadApi {
     /**
      * I am not sure whether this is helpful. Mainly a feature for testing?!
      * @param id
      * @return
      */
     @JsonRequest
-    CompletableFuture<Proof> loadExample(String id);
+    CompletableFuture<ProofId> loadExample(String id);
 
     /**
      *
      */
     @JsonRequest
-    CompletableFuture<Proof> loadProblem(ProblemDefinition problem);
+    CompletableFuture<ProofId> loadProblem(ProblemDefinition problem);
+
+    /**
+     *
+     */
+    @JsonRequest
+    CompletableFuture<ProofId> loadKey(String content);
+
+    @JsonRequest
+    CompletableFuture<ProofId> loadTerm(String term);
 
     /**
      * Test!
@@ -38,5 +53,5 @@ public interface ProofLoading {
      * @throws ProblemLoaderException if something went wrong
      */
     @JsonRequest
-    CompletableFuture<KeYEnvironment<?>> load(LoadParams params) throws ProblemLoaderException;
+    CompletableFuture<Either<EnvironmentId,ProofId>> load(LoadParams params) throws ProblemLoaderException;
 }

@@ -1,9 +1,8 @@
 package org.keyproject.key.api.remoteapi;
 
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
+import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
 import org.keyproject.key.api.data.StreategyOptions;
@@ -17,32 +16,32 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ProofApi {
     @JsonRequest
-    CompletableFuture<MacroStatistic> script(Proof proof, String scriptLine, StreategyOptions options);
+    CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine, StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<MacroStatistic> macro(Proof proof, String macroId, StreategyOptions options);
+    CompletableFuture<MacroStatistic> macro(ProofId proof, String macroId, StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<MacroStatistic> auto(Proof proof, StreategyOptions options);
+    CompletableFuture<MacroStatistic> auto(ProofId proof, StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<Boolean> dispose(Proof proof);
+    CompletableFuture<Boolean> dispose(ProofId proof);
 
     @JsonRequest
-    CompletableFuture<NodeDesc> goals(Proof proof);
+    CompletableFuture<List<NodeDesc>> goals(ProofId proof, boolean onlyOpened, boolean onlyEnabled);
 
     @JsonRequest
-    CompletableFuture<NodeDesc> tree(Proof proof);
+    CompletableFuture<NodeDesc> tree(ProofId proof);
 
     @JsonRequest
-    CompletableFuture<NodeDesc> root(Proof proof);
+    CompletableFuture<NodeDesc> root(ProofId proof);
 
     @JsonRequest
-    CompletableFuture<List<NodeDesc>> children(Proof proof, Node nodeId);
+    CompletableFuture<List<NodeDesc>> children(NodeId nodeId);
 
     @JsonRequest
-    CompletableFuture<List<NodeDesc>> pruneTo(Proof proof, Node nodeId);
+    CompletableFuture<List<NodeDesc>> pruneTo(NodeId nodeId);
 
     @JsonRequest
-    CompletableFuture<Statistics> statistics(Proof proof);
+    CompletableFuture<Statistics> statistics(ProofId proof);
 }
