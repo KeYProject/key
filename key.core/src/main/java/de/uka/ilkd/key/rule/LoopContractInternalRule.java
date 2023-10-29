@@ -104,7 +104,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      *
      * @param modifiesClauses the loop's modifies clauses.
      * @param freeModifiesClauses the loop's free modifies clauses.
-     * @param conditionsAndClausesBuildera ConditionsAndClausesBuilder.
+     * @param conditionsAndClausesBuilder ConditionsAndClausesBuilder.
      * @return the postconditions for the current loop iteration.
      */
     private static Term[] createPostconditions(

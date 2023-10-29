@@ -14,7 +14,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
- * Costs for the {@link DeleteMergePointRule}; incredibly cheap if the previous rule application was
+ * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
+ * application was
  * a {@link MergeRule} app, infinitely expensive otherwise. The alternative would be to always check
  * whether there's another {@link Goal} around with the same {@link MergePointStatement} (then we
  * may not delete), which is much more time intensive.

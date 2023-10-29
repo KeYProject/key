@@ -11,8 +11,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
  * moment, this is used to distinguish implicit specifications from explicit ones and '&' from '&&'
- * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or'). Cf.
- * {@link de.uka.ilkd.key.logic.TermImpl} and {@link de.uka.ilkd.key.logic.LabeledTermImpl}.
+ * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or').
  *
  * @author Michael Kirsten
  */

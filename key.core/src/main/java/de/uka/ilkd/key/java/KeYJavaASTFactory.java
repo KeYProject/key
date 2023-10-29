@@ -1878,7 +1878,7 @@ public abstract class KeYJavaASTFactory {
      * modifiers typePrefix.baseType[] variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifiers}
+     * @param modifiers the {@link Modifier}s
      * @param variable the named and typed {@link IProgramVariable} to be declared
      * @param init the {@link Expression} <code>variable</code> is initialized with
      * @param typeName the type's {@link ProgramElementName}
@@ -2510,7 +2510,7 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param statement the {@link Statement} to be executed
-     * @param branches the try-catch {@link Branch}
+     * @param branch the try-catch {@link Branch}
      * @return a new {@link Try} block for the execution of <code>branch</code> depending on the
      *         events during the execution of <code>statement</code>
      */
