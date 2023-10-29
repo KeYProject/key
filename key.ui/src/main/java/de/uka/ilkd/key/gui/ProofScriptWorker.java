@@ -163,6 +163,13 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
         }
 
         mediator.removeInterruptedListener(this);
+        runWithDeadline(() -> mediator.startInterface(true), 1000);
+        runWithDeadline(() -> {
+            try {
+                mediator.getUI().getProofControl().stopAndWaitAutoMode();
+            } catch (InterruptedException ignored) {
+            }
+        }, 1000);
 
         final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
                 : mediator.getSelectedProof();
