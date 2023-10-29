@@ -1489,7 +1489,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param variables this contract's variables.
          * @param transactionApplicable whether or not this contract is applicable for transactions.
          * @param hasMod a map specifying on which heaps this contract has a modifies clause.
-         * @param hasMod a map specifying on which heaps this contract has a free modifies clause.
+         * @param hasFreeMod a map specifying on which heaps this contract has a free modifies clause.
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,

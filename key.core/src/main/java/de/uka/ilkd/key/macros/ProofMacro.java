@@ -39,14 +39,14 @@ import org.key_project.util.collection.ImmutableList;
  * A macro is offered to the user iff it returns <code>true</code>. No changes should be made there.
  *
  * A macro is then applied using {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence,
- * ProverTaskListener)/
+ * ProverTaskListener)}/
  * {@link #applyTo(UserInterfaceControl, Proof, ImmutableList, PosInOccurrence, ProverTaskListener)}.
  * This may change the proof by applying rule applications. It is allowed to use automatic runs,
  * manual instantiations,
  * ...
  *
  * A proof macro needs to extract all necessary information on the application from the mediator
- * passed to one {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener) or
+ * passed to one {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener)} or
  * {@link #applyTo(UserInterfaceControl, Proof, ImmutableList, PosInOccurrence, ProverTaskListener)}.
  * You will be able to access any interesting data from that starting point,
  * especially KeYMediator,getInteractiveProver().
@@ -57,7 +57,7 @@ import org.key_project.util.collection.ImmutableList;
  * name of your new implementation to the file
  * <tt>resources/META-INF/services/de.uka.ilkd.key.macros.ProofMacro</tt>.
  *
- * @see KeYMediator
+ * (see also {@code KeYMediator})
  *
  * @author mattias ulbrich
  */

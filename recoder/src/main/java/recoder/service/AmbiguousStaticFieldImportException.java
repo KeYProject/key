@@ -51,7 +51,8 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      * Constructor with an explanation text.
      *
      * @param s an explanation.
-     * @param importStatement the import found to be ambiguous.
+     * @param importStatement1 the first import found to be ambiguous.
+     * @param importStatement2 the second import found to be ambiguous.
      * @param version1 the first possible type.
      * @param version2 the second possible type.
      */

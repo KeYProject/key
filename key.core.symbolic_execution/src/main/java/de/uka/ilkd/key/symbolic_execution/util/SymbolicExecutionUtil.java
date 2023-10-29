@@ -3661,7 +3661,7 @@ public final class SymbolicExecutionUtil {
      * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
      * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks
+     * @param aliasChecksImmediately {@code true} immediately alias checks, {@code false} alias checks
      *        never.
      */
     public static void updateStrategySettings(Proof proof, boolean useOperationContracts,

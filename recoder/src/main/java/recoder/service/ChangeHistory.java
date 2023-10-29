@@ -135,7 +135,7 @@ public class ChangeHistory extends AbstractService {
     /**
      * Adds a model update listener to the history.
      *
-     * @param mul a listener.
+     * @param l a listener.
      */
     public void addModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
@@ -150,7 +150,7 @@ public class ChangeHistory extends AbstractService {
     /**
      * Removes a model update listener from the history.
      *
-     * @param mul a listener.
+     * @param l a listener.
      */
     public void removeModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {

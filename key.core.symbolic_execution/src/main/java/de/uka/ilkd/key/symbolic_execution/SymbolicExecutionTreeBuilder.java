@@ -76,7 +76,6 @@ import org.key_project.util.java.ArrayUtil;
  * The following snippet shows the basic usage of this class to extract an symbolic execution tree:
  *
  * <pre>
- * {@code
  * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set
  * // addUninterpretedPredicate to true
  * // Start KeY's auto mode with SymbolicExecutionStrategy to do the proof
@@ -1198,8 +1197,6 @@ public class SymbolicExecutionTreeBuilder {
      * @param blockStartNode The {@link AbstractExecutionNode} to add.
      * @param stackSize TODO
      * @param sourceElements TODO
-     * @return {@code false} block is definitively not opened, {@code true} block is or might be
-     *         opened.
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode,
             int stackSize, SourceElement... sourceElements) {

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
- * <li>Functionality to load files via {@link #load)}.</li>
+ * <li>Functionality to load files via {@link #load(Profile, File, List, File, List, Properties, boolean, Consumer)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
  * <li>Functionality to register existing {@link Proof}s in the user interface via

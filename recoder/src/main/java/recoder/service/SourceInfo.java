@@ -307,7 +307,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given method. Returns <CODE>
      * null</CODE>, if the given method is not a method declaration.
      *
-     * @param m a method.
+     * @param c a constructor.
      * @return the corresponding method declaration, or <CODE>null</CODE>, if the given method has
      *         no syntactical representation.
      */
@@ -317,7 +317,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given variable. Returns <CODE>
      * null</CODE>, if the given variable is not a variable specification.
      *
-     * @param m a variable.
+     * @param v a variable.
      * @return the corresponding variable specification, or <CODE>null</CODE>, if the given variable
      *         has no syntactical representation.
      */
