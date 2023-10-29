@@ -80,7 +80,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
 
             progressBar.setMaximumSize(new Dimension(100, 25));
 
-            progressBar.setMaximum(total);
+            progressBar.setMaximum(max);
             final var used = total - free;
             progressBar.setValue(used);
             progressBar.setString("%sM of %sM".formatted(used, max));
