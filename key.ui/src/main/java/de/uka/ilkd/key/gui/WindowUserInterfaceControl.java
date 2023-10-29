@@ -554,7 +554,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param includes Optional includes to consider.
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs} will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -103,7 +104,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking {@link ProverTaskListener#taskStarted(String, int)} on the
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on the
      * registered listener.
      *
      * Termination is announced by invoking

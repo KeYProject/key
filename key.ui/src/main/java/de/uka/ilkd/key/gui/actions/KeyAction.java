@@ -44,7 +44,7 @@ public abstract class KeyAction extends AbstractAction {
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
      *
-     * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
+     * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
 
