@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import de.uka.ilkd.key.Identifiable;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -57,7 +56,7 @@ import org.jspecify.annotations.Nullable;
  * goals, namespaces and several other information about the current state of the proof.
  */
 @NullMarked
-public class Proof implements ProofObject<Goal>, Named, Identifiable {
+public class Proof implements ProofObject<Goal>, Named {
 
     /**
      * The time when the {@link Proof} instance was created.
@@ -1368,13 +1367,5 @@ public class Proof implements ProofObject<Goal>, Named, Identifiable {
                 callbackBranch.run();
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String identification() {
-        return getClass().getName() + "_" + name + "_" + hashCode();
     }
 }

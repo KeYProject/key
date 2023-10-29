@@ -96,6 +96,7 @@ public class Main {
                 LOGGER.info("Found contract '" + contract.getDisplayName());
                 proveContract(env, contract);
             }
+        } catch (InterruptedException ignored) {
         } finally {
             env.dispose(); // Ensure always that all instances of KeYEnvironment are disposed
         }
@@ -134,7 +135,8 @@ public class Main {
      * @param env the {@link KeYEnvironment} in which to prove the contract
      * @param contract the {@link Contract} to be proven
      */
-    private static void proveContract(KeYEnvironment<?> env, Contract contract) {
+    private static void proveContract(KeYEnvironment<?> env, Contract contract)
+            throws InterruptedException {
         Proof proof = null;
         try {
             // Create proof
