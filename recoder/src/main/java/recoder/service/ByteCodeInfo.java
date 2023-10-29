@@ -48,8 +48,9 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * </CODE>, if the given field is not a field info.
      *
      * @param f a field.
-     * @return  the corresponding field info, or <CODE>null</CODE>, if the given field has no bytecode
-     *        representation.
+     * @return the corresponding field info, or <CODE>null</CODE>, if the given field has no
+     *         bytecode
+     *         representation.
      */
     FieldInfo getFieldInfo(Field f);
 

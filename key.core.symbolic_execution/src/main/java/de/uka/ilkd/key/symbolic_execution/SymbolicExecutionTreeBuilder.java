@@ -94,6 +94,7 @@ import org.key_project.util.java.ArrayUtil;
  * // ...
  * </pre>
  * </p>
+ *
  * @author Martin Hentschel
  *
  * @see FunctionalOperationContractPO#isAddUninterpretedPredicate()

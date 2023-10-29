@@ -98,7 +98,8 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
     /**
      * Returns the methods locally defined within this class type.
      * <p>
-     * we cannot declare {@code List<? extends Method>} here: if we did, we'd have to support that in
+     * we cannot declare {@code List<? extends Method>} here: if we did, we'd have to support that
+     * in
      * everywhere; then, enums have a mix of MethodDeclaration and implict methods. Thus, this would
      * help in bytecode only. It's not worth it.
      *

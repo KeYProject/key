@@ -154,7 +154,8 @@ public class TypeKit {
     /**
      * creates an abstract super class (interface) for the given class.
      *
-     * @param ni the NameInfo to ensure that a class of the sme name as the new superclass does not yet exist
+     * @param ni the NameInfo to ensure that a class of the sme name as the new superclass does not
+     *        yet exist
      * @param cdecl public class to abstractify
      * @param abstractsupername the name of the new abstract superclass
      *

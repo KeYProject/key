@@ -46,7 +46,8 @@ import org.key_project.util.collection.ImmutableList;
  * ...
  *
  * A proof macro needs to extract all necessary information on the application from the mediator
- * passed to one {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener)} or
+ * passed to one {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener)}
+ * or
  * {@link #applyTo(UserInterfaceControl, Proof, ImmutableList, PosInOccurrence, ProverTaskListener)}.
  * You will be able to access any interesting data from that starting point,
  * especially KeYMediator,getInteractiveProver().
