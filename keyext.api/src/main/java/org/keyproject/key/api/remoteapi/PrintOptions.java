@@ -4,8 +4,9 @@
 package org.keyproject.key.api.remoteapi;
 
 /**
- * The combined interface that is provided by KeY.
+ * @author Alexander Weigl
+ * @version 1 (29.10.23)
  */
-public interface KeyApi extends ExampleApi, MetaApi, ServerManagement, ProofApi, ProofTreeApi,
-        GoalApi, EnvApi, ProofLoadApi {
+public record PrintOptions(boolean unicode, int width, int indentation, boolean pure,
+        boolean termLabels) {
 }

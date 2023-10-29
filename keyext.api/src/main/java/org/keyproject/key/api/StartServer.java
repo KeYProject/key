@@ -120,6 +120,8 @@ public class StartServer implements Runnable {
         }
 
         try {
+            final var keyApi = new KeyApiImpl();
+
             if (websocket) {
                 var launcherBuilder = new WebSocketLauncherBuilder<ClientApi>()
                         .setOutput(out)
@@ -127,14 +129,18 @@ public class StartServer implements Runnable {
                         .traceMessages(new PrintWriter(System.err))
                         .validateMessages(true);
                 launcherBuilder.configureGson(StartServer::configureJson);
-                launcherBuilder.setLocalService(new KeyApiImpl(adapter));
+                launcherBuilder.setLocalService(keyApi);
                 launcherBuilder.setRemoteInterface(ClientApi.class);
-                launcherBuilder.create().startListening().get();
+
+                final var clientApiLauncher = launcherBuilder.create();
+                keyApi.setClientApi(clientApiLauncher.getRemoteProxy());
+                clientApiLauncher.startListening().get();
             } else {
                 establishStreams();
                 try (var lin = in; var lout = out) {
-                    var listener = launch(lout, lin);
+                    var listener = launch(lout, lin, keyApi);
                     LOGGER.info("JSON-RPC is listening for requests");
+                    keyApi.setClientApi(listener.getRemoteProxy());
                     listener.startListening().get();
                 }
             }
@@ -148,7 +154,7 @@ public class StartServer implements Runnable {
         adapter = new KeyAdapter(gsonBuilder);
     }
 
-    public static Launcher<ClientApi> launch(OutputStream out, InputStream in) {
+    public static Launcher<ClientApi> launch(OutputStream out, InputStream in, KeyApiImpl keyApi) {
         // var localServices = getLocalServices();
         // var remoteInterfaces = getRemoteInterfaces();
         var launcherBuilder = new Launcher.Builder<ClientApi>()
@@ -159,7 +165,7 @@ public class StartServer implements Runnable {
 
         launcherBuilder.configureGson(StartServer::configureJson);
         // if (localServices != null && !localServices.isEmpty())
-        launcherBuilder.setLocalService(new KeyApiImpl(adapter));
+        launcherBuilder.setLocalService(keyApi);
         // if (remoteInterfaces != null && !remoteInterfaces.isEmpty())
         launcherBuilder.setRemoteInterface(ClientApi.class);
 

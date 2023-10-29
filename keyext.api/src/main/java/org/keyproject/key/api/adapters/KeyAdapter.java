@@ -5,16 +5,11 @@ package org.keyproject.key.api.adapters;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 
-import de.uka.ilkd.key.Identifiable;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.proof.Proof;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -25,33 +20,32 @@ import org.keyproject.key.api.data.MacroDescription;
  * @version 1 (14.10.23)
  */
 public class KeyAdapter {
-    private final BiMap<String, WeakReference<Object>> map = HashBiMap.create(1024);
+    // private final BiMap<String, WeakReference<Object>> map = HashBiMap.create(1024);
     // private final TypeAdapter<Object> adaptor;
 
     public KeyAdapter(GsonBuilder gson) {
         gson.registerTypeAdapter(File.class, new FileTypeAdapter());
-        gson.registerTypeAdapter(Function.class, new FunctionTypeAdapter());
-        gson.registerTypeAdapter(Proof.class, new IdentifiableTypeAdapter());
-        gson.registerTypeAdapter(ProofMacro.class, new MacroTypeAdapter());
-        // adaptor = gson.create().getAdapter(Object.class);
+        // gson.registerTypeAdapter(Function.class, new FunctionSerializer());
+        // gson.registerTypeAdapter(ProofMacro.class, new MacroSerializer());
     }
 
 
-    // translating entities to identification strings
-    public String insert(Identifiable p) {
-        var id = p.identification();
-        if (!map.containsKey(id)) {
-            map.put(id, new WeakReference<>(p));
-        }
-        return id;
-    }
+    /*
+     * //translating entities to identification strings
+     * public void insert(Identifiable p) {
+     * var id = p.identification();
+     * if (!map.containsKey(id)) {
+     * map.put(id, new WeakReference<>(p));
+     * }
+     * }
+     *
+     * public Object find(String id) {
+     * return map.get(id).get();
+     * }
+     * //endregion
+     */
 
-    public Object find(String id) {
-        return map.get(id).get();
-    }
-    // endregion
-
-    class MacroTypeAdapter implements JsonSerializer<ProofMacro> {
+    static class MacroSerializer implements JsonSerializer<ProofMacro> {
         @Override
         public JsonElement serialize(ProofMacro src, Type typeOfSrc,
                 JsonSerializationContext context) {
@@ -59,7 +53,7 @@ public class KeyAdapter {
         }
     }
 
-    class FileTypeAdapter extends TypeAdapter<File> {
+    static class FileTypeAdapter extends TypeAdapter<File> {
         @Override
         public void write(JsonWriter out, File value) throws IOException {
             out.value(value.toString());
@@ -71,7 +65,7 @@ public class KeyAdapter {
         }
     }
 
-    class FunctionTypeAdapter implements JsonSerializer<Function> {
+    static class FunctionSerializer implements JsonSerializer<Function> {
         @Override
         public JsonElement serialize(Function src, Type typeOfSrc,
                 JsonSerializationContext context) {
@@ -86,19 +80,22 @@ public class KeyAdapter {
         }
     }
 
-    class IdentifiableTypeAdapter
-            implements JsonSerializer<Identifiable>, JsonDeserializer<Identifiable> {
-        @Override
-        public Identifiable deserialize(JsonElement json, Type typeOfT,
-                JsonDeserializationContext context) throws JsonParseException {
-            return (Identifiable) find(json.getAsString());
-        }
-
-        @Override
-        public JsonElement serialize(Identifiable src, Type typeOfSrc,
-                JsonSerializationContext context) {
-            insert(src);
-            return context.serialize(src.identification());
-        }
-    }
+    /*
+     * class IdentifiableTypeAdapter implements JsonSerializer<Identifiable>,
+     * JsonDeserializer<Identifiable> {
+     *
+     * @Override
+     * public Identifiable deserialize(JsonElement json, Type typeOfT,
+     * JsonDeserializationContext context) throws JsonParseException {
+     * return (Identifiable) find(json.getAsString());
+     * }
+     *
+     * @Override
+     * public JsonElement serialize(Identifiable src, Type typeOfSrc,
+     * JsonSerializationContext context) {
+     * insert(src);
+     * return context.serialize(src.identification());
+     * }
+     * }
+     */
 }
