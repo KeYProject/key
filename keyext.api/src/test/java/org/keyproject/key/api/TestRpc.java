@@ -5,6 +5,7 @@ import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.keyproject.key.api.adapters.KeyAdapter;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
@@ -24,7 +25,7 @@ public class TestRpc {
     private KeyApi keyApi;
 
     @BeforeEach
-    void setup() throws IOException, ExecutionException, InterruptedException, TimeoutException {
+    void setup() throws IOException {
         PipedInputStream inClient = new PipedInputStream();
         PipedOutputStream outClient = new PipedOutputStream();
         PipedInputStream inServer = new PipedInputStream();
@@ -33,7 +34,9 @@ public class TestRpc {
         inClient.connect(outServer);
         outClient.connect(inServer);
 
-        Launcher<ClientApi> serverLauncher = StartServer.launch(outServer, inServer);
+        KeyApiImpl impl = new KeyApiImpl(new KeyAdapter(null));
+        Launcher<ClientApi> serverLauncher = StartServer.launch(outServer, inServer, impl);
+        impl.setClientApi(serverLauncher.getRemoteProxy());
 
         var client = new SimpleClient();
         Launcher<KeyApi> clientLauncher = new Launcher.Builder<KeyApi>()

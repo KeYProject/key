@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.*;
-
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -20,9 +16,14 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The Class ProofMacroWorker is a swing worker for the application of proof macros.
@@ -39,7 +40,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      * goals under the current pio, selection remains where it was.
      */
     private static final boolean SELECT_GOAL_AFTER_MACRO =
-        Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
+            Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
      * The {@link Node} to start macro at.
@@ -69,22 +70,26 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     private Exception exception;
     private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
+    private final Condition finish;
+
     /**
      * Instantiates a new proof macro worker.
      *
-     * @param node the {@link Node} to start macro at.
-     * @param macro the macro, not null
+     * @param node     the {@link Node} to start macro at.
+     * @param macro    the macro, not null
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
     public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator,
-            PosInOccurrence posInOcc) {
+                            PosInOccurrence posInOcc) {
         assert macro != null;
         assert mediator != null;
         this.node = node;
         this.macro = macro;
         this.mediator = mediator;
         this.posInOcc = posInOcc;
+
+        finish = new ReentrantLock().newCondition();
     }
 
     @Override
@@ -93,7 +98,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
         ptl.taskStarted(
-            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+                new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
@@ -105,6 +110,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
+        } finally {
+            finish.signalAll();
         }
 
         return info;
@@ -120,8 +127,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         synchronized (macro) {
             mediator.removeInterruptedListener(this);
             if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
-                                                       // report this
-                // This should actually never happen.
+                // report this // This should actually never happen.
                 LOGGER.error("", exception);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
@@ -138,7 +144,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     }
 
     protected void emitProofMacroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc,
-            ProofMacroFinishedInfo info) {
+                                          ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }
 
@@ -166,5 +172,12 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
                 n = n.parent();
             }
         }
+    }
+
+    /**
+     * @return a condition for waiting on this thread to be finished
+     */
+    public Condition getFinish() {
+        return finish;
     }
 }

@@ -1,13 +1,12 @@
 package org.keyproject.key.api.remoteapi;
 
-import de.uka.ilkd.key.proof.Node;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.keyproject.key.api.data.GoalText;
-import org.keyproject.key.api.data.PrintId;
-import org.keyproject.key.api.data.TermAction;
-import org.keyproject.key.api.data.TermActionId;
+import org.keyproject.key.api.NodeTextDesc;
+import org.keyproject.key.api.NodeTextId;
+import org.keyproject.key.api.data.*;
+import org.keyproject.key.api.data.KeyIdentifications.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,14 +18,14 @@ import java.util.concurrent.CompletableFuture;
 @JsonSegment("goal")
 public interface GoalApi {
     @JsonRequest
-    CompletableFuture<GoalText> print(Node id);
+    CompletableFuture<NodeTextDesc> print(NodeId id, PrintOptions options);
 
     @JsonRequest
-    CompletableFuture<List<TermAction>> actions(PrintId id, int pos);
+    CompletableFuture<List<TermActionDesc>> actions(NodeTextId id, int pos);
 
     @JsonRequest("apply_action")
-    CompletableFuture<List<TermAction>> applyAction(TermActionId id);
+    CompletableFuture<List<TermActionDesc>> applyAction(TermActionId id);
 
     @JsonNotification("free")
-    void freePrint(PrintId id);
+    void freePrint(NodeTextId id);
 }

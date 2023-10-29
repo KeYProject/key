@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import java.io.File;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -12,13 +10,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-
-import org.key_project.util.collection.ImmutableList;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -85,7 +83,7 @@ public class ProofExplorationServiceTest {
 
 
         assertTrue(checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()),
-            "Parent is marked as ExplorationNode and data contains Exploration Action");
+                "Parent is marked as ExplorationNode and data contains Exploration Action");
 
         assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
         assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
@@ -127,7 +125,7 @@ public class ProofExplorationServiceTest {
         testAddition(withAddedTerm, justification, added, false);
 
         assertTrue(checkNodeForExplorationDataAndAction(withAddedTerm.node().parent()),
-            "Parent is marked as ExplorationNode and data contains Exploration Action");
+                "Parent is marked as ExplorationNode and data contains Exploration Action");
 
         assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
         assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
@@ -148,9 +146,9 @@ public class ProofExplorationServiceTest {
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
         PosInOccurrence pio =
-            new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
+                new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
         expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
-            change);
+                change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
         assertEquals(2, newCreatedGoals.size(), "Two new goals created");
@@ -168,13 +166,16 @@ public class ProofExplorationServiceTest {
         assertNotNull(justificationBranch.node().lookup(ExplorationNodeData.class));
 
         assertEquals(new Name("hide_right"), hideNode.getAppliedRuleApp().rule().name(),
-            "Hide Right was applied");
+                "Hide Right was applied");
         // set all goals to interactive
         justificationBranch.setEnabled(true);
         // perform proof, it has to close
-        env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
-        assertTrue(currentProof.closed(), "Proof is closed");
-
+        try {
+            env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
+            assertTrue(currentProof.closed(), "Proof is closed");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -183,34 +184,34 @@ public class ProofExplorationServiceTest {
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
         Semisequent semiSeqAdded =
-            antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
+                antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
         Semisequent parentSemiSeqOfAdded =
-            antec ? withAddedTerm.node().parent().sequent().antecedent()
-                    : withAddedTerm.node().parent().sequent().succedent();
+                antec ? withAddedTerm.node().parent().sequent().antecedent()
+                        : withAddedTerm.node().parent().sequent().succedent();
 
         Semisequent semiSeqUntouched =
-            !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
+                !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
 
         Semisequent parentSemiSeqOfUntouched =
-            !antec ? withAddedTerm.node().parent().sequent().antecedent()
-                    : withAddedTerm.node().parent().sequent().succedent();
+                !antec ? withAddedTerm.node().parent().sequent().antecedent()
+                        : withAddedTerm.node().parent().sequent().succedent();
 
 
         assertSame(semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1,
-            "The size of the added semisequent has changed");
+                "The size of the added semisequent has changed");
         assertEquals(semiSeqAdded.get(0).formula(), added, "Added Term is indeed added");
         assertFalse(justification.isAutomatic(), "Justification branch is marked as interactive");
 
         assertSame(semiSeqUntouched.size(), parentSemiSeqOfUntouched.size(),
-            "The size if untouched semisequents is the same");
+                "The size if untouched semisequents is the same");
         assertEquals(semiSeqUntouched, parentSemiSeqOfUntouched,
-            "The  untouched semisequents are equal");
+                "The  untouched semisequents are equal");
 
         Node parent = withAddedTerm.node().parent();
 
         assertEquals(parent, justification.node().parent(), "Both nodes have the same parent");
         assertEquals(new Name("cut"), parent.getAppliedRuleApp().rule().name(),
-            "The addition was inserted using the cut rule");
+                "The addition was inserted using the cut rule");
     }
 
     /**

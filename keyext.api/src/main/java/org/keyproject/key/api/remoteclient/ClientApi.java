@@ -1,5 +1,7 @@
 package org.keyproject.key.api.remoteclient;
 
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
@@ -61,5 +63,10 @@ public interface ClientApi {
      */
     @JsonRequest
     CompletableFuture<ShowDocumentResult> showDocument(ShowDocumentParams params);
+
+
+    void taskFinished(TaskFinishedInfo info);
+    void taskProgress(int position);
+    void taskStarted(TaskStartedInfo info);
     //endregion
 }
