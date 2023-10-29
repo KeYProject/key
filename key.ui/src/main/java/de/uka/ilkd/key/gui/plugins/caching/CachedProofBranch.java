@@ -9,6 +9,7 @@ import java.io.File;
  * Data object about a cached proof branch.
  *
  * (see CachingDatabase)
+ *
  * @author Arne Keller
  */
 public class CachedProofBranch {

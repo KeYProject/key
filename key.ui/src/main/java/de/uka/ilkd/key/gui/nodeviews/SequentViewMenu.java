@@ -81,6 +81,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      * <p>
      * (see KeYSequentViewMenuExtension)
      * </p>
+     *
      * @see KeYGuiExtensionFacade#getContextMenuItems
      */
     protected void addExtensionMenu() {

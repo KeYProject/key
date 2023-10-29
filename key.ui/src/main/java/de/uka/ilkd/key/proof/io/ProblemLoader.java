@@ -104,7 +104,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on the
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on
+     * the
      * registered listener.
      *
      * Termination is announced by invoking

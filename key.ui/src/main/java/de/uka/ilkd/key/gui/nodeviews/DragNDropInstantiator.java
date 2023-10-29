@@ -303,7 +303,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * the taclet applications is given the correct position information where their "find" has been
      * matched
      *
-     * @param tacletApps the {@link ImmutableList<TacletApp>} with taclet applications to be enriched by
+     * @param tacletApps the {@link ImmutableList<TacletApp>} with taclet applications to be
+     *        enriched by
      *        position information
      * @param findPos the {@link PosInOccurrence} against which the find part has been matched
      * @return the taclet apps as given in <tt>tacletApps</tt> but with position information
@@ -328,7 +329,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * <tt>apps</tt>. The resulting applications are returned. The given apps must have either all
      * an if part or none of them.
      *
-     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be matched
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
+     *        matched
      *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt>
      * @param seq the Sequent to which the position information in <tt>ifPIO</tt> is relative to
      * @param ifPIO the PosInOccurrence describing the position of the term to be matched against
@@ -388,7 +390,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * tries to complete the (partial) taclet instantantiation of the applications given in
      * <tt>apps</tt>. The resulting applications are returned.
      *
-     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be matched
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
+     *        matched
      *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt> is relative
      *        to
      * @param missingSVPIO the PosInOccurrence describing the position of the term an uninstantiated
@@ -555,7 +558,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             /**
              * tests if the goal templates contain at least one addrule section
              *
-             * @param goalDescriptions the {@link ImmutableList<TacletGoalTemplate>} to be looked through
+             * @param goalDescriptions the {@link ImmutableList<TacletGoalTemplate>} to be looked
+             *        through
              * @return true if an addrule section has been found
              */
             private boolean goalTemplatesContainAddrules(
