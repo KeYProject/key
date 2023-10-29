@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
+
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl

@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":keyext.api"))
     implementation("com.github.javaparser:javaparser-core:3.25.5")
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.25.5")
 }

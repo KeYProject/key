@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.keyproject.key.api.NodeTextId;
 import org.keyproject.key.api.internal.NodeText;
 
@@ -118,10 +119,11 @@ public class KeyIdentifications {
 
     /**
      * @author Alexander Weigl
-     * @version 1 (13.10.23)
+     * @version 1 (29.10.23)
      */
-    public record PrintId(String id) {
+    public record NodeTextId(NodeId nodeId, int nodeTextId) {
     }
+
 
     /**
      * @author Alexander Weigl
