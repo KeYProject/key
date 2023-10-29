@@ -10,10 +10,10 @@ plugins {
 description "Verification server interface via JSON-RPC"
 
 dependencies {
-    implementation(project(":key.core"))
-    implementation(project(":key.ui"))
+    api(project(":key.core"))
+    api(project(":key.ui"))
 
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.21.1")
+    api("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.21.1")
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.21.1")
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.21.1")
     implementation("org.eclipse.jetty.websocket:websocket-javax-server:10.0.16")

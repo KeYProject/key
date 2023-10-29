@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
