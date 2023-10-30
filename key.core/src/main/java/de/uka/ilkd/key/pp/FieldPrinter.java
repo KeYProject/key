@@ -33,9 +33,6 @@ class FieldPrinter {
      * hidden by another field, the name of the field is preceeded by the corresponding class name.
      *
      * Example default: object.field Example hidden field: object.(package.class::field)
-     *
-     * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
      */
     protected String getPrettySyntaxForFieldConstant(Term objectTerm, Term fieldTerm) {
         JavaInfo javaInfo = services.getJavaInfo();

@@ -109,19 +109,28 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
+        if (o == this) {
+            return true;
         }
 
-        final LabeledTermImpl cmp = (LabeledTermImpl) o;
-        if (labels.size() == cmp.labels.size()) {
-            for (int i = 0, sz = labels.size(); i < sz; i++) {
-                // this is not optimal, but as long as number of labels limited ok
-                if (!cmp.labels.contains(labels.get(i))) {
-                    return false;
-                }
+        if (o instanceof final LabeledTermImpl cmp) {
+            if (labels.size() != cmp.labels.size()) {
+                return false;
             }
-            return true;
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            if (labels.size() == cmp.labels.size()) {
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    // this is not optimal, but as long as number of labels limited ok
+                    if (!cmp.labels.contains(labels.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     }

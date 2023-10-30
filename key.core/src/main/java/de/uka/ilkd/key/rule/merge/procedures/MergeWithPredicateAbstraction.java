@@ -100,7 +100,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * been specified for that sort.
      *
      * @param s {@link Sort} of for elements in the lattice.
-     * @param predicates {@link AbstractionPredicate}s for all sorts.
+     * @param applicablePredicates {@link AbstractionPredicate}s for all sorts.
      * @param latticeType Type of {@link AbstractPredicateAbstractionLattice}.
      * @param services The {@link Services} object.
      * @return The corresponding {@link AbstractDomainLattice}.

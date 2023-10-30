@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +25,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Stateful service for translating JML into KeY entities.
@@ -84,7 +84,7 @@ public class JmlIO {
      * @param atPres i do not know
      * @param atBefores i do not know
      */
-    public JmlIO(@Nonnull Services services, @Nullable KeYJavaType specInClass,
+    public JmlIO(@NonNull Services services, @Nullable KeYJavaType specInClass,
             @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
             @Nullable ProgramVariable resultVar, @Nullable ProgramVariable excVar,
             @Nullable Map<LocationVariable, Term> atPres,
@@ -120,8 +120,8 @@ public class JmlIO {
      *
      * @throws ClassCastException if unsuitable parser rule context is given@param clause
      */
-    public @Nonnull Pair<IObserverFunction, Term> translateRepresents(
-            @Nonnull LabeledParserRuleContext clause) {
+    public @NonNull Pair<IObserverFunction, Term> translateRepresents(
+            @NonNull LabeledParserRuleContext clause) {
         Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
         return new Pair<>(p.first, p.second);
     }
@@ -186,7 +186,7 @@ public class JmlIO {
     /**
      * Interpret the given parse tree as an JML expression in the current context.
      */
-    public @Nonnull Term translateTerm(@Nonnull ParserRuleContext expr) {
+    public @NonNull Term translateTerm(@NonNull ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
@@ -268,7 +268,7 @@ public class JmlIO {
      * @return a information flow specification from the given context.
      * @throws ClassCastException if the {@code expr} is not suitable
      */
-    public @Nonnull InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
+    public @NonNull InfFlowSpec translateInfFlow(@NonNull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
     }
 
@@ -321,7 +321,7 @@ public class JmlIO {
     /**
      * Sets the spec math mode.
      */
-    public JmlIO specMathMode(@Nonnull SpecMathMode specMathMode) {
+    public JmlIO specMathMode(@NonNull SpecMathMode specMathMode) {
         this.specMathMode = specMathMode;
         return this;
     }

@@ -6,7 +6,8 @@ package de.uka.ilkd.key.proof.io;
 import java.util.List;
 
 /**
- * Defines the required which a {@link KeYParser} needs to parse a *.proof file and to apply the
+ * Defines the required which a {@link de.uka.ilkd.key.nparser.KeYParser} needs to parse a *.proof
+ * file and to apply the
  * rules again.
  *
  * @author Martin Hentschel

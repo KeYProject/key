@@ -74,7 +74,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * Adds a new {@link ISymbolicObject}.
      *
-     * @param value The new {@link ISymbolicObject} to add.
+     * @param object The new {@link ISymbolicObject} to add.
      */
     public void addObject(ISymbolicObject object) {
         objects = objects.append(object);

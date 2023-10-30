@@ -71,8 +71,6 @@ public final class KeYGuiExtensionFacade {
 
     /**
      * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
-     *
-     * @return a menu
      */
     public static void addExtensionsToMainMenu(MainWindow mainWindow, JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");

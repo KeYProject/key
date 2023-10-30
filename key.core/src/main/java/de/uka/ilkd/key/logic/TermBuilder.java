@@ -1066,6 +1066,11 @@ public class TermBuilder {
         return apply(parallel(updates), target, null);
     }
 
+    public Term applyParallel(ImmutableList<Term> updates, Term target,
+            ImmutableArray<TermLabel> labels) {
+        return apply(parallel(updates), target, labels);
+    }
+
     public Term applyParallel(Term[] lhss, Term[] values, Term target) {
         return apply(parallel(lhss, values), target, null);
     }
@@ -1687,10 +1692,11 @@ public class TermBuilder {
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
-            if (labels != null || !labels.isEmpty()) {
+            if (labels != null && !labels.isEmpty()) {
                 for (TermLabel newLabel : labels) {
-                    for (TermLabel oldLabel : newLabelList) {
-                        if (oldLabel.getClass().equals(newLabel.getClass())) {
+                    for (TermLabel oldLabel : term.getLabels()) {
+                        if (oldLabel.equals(newLabel) || (oldLabel.getClass() == newLabel.getClass()
+                                && oldLabel instanceof OriginTermLabel)) {
                             newLabelList.remove(oldLabel);
                             break;
                         }

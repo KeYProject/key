@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(KeYMediator, PosInOccurrence)}.
+ * {@link #createStrategy(Proof, PosInOccurrence)}.
  *
  * This class is aware of Position in occurrences and can also be applied to inner nodes. Both
  * {@link AutomatedRuleApplicationManager} and {@link Strategy} are changed for the course of the

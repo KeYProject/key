@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -16,6 +13,9 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
@@ -382,7 +382,7 @@ public final class JMLInfoExtractor {
      * Returns the spec math mode of this type
      */
     @Nullable
-    public static SpecMathMode getSpecMathMode(@Nonnull KeYJavaType t) {
+    public static SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
@@ -390,7 +390,7 @@ public final class JMLInfoExtractor {
         }
     }
 
-    @Nonnull
+    @NonNull
     private static SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
         return mode == null ? SpecMathMode.defaultMode() : mode;
     }
@@ -398,8 +398,8 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type or the default
      */
-    @Nonnull
-    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull KeYJavaType t) {
+    @NonNull
+    public static SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
         return modeOrDefault(getSpecMathMode(t));
     }
 
@@ -407,7 +407,7 @@ public final class JMLInfoExtractor {
      * Returns the spec math mode of this method
      */
     @Nullable
-    public static SpecMathMode getSpecMathMode(@Nonnull IProgramMethod pm) {
+    public static SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
         var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
@@ -415,8 +415,8 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this method
      */
-    @Nonnull
-    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull IProgramMethod pm) {
+    @NonNull
+    public static SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
         return modeOrDefault(getSpecMathMode(pm));
     }
 }

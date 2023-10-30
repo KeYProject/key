@@ -20,9 +20,6 @@ import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 /**
  * The macro UseInformationFlowContractMacro applies all applicable information flow contracts.
- * <p/>
- * The rules that are applied can be set in {@link #ADMITTED_RULENAMES}.
- * <p/>
  *
  * @author christoph
  */

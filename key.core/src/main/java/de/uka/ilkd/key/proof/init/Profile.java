@@ -40,8 +40,7 @@ import org.key_project.util.collection.ImmutableSet;
  * It is recommended to have only one instance of each {@link Profile}. The default instances for
  * usage in the {@link Thread} of the user interface are available via
  * {@link JavaProfile#getDefaultInstance()} and
- * {@code SymbolicExecutionJavaProfile#getDefaultInstance()}. It is possible to get the default
- * instance for a given name via {@link AbstractProfile#getDefaultInstanceForName(String)}. Multiple
+ * {@code SymbolicExecutionJavaProfile#getDefaultInstance()}. Multiple
  * instances are only required if {@link Proof}s are done in parallel (in different
  * {@link Thread}s), because some rules might have a state (at the moment this is only the
  * {@link OneStepSimplifier}).

@@ -6,7 +6,8 @@ package de.uka.ilkd.key.smt.communication;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A {@link TeeReader} writes everything it reads to a separated writer.
@@ -15,13 +16,13 @@ import javax.annotation.Nonnull;
  * @version 1 (10/3/21)
  */
 public class TeeReader extends Reader {
-    @Nonnull
+    @NonNull
     private final Reader source;
 
-    @Nonnull
+    @NonNull
     private final Writer sink;
 
-    public TeeReader(@Nonnull Reader source, @Nonnull Writer sink) {
+    public TeeReader(@NonNull Reader source, @NonNull Writer sink) {
         this.source = source;
         this.sink = sink;
     }

@@ -405,8 +405,8 @@ public class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            if (sv.getType().getJavaType() instanceof ArrayType) {
-                layouter.print(((ArrayType) sv.getType()).getAlternativeNameRepresentation());
+            if (sv.getType().getJavaType() instanceof ArrayType at) {
+                layouter.print(at.getAlternativeNameRepresentation());
             } else {
                 layouter.print(sv.getType().getFullName());
             }

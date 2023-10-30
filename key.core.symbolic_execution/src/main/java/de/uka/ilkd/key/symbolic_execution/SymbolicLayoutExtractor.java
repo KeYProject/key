@@ -110,7 +110,7 @@ import org.key_project.util.java.CollectionUtil;
  * </ol>
  * </li>
  * <li>Compute a concrete initial or current memory layout when they are requested the first time
- * via {@link #lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+ * via {@link #lazyComputeLayout}.
  * <ol>
  * <li>Start side proof based on node's sequent for a current memory layout or root's sequent for an
  * initial memory layout. The sequent is modified by adding the pre updates and on initial memory
@@ -598,7 +598,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * <p>
      * Computes a memory layout lazily when it is first time requested via
-     * {@link #getLayout(Map, int, Term, Set, String, boolean)}.
+     * {@link #getLayout}.
      * </p>
      * <p>
      * Finally, the last step is to create the {@link ISymbolicLayout} instance and to fill it with

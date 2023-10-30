@@ -35,7 +35,7 @@ public class ObjectIDAssignment {
      * tells the assignment manager to forget about the given object. CAUTION: The next call to
      * <tt>getID</tt> for the given object will produce a <b>new </b> id.
      *
-     * @param the object that is not needed anymore.
+     * @param o the object that is not needed anymore.
      */
     public static void releaseID(Object o) {
         ids.remove(o);

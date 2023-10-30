@@ -37,8 +37,7 @@ public class EnumDeclaration extends TypeDeclaration {
     /**
      * @param declSpecs
      * @param name
-     * @param extended
-     * @param implemented
+     * @param implementing
      * @param members
      */
     public EnumDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,

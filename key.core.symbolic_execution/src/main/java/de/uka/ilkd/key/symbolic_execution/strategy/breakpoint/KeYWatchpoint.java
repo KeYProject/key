@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -45,8 +44,6 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
      * calling the constructor!
      *
      * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
-     *        at
      * @param proof the {@link Proof} that will be executed and should stop
      * @param condition the condition as given by the user
      * @param enabled flag if the Breakpoint is enabled

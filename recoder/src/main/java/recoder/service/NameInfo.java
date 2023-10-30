@@ -289,7 +289,7 @@ public interface NameInfo extends Service {
     /**
      * Returns a field belonging to the given fully qualified name.
      *
-     * @param a fully qualified field name, e.g. "System.out".
+     * @param name fully qualified field name, e.g. "System.out".
      * @return the field with that name, or <tt>null</tt> if no such field is known.
      */
     Field getField(String name);

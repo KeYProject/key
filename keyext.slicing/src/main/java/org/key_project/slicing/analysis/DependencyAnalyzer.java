@@ -189,6 +189,8 @@ public final class DependencyAnalyzer {
             throw new IllegalStateException("cannot analyze proof with cached references");
         }
 
+        graph.ensureProofIsTracked(proof);
+
         executionTime.start(TOTAL_WORK);
         proof.setStepIndices();
 

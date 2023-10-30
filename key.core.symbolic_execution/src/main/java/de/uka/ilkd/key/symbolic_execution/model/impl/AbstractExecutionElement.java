@@ -33,7 +33,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     private final Node proofNode;
 
     /**
-     * The human readable name of this node.
+     * The human-readable name of this node.
      */
     private String name;
 
@@ -135,12 +135,13 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     /**
      * Computes the name of this node lazily when {@link #getName()} is called the first time.
      *
-     * @return The human readable name of this {@link IExecutionNode}.
+     * @return The human-readable name of this {@link IExecutionNode}.
      */
     protected abstract String lazyComputeName() throws ProofInputException;
 
     /**
-     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+     * Converts the given {@link Term} into a {@link String} respecting
+     * {@link ITreeSettings#usePrettyPrinting()}.
      *
      * @param term The {@link Term} to convert.
      * @param services The {@link Services} to use.

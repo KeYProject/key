@@ -5,11 +5,12 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Branch node indicating the start of a new proof branch.
@@ -100,7 +101,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = null;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getSearchString() {
         return toString();

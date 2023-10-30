@@ -6,7 +6,6 @@ package de.uka.ilkd.key.speclang.njml;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -18,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 public class PreParser {
     /** warnings */
@@ -35,7 +35,7 @@ public class PreParser {
      * parse tree.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
-        @Nonnull
+        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         p.getErrorReporter().throwException();
@@ -77,7 +77,7 @@ public class PreParser {
      * parse tree.
      */
     private ImmutableList<TextualJMLConstruct> parseMethodLevel(JmlLexer lexer) {
-        @Nonnull
+        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         p.getErrorReporter().throwException();
