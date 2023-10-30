@@ -41,8 +41,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * Imagine the following snippet:
  *
  * <pre>
- * {
- *     &#64;code
+ * {@code
  *     int x = 1; // from 3/59 to 4/16
  *     int y = 2; // from 4/16 to 5/16
  *     int z = 3; // from 5/16 to 6/16

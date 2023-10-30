@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This class defines the equality operator {@code ==}. It is a binary predicate accepting arbitrary
+ * This class defines the logic equality operator {@code =}. It is a binary predicate accepting arbitrary
  * terms
  * (sort "any") as arguments.
  *

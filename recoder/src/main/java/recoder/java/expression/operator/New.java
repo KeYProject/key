@@ -31,7 +31,7 @@ import recoder.list.generic.ASTList;
  * {@code new XYZ(a_1, ..., a_n)}
  *
  * <pre>
- * &#64;code{  m_1, ..., m_k
+ * {@code{  m_1, ..., m_k
  * if getType() instanceof UserType && getClassDeclaration() != null
  * }
  * </pre>

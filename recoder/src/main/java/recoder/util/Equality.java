@@ -15,7 +15,7 @@ package recoder.util;
  * {@code (equals(x, y) && equals(y, z))} implies
  * {@code  equals(x, z)}</LI>
  * </UL>
- * Whether or not objects of different type or <CODE>null</CODE> objects are allowed is up to the
+ * Whether objects of different type or <CODE>null</CODE> objects are allowed is up to the
  * specific implementation.
  *
  * @author AL
@@ -23,7 +23,7 @@ package recoder.util;
 public interface Equality {
 
     /**
-     * Natural equality relation object. The implementation calls x.equals(y), hence no
+     * Natural equality relation object. The implementation calls {@code x.equals(y)}, hence no
      * <CODE>null</CODE> are allowed (not even for y, as the relation must be symmetric).
      */
     Equality NATURAL = Order.NATURAL;

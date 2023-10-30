@@ -44,8 +44,7 @@ import org.key_project.util.java.CollectionUtil;
  * Example program:
  *
  * <pre>
- * {
- *     &#64;code
+ * {@code
  *     public class Example {
  *         private int value;
  *
@@ -69,8 +68,7 @@ import org.key_project.util.java.CollectionUtil;
  * The following code snippet shows how to use this class:
  *
  * <pre>
- * {
- *     &#64;code
+ * {@code
  *     SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
  *     e.analyse();
  *     for (int i = 0; i < e.getLayoutsCount(); i++) {
