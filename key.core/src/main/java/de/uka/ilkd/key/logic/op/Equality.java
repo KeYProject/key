@@ -8,13 +8,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This class defines the logic equality operator {@code =}. It is a binary predicate accepting arbitrary
- * terms
- * (sort "any") as arguments.
+ * This class defines the logic equality operator {@code =}. It is a binary predicate accepting
+ * arbitrary terms (of sort "any") as arguments.
  *
  * It also defines the formula equivalence operator {@code <->} (which could alternatively be seen
- * as a
- * Junctor).
+ * as a Junctor).
  */
 public final class Equality extends AbstractSortedOperator {
 

@@ -17,8 +17,8 @@ import recoder.list.generic.ASTList;
 
 /**
  * The object allocation operator. There are two variants for New:
- * <OL>
- * <LI>Class constructor call <BR>
+ * <ol>
+ * <li>Class constructor call <BR>
  *
  * <pre>
  * {@code
@@ -27,15 +27,20 @@ import recoder.list.generic.ASTList;
  * }
  * </pre>
  *
- * <LI>Anonymous Inner Class definition and construction <BR>
+ * </li>
+ *
+ * <li>Anonymous Inner Class definition and construction <br/>
  * {@code new XYZ(a_1, ..., a_n)}
  *
  * <pre>
- * {@code{  m_1, ..., m_k
- * if getType() instanceof UserType && getClassDeclaration() != null
+ * {@code
+ *   m_1, ..., m_k
+ *  if getType() instanceof UserType && getClassDeclaration() != null
  * }
  * </pre>
- * </OL>
+ *
+ * </li>
+ * </ol>
  * The access path is <tt>null</tt> in most cases, except when an inner class constructor is invoked
  * from an outer instance.
  */

@@ -26,6 +26,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+// need to switch spotless off for this comment as it replaces @code with &#64;code
+// spotless:off
 /**
  * <p>
  * This proof obligation executes selected statements of the body of a given {@link IProgramMethod}.
@@ -47,7 +49,8 @@ import org.key_project.util.collection.ImmutableSLList;
  *     int z = 3; // from 5/16 to 6/16
  * }
  * </pre>
- *
+ * </p>
+ * <p>
  * To execute only the last two statements a user would select intuitively the source
  * range 5/0 to 6/16 (the text without leading white space) which matches exactly the used selection
  * definition.
@@ -77,6 +80,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Martin Hentschel
  */
+//spotless:on
 public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Contains all undeclared variables used in the method part to execute.

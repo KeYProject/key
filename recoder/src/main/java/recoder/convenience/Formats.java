@@ -14,26 +14,35 @@ public interface Formats {
     /**
      * Long default formatting string for program elements, handsome for descriptive external error
      * messages. Derives messages such as
+     *
      * <pre>
      * {@code
      * MethodReference "x.f(i + 1)" @23/45 in FILE:/tmp/Foo.java
-     * }</pre>
+     * }
+     * </pre>
      */
     String ELEMENT_LONG = "%c \"%s\" @%p in \"%f\"";
 
     /**
      * Long formatting string for program elements, omitting file information. Derives messages such
-     * as <pre>{@code
-     * MethodReference "x.f(i + 1)" @23/45}</pre>
+     * as
+     *
+     * <pre>
+     * {@code
+     * MethodReference "x.f(i + 1)" @23/45}
+     * </pre>
      */
     String ELEMENT_LONG_LOCAL = "%c \"%s\" @%p";
 
     /**
      * Short default formatting string for named program elements, handsome for descriptive external
      * error messages. Derives messages such as
-     * <pre>{@code
+     *
+     * <pre>
+     * {@code
      * MethodDeclaration "Foo.f(int)"@23/45 in FILE:/tmp/Foo.java
-     * }</pre>
+     * }
+     * </pre>
      */
     String ELEMENT_SHORT = "%c \"%N\" @%p in \"%f\"";
 }

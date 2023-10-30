@@ -285,13 +285,13 @@ public class Format {
 
     /**
      * Formats a list of model elements. Each element is formatted according to the format string by
-     * a call to {@link #toString(String, String, String, String, ModelElementList)}using
+     * a call to {@link #toString(String, String, String, String, List)} using
      * <CODE>"(", ", ", ")"</CODE> formatting.
      *
      * @param formatText the format text, containing tags.
      * @param l the list to be formatted.
      * @return a textual representation of the list.
-     * @see #toString(String, String, String, String, ModelElementList)
+     * @see #toString(String, String, String, String, List)
      */
     public static String toString(String formatText, List<? extends ModelElement> l) {
         return toString(formatText, "(", ", ", ")", l);

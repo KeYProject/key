@@ -31,6 +31,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 
+// need to switch spotless off for this comment as it replaces @code with &#64;code
+// spotless:off
 /**
  * <p>
  * Instances of this class can be used to compute memory layouts (objects with values and
@@ -41,7 +43,7 @@ import org.key_project.util.java.CollectionUtil;
  * started. Such memory layouts are named <i>initial memory layouts</i>.
  * </p>
  * <p>
- * Example program:
+ * Example program:<br/>
  *
  * <pre>
  * {@code
@@ -59,6 +61,8 @@ import org.key_project.util.java.CollectionUtil;
  * }
  * </pre>
  *
+ * </p>
+ * <p>
  * If the symbolic execution stops at the return statement, two memory layouts are possible. In the
  * first case refers {@code e} and {@code e.next} to different objects (result is {@code 3}). In the
  * second case refers both to the same object (result is {@code 4}). That both objects can't be
@@ -77,7 +81,6 @@ import org.key_project.util.java.CollectionUtil;
  *         ISymbolicLayout current = e.getCurrentLayout(i);
  *     }
  * }
- * </pre>
  * </pre>
  * </p>
  * <p>
@@ -129,6 +132,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see ISymbolicLayout
  * @see ExecutionNodeSymbolicLayoutExtractor
  */
+// spotless:on
 public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * The used {@link IModelSettings}.
