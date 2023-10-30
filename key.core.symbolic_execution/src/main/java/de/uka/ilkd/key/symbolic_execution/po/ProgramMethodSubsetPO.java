@@ -38,11 +38,18 @@ import org.key_project.util.collection.ImmutableSLList;
  * position of the previous statement is exactly the start position of the following statement.
  * </p>
  * <p>
- * Imagine the following snippet: <code><pre>
- * int x = 1; // from 3/59 to 4/16
- * int y = 2; // from 4/16 to 5/16
- * int z = 3; // from 5/16 to 6/16
- * </pre></code> To execute only the last two statements a user would select intuitively the source
+ * Imagine the following snippet:
+ *
+ * <pre>
+ * {
+ *     &#64;code
+ *     int x = 1; // from 3/59 to 4/16
+ *     int y = 2; // from 4/16 to 5/16
+ *     int z = 3; // from 5/16 to 6/16
+ * }
+ * </pre>
+ *
+ * To execute only the last two statements a user would select intuitively the source
  * range 5/0 to 6/16 (the text without leading white space) which matches exactly the used selection
  * definition.
  * </p>
@@ -50,17 +57,22 @@ import org.key_project.util.collection.ImmutableSLList;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodFrame&gt;&lt;selectedStatements&gt;}catch(java.lang.Exception e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <methodFrame><selectedStatements>
+ * } catch(java.lang.Exception e) {
+ *  exc = e
+ * }
+ * <modalityEnd>
+ * (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  *

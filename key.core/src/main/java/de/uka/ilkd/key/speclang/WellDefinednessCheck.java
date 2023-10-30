@@ -916,7 +916,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     /**
      * collects terms for precondition, assignable clause and other specification elements, and
-     * postcondition & signals-clause
+     * {code postcondition {@code &} signals-clause}
      */
     public final POTerms createPOTerms() {
         final Condition pre = this.getRequires();

@@ -11,7 +11,8 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 public class ParameterDeclaration extends VariableDeclaration {

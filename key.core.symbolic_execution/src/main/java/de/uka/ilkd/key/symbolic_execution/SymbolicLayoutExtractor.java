@@ -44,19 +44,20 @@ import org.key_project.util.java.CollectionUtil;
  * Example program:
  *
  * <pre>
- * <code>
- * public class Example {
- *    private int value;
+ * {
+ *     &#64;code
+ *     public class Example {
+ *         private int value;
  *
- *    private Example next;
+ *         private Example next;
  *
- *    public static int main(Example e) {
- *       e.value = 1;
- *       e.next.value = 2;
- *       return e.value + e.next.value; // Current node in KeY's proof tree
- *    }
+ *         public static int main(Example e) {
+ *             e.value = 1;
+ *             e.next.value = 2;
+ *             return e.value + e.next.value; // Current node in KeY's proof tree
+ *         }
+ *     }
  * }
- * </code>
  * </pre>
  *
  * If the symbolic execution stops at the return statement, two memory layouts are possible. In the
@@ -68,15 +69,17 @@ import org.key_project.util.java.CollectionUtil;
  * The following code snippet shows how to use this class:
  *
  * <pre>
- * <code>
- * SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
- * e.analyse();
- * for (int i = 0; i < e.getLayoutsCount(); i++) {
- *    ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
- *    ISymbolicLayout initial = e.getInitialLayout(i);
- *    ISymbolicLayout current = e.getCurrentLayout(i);
+ * {
+ *     &#64;code
+ *     SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
+ *     e.analyse();
+ *     for (int i = 0; i < e.getLayoutsCount(); i++) {
+ *         ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
+ *         ISymbolicLayout initial = e.getInitialLayout(i);
+ *         ISymbolicLayout current = e.getCurrentLayout(i);
+ *     }
  * }
- * </code>
+ * </pre>
  * </pre>
  * </p>
  * <p>
