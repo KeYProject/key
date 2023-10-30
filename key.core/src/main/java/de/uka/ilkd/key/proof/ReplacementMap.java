@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Collection;
@@ -7,9 +10,9 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
@@ -35,7 +38,10 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      */
     static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof) {
-        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
+        var noIrrelevantTermLabelsMap = proof == null
+                ? ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings().getUseOriginLabels()
+                : proof.getServices().getTermBuilder().getOriginFactory() != null;
+        if (noIrrelevantTermLabelsMap) {
             return new NoIrrelevantLabelsReplacementMap<>(tf);
         } else {
             return new DefaultReplacementMap<>();
@@ -117,7 +123,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
         @SuppressWarnings("unchecked")
         private <R> R wrap(R obj) {
             if (obj instanceof Term) {
-                return (R) TermLabel.removeIrrelevantLabels((Term) obj, tf);
+                return (R) TermLabelManager.removeIrrelevantLabels((Term) obj, tf);
             } else {
                 return obj;
             }

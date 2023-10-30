@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.util.ArrayList;
@@ -136,8 +138,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     public List<ClassType> getSupertypes(ClassType ct) {
         Debug.assertNonnull(ct);
         // TODO cache / register (?)
-        if (ct instanceof TypeParameterInfo) {
-            TypeParameterInfo tp = (TypeParameterInfo) ct;
+        if (ct instanceof TypeParameterInfo tp) {
             List<ClassType> res = new ArrayList<>();
             if (tp.getBoundCount() == 0) {
                 // see JLS 3rd edition ?4.4

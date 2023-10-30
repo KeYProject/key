@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.logic.Term;
  * {@link ProofOblInput}.
  * <p>
  * Implementations are instantiated once via
- * {@link ProofInitServiceUtil#createOperationPOExtension(ProofOblInput)} and reused all the time.
+ * {@code ProofInitServiceUtil.createOperationPOExtension()} and reused all the time.
  * This means that {@link POExtension} are singletons and should not have a state.
  *
  * @author Martin Hentschel

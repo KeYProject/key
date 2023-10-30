@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -5,7 +8,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -16,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice
@@ -32,8 +35,20 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
     protected SettingsPanel() {
-        pCenter.setLayout(new MigLayout(new LC().fillX().wrapAfter(3), new AC().count(3).fill(1)
-                .grow(1000f, 1).size("16px", 2).grow(0f, 0).align("right", 0)));
+        pCenter.setLayout(new MigLayout(
+            // set up rows:
+            new LC().fillX()
+                    // remove the padding after the help icon
+                    .insets(null, null, null, "0").wrapAfter(3),
+            // set up columns:
+            new AC().count(3).fill(1)
+                    // label column does not grow
+                    .grow(0f, 0)
+                    // input area does grow
+                    .grow(1000f, 1)
+                    // help icon always has the same size
+                    .size("16px", 2)
+                    .align("right", 0)));
     }
 
     /**
@@ -164,12 +179,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     * @param info
-     * @param selectionIndex
-     * @param validator
-     * @param items
-     * @param <T>
-     * @return
+     * @param title label of the combo box
+     * @param info help text
+     * @param selectionIndex which item to initially select
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
+     * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
             @Nullable Validator<T> validator, T... items) {
@@ -217,6 +233,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JScrollPane field = createTextArea(text, validator);
         addTitledComponent(title, field, info);
         return (JTextArea) field.getViewport().getView();
+    }
+
+    protected JTextArea addTextAreaWithoutScroll(String title, String text, String info,
+            final Validator<String> validator) {
+        JTextArea field = createTextAreaWithoutScroll(text, validator);
+        addTitledComponent(title, field, info);
+        return field;
     }
 
 

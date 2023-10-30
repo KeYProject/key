@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -130,6 +133,16 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @return whether this contract is strictly pure.
      */
     boolean hasModifiesClause(LocationVariable heap);
+
+    /**
+     * Returns <code>true</code> iff the method (according to the free part of the contract)
+     * does not modify the heap at all, i.e., iff it is "strictly pure."
+     *
+     * @param heap
+     *        the heap to use.
+     * @return whether this contract is strictly pure.
+     */
+    boolean hasFreeModifiesClause(LocationVariable heap);
 
     /**
      *
@@ -341,6 +354,56 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @return this contract's modifies clause on the specified heap.
      */
     Term getModifiesClause(LocationVariable heap, Services services);
+
+    /**
+     *
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    Term getFreeModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    Term getFreeModifiesClause(LocationVariable heapVariable, Term heap, Term self,
+            Services services);
+
+    /**
+     *
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    Term getFreeModifiesClause(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
+     * @return this contract's free modifies clause on the specified heap.
+     */
+    Term getFreeModifiesClause(LocationVariable heap, Services services);
+
 
     /**
      *
@@ -616,7 +679,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         private final TermServices services;
 
         /**
-         * You should use {@link #create()} instead of this constructor.
+         * creates an auxiliary contract
          *
          * @param self {@code self}
          * @param breakFlags boolean flags that are set to {@code true} when the block terminates by
@@ -1074,8 +1137,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 first = statement.getFirstElement();
             }
 
-            while (first instanceof LabeledStatement) {
-                LabeledStatement s = (LabeledStatement) first;
+            while (first instanceof LabeledStatement s) {
                 first = s.getBody();
             }
 
@@ -1126,8 +1188,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (statement instanceof LoopStatement) {
             } else {
                 first = statement.getFirstElement();
-                while (first instanceof LabeledStatement) {
-                    LabeledStatement s = (LabeledStatement) first;
+                while (first instanceof LabeledStatement s) {
                     first = s.getBody();
                 }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
@@ -74,13 +77,13 @@ public class FindTacletAppContainer extends TacletAppContainer {
             final FormulaChangeInfo info = infoList.head();
             infoList = infoList.tail();
 
-            final SequentFormula newFormula = info.getNewFormula();
+            final SequentFormula newFormula = info.newFormula();
             if (newFormula == applicationPosition.sequentFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object
                 return false;
             }
-            if (!independentSubformulas(info.getPositionOfModification(), newFormula)) {
+            if (!independentSubformulas(info.positionOfModification(), newFormula)) {
                 return true;
             }
         }

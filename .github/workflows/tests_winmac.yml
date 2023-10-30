@@ -1,0 +1,90 @@
+name: Broad Release Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 5 * * 1' # every monday morning
+  
+permissions:
+  checks: write
+
+jobs:
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        java: [17]
+    continue-on-error: true
+    runs-on: ${{ matrix.os }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results-${{ matrix.os }}
+          path: |
+            **/build/test-results/*/*.xml
+            **/build/reports/
+            !**/jacocoTestReport.xml
+            
+
+  integration-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        java: [17]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+
+      - name: Cache SMT-Solvers
+        id: smt-solvers
+        uses: actions/cache@v3
+        with:
+          path: smt-solvers
+          key: ${{ runner.os }}-smt-solvers
+
+      - name: Install SMT-Solvers
+        run: .github/dlsmt.sh
+
+      - name: "Running tests: ${{ matrix.test }}"
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --continue ${{ matrix.test }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results-${{ matrix.os }}
+          path: |
+            **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
+            **/build/reports/
+            !**/jacocoTestReport.xml
+

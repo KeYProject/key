@@ -1,8 +1,7 @@
-/*
- * Created on 27.05.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationProperty;
@@ -34,8 +33,7 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
      * @param modifiers
      * @param returnType
      * @param name
-     * @param parameters
-     * @param exceptions
+     * @param defaultValue
      */
     public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers,
             TypeReference returnType, Identifier name, Expression defaultValue) {

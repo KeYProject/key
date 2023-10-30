@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -111,10 +114,9 @@ public class Substitution {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof Substitution)) {
+        if (!(arg0 instanceof Substitution s)) {
             return false;
         }
-        final Substitution s = (Substitution) arg0;
         return varMap.equals(s.varMap);
     }
 

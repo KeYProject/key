@@ -1,27 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This POJO represents the static information of a KeY problem. It can be extracted directly via
- * {@link FindProblemInformation}, without any previous interpretation of the AST.
+ * {@link de.uka.ilkd.key.nparser.builder.FindProblemInformation}, without any previous
+ * interpretation of the AST.
  * <p>
  * This class contains rather the <i>raw</i> information, e.g. classpaths are not completed with
  * current working dir. Rather the values are provided as in the {@link KeyAst.File}. Further work
- * may require, like in {@link KeYFile#readJavaPath()}.
+ * may require, like in {@link de.uka.ilkd.key.proof.io.KeYFile#readJavaPath()}.
  * </p>
  *
  * @author weigl
- * @see FindProblemInformation
+ * @see de.uka.ilkd.key.nparser.builder.FindProblemInformation
  */
 public class ProblemInformation {
     /**
      * A list of class paths entries.
      */
-    private final @Nonnull List<String> classpath;
+    private final @NonNull List<String> classpath;
 
     /**
      * Value of a "\chooseContract". If "\chooseContract" are mentioned in the file, but without a
@@ -119,7 +124,7 @@ public class ProblemInformation {
         this.javaSource = javaSource;
     }
 
-    @Nonnull
+    @NonNull
     public List<String> getClasspath() {
         return classpath;
     }

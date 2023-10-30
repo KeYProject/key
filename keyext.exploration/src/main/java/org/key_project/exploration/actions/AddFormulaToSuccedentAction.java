@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -32,7 +36,7 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @Nonnull
+        @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }

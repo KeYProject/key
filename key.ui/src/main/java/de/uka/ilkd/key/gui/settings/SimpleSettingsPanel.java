@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
 import java.awt.*;
 import java.text.Format;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +109,13 @@ public class SimpleSettingsPanel extends JPanel {
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
         return new JScrollPane(area);
+    }
+
+    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.setRows(5);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        return area;
     }
 
 

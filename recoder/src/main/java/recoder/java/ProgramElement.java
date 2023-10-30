@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 import recoder.ModelElement;
@@ -115,7 +117,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
             if (x == null || y == null) {
                 return false;
             }
-            if (x instanceof NonTerminalProgramElement) {
+            if (x instanceof NonTerminalProgramElement a) {
                 if (x.getClass() != y.getClass()) {
                     if (x instanceof UncollatedReferenceQualifier) {
                         if (!(y instanceof ArrayLengthReference) && !(y instanceof PackageReference)
@@ -133,7 +135,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
                         return false;
                     }
                 }
-                NonTerminalProgramElement a = (NonTerminalProgramElement) x;
                 NonTerminalProgramElement b = (NonTerminalProgramElement) y;
                 int n = a.getChildCount();
                 int m = b.getChildCount();

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -7,8 +10,6 @@ import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -40,6 +41,8 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CDropDownButton;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,19 +58,14 @@ import org.slf4j.LoggerFactory;
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 panel.setGoal(mediator.getSelectedGoal());
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-
             }
         });
 
@@ -189,7 +187,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 TacletApp tacletApp = (TacletApp) ruleApp;
                 ImmutableSet<TacletApp> seq = ImmutableSet.singleton(tacletApp);
                 pc.selectedTaclet(seq, lastGoal);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException ignored) {
 
             }
         } else {
@@ -456,23 +454,23 @@ class KeyboardTacletModel {
 
     public void processChar(char c) {
         switch (c) {
-        case '\u001B': // escape
+        case '\u001B' -> // escape
             reset();
-            break;
-        case '\b':
+        case '\b' -> {
             if (currentPrefix.length() <= 1) {
                 setCurrentPrefix("");
             } else {
                 setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
             }
-            break;
-        default:
+        }
+        default -> {
             if ('0' <= c && c <= '9') {
                 setCurrentPos(c - '0');
             }
             if (charValid(c)) {
                 setCurrentPrefix(currentPrefix + c);
             }
+        }
         }
     }
 

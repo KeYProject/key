@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
@@ -18,14 +22,14 @@ import de.uka.ilkd.key.nparser.KeYParser;
  * @see ChoiceInformation
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
-    @Nonnull
+    @NonNull
     private final ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
         choiceInformation = new ChoiceInformation();
     }
 
-    public ChoiceFinder(@Nonnull ChoiceInformation choiceInformation) {
+    public ChoiceFinder(@NonNull ChoiceInformation choiceInformation) {
         this.choiceInformation = choiceInformation;
     }
 
@@ -77,7 +81,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return c;
     }
 
-    @Nonnull
+    @NonNull
     public ChoiceInformation getChoiceInformation() {
         return choiceInformation;
     }

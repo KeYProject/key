@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -163,8 +166,7 @@ public final class IconFactory {
     private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
     private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
     private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
@@ -209,6 +211,9 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }

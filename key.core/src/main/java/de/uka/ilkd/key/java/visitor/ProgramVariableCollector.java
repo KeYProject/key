@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
@@ -125,6 +128,15 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             Term mod = x.getModifies(heap, selfTerm, atPres, services);
             if (mod != null) {
                 mod.execPostOrder(tpvc);
+            }
+        }
+
+        // free modifies
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term freeMod = x.getFreeModifies(heap, selfTerm, atPres, services);
+            if (freeMod != null) {
+                freeMod.execPostOrder(tpvc);
             }
         }
 

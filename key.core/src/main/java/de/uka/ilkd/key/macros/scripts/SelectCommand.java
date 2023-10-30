@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Deque;
@@ -101,15 +104,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
 
             switch (childCount) {
-            case 0:
-                node = choices.pollLast();
-                break;
-
-            case 1:
-                node = node.child(0);
-                break;
-
-            default:
+            case 0 -> node = choices.pollLast();
+            case 1 -> node = node.child(0);
+            default -> {
                 Node next = null;
                 for (int i = 0; i < childCount; i++) {
                     Node child = node.child(i);
@@ -123,7 +120,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                 }
                 assert next != null;
                 node = next;
-                break;
+            }
             }
         }
 

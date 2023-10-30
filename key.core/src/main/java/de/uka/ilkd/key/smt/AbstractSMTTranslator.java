@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 
@@ -744,7 +747,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // make sure, no sort is added twice!!
                 boolean alreadyIn = false;
                 for (StringBuilder stringBuilder : toReturn) {
-                    if (stringBuilder.equals(newSort)) {
+                    if (stringBuilder.compareTo(newSort) == 0) {
                         alreadyIn = true;
                         break;
                     }
@@ -1612,8 +1615,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 return translateFunc(op, subterms);
             }
-        } else if (op instanceof Function) {
-            Function fun = (Function) op;
+        } else if (op instanceof Function fun) {
             if (fun.sort() == Sort.FORMULA) {
                 // This Function is a predicate, so translate it
                 // as such
@@ -2112,8 +2114,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < args.length; i++) {
             QuantifiableVariable qv = args[i];
-            if (qv instanceof LogicVariable) {
-                LogicVariable lv = (LogicVariable) qv;
+            if (qv instanceof LogicVariable lv) {
                 subs[i] = tb.var(lv);
                 argsorts[i] = lv.sort();
             } else {
@@ -2499,8 +2500,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort s = ((SortDependingFunction) op).getSortDependingOn();
                 tempSorts.add(s);
             }
-            if (op instanceof LocationVariable) {
-                LocationVariable lv = (LocationVariable) op;
+            if (op instanceof LocationVariable lv) {
                 if (lv.getContainerType() != null) {
                     tempSorts.add(lv.getContainerType().getSort());
                 }

@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.text.*;
@@ -13,15 +17,16 @@ import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
  * whole String at once is supported, otherwise the syntax highlighting will be faulty.
- *
+ * <p>
  * Note that tab characters have to be replaced by spaces before inserting into the document.
- *
+ * <p>
  * The document currently only works when newlines are represented by "\n"!
  *
  * @author Wolfram Pfeifer
  */
 public class JavaDocument extends DefaultStyledDocument {
 
+    @Serial
     private static final long serialVersionUID = -1856296532743892931L;
 
     // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
@@ -53,7 +58,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * COMMENT (&#47;&#42; ... &#42;&#47;), JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
      */
     private enum Mode {
-        /** parser is currently inside a String */
+        /* parser is currently inside a String */
         // STRING, // currently not in use
         /** parser is currently inside normal java code */
         NORMAL,
@@ -122,7 +127,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Stores the Java keywords which have to be highlighted. The list is taken from
      * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">
      * https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html </a>.
-     *
+     * <p>
      * To add additional keywords, simply add them to the array. Note that the keywords must not
      * contain any of the characters defined by the DELIM regex.
      */
@@ -137,7 +142,7 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /**
      * Stores the JML keywords which have to be highlighted.
-     *
+     * <p>
      * To add additional keywords, simply add them to the array. Note that the keywords must not
      * contain any of the characters defined by the DELIM regex.
      */
@@ -172,21 +177,22 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\working_space", "\\values", "\\inv",
         // clause keywords:
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
-        "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
-        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly", "continues",
-        "continues_redundantly", "debug", "\\declassifies", "decreases", "decreases_redundantly",
-        "decreasing", "decreasing_redundantly", "diverges", "determines", "diverges_redundantly",
-        "duration", "duration_redundantly", "ensures", "ensures_redundantly", "\\erases", "forall",
-        "for_example", "hence_by", "implies_that", "in", "in_redundantly", "\\into",
-        "loop_invariant", "loop_invariant_redundantly", "measured_by", "measured_by_redundantly",
-        "maintaining", "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects",
-        "old", "refining", "represents", "requires", "set", "signals", "signals_only",
-        "\\such_that", "unreachable", "when", "working_space",
+        "assignable_free", "assignable_redundantly", "assume", "assume_redudantly", "breaks",
+        "breaks_redundantly", "\\by", "callable", "callable_redundantly", "captures",
+        "captures_redundantly", "continues", "continues_redundantly", "debug", "\\declassifies",
+        "decreases", "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
+        "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
+        "ensures_free", "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by",
+        "implies_that", "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_free",
+        "loop_invariant_redundantly", "measured_by", "measured_by_redundantly", "maintaining",
+        "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects", "old", "refining",
+        "represents", "requires", "requires_free", "set", "signals", "signals_only", "\\such_that",
+        "unreachable", "when", "working_space",
         // "invariant-like" keywords
         "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
         "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
-        "model_behavior", "model_behaviour", "monitors_for", "normal_behavior", "normal_behaviour",
-        "readable", "writable",
+        "invariant_free", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
+        "normal_behaviour", "readable", "writable",
         // ADT functions:
         "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put", "\\seq_reverse",
         "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton", "\\set_union",
@@ -196,7 +202,7 @@ public class JavaDocument extends DefaultStyledDocument {
     /** the style of annotations */
     private final SimpleAttributeSet annotation = new SimpleAttributeSet();
 
-    /** the style of strings */
+    /* the style of strings */
     // private SimpleAttributeSet string = new SimpleAttributeSet();
 
     /** default style */
@@ -437,61 +443,26 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void processChar(char strChar) throws BadLocationException {
         switch (strChar) {
-        case ('@'):
-            checkAt();
-            break;
-        case '\n':
-            checkLinefeed();
-            break;
-        case '\t': // all tabs should have been replaced earlier!
-        case ' ':
-            checkSpaceTab(strChar);
-            break;
-        case '*':
-            checkStar();
-            break;
-        case '/':
-            checkSlash();
-            break;
-        case '"':
-            checkQuote();
-            break;
+        case ('@') -> checkAt();
+        case '\n' -> checkLinefeed();
+        // all tabs should have been replaced earlier!
+        case '\t', ' ' -> checkSpaceTab(strChar);
+        case '*' -> checkStar();
+        case '/' -> checkSlash();
+        case '"' -> checkQuote();
+
         // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
-        case '+':
-        case '-':
-            checkPlusMinus(strChar);
-            break;
+        case '+', '-' -> checkPlusMinus(strChar);
+
         // case '*':
         // case '/':
-        case '(':
-        case ')':
-        case '[':
-        case ']':
-        case '{':
-        case '}':
-        case '%':
-        case '!':
-        case '^':
-        case '~':
-        case '&':
-        case '|':
-        case '.':
-        case ':':
-        case ';':
-        case '?':
-        case '<':
-        case '>':
-        case '=':
-        case '\'':
+        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<', '>', '=', '\'' ->
             // case ' ':
             // case '"':
             // case '\'':
             // case '\n':
             checkDelimiter(strChar);
-            break;
-        default:
-            checkOther(strChar);
-            break;
+        default -> checkOther(strChar);
         }
     }
 

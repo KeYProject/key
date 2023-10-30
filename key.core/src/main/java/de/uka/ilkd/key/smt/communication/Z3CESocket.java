@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+
+import org.jspecify.annotations.NonNull;
 
 public class Z3CESocket extends AbstractSolverSocket {
 
@@ -13,7 +17,7 @@ public class Z3CESocket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
 
         if (msg.startsWith("(error")) {
@@ -30,7 +34,7 @@ public class Z3CESocket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-        case WAIT_FOR_RESULT:
+        case WAIT_FOR_RESULT -> {
             if (msg.equals("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 pipe.sendMessage("(exit)");
@@ -47,21 +51,17 @@ public class Z3CESocket extends AbstractSolverSocket {
                 sc.setState(WAIT_FOR_DETAILS);
                 pipe.sendMessage("(exit)");
             }
-
-            break;
-
-        case WAIT_FOR_DETAILS:
-            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-            // not work in future, it may be that we have to forcibly close the pipe.
-            break;
-
-        case WAIT_FOR_QUERY:
+        }
+        case WAIT_FOR_DETAILS -> {
+        }
+        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+        // not work in future, it may be that we have to forcibly close the pipe.
+        case WAIT_FOR_QUERY -> {
             if (!msg.equals("success")) {
                 getQuery().messageIncoming(pipe, msg);
             }
-            break;
-
-        case WAIT_FOR_MODEL:
+        }
+        case WAIT_FOR_MODEL -> {
             if (msg.equals("endmodel")) {
                 if (getQuery() != null && getQuery().getState() == ModelExtractor.DEFAULT) {
                     getQuery().getModel().setEmpty(false);
@@ -72,9 +72,8 @@ public class Z3CESocket extends AbstractSolverSocket {
                     sc.setState(WAIT_FOR_DETAILS);
                 }
             }
-            break;
-        default:
-            throw new IllegalStateException("Unexpected value: " + sc.getState());
+        }
+        default -> throw new IllegalStateException("Unexpected value: " + sc.getState());
         }
     }
 

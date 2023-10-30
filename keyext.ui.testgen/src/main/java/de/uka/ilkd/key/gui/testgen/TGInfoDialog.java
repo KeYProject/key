@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.*;
@@ -100,7 +103,6 @@ public class TGInfoDialog extends JDialog {
         setTitle("Test Suite Generation");
         setSize(1000, 700);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(MainWindow.getInstance());
         setLayout(new BorderLayout());
 
         final JScrollPane scrollpane = new JScrollPane(textArea);

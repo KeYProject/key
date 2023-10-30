@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -31,10 +34,6 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      * The mediator.
      */
     private final KeYMediator mediator;
-    /**
-     * The opened dialog, once the user clicks on the button.
-     */
-    private ReferenceSearchDialog dialog = null;
 
     /**
      * Construct a new button.
@@ -57,22 +56,31 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());
             if (c != null) {
-                // p.closeGoal(goal);
-                goal.setEnabled(false);
-
+                p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
-                c.getProof()
+
+                c.proof()
                         .addProofDisposedListenerFirst(new CachingExtension.CopyBeforeDispose(
-                            mediator, c.getProof(), p));
+                            mediator, c.proof(), p));
             }
         }
-        dialog = new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
+        var dialog =
+            new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
         dialog.setVisible(true);
     }
 
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
+        updateState(p);
+    }
+
+    /**
+     * Update the UI state of this button.
+     *
+     * @param p the currently selected proof
+     */
+    public void updateState(Proof p) {
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);
@@ -80,7 +88,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             return;
         }
         long foundRefs =
-            p.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+            p.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
         if (foundRefs > 0) {
             setText(String.format("Proof Caching (%d)", foundRefs));
             setForeground(COLOR_FINE.get());

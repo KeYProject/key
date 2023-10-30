@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
@@ -142,10 +146,9 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp)) {
+        if (!(obj instanceof IBuiltInRuleApp that)) {
             return false;
         }
-        IBuiltInRuleApp that = (IBuiltInRuleApp) obj;
         if (!(Objects.equals(rule(), that.rule())
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;

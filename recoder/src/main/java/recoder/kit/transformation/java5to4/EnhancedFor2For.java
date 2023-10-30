@@ -1,6 +1,7 @@
-/**
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -163,8 +164,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         if (enhancedFor.getStatementCount() > 0) {
             // if statement block, go into it
             Statement s = enhancedFor.getStatementAt(0);
-            if (s instanceof StatementBlock) {
-                StatementBlock sb = (StatementBlock) s;
+            if (s instanceof StatementBlock sb) {
                 for (int i = 0; i < sb.getStatementCount(); i++) {
                     statements.add(sb.getStatementAt(i).deepClone());
                 }

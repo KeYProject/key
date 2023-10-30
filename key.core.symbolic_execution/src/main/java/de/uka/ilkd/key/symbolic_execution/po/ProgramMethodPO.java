@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -236,8 +239,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodPO) {
-            ProgramMethodPO other = (ProgramMethodPO) obj;
+        if (obj instanceof ProgramMethodPO other) {
             return Objects.equals(pm, other.getProgramMethod())
                     && Objects.equals(precondition, other.getPrecondition());
         } else {

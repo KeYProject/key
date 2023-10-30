@@ -1,14 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JMenu;
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+
+import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /**
  * Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
@@ -39,7 +41,7 @@ public abstract class KeyAction extends AbstractAction {
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
      *
-     * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
+     * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
 
@@ -56,12 +58,6 @@ public abstract class KeyAction extends AbstractAction {
      * The stored values are {@link KeyStroke}.
      */
     public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
-
-
-    /**
-     * @see KeyStrokeManager#SHORTCUT_KEY_MASK
-     */
-    protected static final int SHORTCUT_KEY_MASK = KeyStrokeManager.SHORTCUT_KEY_MASK;
 
     public String getName() {
         return (String) getValue(NAME);
@@ -152,6 +148,11 @@ public abstract class KeyAction extends AbstractAction {
         return i == null ? 0 : i;
     }
 
+    /**
+     * Set the priority of this action. Actions are sorted from low priority to high priority.
+     *
+     * @param priority integer value
+     */
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);
     }

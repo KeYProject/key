@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -34,6 +36,8 @@ import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -133,7 +137,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 && !(modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
@@ -142,24 +146,24 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         LoopInvariantInformation loopInvInfo = doPreparations(goal, services, ruleApp);
 
-        ImmutableList<Goal> goals = loopInvInfo.goals;
+        ImmutableList<Goal> goals = loopInvInfo.goals();
         Goal initiallyGoal = goals.tail().head();
         Goal preservesGoal = goals.head();
 
         Pair<Optional<Label>, Statement> labelAndStmtToReplace =
-            findLoopLabel(ruleApp, loopInvInfo.inst.loop);
+            findLoopLabel(ruleApp, loopInvInfo.inst().loop());
 
         // Create the "Initially" goal
-        constructInitiallyGoal(loopInvInfo.services, loopInvInfo.ruleApp,
-            loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst, loopInvInfo.invTerm,
-            loopInvInfo.reachableState);
+        constructInitiallyGoal(loopInvInfo.services(), loopInvInfo.ruleApp(),
+            loopInvInfo.termLabelState(), initiallyGoal, loopInvInfo.inst(), loopInvInfo.invTerm(),
+            loopInvInfo.reachableState());
 
         // Create the "Invariant Preserved and Use Case" goal
-        constructPresrvAndUCGoal(loopInvInfo.services, loopInvInfo.ruleApp, preservesGoal,
-            loopInvInfo.inst, labelAndStmtToReplace.first, labelAndStmtToReplace.second,
-            loopInvInfo.anonUpdate, loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
-            loopInvInfo.frameCondition, loopInvInfo.variantPO, loopInvInfo.termLabelState,
-            loopInvInfo.invTerm, loopInvInfo.uBeforeLoopDefAnonVariant);
+        constructPresrvAndUCGoal(loopInvInfo.services(), loopInvInfo.ruleApp(), preservesGoal,
+            loopInvInfo.inst(), labelAndStmtToReplace.first, labelAndStmtToReplace.second,
+            loopInvInfo.anonUpdate(), loopInvInfo.wellFormedAnon(), loopInvInfo.uAnonInv(),
+            loopInvInfo.frameCondition(), loopInvInfo.variantPO(), loopInvInfo.termLabelState(),
+            loopInvInfo.invTerm(), loopInvInfo.uBeforeLoopDefAnonVariant());
 
         return goals;
     }
@@ -228,7 +232,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Term anonUpdate, Term wellFormedAnon, final Term uAnonInv, Term frameCondition,
             Term variantPO, TermLabelState termLabelState, Term invTerm,
             Term[] uBeforeLoopDefAnonVariant) {
-        final While loop = inst.loop;
+        final While loop = inst.loop();
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate, loop, loopLabel,
             stmtToReplace, frameCondition, variantPO, termLabelState, presrvAndUCGoal,
@@ -332,7 +336,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 
-        Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
+        Term sfTerm = tb.apply(inst.u(), tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
 
@@ -367,7 +371,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Term frameCondition, Term variantPO, TermLabelState termLabelState,
             Goal presrvAndUCGoal, final Term[] uBeforeLoopDefAnonVariant, Term invTerm) {
         final TermBuilder tb = services.getTermBuilder();
-        final Term progPost = splitUpdates(inst.progPost, services).second;
+        final Term progPost = splitUpdates(inst.progPost(), services).second;
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services, null, fullInvariant,
@@ -414,9 +418,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             ((StatementBlock) TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm())
                     .javaBlock().program()).getPrefixElements();
 
-        if (prefixElems.size() > 0 && (prefixElems.last() instanceof LabeledStatement)
+        if (prefixElems.size() > 0
+                && (prefixElems.last() instanceof LabeledStatement lastLabeledStmt)
                 && ((LabeledStatement) prefixElems.last()).getBody().equals(whileLoop)) {
-            final LabeledStatement lastLabeledStmt = (LabeledStatement) prefixElems.last();
             loopLabel = Optional.of(lastLabeledStmt.getLabel());
             stmtToRepl = lastLabeledStmt.getBody();
         }

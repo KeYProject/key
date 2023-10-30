@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
-import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.NonNull;
 
 
 public abstract class GUIAbstractTreeNode implements TreeNode {
@@ -37,7 +41,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public abstract void flushCache();
 
-    public abstract @Nonnull String getSearchString();
+    public abstract @NonNull String getSearchString();
 
     public int getIndex(TreeNode node) {
         for (int i = 0; i < getChildCount(); i++) {

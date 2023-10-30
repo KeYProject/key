@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import javax.swing.*;
@@ -9,6 +12,9 @@ import de.uka.ilkd.key.settings.ProofCachingSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+
+import static de.uka.ilkd.key.settings.ProofCachingSettings.DISPOSE_COPY;
+import static de.uka.ilkd.key.settings.ProofCachingSettings.DISPOSE_REOPEN;
 
 /**
  * Settings for the proof slicing extension.
@@ -32,10 +38,6 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         "Automatically search for references in auto mode";
     private static final String DISPOSE_TITLE =
         "Behaviour when disposing referenced proof";
-    public static final String DISPOSE_COPY =
-        "Copy steps into new proof";
-    public static final String DISPOSE_REOPEN =
-        "Reopen proof";
 
     /**
      * Checkbox for first option.

@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
 
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class VariableKit {
      * guess.
      *
      * @param sc the service configuration to be used
-     * @param sde the element that defines the scope
+     * @param context the element that defines the scope
      * @param guess the variable name to be used if possible. If a variable with that name already
      *        exists, the method uses suffix numbers.
      * @param t the type of the variable to be declared.

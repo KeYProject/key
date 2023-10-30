@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
 
 import java.io.DataInput;
@@ -901,7 +903,7 @@ public class ByteCodeParser {
                         rpos++;
                     }
                     typeName = tn.substring(pos + 1, rpos).replace('/', '.');
-                    if (typeName.equals("")) {
+                    if (typeName.isEmpty()) {
                         typeName = "java.lang.Object"; // allowed for class bound only, but
                     }
                     // we assume that bytecode isn't corrupted.

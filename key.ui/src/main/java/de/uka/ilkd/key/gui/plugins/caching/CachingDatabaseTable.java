@@ -1,14 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import javax.swing.*;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 
 public class CachingDatabaseTable extends AbstractTableModel {
 
@@ -33,27 +33,27 @@ public class CachingDatabaseTable extends AbstractTableModel {
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
-            case 0:
-                return "Proof";
-            case 1:
-                return "Java source";
-            case 2:
-                return "Info";
-            default:
-                return "??";
+        case 0:
+            return "Proof";
+        case 1:
+            return "Java source";
+        case 2:
+            return "Info";
+        default:
+            return "??";
         }
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
-            case 0:
-                return File.class;
-            case 1:
-            case 2:
-                return String.class;
-            default:
-                return null;
+        case 0:
+            return File.class;
+        case 1:
+        case 2:
+            return String.class;
+        default:
+            return null;
         }
     }
 
@@ -65,16 +65,16 @@ public class CachingDatabaseTable extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0:
-                return cachedProofs.get(rowIndex).getName();
-            case 1:
-                return "?";
-            case 2:
-                var proof = cachedProofs.get(rowIndex);
-                var data = cache.get(proof);
-                return String.format("Branches: %d", data.size());
-            default:
-                return null;
+        case 0:
+            return cachedProofs.get(rowIndex).getName();
+        case 1:
+            return "?";
+        case 2:
+            var proof = cachedProofs.get(rowIndex);
+            var data = cache.get(proof);
+            return String.format("Branches: %d", data.size());
+        default:
+            return null;
         }
     }
 

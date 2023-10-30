@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 
@@ -11,8 +14,6 @@ import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
 
 /**
  * The DeclarationProgramVariableCollector collects all top level declared program variables
@@ -66,14 +67,6 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
     public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         addVariable(x.getProgramVariable());
-    }
-
-    public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
-    }
-
-    public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramVariable(x);
     }
 
 }

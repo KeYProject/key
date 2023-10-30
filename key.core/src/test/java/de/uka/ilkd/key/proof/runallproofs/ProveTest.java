@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
@@ -70,7 +73,7 @@ public class ProveTest {
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
-        if (localSettings != null && !"".equals(localSettings)) {
+        if (localSettings != null && !localSettings.isEmpty()) {
             // local settings must be complete to have desired effect
             ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(localSettings);
         }

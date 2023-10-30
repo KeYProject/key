@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -390,8 +393,7 @@ public final class ExampleChooser extends JDialog {
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 
-        if (nodeObj instanceof Example) {
-            Example example = (Example) nodeObj;
+        if (nodeObj instanceof Example example) {
 
             if (example != selectedExample) {
                 addTab(example.getDescription(), "Description", true);

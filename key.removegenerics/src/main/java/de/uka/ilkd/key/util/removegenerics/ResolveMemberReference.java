@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -80,8 +83,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
         setProblemReport(IDENTITY);
 
         // we have to transform if there are explicit type arguments.
-        if (reference instanceof MethodReference) {
-            MethodReference methRef = (MethodReference) reference;
+        if (reference instanceof MethodReference methRef) {
             ASTList<TypeArgumentDeclaration> typeArguments = methRef.getTypeArguments();
             if (typeArguments != null && typeArguments.size() > 0) {
                 setProblemReport(EQUIVALENCE);
@@ -157,8 +159,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      */
     private static boolean isLHS(Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
-        if (parent instanceof Assignment) {
-            Assignment ass = (Assignment) parent;
+        if (parent instanceof Assignment ass) {
             return ass.getExpressionAt(0) == reference;
         } // else if
 
@@ -176,14 +177,11 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
         SourceInfo sourceInfo = getSourceInfo();
         Type formalType = null;
 
-        if (reference instanceof MethodReference) {
-            MethodReference methodReference = (MethodReference) reference;
+        if (reference instanceof MethodReference methodReference) {
             formalType = sourceInfo.getMethod(methodReference).getReturnType();
-        } else if (reference instanceof FieldReference) {
-            FieldReference fieldReference = (FieldReference) reference;
+        } else if (reference instanceof FieldReference fieldReference) {
             formalType = sourceInfo.getField(fieldReference).getType();
-        } else if (reference instanceof VariableReference) {
-            VariableReference variableReference = (VariableReference) reference;
+        } else if (reference instanceof VariableReference variableReference) {
             formalType = sourceInfo.getVariable(variableReference).getType();
         }
         return formalType;
@@ -239,8 +237,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
         NonTerminalProgramElement parent = reference.getASTParent();
 
-        if (parent instanceof MethodReference) {
-            MethodReference methRef = (MethodReference) parent;
+        if (parent instanceof MethodReference methRef) {
             Method meth = getSourceInfo().getMethod(methRef);
             int index = -1;
             ASTList<Expression> args = methRef.getArguments();
@@ -258,15 +255,13 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             }
         }
 
-        if (parent instanceof FieldReference) {
-            FieldReference fieldRef = (FieldReference) parent;
+        if (parent instanceof FieldReference fieldRef) {
             Field field = getSourceInfo().getField(fieldRef);
             Type classType = field.getContainingClassType();
             return classType;
         }
 
-        if (parent instanceof Assignment) {
-            Assignment assignment = (Assignment) parent;
+        if (parent instanceof Assignment assignment) {
             if (assignment.getChildAt(1) == reference) {
                 // only rhs is relevant
                 Expression lhs = assignment.getArguments().get(0);
@@ -275,8 +270,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             }
         }
 
-        if (parent instanceof VariableSpecification) {
-            VariableSpecification varSpec = (VariableSpecification) parent;
+        if (parent instanceof VariableSpecification varSpec) {
             VariableDeclaration decl = (VariableDeclaration) parent.getASTParent();
             Type varType = targetType(getSourceInfo().getType(decl.getTypeReference()));
             int dimensions = varSpec.getDimensions();
@@ -306,8 +300,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     public void transform() {
 
         // remove explicit type arguments - if there are any
-        if (reference instanceof MethodReference) {
-            MethodReference methRef = (MethodReference) reference;
+        if (reference instanceof MethodReference methRef) {
             methRef.setTypeArguments(null);
         }
 

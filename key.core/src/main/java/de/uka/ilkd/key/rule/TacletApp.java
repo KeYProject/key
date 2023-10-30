@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -21,6 +23,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A TacletApp object contains information required for a concrete application. These information
@@ -1207,9 +1211,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 KeYJavaType kjt;
                 Object o = nvc.getTypeDefiningObject();
                 JavaInfo javaInfo = services.getJavaInfo();
-                if (o instanceof SchemaVariable) {
+                if (o instanceof SchemaVariable peerSV) {
                     final TypeConverter tc = services.getTypeConverter();
-                    final SchemaVariable peerSV = (SchemaVariable) o;
                     final Object peerInst = instantiations().getInstantiation(peerSV);
                     if (peerInst instanceof TypeReference) {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
@@ -1287,10 +1290,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletApp)) {
+        if (!(obj instanceof TacletApp that)) {
             return false;
         }
-        TacletApp that = (TacletApp) obj;
         if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
             that.ifInstantiations)) {
             return false;

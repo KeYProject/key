@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.io.File;
@@ -21,8 +24,6 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -320,7 +321,7 @@ public final class CachingDatabase {
             var virtualSource = Path.of(virtualSrc.toURI());
             for (var path : sourceNew) {
                 Files.createLink(virtualSource.resolve(path.filename),
-                        PathConfig.getCacheDirectory().toPath().resolve(path.filename));
+                    PathConfig.getCacheDirectory().toPath().resolve(path.filename));
             }
         }
         // TODO: bootstrap path (save hash)
@@ -338,8 +339,6 @@ public final class CachingDatabase {
         if (virtualSrc != null) {
             proofHeader.append("\\javaSource \"").append(virtualSrc).append("\";\n");
         }
-        var oldHeader = proof.header();
-        proof.setProblemHeader(proofHeader.toString());
 
         // save to file in ~/.key/cachedProofs/
         File file;
@@ -347,9 +346,7 @@ public final class CachingDatabase {
             var filename = "proof" + (RAND.nextInt(1000000)) + ".proof";
             file = new File(PathConfig.getCacheDirectory(), filename);
         } while (file.exists());
-        proof.saveToFile(file);
-
-        proof.setProblemHeader(oldHeader);
+        proof.saveToFileWithHeader(file, proofHeader.toString());
 
         // save sequents of candidate nodes in cache
         proof.setStepIndices();

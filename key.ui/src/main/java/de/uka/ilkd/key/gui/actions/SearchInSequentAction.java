@@ -1,9 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -25,9 +25,6 @@ public class SearchInSequentAction extends MainWindowAction {
         setName("Search in Sequent View");
         setIcon(IconFactory.search(16));
         setTooltip("Search for strings in the current sequent.");
-        // Key combination for this action: STRG+F.
-        this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         getMediator().enableWhenProofLoaded(this);
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -8,8 +11,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
  * moment, this is used to distinguish implicit specifications from explicit ones and '&' from '&&'
- * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or'). Cf.
- * {@link de.uka.ilkd.key.logic.TermImpl} and {@link de.uka.ilkd.key.logic.LabeledTermImpl}.
+ * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or').
  *
  * @author Michael Kirsten
  */
@@ -68,10 +70,9 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString)) {
+        if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }
-        final PositionedLabeledString cmp = (PositionedLabeledString) o;
         if (labels.size() == cmp.labels.size()) {
             if (!super.equals(o)) {
                 return false;

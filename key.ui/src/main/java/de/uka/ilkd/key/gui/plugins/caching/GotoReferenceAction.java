@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
@@ -36,7 +39,7 @@ public class GotoReferenceAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node ref = node.lookup(ClosedBy.class).getNode();
+        Node ref = node.lookup(ClosedBy.class).node();
         mediator.getSelectionModel().setSelectedNode(ref);
     }
 }

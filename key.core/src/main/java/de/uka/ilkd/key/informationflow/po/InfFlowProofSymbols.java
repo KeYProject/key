@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.LinkedList;
@@ -302,20 +305,16 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof Function) {
-            final Function f = (Function) symb;
+        if (symb instanceof Function f) {
             addFunc(f, l);
         }
-        if (symb instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) symb;
+        if (symb instanceof ProgramVariable pv) {
             addProgramVariable(pv, l);
         }
-        if (symb instanceof SchemaVariable) {
-            final SchemaVariable sv = (SchemaVariable) symb;
+        if (symb instanceof SchemaVariable sv) {
             addSchemaVariable(sv, l);
         }
-        if (symb instanceof Taclet) {
-            final Taclet t = (Taclet) symb;
+        if (symb instanceof Taclet t) {
             addTaclet(t, l);
         }
     }
@@ -332,20 +331,16 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof Function) {
-            final Function f = (Function) symb;
+        if (symb instanceof Function f) {
             addFunc(f, l);
         }
-        if (symb instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) symb;
+        if (symb instanceof ProgramVariable pv) {
             addProgramVariable(pv, l);
         }
-        if (symb instanceof SchemaVariable) {
-            final SchemaVariable sv = (SchemaVariable) symb;
+        if (symb instanceof SchemaVariable sv) {
             addSchemaVariable(sv, l);
         }
-        if (symb instanceof Taclet) {
-            final Taclet t = (Taclet) symb;
+        if (symb instanceof Taclet t) {
             addTaclet(t, l);
         }
     }

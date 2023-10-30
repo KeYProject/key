@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
 import java.awt.*;
@@ -12,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -41,6 +44,7 @@ import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@HelpInfo(path = "/user/ProofSlicing/")
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener,
         ProofTreeListener {
     /**
@@ -359,7 +364,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return c;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<CAction> getTitleCActions() {
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
@@ -532,7 +537,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Proof Slicing";
@@ -543,7 +548,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return INFO_ICON;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return this;

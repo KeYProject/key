@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Iterator;
@@ -179,12 +182,15 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
         for (Proof p : all) {
             if (!p.isDisposed()) {
-                if (p.openGoals().size() > 0 && p.openGoals().stream()
-                        .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                // some branch is closed via cache:
+                if (p.openGoals().size() == 0 && p.closedGoals().stream()
+                        .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
                     p.mgt().proofStatus = ProofStatus.CLOSED_BY_CACHE;
                 } else if (p.openGoals().size() > 0) {
+                    // some branch is open
                     p.mgt().proofStatus = ProofStatus.OPEN;
                 } else {
+                    // all branches are properly closed
                     p.mgt().proofStatus = ProofStatus.CLOSED;
                     presumablyClosed = presumablyClosed.add(p);
                 }
@@ -241,7 +247,7 @@ public final class ProofCorrectnessMgt {
         for (RuleApp ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if (ruleJusti instanceof RuleJustificationBySpec) {
-                Contract contract = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                Contract contract = ((RuleJustificationBySpec) ruleJusti).spec();
                 ImmutableSet<Contract> atomicContracts = specRepos.splitContract(contract);
                 assert atomicContracts != null;
                 atomicContracts = specRepos.getInheritedContracts(atomicContracts);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -501,7 +504,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child {@link ISymbolicEquivalenceClass}.
          *
-         * @param object The {@link ISymbolicEquivalenceClass} to add.
+         * @param ec The {@link ISymbolicEquivalenceClass} to add.
          */
         public void addEquivalenceClass(ISymbolicEquivalenceClass ec) {
             equivalenceClasses = equivalenceClasses.append(ec);
@@ -1093,7 +1096,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child term string.
          *
-         * @param object The term string to add.
+         * @param termString The term string to add.
          */
         public void addTermString(String termString) {
             this.termStrings = termStrings.append(termString);

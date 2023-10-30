@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -12,20 +15,21 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
+    private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name) {
-        super(mods);
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name,
+            boolean free) {
+        super(mods, name);
         assert inv != null;
         this.inv = inv;
         this.name = name;
+        this.free = free;
         setPosition(inv);
     }
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
-            JmlParser.Class_invariantContext ctx) {
-        super(mods, null);
-        inv = ctx;
-        setPosition(ctx);
+            JmlParser.Class_invariantContext inv, boolean free) {
+        this(mods, inv, null, free);
     }
 
     public ParserRuleContext getInv() {
@@ -41,10 +45,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLClassInv)) {
+        if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }
-        TextualJMLClassInv ci = (TextualJMLClassInv) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
 
@@ -57,4 +60,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     public String getName() {
         return name;
     }
+
+    public boolean isFree() {
+        return free;
+    }
+
 }

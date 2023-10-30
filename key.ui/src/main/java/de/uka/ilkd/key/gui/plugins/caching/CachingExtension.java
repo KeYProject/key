@@ -1,23 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EventObject;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
@@ -30,7 +29,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
@@ -38,9 +36,11 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,14 +55,8 @@ import org.slf4j.LoggerFactory;
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.MainMenu,
-        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
+        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
-
-    /**
-     * Whether to enable the caching database. Remove (or replace with an optino) once the feature
-     * is done.
-     */
-    public static final boolean ENABLE_DATABASE = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**
@@ -79,10 +73,7 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
-
-    @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
-    }
+    private ReferenceSearchButton referenceSearchButton;
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
@@ -121,13 +112,12 @@ public class CachingExtension
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());
             if (c != null) {
-                // p.closeGoal(goal);
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
-                c.getProof()
+                c.proof()
                         .addProofDisposedListenerFirst(
-                            new CopyBeforeDispose(mediator, c.getProof(), p));
+                            new CopyBeforeDispose(mediator, c.proof(), p));
             }
         }
     }
@@ -136,18 +126,12 @@ public class CachingExtension
     public void preInit(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
-        mediator.addGUIListener(this);
         mediator.getUI().addProverTaskListener(this);
     }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
 
-    }
-
-    @Override
-    public void shutDown(EventObject e) {
-        CachingDatabase.shutdown();
     }
 
     @Override
@@ -160,10 +144,10 @@ public class CachingExtension
 
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
             List<Action> actions = new ArrayList<>();
@@ -171,21 +155,20 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
-        } else if (kind.getType() == Proof.class && ENABLE_DATABASE) {
-            return List.of(new AddToDatabaseAction((Proof) underlyingObject));
         }
         return new ArrayList<>();
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        return List.of(new ReferenceSearchButton(mediator));
+        referenceSearchButton = new ReferenceSearchButton(mediator);
+        return List.of(referenceSearchButton);
     }
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-        if (info.getKind().equals(TaskStartedInfo.TaskKind.Macro)
-                && info.getMessage().equals(new TryCloseMacro().getName())) {
+        if (info.kind().equals(TaskStartedInfo.TaskKind.Macro)
+                && info.message().equals(new TryCloseMacro().getName())) {
             tryToClose = false;
         }
     }
@@ -197,25 +180,30 @@ public class CachingExtension
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        tryToClose = info.getSource() instanceof TryCloseMacro;
+        if (tryToClose) {
+            return; // try close macro was running, no need to do anything here
+        }
         Proof p = info.getProof();
-        if (p == null || p.closed() || !(info.getSource() instanceof ApplyStrategy
+        if (p == null || p.isDisposed() || p.closed() || !(info.getSource() instanceof ApplyStrategy
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }
-        // show statistics if closed by reference
+        // unmark interactive goals
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
-            SwingUtilities.invokeLater(() -> {
-                ShowProofStatistics.Window win =
-                    new ShowProofStatistics.Window(MainWindow.getInstance(), p);
-                win.setVisible(true);
-            });
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+            // mark goals as automatic again
+            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
+                    .forEach(g -> {
+                        g.setEnabled(true);
+                        g.proof().closeGoal(g);
+                    });
+            // statistics dialog is automatically shown
         }
     }
 
-    @Nonnull
     @Override
-    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public List<Action> getMainMenuActions(MainWindow mainWindow) {
         return List.of(CachingDatabaseDialog.getOpenAction());
     }
 
@@ -258,16 +246,16 @@ public class CachingExtension
                 return;
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
-                    .equals(CachingSettingsProvider.DISPOSE_COPY)) {
+                    .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.stopInterface(true);
                 newProof.copyCachedGoals(referencedProof, null, null);
                 mediator.startInterface(true);
             } else {
-                newProof.openGoals().stream()
+                newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
-                                && x.node().lookup(ClosedBy.class).getProof() == referencedProof)
+                                && x.node().lookup(ClosedBy.class).proof() == referencedProof)
                         .forEach(x -> {
-                            x.setEnabled(true);
+                            newProof.reOpenGoal(x);
                             x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
                         });
             }
@@ -284,41 +272,7 @@ public class CachingExtension
      *
      * @author Arne Keller
      */
-    static class AddToDatabaseAction extends KeyAction {
-        /**
-         * The node to try to close by reference.
-         */
-        private final Proof proof;
-
-        /**
-         * Construct new action.
-         *
-         * @param proof the proof
-         */
-        public AddToDatabaseAction(Proof proof) {
-            this.proof = proof;
-            setName("Add to database of cached proofs");
-            setEnabled(proof.closed());
-            setMenuPath("Proof Caching");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                CachingDatabase.addProof(proof);
-            } catch (IOException err) {
-                LOGGER.error("failed to add proof to database ", err);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), err);
-            }
-        }
-    }
-
-    /**
-     * Action to search for suitable references on a single node.
-     *
-     * @author Arne Keller
-     */
-    static class CloseByReference extends KeyAction {
+    private final class CloseByReference extends KeyAction {
         /**
          * The mediator.
          */
@@ -338,20 +292,43 @@ public class CachingExtension
             this.mediator = mediator;
             this.node = node;
             setName("Close by reference to other proof");
-            setEnabled(node.leaf() && !node.isClosed() && node.lookup(ClosedBy.class) == null);
+            setEnabled(!node.isClosed() && node.lookup(ClosedBy.class) == null);
             setMenuPath("Proof Caching");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // search other proofs for matching nodes
-            ClosedBy c = ReferenceSearcher.findPreviousProof(
-                mediator.getCurrentlyOpenedProofs(), node);
-            if (c != null) {
-                node.register(c, ClosedBy.class);
+            List<Node> nodes = new ArrayList<>();
+            if (node.leaf()) {
+                nodes.add(node);
             } else {
-                JOptionPane.showMessageDialog((JComponent) e.getSource(),
-                    "No matching branch found", "Proof Caching error", JOptionPane.WARNING_MESSAGE);
+                node.subtreeIterator().forEachRemaining(n -> {
+                    if (n.leaf() && !n.isClosed()) {
+                        nodes.add(n);
+                    }
+                });
+            }
+            List<Integer> mismatches = new ArrayList<>();
+            for (Node n : nodes) {
+                // search other proofs for matching nodes
+                ClosedBy c = ReferenceSearcher.findPreviousProof(
+                    mediator.getCurrentlyOpenedProofs(), n);
+                if (c != null) {
+                    n.proof().closeGoal(n.proof().getOpenGoal(n));
+                    n.register(c, ClosedBy.class);
+                } else {
+                    mismatches.add(n.serialNr());
+                }
+            }
+            if (!nodes.isEmpty()) {
+                referenceSearchButton.updateState(nodes.get(0).proof());
+            }
+            if (!mismatches.isEmpty()) {
+                // since e.getSource() is the popup menu, it is better to use the MainWindow
+                // instance here as a parent
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
+                    "Proof Caching error", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -381,7 +358,7 @@ public class CachingExtension
             this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
-            setEnabled(node.leaf() && !node.isClosed()
+            setEnabled(node.leaf() && node.isClosed()
                     && node.lookup(ClosedBy.class) != null);
             setMenuPath("Proof Caching");
         }
@@ -389,13 +366,14 @@ public class CachingExtension
         @Override
         public void actionPerformed(ActionEvent e) {
             ClosedBy c = node.lookup(ClosedBy.class);
-            Goal current = node.proof().getGoal(node);
+            Goal current = node.proof().getClosedGoal(node);
             try {
                 mediator.stopInterface(true);
-                new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
                 mediator.startInterface(true);
-            } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
-                throw new RuntimeException(ex);
+            } catch (Exception ex) {
+                LOGGER.error("failed to copy proof ", ex);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
             }
         }
     }
@@ -403,15 +381,5 @@ public class CachingExtension
     @Override
     public SettingsProvider getSettings() {
         return new CachingSettingsProvider();
-    }
-
-    @Override
-    public void modalDialogOpened(EventObject e) {
-
-    }
-
-    @Override
-    public void modalDialogClosed(EventObject e) {
-
     }
 }

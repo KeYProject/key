@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
@@ -45,8 +48,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f instanceof Transformer) {
-            Transformer t = (Transformer) f;
+        if (f instanceof Transformer t) {
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
             return t;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -56,7 +59,6 @@ public class ShowProofStatistics extends MainWindowAction {
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
 
         this.proof = proof;
     }
@@ -117,32 +119,31 @@ public class ShowProofStatistics extends MainWindowAction {
 
     private static String getHTMLStatisticsMessage(Node node) {
         int openGoals = 0;
-        int openCachedGoals = 0;
+        int cachedGoals = 0;
 
         Iterator<Node> leavesIt = node.leavesIterator();
         while (leavesIt.hasNext()) {
-            if (node.proof().getGoal(leavesIt.next()) != null) {
+            if (node.proof().getOpenGoal(leavesIt.next()) != null) {
                 if (node.lookup(ClosedBy.class) != null) {
-                    openCachedGoals++;
+                    cachedGoals++;
                 } else {
                     openGoals++;
                 }
             }
         }
 
-        return getHTMLStatisticsMessage(openGoals, openCachedGoals, node.statistics());
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, node.statistics());
     }
 
     private static String getHTMLStatisticsMessage(Proof proof) {
         int openGoals = proof.openGoals().size();
-        int openCachedGoals =
-            (int) proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
+        int cachedGoals =
+            (int) proof.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
                     .count();
-        openGoals -= openCachedGoals;
-        return getHTMLStatisticsMessage(openGoals, openCachedGoals, proof.getStatistics());
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, proof.getStatistics());
     }
 
-    private static String getHTMLStatisticsMessage(int openGoals, int openCachedGoals,
+    private static String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
             Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
@@ -151,12 +152,12 @@ public class ShowProofStatistics extends MainWindowAction {
         // is not possible, the underline is solid...
 
         stats.append("<br>");
-        if (openCachedGoals > 0 && openGoals > 0) {
+        if (cachedGoals > 0 && openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
-                    .append(openGoals > 1 ? "s, " : ", ").append(openCachedGoals)
-                    .append(" cached goal").append(openCachedGoals > 1 ? "s." : ".")
+                    .append(openGoals > 1 ? "s, " : ", ").append(cachedGoals)
+                    .append(" cached goal").append(cachedGoals > 1 ? "s." : ".")
                     .append("</strong>");
-        } else if (openCachedGoals > 0) {
+        } else if (cachedGoals > 0) {
             stats.append("<strong>").append("Proved (using proof cache).").append("</strong>");
         } else if (openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
@@ -272,9 +273,6 @@ public class ShowProofStatistics extends MainWindowAction {
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
-            statisticsPane.setSize(new Dimension(10, 420));
-            statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 420));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -317,8 +315,11 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
 
-            if (proof.openGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
-                JButton copyReferences = new JButton("Copy referenced proof");
+            if (proof.closedGoals().stream()
+                    .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+                JButton copyReferences = new JButton("Realize cached branches");
+                copyReferences.setToolTipText("For each goal closed using the proof cache, copy " +
+                    "the referenced proof steps into this proof.");
                 copyReferences.addActionListener(e -> {
                     dispose();
                     ReferenceSearchDialog dialog =
@@ -353,10 +354,12 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonsPane.add(buttonPane2);
             add(buttonsPane, BorderLayout.PAGE_END);
 
-            int w = 50 + Math.max(scrollPane.getPreferredSize().width,
-                buttonsPane.getPreferredSize().width);
-            int h =
-                scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height + 100;
+            pack();
+            int w = Math.min(600, 50 + Math.max(scrollPane.getPreferredSize().width,
+                buttonsPane.getPreferredSize().width));
+            int h = Math.min(850,
+                50 + scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height);
+
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }

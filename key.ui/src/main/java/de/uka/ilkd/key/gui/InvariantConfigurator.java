@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -118,6 +121,7 @@ public class InvariantConfigurator {
 
             private Term variantTerm = null;
             private final Map<LocationVariable, Term> modifiesTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, Term> freeModifiesTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
                 new LinkedHashMap<>();
             private final Map<LocationVariable, Term> invariantTerm = new LinkedHashMap<>();
@@ -189,9 +193,9 @@ public class InvariantConfigurator {
                 parser.setAbbrevMap(getAbbrevMap());
 
                 parse();
-                this.pack();
+                pack();
                 setLocationRelativeTo(getOwner());
-                this.setVisible(true);
+                setVisible(true);
             }
 
 
@@ -811,7 +815,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm,
-                        modifiesTerm, infFlowSpecs, variantTerm);
+                        modifiesTerm, freeModifiesTerm, infFlowSpecs, variantTerm);
                     return true;
                 } else {
                     return false;
@@ -858,7 +862,7 @@ public class InvariantConfigurator {
                     int i = inputPane.getSelectedIndex();
                     // TODO Jonas: hier geht's bei der manuellen Regelanwendung vermutlich schief,
                     // wenn es nur freie Invarianten gibt
-                    if (invariants.get(i)[VAR_IDX].get(DEFAULT).equals("")) {
+                    if (invariants.get(i)[VAR_IDX].get(DEFAULT).isEmpty()) {
                         variantTerm = null;
                         if (requiresVariant) {
                             throw new ParserException(VARIANT_REQUIRED, null);

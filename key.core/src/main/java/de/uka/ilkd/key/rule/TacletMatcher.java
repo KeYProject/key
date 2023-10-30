@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -113,7 +116,7 @@ public interface TacletMatcher {
      * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the
      *         instantiation {@code sv <- term} added
      */
-    MatchConditions matchSV(SchemaVariable sv, ProgramElement term,
+    MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
             MatchConditions matchCond, Services services);
 
 

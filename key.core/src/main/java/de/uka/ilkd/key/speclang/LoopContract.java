@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
@@ -108,6 +111,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newPreconditions the new preconditions.
      * @param newPostconditions the new postconditions.
      * @param newModifiesClauses the new modifies clauses.
+     * @param newFreeModifiesClauses the new free modifies clauses.
      * @param newinfFlowSpecs the new information flow specifications.
      * @param newVariables the new variables.
      * @param newMeasuredBy the new measured-by clause.
@@ -119,6 +123,7 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
+            Map<LocationVariable, Term> newFreeModifiesClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 
@@ -128,6 +133,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newPreconditions the new preconditions.
      * @param newPostconditions the new postconditions.
      * @param newModifiesClauses the new modifies clauses.
+     * @param newFreeModifiesClauses the new free modifies clauses.
      * @param newinfFlowSpecs the new information flow specifications.
      * @param newVariables the new variables.
      * @param newMeasuredBy the new measured-by clause.
@@ -139,6 +145,7 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
+            Map<LocationVariable, Term> newFreeModifiesClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 

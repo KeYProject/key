@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
 import java.io.File;
@@ -92,8 +95,8 @@ public class Filenames {
         StringBuilder s = new StringBuilder();
         StringBuilder t = new StringBuilder();
 
-        if (a[0].equals("")) { // not already relative
-            if (!b[0].equals("")) {
+        if (a[0].isEmpty()) { // not already relative
+            if (!b[0].isEmpty()) {
                 throw new RuntimeException("\"" + toFilename
                     + "\" is a relative path. Please use absolute paths to make others relative to them.");
             }
@@ -116,7 +119,7 @@ public class Filenames {
                 if (diff) {
                     s.append("../");
                     if (i < a.length) {
-                        t.append(a[i].equals("") ? "" : "/").append(a[i]);
+                        t.append(a[i].isEmpty() ? "" : "/").append(a[i]);
                     }
                 }
                 i++;
@@ -125,7 +128,7 @@ public class Filenames {
             i = 0;
         }
         while (i < a.length) {
-            t.append(a[i].equals("") ? "" : "/").append(a[i++]);
+            t.append(a[i].isEmpty() ? "" : "/").append(a[i++]);
         }
         // strip leading slash
         if (t.length() > 0 && t.charAt(0) == '/') {

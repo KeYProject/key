@@ -1,2 +1,4 @@
+description "Utility library of the key-project"
+
 dependencies{
 }

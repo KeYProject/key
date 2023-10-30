@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
@@ -180,7 +183,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <p>
      * The rules which use this meta construct must ensure that exp is of type Iterable.
      *
-     * @see #makeIterableForLoop(LocalVariableDeclaration, Expression, Statement)
+     * @see #makeIterableForLoop(EnhancedFor, Services)
      *
      * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
      *      SVInstantiations)

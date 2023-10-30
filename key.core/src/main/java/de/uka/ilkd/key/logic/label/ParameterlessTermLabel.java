@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
@@ -163,8 +166,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ParameterlessTermLabel) {
-            ParameterlessTermLabel other = (ParameterlessTermLabel) obj;
+        if (obj instanceof ParameterlessTermLabel other) {
             return name.equals(other.name);
         } else {
             return false;

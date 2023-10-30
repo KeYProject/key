@@ -2,54 +2,54 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Apr 12 13:29:52 CEST 2023
-[Labels]UseOriginLabels=true
-[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
-[SMTSettings]invariantForall=false
-[Strategy]ActiveStrategy=JavaCardDLStrategy
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+#Wed Aug 02 14:52:57 CEST 2023
 [Choice]DefaultChoices=JavaCard-JavaCard\\:on, Strings-Strings\\:on, assertions-assertions\\:on, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:showSatisfiability, moreSeqRules-moreSeqRules\\:on, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
-[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[Labels]UseOriginLabels=true
+[SMTSettings]SelectedTaclets=
 [SMTSettings]UseBuiltUniqueness=false
 [SMTSettings]explicitTypeHierarchy=false
 [SMTSettings]instantiateHierarchyAssumptions=true
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
-[SMTSettings]SelectedTaclets=
-[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
-[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
-[Strategy]MaximumNumberOfAutomaticApplications=10000
-[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
-[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
-[SMTSettings]useConstantsForBigOrSmallIntegers=true
-[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
-[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
-[Strategy]Timeout=-1
-[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
-[SMTSettings]useUninterpretedMultiplication=true
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
-[SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
-[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
-[SMTSettings]integersMinimum=-2147483645
-[StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]integersMaximum=2147483645
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[SMTSettings]useUninterpretedMultiplication=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[Strategy]Timeout=-1
 "
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Apr 12 13:29:52 CEST 2023
-name=seqPermExists
+#Wed Aug 02 14:52:57 CEST 2023
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+name=seqPermExists
 ";
 
 \proof {
-(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
+(keyLog "0" (keyUser "Wolfram" ) (keyVersion "802791f53995f75600352ac8d6929fd89f529c86"))
 
 (autoModeTime "0")
 
@@ -57,13 +57,13 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "impRight" (formula "1") (newnames "v_iv,f_s1,v_x,f_phi,f_s2"))
 (rule "notRight" (formula "2"))
 (rule "notLeft" (formula "2"))
-(rule "seqPermDef" (formula "1") (inst "s=s") (inst "iv=iv") (userinteraction))
+(rule "seqPermDef" (formula "1") (inst "iv=iv") (inst "s=s") (userinteraction))
 (rule "andLeft" (formula "1"))
 (rule "exLeft" (formula "2") (inst "sk=s_0") (userinteraction))
 (rule "andLeft" (formula "2"))
 (rule "andLeft" (formula "2"))
 (rule "seqNPermRange" (formula "3") (inst "iv=iv") (userinteraction))
-(rule "seqNPermDefReplace" (formula "4") (inst "iv=iv") (inst "jv=jv") (userinteraction))
+(rule "seqNPermDefReplace" (formula "4") (inst "jv=jv") (inst "iv=iv") (userinteraction))
 (rule "apply_subst_for" (formula "6") (term "1,0,0") (userinteraction))
 (rule "apply_subst_for" (formula "6") (term "1,0,1") (userinteraction))
 (rule "equiv_right" (formula "6") (userinteraction))
@@ -241,7 +241,79 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    (rule "closeFalse" (formula "1"))
 )
 (branch "Case '<-'"
-    (builtin "SMTRule")
+   (rule "exLeft" (formula "1") (inst "sk=v_iv_0") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "instAll" (formula "2") (term "0") (ifseqformula "7") (userinteraction))
+   (rule "replace_known_left" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
+   (rule "applyEqRigid" (formula "2") (term "1,1,0") (ifseqformula "6") (userinteraction))
+   (rule "replace_known_left" (formula "2") (term "1,0") (ifseqformula "3") (userinteraction))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "exLeft" (formula "2") (inst "sk=jv_0") (userinteraction))
+   (rule "andLeft" (formula "2") (userinteraction))
+   (rule "andLeft" (formula "2") (userinteraction))
+   (rule "instAll" (formula "4") (term "1,0") (ifseqformula "11") (userinteraction))
+   (rule "replace_known_left" (formula "4") (term "1,0") (ifseqformula "3") (userinteraction))
+   (rule "replace_known_left" (formula "4") (term "0,0") (ifseqformula "2") (userinteraction))
+    (builtin "One Step Simplification" (formula "4"))
+   (rule "seqGetAlphaCast" (formula "4") (term "1,1") (userinteraction))
+   (rule "applyEqReverse" (formula "5") (term "1,1") (ifseqformula "4") (userinteraction))
+   (rule "applyEq" (formula "5") (term "0,1,1") (ifseqformula "6") (userinteraction))
+   (rule "castDel" (formula "5") (term "1,1") (userinteraction))
+   (rule "eqSymm" (formula "5"))
+   (rule "inEqSimp_ltToLeq" (formula "3"))
+   (rule "polySimp_mulComm0" (formula "3") (term "1,0,0"))
+   (rule "polySimp_addComm1" (formula "3") (term "0"))
+   (rule "inEqSimp_ltToLeq" (formula "14") (term "1,0,0"))
+   (rule "polySimp_mulComm0" (formula "14") (term "1,0,0,1,0,0"))
+   (rule "inEqSimp_commuteLeq" (formula "2"))
+   (rule "inEqSimp_commuteLeq" (formula "14") (term "0,0,0"))
+   (rule "applyEq" (formula "3") (term "0,1,0") (ifseqformula "10"))
+   (rule "applyEq" (formula "8") (term "0") (ifseqformula "5"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "14") (term "1,0,0"))
+   (rule "polySimp_mulComm0" (formula "14") (term "1,1,0,0"))
+   (rule "polySimp_rightDist" (formula "14") (term "1,1,0,0"))
+   (rule "mul_literals" (formula "14") (term "0,1,1,0,0"))
+   (rule "polySimp_mulLiterals" (formula "14") (term "1,1,1,0,0"))
+   (rule "polySimp_elimOne" (formula "14") (term "1,1,1,0,0"))
+   (rule "inEqSimp_sepNegMonomial0" (formula "3"))
+   (rule "polySimp_mulLiterals" (formula "3") (term "0"))
+   (rule "polySimp_elimOne" (formula "3") (term "0"))
+   (rule "nnf_ex2all" (formula "14"))
+   (rule "nnf_notAnd" (formula "1") (term "0"))
+   (rule "nnf_notAnd" (formula "1") (term "0,0"))
+   (rule "inEqSimp_notLeq" (formula "1") (term "1,0,0"))
+   (rule "polySimp_rightDist" (formula "1") (term "1,0,0,1,0,0"))
+   (rule "mul_literals" (formula "1") (term "0,1,0,0,1,0,0"))
+   (rule "polySimp_addAssoc" (formula "1") (term "0,0,1,0,0"))
+   (rule "add_literals" (formula "1") (term "0,0,0,1,0,0"))
+   (rule "add_zero_left" (formula "1") (term "0,0,1,0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "1") (term "1,0,0"))
+   (rule "polySimp_mulLiterals" (formula "1") (term "1,1,0,0"))
+   (rule "polySimp_elimOne" (formula "1") (term "1,1,0,0"))
+   (rule "inEqSimp_notGeq" (formula "1") (term "0,0,0"))
+   (rule "times_zero_1" (formula "1") (term "1,0,0,0,0,0"))
+   (rule "add_literals" (formula "1") (term "0,0,0,0,0"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "1") (term "0,0,0"))
+   (rule "mul_literals" (formula "1") (term "1,0,0,0"))
+   (rule "commute_or_2" (formula "1") (term "0"))
+   (rule "commute_or" (formula "1") (term "0,0"))
+   (rule "allLeft" (formula "1") (inst "t=jv_0"))
+   (rule "replace_known_left" (formula "1") (term "0,0,0") (ifseqformula "10"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "inEqSimp_commuteGeq" (formula "1") (term "1"))
+   (rule "inEqSimp_contradInEq1" (formula "1") (term "1") (ifseqformula "5"))
+   (rule "inEqSimp_homoInEq1" (formula "1") (term "0,1"))
+   (rule "polySimp_pullOutFactor1b" (formula "1") (term "0,0,1"))
+   (rule "add_literals" (formula "1") (term "1,1,0,0,1"))
+   (rule "times_zero_1" (formula "1") (term "1,0,0,1"))
+   (rule "add_zero_right" (formula "1") (term "0,0,1"))
+   (rule "leq_literals" (formula "1") (term "0,1"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "inEqSimp_contradInEq0" (formula "4") (ifseqformula "1"))
+   (rule "qeq_literals" (formula "4") (term "0"))
+    (builtin "One Step Simplification" (formula "4"))
+   (rule "closeFalse" (formula "4"))
 )
 )
 }

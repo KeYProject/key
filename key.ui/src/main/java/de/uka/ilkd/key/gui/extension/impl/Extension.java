@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.impl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -84,10 +87,9 @@ public class Extension<T> implements Comparable<Extension<T>> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Extension)) {
+        if (!(o instanceof Extension<?> extension)) {
             return false;
         }
-        Extension<?> extension = (Extension<?>) o;
         return clazz.equals(extension.clazz);
     }
 

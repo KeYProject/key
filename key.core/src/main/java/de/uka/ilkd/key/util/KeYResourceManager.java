@@ -1,8 +1,6 @@
-/**
- * KeYResourceManager controls the access to the properties and resources used in the KeY system.
- * Use the static method getManager to get the unique instance.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.*;
@@ -99,7 +97,7 @@ public class KeYResourceManager {
     public boolean visibleBranch() {
         final String b = getBranch();
         final String v = getVersion();
-        return !b.equals("") && !INVISIBLE_BRANCHES.contains(b) && !b.startsWith("KeY" + v)
+        return !b.isEmpty() && !INVISIBLE_BRANCHES.contains(b) && !b.startsWith("KeY" + v)
                 && !b.startsWith("KeY" + "-" + v);
     }
 

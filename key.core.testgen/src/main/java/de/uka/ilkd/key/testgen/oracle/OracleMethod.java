@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
@@ -48,7 +51,7 @@ public class OracleMethod {
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
-            argString.append(var.getSort().name()).append(" ").append(var.getName()).append(",");
+            argString.append(var.sort().name()).append(" ").append(var.name()).append(",");
         }
         if (!args.isEmpty()) {
             argString = new StringBuilder(argString.substring(0, argString.length() - 1));

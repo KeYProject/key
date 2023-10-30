@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Map;
@@ -78,7 +81,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     /**
      * Instantiate a new variable condition.
      *
-     * @param negation {@code true} iff the condition is to be negated
      * @param receiver program schema var for the receiver, may be null for class-local calls
      * @param methname non-null program schema var for the methodname
      * @param args non-null program schema var for the arguments of the call

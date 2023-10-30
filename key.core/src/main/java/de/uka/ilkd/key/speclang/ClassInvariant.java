@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -35,6 +38,11 @@ public interface ClassInvariant extends SpecificationElement {
      * Tells whether the invariant is static (i.e., does not refer to a receiver object).
      */
     boolean isStatic();
+
+    /**
+     * Tells whether the invariant is free (i.e., can be assumed without proof).
+     */
+    boolean isFree();
 
     /**
      * Returns another class invariant like this one, except that it refers to the passed

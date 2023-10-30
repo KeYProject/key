@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.*;
@@ -24,14 +27,14 @@ public class SchematicFieldReference extends FieldReference
 
 
     public SchematicFieldReference(SchemaVariable pe, ReferencePrefix prefix) {
+        super(prefix);
         this.schemaVariable = pe;
-        this.prefix = prefix;
     }
 
 
     public SchematicFieldReference(ExtList children, ReferencePrefix prefix) {
+        super(prefix);
         this.schemaVariable = children.get(SchemaVariable.class);
-        this.prefix = prefix;
     }
 
 
@@ -78,15 +81,6 @@ public class SchematicFieldReference extends FieldReference
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
-        return prefix;
-    }
-
-    /**
-     * Get reference prefix.
-     *
-     * @return the reference prefix.
-     */
     public ReferenceSuffix getReferenceSuffix() {
         return (ProgramSV) schemaVariable;
     }
@@ -103,16 +97,6 @@ public class SchematicFieldReference extends FieldReference
 
 
     /**
-     * Get the number of type references in this container.
-     *
-     * @return the number of type references.
-     */
-
-    public int getTypeReferenceCount() {
-        return (prefix instanceof TypeReference) ? 1 : 0;
-    }
-
-    /**
      * Return the type reference at the specified index in this node's "virtual" type reference
      * array.
      *
@@ -125,15 +109,6 @@ public class SchematicFieldReference extends FieldReference
             return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
-    }
-
-    /**
-     * Get the number of expressions in this container.
-     *
-     * @return the number of expressions.
-     */
-    public int getExpressionCount() {
-        return (prefix instanceof Expression) ? 1 : 0;
     }
 
     /**

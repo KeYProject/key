@@ -1,7 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -38,8 +43,7 @@ public class ProofTreePopupFactory {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
-        if (o instanceof GUIProofTreeNode) {
-            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+        if (o instanceof GUIProofTreeNode n) {
             if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 return false;
             }
@@ -364,7 +368,7 @@ public class ProofTreePopupFactory {
             if (context.proof != null) {
                 // disable pruning for goals and disable it for closed subtrees if the command line
                 // option "--no-pruning-closed" is set (saves memory)
-                if (!context.proof.isGoal(context.invokedNode)
+                if (!context.proof.isOpenGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed && context.proof
@@ -468,17 +472,23 @@ public class ProofTreePopupFactory {
             return context.proof.getSubtreeGoals(context.invokedNode);
         }
 
-        /*
+        /**
          * In addition to marking setting goals, update the tree model so that the label sizes are
          * recalculated
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.delegateModel.setBatchGoalStateChange(true);
+            var selectedNode = context.proofTreeView.getSelectedNode();
+            context.delegateModel.setBatchGoalStateChange(true, null);
             super.actionPerformed(e);
-            context.delegateModel.setBatchGoalStateChange(false);
-            // trigger repainting the tree after the completion of this event.
-            context.delegateView.repaint();
+            List<Node> goals = new ArrayList<>();
+            getGoalList().forEach(x -> goals.add(x.node()));
+            context.delegateModel.setBatchGoalStateChange(false, goals);
+            // make sure the node is selected again
+            if (selectedNode != null) {
+                context.proofTreeView.makeNodeVisible(selectedNode);
+            }
+            // repainting the tree after the completion of this event is done automatically
         }
     }
 

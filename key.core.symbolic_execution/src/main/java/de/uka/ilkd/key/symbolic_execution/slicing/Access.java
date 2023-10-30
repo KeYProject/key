@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.Objects;
@@ -95,8 +98,7 @@ public class Access {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Access) {
-            Access other = (Access) obj;
+        if (obj instanceof Access other) {
             return Objects.equals(programVariable, other.getProgramVariable())
                     && Objects.equals(dimensionExpressions, other.getDimensionExpressions());
         } else {

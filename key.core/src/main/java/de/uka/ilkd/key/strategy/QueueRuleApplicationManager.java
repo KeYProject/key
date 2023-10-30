@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +15,8 @@ import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implementation of {@link AutomatedRuleApplicationManager} that stores possible {@link RuleApp}s
@@ -96,7 +100,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        goal.ruleAppIndex().reportAutomatedRuleApps();
+        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
+            goal.proof().getServices());
     }
 
     /**

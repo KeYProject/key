@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.Iterator;
@@ -62,9 +65,8 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                         }
                     }
                 }
-                if (found instanceof PartialInvAxiom) {
+                if (found instanceof PartialInvAxiom axiom) {
                     // Invariant was applied
-                    PartialInvAxiom axiom = (PartialInvAxiom) found;
                     DefaultProofReference<ClassInvariant> reference =
                         new DefaultProofReference<>(IProofReference.USE_INVARIANT,
                             node, axiom.getInv());

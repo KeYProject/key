@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -180,13 +183,11 @@ public class TaskTree extends JPanel {
         int i = 0;
         while (!contains && i < model.getChildCount(model.getRoot())) {
             Object rootChild = model.getChild(model.getRoot(), i);
-            if (rootChild instanceof EnvNode) {
-                EnvNode envNode = (EnvNode) rootChild;
+            if (rootChild instanceof EnvNode envNode) {
                 int j = 0;
                 while (!contains && j < envNode.getChildCount()) {
                     Object envChild = envNode.getChildAt(j);
-                    if (envChild instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) envChild;
+                    if (envChild instanceof TaskTreeNode taskChild) {
                         contains = taskChild.proof() == proof;
                     }
                     j++;
@@ -209,8 +210,7 @@ public class TaskTree extends JPanel {
             EnvNode envNode = null;
             for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
                 Object child = model.getChild(model.getRoot(), i);
-                if (child instanceof EnvNode) {
-                    EnvNode envChild = (EnvNode) child;
+                if (child instanceof EnvNode envChild) {
                     if (env != null ? env.equals(envChild.getProofEnv())
                             : envChild.getProofEnv() == null) {
                         envNode = envChild;
@@ -221,8 +221,7 @@ public class TaskTree extends JPanel {
             if (envNode != null) {
                 for (int i = 0; i < envNode.getChildCount(); i++) {
                     Object child = envNode.getChildAt(i);
-                    if (child instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) child;
+                    if (child instanceof TaskTreeNode taskChild) {
                         if (taskChild.proof() == proof) {
                             removeTask(taskChild);
                         }
@@ -267,8 +266,7 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
-                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
-                    BasicTask task = (BasicTask) selPath.getLastPathComponent();
+                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
                     mediator.setProof(task.proof());
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
@@ -334,10 +332,6 @@ public class TaskTree extends JPanel {
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed()) {
-                        setIcon(KEY_CLOSED_ICON);
-                        setToolTipText("Closed proof");
-                    }
                     if (ps.getProofClosedButLemmasLeft()) {
                         setIcon(KEY_ALMOST_CLOSED_ICON);
                         setToolTipText("Closed proof (depends on other contracts)");
@@ -345,6 +339,10 @@ public class TaskTree extends JPanel {
                     if (ps.getProofClosedByCache()) {
                         setIcon(KEY_CACHED_CLOSED_ICON);
                         setToolTipText("Closed proof (using proof cache)");
+                    }
+                    if (ps.getProofClosed()) {
+                        setIcon(KEY_CLOSED_ICON);
+                        setToolTipText("Closed proof");
                     }
                     if (ps.getProofOpen()) {
                         setIcon(KEY_ICON);

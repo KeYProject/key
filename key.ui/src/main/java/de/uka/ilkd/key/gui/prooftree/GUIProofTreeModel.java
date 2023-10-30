@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
-import javax.annotation.Nonnull;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,9 +147,15 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * This can be used to pause tree updates when many goals get their state changed at once. The
      * tree is updated automatically after this is set to false.
      */
-    public void setBatchGoalStateChange(boolean value) {
+    public void setBatchGoalStateChange(boolean value, Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
-            updateTree((TreeNode) null);
+            if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
+                updateTree((TreeNode) null);
+            } else {
+                for (Node n : nodesToUpdate) {
+                    updateTree(n);
+                }
+            }
         }
         batchGoalStateChange = value;
     }
@@ -508,13 +517,13 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
 
     /** stores exactly the paths that are expanded in the proof tree */
-    private @Nonnull Collection<TreePath> expansionState = Collections.emptySet();
+    private @NonNull Collection<TreePath> expansionState = Collections.emptySet();
 
-    public void setExpansionState(@Nonnull Collection<TreePath> c) {
+    public void setExpansionState(@NonNull Collection<TreePath> c) {
         expansionState = c;
     }
 
-    public @Nonnull Collection<TreePath> getExpansionState() {
+    public @NonNull Collection<TreePath> getExpansionState() {
         return expansionState;
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
@@ -63,7 +66,7 @@ public class TacletMatchProgram {
     /**
      * returns the instruction for the specified variable
      *
-     * @param sv the {@link SchemaVariable} for which to get the instruction
+     * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(

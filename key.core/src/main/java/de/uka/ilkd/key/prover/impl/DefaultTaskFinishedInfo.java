@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -70,6 +73,9 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // display message for the status bar
     @Override
     public String toString() {
+        if (proof.isDisposed()) {
+            return "Proof disposed";
+        }
         if (appliedRules != 0) {
             StringBuilder message = new StringBuilder();
             String timeString = (timeInMillis / 1000) + "." + ((timeInMillis % 1000) / 100);

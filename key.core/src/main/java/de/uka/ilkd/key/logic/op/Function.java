@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -112,16 +116,7 @@ public class Function extends AbstractSortedOperator {
             new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
         s.append(name());
         if (arity() > 0) {
-            int i = 0;
-            s.append("(");
-            while (i < arity()) {
-                if (i > 0) {
-                    s.append(",");
-                }
-                s.append(argSort(i));
-                i++;
-            }
-            s.append(")");
+            s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));
         }
         s.append(";\n");
         return s.toString();

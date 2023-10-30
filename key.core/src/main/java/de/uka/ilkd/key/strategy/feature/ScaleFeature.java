@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -123,10 +126,13 @@ public abstract class ScaleFeature implements Feature {
      * @param cost
      */
     private static long getValue(RuleAppCost cost) {
-        if (!(cost instanceof NumberRuleAppCost)) {
+        if (cost instanceof NumberRuleAppCost costValue) {
+            return costValue.getValue();
+        } else {
             illegalCostError(cost);
+            // should never be reached
+            return 0;
         }
-        return ((NumberRuleAppCost) cost).getValue();
     }
 
     protected static void illegalCostError(final RuleAppCost cost) {

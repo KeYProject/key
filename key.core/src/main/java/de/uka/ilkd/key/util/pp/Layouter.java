@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
 import java.util.*;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -595,7 +599,7 @@ public class Layouter<M> {
     /**
      * Remove and return the token from the <em>bottom</em> of the delimStack
      */
-    private @Nonnull StreamToken<M> popBottom() {
+    private @NonNull StreamToken<M> popBottom() {
         StreamToken<M> token = delimStack.pollFirst();
         if (token == null) {
             throw new UnbalancedBlocksException();

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Expression;
@@ -433,11 +436,10 @@ public abstract class LoopStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LoopStatement)) {
+        if (!(o instanceof LoopStatement cmp)) {
             return false;
         }
 
-        LoopStatement cmp = (LoopStatement) o;
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
                 || this.getStartPosition().line() == cmp.getStartPosition().line());

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -5,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -15,13 +20,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Opens the last opened file in an editor (well, it tries)
  */
-public final class EditMostRecentFileAction extends MainWindowAction {
+public final class EditMostRecentFileAction extends MainWindowAction
+        implements KeYSelectionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditMostRecentFileAction.class);
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -6214327707255790570L;
 
     public EditMostRecentFileAction(MainWindow mainWindow) {
@@ -31,12 +34,15 @@ public final class EditMostRecentFileAction extends MainWindowAction {
         setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Open the last opened file with the default external editor");
 
+        setEnabled(mainWindow.getRecentFiles() != null
+                && mainWindow.getRecentFiles().getMostRecent() != null);
         Desktop desktop = Desktop.getDesktop();
         if (!desktop.isSupported(Desktop.Action.EDIT)
                 && !desktop.isSupported(Desktop.Action.OPEN)) {
             setEnabled(false);
+        } else {
+            mainWindow.getMediator().addKeYSelectionListener(this);
         }
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -53,6 +59,11 @@ public final class EditMostRecentFileAction extends MainWindowAction {
                 }
             }
         }
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        setEnabled(true);
     }
 
     /**

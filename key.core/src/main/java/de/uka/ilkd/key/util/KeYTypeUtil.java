@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
@@ -204,8 +207,7 @@ public final class KeYTypeUtil {
     public static String resolveType(Type type) {
         if (type instanceof KeYJavaType) {
             return resolveType(((KeYJavaType) type).getJavaType());
-        } else if (type instanceof ArrayType) {
-            ArrayType arrayType = (ArrayType) type;
+        } else if (type instanceof ArrayType arrayType) {
             StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
             for (int i = 0; i < arrayType.getDimension(); i++) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
@@ -7,9 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -27,6 +27,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ public class KeyIO {
     private AbbrevMap abbrevMap;
 
 
-    public KeyIO(@Nonnull Services services, @Nonnull NamespaceSet nss) {
+    public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
@@ -75,7 +77,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Term parseExpression(@Nonnull String expr) {
+    public @NonNull Term parseExpression(@NonNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
@@ -86,7 +88,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Term parseExpression(@Nonnull CharStream stream) {
+    public @NonNull Term parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
@@ -106,7 +108,7 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Sequent parseSequent(@Nonnull CharStream stream) {
+    public @NonNull Sequent parseSequent(@NonNull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
@@ -328,7 +330,7 @@ public class KeyIO {
                 throw new IllegalStateException();
             }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
-                    .collect(Collectors.toList());
+                    .toList();
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {

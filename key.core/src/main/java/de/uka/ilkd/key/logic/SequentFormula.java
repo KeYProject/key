@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -51,8 +54,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
+        if (obj instanceof SequentFormula cmp) {
             return term.equals(cmp.formula());
         }
         return false;
@@ -72,8 +74,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
+        if (obj instanceof SequentFormula cmp) {
             if (term.equalsModProofIrrelevancy(cmp.formula())) {
                 return true;
             }

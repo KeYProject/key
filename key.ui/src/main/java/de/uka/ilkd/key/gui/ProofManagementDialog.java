@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -10,10 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -44,9 +44,15 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofManagementDialog.class);
 
     /**
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
@@ -55,10 +61,10 @@ public final class ProofManagementDialog extends JDialog {
     @Nullable
     private static ContractId previouslySelectedContracts;
 
-    private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
-    private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
-    private static final ImageIcon keyCachedlosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
-    private static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
+    private static final ImageIcon KEY_OPEN = IconFactory.keyHole(20, 20);
+    private static final ImageIcon KEY_ALMOST_CLOSED = IconFactory.keyHoleAlmostClosed(20, 20);
+    private static final ImageIcon KEY_CACHED_CLOSED = IconFactory.keyCachedClosed(20, 20);
+    private static final Icon KEY_CLOSED = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
@@ -119,16 +125,17 @@ public final class ProofManagementDialog extends JDialog {
                 Component result = super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
 
-                if (result instanceof JLabel) {
+                if (result instanceof JLabel label) {
                     ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
-                    JLabel label = (JLabel) result;
                     if (ps.getProofClosed()) {
-                        label.setIcon(keyClosedIcon);
+                        label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {
-                        label.setIcon(keyAlmostClosedIcon);
+                        label.setIcon(KEY_ALMOST_CLOSED);
+                    } else if (ps.getProofClosedByCache()) {
+                        label.setIcon(KEY_CACHED_CLOSED);
                     } else {
                         assert ps.getProofOpen();
-                        label.setIcon(keyIcon);
+                        label.setIcon(KEY_OPEN);
                     }
                 }
                 return result;
@@ -258,7 +265,7 @@ public final class ProofManagementDialog extends JDialog {
                 // filter out library classes
                 .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
                         && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
-                .collect(Collectors.toList());
+                .toList();
 
         // compare: IProgramMethods by program name, otherwise prefer NOT IProgramMethod
         final Comparator<IObserverFunction> compareFunction = (o1, o2) -> {
@@ -365,7 +372,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Selects the contract by the given {@link ContractId}
      */
-    private void select(@Nonnull ContractId cid) {
+    private void select(@NonNull ContractId cid) {
         Services servicesLocal = initConfig.getServices();
         String keyJavaTypeName = cid.keyJavaTypeName;
         Optional<KeYJavaType> allJavaTypes =
@@ -433,7 +440,7 @@ public final class ProofManagementDialog extends JDialog {
      *         lemmas and then just any proof or {@code null} if there is no proof for the contract
      */
     @Nullable
-    private Proof findPreferablyClosedProof(@Nonnull Contract contract) {
+    private Proof findPreferablyClosedProof(@NonNull Contract contract) {
         // will the contracts here always be atomic?
         // it seems that way, but not completely sure
         ImmutableSet<Proof> proofs =
@@ -455,7 +462,7 @@ public final class ProofManagementDialog extends JDialog {
         return fallback;
     }
 
-    private void findOrStartProof(@Nonnull Contract contract) {
+    private void findOrStartProof(@NonNull Contract contract) {
         Proof proof = findPreferablyClosedProof(contract);
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();
@@ -474,15 +481,20 @@ public final class ProofManagementDialog extends JDialog {
                     env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
                 } else {
                     env.registerProof(po, pl);
-
                 }
             } catch (ProofInputException exc) {
+                LOGGER.error("", exc);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.setProof(proof);
         }
         startedProof = true;
+        // starting another proof will not execute the ProblemLoader again,
+        // so we have to activate the UI here
+        if (initConfig.getServices().getSpecificationRepository().getAllProofs().size() > 1) {
+            mediator.startInterface(true);
+        }
     }
 
     private void updateStartButton() {
@@ -500,12 +512,12 @@ public final class ProofManagementDialog extends JDialog {
                 final ProofStatus status = proof.mgt().getStatus();
                 startButton.setText("Go to Proof");
                 if (status.getProofOpen()) {
-                    startButton.setIcon(keyIcon);
+                    startButton.setIcon(KEY_OPEN);
                 } else if (status.getProofClosedButLemmasLeft()) {
-                    startButton.setIcon(keyAlmostClosedIcon);
+                    startButton.setIcon(KEY_ALMOST_CLOSED);
                 } else {
                     assert status.getProofClosed();
-                    startButton.setIcon(keyClosedIcon);
+                    startButton.setIcon(KEY_CLOSED);
                 }
             }
             startButton.setEnabled(true);
@@ -530,7 +542,7 @@ public final class ProofManagementDialog extends JDialog {
                 pan.setContracts(contracts, "Contracts");
 
                 pan.setGrayOutAuxiliaryContracts(Objects.equals(
-                    targetIcons.get(new Pair<>(entry.kjt, entry.target)), keyClosedIcon));
+                    targetIcons.get(new Pair<>(entry.kjt, entry.target)), KEY_CLOSED));
             } else {
                 pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
@@ -567,6 +579,7 @@ public final class ProofManagementDialog extends JDialog {
                     boolean startedProving = false;
                     boolean allClosed = true;
                     boolean lemmasLeft = false;
+                    boolean cached = false;
                     for (Contract contract : contracts) {
                         // Skip auxiliary contracts (like block/loop contracts).
                         if (contract.isAuxiliary()) {
@@ -583,12 +596,17 @@ public final class ProofManagementDialog extends JDialog {
                             } else if (status.getProofClosedButLemmasLeft()) {
                                 lemmasLeft = true;
                             }
+                            if (status.getProofClosedByCache()) {
+                                cached = true;
+                            }
                         }
                     }
                     targetIcons.put(new Pair<>(kjt, target),
                         startedProving
-                                ? (allClosed ? (lemmasLeft ? keyAlmostClosedIcon : keyClosedIcon)
-                                        : keyIcon)
+                                ? (allClosed
+                                        ? (cached ? KEY_CACHED_CLOSED
+                                                : lemmasLeft ? KEY_ALMOST_CLOSED : KEY_CLOSED)
+                                        : KEY_OPEN)
                                 : null);
                 }
             }
@@ -626,50 +644,33 @@ public final class ProofManagementDialog extends JDialog {
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-    private static final class ProofWrapper {
-
-        public final Proof proof;
-
-        public ProofWrapper(Proof proof) {
-            this.proof = proof;
-        }
-
+    private record ProofWrapper(Proof proof) {
         @Override
-        public String toString() {
-            return proof.name().toString();
-        }
+            public String toString() {
+                return proof.name().toString();
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
-        }
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
+            }
 
-        @Override
-        public int hashCode() {
-            return proof.hashCode();
-        }
+            @Override
+            public int hashCode() {
+                return 3*proof.hashCode();
+            }
+
     }
 
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
+     *
+     * @param keyJavaTypeName The key java type name.
+     * @param methodName The method name.
+     * @param contractName The contract name.
      */
-    private static final class ContractId {
-        /** The key java type name. */
-        @Nullable
-        public final String keyJavaTypeName;
-        /** The method name. */
-        @Nullable
-        public final String methodName;
-        /** The contract name. */
-        @Nullable
-        public final String contractName;
-
-        private ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
-                @Nullable String contractName) {
-            this.keyJavaTypeName = keyJavaTypeName;
-            this.methodName = methodName;
-            this.contractName = contractName;
-        }
+    private record ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
+            @Nullable String contractName) {
     }
 }

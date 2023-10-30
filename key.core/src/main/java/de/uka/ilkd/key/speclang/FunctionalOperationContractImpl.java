@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.*;
@@ -69,6 +72,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * The original assignable clause terms.
      */
     final Map<LocationVariable, Term> originalMods;
+    /**
+     * The original assignable_free clause terms.
+     */
+    final Map<LocationVariable, Term> originalFreeMods;
     final Map<ProgramVariable, Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
@@ -86,9 +93,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /**
      * If a method is strictly pure, it has no modifies clause which could be anonymised.
      *
-     * @see #hasModifiesClause()
+     * @see #hasModifiesClause(LocationVariable)
      */
     final Map<LocationVariable, Boolean> hasRealModifiesClause;
+    /**
+     * @see #hasFreeModifiesClause(LocationVariable)
+     */
+    final Map<LocationVariable, Boolean> hasRealFreeModifiesClause;
 
     /**
      * The term builder.
@@ -120,8 +131,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param freePosts the free/unchecked postcondition of the contract
      * @param axioms the class axioms of the method
      * @param mods the modifies clause of the contract
+     * @param mods the free modifies clause of the contract
      * @param accessibles the dependency clause of the contract
-     * @param hasRealMod TODO
+     * @param hasRealMod whether the contract has a modifies set
+     * @param hasRealFreeMod whether the contract has a free modifies set
      * @param selfVar the variable used for the receiver object
      * @param paramVars the variables used for the operation parameters
      * @param resultVar the variables used for the operation result
@@ -135,10 +148,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      */
     FunctionalOperationContractImpl(String baseName, String name, KeYJavaType kjt,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality modality,
-            Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres, Term mby,
+            Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres,
+            Term mby,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> mods,
-            Map<ProgramVariable, Term> accessibles, Map<LocationVariable, Boolean> hasRealMod,
+            Map<LocationVariable, Term> axioms,
+            Map<LocationVariable, Term> mods, Map<LocationVariable, Term> freeMods,
+            Map<ProgramVariable, Term> accessibles,
+            Map<LocationVariable, Boolean> hasRealMod,
+            Map<LocationVariable, Boolean> hasRealFreeMod,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
             Map<LocationVariable, LocationVariable> atPreVars, Term globalDefs, int id,
@@ -182,8 +199,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.originalFreePosts = freePosts;
         this.originalAxioms = axioms;
         this.originalMods = mods;
+        this.originalFreeMods = freeMods;
         this.originalDeps = accessibles;
         this.hasRealModifiesClause = hasRealMod;
+        this.hasRealFreeModifiesClause = hasRealFreeMod;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
         this.originalResultVar = resultVar;
@@ -211,15 +230,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newMods = originalMods.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeMods = originalFreeMods.entrySet().stream().collect(
+            MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
 
         return new FunctionalOperationContractImpl(baseName, name, kjt, pm, specifiedIn, modality,
-            newPres, newFreePres, newMby, newPosts, newFreePosts, newAxioms, newMods,
-            newAccessibles, hasRealModifiesClause, originalSelfVar, originalParamVars,
-            originalResultVar, originalExcVar, originalAtPreVars, newGlobalDefs, id, toBeSaved,
-            transaction, services);
+            newPres, newFreePres, newMby, newPosts, newFreePosts, newAxioms, newMods, newFreeMods,
+            newAccessibles, hasRealModifiesClause, hasRealFreeModifiesClause, originalSelfVar,
+            originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, newGlobalDefs,
+            id, toBeSaved, transaction, services);
     }
 
     // -------------------------------------------------------------------------
@@ -736,8 +757,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         sig.append(pm.getName());
         sig.append("(");
         for (SVSubstitute subst : originalParamVars) {
-            if (subst instanceof Named) {
-                Named named = (Named) subst;
+            if (subst instanceof Named named) {
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,
@@ -1201,6 +1221,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
 
+    @Override
+    public Term getFreeMod(LocationVariable heap, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
+        return getAnyMod(this.originalFreeMods.get(heap), selfVar, paramVars, services);
+    }
+
     private Term getAnyMod(LocationVariable heap, Term mod, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
         assert heapTerm != null;
@@ -1230,9 +1256,25 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public boolean hasFreeModifiesClause(LocationVariable heap) {
+        Boolean result = this.hasRealFreeModifiesClause.get(heap);
+        if (result == null) {
+            return false;
+        }
+        return result;
+    }
+
+    @Override
     public Term getMod(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
         return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms,
+            services);
+    }
+
+    @Override
+    public Term getFreeMod(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        return getAnyMod(heap, this.originalFreeMods.get(heap), heapTerm, selfTerm, paramTerms,
             services);
     }
 
@@ -1381,9 +1423,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public FunctionalOperationContract setID(int newId) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, specifiedIn, modality,
             originalPres, originalFreePres, originalMby, originalPosts, originalFreePosts,
-            originalAxioms, originalMods, originalDeps, hasRealModifiesClause, originalSelfVar,
-            originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, globalDefs,
-            newId, toBeSaved, transaction, services);
+            originalAxioms, originalMods, originalFreeMods, originalDeps, hasRealModifiesClause,
+            hasRealFreeModifiesClause, originalSelfVar, originalParamVars, originalResultVar,
+            originalExcVar, originalAtPreVars, globalDefs, newId, toBeSaved, transaction, services);
     }
 
     @Override
@@ -1391,10 +1433,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert newPM instanceof IProgramMethod;
         return new FunctionalOperationContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
             specifiedIn, modality, originalPres, originalFreePres, originalMby, originalPosts,
-            originalFreePosts, originalAxioms, originalMods, originalDeps, hasRealModifiesClause,
-            originalSelfVar, originalParamVars, originalResultVar, originalExcVar,
-            originalAtPreVars, globalDefs, id, toBeSaved && newKJT.equals(kjt), transaction,
-            services);
+            originalFreePosts, originalAxioms, originalMods, originalFreeMods, originalDeps,
+            hasRealModifiesClause, hasRealFreeModifiesClause, originalSelfVar, originalParamVars,
+            originalResultVar, originalExcVar, originalAtPreVars, globalDefs, id,
+            toBeSaved && newKJT.equals(kjt), transaction, services);
     }
 
     @Override

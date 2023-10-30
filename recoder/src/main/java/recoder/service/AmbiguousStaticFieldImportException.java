@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.util.ArrayList;
@@ -49,7 +51,8 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      * Constructor with an explanation text.
      *
      * @param s an explanation.
-     * @param importStatement the import found to be ambiguous.
+     * @param importStatement1 the first import found to be ambiguous.
+     * @param importStatement2 the second import found to be ambiguous.
      * @param version1 the first possible type.
      * @param version2 the second possible type.
      */

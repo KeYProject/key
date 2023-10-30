@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -202,7 +205,7 @@ public class RewriteTaclet extends FindTaclet {
     /**
      * Compute polarity
      *
-     * @see AntecSuccPrefixChecker seems to reimplement this.
+     * (the {@code AntecSuccPrefixChecker} seems to reimplement this.
      */
     private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
         // toggle polarity if find term is

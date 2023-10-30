@@ -1,23 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import net.miginfocom.layout.AC;
-import net.miginfocom.layout.LC;
-import net.miginfocom.swing.MigLayout;
-import org.key_project.util.java.SwingUtil;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+
+import org.key_project.util.java.SwingUtil;
+
+import net.miginfocom.layout.AC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 
 public class CachingDatabaseDialog extends JDialog {
     public CachingDatabaseDialog() {
         super(MainWindow.getInstance(), "Proof Caching Database");
 
         var contentPane = new JPanel();
-        contentPane.setLayout(new MigLayout(new LC().fillX().wrapAfter(1), new AC().align("left", 0)));
+        contentPane
+                .setLayout(new MigLayout(new LC().fillX().wrapAfter(1), new AC().align("left", 0)));
         setContentPane(contentPane);
 
         var statusPane = new JLabel();
@@ -42,11 +48,12 @@ public class CachingDatabaseDialog extends JDialog {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         SwingUtil.resizeTableColumns(table);
         var scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         Dimension dim = new Dimension(table.getPreferredSize());
         int scrollbarWidth = (Integer) UIManager.get("ScrollBar.width");
         dim.width += scrollbarWidth + 2;
-        dim.height = Math.min(scrollPane.getPreferredSize().height, dim.height + scrollbarWidth + 30);
+        dim.height =
+            Math.min(scrollPane.getPreferredSize().height, dim.height + scrollbarWidth + 30);
         scrollPane.setPreferredSize(dim);
         contentPane.add(scrollPane, "grow");
 

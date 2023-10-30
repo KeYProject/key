@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.*;
@@ -6,7 +9,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * List interface to be implemented by non-destructive lists
@@ -283,7 +287,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      *
      * @returns the filtered list
      */
-    default @Nonnull ImmutableList<T> filter(@Nonnull Predicate<T> predicate) {
+    default @NonNull ImmutableList<T> filter(@NonNull Predicate<T> predicate) {
         return Immutables.filter(this, predicate);
     }
 
@@ -349,6 +353,18 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
             remainder = remainder.tail();
         }
         return remainder.head();
+    }
+
+    /**
+     * Get the n-th element of this list.
+     *
+     * @param idx the 0-based index of the element
+     * @return the element at index idx.
+     * @throws IndexOutOfBoundsException if idx is less than 0 or at
+     *         least {@link #size()}.
+     */
+    default T get(int idx) {
+        return take(idx).head();
     }
 
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.*;
@@ -44,8 +47,7 @@ class TacletDescriber {
     }
 
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
-        if (schemaVar instanceof ModalOperatorSV) {
-            final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
+        if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
             for (final Operator op : modalOpSV.getModalities()) {
                 out.append(sep);
@@ -136,8 +138,7 @@ class TacletDescriber {
                 s.append(app.rule());
             }
 
-            if (app instanceof TacletApp) {
-                TacletApp tapp = (TacletApp) app;
+            if (app instanceof TacletApp tapp) {
                 if (tapp.instantiations()
                         .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s.append("\n\nWith sorts:\n");

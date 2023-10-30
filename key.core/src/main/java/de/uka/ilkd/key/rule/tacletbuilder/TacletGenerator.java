@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.*;
@@ -19,7 +22,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
-import org.key_project.util.collection.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -290,13 +292,7 @@ public class TacletGenerator {
             if (selfNull != null) {
                 addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
             }
-            // final TermAndBoundVarPair schemaAdd =
-            // createSchemaTerm(addForumlaTerm, pvs, svs, services);
 
-            // final Term addedFormula = schemaAdd.term;
-            // final SequentFormula addedCf = new SequentFormula(addedFormula);
-            // final Semisequent addedSemiSeq =
-            // Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         }
 
         // create taclet
@@ -635,7 +631,7 @@ public class TacletGenerator {
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name, List<SchemaVariable> heapSVs,
             SchemaVariable selfSV, SchemaVariable eqSV, Term term, KeYJavaType kjt,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic, boolean isFree,
             boolean eqVersion, Services services) {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
@@ -669,8 +665,17 @@ public class TacletGenerator {
         }
         // create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-        final Term invTerm = isStatic ? TB.staticInv(hs, kjt)
-                : TB.inv(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        final Term invTerm;
+        if (isStatic && isFree) {
+            invTerm = TB.staticInvFree(hs, kjt);
+        } else if (isStatic) {
+            invTerm = TB.staticInv(hs, kjt);
+        } else if (isFree) {
+            invTerm = TB.invFree(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        } else {
+            invTerm = TB.inv(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        }
+
         tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
             new TacletGoalTemplate(addedSeq, ImmutableSLList.nil()));
@@ -897,8 +902,7 @@ public class TacletGenerator {
 
         // top level operator
         Operator newOp = t.op();
-        if (t.op() instanceof IObserverFunction) {
-            final IObserverFunction obs = (IObserverFunction) t.op();
+        if (t.op() instanceof IObserverFunction obs) {
             for (Pair<Sort, IObserverFunction> pair : toLimit) {
                 if (pair.second.equals(t.op())
                         && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first))) {
@@ -1003,16 +1007,5 @@ public class TacletGenerator {
     }
 
 
-
-    private static class TermAndBoundVarPair {
-
-        public final Term term;
-        public final ImmutableSet<VariableSV> boundVars;
-
-
-        public TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {
-            this.term = term;
-            this.boundVars = boundVars;
-        }
-    }
+    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {}
 }

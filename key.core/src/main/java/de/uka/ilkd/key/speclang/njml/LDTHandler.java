@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -14,21 +16,16 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandle
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.jspecify.annotations.Nullable;
+
 public abstract class LDTHandler implements JMLOperatorHandler {
     /**
      * Pair (KJT, Operator)
+     *
+     * @param type type
+     * @param operator operator
      */
-    public static class TypedOperator {
-        /** type */
-        public final KeYJavaType type;
-        /** operator */
-        public final Operator operator;
-
-        /** constructor */
-        public TypedOperator(KeYJavaType type, Operator operator) {
-            this.type = type;
-            this.operator = operator;
-        }
+    public record TypedOperator(KeYJavaType type, Operator operator) {
     }
 
     protected final Services services;

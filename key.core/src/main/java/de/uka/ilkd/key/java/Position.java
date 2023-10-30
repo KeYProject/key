@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import org.antlr.v4.runtime.Token;
@@ -153,10 +156,9 @@ public class Position implements Comparable<Position> {
         if (x == this) {
             return true;
         }
-        if (!(x instanceof Position)) {
+        if (!(x instanceof Position p)) {
             return false;
         }
-        Position p = (Position) x;
         return line == p.line && column == p.column;
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.HashMap;
@@ -18,7 +21,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * </ul>
  * <p>
  * Exactly one {@link TermLabelState} instance is created in each
- * {@link Rule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)}
+ * {@code Rule.apply(...)}
  * implementation and passed to each performed {@link TermLabelManager} call during rule application
  * and thus passed to the participants.
  *

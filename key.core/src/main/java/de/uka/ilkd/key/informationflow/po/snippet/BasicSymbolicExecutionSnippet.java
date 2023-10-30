@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
@@ -103,12 +106,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        if (!(targetMethod instanceof IProgramMethod)) {
+        if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "java-block for an observer which is no program method.");
         }
         JavaInfo javaInfo = d.services.getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) targetMethod;
 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);

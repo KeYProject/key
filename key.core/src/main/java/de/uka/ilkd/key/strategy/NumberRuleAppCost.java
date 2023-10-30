@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
-
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.LRUCache;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -53,14 +56,13 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
-    @Nonnull
+    @NonNull
     @Override
-    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+    public RuleAppCost mul(@NonNull RuleAppCost cost) {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }
-        if (cost instanceof NumberRuleAppCost) {
-            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+        if (cost instanceof NumberRuleAppCost numberRuleAppCost) {
             return create(getValue() * numberRuleAppCost.getValue());
         }
         throw new IllegalArgumentException();

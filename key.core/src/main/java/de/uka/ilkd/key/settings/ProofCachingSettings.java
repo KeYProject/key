@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 /**
@@ -6,6 +9,9 @@ package de.uka.ilkd.key.settings;
  * @author Arne Keller
  */
 public class ProofCachingSettings extends AbstractPropertiesSettings {
+    public static final String DISPOSE_COPY = "Copy steps into new proof";
+    public static final String DISPOSE_REOPEN = "Reopen proof";
+
     /**
      * Key ID for {@link #enabled}.
      */
@@ -44,6 +50,12 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
         return dispose.get();
     }
 
+    /**
+     * Set the operation to be done when disposing a referenced proof.
+     * Allowed operations: {@link #DISPOSE_COPY}, {@link #DISPOSE_REOPEN}.
+     *
+     * @param operation the operation
+     */
     public void setDispose(String operation) {
         dispose.set(operation);
     }

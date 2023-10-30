@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -49,7 +52,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * An Entry in {@link accessibility} {@link ShowSelectedSequentPrintFilter}.
+     * An Entry in accessibility {@link ShowSelectedSequentPrintFilter}.
      *
      * The only entry created for such a filter contains the sub-term at the specified position as
      * filtered term ({@link #getFilteredFormula()}) and that sub-term's top-level term as the

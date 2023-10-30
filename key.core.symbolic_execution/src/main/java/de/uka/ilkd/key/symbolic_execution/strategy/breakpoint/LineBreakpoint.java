@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.nio.file.Paths;
@@ -105,7 +108,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *
      * @param line The current line of code, that the auto mode is evaluating
      * @param path The path of the Class, that contains the currently evaluated code
-     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates
+     * @return true if a {@link LineBreakpoint} is in the given line and the condition evaluates
      *         to true and the Hitcount is exceeded, false otherwise
      */
     protected boolean shouldStopInLine(int line, String path) {

@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;
@@ -17,6 +19,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 public class TacletSoundnessPOLoader {
     private final boolean loadAsLemmata;
@@ -307,8 +311,7 @@ public class TacletSoundnessPOLoader {
 
 
     public void registerProofs(ProofAggregate aggregate, ProofEnvironment proofEnv) {
-        if (aggregate instanceof CompoundProof) {
-            CompoundProof cp = (CompoundProof) aggregate;
+        if (aggregate instanceof CompoundProof cp) {
             for (ProofAggregate child : cp.getChildren()) {
                 registerProofs(child, proofEnv);
             }

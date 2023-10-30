@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.HashSet;
@@ -116,8 +119,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
         if (relevantElement != null) {
             Location normalizedElement = normalizeAlias(services, relevantElement, info);
             relevantLocations.add(normalizedElement);
-        } else if (read instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) read;
+        } else if (read instanceof NonTerminalProgramElement ntpe) {
             for (int i = 0; i < ntpe.getChildCount(); i++) {
                 updateRelevantLocations(ntpe.getChildAt(i), relevantLocations, info, services);
             }

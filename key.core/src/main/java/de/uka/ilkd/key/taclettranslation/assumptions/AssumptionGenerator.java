@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.*;
@@ -146,8 +149,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     private static void collectGenerics(Term term, HashSet<GenericSort> genericSorts) {
 
-        if (term.op() instanceof SortDependingFunction) {
-            SortDependingFunction func = (SortDependingFunction) term.op();
+        if (term.op() instanceof SortDependingFunction func) {
             if (func.getSortDependingOn() instanceof GenericSort) {
                 genericSorts.add((GenericSort) func.getSortDependingOn());
             }

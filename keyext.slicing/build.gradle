@@ -1,3 +1,5 @@
+description "Computiation of the proof core (the essential rule applications to close a proof)"
+
 dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")

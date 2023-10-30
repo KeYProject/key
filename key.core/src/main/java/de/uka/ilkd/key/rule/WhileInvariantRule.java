@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -66,6 +68,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 public final class WhileInvariantRule implements BuiltInRule {
     /**
@@ -560,8 +564,9 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-            "UseModality", null, inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
-            null, useJavaBlock, inst.progPost.getLabels());
+            "UseModality", null,
+            tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
+                null, useJavaBlock, inst.progPost.getLabels()));
         Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
@@ -697,7 +702,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
@@ -718,9 +723,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
-            final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
-            mods.put(heap, m);
+            mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services));
+            freeMods.put(heap, inst.inv.getFreeModifies(heap, inst.selfTerm, atPres, services));
         }
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
@@ -818,17 +824,28 @@ public final class WhileInvariantRule implements BuiltInRule {
             if (anonHeap == null) {
                 anonHeap = tAnon.anonHeap;
             }
-            final Term m = mods.get(heap);
-            final Term fc;
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(m)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+            final Term mod = mods.get(heap);
+            final Term freeMod = freeMods.get(heap);
+            final Term strictlyNothing = tb.strictlyNothing();
+            final Term currentFrame;
+            if (strictlyNothing.equalsModIrrelevantTermLabels(mod)) {
+                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                    currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+                } else {
+                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
+                }
             } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
+                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
+                } else {
+                    currentFrame = tb.frame(
+                        tb.var(heap), heapToBeforeLoop.get(heap), tb.union(mod, freeMod));
+                }
             }
             if (frameCondition == null) {
-                frameCondition = fc;
+                frameCondition = currentFrame;
             } else {
-                frameCondition = tb.and(frameCondition, fc);
+                frameCondition = tb.and(frameCondition, currentFrame);
             }
             if (reachableState == null) {
                 reachableState = tb.wellFormed(heap);

@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
 
 public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExtension, SVWrapper {
@@ -32,10 +34,6 @@ public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExt
      */
     public SchemaVariable getSV() {
         return sv;
-    }
-
-    public SourceElement getFirstElement() {
-        return this;
     }
 
     public ExecutionContext deepClone() {
