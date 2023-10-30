@@ -4,10 +4,11 @@
 package org.key_project.exploration;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Information on exploration that is attached to nodes. If such an object is attached to a node,
@@ -18,7 +19,7 @@ public class ExplorationNodeData {
 
     private String explorationAction;
 
-    public static @Nonnull ExplorationNodeData get(@Nonnull Node node) {
+    public static @NonNull ExplorationNodeData get(@NonNull Node node) {
         @Nullable
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if (data == null) {

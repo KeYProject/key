@@ -59,7 +59,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     }
 
     /**
-     * @param The node corresponding to this SE state.
+     * @param correspondingNode The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;

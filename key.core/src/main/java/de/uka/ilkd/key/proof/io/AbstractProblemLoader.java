@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
@@ -55,8 +54,8 @@ import org.slf4j.LoggerFactory;
  * in the current {@link Thread} and no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new {@link SingleThreadProblemLoader} or
- * {@link ProblemLoader} instance which should load the file configured by the constructor's
+ * The basic usage of this class is to be subclasses by a problem loader like
+ * {@link SingleThreadProblemLoader} which should load the file configured by the constructor's
  * arguments. The next step is to call {@link #load()} which does the loading process and tries to
  * instantiate a proof and to apply rules again if possible. The result of the loading process is
  * available via the getter methods.
@@ -140,7 +139,7 @@ public abstract class AbstractProblemLoader {
     private final Profile profileOfNewProofs;
 
     /**
-     * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no
+     * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
      * {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to
      * work with the loaded {@link InitConfig}.
      */
@@ -222,7 +221,7 @@ public abstract class AbstractProblemLoader {
      *        will be used for new proofs.
      * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call
-     *        {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is
+     *        {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no {@link Proof} is
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
@@ -539,7 +538,6 @@ public abstract class AbstractProblemLoader {
      * Instantiates the {@link ProblemInitializer} to use.
      *
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
-     * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {

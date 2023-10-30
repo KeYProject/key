@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.Term;
  * {@link ProofOblInput}.
  * <p>
  * Implementations are instantiated once via
- * {@link ProofInitServiceUtil#createOperationPOExtension(ProofOblInput)} and reused all the time.
+ * {@code ProofInitServiceUtil.createOperationPOExtension()} and reused all the time.
  * This means that {@link POExtension} are singletons and should not have a state.
  *
  * @author Martin Hentschel

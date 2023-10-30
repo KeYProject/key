@@ -5,8 +5,6 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -15,6 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -61,7 +62,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @Nonnull
+    @NonNull
     List<File> readClassPath() throws ProofInputException;
 
     /**
@@ -100,7 +101,10 @@ public interface EnvInput {
      * If true, the requested Java file has to given via {@link #getJavaFile()}.
      * </p>
      *
-     * @see de.uka.ilkd.key.proof.init.ProblemInitializer#readJava(EnvInput, InitConfig)
+     * For further information see the <code>readJava(EnvInput, InitConfig)</code> method of class
+     * {@link de.uka.ilkd.key.proof.init.ProblemInitializer}
+     *
+     * @see de.uka.ilkd.key.proof.init.ProblemInitializer
      */
     default boolean isIgnoreOtherJavaFiles() { return false; }
 }

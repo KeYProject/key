@@ -10,9 +10,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
 
 import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * the socket that handles solver results and interactively communicates with the running
      * external solver process
      */
-    private final @Nonnull AbstractSolverSocket socket;
+    private final @NonNull AbstractSolverSocket socket;
 
     /**
      * the ModelExtractor used to generate counterexamples (only used for CE solver type)

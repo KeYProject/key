@@ -8,10 +8,11 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  *

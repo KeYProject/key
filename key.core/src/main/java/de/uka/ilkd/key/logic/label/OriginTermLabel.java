@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * <p>
- * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, TermBuilder)} for
+ * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, Services)} for
  * every top-level formula in your original proof obligation.
  * </p>
  *
@@ -480,7 +480,7 @@ public class OriginTermLabel implements TermLabel {
      * </p>
      *
      * <p>
-     * Note that you need to have called {@link #collectSubtermOrigins(Term, TermBuilder)} for this
+     * Note that you need to have called {@link #collectSubtermOrigins(Term, Services)} for this
      * method to work correctly.
      * </p>
      *

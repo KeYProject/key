@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -18,11 +18,11 @@ import de.uka.ilkd.key.logic.Name;
  * {@link Taclet#equals(Object)} and {@link Taclet#hashCode()} method.
  */
 public class RuleKey {
-    public final @Nonnull Name name;
-    public final @Nonnull ChoiceExpr choices;
+    public final @NonNull Name name;
+    public final @NonNull ChoiceExpr choices;
     public final Rule r;
 
-    RuleKey(@Nonnull Name name, @Nonnull ChoiceExpr choices, Rule r) {
+    RuleKey(@NonNull Name name, @NonNull ChoiceExpr choices, Rule r) {
         this.name = name;
         this.choices = choices;
         this.r = r;

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -23,6 +22,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * manages all applicable Taclets (more precisely: Taclets with instantiations but without position
@@ -301,7 +302,8 @@ public abstract class TacletIndex {
      *
      * @param map the map to select the NoPosTacletApps from
      * @param pe the program element that is used to retrieve the taclets
-     * @param prefixOcc the PrefixOccurrence object used to keep track of the occuring prefix
+     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occuring
+     *        prefix
      *        elements
      */
     private ImmutableList<NoPosTacletApp> getJavaTacletList(

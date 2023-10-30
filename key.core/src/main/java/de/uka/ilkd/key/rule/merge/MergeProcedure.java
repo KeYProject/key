@@ -36,7 +36,6 @@ import org.key_project.util.collection.ImmutableSet;
  * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
- * @see MergeWithSignLattice
  */
 public abstract class MergeProcedure {
 

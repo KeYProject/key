@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
@@ -13,6 +12,8 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.util.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
@@ -53,7 +54,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         search(searchField.getText(), Position.Bias.Backward);
     }
 
-    public boolean search(@Nonnull String searchString) {
+    public boolean search(@NonNull String searchString) {
         fillCache();
         return search(searchString, Position.Bias.Forward);
     }
@@ -129,7 +130,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         }
     }
 
-    private int getNextMatch(@Nonnull String searchString, int startingRow, Position.Bias bias) {
+    private int getNextMatch(@NonNull String searchString, int startingRow, Position.Bias bias) {
         String s = searchString.toLowerCase();
 
         if (bias == Position.Bias.Forward) {
@@ -171,7 +172,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
      * @param searchString the String to be looked for
      * @return true if a match has been found
      */
-    private boolean nodeContainsString(int node, @Nonnull String searchString) {
+    private boolean nodeContainsString(int node, @NonNull String searchString) {
         return cache.get(node).second.contains(searchString);
     }
 }

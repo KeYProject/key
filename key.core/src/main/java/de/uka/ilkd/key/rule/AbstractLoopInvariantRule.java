@@ -338,7 +338,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param tb The {@link TermBuilder} object.
      * @param t1 The first formula of the conjunction; may be null.
      * @param t2 The second formula of the conjunction; may <em>not</em> be null.
-     * @return Returns t2 if t1 is null and t1 & t2 if both aren't null.
+     * @return returns {@code t2} if {@code t1} is null and {@code t1 & t2} if both aren't null.
      */
     protected static Term and(TermBuilder tb, Term t1, Term t2) {
         assert t2 != null;

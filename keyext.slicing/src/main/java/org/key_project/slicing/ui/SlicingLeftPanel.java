@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -45,6 +44,7 @@ import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +69,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Logger of this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
-    /**
-     * If set to true, the panel will include information on the current usage of the Java Heap
-     * and a button that calls {@link System#gc()}.
-     */
-    private static final boolean ENABLE_DEBUGGING_UI = false;
 
     /**
      * KeY mediator instance.
@@ -96,10 +91,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private JButton showGraphRendering = null;
     /**
-     * If {@link #ENABLE_DEBUGGING_UI} is true: a button that will call the garbage collector
-     */
-    private JButton buttonSystemGC = null;
-    /**
      * "Slice proof" button.
      */
     private JButton sliceProof = null;
@@ -115,10 +106,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * "Show rule statistics" button.
      */
     private JButton showRuleStatistics = null;
-    /**
-     * Label showing current usage of the Java heap.
-     */
-    private JLabel memoryStats = null;
     /**
      * Label indicating the number of dependency graph nodes.
      *
@@ -212,16 +199,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 updateGraphLabelsTimer.stop();
             }
         });
-        if (ENABLE_DEBUGGING_UI) {
-            Timer updateHeapMemoryTimer = new Timer(100, e -> {
-                Runtime runtime = Runtime.getRuntime();
-                long total = runtime.totalMemory();
-                long used = total - runtime.freeMemory();
-                memoryStats.setText(String.format(
-                    "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
-            });
-            updateHeapMemoryTimer.start();
-        }
     }
 
     private void buildUI() {
@@ -248,11 +225,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 dialog.start(currentProof);
             }
         });
-        buttonSystemGC = new JButton("call System.gc()");
-        buttonSystemGC.addActionListener(e -> {
-            System.gc();
-            Runtime.getRuntime().gc();
-        });
 
         sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
         sliceProofFixedPoint.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -264,22 +236,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.setBorder(new TitledBorder("Execution timings"));
         timings.setVisible(false);
 
-        memoryStats = new JLabel("Java Heap Usage: ?");
-
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
-        buttonSystemGC.setAlignmentX(Component.LEFT_ALIGNMENT);
-        memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(panel1, gridBagConstraints(0));
         mainPanel.add(panel2, gridBagConstraints(1));
         mainPanel.add(panel3, gridBagConstraints(2));
         mainPanel.add(timings, gridBagConstraints(3));
-        if (ENABLE_DEBUGGING_UI) {
-            mainPanel.add(buttonSystemGC, gridBagConstraints(4));
-            mainPanel.add(memoryStats, gridBagConstraints(5));
-        }
 
         mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
@@ -371,7 +335,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return c;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<CAction> getTitleCActions() {
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
@@ -544,7 +508,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Proof Slicing";
@@ -555,7 +519,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return INFO_ICON;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return this;

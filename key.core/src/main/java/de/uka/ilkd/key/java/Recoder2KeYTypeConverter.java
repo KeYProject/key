@@ -119,12 +119,12 @@ public class Recoder2KeYTypeConverter {
      * Return the cached value if present - otherwise create a new type. Store this in the cache.
      * <p>
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
-     * passes this result to {@link #getKeYJavaType(Type)}
+     * passes this result to {@link #getKeYJavaType(recoder.abstraction.Type)}}
      *
      * @param typeName name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
-     * @see #getKeYJavaType(Type)
+     * @see #getKeYJavaType(recoder.abstraction.Type)
      */
 
     public KeYJavaType getKeYJavaType(String typeName) {

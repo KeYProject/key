@@ -62,7 +62,6 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param conditionEnabled flag if the condition is enabled
      * @param methodStart the line the containing method of this breakpoint starts at
      * @param methodEnd the line the containing method of this breakpoint ends at
-     * @param containerType the type of the element containing the breakpoint
      * @param isEntry flag to tell whether to stop on method entry
      * @param isExit flag to tell whether to stop on method exit
      * @throws SLTranslationException if the condition could not be parsed to a valid Term

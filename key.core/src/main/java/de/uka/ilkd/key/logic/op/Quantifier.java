@@ -15,14 +15,17 @@ public final class Quantifier extends AbstractSortedOperator {
     public static final Name EX_NAME = new Name("exists");
 
     /**
-     * the usual 'forall' operator 'all' (be A a formula then 'all x.A' is true if and only if for
-     * all elements d of the universe A{x<-d} (x substituted with d) is true
+     * the usual {@code forall} operator 'all' (be A a formula then {@code forall x.A} is true if
+     * and only if for
+     * all elements d of the universe {@code A{x<-d}} (x substituted with d) is true
      */
     public static final Quantifier ALL = new Quantifier(ALL_NAME);
 
     /**
-     * the usual 'exists' operator 'ex' (be A a formula then 'ex x.A' is true if and only if there
-     * is at least one elements d of the universe such that A{x<-d} (x substituted with d) is true
+     * the usual {@code exists}-operator (be {@code A} a formula then {@code exists x; A} is true if
+     * and only if there
+     * is at least one element d of the universe such that {@code A{x<-d}} (x substituted with d) is
+     * true
      */
     public static final Quantifier EX = new Quantifier(EX_NAME);
 

@@ -46,7 +46,7 @@ public class VariableAssignments {
     /**
      * Create new, empty variable assignment, to add variables
      *
-     * @param parent
+     * @param parentAssignments the parent assignments
      */
     public VariableAssignments(VariableAssignments parentAssignments) {
         this.currentAssignments = new HashMap<>();
