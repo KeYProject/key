@@ -23,7 +23,7 @@ public class Choice implements Named {
     private final @NonNull String category;
 
     /**
-     * Creates a choice object with name &lt;category&gt:&lt;choice&gt;.
+     * Creates a choice object with name {@code <category>:<choice>}.
      */
     public Choice(String choice, String category) {
         this(new Name(category + ":" + choice), category);

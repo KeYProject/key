@@ -12,7 +12,8 @@ import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 

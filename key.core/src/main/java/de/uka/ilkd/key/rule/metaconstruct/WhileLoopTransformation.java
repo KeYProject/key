@@ -377,7 +377,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
-    /**
+    /*
      *
      * public void performActionOnFor(For x) { ExtList changeList = stack.peek(); if
      * (replaceBreakWithNoLabel==0) { //most outer for loop if (changeList.getFirst() == CHANGED)

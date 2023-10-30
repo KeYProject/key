@@ -130,9 +130,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * During collection of the nodes, the nodes are grouped in the given TreeModel {@code dtm}
      * </p>
      *
-     * @param n start node of exploration indow, KeYMediator mediator) { if (leftPanel == null)
-     *        leftPanel = new ExplorationStepsList(window); return Collections.singleton(leftPanel);
-     *        }* @param foundNodes filled with found exploration nodes
+     * @param node start node of exploration
+     * @param foundNodes filled with found exploration nodes
      * @param dtm a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */

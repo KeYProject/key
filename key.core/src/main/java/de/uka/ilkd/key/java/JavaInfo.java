@@ -1472,7 +1472,7 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt$inv_free&gt;</code> which stands for the static
+     * Returns the special symbol {@code <$inv_free&>}, which stands for the static
      * invariant of a type.
      */
     public IObserverFunction getStaticInvFree(KeYJavaType target) {

@@ -63,6 +63,7 @@ import org.jspecify.annotations.NonNull;
  * </p>
  *
  * <pre>
+ * {@code
  * \Gamma ==> {U}Inv, \Delta
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
  *    boolean x = true;
@@ -72,6 +73,7 @@ import org.jspecify.annotations.NonNull;
  *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
  * ---------------------------------------------------------- loopInvariant
  * \Gamma ==> {U}[\pi l: while (nse) { p } \omega]\phi, Delta
+ * }
  * </pre>
  *
  * @author Dominic Scheurer

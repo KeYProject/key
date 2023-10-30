@@ -195,7 +195,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * retrieve the recoder<->key mapping from the associated Recoder2KeY.
+     * retrieve the recoder {@code <->} key mapping from the associated Recoder2KeY.
      *
      * @return the mapping, not null.
      */
@@ -584,7 +584,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * store an element to the recoder<->key mapping.
+     * store an element to the recoder {@code <->} key mapping.
      *
      * @param r the recoder element (not null)
      * @param k the key element (not null)

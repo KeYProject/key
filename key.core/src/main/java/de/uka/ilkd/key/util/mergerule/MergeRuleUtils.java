@@ -846,7 +846,7 @@ public class MergeRuleUtils {
      * The underlying idea is based upon the observation that many path conditions that should be
      * merged are conjunctions of mostly the same elements and, in addition, formulae phi and !phi
      * that vanish after creating the disjunction of the path conditions. The corresponding valid
-     * formula is <code>(phi & psi) | (phi & !psi) <-> phi</code>
+     * formula is {@code (phi & psi) | (phi & !psi) <-> phi}
      * <p>
      *
      * For formulae that cannot be simplified by this law, the method performs two additional
@@ -1005,7 +1005,8 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state (U,C).
+     * Thereby, all
      * program variables occurring in the symbolic state are replaced by branch-unique
      * correspondents in order to enable merging of different branches declaring local variables.
      * <p>
@@ -1025,7 +1026,8 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C,p). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state
+     * (U,C,p). Thereby, all
      * program variables occurring in the program counter and in the symbolic state are replaced by
      * branch-unique correspondents in order to enable merging of different branches declaring local
      * variables.
