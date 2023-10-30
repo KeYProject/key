@@ -56,7 +56,8 @@ public class ScriptApi {
     /**
      * Execute ScriptCommand onto goal node
      *
-     * @param command to be applied with parameters set
+     * @param call to be applied with parameters set
+     * @param onNode the starting node
      * @return List of new proof goals (possibly empty) Should throw an Exception if command not
      *         applicable?
      */

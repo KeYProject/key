@@ -44,16 +44,22 @@ public final class GenericSort extends AbstractSort {
      * @param ext supersorts of this sort, which have to be either concrete sorts or plain generic
      *        sorts (i.e. not collection sorts of generic sorts)
      */
-    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf)
+    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf,
+            String documentation, String origin)
             throws GenericSupersortException {
-        super(name, ext, false);
+        super(name, ext, false, documentation, origin);
         this.oneOf = oneOf;
         checkSupersorts();
     }
 
+    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf)
+            throws GenericSupersortException {
+        this(name, ext, oneOf, "", "");
+    }
+
 
     public GenericSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         this.oneOf = DefaultImmutableSet.nil();
     }
 

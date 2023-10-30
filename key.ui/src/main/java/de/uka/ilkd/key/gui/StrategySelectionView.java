@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>There is no need to change this class to change the available settings!</b> The only thing to
  * be done is to modify the available {@link StrategySettingsDefinition} in
- * {@link JavaCardDLStrategy.Factory#getSettingsDefinition()}.
+ * {@link StrategyFactory#getSettingsDefinition()}.
  * </p>
  * <p>
  * As future work this class should not show a fixed content defined by {@link #DEFINITION}. Instead
@@ -581,7 +581,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     /**
-     * Provided via {@link StrategySelectionView#getStrategySelectionComponents()} for direct access
+     * Provided via {@link StrategySelectionView} for direct access
      * to created user interface components.
      *
      * @author Martin Hentschel

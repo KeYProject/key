@@ -280,7 +280,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }
 

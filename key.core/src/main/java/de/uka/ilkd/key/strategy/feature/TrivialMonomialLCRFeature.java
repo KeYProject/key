@@ -14,7 +14,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 /**
  * Return zero of the least common reducible of two monomials is so trivial that it is not necessary
  * to do the critical pair completion
- *
+ * <p>
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {

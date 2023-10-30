@@ -25,8 +25,9 @@ import org.key_project.util.collection.ImmutableList;
  * This macro resolves the well-definedness transformer, i.e. it applies exactly all applicable
  * rules to resolve the operators WD and wd (which are formula/term transformers). These rules all
  * have the prefix defined in {@link #WD_PREFIX}. The macro is only applicable for proof obligations
- * created in {@link #WellDefinednessPO} and the Well-Definedness branches in
- * {@link #WhileInvariantRule} and {@link #BlockContractRule}.
+ * created in {@link WellDefinednessPO} and the Well-Definedness branches in
+ * {@link de.uka.ilkd.key.rule.WhileInvariantRule} and
+ * {@link de.uka.ilkd.key.rule.AbstractBlockContractRule}.
  *
  * @author Michael Kirsten
  */

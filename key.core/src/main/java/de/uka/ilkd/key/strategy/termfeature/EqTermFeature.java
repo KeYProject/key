@@ -10,7 +10,7 @@ import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 /**
  * Term feature for testing equality of two terms. The feature returns zero iff it is invoked on a
  * term that is equal to the current value of <code>pattern</code>.
- *
+ * <p>
  * NB: it is not possible to use general <code>ProjectionToTerm</code> here, because the information
  * necessary to evaluate a <code>ProjectionToTerm</code> is not available in a term feature
  */

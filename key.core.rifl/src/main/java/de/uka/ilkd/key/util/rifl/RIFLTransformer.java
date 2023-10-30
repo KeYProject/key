@@ -26,7 +26,8 @@ import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
+
+import static org.key_project.util.Strings.*;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for Information Flow Language
@@ -194,16 +195,8 @@ public class RIFLTransformer {
 
             ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
             for (MethodDeclaration mdecl : si.getSpecifiedMethodDeclarations()) {
-
-
-                StringBuilder sb = new StringBuilder();
-                for (ParameterDeclaration p : mdecl.getParameters()) {
-                    sb.append(p.getTypeReference().getName());
-                    sb.append(",");
-                }
-                if (sb.length() > 0) {
-                    sb.deleteCharAt(sb.length() - 1);
-                }
+                final StringBuilder sb = new StringBuilder();
+                sb.append(formatAsList(mdecl.getParameters(), "", ",", ""));
 
                 String poname = clazz.getFullName() + "[" + clazz.getFullName() + "\\\\:\\\\:"
                     + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";

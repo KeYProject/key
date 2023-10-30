@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
+import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
@@ -48,6 +49,26 @@ public class DependencyGraph {
      * Stores the edges introduced by a proof step.
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
+
+    /**
+     * Ensure the provided proof is fully represented in this dependency graph.
+     *
+     * @param p the proof
+     */
+    public void ensureProofIsTracked(Proof p) {
+        if (!edgeDataReversed.keySet().stream().findFirst().map(x -> x.proof() == p).orElse(true)) {
+            throw new IllegalStateException("tried to use DependencyGraph with wrong proof");
+        }
+        DependencyTracker tracker = p.lookup(DependencyTracker.class);
+        var nodeIterator = p.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            var node = nodeIterator.next();
+            if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) {
+                continue;
+            }
+            tracker.trackNode(node);
+        }
+    }
 
 
     /**

@@ -313,7 +313,7 @@ public abstract class AbstractBetaFeature implements Feature {
         public boolean containsQuantifier;
 
         /** one of CAND_* */
-        public Candidate candidate;
+        private Candidate candidate;
     }
 
     /**

@@ -92,7 +92,7 @@ public final class ReferenceSearcher {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
                 Node n = nodesToCheck.remove();
-                if (checkedNodes.contains(n)) {
+                if (checkedNodes.contains(n) || !n.isClosed()) {
                     continue;
                 }
                 checkedNodes.add(n);

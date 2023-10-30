@@ -10,7 +10,7 @@ import org.key_project.util.ExtList;
 
 public class TypeRef extends TypeReferenceImp {
 
-    private KeYJavaType kjt = null;
+    private final KeYJavaType kjt;
 
     /**
      * creates a type reference for the given KeYJavaType with dimension 0 and creates a suitable

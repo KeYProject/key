@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.parser;
 
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents an error of a parser.

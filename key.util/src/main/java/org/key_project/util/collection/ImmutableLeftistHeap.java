@@ -6,6 +6,8 @@ package org.key_project.util.collection;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
+import org.key_project.util.Strings;
+
 /**
  * This class implements the leftist heap, see &quot;Functional Data Structures&quot; by Chris
  * Okasaki
@@ -331,16 +333,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 
 
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("[");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("]");
-        return str.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
 

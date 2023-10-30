@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
@@ -289,7 +290,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private void createSortDeclaration(ArrayList<StringBuilder> types, StringBuilder result) {
         result.append("\n" + GAP + "; Declaration of sorts.\n");
         for (StringBuilder type : types) {
-            if (!(type == INTSTRING || type.equals(INTSTRING))) {
+            if (!(type == INTSTRING || type.compareTo(INTSTRING) == 0)) {
                 createSortDeclaration(type, result);
             }
         }

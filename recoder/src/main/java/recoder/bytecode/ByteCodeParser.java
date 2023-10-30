@@ -903,7 +903,7 @@ public class ByteCodeParser {
                         rpos++;
                     }
                     typeName = tn.substring(pos + 1, rpos).replace('/', '.');
-                    if (typeName.equals("")) {
+                    if (typeName.isEmpty()) {
                         typeName = "java.lang.Object"; // allowed for class bound only, but
                     }
                     // we assume that bytecode isn't corrupted.

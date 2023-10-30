@@ -6,7 +6,8 @@ package de.uka.ilkd.key.logic;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A choice is an option in a category.
@@ -18,8 +19,8 @@ import javax.annotation.Nonnull;
  * @see de.uka.ilkd.key.nparser.ParsingFacade#getChoices(List)
  */
 public class Choice implements Named {
-    private final @Nonnull Name name;
-    private final @Nonnull String category;
+    private final @NonNull Name name;
+    private final @NonNull String category;
 
     /**
      * Creates a choice object with name &lt;category&gt:&lt;choice&gt;.
@@ -28,18 +29,18 @@ public class Choice implements Named {
         this(new Name(category + ":" + choice), category);
     }
 
-    public Choice(@Nonnull Name name, @Nonnull String category) {
+    public Choice(@NonNull Name name, @NonNull String category) {
         this.name = name;
         this.category = category;
     }
 
 
     @Override
-    public @Nonnull Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
-    public @Nonnull String category() {
+    public @NonNull String category() {
         return category;
     }
 

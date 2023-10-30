@@ -25,9 +25,9 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -161,7 +161,7 @@ public abstract class AbstractUpdateExtractor {
     }
 
     /**
-     * Utility method of {@link #computeInitialObjectsToIgnore()} which computes the objects to
+     * Utility method of {@link #computeInitialObjectsToIgnore} which computes the objects to
      * ignore recursively.
      *
      * @param term The current {@link Term}.
@@ -1422,7 +1422,7 @@ public abstract class AbstractUpdateExtractor {
     }
 
     /**
-     * Utility class used by {@link AbstractUpdateExtractor#computeValueConditions(Set, Map)}.
+     * Utility class used by {@link AbstractUpdateExtractor#computeValueConditions}.
      * Instances of this class store the current {@link Node} and the {@link Goal}s at which
      * backward iteration on parents has started.
      *
@@ -1500,18 +1500,11 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
-            boolean afterFirst = false;
-            for (Goal goal : startingGoals) {
-                if (afterFirst) {
-                    sb.append(", ");
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(goal.node().serialNr());
-            }
+            sb.append(Strings.formatAsList(startingGoals, "", ", ", "",
+                ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr)));
             return sb.toString();
         }
     }
@@ -1545,7 +1538,7 @@ public abstract class AbstractUpdateExtractor {
      * <p>
      * They are instantiated lazily when a concrete memory layout is requested the first during
      * lazily computation
-     * {@link SymbolicLayoutExtractor#lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+     * {@link SymbolicLayoutExtractor#lazyComputeLayout}.
      * The instances exists only temporary until the concrete {@link ISymbolicLayout} was created
      * from them.
      * </p>

@@ -45,6 +45,7 @@ import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
@@ -187,6 +188,8 @@ public final class DependencyAnalyzer {
                 .allMatch(goal -> goal.node().lookup(ClosedBy.class) == null)) {
             throw new IllegalStateException("cannot analyze proof with cached references");
         }
+
+        graph.ensureProofIsTracked(proof);
 
         executionTime.start(TOTAL_WORK);
         proof.setStepIndices();
@@ -385,7 +388,14 @@ public final class DependencyAnalyzer {
             Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
                 x -> groupedOutputs.put(x.getBranchLocation(), new ArrayList<>()));
-            data.outputs.forEach(n -> groupedOutputs.get(n.getBranchLocation()).add(n));
+            data.outputs.forEach(n -> {
+                if (n instanceof PseudoOutput) {
+                    // cut did not any new formulas
+                    // (always leads to cutWasUseful = false)
+                    return;
+                }
+                groupedOutputs.get(n.getBranchLocation()).add(n);
+            });
             boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
             if (cutWasUseful) {

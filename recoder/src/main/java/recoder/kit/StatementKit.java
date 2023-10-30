@@ -315,7 +315,7 @@ public class StatementKit {
      * or throw statements, and the body if its exit is reachable. For other members, returns an
      * empty list.
      *
-     * @param m a member declaration.
+     * @param mdecl a member declaration.
      * @param si the SourceInfo service to use.
      * @return a list of statements that finish the member's body after execution.
      * @since 0.72

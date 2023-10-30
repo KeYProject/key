@@ -46,10 +46,10 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     }
 
     /**
-     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}. If the Hitcount
+     * Checks if the hitcount is exceeded for the given {@link LineBreakpoint}. If the Hitcount
      * is not exceeded the hitted counter is incremented, otherwise its set to 0.
      *
-     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
+     * @return true if the Hitcount is exceeded or the {@link LineBreakpoint} has no Hitcount.
      */
     protected boolean hitcountExceeded(Node node) {
         if (!(hitCount == -1)) {

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation) of

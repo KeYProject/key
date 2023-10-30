@@ -74,8 +74,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
             LabeledParserRuleContext originalSpec) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
+        assert name != null && !name.isEmpty();
+        assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
         assert inv != null;
         this.name = name;

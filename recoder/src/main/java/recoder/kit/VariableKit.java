@@ -83,7 +83,7 @@ public class VariableKit {
      * guess.
      *
      * @param sc the service configuration to be used
-     * @param sde the element that defines the scope
+     * @param context the element that defines the scope
      * @param guess the variable name to be used if possible. If a variable with that name already
      *        exists, the method uses suffix numbers.
      * @param t the type of the variable to be declared.

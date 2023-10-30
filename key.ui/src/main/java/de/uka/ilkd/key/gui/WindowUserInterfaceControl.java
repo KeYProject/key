@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -204,7 +203,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         } else if (info != null && info.getSource() instanceof ProofMacro) {
             ProofMacro macro = (ProofMacro) info.getSource();
             if (!isAtLeastOneMacroRunning()) {
-                resetStatus(this);
+                mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
                 if (proof != null && !proof.closed()
@@ -411,8 +410,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             try {
                 getMediator().stopInterface(true);
                 errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
             } finally {
                 getMediator().startInterface(true);
             }
@@ -442,15 +439,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<File, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            ProofSaver saver = new ProofBundleSaver(proof, file);
+            final File file = fileChooser.getSelectedFile();
+            final ProofSaver saver = new ProofBundleSaver(proof, file);
+            final String errorMsg = saver.save();
 
-            String errorMsg;
-            try {
-                errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
-            }
             if (errorMsg != null) {
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
@@ -590,7 +582,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param includes Optional includes to consider.
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs}
+     *        will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
