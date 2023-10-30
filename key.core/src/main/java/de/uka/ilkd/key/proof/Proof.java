@@ -1444,7 +1444,6 @@ public class Proof implements Named {
      */
     public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
             Runnable callbackBranch) {
-        System.out.println("copycachedgoals");
         // first, ensure that all cached goals are copied over
         List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();
