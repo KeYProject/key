@@ -95,7 +95,8 @@ public class ProofCollections {
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-        // runOnlyOn = group1,group2
+        // runOnlyOn = group1, group2 (the space after each comma is mandatory)
+        // settings.setRunOnlyOn("performance, performancePOConstruction");
 
         settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
 
@@ -1035,7 +1036,9 @@ public class ProofCollections {
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-        // runOnlyOn = group1,group2
+        // runOnlyOn = group1, group2 (the space after each comma is mandatory)
+        // settings.setRunOnlyOn("performance, performancePOConstruction");
+
 
         // // Tests for information flow
 

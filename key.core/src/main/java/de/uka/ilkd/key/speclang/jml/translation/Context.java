@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Common information that is needed almost everywhere during translation. Class is immutable.
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
  * @param classType    The containing class
  * @author Julian Wiesler
  */
-public record Context(@Nonnull SpecMathMode specMathMode, @Nonnull KeYJavaType classType, ProgramVariable selfVar) {
+public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType classType, ProgramVariable selfVar) {
     /**
      * Constructs a self var from the given parameters
      *
@@ -41,7 +41,7 @@ public record Context(@Nonnull SpecMathMode specMathMode, @Nonnull KeYJavaType c
      * @param pm program method
      * @param tb term builder
      */
-    public static Context inMethod(@Nonnull IProgramMethod pm, TermBuilder tb) {
+    public static Context inMethod(@NonNull IProgramMethod pm, TermBuilder tb) {
         var classType = pm.getContainerType();
         var selfVar = createSelfVar(tb, classType, pm.isStatic());
         return Context.inMethodWithSelfVar(pm, selfVar);
@@ -53,7 +53,7 @@ public record Context(@Nonnull SpecMathMode specMathMode, @Nonnull KeYJavaType c
      * @param pm      program method
      * @param selfVar self var
      */
-    public static Context inMethodWithSelfVar(@Nonnull IProgramMethod pm, ProgramVariable selfVar) {
+    public static Context inMethodWithSelfVar(@NonNull IProgramMethod pm, ProgramVariable selfVar) {
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(pm);
         return new Context(mode, pm.getContainerType(), selfVar);
     }
@@ -65,7 +65,7 @@ public record Context(@Nonnull SpecMathMode specMathMode, @Nonnull KeYJavaType c
      * @param isStaticContext whether this is a static context
      * @param tb              term builder
      */
-    public static Context inClass(@Nonnull KeYJavaType classType, boolean isStaticContext,
+    public static Context inClass(@NonNull KeYJavaType classType, boolean isStaticContext,
                                   TermBuilder tb) {
         var selfVar = createSelfVar(tb, classType, isStaticContext);
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(classType);

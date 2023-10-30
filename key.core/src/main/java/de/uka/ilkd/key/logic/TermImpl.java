@@ -5,8 +5,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -20,11 +18,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -80,7 +82,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     private int hashcode2 = -1;
 
     /**
-     * This flag indicates that the {@link Term} itself or one of its children contains a non empty
+     * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
      * {@link JavaBlock}. {@link Term}s which provides a {@link JavaBlock} directly or indirectly
      * can't be cached because it is possible that the contained meta information inside the
      * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
@@ -107,7 +109,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         assert op != null;
         assert subs != null;
         this.op = op;
-        this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
+        this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
         this.origin = origin;
@@ -120,7 +122,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * For which feature is this information needed?
-     * What is the fifference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
+     * What is the difference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
      */
     private final String origin;
 
@@ -158,7 +160,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * Checks whether the Term is valid on the top level. If this is the case this method returns
-     * the Term unmodified. Otherwise a TermCreationException is thrown.
+     * the Term unmodified. Otherwise, a TermCreationException is thrown.
      */
     public Term checked() {
         op.validTopLevelException(this);
@@ -210,7 +212,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
 
     @Override
-    public @Nonnull JavaBlock javaBlock() {
+    public @NonNull JavaBlock javaBlock() {
         return javaBlock;
     }
 
@@ -653,26 +655,12 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         } else {
             sb.append(op().name().toString());
             if (!boundVars.isEmpty()) {
-                sb.append("{");
-                for (int i = 0, n = boundVars.size(); i < n; i++) {
-                    sb.append(boundVars.get(i));
-                    if (i < n - 1) {
-                        sb.append(", ");
-                    }
-                }
-                sb.append("}");
+                sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }
             if (arity() == 0) {
                 return sb.toString();
             }
-            sb.append("(");
-            for (int i = 0, ar = arity(); i < ar; i++) {
-                sb.append(sub(i));
-                if (i < ar - 1) {
-                    sb.append(",");
-                }
-            }
-            sb.append(")");
+            sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
         }
 
         return sb.toString();

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -394,6 +396,7 @@ public final class ProblemInitializer {
         }
 
         // register non-built-in rules
+        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
@@ -453,6 +456,7 @@ public final class ProblemInitializer {
                 cleanupNamespaces(currentBaseConfig);
                 baseConfig = currentBaseConfig;
             }
+
             InitConfig ic = prepare(envInput, currentBaseConfig);
             if (Debug.ENABLE_DEBUG) {
                 print(ic);
@@ -512,11 +516,20 @@ public final class ProblemInitializer {
     // public interface
     // -------------------------------------------------------------------------
 
+    private void configureTermLabelSupport(InitConfig initConfig) {
+        initConfig.getServices().setOriginFactory(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
+    }
+
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
 
+        configureTermLabelSupport(initConfig);
 
         // read Java
         readJava(envInput, initConfig);
@@ -568,6 +581,8 @@ public final class ProblemInitializer {
         try {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
+
+
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");

@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface describes a syntactical check on JML parse trees.
@@ -23,6 +23,6 @@ public interface JmlCheck {
      * @param ctx an arbitrary {@link ParserRuleContext} from the {@link JmlParser}
      * @return a potential empty list of warnings
      */
-    @Nonnull
-    List<PositionedString> check(@Nonnull ParserRuleContext ctx);
+    @NonNull
+    List<PositionedString> check(@NonNull ParserRuleContext ctx);
 }

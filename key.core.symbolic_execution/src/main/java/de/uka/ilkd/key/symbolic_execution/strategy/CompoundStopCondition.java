@@ -10,9 +10,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 
 /**
@@ -29,17 +27,15 @@ public class CompoundStopCondition implements StopCondition {
 
     /**
      * The last {@link StopCondition} treated in
-     * {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)} which
+     * {@link #isGoalAllowed} which
      * will provide the reason via
-     * {@link #getGoalNotAllowedMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)}.
+     * {@link #getGoalNotAllowedMessage}.
      */
     private StopCondition lastGoalAllowedChild;
 
     /**
-     * The last {@link StopCondition} treated in
-     * {@link #shouldStop(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}
-     * which will provide the reason via
-     * {@link #getStopMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}.
+     * The last {@link StopCondition} treated in {@link #shouldStop},
+     * which will provide the reason via {@link #getStopMessage}.
      */
     private StopCondition lastShouldStopChild;
 

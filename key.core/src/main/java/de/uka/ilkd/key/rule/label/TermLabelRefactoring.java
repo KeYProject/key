@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -43,12 +42,15 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
-     * Determines whether any refatorings should be applied on an application of the given
+     * <p>
+     * Determines whether any refactorings should be applied on an application of the given
+     * </p>
      * {@link BuiltInRule}.
-     *
+     * <p>
      * If you perform refactorings despite this method returning false, KeY will throw an exception
      * because the formula that contains the modality in which the contract was applied does not
      * have a FormulaTag.
+     * </p>
      *
      * @param rule the rule being applied.
      * @param goal the goal on which the rule is being applied.
@@ -129,7 +131,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      */
     void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, List<TermLabel> labels);
+            Object hint, Term tacletTerm, Term term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.

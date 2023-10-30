@@ -371,6 +371,10 @@ public class ProofCollectionSettings implements Serializable {
         return set(LOCAL_SETTINGS_KEY, settings);
     }
 
+    public ProofCollectionSettings setRunOnlyOn(String settings) {
+        return set(RUN_ONLY_ON, settings);
+    }
+
     public boolean getVerboseOutput() {
         return "true".equals(get(VERBOSE_OUTPUT_KEY));
     }

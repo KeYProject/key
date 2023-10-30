@@ -472,11 +472,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
             }
             assertTrue(
                 StringUtil.equalIgnoreWhiteSpace(
-                    ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition(),
-                    ((IExecutionMethodReturn) current).getFormatedMethodReturnCondition()),
-                ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition()
+                    ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition(),
+                    ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition()),
+                ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition()
                     + " does not match "
-                    + ((IExecutionMethodReturn) current).getFormatedMethodReturnCondition());
+                    + ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             if (compareReturnValues) {
@@ -494,11 +494,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
                 ((IExecutionExceptionalMethodReturn) expected).getSignature() + " does not match "
                     + ((IExecutionExceptionalMethodReturn) current).getSignature());
             assertTrue(StringUtil.equalIgnoreWhiteSpace(
-                ((IExecutionExceptionalMethodReturn) expected).getFormatedMethodReturnCondition(),
-                ((IExecutionExceptionalMethodReturn) current).getFormatedMethodReturnCondition()),
-                ((IExecutionExceptionalMethodReturn) expected).getFormatedMethodReturnCondition()
+                ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition(),
+                ((IExecutionExceptionalMethodReturn) current).getFormattedMethodReturnCondition()),
+                ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition()
                     + " does not match " + ((IExecutionExceptionalMethodReturn) current)
-                            .getFormatedMethodReturnCondition());
+                            .getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStatement) {

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
@@ -312,8 +312,6 @@ public class NodeInfo {
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
-            // XXX
-
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
             StringBuffer sb = new StringBuffer();
@@ -333,23 +331,21 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
-                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
                             node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
-                        val = TermLabel.removeIrrelevantLabels(
+                        val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
                     } else if (val instanceof LocationVariable locVar) {
                         var originTracker = node.proof().lookup(LocationVariableTracker.class);
                         if (originTracker != null) {
                             var origin = originTracker.getCreatedBy(locVar);
-                            if (origin instanceof PosTacletApp) {
-                                var tacletAppOrigin = (PosTacletApp) origin;
-                                var name = tacletAppOrigin.taclet().displayName();
-                                // TODO: make this mechanism more generic
+                            if (origin instanceof PosTacletApp posTacletApp) {
+                                var name = posTacletApp.taclet().displayName();
                                 if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
-                                    val = tacletAppOrigin.instantiations()
-                                            .lookupValue(new Name("#nse"));
+                                    val =
+                                        posTacletApp.instantiations().lookupValue(new Name("#nse"));
                                 }
                             }
                         }

@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.EventObject;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
@@ -59,6 +57,9 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -530,7 +531,6 @@ public class KeYMediator {
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
     @Nullable
     public Proof getSelectedProof() {
@@ -704,7 +704,7 @@ public class KeYMediator {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
@@ -987,7 +987,7 @@ public class KeYMediator {
      *
      * @see DefaultListModel#addListDataListener
      */
-    public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
     }
 

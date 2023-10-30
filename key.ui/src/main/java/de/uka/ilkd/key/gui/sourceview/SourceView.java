@@ -41,6 +41,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
@@ -200,6 +201,10 @@ public final class SourceView extends JComponent {
             }
         });
 
+        if (mainWindow.getMediator().getSelectedProof() != null) {
+            ensureProofJavaSourceCollectionExists(mainWindow.getMediator().getSelectedProof());
+        }
+
         // add a listener for changes in the proof tree
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -212,12 +217,38 @@ public final class SourceView extends JComponent {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 clear();
+                ensureProofJavaSourceCollectionExists(e.getSource().getSelectedProof());
                 updateGUI();
             }
         });
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(null, this,
             KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+
+    }
+
+    private void ensureProofJavaSourceCollectionExists(Proof proof) {
+        if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
+            final var sources = new ProofJavaSourceCollection();
+            proof.register(sources, ProofJavaSourceCollection.class);
+            proof.root().sequent().forEach(formula -> {
+                OriginTermLabel originLabel =
+                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                if (originLabel != null) {
+                    if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
+                        ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
+                                .getFileName()
+                                .ifPresent(sources::addRelevantFile);
+                    }
+
+                    originLabel.getSubtermOrigins().stream()
+                            .filter(o -> o instanceof OriginTermLabel.FileOrigin)
+                            .map(o -> (OriginTermLabel.FileOrigin) o)
+                            .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
+                }
+            });
+        }
+
 
     }
 

@@ -19,8 +19,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * to most general application methods for a given list of goals and translating the less general
  * versions (firstly for a given node and secondly having neither any goals nor a node). Although
  * all these methods can be redefined by inheritance, this is usually not necessary, unless you know
- * <tt>exactly</tt> what you are doing. The exception is {@link #finishAfterMacro()} for compound
- * macros (see description in {@link ProofMacro#finishAfterMacro()}).
+ * <tt>exactly</tt> what you are doing.
  *
  * @author Michael Kirsten
  */
