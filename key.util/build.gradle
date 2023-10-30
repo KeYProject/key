@@ -1,5 +1,5 @@
 description "Utility library of the key-project"
 
 dependencies {
-    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    implementation("org.jspecify:jspecify:0.3.0")
 }

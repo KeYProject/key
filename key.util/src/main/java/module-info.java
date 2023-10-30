@@ -1,6 +1,6 @@
 module org.key_project.util {
     requires java.desktop;
-    requires jakarta.annotation;
+    requires org.jspecify;
 
     exports org.key_project.util.bean;
     exports org.key_project.util.collection;

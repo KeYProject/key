@@ -33,7 +33,7 @@ public final class NullSort extends Sort {
 
 
     public NullSort(Sort objectSort) {
-        super(NAME, null, false);
+        super(NAME, null, false, "", "");
         assert objectSort != null;
         this.objectSort = objectSort;
     }
