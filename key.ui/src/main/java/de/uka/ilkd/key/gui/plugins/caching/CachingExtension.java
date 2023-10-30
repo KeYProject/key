@@ -54,8 +54,7 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.MainMenu,
-        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
+        KeYGuiExtension.MainMenu, KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
@@ -155,6 +154,9 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
+        } else if (kind.getType() == Proof.class) {
+            Proof proof = (Proof) underlyingObject;
+            return List.of(new AddToDatabaseAction(proof));
         }
         return new ArrayList<>();
     }
