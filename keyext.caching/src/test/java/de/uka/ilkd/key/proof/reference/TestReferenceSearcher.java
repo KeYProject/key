@@ -80,12 +80,12 @@ class TestReferenceSearcher {
         assertTrue(p.closed());
         assertNotEquals(55, foundReference.serialNr());
         // test that copying with slicing information works
-        //var depTracker = new DependencyTracker(p2);
+        new DependencyTracker(p2);
         Node n55 = p.findAny(x -> x.serialNr() == 55);
         assertTrue(ReferenceSearcher.suitableForCloseByReference(n55));
-            ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n55);
-            assertEquals(n55.serialNr(), c.node().serialNr());
-            ClosedBy n55Close = close;
+        ClosedBy n55Close = ReferenceSearcher.findPreviousProof(previousProofs, n55);
+        assertEquals(n55.serialNr(), n55Close.node().serialNr());
+        assertSame(p2, n55Close.proof());
         int previousTotal = p.countNodes();
         n55.register(n55Close, ClosedBy.class);
         p.pruneProof(n55);
@@ -93,7 +93,7 @@ class TestReferenceSearcher {
         assertTrue(p.closed());
         n55.proof().copyCachedGoals(p2, null, null);
         assertTrue(p.closed());
-        assertEquals(previousTotal - 3, p.countNodes());
+        assertEquals(previousTotal - 4, p.countNodes());
 
         GeneralSettings.noPruningClosed = true;
         p.dispose();

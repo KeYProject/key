@@ -45,11 +45,15 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
         newNode.proof().register(this, CopyingProofReplayer.class);
         newNode.proof().setMutedProofCloseEvents(true);
         OneStepSimplifier.refreshOSS(newNode.proof());
+
+        // nodeQueue: nodes in the ORIGINAL proof
         Deque<Node> nodeQueue = new ArrayDeque<>();
+        // queue: nodes in the NEW proof
         Deque<Goal> queue = new ArrayDeque<>();
+
         queue.add(newNode);
         nodeQueue.add(originalNode);
-        while (!nodeQueue.isEmpty()) {
+        while (!nodeQueue.isEmpty() && !queue.isEmpty()) {
             Node nextNode = nodeQueue.pop();
             Goal nextGoal = queue.pop();
             for (int i = nextNode.childrenCount() - 1; i >= 0; i--) {
