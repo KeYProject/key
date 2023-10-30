@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
- * this class wrapps a ImmMap<SchemaVariable,JavaProgramElement> and is used to store instantiations
+ * this class wrapps an {@link ImmutableList} and is used to store instantiations
  * of schemavariables. The class is immutable, this means changing its content will result in
  * creating a new object.
  */
@@ -111,7 +111,7 @@ public class ProgramSVInstantiation {
     /**
      * returns iterator of the listped pair (SchemaVariables, JavaProgramElement)
      *
-     * @return the Iterator<IEntry<SchemaVariable,JavaProgramElement>>
+     * @return the Iterator
      */
     public Iterator<ProgramSVEntry> iterator() {
         return list.iterator();

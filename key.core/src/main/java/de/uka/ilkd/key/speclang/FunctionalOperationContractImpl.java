@@ -93,11 +93,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /**
      * If a method is strictly pure, it has no modifies clause which could be anonymised.
      *
-     * @see #hasModifiesClause()
+     * @see #hasModifiesClause(LocationVariable)
      */
     final Map<LocationVariable, Boolean> hasRealModifiesClause;
     /**
-     * @see #hasFreeModifiesClause()
+     * @see #hasFreeModifiesClause(LocationVariable)
      */
     final Map<LocationVariable, Boolean> hasRealFreeModifiesClause;
 

@@ -23,9 +23,13 @@ public interface DataLocation {
     String getType();
 
     /**
-     * returns a URL-like string representation of the location in the form " <type>:
-     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
+     * returns a URL-like string representation of the location in the form
+     *
+     * <pre>
+     * {@code  <type>: <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
      * zip:recoder.zip:recoder/java/JavaProgramFactory.class
+     * }
+     * </pre>
      */
     String toString();
 

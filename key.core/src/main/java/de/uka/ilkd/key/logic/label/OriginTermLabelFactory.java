@@ -23,6 +23,29 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
  */
 public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel> {
 
+    public OriginTermLabel createOriginTermLabel(Origin origin) {
+        return new OriginTermLabel(origin);
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     *
+     * @param origin the term's origin.
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel createOriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+        return new OriginTermLabel(origin, subtermOrigins);
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     *
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel createOriginTermLabel(Set<Origin> subtermOrigins) {
+        return new OriginTermLabel(subtermOrigins);
+    }
+
     @Override
     public OriginTermLabel parseInstance(List<String> arguments, TermServices services)
             throws TermLabelException {
@@ -102,11 +125,15 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
 
                     String ruleName = tokenizer.nextToken();
 
-                    if (!ruleName.startsWith("(") || !ruleName.endsWith(")")) {
+                    if (ruleName.startsWith("(")) {
+                        ruleName = ruleName.substring(1);
+                        while (!ruleName.endsWith(")")) {
+                            ruleName += tokenizer.nextToken();
+                        }
+                        ruleName = ruleName.substring(0, ruleName.length() - 1);
+                    } else {
                         throw new IllegalArgumentException();
                     }
-
-                    ruleName = ruleName.substring(1, ruleName.length() - 1);
 
                     matchEnd(tokenizer, str);
 

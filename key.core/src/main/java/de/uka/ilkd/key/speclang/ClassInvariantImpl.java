@@ -97,8 +97,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
             boolean free) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
+        assert name != null && !name.isEmpty();
+        assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
         assert inv != null;
         this.name = name;

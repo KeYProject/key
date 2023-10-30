@@ -185,26 +185,27 @@ public class PrettyPrinter implements Visitor {
         if (children != null) {
             l.beginC();
             switch (x.getArity()) {
-            case 2:
+            case 2 -> {
                 children.get(0).visit(this);
                 l.print(" ");
                 l.print(symbol);
                 l.brk();
                 children.get(1).visit(this);
-                break;
-            case 1:
+            }
+            case 1 -> {
                 switch (x.getNotation()) {
-                case Operator.PREFIX:
+                case Operator.PREFIX -> {
                     l.print(symbol);
                     children.get(0).visit(this);
-                    break;
-                case Operator.POSTFIX:
-                    children.get(0).visit(this);
-                    l.print(symbol);
-                    break;
-                default:
-                    break;
                 }
+                case Operator.POSTFIX -> {
+                    children.get(0).visit(this);
+                    l.print(symbol);
+                }
+                default -> {
+                }
+                }
+            }
             }
             l.end();
         }
@@ -654,7 +655,7 @@ public class PrettyPrinter implements Visitor {
         if (hasPackageSpec) {
             performActionOnPackageSpecification(x.getPackageSpecification());
         }
-        boolean hasImports = (x.getImports() != null) && (x.getImports().size() > 0);
+        boolean hasImports = (x.getImports() != null) && (!x.getImports().isEmpty());
         if (hasImports) {
             if (hasPackageSpec) {
                 l.nl();
@@ -1010,10 +1011,6 @@ public class PrettyPrinter implements Visitor {
         IForUpdates upd = x.getIForUpdates();
         if (upd != null) {
             upd.visit(this);
-            if (upd instanceof ProgramSV) {
-
-            } else {
-            }
         }
         endMultilineBracket();
 
@@ -1691,7 +1688,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     private void printCaseBody(ImmutableArray<Statement> body) {
-        if (body != null && body.size() > 0) {
+        if (body != null && !body.isEmpty()) {
             for (int i = 0; i < body.size(); i++) {
                 Statement statement = body.get(i);
                 if (statement instanceof StatementBlock) {

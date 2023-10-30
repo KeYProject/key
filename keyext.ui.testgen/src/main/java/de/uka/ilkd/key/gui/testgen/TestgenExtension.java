@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -18,6 +17,8 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.TestGenMacro;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -38,7 +39,7 @@ public class TestgenExtension
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         init(mainWindow);
         return Arrays.asList(actionCounterExample, actionTestGeneration);
     }
@@ -51,7 +52,7 @@ public class TestgenExtension
     }
 
     @Override
-    public @Nonnull JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("test generation");
         tb.add(actionCounterExample);
         tb.add(actionTestGeneration);

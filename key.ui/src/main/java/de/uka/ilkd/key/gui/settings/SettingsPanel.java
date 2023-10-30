@@ -8,7 +8,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -19,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice
@@ -269,14 +269,18 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
     /**
      * Create a titled JSpinner (with additional information) for entering numbers in [min, max].
-     * The min and max values have to be comparable (to check min <= value <= max) and min must be a
-     * Number to be handled by the JSpinner's SpinnerNumberModel correctly. The Number class of min
-     * also determines how the default NumberFormatter used by the JSpinner formats entered Strings
+     * The min and max values have to be comparable (to check {@code min <= value <= max} and
+     * {@code min} must be a
+     * {@link Number} to be handled by the {@link JSpinner}'s {@link SpinnerNumberModel} correctly.
+     * The Number class of min
+     * also determines how the default {@link javax.swing.text.NumberFormatter} used by the
+     * {@link JSpinner} formats entered Strings
      * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
      *
      * If there are additional restrictions for the entered values, the passed validator can check
-     * those. The entered values have to be of a subclass of Number (as this is a number text
-     * field), otherwise the Number-Validator will fail.
+     * those. The entered values have to be of a subclass of {@link Number} (as this is a number
+     * text
+     * field), otherwise the {@link Validator} will fail.
      *
      * @param title the title of the text field
      * @param min the minimum value that can be entered

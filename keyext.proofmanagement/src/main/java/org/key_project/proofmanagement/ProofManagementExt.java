@@ -5,12 +5,13 @@ package org.key_project.proofmanagement;
 
 import java.awt.event.*;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Wolfram Pfeifer
@@ -25,9 +26,9 @@ public class ProofManagementExt implements
 
     private static final String MENU_PM = "Proof Management";
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
 
         return List.of(new CheckAction());
     }

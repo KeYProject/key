@@ -7,17 +7,17 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class FileRuleSource extends RuleSource {
 
     /**
      * The non-<code>null</code> reference to the file from which rules are read.
      */
-    protected @Nonnull final File ruleFile;
+    protected @NonNull final File ruleFile;
 
     private final long numberOfChars;
 
@@ -32,7 +32,7 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public @Nonnull File file() {
+    public @NonNull File file() {
         return ruleFile;
     }
 

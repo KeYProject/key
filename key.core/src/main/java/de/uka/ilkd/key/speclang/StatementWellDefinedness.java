@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Thus the technical difference to other well-definedness checks is the context update and that it
  * is not a separate contract, but another branch of the specific rule of the overlying proof. The
  * according proof sequent is built in
- * {@link #generateSequent(ProgramVariable, ProgramVariable, ProgramVariable, LocationVariable, ProgramVariable, Term, ImmutableSet, Term, Services)}
+ * {@link #generateSequent}
  * Nevertheless it is imaginable to make them separate contracts.
  *
  * @author Michael Kirsten

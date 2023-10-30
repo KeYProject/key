@@ -79,7 +79,7 @@ public final class ProofUserManager {
      * automatically disposed via {@link Proof#dispose()}.
      *
      * @param proof The {@link Proof}.
-     * @param userThe user.
+     * @param user The user.
      */
     public void removeUserAndDispose(Proof proof, Object user) {
         if (proof == null) {

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,10 +143,10 @@ public class CachingExtension
 
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
             List<Action> actions = new ArrayList<>();

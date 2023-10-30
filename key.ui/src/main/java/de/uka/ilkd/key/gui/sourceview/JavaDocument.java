@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.text.*;
@@ -16,15 +17,16 @@ import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
  * whole String at once is supported, otherwise the syntax highlighting will be faulty.
- *
+ * <p>
  * Note that tab characters have to be replaced by spaces before inserting into the document.
- *
+ * <p>
  * The document currently only works when newlines are represented by "\n"!
  *
  * @author Wolfram Pfeifer
  */
 public class JavaDocument extends DefaultStyledDocument {
 
+    @Serial
     private static final long serialVersionUID = -1856296532743892931L;
 
     // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
@@ -56,7 +58,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * COMMENT (&#47;&#42; ... &#42;&#47;), JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
      */
     private enum Mode {
-        /** parser is currently inside a String */
+        /* parser is currently inside a String */
         // STRING, // currently not in use
         /** parser is currently inside normal java code */
         NORMAL,
@@ -125,7 +127,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Stores the Java keywords which have to be highlighted. The list is taken from
      * <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">
      * https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html </a>.
-     *
+     * <p>
      * To add additional keywords, simply add them to the array. Note that the keywords must not
      * contain any of the characters defined by the DELIM regex.
      */
@@ -140,7 +142,7 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /**
      * Stores the JML keywords which have to be highlighted.
-     *
+     * <p>
      * To add additional keywords, simply add them to the array. Note that the keywords must not
      * contain any of the characters defined by the DELIM regex.
      */
@@ -200,7 +202,7 @@ public class JavaDocument extends DefaultStyledDocument {
     /** the style of annotations */
     private final SimpleAttributeSet annotation = new SimpleAttributeSet();
 
-    /** the style of strings */
+    /* the style of strings */
     // private SimpleAttributeSet string = new SimpleAttributeSet();
 
     /** default style */
@@ -441,61 +443,26 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void processChar(char strChar) throws BadLocationException {
         switch (strChar) {
-        case ('@'):
-            checkAt();
-            break;
-        case '\n':
-            checkLinefeed();
-            break;
-        case '\t': // all tabs should have been replaced earlier!
-        case ' ':
-            checkSpaceTab(strChar);
-            break;
-        case '*':
-            checkStar();
-            break;
-        case '/':
-            checkSlash();
-            break;
-        case '"':
-            checkQuote();
-            break;
+        case ('@') -> checkAt();
+        case '\n' -> checkLinefeed();
+        // all tabs should have been replaced earlier!
+        case '\t', ' ' -> checkSpaceTab(strChar);
+        case '*' -> checkStar();
+        case '/' -> checkSlash();
+        case '"' -> checkQuote();
+
         // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
-        case '+':
-        case '-':
-            checkPlusMinus(strChar);
-            break;
+        case '+', '-' -> checkPlusMinus(strChar);
+
         // case '*':
         // case '/':
-        case '(':
-        case ')':
-        case '[':
-        case ']':
-        case '{':
-        case '}':
-        case '%':
-        case '!':
-        case '^':
-        case '~':
-        case '&':
-        case '|':
-        case '.':
-        case ':':
-        case ';':
-        case '?':
-        case '<':
-        case '>':
-        case '=':
-        case '\'':
+        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<', '>', '=', '\'' ->
             // case ' ':
             // case '"':
             // case '\'':
             // case '\n':
             checkDelimiter(strChar);
-            break;
-        default:
-            checkOther(strChar);
-            break;
+        default -> checkOther(strChar);
         }
     }
 

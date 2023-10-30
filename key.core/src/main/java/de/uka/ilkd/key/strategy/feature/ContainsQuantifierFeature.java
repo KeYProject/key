@@ -11,7 +11,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
  * Binary feature that returns zero iff the focus of a rule contains a quantifier
- *
+ * <p>
  * NB: this can nowadays be done more nicely using term features
  */
 public class ContainsQuantifierFeature extends AbstractBetaFeature {

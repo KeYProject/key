@@ -464,19 +464,12 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
 
-
-    /**
-     * {@inheritDoc}
-     */
     protected void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
         if (ruleCompletionHandler != null) {
             ruleCompletionHandler.completeAndApplyTacletMatch(models, goal);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
             boolean forced) {
         if (ruleCompletionHandler == null) {

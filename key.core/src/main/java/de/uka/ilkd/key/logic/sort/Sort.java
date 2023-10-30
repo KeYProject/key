@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -14,28 +12,30 @@ import de.uka.ilkd.key.rule.HasOrigin;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 
 public interface Sort extends Named, HasOrigin {
 
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    Sort FORMULA = new SortImpl(new Name("Formula"));
+    Sort FORMULA = new SortImpl(new Name("Formula"), null, "", "");
 
     /**
      * Updates are represented as "terms" of this sort.
      */
-    Sort UPDATE = new SortImpl(new Name("Update"));
+    Sort UPDATE = new SortImpl(new Name("Update"), null, "", "");
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    Sort TERMLABEL = new SortImpl(new Name("TermLabel"), null, "", "");
 
     /**
      * Any is a supersort of all sorts.
      */
-    Sort ANY = new SortImpl(new Name("any"));
+    Sort ANY = new SortImpl(new Name("any"), null, "", "");
 
     /**
      * Name of {@link #getCastSymbol(TermServices)}.

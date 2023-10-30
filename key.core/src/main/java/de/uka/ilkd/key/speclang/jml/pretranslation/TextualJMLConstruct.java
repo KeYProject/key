@@ -6,7 +6,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -102,7 +102,7 @@ public abstract class TextualJMLConstruct {
      */
     @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
-            @Nonnull LabeledParserRuleContext ps) {
+            @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());

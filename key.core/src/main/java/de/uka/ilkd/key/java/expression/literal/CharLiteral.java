@@ -36,7 +36,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * the Java 8 Language Specification: chars written directly (like 'a', '0', 'Z'), Java escape
      * chars (like '\n', '\r'), and octal Unicode escapes (like '\040'). Note that unicode escapes
      * in hexadecimal form are processed earlier and don't have to be handled here.
-     *
+     * <p>
      * Note that the char must be enclosed in single-quotes.
      *
      * @param children an ExtList with all children(comments). May contain: Comments
@@ -94,7 +94,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and octal Unicode escapes (like '\040').
      * Note that unicode escapes in hexadecimal form are processed earlier and don't have to be
      * handled by this method.
-     *
+     * <p>
      * This method does not check the length of the literal for validity.
      *
      * @param sourceStr the String containing the literal surrounded by single-quotes
@@ -116,37 +116,20 @@ public class CharLiteral extends AbstractIntegerLiteral {
          * 3. octal Unicode escape like '\040'
          */
         if (valStr.charAt(0) == '\\') {
-            switch (valStr.charAt(1)) {
-            case 'b':
-                return '\b';
-            case 't':
-                return '\t';
-            case 'n':
-                return '\n';
-            case 'f':
-                return '\f';
-            case 'r':
-                return '\r';
-            case '\"':
-                return '\"';
-            case '\'':
-                return '\'';
-            case '\\':
-                return '\\';
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-                return (char) Integer.parseInt(valStr.substring(1), 8);
-            case 'u':
-                return (char) Integer.parseInt(valStr.substring(2), 16);
-            default:
-                throw new NumberFormatException("Invalid char: " + sourceStr);
-            }
+            return switch (valStr.charAt(1)) {
+            case 'b' -> '\b';
+            case 't' -> '\t';
+            case 'n' -> '\n';
+            case 'f' -> '\f';
+            case 'r' -> '\r';
+            case '\"' -> '\"';
+            case '\'' -> '\'';
+            case '\\' -> '\\';
+            case '0', '1', '2', '3', '4', '5', '6', '7' -> (char) Integer
+                    .parseInt(valStr.substring(1), 8);
+            case 'u' -> (char) Integer.parseInt(valStr.substring(2), 16);
+            default -> throw new NumberFormatException("Invalid char: " + sourceStr);
+            };
         } else {
             return valStr.charAt(0);
         }

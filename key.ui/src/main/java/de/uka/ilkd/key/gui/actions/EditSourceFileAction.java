@@ -11,13 +11,11 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
@@ -35,6 +33,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,7 +239,7 @@ public class EditSourceFileAction extends KeyAction {
                     // workaround for #1641: replace "\n" with system dependent line separators when
                     // saving
                     String text = textPane.getText().replace("\n", System.lineSeparator());
-                    Files.write(sourceFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
+                    Files.writeString(sourceFile.toPath(), text);
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);

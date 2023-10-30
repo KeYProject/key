@@ -11,7 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
+
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.NonNull;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -50,7 +53,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
-    public ImmutableArray(@Nonnull Collection<? extends S> list) {
+    public ImmutableArray(@NonNull Collection<? extends S> list) {
         content = (S[]) list.toArray();
     }
 
@@ -145,16 +148,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0, sz = size(); i < sz; i++) {
-            sb.append(content[i]);
-            if (i < sz - 1) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @Override

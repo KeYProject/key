@@ -612,11 +612,10 @@ public final class CommandLine {
 
     /**
      * Sets the line length used for the usage page.
-     *
+     * <p>
      * This is the number of characters printed in one line when printing the usage page. Longer
      * lines are broken at spaces (if possible).
-     *
-     * @return the line length
+     * </p>
      */
     public void setLineLength(int lineLength) {
         this.lineLength = lineLength;

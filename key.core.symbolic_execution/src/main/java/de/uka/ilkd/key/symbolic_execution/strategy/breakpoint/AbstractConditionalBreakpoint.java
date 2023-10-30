@@ -258,7 +258,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * given ruleApp on the given node
      *
      * @param ruleApp the applied rule app
-     * @param nodethe current node
+     * @param node the current node
      */
     protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
@@ -459,7 +459,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the condition for the associated Breakpoint is enabled.
      *
-     * @param conditionEnabled true if the condition for the associated Breakpoint is enabled
+     * @return returns true if the condition for the associated Breakpoint is enabled
      */
     public boolean isConditionEnabled() {
         return conditionEnabled;
