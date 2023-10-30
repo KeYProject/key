@@ -126,10 +126,13 @@ public abstract class ScaleFeature implements Feature {
      * @param cost
      */
     private static long getValue(RuleAppCost cost) {
-        if (!(cost instanceof NumberRuleAppCost)) {
+        if (cost instanceof NumberRuleAppCost costValue) {
+            return costValue.getValue();
+        } else {
             illegalCostError(cost);
+            // should never be reached
+            return 0;
         }
-        return ((NumberRuleAppCost) cost).getValue();
     }
 
     protected static void illegalCostError(final RuleAppCost cost) {

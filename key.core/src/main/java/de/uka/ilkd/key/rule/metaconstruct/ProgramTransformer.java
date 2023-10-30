@@ -227,7 +227,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * get a list of schema variables that are needed by this entity when working given a SV
      * instantiation set.
      *
-     * @param svInst the instantiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {

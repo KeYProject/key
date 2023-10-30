@@ -17,12 +17,13 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private final Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private final Map<String, ProofScriptCommand<?>> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();
     }
 
+    @SuppressWarnings("rawtypes")
     private void initialize() {
         ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
         loader.forEach(psc -> commandMap.put(psc.getName(), psc));
@@ -35,7 +36,7 @@ public class ProofScriptCommandApi {
      *
      * @return a collection of proof script commands
      */
-    public Collection<ProofScriptCommand> getScriptCommands() {
+    public Collection<ProofScriptCommand<?>> getScriptCommands() {
         return commandMap.values();
     }
 

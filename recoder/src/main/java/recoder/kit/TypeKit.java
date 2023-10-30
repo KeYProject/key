@@ -154,7 +154,11 @@ public class TypeKit {
     /**
      * creates an abstract super class (interface) for the given class.
      *
-     * @param concrete public class to abstractify
+     * @param ni the NameInfo to ensure that a class of the sme name as the new superclass does not
+     *        yet exist
+     * @param cdecl public class to abstractify
+     * @param abstractsupername the name of the new abstract superclass
+     *
      */
     public static InterfaceDeclaration createAbstractSuperClass(NameInfo ni, ClassDeclaration cdecl,
             String abstractsupername) throws NameClashException {
@@ -406,8 +410,7 @@ public class TypeKit {
         Debug.assertNonnull(xr, ni, type, newName);
         Debug.assertNonnull(type.getName());
         if (!newName.equals(type.getName())) {
-            List<TypeReference> refs = new ArrayList<>();
-            refs.addAll(xr.getReferences(type));
+            List<TypeReference> refs = new ArrayList<>(xr.getReferences(type));
             List<? extends Constructor> cons = type.getConstructors();
             Type atype = ni.getArrayType(type);
             while (atype != null) {
@@ -516,7 +519,7 @@ public class TypeKit {
      * constructors, fields, methods, and inner types, and for a method, this includes all inner
      * types.
      *
-     * @param ct the class type to collect members from.
+     * @param ctc the class type to collect members from.
      * @return a mutable list of all members of the given class type.
      */
     public static List<Member> getMembers(ClassTypeContainer ctc) {
@@ -594,7 +597,7 @@ public class TypeKit {
      * Checks if for each class type in the first type list there is a super type in the second.
      * This is useful to check if a exception lists is less or equally strict that the other.
      *
-     * @param tsi the type system info to use.
+     * @param pmi the type system info to use.
      * @param x a class list, may not be <CODE>null</CODE>.
      * @param y a class list, may not be <CODE>null</CODE>.
      * @return <CODE>true</CODE> if the first list of class types is covered by the second one,
@@ -661,8 +664,7 @@ public class TypeKit {
      */
     public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi,
             List<? extends ClassType> list) {
-        List<ClassType> copy = new ArrayList<>();
-        copy.addAll(list);
+        List<ClassType> copy = new ArrayList<>(list);
         return removeCoveredSubtypes(pmi, copy);
     }
 

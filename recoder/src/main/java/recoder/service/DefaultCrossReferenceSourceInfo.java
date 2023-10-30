@@ -51,7 +51,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     /**
      * Change notification callback method.
      *
-     * @param config the configuration this services becomes part of.
+     * @param changes the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
 

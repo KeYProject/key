@@ -183,7 +183,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <p>
      * The rules which use this meta construct must ensure that exp is of type Iterable.
      *
-     * @see #makeIterableForLoop(LocalVariableDeclaration, Expression, Statement)
+     * @see #makeIterableForLoop(EnhancedFor, Services)
      *
      * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
      *      SVInstantiations)

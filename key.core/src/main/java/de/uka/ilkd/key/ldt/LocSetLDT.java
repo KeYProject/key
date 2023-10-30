@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -22,6 +20,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class LocSetLDT extends LDT {
@@ -213,17 +213,12 @@ public final class LocSetLDT extends LDT {
     @Nullable
     @Override
     public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
-        case "add":
-            return getUnion();
-        case "sub":
-            return getSetMinus();
-        case "mul":
-            return getIntersect();
-        case "le":
-            return getSubset();
-        default:
-            return null;
-        }
+        return switch (operationName) {
+        case "add" -> getUnion();
+        case "sub" -> getSetMinus();
+        case "mul" -> getIntersect();
+        case "le" -> getSubset();
+        default -> null;
+        };
     }
 }

@@ -3,18 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
-import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
@@ -23,9 +14,7 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.key_project.util.collection.ImmutableArray;
 
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**
@@ -55,18 +44,9 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * The {@link TermLabelManager} is responsible during prove to maintain term labels.
  * This means that labels of new {@link Term}s created during rule application are computed
- * via {@link TermLabelManager#instantiateLabels(
- *         de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
- *         de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule,
- *         de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator,
- *         de.uka.ilkd.key.collection.ImmutableArray,
- *         de.uka.ilkd.key.collection.ImmutableArray,
- *         de.uka.ilkd.key.logic.JavaBlock)}
+ * via {@link TermLabelManager#instantiateLabels}
  * and of existing {@link Term}s are refactored (added or removed) via
- * {@link TermLabelManager#refactorGoal(
- *         de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
- *         de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule,
- *         de.uka.ilkd.key.proof.Goal, Term)}.
+ * {@link TermLabelManager#instantiateLabels}.
  * </p>
  * <p>
  * Antecedent and succedent of a {@link Sequent} are sets. The equality check if a
@@ -146,7 +126,7 @@ import org.key_project.util.collection.ImmutableArray;
  *       Make sure that the {@link Profile} supports the new {@link TermLabel}.
  *       All implementations from the previous have to be bundled in a
  *       {@link TermLabelConfiguration} instance. This instance has to be
- *       created and returned in {@link AbstractProfile#computeTermLabelConfiguration()}.
+ *       created and returned in {@code AbstractProfile.computeTermLabelConfiguration()}.
  *    </li>
  *    <li>
  *       During rule application, especially for {@link BuiltInRule}, the
@@ -154,17 +134,9 @@ import org.key_project.util.collection.ImmutableArray;
  *       is only called for newly created {@link Term}s labeled up to now. If
  *       your {@link TermLabelPolicy}, {@link TermLabelUpdate} or {@link TermLabelRefactoring}
  *       is not called on the right {@link Term}, it is your task to call
- *       {@link TermLabelManager#instantiateLabels(
- *           de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
- *           de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule,
- *           de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator,
- *           de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray,
- *           de.uka.ilkd.key.logic.JavaBlock)}
+ *       {@link TermLabelManager#instantiateLabels}
  *       and
- *       {@link TermLabelManager#refactorLabels(
- *           de.uka.ilkd.key.logic.label.TermLabelState, de.uka.ilkd.key.java.Services,
- *           de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.rule.Rule,
- *           de.uka.ilkd.key.proof.Goal, Term)}
+ *       {@link TermLabelManager#refactorLabelsRecursive}  (
  *       on the right place in the rule implementation.
  *    </li>
  * </ol>
@@ -174,39 +146,6 @@ import org.key_project.util.collection.ImmutableArray;
  */
 // spotless:on
 public interface TermLabel extends Named {
-
-    /**
-     * Remove all irrelevant labels from a term.
-     *
-     * @param term the term to transform.
-     * @param services services.
-     * @return the transformed term.
-     * @see #isProofRelevant()
-     */
-    static Term removeIrrelevantLabels(Term term, Services services) {
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                .getUseOriginLabels()) {
-            return term;
-        } else {
-            return removeIrrelevantLabels(term, services.getTermFactory());
-        }
-    }
-
-    /**
-     * Remove all irrelevant labels from a term.
-     *
-     * @param term the term to transform.
-     * @param tf a term factory.
-     * @return the transformed term.
-     * @see #isProofRelevant()
-     */
-    static Term removeIrrelevantLabels(Term term, TermFactory tf) {
-        return tf.createTerm(term.op(),
-            new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
-                    .collect(Collectors.toList())),
-            term.boundVars(), term.javaBlock(), new ImmutableArray<>(term.getLabels().stream()
-                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
-    }
 
     /**
      * Retrieves the i-th parameter object of this term label.

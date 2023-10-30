@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -22,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(KeYMediator, PosInOccurrence)}.
+ * {@link #createStrategy(Proof, PosInOccurrence)}.
  *
  * This class is aware of Position in occurrences and can also be applied to inner nodes. Both
  * {@link AutomatedRuleApplicationManager} and {@link Strategy} are changed for the course of the
@@ -72,6 +76,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // false
             return null;
         }
+        List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
         final GoalChooser goalChooser =
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
@@ -84,9 +89,9 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
-        if (posInOcc != null && goals != null) {
-            AutomatedRuleApplicationManager realManager = null;
-            FocussedRuleApplicationManager manager = null;
+        if (posInOcc != null) {
+            AutomatedRuleApplicationManager realManager;
+            FocussedRuleApplicationManager manager;
             for (Goal goal : goals) {
                 realManager = goal.getRuleAppManager();
                 realManager.clearCache();
@@ -99,7 +104,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof, false);
+        ProofMacroFinishedInfo info;
         try {
             // find the relevant goals
             // and start
@@ -125,7 +130,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             }
             final ImmutableList<Goal> resultingGoals =
                 setDifference(proof.openGoals(), ignoredOpenGoals);
-            info = new ProofMacroFinishedInfo(this, resultingGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals,
+                nodes);
             proof.setActiveStrategy(oldStrategy);
             doPostProcessing(proof);
             applyStrategy.removeProverTaskObserver(pml);

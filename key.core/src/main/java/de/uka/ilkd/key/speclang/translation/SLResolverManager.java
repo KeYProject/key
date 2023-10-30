@@ -35,11 +35,10 @@ public abstract class SLResolverManager {
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;
 
-    private ImmutableList<Namespace<?>> /* ParsableVariable */
-    localVariablesNamespaces = ImmutableSLList.nil();
+    private ImmutableList<Namespace<ParsableVariable>> localVariablesNamespaces =
+        ImmutableSLList.nil();
 
-    private final Map<ParsableVariable, KeYJavaType> kjts =
-        new LinkedHashMap<>();
+    private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -122,8 +121,7 @@ public abstract class SLResolverManager {
         // (e.g. for static attributes or static methods)
         if (specInClass != null) {
             SLExpression receiver = new SLExpression(specInClass);
-            SLExpression result = resolveExplicit(receiver, name, parameters);
-            return result;
+            return resolveExplicit(receiver, name, parameters);
         }
 
         return null;
@@ -152,7 +150,7 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveIt(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
-        SLExpression result = null;
+        SLExpression result;
 
         if (receiver != null) {
             result = resolveExplicit(receiver, name, parameters);
@@ -181,7 +179,6 @@ public abstract class SLResolverManager {
      * @param name name of the property
      * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
-     * @throws SLTranslationException
      */
     public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
@@ -203,8 +200,7 @@ public abstract class SLResolverManager {
      * Pushes a new, empty namespace onto the stack.
      */
     public void pushLocalVariablesNamespace() {
-        // FIXME: This breaks the generics of namespaces.
-        Namespace ns = new Namespace();
+        var ns = new Namespace<ParsableVariable>();
         localVariablesNamespaces = localVariablesNamespaces.prepend(ns);
     }
 
@@ -213,8 +209,7 @@ public abstract class SLResolverManager {
      * Puts a local variable into the topmost namespace on the stack
      */
     public void putIntoTopLocalVariablesNamespace(ParsableVariable pv, KeYJavaType kjt) {
-        // FIXME: This breaks the generics of Namespaces.
-        ((Namespace) localVariablesNamespaces.head()).addSafely(pv);
+        localVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
 

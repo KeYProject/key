@@ -4,25 +4,21 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
  * A {@link TermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels( TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels}
  * to decide for each {@link TermLabel} of an old {@link Term} if it should be re-added to the new
  * {@link Term} or not.
  * </p>
@@ -53,19 +49,13 @@ public interface TermLabelPolicy {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-     * @param newTermSubs The optional children of the {@link Term} to create.
-     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to
-     *        create.
-     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-     * @param newTermOriginalLabels The original {@link TermLabel}s.
+     * @param newTerm the template for the new {@link Term} to create
      * @param label The {@link TermLabel} to decide if it should be kept or dropped.
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
     TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
-            ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label);
+            Object hint, Term tacletTerm,
+            Term newTerm, TermLabel label);
 }

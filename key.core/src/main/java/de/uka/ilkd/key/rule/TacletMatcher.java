@@ -116,7 +116,7 @@ public interface TacletMatcher {
      * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the
      *         instantiation {@code sv <- term} added
      */
-    MatchConditions matchSV(SchemaVariable sv, ProgramElement term,
+    MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
             MatchConditions matchCond, Services services);
 
 

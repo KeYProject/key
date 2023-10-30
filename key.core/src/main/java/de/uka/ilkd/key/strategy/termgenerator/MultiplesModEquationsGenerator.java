@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * consisting of reduction steps with polynomials that have a single monomial. This is already
  * enough to handle many practical cases and to significantly improve polynomial division modulo
  * equations.
- *
+ * <p>
  * In the future, this class should also be used for instantiating explicit quantifiers over the
  * integers.
  */
@@ -78,7 +78,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * Compute multiples of <code>targetM</code> that are congruent to <code>sourceM</code> modulo
      * the polynomials in <code>cofactorPolys</code>. The result is a list of terms x with the
      * property <code>x * targetM = sourceM (modulo ...)</code>.
-     *
+     * <p>
      * This method will change the object <code>cofactorPolys</code>.
      */
     private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,

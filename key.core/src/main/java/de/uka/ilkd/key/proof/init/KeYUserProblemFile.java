@@ -6,10 +6,9 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProblemInformation;
@@ -30,6 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Term problemTerm = null;
+    private Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -133,8 +133,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         readRules();
 
         try {
-            problemTerm = getProblemFinder().getProblemTerm();
-            if (problemTerm == null) {
+            problem = getProblemFinder().getProblem();
+            if (problem == null) {
                 boolean chooseDLContract = chooseContract() != null;
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
@@ -159,13 +159,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
+    public ProofAggregate getPO() {
+        assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig,
+            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
                 file.file()),
             name);
     }
@@ -181,7 +181,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+    public Triple<String, Integer, Integer> readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -240,10 +240,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
-     * @throws Exception Occurred Exception.
      */
-    private Profile readProfileFromFile() throws Exception {
-        @Nonnull
+    private Profile readProfileFromFile() {
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

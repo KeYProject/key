@@ -9,13 +9,13 @@ import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -93,7 +93,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     }
 
     @Override
-    public int compareTo(@Nonnull Location o) {
+    public int compareTo(@NonNull Location o) {
         return Comparator
                 .<Location, URI>comparing(l -> l.fileUri)
                 .thenComparing(Location::getPosition).compare(this, o);

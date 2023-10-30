@@ -74,7 +74,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * If this is {@code true} an uninterpreted predicate is added to the postconditions which
      * contains the heap and all parameters as arguments.
      *
-     * @see #buildUninterpretedPredicate(ImmutableList, String)
+     * @see #createUninterpretedPredicate(ImmutableList, Term, String, Services)
      * @see #getUninterpretedPredicateName()
      */
     private final boolean addUninterpretedPredicate;
@@ -87,7 +87,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * The used uninterpreted predicate created via
-     * {@link #buildUninterpretedPredicate(ImmutableList, ProgramVariable, String)} and available
+     * {@link #createUninterpretedPredicate(ImmutableList, Term, String, Services)} and available
      * via {@link #getUninterpretedPredicate()}.
      */
     private Term uninterpretedPredicate;
@@ -618,7 +618,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
             selfExactType, paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
+        return tb.addLabelToAllSubs(result, new Origin(SpecType.REQUIRES));
     }
 
     /**

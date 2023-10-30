@@ -280,7 +280,7 @@ public class OutputStreamProofSaver {
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
+                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
                     relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
                             .append("\"");
                     i = j + 1;
@@ -716,7 +716,7 @@ public class OutputStreamProofSaver {
     /**
      * Get the "interesting" instantiations of the provided object.
      *
-     * @see SVInstantiations#interesting
+     * @see SVInstantiations#interesting()
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */

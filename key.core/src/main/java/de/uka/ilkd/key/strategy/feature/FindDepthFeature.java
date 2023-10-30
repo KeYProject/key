@@ -13,7 +13,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 /**
  * A feature that computes the depth of the find-position of a taclet (top-level positions have
  * depth zero or if not a find taclet)
- *
+ * <p>
  * TODO: eliminate this class and use term features instead
  */
 public class FindDepthFeature implements Feature {

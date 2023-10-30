@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -51,6 +51,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Signal;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
@@ -74,6 +75,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new BlockContractInternalCompletion(mainWindow));
         completions.add(new BlockContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
+        try {
+            Signal.handle(new Signal("INT"), sig -> {
+                if (getMediator().isInAutoMode()) {
+                    LOGGER.warn("Caught SIGINT, stopping automode...");
+                    getMediator().getUI().getProofControl().stopAutoMode();
+                } else {
+                    LOGGER.warn("Caught SIGINT, exiting...");
+                    new ExitMainAction(mainWindow).exitMainWithoutInteraction();
+                }
+            });
+        } catch (Exception e) {
+            // the above is optional functionality and may not work on every OS
+        }
     }
 
     @Override
@@ -182,7 +196,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             mainWindow.displayResults(info.toString());
         } else if (info != null && info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                resetStatus(this);
+                mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
                 if (proof != null && !proof.closed()
@@ -368,8 +382,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             try {
                 getMediator().stopInterface(true);
                 errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
             } finally {
                 getMediator().startInterface(true);
             }
@@ -399,15 +411,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<File, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            ProofSaver saver = new ProofBundleSaver(proof, file);
+            final File file = fileChooser.getSelectedFile();
+            final ProofSaver saver = new ProofBundleSaver(proof, file);
+            final String errorMsg = saver.save();
 
-            String errorMsg;
-            try {
-                errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
-            }
             if (errorMsg != null) {
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
@@ -547,7 +554,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param includes Optional includes to consider.
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs}
+     *        will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.

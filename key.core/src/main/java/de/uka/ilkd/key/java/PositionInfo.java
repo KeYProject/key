@@ -8,8 +8,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
+import org.jspecify.annotations.Nullable;
 import recoder.java.SourceElement;
 
 /**
