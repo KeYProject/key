@@ -46,7 +46,7 @@ public abstract class SubstOp extends AbstractOperator {
      * @throws TermCreationException if the check fails
      */
     @Override
-    protected void additionalValidTopLevel(Term term) {
+    protected void additionalValidTopLevel(Term term) throws TermCreationException {
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);
         }

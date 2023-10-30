@@ -157,11 +157,11 @@ public final class XMLUtil {
      *
      * <pre>
      * {@code
-     * " => &quot;&quot;
-     * & => &quot;&amp;
-     * ' => &quot;&apos;
-     * < => &quot;&lt;
-     * > => &quot;&gt;
+     * " => &quot;
+     * & => &amp;
+     * ' => &apos;
+     * < => &lt;
+     * > => &gt;
      * }
      * </pre>
      * </p>
