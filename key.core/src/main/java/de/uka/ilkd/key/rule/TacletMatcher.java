@@ -72,13 +72,13 @@ public interface TacletMatcher {
      * matches the given term against the taclet's find term if the taclet has no find term or the
      * match is unsuccessful <code>null</null>
      * is returned
-     * &#64;param term the Term to be matched against the find expression
+     * @param term the Term to be matched against the find expression
      * of the taclet
-     * &#64;param matchCond the MatchConditions with side conditions to be
-     * satisfied, eg. partial instantiations of schema variables; before
+     * @param matchCond the MatchConditions with side conditions to be
+     * satisfied, e.g. partial instantiations of schema variables; before
      * calling this method the constraint contained in the match conditions
      * must be ensured to be satisfiable, i.e.
-     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt> must return true
+     *       {@code matchCond.getConstraint().isSatisfiable()} must return true
      *
      * @param services the Services
      * @return the found schema variable mapping or <tt>null</tt> if the matching failed

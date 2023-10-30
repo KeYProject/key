@@ -9,10 +9,10 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * Used to mark flag for proof script commands. For example "instantitate formula='...' ... hide" is
  * denoted as
  * <p>
- * <code><pre>
- * &#64;Flag(name="hide"}
+ * <pre>{@code
+ * @Flag(name="hide"}
  * boolean hideFormula.
- * </pre></code>
+ * }</pre>
  * <p>
  * Only applicable to boolean fields!
  *
