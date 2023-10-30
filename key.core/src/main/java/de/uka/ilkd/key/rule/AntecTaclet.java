@@ -29,11 +29,11 @@ public class AntecTaclet extends FindTaclet {
      * @param applPart contains the application part of an Taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
-     * @param heuristics a list of heurisics for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param heuristics a list of heuristics for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find term of the Taclet
-     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the prefix for each
+     * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
