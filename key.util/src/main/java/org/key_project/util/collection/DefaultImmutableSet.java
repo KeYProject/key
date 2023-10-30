@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.Nullable;

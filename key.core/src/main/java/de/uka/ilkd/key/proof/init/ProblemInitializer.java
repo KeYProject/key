@@ -75,7 +75,6 @@ public final class ProblemInitializer {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
-        Modality.clearCache();
     }
 
     public ProblemInitializer(Profile profile) {
@@ -86,7 +85,6 @@ public final class ProblemInitializer {
         this.progMon = null;
         this.listener = null;
         this.services = new Services(Objects.requireNonNull(profile));
-        Modality.clearCache();
     }
 
     private void progressStarted(Object sender) {

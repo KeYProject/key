@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -16,45 +15,18 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Program;
-import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
 public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
-    /*
-     * keeps track of created modalities
-     */
-    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
-        new HashMap<>();
-
-
     /**
-     * Returns the known modalities
+     * Creates a modal operator with the given name
+     * <strong>Creation must only be done by {@link de.uka.ilkd.key.logic.TermServices}!</strong>
+     *
      */
-    public static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators() {
-        return operators;
-    }
-
-    public static Modality modality(Modality.JavaModalityKind kind, JavaBlock jb) {
-        var pair = new Pair<>(kind, jb.program());
-        Modality mod = Modality.operators().get(pair);
-        if (mod == null) {
-            mod = new Modality(jb, kind);
-            Modality.operators().put(pair, mod);
-        }
-        return mod;
-    }
-
-    public static void clearCache() {
-        operators.clear();
-    }
-
-    /**
-     * creates a modal operator with the given name
-     */
-    private Modality(Program prg, JavaModalityKind kind) {
+    public Modality(Program prg, JavaModalityKind kind) {
         super(kind.name(), JavaDLTheory.FORMULA, prg, kind);
     }
 

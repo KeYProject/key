@@ -424,12 +424,12 @@ public class TermBuilder {
     // }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
-        return tf.createTerm(Modality.modality(modKind, jb), new Term[] { t }, null, jb);
+        return tf.createTerm(services.getModality(modKind, jb), new Term[] { t }, null, jb);
     }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t,
             ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(Modality.modality(modKind, jb), new Term[] { t }, null, jb, labels);
+        return tf.createTerm(services.getModality(modKind, jb), new Term[] { t }, null, jb, labels);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -1708,7 +1708,6 @@ public class TermBuilder {
                             break;
                         }
                     }
-                    newLabelList.add(newLabel);
                 }
             }
 

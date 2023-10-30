@@ -468,7 +468,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
         final Instantiation inst =
             new Instantiation(tb.skip(), tb.tt(),
-                Modality.modality(contract.getModalityKind(),
+                services.getModality(contract.getModalityKind(),
                     JavaBlock.createJavaBlock(new StatementBlock())),
                 selfTerm, block, ec);
         return new GoalsConfigurator(null, new TermLabelState(), inst,

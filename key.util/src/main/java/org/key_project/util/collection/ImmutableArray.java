@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;

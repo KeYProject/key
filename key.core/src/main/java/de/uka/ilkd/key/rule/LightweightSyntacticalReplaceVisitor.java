@@ -162,7 +162,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
         if (jb != op.program() || kind != op.kind()) {
-            return Modality.modality(kind, jb);
+            return services.getModality(kind, jb);
         }
         return op;
     }

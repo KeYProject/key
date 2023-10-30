@@ -30,7 +30,7 @@ public abstract class Sort extends org.key_project.logic.sort.AbstractSort<Sort>
     private ImmutableSet<Sort> ext;
 
     public Sort(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
-                        String origin) {
+            String origin) {
         super(name, isAbstract);
         this.ext = ext;
         this.documentation = documentation;

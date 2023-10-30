@@ -76,7 +76,8 @@ public interface Term<S extends Sort<S>> extends LogicElement, Sorted<S> {
     int serialNumber();
 
     /**
-     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while at
+     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while
+     * at
      * each upstep the method visit of the visitor is called.
      *
      * @param visitor the Visitor

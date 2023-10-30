@@ -57,17 +57,20 @@ public interface Term
     /**
      * {@inheritDoc}
      */
-    @Override Term sub(int n);
+    @Override
+    Term sub(int n);
 
     /**
      * {@inheritDoc}
      */
-    @Override ImmutableArray<QuantifiableVariable> boundVars();
+    @Override
+    ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
      * {@inheritDoc}
      */
-    @Override ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
+    @Override
+    ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
 
     /**
      * {@inheritDoc}
@@ -80,7 +83,7 @@ public interface Term
      */
     @NonNull
     JavaBlock javaBlock();
-    
+
     /**
      * Compares if two terms are equal modulo bound renaming
      *
