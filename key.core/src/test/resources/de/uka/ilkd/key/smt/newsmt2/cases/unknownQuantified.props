@@ -12,6 +12,10 @@
   s1.length = maxx - 1
 }
 
+### contains.1
+
+(declare-fun unknown_0 (U) U)
+
 ### expected
 
 fail
