@@ -330,7 +330,7 @@ public class Format {
 
     /**
      * Formats a source element using a default format.
-     * The default format string is {@code "\"%s\"&#64;%p [%f]"}
+     * The default format string is {@code "\"%s\"@%p [%f]"}
      *
      * @param se the source element to be formatted.
      * @return a textual representation of the source element.
