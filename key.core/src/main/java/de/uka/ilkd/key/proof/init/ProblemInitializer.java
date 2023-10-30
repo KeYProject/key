@@ -300,7 +300,7 @@ public final class ProblemInitializer {
     }
 
     /**
-     * Removes all schema variables, all generic sorts and all sort depending symbols for a generic
+     * Removes all schema variables, all generic sorts and all sort-depending symbols for a generic
      * sort out of the namespaces. Helper for readEnvInput().
      * <p>
      * See bug report #1185, #1189 (in Mantis)
@@ -433,7 +433,7 @@ public final class ProblemInitializer {
         // The synchronized statement is required for thread save parsing since all JavaCC parser
         // are generated static.
         // For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to
-        // generate them non static
+        // generate them non-static
         // which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static
         // methods and
         // the synchronized statement can not be avoided for this reason.
