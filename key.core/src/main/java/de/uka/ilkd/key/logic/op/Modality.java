@@ -26,12 +26,12 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
     /*
      * keeps track of created modalities
      */
-    private static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
+    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
         new HashMap<>();
 
 
     /**
-     * Returns the knownm modalities
+     * Returns the known modalities
      */
     public static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators() {
         return operators;
@@ -74,8 +74,8 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at theposition of the term where this method should check the validity.
-     * @param possibleSub the subterm to be ckecked.
+     * @param at the position of the term where this method should check the validity.
+     * @param possibleSub the subterm to be checked.
      * @return true iff the given term can be subterm at the indicated position
      */
     private boolean possibleSub(int at, Term possibleSub) {
