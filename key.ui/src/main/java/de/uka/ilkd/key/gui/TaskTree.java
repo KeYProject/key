@@ -84,7 +84,7 @@ public class TaskTree extends JPanel {
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
-            mediator.getCurrentlyOpenedProofs().addElement(proof);
+            mediator.getCurrentlyOpenedProofs().add(proof);
         }
         delegateView.validate();
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));

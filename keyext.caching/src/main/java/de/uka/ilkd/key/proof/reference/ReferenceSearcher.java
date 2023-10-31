@@ -3,13 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.*;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -40,7 +35,7 @@ public final class ReferenceSearcher {
      * @param newNode new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
-    public static ClosedBy findPreviousProof(DefaultListModel<Proof> previousProofs, Node newNode) {
+    public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
         if (!suitableForCloseByReference(newNode)) {

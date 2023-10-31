@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EventObject;
+import java.util.*;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -102,7 +100,7 @@ public class KeYMediator {
     /**
      * Currently opened proofs.
      */
-    private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
+    private final Vector<Proof> currentlyOpenedProofs = new Vector<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
@@ -975,7 +973,7 @@ public class KeYMediator {
      *
      * @see DefaultListModel#addListDataListener
      */
-    public @NonNull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull List<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
     }
 
