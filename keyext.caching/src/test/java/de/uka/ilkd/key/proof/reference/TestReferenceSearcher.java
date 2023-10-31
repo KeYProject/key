@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof.reference;
 
 import java.io.File;
-import javax.swing.*;
+import java.util.Vector;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -33,17 +33,17 @@ class TestReferenceSearcher {
         // This only verifies that an exactly equivalent branch is found.
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory,
-                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+            KeYEnvironment.load(new File(FindResources.getExampleDirectory(),
+                "heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-            KeYEnvironment.load(new File(testCaseDirectory,
-                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+            KeYEnvironment.load(new File(FindResources.getExampleDirectory(),
+                "heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
-        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
+        Vector<Proof> previousProofs = new Vector<>();
         previousProofs.addElement(p2);
-        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        Vector<Proof> newProof = new Vector<>();
         newProof.addElement(p);
 
         Node foundReference = null;
@@ -68,7 +68,7 @@ class TestReferenceSearcher {
             // verify that the reference searcher ignores the current proof
             assertNull(ReferenceSearcher.findPreviousProof(newProof, n));
             // verify that no match can be found
-            assertNull(ReferenceSearcher.findPreviousProof(new DefaultListModel<>(), n));
+            assertNull(ReferenceSearcher.findPreviousProof(new Vector<>(), n));
         }
 
         // test that copying works
@@ -121,9 +121,9 @@ class TestReferenceSearcher {
                 "proofCaching/proofWithRule.proof"));
         Proof p3 = env3.getLoadedProof();
 
-        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
+        Vector<Proof> previousProofs = new Vector<>();
         previousProofs.addElement(p);
-        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        Vector<Proof> newProof = new Vector<>();
         newProof.addElement(p2);
 
         p2.pruneProof(p2.root());
