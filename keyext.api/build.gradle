@@ -27,5 +27,6 @@ dependencies {
 
 compileJava {
     // for GraalVM options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+    options.compilerArgs += ["-parameters"] // for having parameter name in reflection
 }
 

@@ -1,8 +1,8 @@
-from keyapi.rpc import *
+import abc
+from abc import abstractmethod, ABCMeta
 
-class KeyStub(JsonRPCHandler):
-    def __init__(self, input, output):
-        super().__init__(input, output)
+from keyapi.keydata import *
+from keyapi.rpc import LspEndpoint
 
-    def list_examples(self):
-        return self._send("examples/list", [])
+
+
