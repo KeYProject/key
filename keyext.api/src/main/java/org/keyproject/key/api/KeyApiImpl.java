@@ -81,7 +81,7 @@ public final class KeyApiImpl implements KeyApi {
     public CompletableFuture<List<ExampleDesc>> examples() {
         return CompletableFutures
                 .computeAsync((c) -> ExampleChooser.listExamples(ExampleChooser.lookForExamples())
-                        .stream().map(it -> ExampleDesc.from(it)).toList());
+                        .stream().map(ExampleDesc::from).toList());
     }
 
     @Override

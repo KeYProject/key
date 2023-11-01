@@ -80,13 +80,6 @@ type MessageActionItem {
 }
 ```
 
-### Type: MessageActionItem[]
-```
-type MessageActionItem[] {
- 
-}
-```
-
 ### Type: MessageType
 ```
 enum MessageType { Unused, Error, Warning, Info, Log, Debug }
@@ -206,7 +199,7 @@ type ShowMessageParams {
 ### Type: ShowMessageRequestParams
 ```
 type ShowMessageRequestParams {
- 	actions : MessageActionItem[]
+ 	actions : List
 	message : STRING
 	type : MessageType
 }
@@ -285,63 +278,63 @@ type TreeNodeId {
 ### client/logTrace (`server ~~> client`) 
 
 ```
-Client.client/logTrace( arg0 : LogTraceParams ) **async**
+Client.client/logTrace( params : LogTraceParams ) **async**
 ```
 
 
 ### client/sayHello (`server ~~> client`) 
 
 ```
-Client.client/sayHello( arg0 : STRING ) **async**
+Client.client/sayHello( e : STRING ) **async**
 ```
 
 
 ### client/showDocument (`server -> client`) 
 
 ```
-Client.client/showDocument( arg0 : ShowDocumentParams ) -> ShowDocumentResult
+Client.client/showDocument( params : ShowDocumentParams ) -> ShowDocumentResult
 ```
 
 
 ### client/sm (`server ~~> client`) 
 
 ```
-Client.client/sm( arg0 : ShowMessageParams ) **async**
+Client.client/sm( params : ShowMessageParams ) **async**
 ```
 
 
 ### client/userResponse (`server -> client`) 
 
 ```
-Client.client/userResponse( arg0 : ShowMessageRequestParams ) -> MessageActionItem
+Client.client/userResponse( params : ShowMessageRequestParams ) -> MessageActionItem
 ```
 
 
 ### env/contracts (`client -> server`) 
 
 ```
-Server.env/contracts( arg0 : EnvironmentId ) -> ContractDesc[]
+Server.env/contracts( env : EnvironmentId ) -> ContractDesc[]
 ```
 
 
 ### env/functions (`client -> server`) 
 
 ```
-Server.env/functions( arg0 : EnvironmentId ) -> FunctionDesc[]
+Server.env/functions( env : EnvironmentId ) -> FunctionDesc[]
 ```
 
 
 ### env/openContract (`client -> server`) 
 
 ```
-Server.env/openContract( arg0 : ContractId ) -> ProofId
+Server.env/openContract( contractId : ContractId ) -> ProofId
 ```
 
 
 ### env/sorts (`client -> server`) 
 
 ```
-Server.env/sorts( arg0 : EnvironmentId ) -> SortDesc[]
+Server.env/sorts( env : EnvironmentId ) -> SortDesc[]
 ```
 
 
@@ -355,63 +348,63 @@ Server.examples/list(  ) -> ExampleDesc[]
 ### goal/actions (`client -> server`) 
 
 ```
-Server.goal/actions( arg0 : NodeTextId, arg1 : INT ) -> TermActionDesc[]
+Server.goal/actions( id : NodeTextId, pos : INT ) -> TermActionDesc[]
 ```
 
 
 ### goal/apply_action (`client -> server`) 
 
 ```
-Server.goal/apply_action( arg0 : TermActionId ) -> TermActionDesc[]
+Server.goal/apply_action( id : TermActionId ) -> TermActionDesc[]
 ```
 
 
 ### goal/free (`client ~~> server`) 
 
 ```
-Server.goal/free( arg0 : NodeTextId ) **async**
+Server.goal/free( id : NodeTextId ) **async**
 ```
 
 
 ### goal/print (`client -> server`) 
 
 ```
-Server.goal/print( arg0 : NodeId, arg1 : PrintOptions ) -> NodeTextDesc
+Server.goal/print( id : NodeId, options : PrintOptions ) -> NodeTextDesc
 ```
 
 
 ### loading/load (`client -> server`) 
 
 ```
-Server.loading/load( arg0 : LoadParams ) -> either<a,b>
+Server.loading/load( params : LoadParams ) -> either<a,b>
 ```
 
 
 ### loading/loadExample (`client -> server`) 
 
 ```
-Server.loading/loadExample( arg0 : STRING ) -> ProofId
+Server.loading/loadExample( id : STRING ) -> ProofId
 ```
 
 
 ### loading/loadKey (`client -> server`) 
 
 ```
-Server.loading/loadKey( arg0 : STRING ) -> ProofId
+Server.loading/loadKey( content : STRING ) -> ProofId
 ```
 
 
 ### loading/loadProblem (`client -> server`) 
 
 ```
-Server.loading/loadProblem( arg0 : ProblemDefinition ) -> ProofId
+Server.loading/loadProblem( problem : ProblemDefinition ) -> ProofId
 ```
 
 
 ### loading/loadTerm (`client -> server`) 
 
 ```
-Server.loading/loadTerm( arg0 : STRING ) -> ProofId
+Server.loading/loadTerm( term : STRING ) -> ProofId
 ```
 
 
@@ -439,21 +432,21 @@ Server.meta/version(  ) -> STRING
 ### proofTree/children (`client -> server`) 
 
 ```
-Server.proofTree/children( arg0 : ProofId, arg1 : TreeNodeId ) -> TreeNodeDesc[]
+Server.proofTree/children( proof : ProofId, nodeId : TreeNodeId ) -> TreeNodeDesc[]
 ```
 
 
 ### proofTree/root (`client -> server`) 
 
 ```
-Server.proofTree/root( arg0 : ProofId ) -> TreeNodeDesc
+Server.proofTree/root( id : ProofId ) -> TreeNodeDesc
 ```
 
 
 ### proofTree/subtree (`client -> server`) 
 
 ```
-Server.proofTree/subtree( arg0 : ProofId, arg1 : TreeNodeId ) -> TreeNodeDesc[]
+Server.proofTree/subtree( proof : ProofId, nodeId : TreeNodeId ) -> TreeNodeDesc[]
 ```
 
 
@@ -467,7 +460,7 @@ Server.server/exit(  ) **async**
 ### server/setTrace (`client ~~> server`) 
 
 ```
-Server.server/setTrace( arg0 : SetTraceParams ) **async**
+Server.server/setTrace( params : SetTraceParams ) **async**
 ```
 
 
