@@ -47,10 +47,13 @@ public class Metamodel {
             implements Endpoint {
     }
 
-    record Field(String name, /* Type */ String type) {
+    record Field(String name, /* Type */ String type, String documentation) {
+        Field(String name, String type) {
+            this(name, type, "");
+        }
     }
 
-    sealed interface Type {
+    public sealed interface Type {
         default String kind() {
             return getClass().getSimpleName();
         }
