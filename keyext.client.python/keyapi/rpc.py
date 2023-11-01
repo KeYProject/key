@@ -1,9 +1,10 @@
 import enum
 import json
-import sys
 import threading
-from io import TextIOWrapper
+import typing
 from typing import Dict
+
+from keyapi import KEY_DATA_CLASSES
 
 JSON_RPC_REQ_FORMAT = "Content-Length: {json_string_len}\r\n\r\n{json_string}"
 LEN_HEADER = "Content-Length: "
@@ -16,16 +17,20 @@ class MyEncoder(json.JSONEncoder):
     """
 
     def default(self, o):  # pylint: disable=E0202
-        return o.__dict__
+        d = dict(o.__dict__)
+        d['$type'] = type(o).__name__
+        return d
 
 
 class ResponseError(Exception):
-    def __init__(self, error_code, message):
+    def __init__(self, error_code, message, data=None):
         super().__init__(message)
         self.error_code = error_code
+        self.data = data
 
 
 class ErrorCodes(enum.Enum):
+    MethodNotFound = None
     ParseError = 1
 
 
@@ -57,27 +62,27 @@ class JsonRpcEndpoint(object):
 
         :param dict message: The message to send.
         '''
-        json_string = json.dumps(message, cls=MyEncoder)
+        json_string = json.dumps(message , cls=MyEncoder)
         jsonrpc_req = self.__add_header(json_string)
         with self.write_lock:
-            self.stdin.write(jsonrpc_req.encode())
-            self.stdin.flush()
+            self.stdout.write(jsonrpc_req)
+            self.stdout.flush()
 
-    def recv_response(self):
+    def recv_response(self) -> object:
         '''
         Recives a message.
 
         :return: a message
         '''
-        with self.read_lock:
+        with (self.read_lock):
             message_size = None
             while True:
                 # read header
-                line = self.stdout.readline()
+                line = self.stdin.readline()
                 if not line:
                     # server quit
                     return None
-                line = line.decode("utf-8")
+                # line = line.decode("utf-8")
                 if not line.endswith("\r\n"):
                     raise ResponseError(ErrorCodes.ParseError, "Bad header: missing newline")
                 # remove the "\r\n"
@@ -99,12 +104,18 @@ class JsonRpcEndpoint(object):
             if not message_size:
                 raise ResponseError(ErrorCodes.ParseError, "Bad header: missing size")
 
-            jsonrpc_res = self.stdout.read(message_size).decode("utf-8")
-            return json.loads(jsonrpc_res)
+            jsonrpc_res = self.stdin.read(message_size)  # .decode("utf-8")
+            return json.loads(jsonrpc_res, object_hook=object_decoder)
+
+
+def object_decoder(obj):
+    if '$type' in obj:
+        return KEY_DATA_CLASSES[obj["$type"]](**obj)
+    return obj
 
 
 class LspEndpoint(threading.Thread):
-    def __init__(self, json_rpc_endpoint: JsonRpcEndpoint, method_callbacks=None, notify_callbacks=None, timeout=2):
+    def __init__(self, json_rpc_endpoint: JsonRpcEndpoint, method_callbacks=None, notify_callbacks=None, timeout=2000):
         super().__init__()
         self.json_rpc_endpoint: JsonRpcEndpoint = json_rpc_endpoint
         self.notify_callbacks: Dict = notify_callbacks or {}
@@ -126,6 +137,7 @@ class LspEndpoint(threading.Thread):
         self.shutdown_flag = True
 
     def run(self):
+        rpc_id = None
         while not self.shutdown_flag:
             try:
                 jsonrpc_message = self.json_rpc_endpoint.recv_response()
@@ -175,14 +187,14 @@ class LspEndpoint(threading.Thread):
         message_dict["params"] = params
         self.json_rpc_endpoint.send_request(message_dict)
 
-    def call_method(self, method_name, **kwargs):
+    def call_method(self, method_name, args):
         current_id = self.next_id
         self.next_id += 1
         cond = threading.Condition()
         self.event_dict[current_id] = cond
 
         cond.acquire()
-        self.send_message(method_name, kwargs, current_id)
+        self.send_message(method_name, args, current_id)
         if self.shutdown_flag:
             return None
 
@@ -196,5 +208,17 @@ class LspEndpoint(threading.Thread):
             raise ResponseError(error.get("code"), error.get("message"), error.get("data"))
         return result
 
-    def send_notification(self, method_name, **kwargs):
+    def send_notification(self, method_name, kwargs):
         self.send_message(method_name, kwargs)
+
+
+class ServerBase:
+    def __init__(self, endpoint: LspEndpoint):
+        self.endpoint = endpoint
+
+    def _call_sync(self, method_name: str, param: typing.List[object]) -> object:
+        resp = self.endpoint.call_method(method_name, param)
+        return resp
+
+    def _call_async(self, method_name: str, param: typing.List[object]):
+        self.endpoint.send_notification(method_name, param)

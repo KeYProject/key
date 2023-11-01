@@ -22,6 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author Alexander Weigl
@@ -43,21 +45,16 @@ public class ExtractMetaData {
             addClientEndpoint(method);
         }
 
-        try {
-            Files.writeString(Paths.get("api.meta.json"), getGson().toJson(keyApi));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        runGenerator("api.meta.json", (a) -> () -> getGson().toJson(a));
+        runGenerator("api.meta.md", DocGen::new);
+        runGenerator("keydata.py", PythionGenerator.PyDataGen::new);
+        runGenerator("server.py", PythionGenerator.PyApiGen::new);
+    }
 
+    private static void runGenerator(String target, Function<Metamodel.KeyApi, Supplier<String>> api) {
         try {
-            var n = new DocGen(keyApi);
-            Files.writeString(Paths.get("api.meta.md"), n.get());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            var n = new PyGen(keyApi);
-            Files.writeString(Paths.get("api.py"), n.get());
+            var n = api.apply(keyApi);
+            Files.writeString(Paths.get(target), n.get());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,7 +121,7 @@ public class ExtractMetaData {
     }
 
     private static Metamodel.Argument translate(Parameter parameter) {
-        var type =  getOrFindType(parameter.getType()).name();
+        var type = getOrFindType(parameter.getType()).name();
         return new Metamodel.Argument(parameter.getName(), type);
     }
 

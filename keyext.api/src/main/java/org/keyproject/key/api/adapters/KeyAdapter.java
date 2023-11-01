@@ -48,7 +48,7 @@ public class KeyAdapter {
         }
     }
 
-    static class FileTypeAdapter extends TypeAdapter<File> {
+    public static class FileTypeAdapter extends TypeAdapter<File> {
         @Override
         public void write(JsonWriter out, File value) throws IOException {
             out.value(value.toString());
