@@ -29,8 +29,6 @@ import picocli.CommandLine.Option;
 public class StartServer implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartServer.class);
 
-    private static KeyAdapter adapter;
-
     // region CLI arguments
     @Option(names = "--std", description = "use stdout and stdin for communication")
     boolean stdStreams;
@@ -151,7 +149,9 @@ public class StartServer implements Runnable {
 
 
     public static void configureJson(GsonBuilder gsonBuilder) {
-        adapter = new KeyAdapter(gsonBuilder);
+        gsonBuilder.registerTypeHierarchyAdapter(Object.class, new GenericSerializer());
+        gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
+
     }
 
     public static Launcher<ClientApi> launch(OutputStream out, InputStream in, KeyApiImpl keyApi) {

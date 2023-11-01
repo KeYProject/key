@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteclient;
 
+import java.util.List;
+
 public record ShowMessageRequestParams(
         /**
          * The message type. See {@link MessageType}
@@ -18,5 +20,5 @@ public record ShowMessageRequestParams(
          * The message action items to present.
          *
          */
-        MessageActionItem[] actions) {
+        List<MessageActionItem> actions) {
 }
