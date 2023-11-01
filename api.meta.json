@@ -10,11 +10,13 @@
           "fields": [
             {
               "name": "name",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "description",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -51,19 +53,23 @@
           "fields": [
             {
               "name": "name",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "category",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "description",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "scriptCommandName",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -87,7 +93,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "SetTraceParams"
         }
       ]
@@ -97,7 +103,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "ProofId"
         }
       ],
@@ -112,11 +118,11 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "proof",
           "type": "ProofId"
         },
         {
-          "name": "arg1",
+          "name": "nodeId",
           "type": "TreeNodeId"
         }
       ],
@@ -134,11 +140,11 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "proof",
           "type": "ProofId"
         },
         {
-          "name": "arg1",
+          "name": "nodeId",
           "type": "TreeNodeId"
         }
       ],
@@ -156,11 +162,11 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "NodeId"
         },
         {
-          "name": "arg1",
+          "name": "options",
           "type": "PrintOptions"
         }
       ],
@@ -169,11 +175,13 @@
         "fields": [
           {
             "name": "id",
-            "type": "NodeTextId"
+            "type": "NodeTextId",
+            "documentation": ""
           },
           {
             "name": "result",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -184,11 +192,11 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "NodeTextId"
         },
         {
-          "name": "arg1",
+          "name": "pos",
           "type": "INT"
         }
       ],
@@ -198,23 +206,28 @@
           "fields": [
             {
               "name": "commandId",
-              "type": "TermActionId"
+              "type": "TermActionId",
+              "documentation": ""
             },
             {
               "name": "displayName",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "description",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "category",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "kind",
-              "type": "TermActionKind"
+              "type": "TermActionKind",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -227,7 +240,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "TermActionId"
         }
       ],
@@ -237,23 +250,28 @@
           "fields": [
             {
               "name": "commandId",
-              "type": "TermActionId"
+              "type": "TermActionId",
+              "documentation": ""
             },
             {
               "name": "displayName",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "description",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "category",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "kind",
-              "type": "TermActionKind"
+              "type": "TermActionKind",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -266,7 +284,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "NodeTextId"
         }
       ]
@@ -276,7 +294,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "env",
           "type": "EnvironmentId"
         }
       ],
@@ -286,31 +304,38 @@
           "fields": [
             {
               "name": "name",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "sort",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "retSort",
-              "type": "SortDesc"
+              "type": "SortDesc",
+              "documentation": ""
             },
             {
               "name": "argSorts",
-              "type": "List"
+              "type": "List",
+              "documentation": ""
             },
             {
               "name": "rigid",
-              "type": "BOOL"
+              "type": "BOOL",
+              "documentation": ""
             },
             {
               "name": "unique",
-              "type": "BOOL"
+              "type": "BOOL",
+              "documentation": ""
             },
             {
               "name": "skolemConstant",
-              "type": "BOOL"
+              "type": "BOOL",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -323,7 +348,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "env",
           "type": "EnvironmentId"
         }
       ],
@@ -333,23 +358,28 @@
           "fields": [
             {
               "name": "string",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "documentation",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "extendsSorts",
-              "type": "List"
+              "type": "List",
+              "documentation": ""
             },
             {
               "name": "anAbstract",
-              "type": "BOOL"
+              "type": "BOOL",
+              "documentation": ""
             },
             {
               "name": "s",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -362,7 +392,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "env",
           "type": "EnvironmentId"
         }
       ],
@@ -372,27 +402,33 @@
           "fields": [
             {
               "name": "contractId",
-              "type": "ContractId"
+              "type": "ContractId",
+              "documentation": ""
             },
             {
               "name": "name",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "displayName",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "typeName",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "htmlText",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             },
             {
               "name": "plainText",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -405,7 +441,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "contractId",
           "type": "ContractId"
         }
       ],
@@ -414,11 +450,13 @@
         "fields": [
           {
             "name": "env",
-            "type": "EnvironmentId"
+            "type": "EnvironmentId",
+            "documentation": ""
           },
           {
             "name": "proofId",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -429,7 +467,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "LoadParams"
         }
       ],
@@ -439,7 +477,8 @@
           "fields": [
             {
               "name": "envId",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -449,11 +488,13 @@
           "fields": [
             {
               "name": "env",
-              "type": "EnvironmentId"
+              "type": "EnvironmentId",
+              "documentation": ""
             },
             {
               "name": "proofId",
-              "type": "STRING"
+              "type": "STRING",
+              "documentation": ""
             }
           ],
           "documentation": ""
@@ -462,35 +503,11 @@
       }
     },
     {
-      "name": "loading/loadKey",
-      "documentation": "",
-      "args": [
-        {
-          "name": "arg0",
-          "type": "STRING"
-        }
-      ],
-      "returnType": {
-        "typeName": "ProofId",
-        "fields": [
-          {
-            "name": "env",
-            "type": "EnvironmentId"
-          },
-          {
-            "name": "proofId",
-            "type": "STRING"
-          }
-        ],
-        "documentation": ""
-      }
-    },
-    {
       "name": "loading/loadExample",
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "id",
           "type": "STRING"
         }
       ],
@@ -499,11 +516,13 @@
         "fields": [
           {
             "name": "env",
-            "type": "EnvironmentId"
+            "type": "EnvironmentId",
+            "documentation": ""
           },
           {
             "name": "proofId",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -514,7 +533,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "problem",
           "type": "ProblemDefinition"
         }
       ],
@@ -523,11 +542,39 @@
         "fields": [
           {
             "name": "env",
-            "type": "EnvironmentId"
+            "type": "EnvironmentId",
+            "documentation": ""
           },
           {
             "name": "proofId",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
+          }
+        ],
+        "documentation": ""
+      }
+    },
+    {
+      "name": "loading/loadKey",
+      "documentation": "",
+      "args": [
+        {
+          "name": "content",
+          "type": "STRING"
+        }
+      ],
+      "returnType": {
+        "typeName": "ProofId",
+        "fields": [
+          {
+            "name": "env",
+            "type": "EnvironmentId",
+            "documentation": ""
+          },
+          {
+            "name": "proofId",
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -538,7 +585,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "term",
           "type": "STRING"
         }
       ],
@@ -547,11 +594,13 @@
         "fields": [
           {
             "name": "env",
-            "type": "EnvironmentId"
+            "type": "EnvironmentId",
+            "documentation": ""
           },
           {
             "name": "proofId",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -562,7 +611,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "e",
           "type": "STRING"
         }
       ]
@@ -572,7 +621,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "LogTraceParams"
         }
       ]
@@ -582,7 +631,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "ShowMessageParams"
         }
       ]
@@ -592,7 +641,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "ShowMessageRequestParams"
         }
       ],
@@ -601,7 +650,8 @@
         "fields": [
           {
             "name": "title",
-            "type": "STRING"
+            "type": "STRING",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -612,7 +662,7 @@
       "documentation": "",
       "args": [
         {
-          "name": "arg0",
+          "name": "params",
           "type": "ShowDocumentParams"
         }
       ],
@@ -621,7 +671,8 @@
         "fields": [
           {
             "name": "success",
-            "type": "BOOL"
+            "type": "BOOL",
+            "documentation": ""
           }
         ],
         "documentation": ""
@@ -634,11 +685,13 @@
       "fields": [
         {
           "name": "name",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "description",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -653,19 +706,23 @@
       "fields": [
         {
           "name": "name",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "category",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "description",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "scriptCommandName",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -684,7 +741,8 @@
       "fields": [
         {
           "name": "value",
-          "type": "TraceValue"
+          "type": "TraceValue",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -694,7 +752,8 @@
       "fields": [
         {
           "name": "envId",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -704,11 +763,13 @@
       "fields": [
         {
           "name": "env",
-          "type": "EnvironmentId"
+          "type": "EnvironmentId",
+          "documentation": ""
         },
         {
           "name": "proofId",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -723,7 +784,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -733,11 +795,13 @@
       "fields": [
         {
           "name": "proofId",
-          "type": "ProofId"
+          "type": "ProofId",
+          "documentation": ""
         },
         {
           "name": "nodeId",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -747,23 +811,28 @@
       "fields": [
         {
           "name": "unicode",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "width",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         },
         {
           "name": "indentation",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         },
         {
           "name": "pure",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "termLabels",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -773,11 +842,13 @@
       "fields": [
         {
           "name": "nodeId",
-          "type": "NodeId"
+          "type": "NodeId",
+          "documentation": ""
         },
         {
           "name": "nodeTextId",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -787,11 +858,13 @@
       "fields": [
         {
           "name": "id",
-          "type": "NodeTextId"
+          "type": "NodeTextId",
+          "documentation": ""
         },
         {
           "name": "result",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -801,15 +874,18 @@
       "fields": [
         {
           "name": "nodeId",
-          "type": "NodeId"
+          "type": "NodeId",
+          "documentation": ""
         },
         {
           "name": "pio",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "id",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -829,23 +905,28 @@
       "fields": [
         {
           "name": "commandId",
-          "type": "TermActionId"
+          "type": "TermActionId",
+          "documentation": ""
         },
         {
           "name": "displayName",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "description",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "category",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "kind",
-          "type": "TermActionKind"
+          "type": "TermActionKind",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -860,23 +941,28 @@
       "fields": [
         {
           "name": "string",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "documentation",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "extendsSorts",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "anAbstract",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "s",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -886,31 +972,38 @@
       "fields": [
         {
           "name": "name",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "sort",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "retSort",
-          "type": "SortDesc"
+          "type": "SortDesc",
+          "documentation": ""
         },
         {
           "name": "argSorts",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "rigid",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "unique",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "skolemConstant",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -920,11 +1013,13 @@
       "fields": [
         {
           "name": "envId",
-          "type": "EnvironmentId"
+          "type": "EnvironmentId",
+          "documentation": ""
         },
         {
           "name": "contractId",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -934,27 +1029,33 @@
       "fields": [
         {
           "name": "contractId",
-          "type": "ContractId"
+          "type": "ContractId",
+          "documentation": ""
         },
         {
           "name": "name",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "displayName",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "typeName",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "htmlText",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "plainText",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -964,23 +1065,28 @@
       "fields": [
         {
           "name": "keyFile",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "javaFile",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "classPath",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "bootClassPath",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "includes",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -990,23 +1096,28 @@
       "fields": [
         {
           "name": "sorts",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "functions",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "predicates",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "antecTerms",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         },
         {
           "name": "succTerms",
-          "type": "List"
+          "type": "List",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1016,11 +1127,13 @@
       "fields": [
         {
           "name": "messag",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "verbose",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1042,18 +1155,15 @@
       "fields": [
         {
           "name": "type",
-          "type": "MessageType"
+          "type": "MessageType",
+          "documentation": ""
         },
         {
           "name": "message",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
-      "documentation": ""
-    },
-    {
-      "typeName": "MessageActionItem[]",
-      "fields": [],
       "documentation": ""
     },
     {
@@ -1061,15 +1171,18 @@
       "fields": [
         {
           "name": "type",
-          "type": "MessageType"
+          "type": "MessageType",
+          "documentation": ""
         },
         {
           "name": "message",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "actions",
-          "type": "MessageActionItem[]"
+          "type": "List",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1079,7 +1192,8 @@
       "fields": [
         {
           "name": "title",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1089,11 +1203,13 @@
       "fields": [
         {
           "name": "start",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         },
         {
           "name": "end",
-          "type": "INT"
+          "type": "INT",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1103,19 +1219,23 @@
       "fields": [
         {
           "name": "uri",
-          "type": "STRING"
+          "type": "STRING",
+          "documentation": ""
         },
         {
           "name": "external",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "takeFocus",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         },
         {
           "name": "selection",
-          "type": "Range"
+          "type": "Range",
+          "documentation": ""
         }
       ],
       "documentation": ""
@@ -1125,7 +1245,8 @@
       "fields": [
         {
           "name": "success",
-          "type": "BOOL"
+          "type": "BOOL",
+          "documentation": ""
         }
       ],
       "documentation": ""
