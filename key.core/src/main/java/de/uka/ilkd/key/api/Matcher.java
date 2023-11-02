@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -79,9 +80,9 @@ public class Matcher {
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if (size > 0) {
             // Iteratoren durch die Sequent
-            ImmutableList<IfFormulaInstantiation> antecCand =
+            ImmutableArray<IfFormulaInstantiation> antecCand =
                 IfFormulaInstSeq.createList(currentSeq, true, copyServices);
-            ImmutableList<IfFormulaInstantiation> succCand =
+            ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];

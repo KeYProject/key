@@ -944,15 +944,14 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param instAntec list of the formulas of the antecedent
      * @param instAlreadyMatched matched instantiations, for exactly those formulas that are no
      *        longer in ruleSuccTail and ruleAntecTail
-     * @param matchCond match conditions until now, i.e. after matching the first formulas of the if
-     *        sequent
-     * @param services
+     * @param matchCond match conditions until now, i.e. after matching the first formulas of the assumes-sequent
+     * @param services the {@link Services} to access information about the logic signature or program model
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
-            ImmutableList<IfFormulaInstantiation> instSucc,
-            ImmutableList<IfFormulaInstantiation> instAntec,
+            ImmutableArray<IfFormulaInstantiation> instSucc,
+            ImmutableArray<IfFormulaInstantiation> instAntec,
             ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
             Services services) {
 

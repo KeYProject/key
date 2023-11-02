@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -32,8 +33,8 @@ public class IfInstantiator {
     private final Goal goal;
     private final IfInstantiationCache ifInstCache;
 
-    private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
-    private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
+    private ImmutableArray<IfFormulaInstantiation> allAntecFormulas;
+    private ImmutableArray<IfFormulaInstantiation> allSuccFormulas;
 
     private ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
 
@@ -58,7 +59,7 @@ public class IfInstantiator {
     }
 
     /**
-     * Find all possible instantiations of the if sequent formulas within the sequent "p_seq".
+     * Find all possible instantiations of the assumes-sequent formulas within the sequent {@code goal.sequent()}
      */
     public void findIfFormulaInstantiations() {
         final Sequent p_seq = goal.sequent();
@@ -92,18 +93,18 @@ public class IfInstantiator {
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)
      */
-    private ImmutableList<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
+    private ImmutableArray<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
             boolean p_all) {
         if (p_all) {
             return getAllSequentFormulas(p_antec);
         }
 
-        final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
+        final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
         if (cache != null) {
             return cache;
         }
 
-        final ImmutableList<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
+        final ImmutableArray<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
 
         addNewSequentFormulasToCache(newFormulas, p_antec);
 
@@ -116,16 +117,18 @@ public class IfInstantiator {
      *         the current goal for which the method <code>isNewFormula</code> returns
      *         <code>true</code>
      */
-    private ImmutableList<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
+    private ImmutableArray<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
+        final ImmutableArray<IfFormulaInstantiation> allSequentFormulas = getAllSequentFormulas(p_antec);
+        final IfFormulaInstantiation[] res = new IfFormulaInstantiation[allSequentFormulas.size()];
 
-        for (final IfFormulaInstantiation ifInstantiation : getAllSequentFormulas(p_antec)) {
+        int i = 0;
+        for (final IfFormulaInstantiation ifInstantiation : allSequentFormulas) {
             if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation)) {
-                res = res.prepend(ifInstantiation);
+                res[i] = ifInstantiation;
+                ++i;
             }
         }
-
-        return res;
+        return new ImmutableArray<>(res, 0, i);
     }
 
     /**
@@ -136,7 +139,7 @@ public class IfInstantiator {
     private boolean isNewFormula(IfFormulaInstSeq p_ifInstantiation) {
         final boolean antec = p_ifInstantiation.inAntec();
 
-        final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
+        final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
 
         if (cache != null) {
             return cache.contains(p_ifInstantiation);
@@ -167,17 +170,17 @@ public class IfInstantiator {
         return tacletAppContainer.getAge() < formulaAge;
     }
 
-    private ImmutableList<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
+    private ImmutableArray<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
         return ifInstCache.get(p_antec, tacletAppContainer.getAge());
     }
 
-    private void addNewSequentFormulasToCache(ImmutableList<IfFormulaInstantiation> p_list,
+    private void addNewSequentFormulasToCache(ImmutableArray<IfFormulaInstantiation> p_list,
             boolean p_antec) {
         ifInstCache.put(p_antec, tacletAppContainer.getAge(), p_list);
     }
 
 
-    private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas(boolean p_antec) {
+    private ImmutableArray<IfFormulaInstantiation> getAllSequentFormulas(boolean p_antec) {
         return p_antec ? allAntecFormulas : allSuccFormulas;
     }
 
@@ -187,14 +190,14 @@ public class IfInstantiator {
      * @param p_ifSeqTail tail of the current semisequent as list
      * @param p_ifSeqTail2nd the following semisequent (i.e. antecedent) or null
      * @param p_matchCond match conditions until now, i.e. after matching the first formulas of the
-     *        if sequent
+     *        assumes-sequent
      * @param p_alreadyMatchedNewFor at least one new formula has already been matched, i.e. a
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(ImmutableList<SequentFormula> p_ifSeqTail,
             ImmutableList<SequentFormula> p_ifSeqTail2nd,
-            ImmutableList<IfFormulaInstantiation> p_alreadyMatched, MatchConditions p_matchCond,
-            boolean p_alreadyMatchedNewFor) {
+                                                 ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
+                                                 MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {
@@ -212,7 +215,7 @@ public class IfInstantiator {
         final boolean antec = p_ifSeqTail2nd == null;
         final boolean lastIfFormula =
             p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
-        final ImmutableList<IfFormulaInstantiation> formulas =
+        final ImmutableArray<IfFormulaInstantiation> formulas =
             getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas,
             p_ifSeqTail.head().formula(), p_matchCond, getServices());
