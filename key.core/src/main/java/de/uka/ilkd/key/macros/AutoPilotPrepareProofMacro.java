@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -68,7 +69,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
-        public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
+        public AutoPilotStrategy(Proof proof) {
             this.delegate = proof.getActiveStrategy();
         }
 
@@ -79,14 +80,14 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+            return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
             // Assumptions are normally not considered by the cost
             // computation, because they are normally not yet
             // instantiated when the costs are computed. Because the
             // application of a rule sometimes makes sense only if
             // the assumptions are instantiated in a particular way
             // (for instance equalities should not be applied on
-            // themselves), we need to give the delegate the possiblity
+            // themselves), we need to give the delegate the possibility
             // to reject the application of a rule by calling
             // isApprovedApp. Otherwise, in particular equalities may
             // be applied on themselves.
@@ -94,7 +95,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
 
             Rule rule = app.rule();
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
@@ -102,7 +103,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             }
 
             if (modalityCache.hasModality(goal.node().sequent())) {
-                return delegate.computeCost(app, pio, goal);
+                return delegate.computeCost(app, pio, goal, mState);
             }
 
             if (isAdmittedRule(rule)) {
@@ -138,6 +139,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new AutoPilotStrategy(proof, posInOcc);
+        return new AutoPilotStrategy(proof);
     }
 }

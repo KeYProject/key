@@ -13,13 +13,13 @@ import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 
+import de.uka.ilkd.key.strategy.feature.Feature;
 import org.junit.jupiter.api.*;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
- * {@link JavaCardDLStrategy#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal)}
+ * {@link Feature#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.strategy.feature.MutableState)}
  * so that statistical data about that method can be recorded (time duration, number of invocations
  * and potentially other stuff).
  */

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
@@ -36,7 +37,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Node root = goal.proof().root();
 
         Node n = goal.node();
@@ -46,7 +47,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
                     if (svInstValue instanceof Term) {
-                        return term.toTerm(app, pos, goal).op() == ((Term) svInstValue).op();
+                        return term.toTerm(app, pos, goal, mState).op() == ((Term) svInstValue).op();
                     }
                 }
             }

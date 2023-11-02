@@ -72,11 +72,11 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
         this.targetCandidate = targetCandidate;
     }
 
-    protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial targetM = Monomial.create(targetCandidate.toTerm(app, pos, goal), services);
-        final Monomial mult1M = Monomial.create(mult1Candidate.toTerm(app, pos, goal), services);
-        final Monomial mult2M = Monomial.create(mult2Candidate.toTerm(app, pos, goal), services);
+        final Monomial targetM = Monomial.create(targetCandidate.toTerm(app, pos, goal, mState), services);
+        final Monomial mult1M = Monomial.create(mult1Candidate.toTerm(app, pos, goal, mState), services);
+        final Monomial mult2M = Monomial.create(mult2Candidate.toTerm(app, pos, goal, mState), services);
 
         return filter(targetM, mult1M, mult2M);
     }

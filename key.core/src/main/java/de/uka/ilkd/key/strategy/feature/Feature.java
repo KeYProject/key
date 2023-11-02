@@ -16,12 +16,15 @@ public interface Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
+     * @param app    the RuleApp
+     * @param pos    position where <code>app</code> is to be applied
+     * @param goal   the goal on which <code>app</code> is to be applied
+     * @param mState  variable bank / local storage for feature who might require to store temporary information
+     *                that changes during computation, e.g.
+     *               {@link de.uka.ilkd.key.strategy.termProjection.TermBuffer}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
-     *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
-     *         all (it is discarded by the strategy).
+     * <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
+     * all (it is discarded by the strategy).
      */
-    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal);
+    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
 }

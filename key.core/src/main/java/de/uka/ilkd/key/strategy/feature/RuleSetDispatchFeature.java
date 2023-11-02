@@ -28,7 +28,7 @@ public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if (!(app instanceof TacletApp)) {
             return NumberRuleAppCost.getZeroCost();
         }
@@ -45,7 +45,7 @@ public class RuleSetDispatchFeature implements Feature {
 
             final Feature partialF = rulesetToFeature.get(rs);
             if (partialF != null) {
-                res = res.add(partialF.computeCost(app, pos, goal));
+                res = res.add(partialF.computeCost(app, pos, goal, mState));
                 if (res instanceof TopRuleAppCost) {
                     break;
                 }

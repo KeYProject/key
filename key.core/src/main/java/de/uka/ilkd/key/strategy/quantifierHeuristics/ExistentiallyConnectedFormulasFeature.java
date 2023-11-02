@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
@@ -26,13 +27,13 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
             goal.proof().getServices().getCaches());
 
-        return graph.connected(for0.toTerm(app, pos, goal), for1.toTerm(app, pos, goal));
+        return graph.connected(for0.toTerm(app, pos, goal, mState), for1.toTerm(app, pos, goal, mState));
     }
 
 }

@@ -26,7 +26,7 @@ public class IfThenElseMalusFeature implements Feature {
 
     private IfThenElseMalusFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if (pos == null) {
             return NumberRuleAppCost.getZeroCost();
         }

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -60,11 +61,11 @@ public class TriggeredInstantiations implements TermGenerator {
         this.checkConditions = checkConditions;
     }
 
-    @Override
     /**
      * Generates all instances
      */
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    @Override
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if (app instanceof TacletApp tapp) {
 
             final Services services = goal.proof().getServices();

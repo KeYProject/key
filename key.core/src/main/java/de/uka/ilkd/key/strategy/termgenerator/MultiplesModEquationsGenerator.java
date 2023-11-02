@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.util.collection.ImmutableList;
@@ -51,11 +52,11 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator(source, target);
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal), services);
-        final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal), services);
+        final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
+        final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal, mState), services);
 
         if (targetM.divides(sourceM)) {
             return toIterator(targetM.reduce(sourceM).toTerm(services));
@@ -135,7 +136,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * Extract all integer equations of the antecedent and convert them into
      * <code>Polynomial</code>s.
      *
-     * @returns a list of polynomials, stored in objects of <code>CofactorPolynomial</code>. The
+     * @return a list of polynomials, stored in objects of <code>CofactorPolynomial</code>. The
      *          initial cofactor is set to zero.
      */
     private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
@@ -214,7 +215,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             if (res.poly.getParts().size() == 1 && res.poly.getConstantTerm().signum() == 0) {
                 return new CofactorMonomial(res.poly.getParts().head(), res.cofactor);
             }
-            if (res.poly.getParts().size() == 0 && res.poly.getConstantTerm().signum() != 0) {
+            if (res.poly.getParts().isEmpty() && res.poly.getConstantTerm().signum() != 0) {
                 return new CofactorMonomial(Monomial.ONE.multiply(res.poly.getConstantTerm()),
                     res.cofactor);
             }

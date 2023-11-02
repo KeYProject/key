@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).
@@ -23,7 +24,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
 
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return new ACPIterator(pos.sequentFormula().formula(), pos.isInAntec());
     }
 
