@@ -78,7 +78,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
@@ -129,7 +130,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             return computeCost(app, pio, goal, mState);
         }
 

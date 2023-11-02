@@ -38,7 +38,8 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Term cutFormula =
-            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal, mState);
+            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
+                mState);
         if (cutFormula != null) {
             if (cutFormula.op() == Junctor.NOT) {
                 cutFormula = cutFormula.sub(0);

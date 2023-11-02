@@ -33,7 +33,8 @@ public class LetFeature implements Feature {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         var.setContent(value.toTerm(app, pos, goal, mState), mState);

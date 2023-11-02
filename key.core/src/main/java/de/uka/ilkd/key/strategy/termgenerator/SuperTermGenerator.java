@@ -48,7 +48,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         };
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return createIterator(pos, mState);
     }
 
@@ -71,7 +72,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         @Override
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                MutableState mState) {
             if (services == null) {
                 services = goal.proof().getServices();
                 final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();

@@ -2040,17 +2040,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      *
-     * @param app    rule application
-     * @param pio    corresponding {@link PosInOccurrence}
-     * @param goal   corresponding goal
-     * @param mState the {@link MutableState} to query for information like current value of {@link TermBuffer}s or
-     * {@link de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint}s
+     * @param app rule application
+     * @param pio corresponding {@link PosInOccurrence}
+     * @param goal corresponding goal
+     * @param mState the {@link MutableState} to query for information like current value of
+     *        {@link TermBuffer}s or
+     *        {@link de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
-     * <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
-     * all (it is discarded by the strategy).
+     *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
+     *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         var time = System.nanoTime();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);
@@ -2072,14 +2074,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
-            return !(approvalF.computeCost(app, pio, goal, new MutableState()) == TopRuleAppCost.INSTANCE);
+            return !(approvalF.computeCost(app, pio, goal,
+                new MutableState()) == TopRuleAppCost.INSTANCE);
         } finally {
             PERF_APPROVE.addAndGet(System.nanoTime() - time);
         }
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         var time = System.nanoTime();
         try {
             return instantiationF.computeCost(app, pio, goal, mState);

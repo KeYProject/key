@@ -103,7 +103,8 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     private Polynomial getPolynomial(ProjectionToTerm polyProj, ProjectionToTerm coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Polynomial poly = Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
+        final Polynomial poly =
+            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
 
         if (coeffProj == null) {
             return poly;

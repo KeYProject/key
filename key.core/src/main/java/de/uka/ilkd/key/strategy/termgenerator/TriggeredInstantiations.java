@@ -65,7 +65,8 @@ public class TriggeredInstantiations implements TermGenerator {
      * Generates all instances
      */
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         if (app instanceof TacletApp tapp) {
 
             final Services services = goal.proof().getServices();

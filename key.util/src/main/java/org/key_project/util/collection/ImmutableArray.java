@@ -47,15 +47,17 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     @SuppressWarnings("unchecked")
     public ImmutableArray(S[] arr, int lower, int upper) {
         content = (S[]) Array.newInstance(arr.getClass().getComponentType(), upper - lower);
-        System.arraycopy(arr, lower, content, 0, upper-lower);
+        System.arraycopy(arr, lower, content, 0, upper - lower);
     }
 
     /**
      * <p>
-     *     creates a new immutable array with the contents of the given collection.
-     * </p><p>
+     * creates a new immutable array with the contents of the given collection.
+     * </p>
+     * <p>
      * The order of elements is defined by the collection.
      * </p>
+     *
      * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")

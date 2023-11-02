@@ -22,8 +22,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
-
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -182,7 +182,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
             // formula, else

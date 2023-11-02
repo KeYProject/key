@@ -319,13 +319,14 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * Compute the cost of a RuleApp.
      *
-     * @param app    the RuleApp
-     * @param pos    position where <code>app</code> is to be applied
-     * @param goal   the goal on which <code>app</code> is to be applied
+     * @param app the RuleApp
+     * @param pos position where <code>app</code> is to be applied
+     * @param goal the goal on which <code>app</code> is to be applied
      * @param mState
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term findTerm = pos.sequentFormula().formula();

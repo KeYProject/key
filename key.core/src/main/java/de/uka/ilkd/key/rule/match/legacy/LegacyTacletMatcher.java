@@ -223,7 +223,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      */
     @Override
     public IfMatchResult matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
-                                 Term p_template, MatchConditions p_matchCond, Services p_services) {
+            Term p_template, MatchConditions p_matchCond, Services p_services) {
         ImmutableList<IfFormulaInstantiation> resFormulas =
             ImmutableSLList.nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();

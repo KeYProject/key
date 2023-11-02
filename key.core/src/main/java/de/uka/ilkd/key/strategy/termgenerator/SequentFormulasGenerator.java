@@ -45,7 +45,8 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return new SFIterator(generateForIt(goal));
     }
 

@@ -44,7 +44,8 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
         }

@@ -23,9 +23,9 @@ public interface Strategy extends Named, Feature {
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of the rule application expressed as a
-     * <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
-     * indicates that the rule shall not be applied at all (it is discarded by
-     * the strategy).
+     *         <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
+     *         indicates that the rule shall not be applied at all (it is discarded by
+     *         the strategy).
      */
     default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return computeCost(app, pos, goal, new MutableState());

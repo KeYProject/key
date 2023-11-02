@@ -44,7 +44,8 @@ public class ForEachCP implements Feature {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal,
+            MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 

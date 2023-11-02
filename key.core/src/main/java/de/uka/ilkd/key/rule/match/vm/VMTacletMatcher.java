@@ -39,10 +39,12 @@ import org.key_project.util.collection.ImmutableSet;
  * <p>
  * Matching algorithm using a virtual machine based approach inspired by Voronkonv et al. It matches
  * exactly one taclet and does not produce code trees.
- *</p><p>
+ * </p>
+ * <p>
  * Instances of this class should <strong>not</strong> be created directly, use
  * {@link TacletMatcherKit#createTacletMatcher(Taclet)} instead.
- *</p>
+ * </p>
+ *
  * @see TacletMatcherKit
  */
 public class VMTacletMatcher implements TacletMatcher {
@@ -110,7 +112,7 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final IfMatchResult matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
-                                       Term p_template, MatchConditions p_matchCond, Services p_services) {
+            Term p_template, MatchConditions p_matchCond, Services p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
 
 
@@ -148,7 +150,8 @@ public class VMTacletMatcher implements TacletMatcher {
 
     /**
      * the formula ensures that the update context described the update of the given formula.
-     * If it does not then {@code null} is returned, otherwise the formula without the update context.
+     * If it does not then {@code null} is returned, otherwise the formula without the update
+     * context.
      *
      * @param context the list of update label pairs describing the update context
      * @param formula the formula whose own update context must be equal (modulo renaming) to the
@@ -331,7 +334,7 @@ public class VMTacletMatcher implements TacletMatcher {
         if (findMatchProgram != TacletMatchProgram.EMPTY_PROGRAM) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                        matchAndIgnoreUpdatePrefix(term, matchCond);
+                    matchAndIgnoreUpdatePrefix(term, matchCond);
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }

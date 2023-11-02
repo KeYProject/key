@@ -33,7 +33,8 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
             goal.proof().getServices().getCaches());
 
-        return graph.connected(for0.toTerm(app, pos, goal, mState), for1.toTerm(app, pos, goal, mState));
+        return graph.connected(for0.toTerm(app, pos, goal, mState),
+            for1.toTerm(app, pos, goal, mState));
     }
 
 }

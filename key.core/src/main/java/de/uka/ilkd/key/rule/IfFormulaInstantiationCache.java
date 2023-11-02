@@ -12,7 +12,6 @@ import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 // a simple cache for the results of the method <code>createList</code>
 public final class IfFormulaInstantiationCache {
@@ -38,7 +37,7 @@ public final class IfFormulaInstantiationCache {
     }
 
     public void put(boolean antec, Semisequent s,
-                    ImmutableArray<IfFormulaInstantiation> value) {
+            ImmutableArray<IfFormulaInstantiation> value) {
         try {
             writeLock.lock();
             (antec ? antecCache : succCache).put(System.identityHashCode(s), new Pair<>(s, value));

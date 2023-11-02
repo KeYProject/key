@@ -12,7 +12,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  * A feature that returns a constant value
  */
 public class ConstFeature implements Feature {
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return val;
     }
 

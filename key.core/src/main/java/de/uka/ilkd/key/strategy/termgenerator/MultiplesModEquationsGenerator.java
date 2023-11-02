@@ -52,7 +52,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator(source, target);
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final Services services = goal.proof().getServices();
 
         final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
@@ -137,7 +138,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * <code>Polynomial</code>s.
      *
      * @return a list of polynomials, stored in objects of <code>CofactorPolynomial</code>. The
-     *          initial cofactor is set to zero.
+     *         initial cofactor is set to zero.
      */
     private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();

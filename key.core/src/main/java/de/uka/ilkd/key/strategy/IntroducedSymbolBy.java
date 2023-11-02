@@ -47,7 +47,8 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
                     if (svInstValue instanceof Term) {
-                        return term.toTerm(app, pos, goal, mState).op() == ((Term) svInstValue).op();
+                        return term.toTerm(app, pos, goal, mState).op() == ((Term) svInstValue)
+                                .op();
                     }
                 }
             }

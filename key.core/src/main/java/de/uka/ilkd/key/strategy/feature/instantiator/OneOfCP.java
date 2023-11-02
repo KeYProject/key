@@ -27,7 +27,8 @@ public class OneOfCP implements Feature {
         return new OneOfCP(features);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(cp, this);
         return features[theChosenOne].computeCost(app, pos, goal, mState);

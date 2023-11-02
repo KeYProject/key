@@ -83,7 +83,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             return delegate.computeCost(app, pio, goal, mState);
 
         }

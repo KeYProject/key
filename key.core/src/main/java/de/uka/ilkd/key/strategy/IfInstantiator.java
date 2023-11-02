@@ -59,7 +59,8 @@ public class IfInstantiator {
     }
 
     /**
-     * Find all possible instantiations of the assumes-sequent formulas within the sequent {@code goal.sequent()}
+     * Find all possible instantiations of the assumes-sequent formulas within the sequent
+     * {@code goal.sequent()}
      */
     public void findIfFormulaInstantiations() {
         final Sequent p_seq = goal.sequent();
@@ -99,7 +100,8 @@ public class IfInstantiator {
             return getAllSequentFormulas(p_antec);
         }
 
-        final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
+        final ImmutableArray<IfFormulaInstantiation> cache =
+            getNewSequentFormulasFromCache(p_antec);
         if (cache != null) {
             return cache;
         }
@@ -118,7 +120,8 @@ public class IfInstantiator {
      *         <code>true</code>
      */
     private ImmutableArray<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
-        final ImmutableArray<IfFormulaInstantiation> allSequentFormulas = getAllSequentFormulas(p_antec);
+        final ImmutableArray<IfFormulaInstantiation> allSequentFormulas =
+            getAllSequentFormulas(p_antec);
         final IfFormulaInstantiation[] res = new IfFormulaInstantiation[allSequentFormulas.size()];
 
         int i = 0;
@@ -196,8 +199,8 @@ public class IfInstantiator {
      */
     private void findIfFormulaInstantiationsHelp(ImmutableList<SequentFormula> p_ifSeqTail,
             ImmutableList<SequentFormula> p_ifSeqTail2nd,
-                                                 ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-                                                 MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
+            ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
+            MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {

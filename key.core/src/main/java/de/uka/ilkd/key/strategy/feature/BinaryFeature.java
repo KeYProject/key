@@ -22,7 +22,8 @@ public abstract class BinaryFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return filter(app, pos, goal, mState) ? ZERO_COST : TOP_COST;
     }
 
@@ -30,12 +31,13 @@ public abstract class BinaryFeature implements Feature {
      * Compute whether the result of the feature is zero (<code>true</code>) or infinity
      * (<code>false</code>)
      *
-     * @param app    the RuleApp
-     * @param pos    position where <code>app</code> is to be applied
-     * @param goal   the goal on which <code>app</code> is to be applied
+     * @param app the RuleApp
+     * @param pos position where <code>app</code> is to be applied
+     * @param goal the goal on which <code>app</code> is to be applied
      * @param mState mutable state needed for feature computation
      * @return true iff the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
+    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState);
 
 }

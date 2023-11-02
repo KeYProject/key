@@ -41,8 +41,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
-
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
@@ -205,7 +205,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
 
             if (app.rule() instanceof OneStepSimplifier) {
                 return NumberRuleAppCost.getZeroCost();

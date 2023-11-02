@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
 
 public interface TacletMatcher {
 
@@ -29,7 +28,7 @@ public interface TacletMatcher {
      *         MatchConditions.
      */
     IfMatchResult matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
-                          Term p_template, MatchConditions p_matchCond, Services p_services);
+            Term p_template, MatchConditions p_matchCond, Services p_services);
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent

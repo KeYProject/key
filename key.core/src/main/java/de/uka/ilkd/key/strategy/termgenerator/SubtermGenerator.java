@@ -39,8 +39,10 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-                return new LeftIterator(getTermInst(app, pos, goal, mState), mState, goal.proof().getServices());
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
+                    goal.proof().getServices());
             }
         };
     }
@@ -51,8 +53,10 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-                return new RightIterator(getTermInst(app, pos, goal, mState), mState, goal.proof().getServices());
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return new RightIterator(getTermInst(app, pos, goal, mState), mState,
+                    goal.proof().getServices());
             }
         };
     }

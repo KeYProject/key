@@ -31,7 +31,8 @@ public class PrintFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         RuleAppCost cost = f.computeCost(app, pos, goal, mState);
         LOGGER.debug("{}:{}:{}{}", prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "",
             app.rule().name());

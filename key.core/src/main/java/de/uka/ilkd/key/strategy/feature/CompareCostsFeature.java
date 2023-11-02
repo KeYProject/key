@@ -18,24 +18,30 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-                return a.computeCost(app, pos, goal, mState).compareTo(b.computeCost(app, pos, goal, mState)) < 0;
+            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return a.computeCost(app, pos, goal, mState)
+                        .compareTo(b.computeCost(app, pos, goal, mState)) < 0;
             }
         };
     }
 
     public static Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-                return a.computeCost(app, pos, goal, mState).compareTo(b.computeCost(app, pos, goal, mState)) <= 0;
+            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return a.computeCost(app, pos, goal, mState)
+                        .compareTo(b.computeCost(app, pos, goal, mState)) <= 0;
             }
         };
     }
 
     public static Feature eq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-                return a.computeCost(app, pos, goal, mState).equals(b.computeCost(app, pos, goal, mState));
+            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return a.computeCost(app, pos, goal, mState)
+                        .equals(b.computeCost(app, pos, goal, mState));
             }
         };
     }

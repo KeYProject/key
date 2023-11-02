@@ -40,7 +40,8 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         long begin = System.nanoTime();
         RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();

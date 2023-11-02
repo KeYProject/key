@@ -48,7 +48,8 @@ public class SVInstantiationCP implements Feature {
         this.value = value;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(app, pos, goal, mState), this);
         return NumberRuleAppCost.getZeroCost();

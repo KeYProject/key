@@ -51,7 +51,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      * Create a list with all formulas of a given semisequent
      */
     private static ImmutableArray<IfFormulaInstantiation> createListHelp(Sequent p_s,
-                                                                         boolean antec) {
+            boolean antec) {
         Semisequent semi;
         if (antec) {
             semi = p_s.antecedent();
@@ -62,7 +62,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         final IfFormulaInstSeq[] assumesInstFromSeq = new IfFormulaInstSeq[semi.size()];
         int i = assumesInstFromSeq.length - 1;
 
-        for (final var sf:semi) {
+        for (final var sf : semi) {
             assumesInstFromSeq[i] = new IfFormulaInstSeq(p_s, antec, sf);
             --i;
         }

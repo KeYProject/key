@@ -13,8 +13,8 @@ import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-
 import de.uka.ilkd.key.strategy.feature.Feature;
+
 import org.junit.jupiter.api.*;
 
 /**

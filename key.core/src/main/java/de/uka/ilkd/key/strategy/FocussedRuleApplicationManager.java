@@ -116,7 +116,8 @@ public class FocussedRuleApplicationManager
                  * rule app within the focussed formula, but not within the focussed subterm
                  */
                 return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal, new MutableState()).equals(BinaryFeature.TOP_COST);
+                        .computeCost(rule, pos, goal, new MutableState())
+                        .equals(BinaryFeature.TOP_COST);
             } else {
                 return !onlyModifyFocussedFormula;
             }

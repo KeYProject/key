@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
@@ -12,11 +15,13 @@ import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
  * <p>
  * Realizes a variable bank for strategy features such that each feature
  * computation can be done in parallel.
- * </p><p>
+ * </p>
+ * <p>
  * When the strategy computes the costs for a {@link RuleApp} it creates
  * a new MutableState object and passes it on. This is then used by features
  * to query for the value of {@link TermBuffer}s.
- * </p><p>
+ * </p>
+ * <p>
  * This mutable state should not be abused and strategy features should be stateless.
  * </p>
  *
@@ -32,6 +37,7 @@ public class MutableState {
 
     /**
      * assign the given {@link TermBuffer} the provided value
+     *
      * @param v the {@link TermBuffer}
      * @param value the Term which is assigned as the value
      */
@@ -44,6 +50,7 @@ public class MutableState {
 
     /**
      * retrieves the current value of the given {@link TermBuffer}
+     *
      * @param v the TermBuffer whose value is asked for
      * @return the current value of the {@link TermBuffer} or {@code null} if there is none
      */
@@ -56,6 +63,7 @@ public class MutableState {
 
     /**
      * returns the backtracking manager to access {@link ChoicePoint}s
+     *
      * @return the backtracking manager
      */
     public BackTrackingManager getBacktrackingManager() {

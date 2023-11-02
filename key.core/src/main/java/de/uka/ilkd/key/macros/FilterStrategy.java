@@ -26,7 +26,8 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         if (!isApprovedApp(app, pio, goal)) {
             return TopRuleAppCost.INSTANCE;
         }

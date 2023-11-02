@@ -30,7 +30,8 @@ public class InstantiationCost implements Feature {
     /**
      * Compute the cost of a RuleApp.
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();

@@ -95,7 +95,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
 
             Rule rule = app.rule();
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
