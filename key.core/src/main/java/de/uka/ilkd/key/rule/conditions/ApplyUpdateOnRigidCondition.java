@@ -17,23 +17,30 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     private final UpdateSV u;
-    private final SchemaVariable x;
-    private final SchemaVariable x2;
+    private final SchemaVariable phi;
+    private final SchemaVariable result;
 
-    public ApplyUpdateOnRigidCondition(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
+    public ApplyUpdateOnRigidCondition(UpdateSV u, SchemaVariable phi, SchemaVariable result) {
         this.u = u;
-        this.x = x;
-        this.x2 = x2;
+        this.phi = phi;
+        this.result = result;
     }
 
-
-    private static Term applyUpdateOnRigid(Term update, Term target, TermServices services) {
-        Term[] updatedSubs = new Term[target.arity()];
+    // 1. u.freeVars() -> alle freien vars im Update
+    // 2. Namen der freien vars suchen
+    // 3. phi Term fragen, welche vars gebunden werden: phi.boundVars()
+    // 4. Schnitt von 2 und 3: Substitution: {u}{old_x/new_x}phi.sub(i)
+    // 4.1. Position beibehalten
+    // 4.2. new LogicVariable
+    // 4.3. services.getTermBuilder().subst(old_x, services.getTermBuilder().var(new_x),
+    // phi.sub(i));
+    private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
+        Term[] updatedSubs = new Term[phi.arity()];
         for (int i = 0; i < updatedSubs.length; i++) {
-            updatedSubs[i] = services.getTermBuilder().apply(update, target.sub(i), null);
+            updatedSubs[i] = services.getTermBuilder().apply(u, phi.sub(i), null);
         }
-        Term result = services.getTermFactory().createTerm(target.op(), updatedSubs,
-            target.boundVars(), target.javaBlock());
+        Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
+            phi.boundVars(), phi.javaBlock());
         return result;
     }
 
@@ -43,21 +50,21 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term x2Inst = (Term) svInst.getInstantiation(x2);
-        if (uInst == null || xInst == null) {
+        Term phiInst = (Term) svInst.getInstantiation(phi);
+        Term resultInst = (Term) svInst.getInstantiation(result);
+        if (uInst == null || phiInst == null) {
             return mc;
         }
 
-        if (!xInst.op().isRigid() || xInst.op().arity() == 0) {
+        if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) {
             return null;
         }
 
-        Term properX2Inst = applyUpdateOnRigid(uInst, xInst, services);
-        if (x2Inst == null) {
-            svInst = svInst.add(x2, properX2Inst, services);
+        Term properResultInst = applyUpdateOnRigid(uInst, phiInst, services);
+        if (resultInst == null) {
+            svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (x2Inst.equals(properX2Inst)) {
+        } else if (resultInst.equals(properResultInst)) {
             return mc;
         } else {
             return null;
@@ -67,6 +74,6 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\applyUpdateOnRigid(" + u + ", " + x + ", " + x2 + ")";
+        return "\\applyUpdateOnRigid(" + u + ", " + phi + ", " + result + ")";
     }
 }
