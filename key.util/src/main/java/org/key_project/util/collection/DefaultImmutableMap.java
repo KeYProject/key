@@ -8,8 +8,8 @@ import java.util.Iterator;
 import org.key_project.util.Strings;
 
 /**
- * This class implements ImmMap<S,T> and provides a persistent Map. It is a simple implementation
- * like lists
+ * This class implements {@code ImmutableMap<S,T>} and provides a persistent map.
+ * It is a simple implementation like lists
  */
 public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
@@ -72,12 +72,14 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
 
     /**
-     * inserts mapping <key,val> into the map (old map is not modified) if key exists old entry has
+     * inserts mapping {@code <key,val>} into the map (old map is not modified) if key exists old
+     * entry has
      * to be removed {@code null} is not allowed for key or value.
      *
      * @param key a S to be used as key
      * @param value a T to be stored as value
-     * @return a ImmMap<S,T> including the <key, value> pair and all other pairs of the current map
+     * @return a ImmutableMap including the {@code <key, value>}-pair and all other pairs of the
+     *         current map
      *         with keys different from the given key
      */
     public ImmutableMap<S, T> put(S key, T value) {

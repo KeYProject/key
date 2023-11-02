@@ -160,11 +160,13 @@ public final class XMLUtil {
      * The following signs are replaced:
      *
      * <pre>
-     * " => &quot;quot;
-     * & => &quot;amp;
-     * ' => &quot;apos;
-     * < => &quot;lt;
-     * > => &quot;gt;
+     * {@code
+     * " => &quot;
+     * & => &amp;
+     * ' => &apos;
+     * < => &lt;
+     * > => &gt;
+     * }
      * </pre>
      * </p>
      *

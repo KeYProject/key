@@ -252,18 +252,21 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     }
 
     /**
-     * creates the body of method <code>&lt;createArrayHelper(int
-     * paramLength)&gt;</code> therefore it first adds the statements responsible to take the
+     * creates the body of method {@code <createArrayHelper(int
+     * paramLength)>} therefore it first adds the statements responsible to take the
      * correct one out of the list, then the arrays length attribute is set followed by a call to
-     * <code>&lt;prepare&gt;()</code> setting the arrays fields on their default value.
+     * {@code <prepare>()} setting the arrays fields on their default value.
      *
-     * @param length the final public ProgramVariable <code>length</length> of the array
-     * &#64;param fields the IList<Fields> of the current array
-     * &#64;param createTransient a boolean indicating if a transient array has
-     * to be created (this is special to JavaCard)
-     * &#64;param transientType a ProgramVariable identifying the kind of transient
-     * &#64;return the StatementBlock which is the method's body <br></br>
-     *     <code>
+     * @param length the final public ProgramVariable {@code length} of the array
+     * @param fields the ImmutableList with fields of the current array
+     * @param createTransient a boolean indicating if a transient array has
+     *        to be created (this is special to JavaCard)
+     * @param transientType a ProgramVariable identifying the kind of transient
+     * @return the StatementBlock which is the method's body <br>
+     *         </br>
+     *
+     *         <pre>
+     *  {@code
      *  {
      *    this.<nextToCreate> = this.<nextToCreate>.;
      *    this.<initialized> = false;
@@ -273,7 +276,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *    this.<initialized> = true;
      *    return this;
      *   }
-     *   </code>
+     *   }
+     *         </pre>
      */
     private StatementBlock getCreateArrayHelperBody(
             ProgramVariable length,
