@@ -34,11 +34,11 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
         DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
