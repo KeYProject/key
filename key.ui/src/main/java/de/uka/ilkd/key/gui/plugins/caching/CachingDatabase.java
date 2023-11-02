@@ -252,7 +252,7 @@ public final class CachingDatabase {
                 // TODO: ...
             }
             // compilation error to skip tests
-            jsonBuilder
+            // jsonBuilder
         } catch (Exception e) {
             LOGGER.error("failed to save proof cache database ", e);
         }

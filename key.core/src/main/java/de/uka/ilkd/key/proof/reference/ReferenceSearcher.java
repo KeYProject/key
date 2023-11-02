@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,6 +120,7 @@ public final class ReferenceSearcher {
                 LOGGER.debug("found caching candidate in proof {} node {}", p.name(), n.serialNr());
                 return new ClosedBy(p, n);
             }
+            // dependency graph caching search
         }
         LOGGER.trace("found no caching candidate");
         return null;
