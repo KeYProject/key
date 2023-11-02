@@ -16,6 +16,8 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.DefaultEdge;
+import org.key_project.util.helper.JsonBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +37,6 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 public class DependencyGraph {
-    /**
-     * Logger.
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
@@ -355,5 +354,26 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    public void saveToJson(JsonBuilder obj) {
+        var nodes = obj.newArray("nodes");
+        int i = 0;
+        for (var node : graph.vertexSet()) {
+            nodes.putString(i, node.toString(false, false));
+            i++;
+        }
+        var edges = obj.newArray("edges");
+        i = 0;
+        for (var ruleApp : edgeDataReversed.values()) {
+            var in = ruleApp.stream().map(DefaultEdge::getSource)
+                    .map(x -> ((GraphNode) x).toString(false, false)).distinct().toList();
+            var out = ruleApp.stream().map(DefaultEdge::getTarget)
+                    .map(x -> ((GraphNode) x).toString(false, false)).distinct().toList();
+            var edge = edges.newObject(i);
+            edge.newArray("in").setFrom(in);
+            edge.newArray("out").setFrom(out);
+            i++;
+        }
     }
 }

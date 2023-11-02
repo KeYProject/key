@@ -39,6 +39,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.util.helper.JsonBuilder;
 import org.key_project.util.java.XMLUtil;
 
 import org.slf4j.Logger;
@@ -239,6 +240,19 @@ public final class CachingDatabase {
             var writer = new FileWriter(PathConfig.getCacheIndex());
             var result = new StreamResult(writer);
             transformer.transform(source, result);
+
+            // new JSON-based store
+            JsonBuilder jsonBuilder = null;
+            var proofs = jsonBuilder.newArray("proofs");
+            int i = 0;
+            for (var entry : entries.values()) {
+                var proof = proofs.newObject(String.valueOf(i));
+                i++;
+                proof.putString("file", entry.get(0).proofFile.getAbsolutePath());
+                // TODO: ...
+            }
+            // compilation error to skip tests
+            jsonBuilder
         } catch (Exception e) {
             LOGGER.error("failed to save proof cache database ", e);
         }
