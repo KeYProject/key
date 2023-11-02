@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.TermServices;
  * the same name.
  *
  * <p>
- * Please see information in {@link TermLabels} on how to introduce new label types.
+ * Please see information in {@link TermLabel}s on how to introduce new label types.
  * </p>
  *
  * @param <T> the type of term labels which are returned by this factory.

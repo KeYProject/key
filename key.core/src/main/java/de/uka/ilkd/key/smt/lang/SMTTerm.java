@@ -291,12 +291,10 @@ public abstract class SMTTerm {
      */
 
     public SMTTerm unaryOp(SMTTermUnaryOp.Op op) {
-        switch (op) {
-        case NOT:
-            return this.not();
-        default:
-            return new SMTTermUnaryOp(op, this);
-        }
+        return switch (op) {
+        case NOT -> this.not();
+        default -> new SMTTermUnaryOp(op, this);
+        };
     }
 
     public SMTTerm sign(boolean pol) {
@@ -326,51 +324,29 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm multOp(SMTTermMultOp.Op op, SMTTerm t) {
-
-        switch (op) {
-        case AND:
-            return this.and(t);
-        case OR:
-            return this.or(t);
-        case IMPLIES:
-            return this.implies(t);
-        case IFF:
-            return this.iff(t);
-        case EQUALS:
-            return this.equal(t);
-        case LT:
-            return this.lt(t);
-        case LTE:
-            return this.lte(t);
-        case DIV:
-            return this.div(t);
-        case GT:
-            return this.gt(t);
-        case GTE:
-            return this.gte(t);
-        case MINUS:
-            return this.minus(t);
-        case MUL:
-            return this.mul(t);
-        case PLUS:
-            return this.plus(t);
-        case REM:
-            return this.rem(t);
-
-        default:
-            return defaultMultOp(op, t);
+        return switch (op) {
+        case AND -> this.and(t);
+        case OR -> this.or(t);
+        case IMPLIES -> this.implies(t);
+        case IFF -> this.iff(t);
+        case EQUALS -> this.equal(t);
+        case LT -> this.lt(t);
+        case LTE -> this.lte(t);
+        case DIV -> this.div(t);
+        case GT -> this.gt(t);
+        case GTE -> this.gte(t);
+        case MINUS -> this.minus(t);
+        case MUL -> this.mul(t);
+        case PLUS -> this.plus(t);
+        case REM -> this.rem(t);
+        default -> defaultMultOp(op, t);
         // TODO implement bitvec cases if necessary
         // throw new
         // RuntimeException("Unexpected: binOp as arg for the method binOp(): "+op);
-        }
+        };
 
     }
 
-    /**
-     * @param op
-     * @param f
-     * @return
-     */
     private SMTTerm defaultMultOp(SMTTermMultOp.Op op, SMTTerm f) {
         List<SMTTerm> args = this.toList();
         args.add(f);
@@ -721,26 +697,18 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars) {
-        switch (quant) {
-        case FORALL:
-            return this.forall(bindVars);
-        case EXISTS:
-            return this.exists(bindVars);
-        default:
-            return this;
-        }
+        return switch (quant) {
+        case FORALL -> this.forall(bindVars);
+        case EXISTS -> this.exists(bindVars);
+        };
     }
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars,
             List<List<SMTTerm>> pats) {
-        switch (quant) {
-        case FORALL:
-            return this.forall(bindVars, pats);
-        case EXISTS:
-            return this.exists(bindVars, pats);
-        default:
-            return this;
-        }
+        return switch (quant) {
+        case FORALL -> this.forall(bindVars, pats);
+        case EXISTS -> this.exists(bindVars, pats);
+        };
     }
 
     public SMTTerm forall(List<SMTTermVariable> bindVars) {
@@ -941,12 +909,7 @@ public abstract class SMTTerm {
 
         @Override
         public String toString(int nestPos) {
-            StringBuffer tab = new StringBuffer();
-            for (int i = 0; i < nestPos; i++) {
-                tab = tab.append(" ");
-            }
-
-            return tab + "true";
+            return " ".repeat(Math.max(0, nestPos)) + "true";
         }
 
         @Override
@@ -1041,12 +1004,7 @@ public abstract class SMTTerm {
 
         @Override
         public String toString(int nestPos) {
-            StringBuffer tab = new StringBuffer();
-            for (int i = 0; i < nestPos; i++) {
-                tab = tab.append(" ");
-            }
-
-            return tab + "false";
+            return " ".repeat(Math.max(0, nestPos)) + "false";
         }
 
         @Override

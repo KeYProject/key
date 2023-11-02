@@ -40,10 +40,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * TODO
+     * creates a loop-scope block
      *
-     * @param e
-     * @param body
+     * @param iProgramVariable the IProgramVariable to indicate whether the scope should be left
+     *        or continuued
+     * @param body the StatementBlock inside the loop scope (the actual loop body)
      */
     public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
         this.indexPV = iProgramVariable;

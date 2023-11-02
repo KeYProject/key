@@ -8,11 +8,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -47,6 +45,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
+
+import org.jspecify.annotations.NonNull;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -395,8 +395,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             // missing)
             ImmutableArray<TermLabel> labels =
                 TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
-                    ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
-                    result.javaBlock(), result.getLabels());
+                    ruleApp, goal, null, null, result);
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);
             }
@@ -434,8 +433,6 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Simplifies the given constrained formula as far as possible using the replace-known rules
      * (hardcoded here). The context formulas available for replace-known are passed in as
      * "context". The positions of the actually used context formulas are passed out as "ifInsts".
-     *
-     * @param protocol
      */
     private SequentFormula replaceKnown(Services services, SequentFormula cf, boolean inAntecedent,
             Map<TermReplacementKey, PosInOccurrence> context,
@@ -656,7 +653,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             null);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public synchronized ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 
@@ -789,7 +786,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     /**
      * Instances of this class are used in the {@link Map} of
-     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)} to
+     * {@link OneStepSimplifier#replaceKnown} to
      * forece the same behavior as in Taclet rules where names of logical variables and
      * {@link TermLabel}s are ignored.
      *

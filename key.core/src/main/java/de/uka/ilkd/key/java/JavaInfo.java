@@ -38,7 +38,7 @@ public final class JavaInfo {
 
 
     private final Services services;
-    private KeYProgModelInfo kpmi;
+    private final KeYProgModelInfo kpmi;
 
     /**
      * the type of null
@@ -128,10 +128,6 @@ public final class JavaInfo {
      */
     public KeYProgModelInfo getKeYProgModelInfo() {
         return kpmi;
-    }
-
-    void setKeYProgModelInfo(KeYProgModelInfo kpmi) {
-        this.kpmi = kpmi;
     }
 
     /**
@@ -1440,7 +1436,7 @@ public final class JavaInfo {
      * the free class
      * invariant of an object.
      *
-     * @see #getFreeInv()
+     * @see #getInvFree()
      */
     public ProgramVariable getFreeInvProgramVar() {
         if (invFreeProgVar == null) {
@@ -1476,7 +1472,7 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt$inv_free&gt;</code> which stands for the static
+     * Returns the special symbol {@code <$inv_free&>}, which stands for the static
      * invariant of a type.
      */
     public IObserverFunction getStaticInvFree(KeYJavaType target) {

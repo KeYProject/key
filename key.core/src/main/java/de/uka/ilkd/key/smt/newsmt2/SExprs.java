@@ -54,14 +54,11 @@ public class SExprs {
      * @return an SExpr equivalent to the conjunction of the clauses.
      */
     public static SExpr and(List<SExpr> clauses) {
-        switch (clauses.size()) {
-        case 0:
-            return TRUE;
-        case 1:
-            return clauses.get(0);
-        default:
-            return new SExpr("and", Type.BOOL, clauses);
-        }
+        return switch (clauses.size()) {
+        case 0 -> TRUE;
+        case 1 -> clauses.get(0);
+        default -> new SExpr("and", Type.BOOL, clauses);
+        };
     }
 
     /**

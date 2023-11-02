@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -78,6 +79,8 @@ public class Services implements TermServices {
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
+    private OriginTermLabelFactory originFactory;
+
     private final Profile profile;
 
     private final ServiceCaches caches;
@@ -138,6 +141,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.originFactory = s.originFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -241,6 +245,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -280,7 +285,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -305,23 +310,6 @@ public class Services implements TermServices {
             profile.getTermLabelManager().disableOriginLabelRefactorings();
         }
     }
-
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
-    }
-
 
     /*
      * returns an existing named counter, creates a new one otherwise
@@ -367,7 +355,6 @@ public class Services implements TermServices {
         this.namespaces = namespaces;
     }
 
-
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
      */
@@ -386,6 +373,21 @@ public class Services implements TermServices {
      */
     public Profile getProfile() {
         return profile;
+    }
+
+    /**
+     * returns the {@link JavaModel} with all path information
+     *
+     * @return the {@link JavaModel} on which this services is based on
+     */
+    public JavaModel getJavaModel() {
+        return javaModel;
+    }
+
+
+    public void setJavaModel(JavaModel javaModel) {
+        assert this.javaModel == null;
+        this.javaModel = javaModel;
     }
 
     /**
@@ -413,7 +415,7 @@ public class Services implements TermServices {
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
-     * {@link #getTermBuilder(true).
+     * <code>getTermBuilder(true)</code>>.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
@@ -436,26 +438,39 @@ public class Services implements TermServices {
         return factory;
     }
 
-
     public void setFactory(ITermProgramVariableCollectorFactory factory) {
         this.factory = factory;
     }
 
 
+    // =================================================================================================================
+    // =================================================================================================================
+
+    // Origin label specific methods; these should eventually be moved out of the services class
+    // when doing that we must take care not to introduce dependencies to ProofSettings or similar
+    // in places
+    // where that should not occur
+
     /**
-     * returns the {@link JavaModel} with all path information
+     * sets the factory for origin term labels
      *
-     * @return the {@link JavaModel} on which this services is based on
+     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
+     *        should not be created
      */
-    public JavaModel getJavaModel() {
-        return javaModel;
+    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+        this.originFactory = originFactory;
     }
 
-
-    public void setJavaModel(JavaModel javaModel) {
-        assert this.javaModel == null;
-        this.javaModel = javaModel;
+    /**
+     * return the factory for origin term labels
+     *
+     * @return the OriginTermLabelFactory to use or null if origin labels should not be created
+     */
+    public OriginTermLabelFactory getOriginFactory() {
+        return originFactory;
     }
+    // =================================================================================================================
+    // =================================================================================================================
 
     public Lookup createLookup() {
         Lookup lookup = new Lookup();

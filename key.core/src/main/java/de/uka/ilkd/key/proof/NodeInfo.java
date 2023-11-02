@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -331,10 +331,10 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
-                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
                             node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
-                        val = TermLabel.removeIrrelevantLabels(
+                        val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
                     }

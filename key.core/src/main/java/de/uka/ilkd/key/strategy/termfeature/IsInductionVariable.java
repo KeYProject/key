@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.Term;
 /**
  *
  * The comment below was the description used in the variable condition:
- *
+ * <p>
  * <quote>In the taclet language the variable condition is called "\isInductVar". This variable
  * condition checks if a logical variable is marked as an induction variable. A variable is marked
  * as such if its name has the suffix is "Ind" or "IND" and the name has length>3.

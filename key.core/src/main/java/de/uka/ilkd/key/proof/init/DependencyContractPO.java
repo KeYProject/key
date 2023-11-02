@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
@@ -302,10 +301,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
      * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String contractName = properties.getProperty("contract");
         int proofNum = 0;
         String baseContractName = null;

@@ -16,9 +16,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.ExtList;
 
 /**
- * In the DL-formulae description of Taclets the program part can have the following form < pi
- * alpha;...; omega > Phi where pi is a prefix consisting of open brackets, try's and so on and
- * omega is the rest of the program. Between the prefix pi and the postfix omega there can stand an
+ * In the DL-formulae description of Taclets the program part can have the following form
+ * {@code < pi
+ * alpha;...; omega > Phi} where {@code pi} is a prefix consisting of open brackets, {@code try}'s
+ * and so on and
+ * omega is the rest of the program. Between the prefix {@code pi} and the postfix {@code omega}
+ * there can stand an
  * arbitrary program. This pattern is realized using this class.
  */
 

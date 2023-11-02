@@ -34,29 +34,6 @@ public class ParenthesizedExpression extends Operator
     }
 
     /**
-     * Returns the number of children of this node.
-     *
-     * @return an int giving the number of children of this node
-     */
-    public int getChildCount() {
-        return (children != null) ? children.size() : 0;
-    }
-
-    /**
-     * Returns the child at the specified index in this node's "virtual" child array
-     *
-     * @param index an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
-     */
-    public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
-    }
-
-    /**
      * Get arity.
      *
      * @return the int value.

@@ -55,7 +55,7 @@ public class ApplyStrategy extends AbstractProverCore {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-    /** true if the prover should stop as soon as a non closable goal is detected */
+    /** true if the prover should stop as soon as a non-closable goal is detected */
     private boolean stopAtFirstNonClosableGoal;
     /** the number of (so far) closed goal by the current running strategy */
     private int closedGoals;
@@ -67,7 +67,7 @@ public class ApplyStrategy extends AbstractProverCore {
     private GoalChooser goalChooser;
 
     // Please create this object beforehand and re-use it.
-    // Otherwise the addition/removal of the InteractiveProofListener
+    // Otherwise, the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(GoalChooser defaultGoalChooser) {
         this.defaultGoalChooser = defaultGoalChooser;
@@ -76,7 +76,7 @@ public class ApplyStrategy extends AbstractProverCore {
     /**
      * applies rules that are chosen by the active strategy
      *
-     * @return true iff a rule has been applied, false otherwise
+     * @return information whether the rule application was successful or not
      */
     private synchronized SingleRuleApplicationInfo applyAutomaticRule(final GoalChooser goalChooser,
             final StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
@@ -110,7 +110,6 @@ public class ApplyStrategy extends AbstractProverCore {
             return new SingleRuleApplicationInfo(
                 "No more rules automatically applicable to any goal.", g, app);
         } else {
-            assert g != null;
             var time = System.nanoTime();
             try {
                 g.apply(app);
@@ -287,7 +286,7 @@ public class ApplyStrategy extends AbstractProverCore {
 
         ProofListener pl = new ProofListener();
         proof.addRuleAppListener(pl);
-        ApplyStrategyInfo result = null;
+        ApplyStrategyInfo result;
         try {
             result = doWork(goalChooser, stopCondition);
         } finally {

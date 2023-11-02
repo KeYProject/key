@@ -82,8 +82,7 @@ public class DefaultGoalChooser implements GoalChooser {
             }
         } else {
 
-            for (Goal p_goal : p_goals) {
-                final Goal goal = p_goal;
+            for (final Goal goal : p_goals) {
                 selectedList = selectedList.prepend(goal);
             }
 
@@ -218,9 +217,7 @@ public class DefaultGoalChooser implements GoalChooser {
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
-        for (Goal newGoal : newGoals) {
-            final Goal g = newGoal;
-
+        for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {
                 if (!allGoalsSatisfiable) {
                     goalList = goalList.prepend(g);

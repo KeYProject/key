@@ -292,8 +292,14 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     /**
-     * PRECONDITION: ifFormulaInstantiations () == null && ( pos == null ||
-     * termConstraint.isSatisfiable () )
+     * PRECONDITION:
+     *
+     * <pre>
+     *  {@code
+     * ifFormulaInstantiations () == null &&
+     *   ( pos == null || termConstraint.isSatisfiable () )
+     * }
+     * </pre>
      *
      * @return TacletApp with the resulting instantiations or null
      */

@@ -6,7 +6,6 @@ package org.key_project.proofmanagement.io;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -56,7 +55,7 @@ public final class HTMLReport {
         data.print("Generating html report ...");
         try {
             String output = st.render();
-            Files.write(target, output.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(target, output);
             data.print("Report generated at " + target.normalize());
         } catch (IOException e) {
             data.print("Unable to generate report: " + e.getMessage());
@@ -69,6 +68,7 @@ public final class HTMLReport {
      * @return the ST object for rendering the HTML report
      * @throws IOException if an error occurs accessing the StringTemplate resources
      */
+    @SuppressWarnings("rawtypes")
     private static ST prepareStringTemplate() throws IOException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html");
