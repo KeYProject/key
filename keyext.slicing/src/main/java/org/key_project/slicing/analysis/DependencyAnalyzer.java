@@ -292,7 +292,8 @@ public final class DependencyAnalyzer {
             // handle State Merging by throwing an error
             if (node.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                     || node.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
-                throw new IllegalStateException("tried to analyze proof featuring state merging!");
+                throw new IllegalStateException(
+                    "The Proof Slicing functionality does not support state merging!");
             }
 
             // closed goal & has previous step
