@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for proof caching.
@@ -26,6 +28,8 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
  * @author Arne Keller
  */
 public final class ReferenceSearcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearcher.class);
+
     private ReferenceSearcher() {
 
     }
@@ -43,6 +47,7 @@ public final class ReferenceSearcher {
         if (!suitableForCloseByReference(newNode)) {
             return null;
         }
+        LOGGER.trace("searching in {} previous proofs", previousProofs.size());
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
@@ -111,9 +116,11 @@ public final class ReferenceSearcher {
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
                     continue;
                 }
+                LOGGER.debug("found caching candidate in proof {} node {}", p.name(), n.serialNr());
                 return new ClosedBy(p, n);
             }
         }
+        LOGGER.trace("found no caching candidate");
         return null;
     }
 
