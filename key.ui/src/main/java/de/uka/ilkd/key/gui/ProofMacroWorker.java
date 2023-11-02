@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.InteractionListener;
@@ -70,6 +72,9 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     private Exception exception;
     private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
+    /** a condition for signaling the ready state */
+    private final Condition cond;
+
     /**
      * Instantiates a new proof macro worker.
      *
@@ -86,6 +91,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         this.macro = macro;
         this.mediator = mediator;
         this.posInOcc = posInOcc;
+
+        cond = new ReentrantLock().newCondition();
     }
 
     @Override
@@ -106,6 +113,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
+        } finally {
         }
 
         return info;
@@ -130,6 +138,9 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
 
             mediator.setInteractive(true);
             mediator.startInterface(true);
+            // give the signal to waiting threads
+            cond.signalAll();
+
             mediator.getUI().getProofControl().fireAutoModeStopped(new ProofEvent(node.proof()));
             if (SELECT_GOAL_AFTER_MACRO) {
                 selectOpenGoalBelow();
@@ -168,5 +179,9 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
                 n = n.parent();
             }
         }
+    }
+
+    public Condition getReadyCondition() {
+        return cond;
     }
 }
