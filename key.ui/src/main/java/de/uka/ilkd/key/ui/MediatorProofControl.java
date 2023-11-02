@@ -6,6 +6,8 @@ package de.uka.ilkd.key.ui;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -44,6 +47,12 @@ public class MediatorProofControl extends AbstractProofControl {
 
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
+
+    /**
+     * This is condition is non-null during auto-mode execution. You can wait on it to block until auto-mode has finished.
+     */
+    @Nullable
+    private Condition notInAutoMode;
 
     public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
@@ -82,6 +91,8 @@ public class MediatorProofControl extends AbstractProofControl {
             return;
         }
         worker = new AutoModeWorker(proof, goals, ptl);
+        notInAutoMode = worker.getReadyCondition();
+
         ui.getMediator().initiateAutoMode(proof, true, false);
         worker.execute();
     }
@@ -107,10 +118,11 @@ public class MediatorProofControl extends AbstractProofControl {
                 "tried to block the UI thread whilst waiting for auto mode to finish"));
             return; // do not block the UI thread
         }
-        while (ui.getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
+        if(notInAutoMode != null) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+                notInAutoMode.await();
+            } catch (InterruptedException ignore) {
+
             }
         }
     }
@@ -138,6 +150,7 @@ public class MediatorProofControl extends AbstractProofControl {
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+        notInAutoMode = worker.getReadyCondition();
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
@@ -158,6 +171,7 @@ public class MediatorProofControl extends AbstractProofControl {
         private final ImmutableList<Goal> goals;
         private final ApplyStrategy applyStrategy;
         private ApplyStrategyInfo info;
+        private final Condition ready;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
                 ProverTaskListener ptl) {
@@ -174,6 +188,8 @@ public class MediatorProofControl extends AbstractProofControl {
             if (ui.getMediator().getAutoSaver() != null) {
                 applyStrategy.addProverTaskObserver(ui.getMediator().getAutoSaver());
             }
+
+            ready = new ReentrantLock().newCondition();
         }
 
         @Override
@@ -193,6 +209,7 @@ public class MediatorProofControl extends AbstractProofControl {
                     applyStrategy.clear();
                 }
                 ui.getMediator().finishAutoMode(proof, true, true, null);
+                ready.signalAll();
                 emitInteractiveAutoMode(initialGoals, proof, info);
 
                 if (info.getException() != null) {
@@ -212,7 +229,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected ApplyStrategyInfo doInBackground() throws Exception {
+        protected ApplyStrategyInfo doInBackground() {
             boolean stopMode =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                         .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
@@ -221,6 +238,10 @@ public class MediatorProofControl extends AbstractProofControl {
             info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
                 ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
             return info;
+        }
+
+        public Condition getReadyCondition() {
+            return ready;
         }
     }
 }
