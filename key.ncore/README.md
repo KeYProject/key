@@ -19,10 +19,21 @@ etc.
   - Language-independent `Sort` and `AbstractSort`
     - No implementation of `Sort` in `ncore`
     - No concrete sorts (e.g., `ANY`, `FORMULA`)
+  - `Modality` has a `kind` of type `ModalityKind`, i.e., box, diamond, etc.
+  - `Modality` references program
 - Changes to `core`
   - Removed dependency of `Operator` on `Term`
   - Created `ldt.JavaDLTheory`, which now holds `ANY`, `FORMULA`, etc. sorts
   - Classes and interfaces now depend on `ncore` structures
+  - Removed `AbstractSort`; make `Sort` an abstract class and integrate old `AbstractSort` functionality
+  - Move most `Term` methods to `ncore`
+  - Move `Visitor` interface to `ncore`
+  - Modality now references the program
+  - Add `JavaModalityKind`
+  - `Term` no longer has `javaBlock` field
+  - Update matching and term creation
+  - Modality has new equality
+    - Equal iff kind and program are correct
 
 ## Philosophy
 
