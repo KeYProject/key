@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
@@ -45,10 +44,6 @@ public interface ImmutableSet<T extends @Nullable Object>
 
     static <T extends @Nullable Object> ImmutableSet<T> empty() {
         return DefaultImmutableSet.nil();
-    }
-
-    static <T> ImmutableSet<T> fromCollection(Collection<? extends T> seq) {
-        return fromSet(new HashSet<>(seq));
     }
 
     /**
