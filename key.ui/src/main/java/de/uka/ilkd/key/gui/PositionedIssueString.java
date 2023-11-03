@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Objects;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Small data class that in addition to the information already contained by PositionedString

@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.checkerframework.checker.nullness.util.NullnessUtil;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utilities for Collections.
@@ -29,7 +29,8 @@ public class KeYCollections {
      * first one.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
-        @Nullable S[] res = Arrays.copyOf(s1, s1.length + s2.length);
+        @Nullable
+        S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
         // After arraycopy, all elements of res are NonNull.
         return NullnessUtil.castNonNullDeep(res);

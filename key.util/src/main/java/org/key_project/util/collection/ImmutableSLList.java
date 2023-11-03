@@ -3,13 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -17,10 +10,15 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.logging.LogManager;
 import java.util.stream.Collector;
 
 import org.key_project.util.Strings;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation allows
@@ -78,7 +76,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         S[] result;
         if (array.length < size()) {
             Class<? extends Object[]> arrayClass = array.getClass();
-            assert arrayClass.isArray() : "@AssumeAssertion(nullness): This has indeed a component type";
+            assert arrayClass.isArray()
+                    : "@AssumeAssertion(nullness): This has indeed a component type";
             result = (S[]) Array.newInstance(arrayClass.getComponentType(), size());
         } else {
             result = array;
@@ -100,9 +99,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         S[] result = (S[]) Array.newInstance(type, size());
         ImmutableList<T> rest = this;
         for (int i = 0, sz = size(); i < sz; i++) {
-            //@ assert !rest.isEmpty();
+            // @ assert !rest.isEmpty();
             T head = rest.head();
-            result[i] = (S)type.cast(head);
+            result[i] = (S) type.cast(head);
             rest = rest.tail();
         }
         return result;
@@ -240,9 +239,10 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             } else {
                 final int sz = list.size();
                 if (sz == 1) {
-                    //@ assert !list.isEmpty();
+                    // @ assert !list.isEmpty();
                     @SuppressWarnings("nullness")
-                    @NonNull S head = list.head();
+                    @NonNull
+                    S head = list.head();
                     return new Cons<>(head, this);
                 }
                 Cons<S> result = this;

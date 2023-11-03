@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -15,11 +10,15 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * List interface to be implemented by non-destructive lists
  */
 @NullMarked
-public interface ImmutableList<T extends @Nullable Object> extends Iterable<T>, java.io.Serializable {
+public interface ImmutableList<T extends @Nullable Object>
+        extends Iterable<T>, java.io.Serializable {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.

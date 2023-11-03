@@ -24,5 +24,6 @@ public interface IRunnableWithException extends Runnable {
      *
      * @return An occurred exception.
      */
-    @Nullable Exception getException();
+    @Nullable
+    Exception getException();
 }

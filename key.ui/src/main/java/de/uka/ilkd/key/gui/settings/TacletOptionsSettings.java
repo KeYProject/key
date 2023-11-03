@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;

@@ -7,10 +7,11 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
-import org.jspecify.annotations.NonNull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class GUIAbstractTreeNode implements TreeNode {
 

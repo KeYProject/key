@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

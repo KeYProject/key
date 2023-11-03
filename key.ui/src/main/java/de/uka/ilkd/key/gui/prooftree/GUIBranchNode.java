@@ -6,10 +6,11 @@ package de.uka.ilkd.key.gui.prooftree;
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
 
-import org.jspecify.annotations.NonNull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.NonNull;
 
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 

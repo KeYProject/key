@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
@@ -13,6 +12,8 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.util.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 

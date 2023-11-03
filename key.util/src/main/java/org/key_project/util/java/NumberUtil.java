@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Provides utility methods to work with numbers.

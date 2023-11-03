@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.SearchBar;
@@ -19,6 +18,8 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /*
  * Search bar implementing search function for SequentView.

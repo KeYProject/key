@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides static methods to work with XML.
@@ -39,7 +37,8 @@ public final class XMLUtil {
      * @param replacer The {@link ITagReplacer} to use.
      * @return The new created text.
      */
-    public static @Nullable String replaceTags(@Nullable String text, @Nullable ITagReplacer replacer) {
+    public static @Nullable String replaceTags(@Nullable String text,
+            @Nullable ITagReplacer replacer) {
         if (text != null && replacer != null) {
             StringBuilder sb = new StringBuilder();
             char[] signs = text.toCharArray();
@@ -56,7 +55,8 @@ public final class XMLUtil {
                         sb.append(sign);
                     }
                 } else {
-                    assert tagSB != null : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+                    assert tagSB != null
+                            : "@AssumeAssertion(nullness): tagSB must have been intialised already";
                     tagSB.append(sign);
                     if (sign == '>' && !inAttribute) {
                         inTag = false;
@@ -88,7 +88,8 @@ public final class XMLUtil {
          * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
-        @Nullable String replaceTag(String tag);
+        @Nullable
+        String replaceTag(String tag);
     }
 
     /**

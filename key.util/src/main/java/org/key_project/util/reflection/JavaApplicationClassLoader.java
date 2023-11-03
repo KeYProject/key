@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.reflection;
 
-import org.jspecify.annotations.NullMarked;
-
 import java.util.ServiceLoader;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An {@link IClassLoader} implementation for Java Applications.

@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.helper;
 
-import org.checkerframework.checker.units.qual.N;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,8 +10,9 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -37,13 +34,15 @@ public final class FindResources {
             throws URISyntaxException, IOException {
         final var classLoader = clazz.getClassLoader();
 
-        if (classLoader == null) return null;
+        if (classLoader == null)
+            return null;
 
-        @Nullable URL dirURL = classLoader.getResource(path);
+        @Nullable
+        URL dirURL = classLoader.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             /* A file path: easy enough */
             File[] files = new File(dirURL.toURI()).listFiles();
-            if(files == null)
+            if (files == null)
                 files = new File[0];
             return Arrays.stream(files).map(File::toPath).collect(Collectors.toList());
         }
@@ -76,14 +75,16 @@ public final class FindResources {
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
-    public static <T> @Nullable List<Path> getResources(String path) throws URISyntaxException, IOException {
+    public static <T> @Nullable List<Path> getResources(String path)
+            throws URISyntaxException, IOException {
         return getResources(path, FindResources.class);
     }
 
     public static <T> @Nullable Path getResource(String path, Class<T> clazz)
             throws URISyntaxException, IOException {
         final var classLoader = clazz.getClassLoader();
-        if(classLoader == null) return null;
+        if (classLoader == null)
+            return null;
         URL dirURL = classLoader.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             return new File(dirURL.toURI()).toPath();
@@ -114,7 +115,8 @@ public final class FindResources {
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
-    public static <T> @Nullable Path getResource(String path) throws URISyntaxException, IOException {
+    public static <T> @Nullable Path getResource(String path)
+            throws URISyntaxException, IOException {
         return getResource(path, FindResources.class);
     }
 

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
-import org.jspecify.annotations.NullMarked;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Simple realisation of an LRU cache.

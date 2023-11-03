@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
-import org.jspecify.annotations.NonNull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;

@@ -11,11 +11,12 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
 import java.util.function.Predicate;
-import org.jspecify.annotations.NonNull;
 import javax.swing.JTree;
 import javax.swing.event.*;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Cache/Access JTree's expansion state. The interface of JTree to access the expanded paths is

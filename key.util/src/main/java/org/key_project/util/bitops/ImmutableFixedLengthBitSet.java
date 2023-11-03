@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.bitops;
 
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.BitSet;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents a non-negative number with access to single bits; the length of the bit set is fixed.

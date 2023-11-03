@@ -7,10 +7,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.Icon;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl

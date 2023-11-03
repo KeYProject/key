@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
-
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Helper functions for {@link String}s

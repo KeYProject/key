@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -33,6 +32,8 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Entry point for the Proof Exploration Extension.
