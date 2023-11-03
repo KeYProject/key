@@ -17,7 +17,7 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 public class SlicingSettings extends AbstractPropertiesSettings {
 
     public static final String CATEGORY = "ProofSlicing";
-    
+
     /**
      * Config key for {@link #alwaysTrack}.
      */
