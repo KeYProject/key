@@ -141,7 +141,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     /**
      * A list of bookmark of favourite folders of the user. Can be manipulated with
-     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
+     * {@code de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
      */
     private static final String USER_FOLDER_BOOKMARKS = "folderBookmarks";
 

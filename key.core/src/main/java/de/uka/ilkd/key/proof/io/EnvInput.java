@@ -101,7 +101,10 @@ public interface EnvInput {
      * If true, the requested Java file has to given via {@link #getJavaFile()}.
      * </p>
      *
-     * @see de.uka.ilkd.key.proof.init.ProblemInitializer#readJava(EnvInput, InitConfig)
+     * For further information see the <code>readJava(EnvInput, InitConfig)</code> method of class
+     * {@link de.uka.ilkd.key.proof.init.ProblemInitializer}
+     *
+     * @see de.uka.ilkd.key.proof.init.ProblemInitializer
      */
     default boolean isIgnoreOtherJavaFiles() { return false; }
 }

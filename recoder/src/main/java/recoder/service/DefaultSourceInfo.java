@@ -221,10 +221,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     /**
-     * handles the given change by trying not to invalidate too much pre computed information.
+     * handles the given change by trying not to invalidate too much pre-computed information.
      *
-     * @param attached true if the program elements was attached, false otherwise
-     * @param changed the program element that was changed
+     * @param change the change made in the AST
      */
     void processChange(TreeChange change) {
         // the following code implements a very restrictive way to invalidate
@@ -1836,8 +1835,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * UNTESTED AND INCOMPLETE
      *
-     * @param pe
-     * @return
+     * @param m the method to be checked
+     * @param mr the method reference to be checked
+     * @return warning/error message or {@code null} if everything was fine
      */
     private final String isAppropriate(Method m, MethodReference mr) {
         // follows JLS ?15.12.3

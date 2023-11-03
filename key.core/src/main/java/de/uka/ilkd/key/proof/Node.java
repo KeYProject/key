@@ -122,7 +122,7 @@ public class Node implements Iterable<Node> {
         DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 

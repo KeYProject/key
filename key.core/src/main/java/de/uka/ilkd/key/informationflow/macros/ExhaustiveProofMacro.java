@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
- * the macro given by {@link getProofMacro()} directly, or --if not directly applicable-- search on
+ * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on
  * the sequent for any applicable posInOcc and apply it on the first applicable one or --if not
  * applicable anywhere on the sequent-- do not apply it.
  *

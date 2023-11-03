@@ -99,7 +99,7 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
      *        matches of this schemavariable)
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair {@link (sv, instantiationCandidate)} added
+     *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
             Services services);

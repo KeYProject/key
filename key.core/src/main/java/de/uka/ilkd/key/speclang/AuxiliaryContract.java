@@ -679,7 +679,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         private final TermServices services;
 
         /**
-         * You should use {@link #create()} instead of this constructor.
+         * creates an auxiliary contract
          *
          * @param self {@code self}
          * @param breakFlags boolean flags that are set to {@code true} when the block terminates by

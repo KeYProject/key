@@ -16,7 +16,7 @@ import org.key_project.util.java.IOUtil;
  * directory. In Microsoft windows operating systems this is directly the hard disc that contains
  * the KeY code. But the eclipse integration requires to change the default location. This is
  * possible via {@link #setKeyConfigDir(String)} which should be called once before something is
- * done with KeY (e.g. before the {@link MainWindow} is opened).
+ * done with KeY (e.g. before the {@code MainWindow} is opened).
  * </p>
  */
 public final class PathConfig {
