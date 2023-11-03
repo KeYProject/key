@@ -6,7 +6,6 @@ package de.uka.ilkd.key.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -91,6 +90,8 @@ public class KeYMediator {
 
     /**
      * Registered proof load listeners.
+     *
+     * @see #fireProofLoaded(Proof)
      */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
@@ -105,10 +106,6 @@ public class KeYMediator {
      * Currently opened proofs.
      */
     private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
-    /**
-     * Currently loaded proofs.
-     */
-    private final WeakHashMap<Proof, Object> loadedProofs = new WeakHashMap<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
@@ -141,7 +138,7 @@ public class KeYMediator {
 
     /**
      * Register a proof load listener. Will be called whenever a new proof is loaded, but before
-     * it is replayed.
+     * it is replayed. The listener MUST be able to accept the same proof twice!
      *
      * @param listener callback
      */
@@ -518,10 +515,6 @@ public class KeYMediator {
         if (p == null) {
             return;
         }
-        if (loadedProofs.containsKey(p)) {
-            return;
-        }
-        loadedProofs.put(p, null);
         for (Consumer<Proof> listener : proofLoadListeners) {
             listener.accept(p);
         }

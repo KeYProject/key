@@ -13,19 +13,37 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.rule.RuleApp;
 
+/**
+ * Tracks which rule application introduced each {@link LocationVariable} in a proof.
+ * Currently only checks for {@code ifElseUnfold} rules.
+ *
+ * @author Arne Keller
+ */
 public class LocationVariableTracker implements RuleAppListener {
     /**
-     * The "origin" of this variable. Used to indicate which
+     * The "origin" of the variables. Used to indicate which
      * {@link de.uka.ilkd.key.rule.TacletApp} created a new program variable.
      */
     private final Map<LocationVariable, RuleApp> createdBy = new WeakHashMap<>();
 
+    /**
+     * Register a new tracker on the provided proof.
+     *
+     * @param proof proof to track
+     */
     public static void handleProofLoad(Proof proof) {
+        if (proof.lookup(LocationVariableTracker.class) != null) {
+            return;
+        }
         LocationVariableTracker self = new LocationVariableTracker();
         proof.register(self, LocationVariableTracker.class);
         proof.addRuleAppListener(self);
     }
 
+    /**
+     * @param locationVariable some location variable
+     * @return the rule app that created it, or null
+     */
     public RuleApp getCreatedBy(LocationVariable locationVariable) {
         return createdBy.get(locationVariable);
     }
