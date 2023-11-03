@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -310,8 +312,6 @@ public class NodeInfo {
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
-            // XXX
-
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
             StringBuffer sb = new StringBuffer();
@@ -337,6 +337,18 @@ public class NodeInfo {
                         val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
+                    } else if (val instanceof LocationVariable locVar) {
+                        var originTracker = node.proof().lookup(LocationVariableTracker.class);
+                        if (originTracker != null) {
+                            var origin = originTracker.getCreatedBy(locVar);
+                            if (origin instanceof PosTacletApp posTacletApp) {
+                                var name = posTacletApp.taclet().displayName();
+                                if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
+                                    val =
+                                        posTacletApp.instantiations().lookupValue(new Name("#nse"));
+                                }
+                            }
+                        }
                     }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
                 }
