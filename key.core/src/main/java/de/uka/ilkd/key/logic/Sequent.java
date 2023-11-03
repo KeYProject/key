@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -84,7 +83,7 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /** creates new Sequent with antecedence and succedence */
-    private Sequent(@Nonnull Semisequent antecedent, @Nonnull Semisequent succedent) {
+    private Sequent(Semisequent antecedent, Semisequent succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;
