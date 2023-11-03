@@ -23,7 +23,7 @@ import org.key_project.util.reflection.ClassLoaderUtil;
  *
  * <p>
  * It provides a menu with all macros which are applicable in a given context. The check of of
- * applicability is done using {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence)}.
+ * applicability is done using {@link ProofMacro#canApplyTo}.
  *
  * <p>
  * The menu items bear the name returned by {@link ProofMacro#getName()} and the tooltip is set to

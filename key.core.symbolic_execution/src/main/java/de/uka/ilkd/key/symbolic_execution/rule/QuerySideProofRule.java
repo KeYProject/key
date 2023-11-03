@@ -34,7 +34,6 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableList;
@@ -110,7 +109,7 @@ import org.key_project.util.collection.ImmutableList;
  * </li>
  * </ol>
  * The side proof uses the default side proof settings (splitting = delayed) and is started via
- * {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}. In
+ * {@link SymbolicExecutionSideProofUtil#startSideProof}. In
  * case that at least one result branch has applicable rules an exception is thrown and the rule is
  * aborted.
  * </p>

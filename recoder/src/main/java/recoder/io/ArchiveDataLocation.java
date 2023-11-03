@@ -70,9 +70,12 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form " <type>:
-     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
-     * archive:recoder.zip:recoder/java/JavaProgramFactory.class
+     * returns a URL-like string representation of the location in the form {@code  <type>:
+     * <location-specific-name>}, i.e.
+     *
+     * <pre>
+     * {@code  file:/bin/sh url:http://mywww/myfile archive:recoder.zip:recoder/java/JavaProgramFactory.class}
+     * </pre>
      */
     public String toString() {
         return getType() + ":" + archiveFile.getName() + "?" + itemName;

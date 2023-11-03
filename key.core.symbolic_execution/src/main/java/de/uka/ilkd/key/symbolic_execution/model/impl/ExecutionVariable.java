@@ -27,7 +27,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
@@ -72,7 +71,6 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Constructor for a "normal" child value.
      *
-     * @param settings The {@link ITreeSettings} to use.
      * @param parentNode The parent {@link IExecutionNode} which provides this
      *        {@link ExecutionVariable}.
      * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.

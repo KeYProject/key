@@ -5,6 +5,7 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,9 +26,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -35,16 +34,12 @@ import org.key_project.util.collection.ImmutableSet;
 
 import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
 
@@ -118,7 +113,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (String s : Objects.requireNonNull(ids)) {
             modalities = opSVHelper(s, modalities);
         }
-        SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
+        SchemaVariable osv =
+            SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
         schemaVariables().add(osv);
         return osv;
     }
@@ -485,12 +481,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         return switch (expectedType) {
-            case TYPE_RESOLVER -> buildTypeResolver(ctx);
-            case SORT -> visitSortId(ctx.term().getText(), ctx.term());
-            case JAVA_TYPE -> getOrCreateJavaType(ctx.term().getText(), ctx);
-            case VARIABLE -> varId(ctx, ctx.getText());
-            case STRING -> ctx.getText();
-            case TERM -> accept(ctx.term());
+        case TYPE_RESOLVER -> buildTypeResolver(ctx);
+        case SORT -> visitSortId(ctx.term().getText(), ctx.term());
+        case JAVA_TYPE -> getOrCreateJavaType(ctx.term().getText(), ctx);
+        case VARIABLE -> varId(ctx, ctx.getText());
+        case STRING -> ctx.getText();
+        case TERM -> accept(ctx.term());
         };
     }
 

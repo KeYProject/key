@@ -55,7 +55,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * Set comments.
      *
-     * @param c a comment list.
+     * @param list a comment list.
      */
 
     public void setComments(ASTList<Comment> list) {

@@ -65,7 +65,7 @@ import org.jspecify.annotations.NonNull;
  * <li>Succedent: {@code <resultCondition> & <result> = <something>}</li>
  * </ul>
  * The side proof uses the default side proof settings (splitting = delayed) and is started via
- * {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}. In
+ * {@link SymbolicExecutionSideProofUtil#startSideProof}. In
  * case that at least one result branch has applicable rules an exception is thrown and the rule is
  * aborted.
  * </p>

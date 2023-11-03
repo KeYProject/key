@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.Name;
 public final class MetaShiftRight extends MetaShift {
 
     /**
-     * @param leftShift
+     * creates the transformer for performing a shift to the right
      */
     public MetaShiftRight() {
         super(new Name("#ShiftRight"));

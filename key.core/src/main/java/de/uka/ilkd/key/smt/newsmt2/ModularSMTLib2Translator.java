@@ -42,7 +42,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     /**
      * Handler option. If provided, the translator will label translations of sequent formulas such
-     * that {@link de.uka.ilkd.key.gui.smt.SMTFocusResults} can interpret the unsat core.
+     * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
      * This option is currently only enabled for Z3.
      * Currently, this option only works with a CVC5 dev build.

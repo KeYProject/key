@@ -71,11 +71,11 @@ public abstract class TacletLoader {
      * Taclets are stored in ImmutableSets which fortunately enough still have a fixed order due to
      * their implementation using immutable lists.
      *
-     * @param taclet the taclet for which PO will be generated. Remove all taclets after this
-     *        taclet.
-     *
      * @param initConfig the initial config from which the taclet to prove and all following taclets
      *        have been removed.
+     * @param tacletToProve the taclet for which PO will be generated. Remove all taclets after this
+     *        taclet.
+     *
      */
 
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
