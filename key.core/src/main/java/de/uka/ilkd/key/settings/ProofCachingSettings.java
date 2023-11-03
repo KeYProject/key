@@ -15,11 +15,11 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
     /**
      * Key ID for {@link #enabled}.
      */
-    private static final String ENABLED_KEY = "[ProofCaching]Enabled";
+    private static final String ENABLED_KEY = "Enabled";
     /**
      * Key ID for {@link #enabled}.
      */
-    private static final String DISPOSE_KEY = "[ProofCaching]Dispose";
+    private static final String DISPOSE_KEY = "Dispose";
 
 
     /**

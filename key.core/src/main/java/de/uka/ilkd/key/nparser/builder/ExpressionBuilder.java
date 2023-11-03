@@ -702,8 +702,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 throw new BuildingException(ex);
             }
         } else if (attributeName.equals("<inv>")) {
-            // The invariant observer "<inv>" is implicit and
-            // not part of the class declap
+            // The invariant observer "<inv>" is implicit and not part of the class declaration
             // A special case is needed, hence.
             result = javaInfo.getInvProgramVar();
         } else if (attributeName.equals("<inv_free>")) {

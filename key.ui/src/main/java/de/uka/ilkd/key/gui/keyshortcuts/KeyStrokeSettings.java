@@ -222,7 +222,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
-            config.save(writer, "KeY's Colors");
+            config.save(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {
             LOGGER.warn("Failed to save", ex);

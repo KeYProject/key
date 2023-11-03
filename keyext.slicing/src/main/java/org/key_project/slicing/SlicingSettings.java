@@ -15,11 +15,13 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
  * @author Arne Keller
  */
 public class SlicingSettings extends AbstractPropertiesSettings {
+
     public static final String CATEGORY = "ProofSlicing";
+    
     /**
      * Config key for {@link #alwaysTrack}.
      */
-    private static final String KEY_ALWAYS_TRACK = "[ProofSlicing]alwaysTrack";
+    private static final String KEY_ALWAYS_TRACK = "alwaysTrack";
     /**
      * Config key for {@link #aggressiveDeduplicate}.
      */
