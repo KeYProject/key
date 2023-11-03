@@ -74,6 +74,17 @@ public class KeyAdapter {
         }
     }
 
+    public static class ThrowableAdapter implements JsonSerializer<Throwable> {
+        @Override
+        public JsonElement serialize(Throwable src, Type typeOfSrc, JsonSerializationContext context) {
+            var obj = new JsonObject();
+            obj.add("$class", context.serialize(src.getClass().getSimpleName()));
+            obj.add("message", context.serialize(src.getMessage()));
+            obj.add("cause", context.serialize(src.getCause()));
+            return obj;
+        }
+    }
+
     /*class IdentifiableTypeAdapter implements JsonSerializer<Identifiable>, JsonDeserializer<Identifiable> {
         @Override
         public Identifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
