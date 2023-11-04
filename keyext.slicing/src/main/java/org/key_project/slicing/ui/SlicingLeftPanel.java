@@ -290,8 +290,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
 
-        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
+        abbreviateFormulas = new JCheckBox("Abbreviate node labels");
+        abbreviateFormulas.setToolTipText("Replace node labels with their hash value.");
         abbreviateChains = new JCheckBox("Shorten long chains");
+        abbreviateChains.setToolTipText("""
+                Collapse long chains when rendering the graph.
+                When enabled, nodes with both input and output degree equal to one,
+                and input/output hyperedge size equal to one will be collapsed into the output
+                edge.""");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
