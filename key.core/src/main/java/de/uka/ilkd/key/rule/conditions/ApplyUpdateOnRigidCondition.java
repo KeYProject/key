@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.collection.ImmutableArray;
 
 
 public final class ApplyUpdateOnRigidCondition implements VariableCondition {
@@ -36,11 +38,36 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     // phi.sub(i));
     private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
         Term[] updatedSubs = new Term[phi.arity()];
-        for (int i = 0; i < updatedSubs.length; i++) {
-            updatedSubs[i] = services.getTermBuilder().apply(u, phi.sub(i), null);
+        updatedSubs = phi.subs().toArray(updatedSubs);
+
+        Set<Name> freeVarNamesInU = new HashSet<>();
+        u.freeVars().forEach((freeVar) -> freeVarNamesInU.add(freeVar.name()));
+        List<QuantifiableVariable> boundVarsinPhi = new LinkedList<>();
+        phi.boundVars().forEach(boundVarsinPhi::add);
+
+        for (int i = 0; i < boundVarsinPhi.size(); i++) {
+            QuantifiableVariable currentBoundVar = boundVarsinPhi.get(i);
+            if (freeVarNamesInU.contains(currentBoundVar.name())) {
+                LogicVariable renamedVar =
+                    new LogicVariable(new Name("tobias" + i), currentBoundVar.sort());
+                Term substTerm = services.getTermBuilder().var(renamedVar);
+
+                for (int j = 0; j < updatedSubs.length; j++) {
+                    updatedSubs[j] =
+                        services.getTermBuilder().subst(currentBoundVar, substTerm, updatedSubs[j]);
+                }
+
+                boundVarsinPhi.set(i, renamedVar);
+            }
         }
+        for (int i = 0; i < updatedSubs.length; i++) {
+            updatedSubs[i] = services.getTermBuilder().apply(u, updatedSubs[i], null);
+        }
+
+        // Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
+        //     phi.boundVars(), phi.javaBlock());
         Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            phi.boundVars(), phi.javaBlock());
+            new ImmutableArray<>(boundVarsinPhi), phi.javaBlock());
         return result;
     }
 
