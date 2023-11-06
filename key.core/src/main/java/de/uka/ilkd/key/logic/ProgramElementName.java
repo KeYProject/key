@@ -70,7 +70,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
         super(q + "::" + n);
-        assert q.length() > 0 : "Tried to create qualified name with missing qualifier";
+        assert !q.isEmpty() : "Tried to create qualified name with missing qualifier";
 
         this.qualifierString = q.intern();
         this.shortName = n.intern();
