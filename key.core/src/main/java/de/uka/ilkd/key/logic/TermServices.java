@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Modality;
 
 /**
  * This interface defines the basic functionalities of services required to construct {@link Term}s.
@@ -18,15 +17,6 @@ public interface TermServices {
      * @return the proof specific namespaces
      */
     NamespaceSet getNamespaces();
-
-    /**
-     * Retrieves the modality of the given kind and program.
-     *
-     * @param kind the kind of the modality such as diamond or box
-     * @param jb the program of this modality
-     * @return the modality of the given kind and program.
-     */
-    Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb);
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.

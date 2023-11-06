@@ -466,10 +466,11 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
+        Modality.JavaModalityKind kind = contract.getModalityKind();
+        JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock());
         final Instantiation inst =
             new Instantiation(tb.skip(), tb.tt(),
-                services.getModality(contract.getModalityKind(),
-                    JavaBlock.createJavaBlock(new StatementBlock())),
+                Modality.getModality(kind, jb),
                 selfTerm, block, ec);
         return new GoalsConfigurator(null, new TermLabelState(), inst,
             contract.getAuxiliaryContract().getLabels(), variables, null, services, null);

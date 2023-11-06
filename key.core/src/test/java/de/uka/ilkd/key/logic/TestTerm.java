@@ -195,7 +195,7 @@ public class TestTerm {
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
         Term withJB =
-            tf.createTerm(tb.services.getModality(Modality.JavaModalityKind.DIA, javaBlock),
+            tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, javaBlock),
                 new ImmutableArray<>(noJB), null, javaBlock);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);

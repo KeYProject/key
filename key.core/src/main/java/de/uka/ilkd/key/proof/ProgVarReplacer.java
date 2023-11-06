@@ -248,7 +248,7 @@ public final class ProgVarReplacer {
             Statement newS = (Statement) replace(s);
             if (newS != s) {
                 newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
-                op = services.getModality(mod.kind(), newJb);
+                op = Modality.getModality(mod.kind(), newJb);
             }
         }
 

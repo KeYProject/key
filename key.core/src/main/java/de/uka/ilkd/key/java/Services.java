@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -22,7 +20,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.logic.Name;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -94,11 +91,6 @@ public class Services implements TermServices {
     private final TermBuilder termBuilderWithoutCache;
 
     /**
-     * keeps track of created modalities
-     */
-    private Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> modalities;
-
-    /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
      */
@@ -115,12 +107,10 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(
             new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
-        modalities = new HashMap<>();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
-            KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches,
-            Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> modalities) {
+            KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -131,7 +121,6 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        this.modalities = modalities;
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
@@ -151,7 +140,6 @@ public class Services implements TermServices {
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
-        this.modalities = s.modalities;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.originFactory = s.originFactory;
@@ -254,8 +242,7 @@ public class Services implements TermServices {
             "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches,
-            new HashMap<>(modalities));
+            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -299,7 +286,6 @@ public class Services implements TermServices {
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        s.modalities = new HashMap<>(modalities);
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
         s.originFactory = originFactory;
@@ -364,17 +350,6 @@ public class Services implements TermServices {
      */
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
-    }
-
-    @Override
-    public Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
-        var pair = new Pair<>(kind, jb.program());
-        Modality mod = modalities.get(pair);
-        if (mod == null) {
-            mod = new Modality(jb, kind);
-            modalities.put(pair, mod);
-        }
-        return mod;
     }
 
     /**
@@ -505,7 +480,6 @@ public class Services implements TermServices {
         lookup.register(getTermBuilder());
         lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
-        lookup.register(modalities);
         return lookup;
     }
 }

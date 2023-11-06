@@ -5,16 +5,20 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Program;
+import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
@@ -22,11 +26,34 @@ import org.key_project.logic.Program;
  */
 public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
     /**
+     * keeps track of created modalities
+     */
+    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
+        new WeakHashMap<>();
+
+    /**
+     * Retrieves the modality of the given kind and program.
+     *
+     * @param kind the kind of the modality such as diamond or box
+     * @param jb the program of this modality
+     * @return the modality of the given kind and program.
+     */
+    public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
+        var pair = new Pair<>(kind, jb.program());
+        Modality mod = modalities.get(pair);
+        if (mod == null) {
+            mod = new Modality(jb, kind);
+            modalities.put(pair, mod);
+        }
+        return mod;
+    }
+
+    /**
      * Creates a modal operator with the given name
      * <strong>Creation must only be done by {@link de.uka.ilkd.key.logic.TermServices}!</strong>
      *
      */
-    public Modality(Program prg, JavaModalityKind kind) {
+    private Modality(Program prg, JavaModalityKind kind) {
         super(kind.name(), JavaDLTheory.FORMULA, prg, kind);
     }
 
@@ -105,6 +132,12 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
             return kind().toString();
         }
         return super.toString();
+    }
+
+    @Override
+    protected void finalize() {
+        System.out.println(
+            "Drop modality " + kind() + ": " + ProofSaver.printAnything(program().program(), null));
     }
 
     public static class JavaModalityKind extends Kind implements SVSubstitute {

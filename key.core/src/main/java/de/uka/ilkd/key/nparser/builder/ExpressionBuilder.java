@@ -1124,10 +1124,10 @@ public class ExpressionBuilder extends DefaultBuilder {
              * "No schema elements allowed outside taclet declarations (" + sjb.opName + ")"); }
              */
             Modality.JavaModalityKind kind = (Modality.JavaModalityKind) schemaVariables().lookup(new Name(sjb.opName));
-            op = services.getModality(kind, sjb.javaBlock);
+            op = Modality.getModality(kind, sjb.javaBlock);
         } else {
             Modality.JavaModalityKind kind = Modality.JavaModalityKind.getKind(sjb.opName);
-            op = services.getModality(kind, sjb.javaBlock);
+            op = Modality.getModality(kind, sjb.javaBlock);
         }
         if (op == null) {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
