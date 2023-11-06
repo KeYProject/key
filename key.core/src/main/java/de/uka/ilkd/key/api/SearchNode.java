@@ -49,7 +49,7 @@ public final class SearchNode {
     }
 
     public SVInstantiations getInstantiations() {
-        return mc.getInstantiations();
+        return mc == null ? null : mc.getInstantiations();
     }
 
     public MatchConditions getMatchConditions() {
