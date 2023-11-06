@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
 import java.io.File;
@@ -39,6 +42,11 @@ class TestReferenceSearcher {
 
         DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
         previousProofs.addElement(p2);
+        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        newProof.addElement(p);
+
+        Node foundReference = null;
+        ClosedBy close = null;
 
         // close by reference only works if there are no branching steps left
         // -> only check the first node in each closed branch
@@ -49,11 +57,75 @@ class TestReferenceSearcher {
             }
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
-                assertEquals(n.serialNr(), c.getNode().serialNr());
+                assertEquals(n.serialNr(), c.node().serialNr());
+                close = c;
+                foundReference = n;
+            } else {
+                // verify that incompatible nodes return null
+                assertNull(ReferenceSearcher.findPreviousProof(previousProofs, n));
             }
+            // verify that the reference searcher ignores the current proof
+            assertNull(ReferenceSearcher.findPreviousProof(newProof, n));
+            // verify that no match can be found
+            assertNull(ReferenceSearcher.findPreviousProof(new DefaultListModel<>(), n));
         }
+
+        // test that copying works
+        foundReference.register(close, ClosedBy.class);
+        p.pruneProof(foundReference);
+        p.closeGoal(p.getOpenGoal(foundReference));
+        assertTrue(p.closed());
+        foundReference.proof().copyCachedGoals(p2, null, null);
+        assertTrue(p.closed());
+
         GeneralSettings.noPruningClosed = true;
         p.dispose();
         p2.dispose();
+    }
+
+    @Test
+    void checksUserLemmas() throws Exception {
+        GeneralSettings.noPruningClosed = false;
+        // Test scenario:
+        // Proof 1 uses a user-defined lemma.
+        // Proof 2 does not.
+        // Reference searcher should not find proof 1 when considering proof 2.
+
+        KeYEnvironment<DefaultUserInterfaceControl> env =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithRule.proof"));
+        Proof p = env.getLoadedProof();
+        KeYEnvironment<DefaultUserInterfaceControl> env2 =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithoutRule.proof"));
+        Proof p2 = env2.getLoadedProof();
+        KeYEnvironment<DefaultUserInterfaceControl> env3 =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithRule.proof"));
+        Proof p3 = env3.getLoadedProof();
+
+        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
+        previousProofs.addElement(p);
+        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        newProof.addElement(p2);
+
+        p2.pruneProof(p2.root());
+
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(p2.root()));
+        ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, p2.root());
+        assertNull(c);
+
+        // check that result is found if the user taclet is available
+        p3.pruneProof(p3.root());
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(p3.root()));
+        c = ReferenceSearcher.findPreviousProof(previousProofs, p3.root());
+        assertNotNull(c);
+        assertEquals(0, c.node().serialNr());
+        assertEquals(p, c.proof());
+
+        GeneralSettings.noPruningClosed = true;
+        p.dispose();
+        p2.dispose();
+        p3.dispose();
     }
 }

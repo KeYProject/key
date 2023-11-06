@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.HashMap;
@@ -118,8 +121,7 @@ public class ProblemTypeInformation {
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
-        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration) {
-            ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
+        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
                 if (!sp.equals(kjt)) {

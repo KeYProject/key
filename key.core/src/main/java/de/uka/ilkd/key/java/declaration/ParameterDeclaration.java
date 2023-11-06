@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -8,7 +11,8 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 public class ParameterDeclaration extends VariableDeclaration {

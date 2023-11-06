@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -56,8 +59,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             for (RuleSet rs : taclet.getRuleSets()) {
                 if (ruleSetName.equals(rs.name())) {
                     return true;

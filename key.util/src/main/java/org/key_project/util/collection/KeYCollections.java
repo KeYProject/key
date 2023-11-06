@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Arrays;
@@ -39,7 +42,7 @@ public class KeYCollections {
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
-        Map<S, U> res = null;
+        Map<S, U> res;
         final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {

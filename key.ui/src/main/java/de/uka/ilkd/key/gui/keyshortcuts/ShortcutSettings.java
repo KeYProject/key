@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -21,6 +25,7 @@ import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
  * @version 1 (09.05.19)
  */
 public class ShortcutSettings extends SimpleSettingsPanel implements SettingsProvider {
+    @Serial
     private static final long serialVersionUID = -7609149706562761596L;
     private final JTable tblShortcuts = new JTable();
     private ShortcutsTableModel modelShortcuts;
@@ -47,8 +52,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         List<String> actionNames =
             p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
 
-        List<String> shortcuts =
-            actionNames.stream().map(p::getProperty).collect(Collectors.toList());
+        // for the view, we hide "pressed" to increase readability
+        List<String> shortcuts = actionNames.stream().map(p::getProperty)
+                .map(s -> s.replace("pressed ", "")).collect(Collectors.toList());
 
         List<Action> actions =
             actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
@@ -81,7 +87,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                 }
 
                 KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
-                txtCaptureShortcut.setText(ks.toString());
+                // for the view, we hide "pressed" to increase readability
+                String shortened = ks.toString().replace("pressed ", "");
+                txtCaptureShortcut.setText(shortened);
 
                 boolean shortcutComplete =
                     ks.getModifiers() > 0 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
@@ -123,7 +131,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
          */
 
         List<KeyStroke> keystrokes =
-            s.stream().map(KeyStroke::getKeyStroke).collect(Collectors.toList());
+            s.stream().map(KeyStroke::getKeyStroke).toList();
         /*
          * if (keystrokes.contains(null)) { throw new InvalidSettingsInputException(
          * "Invalid keystroke specified", this, tblShortcuts); }
@@ -141,6 +149,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     private static class ShortcutsTableModel extends AbstractTableModel {
+        @Serial
         private static final long serialVersionUID = -2854179933936417703L;
         private static final String[] COLUMNS = new String[] { "Name", "Description", "Shortcut" };
         private final List<String> actionName;
@@ -172,19 +181,22 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
-            case 0:
+            case 0 -> {
                 return actionName.get(rowIndex)
                         // remove common package prefixes
                         .replaceAll("([a-z]\\w*\\.)*", "");
-            case 1:
+            }
+            case 1 -> {
                 Action a = actions.get(rowIndex);
                 if (a == null) {
                     return "";
                 }
                 Object val = a.getValue(Action.SHORT_DESCRIPTION);
                 return val != null ? val.toString() : "";
-            case 2:
+            }
+            case 2 -> {
                 return shortcut.get(rowIndex);
+            }
             }
             return "";
         }

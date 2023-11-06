@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Collections;
@@ -86,12 +89,10 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term termExt = term.sub(0);
         Term termBase = term.sub(1);
 
-        if (!(termExt.op() instanceof IObserverFunction)
-                || !(termBase.op() instanceof IObserverFunction)) {
+        if (!(termExt.op() instanceof IObserverFunction obs1)
+                || !(termBase.op() instanceof IObserverFunction obs2)) {
             throw new IllegalArgumentException("\\sameObserver must be true for " + NAME);
         }
-        IObserverFunction obs1 = (IObserverFunction) termExt.op();
-        IObserverFunction obs2 = (IObserverFunction) termBase.op();
 
         if (obs1 != obs2) {
             throw new IllegalArgumentException("\\sameObserver must be true");

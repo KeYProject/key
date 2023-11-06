@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 /**
@@ -33,7 +35,7 @@ public class ObjectIDAssignment {
      * tells the assignment manager to forget about the given object. CAUTION: The next call to
      * <tt>getID</tt> for the given object will produce a <b>new </b> id.
      *
-     * @param the object that is not needed anymore.
+     * @param o the object that is not needed anymore.
      */
     public static void releaseID(Object o) {
         ids.remove(o);

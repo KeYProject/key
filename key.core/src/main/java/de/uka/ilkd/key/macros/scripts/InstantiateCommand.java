@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -127,8 +130,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
      */
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModRenaming(p.formula)) {
                     return pta;
                 }

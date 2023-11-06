@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -93,10 +96,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstSeq)) {
+        if (!(p_obj instanceof IfFormulaInstSeq other)) {
             return false;
         }
-        final IfFormulaInstSeq other = (IfFormulaInstSeq) p_obj;
         return seq == other.seq && cf == other.cf && antec == other.antec;
     }
 

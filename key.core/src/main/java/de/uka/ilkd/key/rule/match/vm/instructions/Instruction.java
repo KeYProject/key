@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -96,7 +99,7 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
      *        matches of this schemavariable)
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair {@link (sv, instantiationCandidate)} added
+     *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
             Services services);

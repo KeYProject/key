@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
  * apply macros one after the other. This works only for macros which use
- * {@link KeYMediator#startAutoMode()}.
+ * {@code KeYMediator.startAutoMode()}.
  *
  * <p>
  * Since {@link ProofMacro}s run asynchronously, the start of the next macro must be performed in a

@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -59,7 +62,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
      */
     public static final Name NAME = new Name("Loop Apply Head");
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
@@ -75,14 +78,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
-        Modality modality = instantiation.modality;
-        Term update = instantiation.update;
-        Term target = instantiation.formula;
+        Modality modality = instantiation.modality();
+        Term update = instantiation.update();
+        Term target = instantiation.formula();
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
-                    .replace(instantiation.statement, headAndBlock));
+                    .replace(instantiation.statement(), headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);

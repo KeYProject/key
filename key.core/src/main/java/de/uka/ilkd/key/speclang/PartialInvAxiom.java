@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
@@ -143,8 +146,8 @@ public final class PartialInvAxiom extends ClassAxiom {
                         services.getJavaInfo().objectSort());
 
             ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
-                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
-                services);
+                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(),
+                inv.isFree(), i == 1, services);
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants

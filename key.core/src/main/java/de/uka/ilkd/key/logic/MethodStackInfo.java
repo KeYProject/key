@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -30,8 +33,7 @@ public class MethodStackInfo implements NameCreationInfo {
             final ImmutableArray<ProgramPrefix> prefix =
                 ((ProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
-                if (prefix.get(i) instanceof MethodFrame) {
-                    final MethodFrame frame = (MethodFrame) prefix.get(i);
+                if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
                     if (method != null) {
                         list = list.prepend(method);

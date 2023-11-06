@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
 import recoder.java.LoopInitializer;
-import recoder.java.NonTerminalProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
 import recoder.java.expression.Literal;
@@ -45,15 +46,6 @@ public class ExpressionSVWrapper extends Literal
     public void makeParentRoleValid() {
     }
 
-    /**
-     * Get AST parent.
-     *
-     * @return the non terminal program element.
-     */
-    public NonTerminalProgramElement getASTParent() {
-        return expressionParent;
-    }
-
 
     /**
      * sets the schema variable of sort statement
@@ -69,24 +61,6 @@ public class ExpressionSVWrapper extends Literal
         return sv;
     }
 
-
-    /**
-     * Get expression container.
-     *
-     * @return the expression container.
-     */
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     *
-     * @param c an expression container.
-     */
-    public void setExpressionContainer(ExpressionContainer c) {
-        expressionParent = c;
-    }
 
     // don't think we need it
     public void accept(SourceVisitor v) {

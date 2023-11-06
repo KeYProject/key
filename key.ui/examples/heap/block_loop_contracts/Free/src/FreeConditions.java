@@ -1,6 +1,7 @@
 public class FreeConditions {
 
     public static int field;
+    public static /*@nullable@*/ Object obj;
 
     /*@ public normal_behavior
       @ ensures field == 42;
@@ -25,6 +26,41 @@ public class FreeConditions {
         {
             ++field;
         }
+    }
+    
+    /*@ public normal_behavior
+      @ ensures field == 21; */
+    public static void blockContract2() {
+        /*@ public normal_behavior
+          @ ensures field == 21; 
+          @ assignable field;
+          @ assignable_free obj; */
+        { field = 21; 
+          obj = new Object(); }
+        
+        /*@ public normal_behavior
+          @ ensures true; 
+          @ assignable \nothing;
+          @ assignable_free field; */
+        { field = 42;
+          new Object(); }
+        
+        /*@ public normal_behavior
+          @ ensures true; 
+          @ assignable \strictly_nothing;
+          @ assignable_free \nothing; */
+        { new Object(); }
+    }
+    
+    /*@ public normal_behavior
+      @ ensures field == 21; */
+    public static void blockContract3() {
+        /*@ public normal_behavior
+          @ ensures field == 21; 
+          @ assignable \strictly_nothing;
+          @ assignable_free field; */
+        { field = 42;
+          obj = new Object(); }
     }
 
     /*@ public normal_behavior

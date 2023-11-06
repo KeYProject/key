@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.io.IOException;
@@ -6,9 +9,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import org.key_project.util.Streams;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class providing various methods to read properties.
@@ -127,7 +131,7 @@ public final class SettingsConverter {
      * @param str the String to decode
      * @return the decoded version of str
      */
-    public static String decode(@Nonnull String str) {
+    public static String decode(@NonNull String str) {
         int i = str.indexOf(PREFIX);
         if (i == 0) {
             str = str.substring(PREFIX.length());
@@ -162,7 +166,7 @@ public final class SettingsConverter {
      * @param str the String to encode
      * @return the encoded version of str
      */
-    public static String encode(@Nonnull String str) {
+    public static String encode(@NonNull String str) {
         return PREFIX + encodeString(str) + POSTFIX;
     }
 

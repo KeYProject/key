@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * <p>
- * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, TermBuilder)} for
+ * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, Services)} for
  * every top-level formula in your original proof obligation.
  * </p>
  *
@@ -123,7 +126,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @param origin the term's origin.
      */
-    public OriginTermLabel(Origin origin) {
+    OriginTermLabel(Origin origin) {
         this.origin = origin;
         this.subtermOrigins = new LinkedHashSet<>();
     }
@@ -134,7 +137,7 @@ public class OriginTermLabel implements TermLabel {
      * @param origin the term's origin.
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-    public OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+    OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
         this.subtermOrigins.addAll(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
@@ -147,7 +150,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-    public OriginTermLabel(Set<Origin> subtermOrigins) {
+    OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
         this.subtermOrigins = new LinkedHashSet<>(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
@@ -166,8 +169,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof OriginTermLabel) {
-            OriginTermLabel other = (OriginTermLabel) obj;
+        if (obj instanceof OriginTermLabel other) {
             return other.origin.equals(origin) && other.subtermOrigins.equals(subtermOrigins);
         } else {
             return false;
@@ -478,7 +480,7 @@ public class OriginTermLabel implements TermLabel {
      * </p>
      *
      * <p>
-     * Note that you need to have called {@link #collectSubtermOrigins(Term, TermBuilder)} for this
+     * Note that you need to have called {@link #collectSubtermOrigins(Term, Services)} for this
      * method to work correctly.
      * </p>
      *
@@ -785,6 +787,11 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
 
         /**
+         * assignable_free
+         */
+        ASSIGNABLE_FREE("assignable_free"),
+
+        /**
          * assume
          */
         ASSUME("assume"),
@@ -803,6 +810,11 @@ public class OriginTermLabel implements TermLabel {
          * invariant
          */
         INVARIANT("invariant"),
+
+        /**
+         * invariant_free
+         */
+        INVARIANT_FREE("invariant_free"),
 
         /**
          * loop_invariant

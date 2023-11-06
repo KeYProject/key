@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -30,9 +33,6 @@ class FieldPrinter {
      * hidden by another field, the name of the field is preceeded by the corresponding class name.
      *
      * Example default: object.field Example hidden field: object.(package.class::field)
-     *
-     * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
      */
     protected String getPrettySyntaxForFieldConstant(Term objectTerm, Term fieldTerm) {
         JavaInfo javaInfo = services.getJavaInfo();

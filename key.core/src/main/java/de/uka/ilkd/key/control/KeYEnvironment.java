@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
 import java.io.File;
@@ -170,7 +173,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
-     * {@link MainWindow} is not involved in the whole process.
+     * {@code MainWindow} is not involved in the whole process.
      *
      * @param location The location to load.
      * @param classPaths The class path entries to use.
@@ -187,7 +190,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
-     * {@link MainWindow} is not involved in the whole process.
+     * {@code MainWindow} is not involved in the whole process.
      *
      * @param location The location to load.
      * @param classPaths The class path entries to use.
@@ -206,14 +209,15 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
-     * {@link MainWindow} is not involved in the whole process.
+     * {@code MainWindow} is not involved in the whole process.
      *
      * @param profile The {@link Profile} to use.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @param includes Optional includes to consider.
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     * @param forceNewProfileOfNewProofs {@code} true
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
@@ -228,7 +232,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
-     * {@link MainWindow} is not involved in the whole process.
+     * {@code MainWindow} is not involved in the whole process.
      *
      * @param profile The {@link Profile} to use.
      * @param location The location to load.
@@ -238,7 +242,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param poPropertiesToForce Some optional PO {@link Properties} to force.
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      * @param forceNewProfileOfNewProofs {@code} true
-     *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
@@ -255,7 +259,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
-     * {@link MainWindow} is not involved in the whole process.
+     * {@code MainWindow} is not involved in the whole process.
      *
      * @param profile The {@link Profile} to use.
      * @param location The location to load.
@@ -267,7 +271,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param callbackProofLoaded An optional callback (called when the proof is loaded, before
      *        replay)
      * @param forceNewProfileOfNewProofs {@code} true
-     *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
@@ -315,5 +319,4 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     public Pair<String, Location> getProofScript() {
         return proofScript;
     }
-
 }

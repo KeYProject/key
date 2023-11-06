@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
@@ -183,7 +186,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals("")) {
+        if (termstr.isEmpty()) {
             return null;
         }
 
@@ -199,7 +202,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals("")) {
+        if (termstr.isEmpty()) {
             return null;
         }
         return new KeyIO(services(), set).parseExpression(termstr);

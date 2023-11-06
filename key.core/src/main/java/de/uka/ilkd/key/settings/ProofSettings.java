@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
@@ -175,14 +178,19 @@ public class ProofSettings {
      * Loads the the former settings from configuration file.
      */
     public void loadSettings() {
-        try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
-            if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
-            } else {
-                loadSettingsFromStream(in);
+        if (!PROVER_CONFIG_FILE.exists()) {
+            saveSettings();
+            LOGGER.info("No proof-settings exists. Generating default settings.");
+        } else {
+            try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
+                if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                    LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
+                } else {
+                    loadSettingsFromStream(in);
+                }
+            } catch (IOException e) {
+                LOGGER.warn("No proof-settings could be loaded, using defaults", e);
             }
-        } catch (IOException e) {
-            LOGGER.warn("No proof-settings could be loaded, using defaults", e);
         }
     }
 

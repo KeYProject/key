@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -11,13 +14,14 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
- * loading process as {@link SwingWorker3} {@link Thread} and it opens the proof obligation browser
+ * loading process as {@link SwingWorker} {@link Thread} and it opens the proof obligation browser
  * it is not possible to instantiate a proof configured by the opened file.
  *
  * @author Martin Hentschel
@@ -100,7 +104,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking {@link ProverTaskListener#taskStarted(String, int)} on the
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on
+     * the
      * registered listener.
      *
      * Termination is announced by invoking
@@ -112,7 +117,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             private long runTime;
 
             @Override
-            protected Throwable doInBackground() throws Exception {
+            protected Throwable doInBackground() {
                 long currentTime = System.currentTimeMillis();
                 final Throwable message = doWork();
                 runTime = System.currentTimeMillis() - currentTime;

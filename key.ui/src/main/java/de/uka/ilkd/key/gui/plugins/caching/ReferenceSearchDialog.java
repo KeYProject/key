@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -8,6 +11,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+import org.key_project.util.java.SwingUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Dialog showing reference search information.
  *
@@ -16,6 +24,8 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearchDialog.class);
+
     /**
      * The table of reference search results.
      */
@@ -85,7 +95,7 @@ public class ReferenceSearchDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
 
-        if (proof.openGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
             getApplyButton().setEnabled(true);
         }
 
@@ -100,9 +110,12 @@ public class ReferenceSearchDialog extends JDialog {
             applyButton.setEnabled(false);
             applyButton.addActionListener(e -> {
                 try {
-                    listener.copyButtonClicked();
+                    applyButton.setEnabled(false);
+                    closeDialog.setEnabled(false);
+                    listener.copyButtonClicked(this);
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ReferenceSearchDialog.this, exception);
                 }
             });
@@ -110,16 +123,13 @@ public class ReferenceSearchDialog extends JDialog {
         return applyButton;
     }
 
+    public void apply() {
+        getApplyButton().doClick();
+    }
+
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
-            scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-            Dimension dim = new Dimension(table.getPreferredSize());
-            dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
-            dim.height = scrollPane.getPreferredSize().height;
-            scrollPane.setPreferredSize(dim);
-
+            scrollPane = SwingUtil.createScrollPane(table);
         }
         return scrollPane;
     }
@@ -127,7 +137,7 @@ public class ReferenceSearchDialog extends JDialog {
     private JButton getCloseDialog() {
         if (closeDialog == null) {
             closeDialog = new JButton("Close");
-            closeDialog.addActionListener(e -> listener.closeButtonClicked());
+            closeDialog.addActionListener(e -> listener.closeButtonClicked(this));
         }
         return closeDialog;
     }

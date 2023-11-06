@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
@@ -71,7 +74,7 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     }
 
     /**
-     * @param The node corresponding to this SE state.
+     * @param correspondingNode The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;

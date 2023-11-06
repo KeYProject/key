@@ -32,7 +32,7 @@ public class ReorderingReplayer extends AbstractProofReplayer {
         OneStepSimplifier.refreshOSS(proof);
         Deque<Node> nodeQueue = new ArrayDeque<>();
         Deque<Goal> queue = new ArrayDeque<>();
-        queue.add(proof.getGoal(proof.root()));
+        queue.add(proof.getOpenGoal(proof.root()));
 
         for (Map.Entry<BranchLocation, List<Node>> e : steps.entrySet()) {
             nodeQueue.addAll(e.getValue());

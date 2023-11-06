@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashSet;
@@ -49,8 +52,7 @@ public class TestGenericRemovingLemmaGenerator {
 
         sorts.add(term.sort());
 
-        if (term.op() instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) term.op();
+        if (term.op() instanceof SortDependingFunction sdf) {
             sorts.add(sdf.getSortDependingOn());
         }
 

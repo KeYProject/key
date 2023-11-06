@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.LinkedHashMap;
@@ -41,7 +44,7 @@ public class OpReplacer {
      * <p>
      * If there is a proof currently loaded, you may want to use
      * {@link #OpReplacer(Map, TermFactory, Proof)} as it correctly deals with
-     * {@link OriginTermLabels} and other proof-dependent features.
+     * {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent features.
      * </p>
      *
      * @param map map mapping from the operators/terms to be replaced to the ones to replace them
@@ -79,7 +82,8 @@ public class OpReplacer {
      * <p>
      * If there is a proof currently loaded, you may want to use
      * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)} as it correctly
-     * deals with {@link OriginTermLabels} and other proof-dependent features.
+     * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
+     * features.
      * </p>
      *
      * @param toReplace the sub-term to replace.
@@ -100,7 +104,8 @@ public class OpReplacer {
      * <p>
      * If there is a proof currently loaded, you may want to use
      * {@link OpReplacer#replace(Term, Term, ImmutableList, TermFactory, Proof)} as it correctly
-     * deals with {@link OriginTermLabels} and other proof-dependent features.
+     * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
+     * features.
      * </p>
      *
      * @param toReplace the sub-term to replace.
@@ -122,7 +127,8 @@ public class OpReplacer {
      * <p>
      * If there is a proof currently loaded, you may want to use
      * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)} as it correctly
-     * deals with {@link OriginTermLabels} and other proof-dependent features.
+     * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
+     * features.
      * </p>
      *
      * @param toReplace the operator to replace.

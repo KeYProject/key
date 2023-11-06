@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
-
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class SeqLDT extends LDT {
@@ -101,8 +104,6 @@ public final class SeqLDT extends LDT {
     /**
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
-     *
-     * @return
      */
     public Function getValues() {
         return values;
@@ -164,12 +165,10 @@ public final class SeqLDT extends LDT {
     @Nullable
     @Override
     public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
-        case "add":
+        if (operationName.equals("add")) {
             return getSeqConcat();
-        default:
-            return null;
         }
+        return null;
     }
 
 

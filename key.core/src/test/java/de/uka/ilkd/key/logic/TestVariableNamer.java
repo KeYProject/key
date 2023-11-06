@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Collections;
@@ -202,14 +205,15 @@ public class TestVariableNamer {
         PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
-        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null);
+        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
         assertEquals("var_2", proposal.toString());
 
         proof.getNamespaces().programVariables().addSafely(var_2);
         addGlobal(goal, var_2);
 
-        proposal = vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null);
-        assertEquals("var_2", proposal.toString());
+        proposal =
+            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
+        assertEquals("var_3", proposal.toString());
     }
 
 

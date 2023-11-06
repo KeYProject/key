@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -7,7 +10,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -67,7 +69,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence step(Sequent seq, TermServices services) {
+    public PosInOccurrence step() {
         return step;
     }
 
@@ -108,13 +110,12 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
-        if (!(focus.op() instanceof IObserverFunction))
+        if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
         {
             throw new RuntimeException(
                 "Dependency contract rule is not applicable to term " + focus);
         }
-        final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;
         final KeYJavaType kjt;

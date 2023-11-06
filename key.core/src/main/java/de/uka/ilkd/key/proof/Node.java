@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -9,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
@@ -29,6 +30,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.lookup.Lookup;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class Node implements Iterable<Node>, Comparable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
@@ -41,7 +45,7 @@ public class Node implements Iterable<Node>, Comparable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
-    private static final String CACHED_GOAL = "Cached goal";
+    private static final String CACHED_GOAL = "Closed goal (via cache)";
 
     private static final String NODES = "nodes";
 
@@ -122,7 +126,7 @@ public class Node implements Iterable<Node>, Comparable<Node> {
         DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
@@ -458,6 +462,13 @@ public class Node implements Iterable<Node>, Comparable<Node> {
     }
 
     /**
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
      * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {
@@ -598,8 +609,10 @@ public class Node implements Iterable<Node>, Comparable<Node> {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                final Goal goal = proof().getGoal(this);
-                if (this.isClosed()) {
+                final Goal goal = proof().getOpenGoal(this);
+                if (this.isClosed() && lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
                     // should never happen (please check)
@@ -608,8 +621,6 @@ public class Node implements Iterable<Node>, Comparable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal.node().lookup(ClosedBy.class) != null) {
-                    cachedName = CACHED_GOAL;
                 } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
@@ -805,7 +816,7 @@ public class Node implements Iterable<Node>, Comparable<Node> {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

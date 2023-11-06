@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
@@ -18,20 +21,14 @@ import recoder.io.DataLocation;
  * @author mulbrich
  * @since 2006-11-02
  */
-public class URLDataLocation implements DataLocation {
-
-    private final URL url;
+public record URLDataLocation(URL url) implements DataLocation {
 
     public static final String LOCATION_TYPE_FILE = "URL";
-
-    public URLDataLocation(URL url) {
-        this.url = url;
-    }
 
     /**
      * return the URL's input stream
      *
-     * @see recoder.io.DataLocation#getInputStream()
+     * @see DataLocation#getInputStream()
      */
     public InputStream getInputStream() throws IOException {
         return url.openStream();
@@ -39,7 +36,7 @@ public class URLDataLocation implements DataLocation {
 
     /**
      * @throws UnsupportedOperationException always
-     * @see recoder.io.DataLocation#getOutputStream()
+     * @see DataLocation#getOutputStream()
      */
     public OutputStream getOutputStream() throws IOException {
         throw new UnsupportedOperationException("Output is not supported for URLDataLocation");
@@ -47,7 +44,7 @@ public class URLDataLocation implements DataLocation {
 
     /**
      * @throws UnsupportedOperationException always
-     * @see recoder.io.DataLocation#getWriter()
+     * @see DataLocation#getWriter()
      */
     public Writer getWriter() throws IOException {
         throw new UnsupportedOperationException("Output is not supported for URLDataLocation");
@@ -66,7 +63,8 @@ public class URLDataLocation implements DataLocation {
      *
      * @return the url of this data location
      */
-    public URL getUrl() {
+    @Override
+    public URL url() {
         return url;
     }
 

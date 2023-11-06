@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
@@ -11,7 +14,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,6 +25,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,7 +220,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(p, new CC().span().newline());
     }
 
-    @Nonnull
+    @NonNull
     private JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new BorderLayout());
@@ -413,8 +416,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ChoiceEntry) {
-                ChoiceEntry other = (ChoiceEntry) obj;
+            if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
                         && Objects.equals(information, other.getInformation());

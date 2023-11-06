@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
 
 import java.io.*;
@@ -68,9 +70,12 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form " <type>:
-     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
-     * archive:recoder.zip:recoder/java/JavaProgramFactory.class
+     * returns a URL-like string representation of the location in the form {@code  <type>:
+     * <location-specific-name>}, i.e.
+     *
+     * <pre>
+     * {@code  file:/bin/sh url:http://mywww/myfile archive:recoder.zip:recoder/java/JavaProgramFactory.class}
+     * </pre>
      */
     public String toString() {
         return getType() + ":" + archiveFile.getName() + "?" + itemName;

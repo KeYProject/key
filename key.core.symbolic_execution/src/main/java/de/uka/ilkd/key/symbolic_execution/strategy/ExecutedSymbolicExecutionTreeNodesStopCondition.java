@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
@@ -22,7 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * <p>
  * If a {@link Node} in KeY's proof tree is also a node in a symbolic execution tree is computed via
- * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode(Node)}.
+ * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode}.
  * </p>
  * <p>
  * The auto mode is stopped exactly in the open goal {@link Node} which will become the next
@@ -220,7 +223,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     Iterator<Node> childIter = updatedNode.childrenIterator();
                     while (childIter.hasNext()) {
                         Node next = childIter.next();
-                        Goal nextGoal = next.proof().getGoal(next);
+                        Goal nextGoal = next.proof().getOpenGoal(next);
                         // Check if the current goal is a new one
                         if (nextGoal != goal) {
                             // New goal found, use the number of set nodes for it.

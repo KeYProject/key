@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -51,7 +55,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
-    private static @Nonnull List<String> parseStringList(@Nonnull String str) {
+    private static @NonNull List<String> parseStringList(@NonNull String str) {
         // escape special chars (in particular the comma)
         return Arrays.stream(str.split(SET_DELIMITER)).map(SettingsConverter::decodeString)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -61,7 +65,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param seq a string list
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
-    private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
+    private static @NonNull String stringListToString(@NonNull List<String> seq) {
         // escape special chars (in particular the comma)
         return seq.stream().map(SettingsConverter::encodeString)
                 .collect(Collectors.joining(SET_DELIMITER));
@@ -132,7 +136,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
+    protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
             @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
             AbstractPropertiesSettings::parseStringList,

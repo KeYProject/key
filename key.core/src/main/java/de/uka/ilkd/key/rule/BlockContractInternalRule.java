@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -30,6 +32,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -209,7 +213,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return new BlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -220,35 +224,38 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Instantiation instantiation =
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.statement);
-        final Term contextUpdate = instantiation.update;
+        contract.setInstantiationSelf(instantiation.self());
+        assert contract.getBlock().equals(instantiation.statement());
+        final Term contextUpdate = instantiation.update();
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                    .createAndRegister(instantiation.self, true);
+                    .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Term[] preconditions = createPreconditions(contract, instantiation.self, heaps,
+        final Term[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses =
+            conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final Term frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(
+                modifiesClauses, freeModifiesClauses);
         final Term[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
+        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, modifiesClauses, services);
 
         final GoalsConfigurator configurator =

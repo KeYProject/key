@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.MalformedURLException;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple checked exception which holds an location.

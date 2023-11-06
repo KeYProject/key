@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -39,17 +42,22 @@ import org.key_project.util.collection.ImmutableSLList;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodBodyStatement&gt}catch(java.lang.Exception e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <methodBodyStatement>
+ * } catch(java.lang.Exception e) {
+ *    exc = e
+ * }
+ * <modalityEnd>
+ *  (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  *
@@ -236,8 +244,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodPO) {
-            ProgramMethodPO other = (ProgramMethodPO) obj;
+        if (obj instanceof ProgramMethodPO other) {
             return Objects.equals(pm, other.getProgramMethod())
                     && Objects.equals(precondition, other.getPrecondition());
         } else {

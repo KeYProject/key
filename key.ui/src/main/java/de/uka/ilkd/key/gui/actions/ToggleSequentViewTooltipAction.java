@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.*;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -16,7 +18,6 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * @author lanzinger
  *
  * @see SequentView#getToolTipText()
- * @see KeYTooltipExtension
  */
 public class ToggleSequentViewTooltipAction extends MainWindowAction {
     /** This action's name. */

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
@@ -14,10 +17,10 @@ import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the current implementation:
- *
+ * <p>
  * * the usage of EqualityConstraint for unification implies that a variable is never instantiated
  * with non-rigid terms
- *
+ * <p>
  * * it is unclear whether certain instantiations are lost due to too strict type checks in
  * EqualityConstraint
  */

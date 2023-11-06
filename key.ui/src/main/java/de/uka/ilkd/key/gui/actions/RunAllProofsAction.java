@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -7,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -18,6 +19,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +70,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
      * {@link #DEFAULT_FILE} is used.
      */
-    @Nonnull
+    @NonNull
     private List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
             getClass().getSimpleName());

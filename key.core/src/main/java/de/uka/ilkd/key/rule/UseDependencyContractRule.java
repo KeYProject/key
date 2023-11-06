@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -26,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 public final class UseDependencyContractRule implements BuiltInRule {
@@ -320,7 +324,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // top level symbol must be observer
         final Term focus = pio.subTerm();
-        if (!(focus.op() instanceof IObserverFunction)) {
+        if (!(focus.op() instanceof IObserverFunction target)) {
             return false;
         }
 
@@ -337,7 +341,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         // heap term of observer must be store-term (or anon, create,
         // memset, ...)
         final Services services = goal.proof().getServices();
-        final IObserverFunction target = (IObserverFunction) focus.op();
         // final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         boolean hasRawSteps = false;
         for (int i = 0; i < target.getHeapCount(services) * target.getStateCount(); i++) {
@@ -368,7 +371,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         // collect information
@@ -398,8 +401,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         assert contract != null;
 
         // get step
-        final PosInOccurrence step =
-            ((UseDependencyContractApp) ruleApp).step(goal.sequent(), services);
+        final PosInOccurrence step = ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);

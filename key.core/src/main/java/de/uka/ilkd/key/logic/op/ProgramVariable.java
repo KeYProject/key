@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.*;
@@ -60,7 +63,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         assert sort() != Sort.FORMULA;
         assert sort() != Sort.UPDATE;
     }
-
 
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
@@ -260,6 +262,5 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      * @param name the new name
      * @return equivalent operator with the new name
      */
-    abstract public Operator rename(Name name);
-
+    public abstract Operator rename(Name name);
 }

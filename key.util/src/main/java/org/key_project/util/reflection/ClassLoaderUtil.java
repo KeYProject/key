@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.reflection;
 
 import java.util.ServiceLoader;
@@ -23,7 +26,7 @@ import java.util.ServiceLoader;
  * should be used instead:
  * <ul>
  * <li>{@link #getClassforName(String)} instead of {@link Class#forName(String)}</li>
- * <li>{@link #loadServices(Class, Class) instead of {@link ServiceLoader#load(Class)}</li>
+ * <li>{@link #loadServices(Class, Class)} instead of {@link ServiceLoader#load(Class)}</li>
  * </ul>
  * <p>
  * The application specific behavior is implemented in {@link IClassLoader} instances. The used

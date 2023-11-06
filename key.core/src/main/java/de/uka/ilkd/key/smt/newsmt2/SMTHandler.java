@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
@@ -23,7 +26,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
  * SMT handlers are created using the default constructor without parameters They are always used
  * within the same proof, but possibly for several proof obligations.
  *
- * After creation, the {@link #init(MasterHandler, Services, Properties)} method is called that
+ * After creation, the {@link #init} method is called that
  * injects the {@link Services} object belonging to the proof.
  *
  * During translation, an SMT handler can be asked via {@link #canHandle(Term)} if it can translate

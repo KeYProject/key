@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.IntStream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl

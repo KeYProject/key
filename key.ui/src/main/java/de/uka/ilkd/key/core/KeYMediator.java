@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -51,8 +53,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -84,6 +90,8 @@ public class KeYMediator {
 
     /**
      * Registered proof load listeners.
+     *
+     * @see #fireProofLoaded(Proof)
      */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
@@ -124,11 +132,13 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+
+        registerProofLoadListener(LocationVariableTracker::handleProofLoad);
     }
 
     /**
      * Register a proof load listener. Will be called whenever a new proof is loaded, but before
-     * it is replayed.
+     * it is replayed. The listener MUST be able to accept the same proof twice!
      *
      * @param listener callback
      */
@@ -514,7 +524,6 @@ public class KeYMediator {
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
     @Nullable
     public Proof getSelectedProof() {
@@ -563,6 +572,7 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
+        MainWindow.getInstance().getAutoModeAction().setEnabled(true);
         if (getSelectedProof() != null) {
             if (b) {
                 getSelectedProof().setRuleAppIndexToInteractiveMode();
@@ -687,7 +697,7 @@ public class KeYMediator {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
@@ -802,9 +812,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -821,9 +828,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -976,7 +980,7 @@ public class KeYMediator {
      *
      * @see DefaultListModel#addListDataListener
      */
-    public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
     }
 

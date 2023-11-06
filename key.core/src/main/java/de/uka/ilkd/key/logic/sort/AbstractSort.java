@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
-
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -10,44 +11,46 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract base class for implementations of the Sort interface.
  */
 public abstract class AbstractSort implements Sort {
-
     private final Name name;
-    private ImmutableSet<Sort> ext;
+    private final ImmutableSet<Sort> ext;
     private final boolean isAbstract;
 
     /**
-     * Documentation for this sort given by the an associated documentation comment.
+     * Documentation for this sort given by the associated documentation comment.
      *
      * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
-    private String documentation;
+    private final String documentation;
 
     /** Information of the origin of this sort */
-    private String origin;
+    private final String origin;
 
-    public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
+    public AbstractSort(Name name,
+            ImmutableSet<Sort> extendedSorts,
+            boolean isAbstract,
+            String documentation,
+            String origin) {
         this.name = name;
-        this.ext = ext;
         this.isAbstract = isAbstract;
+        if (extendedSorts != null && extendedSorts.isEmpty()) {
+            this.ext = DefaultImmutableSet.<Sort>nil().add(ANY);
+        } else {
+            this.ext = extendedSorts == null ? DefaultImmutableSet.<Sort>nil() : extendedSorts;
+        }
+        this.documentation = documentation;
+        this.origin = origin;
     }
-
 
     @Override
     public final ImmutableSet<Sort> extendsSorts() {
-        if (this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY) {
-            return DefaultImmutableSet.nil();
-        } else {
-            if (ext.isEmpty()) {
-                ext = DefaultImmutableSet.<Sort>nil().add(ANY);
-            }
-            return ext;
-        }
+        return ext;
     }
-
 
     @Override
     public final ImmutableSet<Sort> extendsSorts(Services services) {
@@ -122,10 +125,6 @@ public abstract class AbstractSort implements Sort {
         return name.toString();
     }
 
-    public void setDocumentation(@Nullable String documentation) {
-        this.documentation = documentation;
-    }
-
     @Nullable
     @Override
     public String getDocumentation() {
@@ -136,9 +135,5 @@ public abstract class AbstractSort implements Sort {
     @Override
     public String getOrigin() {
         return origin;
-    }
-
-    public void setOrigin(@Nullable String origin) {
-        this.origin = origin;
     }
 }

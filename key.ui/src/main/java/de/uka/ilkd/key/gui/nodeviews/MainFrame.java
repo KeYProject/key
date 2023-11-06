@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -22,7 +25,6 @@ public final class MainFrame extends JPanel {
 
     private static final long serialVersionUID = -2412537422601138379L;
 
-    private final MainWindow mainWindow;
     private final JScrollPane scrollPane = new JScrollPane();
     private Component content;
     private boolean showTacletInfo = false;
@@ -30,8 +32,7 @@ public final class MainFrame extends JPanel {
     public Component setContent(Component component) {
         Component oldContent = content;
         content = component;
-        if (component instanceof SequentView) {
-            SequentView sequentView = (SequentView) component;
+        if (component instanceof SequentView sequentView) {
             Point oldSequentViewPosition = scrollPane.getViewport().getViewPosition();
             scrollPane.setViewportView(new SequentViewPanel(sequentView));
             scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
@@ -49,7 +50,6 @@ public final class MainFrame extends JPanel {
     }
 
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
-        this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(30);
@@ -86,7 +86,7 @@ public final class MainFrame extends JPanel {
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);
@@ -96,13 +96,21 @@ public final class MainFrame extends JPanel {
     public void setShowTacletInfo(boolean showTacletInfo) {
         this.showTacletInfo = showTacletInfo;
 
-        if (content instanceof InnerNodeView) {
-            InnerNodeView view = (InnerNodeView) content;
+        if (content instanceof InnerNodeView view) {
             view.tacletInfo.setVisible(this.showTacletInfo);
         }
     }
 
     public boolean isShowTacletInfo() {
         return showTacletInfo;
+    }
+
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        scrollPane.getVerticalScrollBar().setValue(y);
     }
 }

@@ -1,6 +1,5 @@
 package org.key_project.slicing;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -24,7 +23,6 @@ public class RegroupExtension implements KeYGuiExtension,
         KeYGuiExtension.Toolbar {
 
 
-    @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         return new JToolBar();

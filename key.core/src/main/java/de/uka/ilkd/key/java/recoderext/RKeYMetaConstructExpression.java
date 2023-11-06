@@ -1,11 +1,6 @@
-// This file is taken from the RECODER library, which is protected by the LGPL,
-// and modified.
-/**
- * This class is part of the AST RECODER builds when it parses and resolves Java programs with meta
- * constructs and schema variables. It is transformed by Recoder2KeY to a subclass of
- * ...rule.metaconstruct.ProgramMetaConstruct.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.ModelException;

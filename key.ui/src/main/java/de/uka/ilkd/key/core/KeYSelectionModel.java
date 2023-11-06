@@ -1,10 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.util.*;
 
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +25,16 @@ public class KeYSelectionModel {
     private Goal selectedGoal;
     /** the current displayed node */
     private Node selectedNode;
+    /**
+     * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
+     * we are displaying an OSS node.
+     */
+    private Sequent selectedSequent;
+    /**
+     * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
+     * unless we are displaying an OSS node.
+     */
+    private RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
@@ -38,9 +53,13 @@ public class KeYSelectionModel {
         Goal g = proof.openGoals().iterator().next();
         if (g == null) {
             selectedNode = proof.root().leavesIterator().next();
+            selectedSequent = selectedNode.sequent();
+            selectedRuleApp = selectedNode.getAppliedRuleApp();
         } else {
             goalIsValid = true;
             selectedNode = g.node();
+            selectedSequent = selectedNode.sequent();
+            selectedRuleApp = selectedNode.getAppliedRuleApp();
             selectedGoal = g;
         }
     }
@@ -59,13 +78,19 @@ public class KeYSelectionModel {
             Goal g = proof.openGoals().iterator().next();
             if (g == null) {
                 selectedNode = proof.root().leavesIterator().next();
+                selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
             } else {
                 goalIsValid = true;
                 selectedNode = g.node();
+                selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
                 selectedGoal = g;
             }
         } else {
             selectedNode = null;
+            selectedSequent = null;
+            selectedRuleApp = null;
             selectedGoal = null;
         }
         fireSelectedProofChanged();
@@ -92,6 +117,27 @@ public class KeYSelectionModel {
         }
         goalIsValid = false;
         selectedNode = n;
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        fireSelectedNodeChanged();
+    }
+
+    /**
+     * Sets the node and sequent focused by the user.
+     *
+     * @param node selected node
+     * @param sequent selected sequent
+     */
+    public void setSelectedSequentAndRuleApp(Node node, Sequent sequent, RuleApp ruleApp) {
+        // switch proof if needed
+        if (node.proof() != getSelectedProof()) {
+            setSelectedProof(node.proof());
+        }
+        goalIsValid = true;
+        selectedGoal = null;
+        selectedNode = node;
+        selectedSequent = sequent;
+        selectedRuleApp = ruleApp;
         fireSelectedNodeChanged();
     }
 
@@ -104,6 +150,8 @@ public class KeYSelectionModel {
         goalIsValid = true;
         selectedGoal = g;
         selectedNode = g.node();
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
         fireSelectedNodeChanged();
     }
 
@@ -116,6 +164,14 @@ public class KeYSelectionModel {
         return selectedNode;
     }
 
+    public Sequent getSelectedSequent() {
+        return selectedSequent;
+    }
+
+    public RuleApp getSelectedRuleApp() {
+        return selectedRuleApp;
+    }
+
     /**
      * returns the goal the selected node belongs to, null if it is an inner node
      *
@@ -126,7 +182,7 @@ public class KeYSelectionModel {
             throw new IllegalStateException("No proof loaded.");
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getGoal(selectedNode);
+            selectedGoal = proof.getOpenGoal(selectedNode);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -165,15 +221,15 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START:
+                case POS_START -> {
                     currentPos = POS_LEAVES;
                     if (selectedNode != null) {
                         nodeIt = selectedNode.leavesIterator();
                     } else {
                         nodeIt = null;
                     }
-                    break;
-                case POS_LEAVES:
+                }
+                case POS_LEAVES -> {
                     if (nodeIt == null || !nodeIt.hasNext()) {
                         currentPos = POS_GOAL_LIST;
                         if (!proof.openGoals().isEmpty()) {
@@ -182,18 +238,17 @@ public class KeYSelectionModel {
                             goalIt = null;
                         }
                     } else {
-                        nextOne = proof.getGoal(nodeIt.next());
+                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                    break;
-
-                case POS_GOAL_LIST:
+                }
+                case POS_GOAL_LIST -> {
                     if (goalIt == null || !goalIt.hasNext()) {
                         // no more items
                         return;
                     } else {
                         nextOne = goalIt.next();
                     }
-                    break;
+                }
                 }
             }
         }
@@ -222,14 +277,10 @@ public class KeYSelectionModel {
      */
     public void defaultSelection() {
         Goal g = null;
-        Goal firstG = null;
         Iterator<Goal> it = new DefaultSelectionIterator();
 
         while (g == null && it.hasNext()) {
             g = it.next();
-            if (firstG == null) {
-                firstG = g;
-            }
         }
 
         /*
@@ -239,11 +290,7 @@ public class KeYSelectionModel {
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            if (firstG != null) {
-                setSelectedGoal(firstG);
-            } else {
-                setSelectedNode(proof.root().leavesIterator().next());
-            }
+            setSelectedNode(proof.root().leavesIterator().next());
         }
     }
 
@@ -289,7 +336,7 @@ public class KeYSelectionModel {
         while (it.hasNext()) {
             final Node node = it.next();
             if (!node.isClosed()) {
-                return proof.getGoal(node);
+                return proof.getOpenGoal(node);
             }
         }
         return null;

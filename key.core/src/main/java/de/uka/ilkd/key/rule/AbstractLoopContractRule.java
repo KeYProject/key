@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -51,7 +54,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement, instantiation.modality, goal);
+            instantiation.statement(), instantiation.modality(), goal);
     }
 
     /**
@@ -67,8 +70,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             final Modality modality, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
-        if (statement instanceof StatementBlock) {
-            StatementBlock block = (StatementBlock) statement;
+        if (statement instanceof StatementBlock block) {
 
             collectedContracts = specifications.getLoopContracts(block, modality);
             if (modality == Modality.BOX) {
@@ -122,9 +124,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof LoopContractInternalBuiltInRuleApp) {
-                LoopContractInternalBuiltInRuleApp blockRuleApp =
-                    (LoopContractInternalBuiltInRuleApp) app;
+            if (app instanceof LoopContractInternalBuiltInRuleApp blockRuleApp) {
                 if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
                         || !contract.isOnBlock()
                                 && blockRuleApp.getStatement().equals(contract.getLoop()))

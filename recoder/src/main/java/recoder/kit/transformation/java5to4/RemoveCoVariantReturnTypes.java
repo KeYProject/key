@@ -1,9 +1,7 @@
-/*
- * Created on 31.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import java.util.ArrayList;
@@ -56,8 +54,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration md) {
                 Type returnType = getSourceInfo().getReturnType(md);
                 if (returnType == null || returnType instanceof PrimitiveType) {
                     continue;
@@ -111,9 +108,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     if (targs != null && targs.size() > 0) {
                         castToReference.setTypeArguments(targs.deepClone());
                     }
-                    if (originalType instanceof ParameterizedType) {
-                        recoder.abstraction.ParameterizedType pt =
-                            (recoder.abstraction.ParameterizedType) originalType;
+                    if (originalType instanceof ParameterizedType pt) {
                         targs = TypeKit.makeTypeArgRef(getProgramFactory(), pt.getTypeArgs());
                         originalTypeReference.setTypeArguments(targs);
                     }
@@ -126,8 +121,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private Type makeSomething(Type originalType) {
-        if (originalType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) originalType;
+        if (originalType instanceof ParameterizedType pt) {
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
             ASTList<TypeArgumentDeclaration> targs =
                 new ASTArrayList<>(pt.getTypeArgs().size());
@@ -141,10 +135,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private Type makeSomething0(Type originalType) {
-        if (!(originalType instanceof TypeParameter)) {
+        if (!(originalType instanceof TypeParameter tp)) {
             return originalType;
         }
-        TypeParameter tp = (TypeParameter) originalType;
         if (tp.getBoundCount() == 0) {
             originalType = getNameInfo().getJavaLangObject();
         } else {

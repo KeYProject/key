@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import java.util.LinkedHashMap;
@@ -15,7 +18,8 @@ public final class Modality extends AbstractSortedOperator {
     private static final Map<String, Modality> nameMap = new LinkedHashMap<>(10);
 
     /**
-     * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after processing
+     * The diamond operator of dynamic logic. A formula {@code <alpha;>Phi} can be read as after
+     * processing
      * the program alpha there exists a state such that Phi holds.
      */
     public static final Modality DIA = new Modality(new Name("diamond"));

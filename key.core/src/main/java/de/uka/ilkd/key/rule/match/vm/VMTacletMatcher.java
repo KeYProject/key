@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.HashMap;
@@ -164,8 +167,8 @@ public class VMTacletMatcher implements TacletMatcher {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
                 final UpdateLabelPair ulp = curContext.head();
-                if (ulp.getUpdate().equalsModRenaming(update)
-                        && ulp.getUpdateApplicationlabels().equals(update.getLabels())) {
+                if (ulp.update().equalsModRenaming(update)
+                        && ulp.updateApplicationlabels().equals(update.getLabels())) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);
                     continue;
@@ -278,8 +281,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions checkVariableConditions(SchemaVariable var,
             SVSubstitute instantiationCandidate, MatchConditions matchCond, Services services) {
         if (matchCond != null) {
-            if (instantiationCandidate instanceof Term) {
-                final Term term = (Term) instantiationCandidate;
+            if (instantiationCandidate instanceof Term term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is

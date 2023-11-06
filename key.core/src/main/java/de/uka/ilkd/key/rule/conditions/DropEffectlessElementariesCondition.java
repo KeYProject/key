@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Set;
@@ -32,8 +35,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
     private static Term dropEffectlessElementariesHelper(Term update,
             Set<LocationVariable> relevantVars, TermServices services) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) update.op();
+        if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
             if (relevantVars.contains(lhs)) {
                 relevantVars.remove(lhs);

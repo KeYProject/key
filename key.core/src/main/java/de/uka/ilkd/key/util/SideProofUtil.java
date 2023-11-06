@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
@@ -84,7 +87,7 @@ public final class SideProofUtil {
 
     /**
      * removes all choices with the same category as {@code choiceToActivate} from {@code choices}
-     * and adds {@link choiceToActivate} to the set
+     * and adds {@code choiceToActivate} to the set
      *
      * @param choices the currently active choices
      * @param choiceToActivate the {@link Choice} to activate

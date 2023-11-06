@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -19,17 +23,14 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  * @author Arne Keller
  */
 class ReferenceSearchTable extends JTable implements TableModel {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * The mediator.
      */
     private final KeYMediator mediator;
     /**
-     * List of open goals in the selected proof.
+     * List of open and closed goals in the selected proof.
      */
-    private final List<Goal> openGoals;
+    private final List<Goal> goals;
 
     /**
      * Construct a new table.
@@ -39,8 +40,10 @@ class ReferenceSearchTable extends JTable implements TableModel {
      */
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
-        this.openGoals = proof.openGoals().toList();
-        Collections.reverse(this.openGoals);
+        this.goals = proof.allGoals().stream()
+                .filter(g -> !g.node().isClosed() || g.node().lookup(ClosedBy.class) != null)
+                .collect(Collectors.toList());
+        Collections.reverse(this.goals);
         this.mediator = mediator;
         getColumnModel().getColumn(1).setMinWidth(200);
     }
@@ -63,7 +66,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
 
     @Override
     public int getRowCount() {
-        return openGoals.size();
+        return goals.size();
     }
 
     @Override
@@ -73,14 +76,11 @@ class ReferenceSearchTable extends JTable implements TableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-        case 0:
-            return "Goal";
-        case 1:
-            return "Reference";
-        default:
-            return "??";
-        }
+        return switch (column) {
+        case 0 -> "Goal";
+        case 1 -> "Reference";
+        default -> "??";
+        };
     }
 
     @Override
@@ -91,9 +91,9 @@ class ReferenceSearchTable extends JTable implements TableModel {
     @Override
     public Object getValueAt(int row, int column) {
         if (column == 0) {
-            return "" + openGoals.get(row).node().serialNr();
+            return String.valueOf(goals.get(row).node().serialNr());
         } else {
-            Goal g = openGoals.get(row);
+            Goal g = goals.get(row);
             ClosedBy c = g.node().lookup(ClosedBy.class);
             if (c == null) {
                 return "no reference found";

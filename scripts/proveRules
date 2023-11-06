@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# ProveRules documentation can be found at: https://key-project.org/docs/devel/ProveRules/
+# ProveRules documentation can be found at: https://keyproject.github.io/key-docs/devel/ProveRules/
 #
 
 LIST_TESTS_FLAG=--list-tests

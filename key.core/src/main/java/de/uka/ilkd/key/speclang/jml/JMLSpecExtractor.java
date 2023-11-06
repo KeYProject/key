@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
 import java.net.URI;
@@ -102,8 +105,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private int getIndexOfMethodDecl(IProgramMethod pm, TextualJMLConstruct[] constructsArray) {
         for (int i = 0; i < constructsArray.length; i++) {
-            if (constructsArray[i] instanceof TextualJMLMethodDecl) {
-                TextualJMLMethodDecl methodDecl = (TextualJMLMethodDecl) constructsArray[i];
+            if (constructsArray[i] instanceof TextualJMLMethodDecl methodDecl) {
                 if (methodDecl.getMethodName().equals(pm.getName())) {
                     return i;
                 }
@@ -204,12 +206,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
 
         // primitive types have no class invariants
-        if (!(kjt.getJavaType() instanceof TypeDeclaration)) {
+        if (!(kjt.getJavaType() instanceof TypeDeclaration td)) {
             return result;
         }
 
         // get type declaration, file name
-        TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
         URI fileName = td.getPositionInfo().getURI().orElse(null);
 
         // add invariants for non_null fields
@@ -281,7 +282,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            var parser = new PreParser();
+            var parser = new PreParser(services.getOriginFactory() != null);
             ImmutableList<TextualJMLConstruct> constructs =
                 parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
@@ -289,8 +290,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // create class invs out of textual constructs, add them to result
             for (TextualJMLConstruct c : constructs) {
                 try {
-                    if (c instanceof TextualJMLClassInv) {
-                        TextualJMLClassInv textualInv = (TextualJMLClassInv) c;
+                    if (c instanceof TextualJMLClassInv textualInv) {
                         ClassInvariant inv = jsf.createJMLClassInvariant(kjt, textualInv);
                         result = result.add(inv);
                     } else if (c instanceof TextualJMLInitially) {
@@ -301,8 +301,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
                         ClassAxiom rep = jsf.createJMLRepresents(kjt, textualRep);
                         result = result.add(rep);
-                    } else if (c instanceof TextualJMLDepends) {
-                        TextualJMLDepends textualDep = (TextualJMLDepends) c;
+                    } else if (c instanceof TextualJMLDepends textualDep) {
                         Contract depContract = jsf.createJMLDependencyContract(kjt, textualDep);
                         result = result.add(depContract);
                     } else if (c instanceof TextualJMLClassAxiom) {
@@ -357,7 +356,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            PreParser parser = new PreParser();
+            PreParser parser = new PreParser(services.getOriginFactory() != null);
             constructs = parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
         } else {
@@ -391,8 +390,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         } else {
             startPos = constructsArray.length - 1;
         }
-        for (int i = startPos; i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase; i--) {
-            TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructsArray[i];
+        for (int i = startPos; i >= 0
+                && constructsArray[i] instanceof TextualJMLSpecCase specCase; i--) {
             if (modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                 specCase.addClause(AXIOMS, null, modelMethodDecl.getMethodDefinition());
             }
@@ -413,26 +412,45 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
+                final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
+
+                KeYJavaType classType = pm.getContainerType();
+                boolean hasFreeInvariant = services.getSpecificationRepository()
+                        .getClassInvariants(classType).stream().anyMatch(ClassInvariant::isFree);
+
                 if (!pm.isConstructor()) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(REQUIRES,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    final ParserRuleContext ctx =
-                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
-                    specCase.addClause(REQUIRES,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                        IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                            IMPL_TERM_LABEL));
+                    }
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(ENSURES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
+
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    final ParserRuleContext ctx =
-                        JmlFacade.parseClause(format("signals (Throwable e) %s;", invString));
                     specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
+                            IMPL_TERM_LABEL));
+
                 }
             }
 
@@ -502,8 +520,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
-        while (nextNonLabeled instanceof LabeledStatement) {
-            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+        while (nextNonLabeled instanceof LabeledStatement currentLabeled) {
             labels.add(currentLabeled.getLabel());
             nextNonLabeled = currentLabeled.getBody();
         }
@@ -533,8 +550,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
-        while (nextNonLabeled instanceof LabeledStatement) {
-            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+        while (nextNonLabeled instanceof LabeledStatement currentLabeled) {
             labels.add(currentLabeled.getLabel());
             nextNonLabeled = currentLabeled.getBody();
         }
@@ -574,8 +590,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase; i--) {
-            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
                     jsf.createJMLBlockContracts(method, labels, block, specificationCase));
@@ -595,8 +610,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase; i--) {
-            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result
                         .union(jsf.createJMLLoopContracts(method, labels, loop, specificationCase));
@@ -616,8 +630,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase; i--) {
-            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
                     jsf.createJMLLoopContracts(method, labels, block, specificationCase));
@@ -640,7 +653,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         final String concatenatedComment = concatenate(comments);
         final Position position = comments[0].getStartPosition();
-        final var parser = new PreParser();
+        final var parser = new PreParser(services.getOriginFactory() != null);
         final ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, position);
         warnings = warnings.append(parser.getWarnings());
@@ -671,7 +684,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         Position pos = comments[0].getStartPosition();
 
         // call preparser
-        var parser = new PreParser();
+        var parser = new PreParser(services.getOriginFactory() != null);
         ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());
@@ -681,8 +694,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             return result;
         }
         TextualJMLConstruct c = constructs.take(constructs.size() - 1).head();
-        if (c instanceof TextualJMLLoopSpec) {
-            TextualJMLLoopSpec textualLoopSpec = (TextualJMLLoopSpec) c;
+        if (c instanceof TextualJMLLoopSpec textualLoopSpec) {
             result = jsf.createJMLLoopInvariant(pm, loop, textualLoopSpec);
 
             // Check that a decreases clause exists

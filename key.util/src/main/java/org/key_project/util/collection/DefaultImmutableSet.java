@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Collection;
@@ -7,7 +10,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
+
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
@@ -32,7 +38,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** the empty set */
     @SuppressWarnings("unchecked")
-    public static final <T> DefaultImmutableSet<T> nil() {
+    public static <T> DefaultImmutableSet<T> nil() {
         return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 
@@ -323,16 +329,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     @Override
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("{");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("}");
-        return str.toString();
+        return Strings.formatAsList(this, "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */

@@ -1,12 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
@@ -15,44 +15,31 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  *
  * @author Arne Keller
  */
-public class GotoReferenceAction extends MainWindowAction implements KeYSelectionListener {
+public class GotoReferenceAction extends KeyAction {
+
+    private final KeYMediator mediator;
+    private final Node node;
 
     /**
      * Construct a new action.
      *
-     * @param mainWindow main window
+     * @param mediator KeY mediator
+     * @param node the node to jump from
      */
-    public GotoReferenceAction(MainWindow mainWindow) {
-        super(mainWindow);
-        putValue(SMALL_ICON, IconFactory.BACKREFERENCE_ARROW.get(MainWindow.TOOLBAR_ICON_SIZE));
-        putValue(SHORT_DESCRIPTION, "Go to referenced proof.");
-        initListeners();
-    }
+    public GotoReferenceAction(KeYMediator mediator, Node node) {
+        this.mediator = mediator;
+        this.node = node;
 
-    /**
-     * Registers the action at some listeners to update its status in a correct fashion.
-     */
-    public void initListeners() {
-        getMediator().addKeYSelectionListener(this);
+        setMenuPath("Proof Caching");
+        setEnabled(node.lookup(ClosedBy.class) != null);
 
-        this.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
-    }
-
-    @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
-        Node node = getMediator().getSelectedNode();
-        if (node == null) {
-            // no proof loaded
-            setEnabled(false);
-        } else {
-            boolean anyReferences = node.lookup(ClosedBy.class) != null;
-            setEnabled(anyReferences);
-        }
+        setName("Go to referenced proof");
+        putValue(SHORT_DESCRIPTION, "Select the equivalent node in the other proof.");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node ref = getMediator().getSelectedNode().lookup(ClosedBy.class).getNode();
-        getMediator().getSelectionModel().setSelectedNode(ref);
+        Node ref = node.lookup(ClosedBy.class).getNode();
+        mediator.getSelectionModel().setSelectedNode(ref);
     }
 }

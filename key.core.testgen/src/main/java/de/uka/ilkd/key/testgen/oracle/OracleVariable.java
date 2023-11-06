@@ -1,26 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class OracleVariable implements OracleTerm {
-
-    private final String name;
-
-    private final Sort sort;
-
-    public OracleVariable(String name, Sort sort) {
-        this.name = name;
-        this.sort = sort;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((sort == null) ? 0 : sort.hashCode());
-        return result;
-    }
+public record OracleVariable(String name, Sort sort) implements OracleTerm {
 
     @Override
     public boolean equals(Object obj) {
@@ -46,14 +31,6 @@ public class OracleVariable implements OracleTerm {
         } else {
             return sort.equals(other.sort);
         }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Sort getSort() {
-        return sort;
     }
 
     public String toString() {

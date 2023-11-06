@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.*;
@@ -37,10 +40,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * TODO
+     * creates a loop-scope block
      *
-     * @param e
-     * @param body
+     * @param iProgramVariable the IProgramVariable to indicate whether the scope should be left
+     *        or continuued
+     * @param body the StatementBlock inside the loop scope (the actual loop body)
      */
     public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
         this.indexPV = iProgramVariable;

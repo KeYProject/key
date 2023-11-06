@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.*;
@@ -20,7 +23,7 @@ import org.key_project.util.reflection.ClassLoaderUtil;
  *
  * <p>
  * It provides a menu with all macros which are applicable in a given context. The check of of
- * applicability is done using {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence)}.
+ * applicability is done using {@link ProofMacro#canApplyTo}.
  *
  * <p>
  * The menu items bear the name returned by {@link ProofMacro#getName()} and the tooltip is set to

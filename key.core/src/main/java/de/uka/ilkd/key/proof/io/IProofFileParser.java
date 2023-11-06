@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
 /**
- * Defines the required which a {@link KeYParser} needs to parse a *.proof file and to apply the
+ * Defines the required which a {@link de.uka.ilkd.key.nparser.KeYParser} needs to parse a *.proof
+ * file and to apply the
  * rules again.
  *
  * @author Martin Hentschel
@@ -30,7 +34,7 @@ public interface IProofFileParser {
         USER_INTERACTION("userinteraction"), PROOF_SCRIPT("proofscript"), NEW_NAMES("newnames"),
         AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"),
         KeY_VERSION("keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL("opengoal"),
-        NOTES("notes"), SOLVERTYPE("solverType");
+        NOTES("notes"), SOLVERTYPE("solverType"), MODALITY("modality");
 
         private final String rawName;
 

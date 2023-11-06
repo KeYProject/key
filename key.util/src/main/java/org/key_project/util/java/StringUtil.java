@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -302,15 +306,11 @@ public final class StringUtil {
                 throw new IllegalArgumentException(String.format(
                     "Text \"%s\" with length %d is longer as %d.", text, text.length(), length));
             } else {
-                for (int i = 0; i < length - text.length(); i++) {
-                    sb.append(leadingCharacter);
-                }
+                sb.append(String.valueOf(leadingCharacter).repeat(length - text.length()));
                 sb.append(text);
             }
         } else {
-            for (int i = 0; i < length; i++) {
-                sb.append(leadingCharacter);
-            }
+            sb.append(String.valueOf(leadingCharacter).repeat(Math.max(0, length)));
         }
         return sb.toString();
     }
@@ -388,8 +388,8 @@ public final class StringUtil {
      *
      * The given predicate test the characters, if true the character is removed.
      */
-    @Nonnull
-    public static String trim(@Nonnull String text, @Nonnull Predicate<Character> predicate) {
+    @NonNull
+    public static String trim(@NonNull String text, @NonNull Predicate<Character> predicate) {
         int first = 0;
         int last = text.length() - 1;
         char[] value = text.toCharArray();
@@ -408,7 +408,7 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
+    @NonNull
     public static String trim(String text, char c) {
         return trim(text, it -> it == c);
     }
@@ -418,7 +418,7 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
+    @NonNull
     public static String trim(String text, String chars) {
         return trim(text, it -> chars.indexOf(it) >= 0);
     }
@@ -432,5 +432,20 @@ public final class StringUtil {
      */
     public static String replaceNewlines(String text, String with) {
         return NEWLINE_PATTERN.matcher(text).replaceAll(with);
+    }
+
+    /**
+     * Count occurences of character x in text, starting at beginIndex and ending at endIndex
+     * (exclusive).
+     *
+     * @param text text
+     * @param beginIndex start index (inclusive)
+     * @param endIndex end index (exclusive)
+     * @param x character to search for
+     * @return number of times x is present
+     */
+    public static int count(String text, int beginIndex, int endIndex, char x) {
+        return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
+                .filter(ch -> ch == x).count();
     }
 }

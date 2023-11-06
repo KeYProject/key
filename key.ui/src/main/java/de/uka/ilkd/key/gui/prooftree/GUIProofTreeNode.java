@@ -1,20 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 /**
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
+import org.jspecify.annotations.NonNull;
+
+import java.util.List;
+
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     private GUIAbstractTreeNode[] children;
-    private boolean leaf;
+    private final boolean leaf;
 
     /**
      * This constructor should only be called by the {@link GUIProofTreeModel}!
@@ -87,16 +92,16 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                 children = new GUIAbstractTreeNode[0];
                 return;
             }
-
             Node node = getNode();
-            if (node != null && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                Protocol protocol =
-                    ((OneStepSimplifierRuleApp) node.getAppliedRuleApp()).getProtocol();
+            if (node != null
+                    && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp ruleApp) {
+                Protocol protocol = ruleApp.getProtocol();
                 if (protocol != null) {
                     children = new GUIAbstractTreeNode[protocol.size()];
                     for (int i = 0; i < children.length; i++) {
                         children[i] =
-                            new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i));
+                            new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i),
+                                node.sequent().formulaNumberInSequent(ruleApp.posInOccurrence()));
                     }
                     return;
                 }
@@ -119,7 +124,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         children = null;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getSearchString() {
         return toString();

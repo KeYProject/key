@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 import java.util.Iterator;
@@ -79,8 +82,7 @@ public class DefaultGoalChooser implements GoalChooser {
             }
         } else {
 
-            for (Goal p_goal : p_goals) {
-                final Goal goal = p_goal;
+            for (final Goal goal : p_goals) {
                 selectedList = selectedList.prepend(goal);
             }
 
@@ -215,9 +217,7 @@ public class DefaultGoalChooser implements GoalChooser {
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
-        for (Goal newGoal : newGoals) {
-            final Goal g = newGoal;
-
+        for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {
                 if (!allGoalsSatisfiable) {
                     goalList = goalList.prepend(g);
@@ -312,7 +312,7 @@ public class DefaultGoalChooser implements GoalChooser {
 
         while (childrenIt.hasNext()) {
             final Node child = childrenIt.next();
-            final Goal goal = proof.getGoal(child);
+            final Goal goal = proof.getOpenGoal(child);
 
             if (goalList.contains(goal)) {
                 selectedList = selectedList.prepend(goal);

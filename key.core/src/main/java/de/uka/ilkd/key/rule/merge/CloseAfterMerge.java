@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.HashMap;
@@ -6,7 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -35,6 +37,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
@@ -88,7 +92,7 @@ public class CloseAfterMerge implements BuiltInRule {
         return DISPLAY_NAME;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -199,7 +203,7 @@ public class CloseAfterMerge implements BuiltInRule {
             new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
-            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
@@ -236,7 +240,8 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param constsToReplace Skolem constants to replace before the universal closure.
      * @param services The services object.
      * @return A new term which is equivalent to the universal closure of the argument term, with
-     *         Skolem constants in constsToReplace having been replaced by fresh variables before.
+     *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
+     *         before.
      */
     private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
             Services services) {
@@ -274,8 +279,9 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param mergeNodeState The SE state for the merge node; needed for adding an implicative
      *        premise ensuring the soundness of merge rules.
      * @param partnerState The SE state for the partner node.
-     * @param pc The program counter common to the two states -- a formula of the form U\<{...}\>
-     *        PHI, where U is an update in normal form and PHI is a DL formula).
+     * @param pc The program counter common to the two states -- a formula of the form
+     *        {@code U\<{...}\>
+     *        PHI}, where U is an update in normal form and PHI is a DL formula).
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */

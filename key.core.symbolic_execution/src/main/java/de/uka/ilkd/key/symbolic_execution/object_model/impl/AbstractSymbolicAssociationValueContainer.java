@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import java.util.Objects;
@@ -50,7 +53,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Adds a new {@link ISymbolicAssociation}.
      *
-     * @param value The new {@link ISymbolicAssociation} to add.
+     * @param association The new {@link ISymbolicAssociation} to add.
      */
     public void addAssociation(ISymbolicAssociation association) {
         associations = associations.append(association);

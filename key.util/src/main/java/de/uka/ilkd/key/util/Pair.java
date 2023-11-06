@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.Collection;
@@ -41,10 +44,9 @@ public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Pair<?, ?>)) {
+        if (!(o instanceof Pair<?, ?> p)) {
             return false;
         }
-        Pair<?, ?> p = (Pair<?, ?>) o;
         return Objects.equals(first, p.first) && Objects.equals(second, p.second);
     }
 

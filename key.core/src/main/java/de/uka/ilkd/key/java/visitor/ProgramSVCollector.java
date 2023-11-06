@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -58,7 +61,6 @@ public class ProgramSVCollector extends JavaASTWalker {
      * variables must be taken into consideration, but also program meta constructs with implicit
      * schema variables containment
      *
-     * @see ProgramTransformerWithSV
      */
     protected void doAction(ProgramElement node) {
         if (node instanceof SchemaVariable) {

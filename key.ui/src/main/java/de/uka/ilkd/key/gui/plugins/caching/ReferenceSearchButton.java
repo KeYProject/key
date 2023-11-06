@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -19,8 +22,7 @@ import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
  *
  * @author Arne Keller
  */
-public class ReferenceSearchButton extends JButton
-        implements ActionListener, ReferenceSearchDialogListener, KeYSelectionListener {
+public class ReferenceSearchButton extends JButton implements ActionListener, KeYSelectionListener {
     /**
      * Color used for the label if a reference is found.
      */
@@ -32,10 +34,6 @@ public class ReferenceSearchButton extends JButton
      * The mediator.
      */
     private final KeYMediator mediator;
-    /**
-     * The opened dialog, once the user clicks on the button.
-     */
-    private ReferenceSearchDialog dialog = null;
 
     /**
      * Construct a new button.
@@ -58,46 +56,31 @@ public class ReferenceSearchButton extends JButton
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());
             if (c != null) {
-                // p.closeGoal(goal);
-                goal.setEnabled(false);
-
+                p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
+
                 c.getProof()
-                        .addProofDisposedListener(new CloseReferenceExtension.CopyBeforeDispose(
+                        .addProofDisposedListenerFirst(new CachingExtension.CopyBeforeDispose(
                             mediator, c.getProof(), p));
             }
         }
-        dialog = new ReferenceSearchDialog(p, this);
+        var dialog =
+            new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
         dialog.setVisible(true);
-    }
-
-    @Override
-    public void closeButtonClicked() {
-        if (dialog != null) {
-            dialog.dispose();
-            dialog = null;
-        }
-    }
-
-    @Override
-    public void copyButtonClicked() {
-        if (dialog != null) {
-            mediator.stopInterface(true);
-            new Thread(() -> mediator.getSelectedProof().copyCachedGoals(null,
-                total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
-                () -> SwingUtilities.invokeLater(() -> {
-                    if (dialog.incrementProgress()) {
-                        mediator.startInterface(true);
-                        dialog.dispose();
-                        dialog = null;
-                    }
-                }))).start();
-        }
     }
 
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
+        updateState(p);
+    }
+
+    /**
+     * Update the UI state of this button.
+     *
+     * @param p the currently selected proof
+     */
+    public void updateState(Proof p) {
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);
@@ -105,7 +88,7 @@ public class ReferenceSearchButton extends JButton
             return;
         }
         long foundRefs =
-            p.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+            p.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
         if (foundRefs > 0) {
             setText(String.format("Proof Caching (%d)", foundRefs));
             setForeground(COLOR_FINE.get());

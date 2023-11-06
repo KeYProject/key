@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -815,14 +818,14 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<FormulaChangeInfo> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
-                    PosInOccurrence positionOfMod = fci.getPositionOfModification();
+                    PosInOccurrence positionOfMod = fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
                             if (positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
                                 pair.active = false;
                             } else {
-                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(),
+                                pair.set_pio(new PosInOccurrence(fci.newFormula(),
                                     pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
                             }
                         }
@@ -947,17 +950,19 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.trace("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+        LOGGER.trace("updateSequent " + (node != null ? node.serialNr() : -1) + ": print "
+            + (print - start) / 1e6
             + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
             + (setText - highlight) / 1e6 + "ms");
     }
 
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
         this.filter = sequentPrintFilter;
-        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
-        if (selectedNode != null) {
+        Sequent selectedSequent =
+            getMainWindow().getMediator().getSelectionModel().getSelectedSequent();
+        if (selectedSequent != null) {
             // bugfix #1458 (gitlab). The selected node may be null if no proof.
-            this.filter.setSequent(selectedNode.sequent());
+            this.filter.setSequent(selectedSequent);
         }
         if (forceUpdate) {
             printSequent();
@@ -1054,8 +1059,7 @@ public abstract class SequentView extends JEditorPane {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof CurrentGoalView.PIO_age) {
-                CurrentGoalView.PIO_age c = (CurrentGoalView.PIO_age) o;
+            if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }
             return false;

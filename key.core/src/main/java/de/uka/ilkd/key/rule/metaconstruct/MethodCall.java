@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -229,8 +232,7 @@ public class MethodCall extends ProgramTransformer {
         } else if (newContext instanceof ThisReference) {
             newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
                 services.getTypeConverter().convertToLogicElement(newContext, execContext));
-        } else if (newContext instanceof FieldReference) {
-            final FieldReference fieldContext = (FieldReference) newContext;
+        } else if (newContext instanceof FieldReference fieldContext) {
             if (fieldContext.referencesOwnInstanceField()) {
                 newContext = fieldContext.setReferencePrefix(execContext.getRuntimeInstance());
             }

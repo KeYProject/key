@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.*;
@@ -7,7 +10,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
@@ -45,8 +47,7 @@ class TacletDescriber {
     }
 
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
-        if (schemaVar instanceof ModalOperatorSV) {
-            final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
+        if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
             for (final Operator op : modalOpSV.getModalities()) {
                 out.append(sep);
@@ -119,11 +120,10 @@ class TacletDescriber {
      * </p>
      *
      * @param mediator The {@link KeYMediator} to use.
-     * @param node The {@link Node} to use.
+     * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, Node node, int width) {
-        RuleApp app = node.getAppliedRuleApp();
+    public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {
@@ -138,8 +138,7 @@ class TacletDescriber {
                 s.append(app.rule());
             }
 
-            if (app instanceof TacletApp) {
-                TacletApp tapp = (TacletApp) app;
+            if (app instanceof TacletApp tapp) {
                 if (tapp.instantiations()
                         .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s.append("\n\nWith sorts:\n");

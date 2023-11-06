@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.ArrayList;
@@ -6,7 +9,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -34,9 +36,11 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Proof slicing extension.
- * For more details see <a href="https://key-project.org/docs/user/ProofSlicing/">the user
+ * For more details see <a href="https://keyproject.github.io/key-docs/user/ProofSlicing/">the user
  * guide</a>.
  *
  * @author Arne Keller
@@ -107,11 +111,11 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind,
-            @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -146,10 +150,10 @@ public class SlicingExtension implements KeYGuiExtension,
         });
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<TabPanel> getPanels(
-            @Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+            @NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             leftPanel = new SlicingLeftPanel(mediator, this);
             mediator.addKeYSelectionListener(leftPanel);
@@ -183,7 +187,6 @@ public class SlicingExtension implements KeYGuiExtension,
         this.enableSafeModeForNextProof = true;
     }
 
-    @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar bar = new JToolBar();

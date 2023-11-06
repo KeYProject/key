@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.colors;
 
 import java.awt.*;
@@ -114,15 +117,12 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch (columnIndex) {
-            case 0:
-                return colorData.get(rowIndex).property.getKey();
-            case 1:
-                return colorData.get(rowIndex).property.getDescription();
-            case 2:
-                return colorData.get(rowIndex).color;
-            }
-            return "";
+            return switch (columnIndex) {
+            case 0 -> colorData.get(rowIndex).property.getKey();
+            case 1 -> colorData.get(rowIndex).property.getDescription();
+            case 2 -> colorData.get(rowIndex).color;
+            default -> "";
+            };
         }
 
         @Override

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -42,7 +45,7 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * @return The human readable method return condition to reach this node from its
      *         {@link IExecutionMethodCall}.
      */
-    String getFormatedMethodReturnCondition() throws ProofInputException;
+    String getFormattedMethodReturnCondition() throws ProofInputException;
 
     /**
      * Returns the variable value pairs of the state when the method has been called.

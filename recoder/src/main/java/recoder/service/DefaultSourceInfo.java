@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.util.ArrayList;
@@ -87,7 +89,6 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * looks for the next variable scope that is a parent of the given element
      *
-     * @param pe a program element
      * @return the outer variable scope of the program element or <tt>null</tt>
      */
     private static VariableScope findOuterVariableScope(VariableScope ts) {
@@ -116,8 +117,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 break;
             }
             if (parent instanceof Statement) {
-                if (parent instanceof LoopStatement) {
-                    LoopStatement loop = (LoopStatement) parent;
+                if (parent instanceof LoopStatement loop) {
 
                     list.add(loop);
                     return;
@@ -159,7 +159,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * Initializes the new service; called by the configuration.
      *
-     * @param config the configuration this services becomes part of.
+     * @param cfg the configuration this services becomes part of.
      */
     public void initialize(ServiceConfiguration cfg) {
         super.initialize(cfg);
@@ -197,8 +197,6 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     /**
      * Change notification callback method.
-     *
-     * @param config the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
         List<TreeChange> changed = changes.getChanges();
@@ -223,10 +221,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     /**
-     * handles the given change by trying not to invalidate too much pre computed information.
+     * handles the given change by trying not to invalidate too much pre-computed information.
      *
-     * @param attached true if the program elements was attached, false otherwise
-     * @param changed the program element that was changed
+     * @param change the change made in the AST
      */
     void processChange(TreeChange change) {
         // the following code implements a very restrictive way to invalidate
@@ -243,8 +240,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
              */
         }
         // if package specification, update NameInfo (which can reuse old cache entries)
-        if (changed instanceof PackageSpecification) {
-            PackageSpecification pkgSpec = (PackageSpecification) changed;
+        if (changed instanceof PackageSpecification pkgSpec) {
             boolean isAttach = change instanceof AttachChange;
             handleCUPackageChange(pkgSpec.getParent(),
                 Naming.toPathName(pkgSpec.getPackageReference()), isAttach);
@@ -295,11 +291,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private void processIdentifierChanged(TreeChange tc) {
-        if (!(getNameInfo() instanceof DefaultNameInfo)) {
+        if (!(getNameInfo() instanceof DefaultNameInfo dni)) {
             return;
         }
 
-        DefaultNameInfo dni = (DefaultNameInfo) getNameInfo();
         Identifier id = (Identifier) tc.getChangeRoot();
         NonTerminalProgramElement npe = id.getParent();
         /*
@@ -308,8 +303,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
          * - any subtype of NameReference (ignore) - package reference -> parent is package
          * specification (handle)
          */
-        if (npe instanceof TypeDeclaration) {
-            TypeDeclaration td = (TypeDeclaration) npe;
+        if (npe instanceof TypeDeclaration td) {
             // name info will automatically conserve array references (see there)
             if (tc instanceof AttachChange) {
                 Object old = dni.getType(td.getFullName());
@@ -324,8 +318,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     dni.unregisterClassType(td.getFullName(), true);
                 }
             }
-        } else if (npe instanceof FieldSpecification) {
-            FieldSpecification fs = (FieldSpecification) npe;
+        } else if (npe instanceof FieldSpecification fs) {
             if (tc instanceof AttachChange) {
                 dni.register(fs);
             } else {
@@ -694,8 +687,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     break;
                 }
             }
-            if (s instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) s;
+            if (s instanceof TypeDeclaration td) {
                 ClassType newResult = getInheritedType(name, td);
 
                 if (newResult != null) {
@@ -828,8 +820,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Type result = getType(tr);
         if (result != null) {
             int d = vs.getDimensions();
-            if (vs.getASTParent() instanceof ParameterDeclaration) {
-                ParameterDeclaration pd = (ParameterDeclaration) vs.getASTParent();
+            if (vs.getASTParent() instanceof ParameterDeclaration pd) {
                 if (pd.isVarArg()) {
                     d++;
                 }
@@ -896,15 +887,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public Type getType(Expression expr) {
         Type result = null;
-        if (expr instanceof Operator) { ///////////////// Operators
-            Operator op = (Operator) expr;
+        if (expr instanceof Operator op) { ///////////////// Operators
             ASTList<Expression> args = op.getArguments();
             if (op instanceof Assignment) {
                 result = getType(args.get(0));
             } else if ((op instanceof TypeCast) || (op instanceof New)) {
                 result = getType(((TypeOperator) op).getTypeReference());
-            } else if (op instanceof NewArray) {
-                NewArray n = (NewArray) op;
+            } else if (op instanceof NewArray n) {
                 TypeReference tr = n.getTypeReference();
                 result = getType(tr);
                 for (int d = n.getDimensions(); d > 0; d -= 1) {
@@ -1197,8 +1186,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 }
             } else if (expr instanceof ArrayLengthReference) {
                 result = getNameInfo().getIntType();
-            } else if (expr instanceof ArrayReference) {
-                ArrayReference aref = (ArrayReference) expr;
+            } else if (expr instanceof ArrayReference aref) {
                 Type ht = getType(aref.getReferencePrefix());
                 if (ht != null && !(ht instanceof UnknownClassType)) {
                     List<Expression> dimExprs = aref.getDimensionExpressions();
@@ -1309,10 +1297,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     private void inferType1(String typeParamName, List<Type> result, Type t, Type actualArgType) {
         inferType2(typeParamName, result, t, actualArgType);
-        if (t instanceof ParameterizedType && actualArgType instanceof ParameterizedType) {
+        if (t instanceof ParameterizedType tp && actualArgType instanceof ParameterizedType ap) {
             // also consider type arguments
-            ParameterizedType tp = (ParameterizedType) t;
-            ParameterizedType ap = (ParameterizedType) actualArgType;
             for (int i = 0; i < tp.getTypeArgs().size(); i++) {
                 inferType1(typeParamName, result, getBaseType(tp.getTypeArgs().get(i)),
                     getBaseType(ap.getTypeArgs().get(i)));
@@ -1395,8 +1381,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (t instanceof TypeParameter) {
             return true;
         }
-        if (t instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) t;
+        if (t instanceof ParameterizedType pt) {
             if (pt.getGenericType() instanceof TypeParameter) {
                 return true;
             }
@@ -1441,18 +1426,16 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private ReplaceTypeArgResult replaceTypeParameter(ParameterizedType context, Type toReplace) {
         ReplaceTypeArgResult result;
         List<? extends TypeArgument> newTypeArgs = null;
-        if (toReplace instanceof ArrayType) {
-            ArrayType arrayType = (ArrayType) toReplace;
+        if (toReplace instanceof ArrayType arrayType) {
             ReplaceTypeArgResult innerResult =
                 replaceTypeParameter(context, arrayType.getBaseType());
             result =
                 new ReplaceTypeArgResult(getNameInfo().createArrayType(innerResult.baseType), null);
             return result;
         }
-        if (toReplace instanceof ParameterizedType) {
+        if (toReplace instanceof ParameterizedType pt) {
             // TODO if entering this branch, a lot of senseless object creation may occur
             // if nothing needs to be actually done...
-            ParameterizedType pt = (ParameterizedType) toReplace;
             newTypeArgs = replaceTypeArgsRec(context, pt.getTypeArgs());
             toReplace = pt.getGenericType();
         }
@@ -1852,8 +1835,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * UNTESTED AND INCOMPLETE
      *
-     * @param pe
-     * @return
+     * @param m the method to be checked
+     * @param mr the method reference to be checked
+     * @return warning/error message or {@code null} if everything was fine
      */
     private final String isAppropriate(Method m, MethodReference mr) {
         // follows JLS ?15.12.3
@@ -1873,8 +1857,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // context (b)";
             return null;
         }
-        if (mr.getReferencePrefix() instanceof SuperReference) {
-            SuperReference sr = (SuperReference) mr.getReferencePrefix();
+        if (mr.getReferencePrefix() instanceof SuperReference sr) {
             if (m.isAbstract()) {
                 // System.out.println(m.getContainingClassType().getFullName());
                 // return "cannot access super method because it is abstract";
@@ -1927,8 +1910,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             return res;
         }
         Type at = getType(apr.getParent().getParent().getTypeReference());
-        if (at instanceof ClassType && ((ClassType) at).isAnnotationType()) {
-            ClassType ct = (ClassType) at;
+        if (at instanceof ClassType ct && ((ClassType) at).isAnnotationType()) {
             List<? extends Method> ml = ct.getMethods();
             for (Method method : ml) {
                 if (method.getName().equals(apr.getIdentifier().getText())) {
@@ -2141,8 +2123,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public List<? extends Constructor> getConstructors(ConstructorReference cr) {
         updateModel();
         ClassType type = null;
-        if (cr instanceof New) {
-            New n = (New) cr;
+        if (cr instanceof New n) {
             ReferencePrefix rp = n.getReferencePrefix();
             if (rp != null) {
                 // In this case we need not do anything
@@ -2369,15 +2350,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // only java.lang.annotation.Annotation and java.lang.Object
                 res.add(getNameInfo().getJavaLangAnnotationAnnotation());
                 res.add(getNameInfo().getJavaLangObject());
-            } else if (td instanceof InterfaceDeclaration) {
-                InterfaceDeclaration id = (InterfaceDeclaration) td;
+            } else if (td instanceof InterfaceDeclaration id) {
                 Extends ext = id.getExtendedTypes();
                 if (ext != null) {
                     addToTypeList(res, ext.getSupertypes());
                 }
                 res.add(getNameInfo().getJavaLangObject());
-            } else if (td instanceof TypeParameterDeclaration) {
-                TypeParameterDeclaration tp = (TypeParameterDeclaration) td;
+            } else if (td instanceof TypeParameterDeclaration tp) {
                 if (tp.getBounds() == null || tp.getBounds().size() == 0) {
                     // see JLS 3rd edition ?4.4
                     res.add(getNameInfo().getJavaLangObject());
@@ -2659,8 +2638,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         } else if ((rp instanceof TypeReference) || (rp instanceof Expression)) {
             // includes VariableReferences
             Type refT = getType(rp);
-            if (refT instanceof ClassType) {
-                ClassType ct = (ClassType) refT;
+            if (refT instanceof ClassType ct) {
                 if (allowVariables) {
                     Field f = getInheritedField(urq.getName(), ct);
                     if (f != null) {
@@ -2715,8 +2693,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
                 boolean throwAgain = true;
                 if (!(result instanceof Expression)) {
-                    if (result instanceof PackageReference) {
-                        PackageReference pr = (PackageReference) result;
+                    if (result instanceof PackageReference pr) {
                         ProgramFactory pf = result.getFactory();
                         Package pack =
                             pf.getServiceConfiguration().getNameInfo().getPackage(pr.toSource());
@@ -2754,8 +2731,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public List<Statement> getSucceedingStatements(Statement s) {
         List<Statement> list = new ArrayList<>();
-        if (s instanceof LoopStatement) {
-            LoopStatement loop = (LoopStatement) s;
+        if (s instanceof LoopStatement loop) {
             switch (getBooleanStatus(loop.getGuard())) {
             case CONSTANT_TRUE:
                 if (loop.getBody() != null) {
@@ -2797,8 +2773,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             } else {
                 list.add(slist.get(0));
             }
-        } else if (s instanceof If) {
-            If ifstmt = (If) s;
+        } else if (s instanceof If ifstmt) {
             if (ifstmt.getElse() != null) {
                 list.add(ifstmt.getThen().getBody());
                 list.add(ifstmt.getElse().getBody());
@@ -2842,8 +2817,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             }
             for (int i = 0; i < branches.size(); i += 1) {
                 Branch b = branches.get(i);
-                if (b instanceof Catch) {
-                    Catch ca = (Catch) b;
+                if (b instanceof Catch ca) {
                     boolean newException = true;
                     if (i > 0) {
                         ClassType ex =
@@ -2930,8 +2904,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      */
     private void analyzeProgramElement(ProgramElement pe) {
         Debug.assertNonnull(pe);
-        if (pe instanceof CompilationUnit) {
-            CompilationUnit cu = (CompilationUnit) pe;
+        if (pe instanceof CompilationUnit cu) {
             String packageName = Naming.getPackageName(cu);
             getNameInfo().createPackage(packageName);
         }
@@ -2948,8 +2921,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (pe instanceof MethodDeclaration) {
                 // also for ConstructorDeclarations
                 ((MethodDeclaration) pe).setProgramModelInfo(this);
-            } else if (pe instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) pe;
+            } else if (pe instanceof TypeDeclaration td) {
                 td.setProgramModelInfo(this);
                 String typename = td.getName();
                 if (typename != null) {
@@ -2957,10 +2929,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     // usually, the type scope is just the parent
                     // there are few exceptions, such as labeled or switch
                     // statements
-                    while (!(parent instanceof TypeScope)) {
+                    while (!(parent instanceof TypeScope scope)) {
                         parent = parent.getASTParent();
                     }
-                    TypeScope scope = (TypeScope) parent;
                     ClassType dup = scope.getTypeInScope(typename);
                     if (dup != null && dup != td) {
                         getErrorHandler()
@@ -2977,17 +2948,15 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     getNameInfo().register(td);
                 }
             }
-        } else if (pe instanceof VariableSpecification) {
+        } else if (pe instanceof VariableSpecification vs) {
             // also for FieldSpecification
-            VariableSpecification vs = (VariableSpecification) pe;
             vs.setProgramModelInfo(this);
             NonTerminalProgramElement parent = vs.getASTParent().getASTParent();
             // usually, the variable scope is the grand parent
             // there are few exceptions, such as labeled or switch statements
-            while (!(parent instanceof VariableScope)) {
+            while (!(parent instanceof VariableScope scope)) {
                 parent = parent.getASTParent();
             }
-            VariableScope scope = (VariableScope) parent;
 
             String vname = vs.getName();
             Variable dup = scope.getVariableInScope(vname);

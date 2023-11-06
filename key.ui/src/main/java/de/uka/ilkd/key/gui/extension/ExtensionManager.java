@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension;
 
 import java.awt.*;
@@ -23,9 +26,8 @@ import net.miginfocom.layout.CC;
  * @version 1 (08.04.19)
  */
 public class ExtensionManager extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = 6682677093231975786L;
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
-    private HashMap<JCheckBox, Extension> map;
+    private HashMap<JCheckBox, Extension<?>> map;
     private String keywords = "";
 
     public ExtensionManager() {
@@ -88,7 +90,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                 });
     }
 
-    private String getSupportLabel(Extension it) {
+    private String getSupportLabel(Extension<?> it) {
         return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
             + (it.supportsLeftPanel() ? "LeftPanel " : "")
             + (it.supportsMainMenu() ? "MainMenu " : "")

@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 
-/** Proof-specific counter object: taclet names, var names, node numbers, &c */
+/** Proof-specific counter object: taclet names, var names, node numbers, etc */
 public class Counter {
 
     private final String name;

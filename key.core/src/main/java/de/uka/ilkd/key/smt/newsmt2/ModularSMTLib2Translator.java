@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.BufferedReader;
@@ -7,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +42,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     /**
      * Handler option. If provided, the translator will label translations of sequent formulas such
-     * that {@link de.uka.ilkd.key.gui.smt.SMTFocusResults} can interpret the unsat core.
+     * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
      * This option is currently only enabled for Z3.
      * Currently, this option only works with a CVC5 dev build.

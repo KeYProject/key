@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -27,7 +30,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
     /**
      * tries to add the pair <tt>(this,pe)</tt> to the match conditions. If possible the resulting
      * match conditions are returned, otherwise <tt>null</tt>. Such an addition can fail, e.g. if
-     * already a pair <tt>(this,x)</tt> exists where <tt>x<>pe</tt>
+     * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
     protected MatchConditions addInstantiation(ProgramElement pe, MatchConditions matchCond,
             Services services) {

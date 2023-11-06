@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
@@ -261,10 +264,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof VariableSpecification)) {
+        if (!(se instanceof VariableSpecification vs)) {
             return false;
         }
-        final VariableSpecification vs = (VariableSpecification) se;
         if (dimensions != vs.getDimensions()) {
             return false;
         }

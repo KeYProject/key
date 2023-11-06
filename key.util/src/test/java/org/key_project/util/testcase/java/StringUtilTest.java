@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.testcase.java;
 
 import java.util.Comparator;
@@ -7,6 +10,7 @@ import org.key_project.util.java.StringUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.key_project.util.java.StringUtil.count;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**
@@ -293,5 +297,22 @@ public class StringUtilTest {
         assertEquals(".", trim("\".\"", '"'));
         assertEquals(".", trim(".", '"'));
         assertEquals(".", trim(".", it -> false));
+    }
+
+    @Test
+    void testCount() {
+        assertEquals(3, count("AbAbA", 0, 5, 'A'));
+        assertEquals(2, count("AbAbA", 0, 4, 'A'));
+        assertEquals(2, count("AbAbA", 0, 3, 'A'));
+        assertEquals(1, count("AbAbA", 0, 2, 'A'));
+        assertEquals(1, count("AbAbA", 0, 1, 'A'));
+        assertEquals(0, count("AbAbA", 0, 0, 'A'));
+
+        assertEquals(2, count("AbAbA", 1, 5, 'A'));
+        assertEquals(2, count("AbAbA", 2, 5, 'A'));
+        assertEquals(1, count("AbAbA", 3, 5, 'A'));
+        assertEquals(1, count("AbAbA", 4, 5, 'A'));
+
+        assertEquals(0, count("AbAbA", 5, 5, 'A'));
     }
 }

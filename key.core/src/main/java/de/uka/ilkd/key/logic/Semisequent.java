@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
@@ -141,7 +144,6 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
             SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
-        assert idx >= 0;
 
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
@@ -257,7 +259,6 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos, SequentFormula sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
-        assert idx >= 0;
         final FormulaChangeInfo fci = new FormulaChangeInfo(pos, sequentFormula);
         return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
@@ -347,7 +348,8 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /**
      * returns the index of the given {@link SequentFormula} or {@code -1} if the sequent formula is
-     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,{@link ==})
+     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,
+     * <code>==</code>)
      *
      * @param sequentFormula the {@link SequentFormula} to look for
      * @return index of sequentFormula (-1 if not found)
@@ -421,9 +423,6 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
         if (!(o instanceof Semisequent)) {
             return false;
         }

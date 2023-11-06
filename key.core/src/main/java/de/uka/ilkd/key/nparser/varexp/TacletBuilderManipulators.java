@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
 import java.util.ArrayList;
@@ -5,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -16,6 +18,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
@@ -84,7 +88,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder STRICT =
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
-            public boolean isSuitableFor(@Nonnull String name) {
+            public boolean isSuitableFor(@NonNull String name) {
                 if (super.isSuitableFor(name)) {
                     return true;
                 }
@@ -157,7 +161,7 @@ public class TacletBuilderManipulators {
 
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@Nonnull ArgumentType... argumentsTypes) {
+        public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
         }
 
@@ -273,6 +277,8 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("subFormulas", SubFormulaCondition.class, FSV);
     public static final AbstractConditionBuilder STATIC_FIELD =
         new ConstructorBasedBuilder("isStaticField", StaticFieldCondition.class, FSV);
+    public static final AbstractConditionBuilder MODEL_FIELD =
+        new ConstructorBasedBuilder("isModelField", ModelFieldCondition.class, FSV);
     public static final AbstractConditionBuilder SUBFORMULA =
         new ConstructorBasedBuilder("hasSubFormulas", SubFormulaCondition.class, FSV);
     public static final TacletBuilderCommand DROP_EFFECTLESS_STORES = new ConstructorBasedBuilder(
@@ -289,7 +295,7 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@Nonnull String triggerName, boolean forceElmentary) {
+        public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
             super(triggerName, SV, SORT);
             this.elmen = forceElmentary;
         }
@@ -365,7 +371,8 @@ public class TacletBuilderManipulators {
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,
             CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS, SAME_OBSERVER,
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
-            STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE, META_DISJOINT,
+            STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
+            META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);

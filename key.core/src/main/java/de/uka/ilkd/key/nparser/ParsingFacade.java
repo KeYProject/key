@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.BufferedInputStream;
@@ -10,14 +13,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +50,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @Nonnull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@Nonnull KeyAst<T> ast) {
+    @NonNull
+    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -76,7 +81,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
+    public static @NonNull ChoiceInformation getChoices(@NonNull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -121,7 +126,20 @@ public final class ParsingFacade {
 
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
-        KeYParser.FileContext ctx = p.file();
+
+        p.getInterpreter().setPredictionMode(PredictionMode.SLL);
+        // we don't want error messages or recovery during first try
+        p.removeErrorListeners();
+        p.setErrorHandler(new BailErrorStrategy());
+        KeYParser.FileContext ctx;
+        try {
+            ctx = p.file();
+        } catch (ParseCancellationException ex) {
+            LOGGER.warn("SLL was not enough");
+            p = createParser(stream);
+            ctx = p.file();
+        }
+
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }
@@ -147,8 +165,8 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @Nonnull String getValueDocumentation(
-            @Nonnull KeYParser.String_valueContext ctx) {
+    public static @NonNull String getValueDocumentation(
+            KeYParser.@NonNull String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }

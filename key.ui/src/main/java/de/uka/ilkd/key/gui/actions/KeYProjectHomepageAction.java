@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -25,10 +28,11 @@ public class KeYProjectHomepageAction extends MainWindowAction {
 
     public KeYProjectHomepageAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Online Help");
+        setName("KeY Homepage");
         setEnabled(desktopEnabled());
         setTooltip("Opens the KeY project homepage in the default browser");
         setIcon(IconFactory.help(16));
+        lookupAcceleratorKey();
     }
 
     private static boolean desktopEnabled() {

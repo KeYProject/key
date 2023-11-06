@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
@@ -40,8 +43,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     @Override
     protected Operator replaceOp(Operator op, TermServices services) {
 
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
             if (sort != repSort) {
@@ -68,7 +70,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
             }
 
             ImmutableSet<Sort> extSorts = replaceSorts(sort.extendsSorts(), services);
-            ProxySort result = new ProxySort(sort.name(), extSorts);
+            ProxySort result = new ProxySort(sort.name(), extSorts, "", "");
             sortMap.put(sort, result);
             return result;
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
 import java.io.File;
@@ -35,11 +38,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -138,7 +142,7 @@ public abstract class AbstractProofReplayer {
                     .getJustification(ruleApp, originalProof.getServices());
             currContract = proof.getServices().getSpecificationRepository()
                     .getContractByName(
-                        ((RuleJustificationBySpec) justification).getSpec().getName());
+                        ((RuleJustificationBySpec) justification).spec().getName());
         }
 
         // Load ifInsts, if applicable
@@ -154,8 +158,8 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (RuleAppSMT.RULE.displayName().equals(ruleName)) {
-            return RuleAppSMT.RULE.createApp(null, proof.getServices());
+        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
+            return SMTRuleApp.RULE.createApp(null, proof.getServices());
         }
 
         IBuiltInRuleApp ourApp = null;
@@ -180,8 +184,11 @@ public abstract class AbstractProofReplayer {
                         .createApp(pos)).setContract(currContract);
             } else {
                 useContractRule = UseDependencyContractRule.INSTANCE;
+                // copy over the mysterious "step"
+                PosInOccurrence step = findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                    currGoal.sequent());
                 contractApp = (((UseDependencyContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract);
+                        .createApp(pos)).setContract(currContract).setStep(step);
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
@@ -286,8 +293,7 @@ public abstract class AbstractProofReplayer {
                 .map(x -> new Pair<>(x, true))
                 .collect(Collectors.toList());
         // add direct instantiations
-        if (tacletApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) tacletApp;
+        if (tacletApp instanceof PosTacletApp posTacletApp) {
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
                     if (x instanceof IfFormulaInstDirect) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
@@ -126,7 +129,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
                     Iterator<Node> childIter = updatedNode.childrenIterator();
                     while (childIter.hasNext()) {
                         Node next = childIter.next();
-                        Goal nextGoal = next.proof().getGoal(next);
+                        Goal nextGoal = next.proof().getOpenGoal(next);
                         // Check if the current goal is a new one
                         if (nextGoal != goal) {
                             // New goal found, use the initial call stack size for it.

@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
@@ -65,6 +70,12 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     public ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals) {
         this(macro, goals, goals.isEmpty() ? null : goals.head().proof(), false);
+    }
+
+    public ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
+            List<Node> statisticNodes) {
+        this(macro, goals, goals.isEmpty() ? null : goals.head().proof(),
+            statisticNodes.isEmpty() ? null : new Statistics(statisticNodes));
     }
 
     public ProofMacroFinishedInfo(ProofMacro macro, Proof proof) {

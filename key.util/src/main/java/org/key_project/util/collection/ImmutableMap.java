@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
@@ -10,7 +13,8 @@ public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>>, java.io.Serializable {
 
     /**
-     * adds a mapping <key,val> to the Map (old map is not modified) if key exists old entry has to
+     * adds a mapping {@code <key,val>} to the Map (old map is not modified) if key exists old entry
+     * has to
      * be removed
      *
      * @return the new mapping

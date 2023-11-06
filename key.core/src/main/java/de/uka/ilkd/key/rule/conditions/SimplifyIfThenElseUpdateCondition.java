@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Comparator;
@@ -110,8 +113,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
                 updates.add(next.sub(1));
             } else if (next.op() == UpdateJunctor.SKIP) {
                 return true;
-            } else if (next.op() instanceof ElementaryUpdate) {
-                ElementaryUpdate eu = (ElementaryUpdate) next.op();
+            } else if (next.op() instanceof ElementaryUpdate eu) {
                 if (collected.contains(eu.lhs())) {
                     return false;
                 }

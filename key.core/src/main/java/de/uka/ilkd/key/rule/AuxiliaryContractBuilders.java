@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
@@ -385,7 +388,7 @@ public final class AuxiliaryContractBuilders {
          * Creates and registers copies of the remembrance variables and heaps.
          *
          * @param suffix a suffix for the new variables' names.
-         * @return a {@link Variables} object containing the new {@link ProgramVariables}.
+         * @return a {@link Variables} object containing the new {@link ProgramVariable}s.
          */
         public Variables createAndRegisterCopies(String suffix) {
             return new BlockContract.Variables(null, placeholderVariables.breakFlags,
@@ -838,7 +841,7 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @return the contract's modifies clause.
+         * @return the contract's modifies clauses.
          */
         public Map<LocationVariable, Term> buildModifiesClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
@@ -850,14 +853,26 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
+         * @return the contract's free modifies clauses.
+         */
+        public Map<LocationVariable, Term> buildFreeModifiesClauses() {
+            Map<LocationVariable, Term> result = new LinkedHashMap<>();
+            for (final LocationVariable heap : heaps) {
+                result.put(heap,
+                    contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
+            }
+            return result;
+        }
+
+        /**
+         *
          * @return the loop contract's decreases clause.
          */
         public Term buildDecreasesCheck() {
-            if (!(contract instanceof LoopContract)) {
+            if (!(contract instanceof LoopContract lc)) {
                 throw new IllegalStateException();
             }
 
-            LoopContract lc = (LoopContract) contract;
             Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
             if (decreases == null) {
@@ -901,20 +916,35 @@ public final class AuxiliaryContractBuilders {
         /**
          *
          * @param modifiesClauses the contract's modifies clauses
+         * @param freeModifiesClauses the contract's free modifies clauses
          * @return the contract's framing condition.
          */
-        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses) {
+        public Term buildFrameCondition(
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses) {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                 constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
+                final Term freeModifiesClause = freeModifiesClauses.get(heap);
                 final Term frameCondition;
                 if (!contract.hasModifiesClause(heap)) {
-                    frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
+                    if (!contract.hasFreeModifiesClause(heap)) {
+                        frameCondition = frameStrictlyEmpty(
+                            var(heap), remembranceVariables.get(heap));
+                    } else {
+                        frameCondition =
+                            frame(var(heap), remembranceVariables.get(heap), freeModifiesClause);
+                    }
                 } else {
-                    frameCondition =
-                        frame(var(heap), remembranceVariables.get(heap), modifiesClause);
+                    if (!contract.hasFreeModifiesClause(heap)) {
+                        frameCondition = frame(
+                            var(heap), remembranceVariables.get(heap), modifiesClause);
+                    } else {
+                        frameCondition = frame(var(heap), remembranceVariables.get(heap),
+                            union(modifiesClause, freeModifiesClause));
+                    }
                 }
                 result = and(result, frameCondition);
             }
@@ -1360,11 +1390,12 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    instantiation.modality, new ImmutableArray<>(newPost), null, newJavaBlock,
-                    instantiation.formula.getLabels());
+                    tb.tf().createTerm(instantiation.modality(),
+                        new ImmutableArray<>(newPost), null, newJavaBlock,
+                        instantiation.formula().getLabels()));
 
                 term = tb.applySequential(updates,
-                    tb.prog(instantiation.modality, newJavaBlock, newPost, labels));
+                    tb.prog(instantiation.modality(), newJavaBlock, newPost, labels));
 
                 goal.changeFormula(new SequentFormula(term), occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
@@ -1373,7 +1404,8 @@ public final class AuxiliaryContractBuilders {
             } else {
                 Term pre = tb.and(assumptions);
                 Term prog =
-                    tb.prog(instantiation.modality, newJavaBlock, newPost, new ImmutableArray<>());
+                    tb.prog(instantiation.modality(), newJavaBlock, newPost,
+                        new ImmutableArray<>());
                 term = tb.applySequential(updates, tb.imp(pre, prog));
             }
 
@@ -1401,12 +1433,14 @@ public final class AuxiliaryContractBuilders {
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
                 final Map<LocationVariable, Function> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses,
+                final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
-            final Modality modality = instantiation.modality;
+            final Modality modality = instantiation.modality();
 
             final ProgramVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =
@@ -1519,10 +1553,10 @@ public final class AuxiliaryContractBuilders {
          *         itself.
          */
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
-            if (instantiation.context == null) {
+            if (instantiation.context() == null) {
                 return block;
             }
-            return new MethodFrame(null, instantiation.context, block);
+            return new MethodFrame(null, instantiation.context(), block);
         }
 
         /**
@@ -1576,13 +1610,16 @@ public final class AuxiliaryContractBuilders {
 
         private Term buildUsageFormula(Goal goal) {
             return services.getTermBuilder().prog(
-                instantiation.modality, replaceBlock(instantiation.formula.javaBlock(),
-                    instantiation.statement, constructAbruptTerminationIfCascade()),
-                instantiation.formula.sub(0),
+                instantiation.modality(), replaceBlock(instantiation.formula().javaBlock(),
+                    instantiation.statement(), constructAbruptTerminationIfCascade()),
+                instantiation.formula().sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
-                    instantiation.modality, new ImmutableArray<>(instantiation.formula.sub(0)),
-                    null, instantiation.formula.javaBlock(), instantiation.formula.getLabels()));
+                    services.getTermBuilder().tf().createTerm(
+                        instantiation.modality(),
+                        new ImmutableArray<>(instantiation.formula().sub(0)),
+                        null, instantiation.formula().javaBlock(),
+                        instantiation.formula().getLabels())));
         }
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,
@@ -1618,13 +1655,14 @@ public final class AuxiliaryContractBuilders {
         private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {
             final StatementBlock block;
 
-            if (instantiation.statement instanceof StatementBlock) {
+            if (instantiation.statement() instanceof StatementBlock) {
                 block =
-                    new ValidityProgramConstructor(labels, (StatementBlock) instantiation.statement,
+                    new ValidityProgramConstructor(labels,
+                        (StatementBlock) instantiation.statement(),
                         variables, exceptionParameter, services).construct();
             } else {
                 block = new ValidityProgramConstructor(labels,
-                    new StatementBlock(instantiation.statement), variables, exceptionParameter,
+                    new StatementBlock(instantiation.statement()), variables, exceptionParameter,
                     services).construct();
             }
 

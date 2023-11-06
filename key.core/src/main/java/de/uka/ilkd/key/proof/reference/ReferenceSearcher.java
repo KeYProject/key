@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
 import java.util.ArrayDeque;
@@ -14,6 +17,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 /**
@@ -39,12 +43,35 @@ public final class ReferenceSearcher {
         if (!suitableForCloseByReference(newNode)) {
             return null;
         }
-        DefaultListModel<Proof> proofs = previousProofs;
-        for (int i = 0; i < proofs.size(); i++) {
-            Proof p = proofs.get(i);
+        for (int i = 0; i < previousProofs.size(); i++) {
+            Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
                 continue; // doesn't make sense
             }
+            // conservative check: all user-defined rules in a previous proof
+            // have to also be available in the new proof
+            var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
+            var tacletIndex = p.allGoals().head().ruleAppIndex().tacletIndex();
+            var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
+            Set<NoPosTacletApp> newTaclets = null;
+            var tacletsOk = true;
+            for (var taclet : tacletIndex.allNoPosTacletApps().stream()
+                    .filter(x -> x.taclet().getOrigin() != null
+                            && x.taclet().getOrigin().contains(proofFile))
+                    .toList()) {
+                if (newTaclets == null) {
+                    newTaclets = newTacletIndex.allNoPosTacletApps();
+                }
+                if (newTaclets.stream().noneMatch(newTaclet -> Objects
+                        .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
+                    tacletsOk = false;
+                    break;
+                }
+            }
+            if (!tacletsOk) {
+                continue;
+            }
+
             // only search in compatible proofs
             if (!p.getSettings().getChoiceSettings()
                     .equals(newNode.proof().getSettings().getChoiceSettings())) {
@@ -62,12 +89,15 @@ public final class ReferenceSearcher {
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
             while (!nodesToCheck.isEmpty()) {
+                // for each node, check that the sequent in the reference is
+                // a subset of the new sequent
                 Node n = nodesToCheck.remove();
-                if (checkedNodes.contains(n)) {
+                if (checkedNodes.contains(n) || !n.isClosed()) {
                     continue;
                 }
                 checkedNodes.add(n);
 
+                // find the first node in the branch
                 while (n.parent() != null && n.parent().childrenCount() == 1) {
                     n = n.parent();
                 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.io.*;
@@ -177,11 +180,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        progressMax = info.getSize();
-        if (TaskKind.Strategy.equals(info.getKind())) {
-            System.out.println(info.getMessage() + " ["); // start progress bar
+        progressMax = info.size();
+        if (TaskKind.Strategy.equals(info.kind())) {
+            System.out.println(info.message() + " ["); // start progress bar
         } else {
-            System.out.println(info.getMessage());
+            System.out.println(info.message());
         }
     }
 

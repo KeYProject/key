@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -15,8 +18,9 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.LRUCache;
 
 /**
- * This class is used to prove some simple arithmetic problem which are a==b, a>=b, a<=b; Besides it
- * can be used to prove that a>=b or a<=b by knowing that c>=d or c<=d;
+ * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
+ * {@code a<=b}; Besides it can be used to prove that {@code a>=b} or {@code a<=b} by
+ * knowing that {@code c>=d} or {@code c<=d;}
  *
  */
 public class HandleArith {
