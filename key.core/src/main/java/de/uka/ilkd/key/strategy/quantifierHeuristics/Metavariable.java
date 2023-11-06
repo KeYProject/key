@@ -6,9 +6,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator

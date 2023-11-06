@@ -8,6 +8,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -17,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
  * be a subsort of the instantiations of the supersorts of this sort
  */
-public final class GenericSort extends Sort {
+public final class GenericSort extends SortImpl {
 
 
     /**

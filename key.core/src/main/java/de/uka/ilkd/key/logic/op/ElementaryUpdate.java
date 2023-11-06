@@ -7,9 +7,9 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 
 /**

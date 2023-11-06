@@ -37,6 +37,7 @@ import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 

@@ -6,9 +6,9 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 

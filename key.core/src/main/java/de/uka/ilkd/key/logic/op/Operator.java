@@ -7,8 +7,8 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 

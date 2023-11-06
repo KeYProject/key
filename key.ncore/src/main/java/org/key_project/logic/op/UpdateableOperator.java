@@ -10,6 +10,6 @@ import org.key_project.logic.sort.Sort;
  * Operators implementing this interface may stand for locations as well. This means e.g. occur as
  * top level operators on the left side of an assignment pair of an update.
  */
-public interface UpdateableOperator<S extends Sort<S>> extends ParsableVariable<S> {
+public interface UpdateableOperator<S extends Sort> extends ParsableVariable<S> {
 
 }

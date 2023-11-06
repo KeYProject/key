@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the moment, such schema

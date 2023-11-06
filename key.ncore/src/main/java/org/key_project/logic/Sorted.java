@@ -5,7 +5,7 @@ package org.key_project.logic;
 
 import org.key_project.logic.sort.Sort;
 
-public interface Sorted<S extends Sort<S>> {
+public interface Sorted<S extends Sort> {
     /**
      * the sort of the entity
      *

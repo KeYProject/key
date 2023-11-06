@@ -11,8 +11,9 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms for the modular

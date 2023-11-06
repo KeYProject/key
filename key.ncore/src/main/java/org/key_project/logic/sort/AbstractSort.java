@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Abstract base class for implementations of the Sort interface.
  */
-public abstract class AbstractSort<S extends Sort<S>> implements Sort<S> {
+public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 

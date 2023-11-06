@@ -10,8 +10,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This SMT translation handler takes care of those sort-depending functions f whose return type is

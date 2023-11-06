@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract operator class offering some common functionality.
  */
-public abstract class AbstractOperator<S extends Sort<S>> implements Operator<S> {
+public abstract class AbstractOperator<S extends Sort> implements Operator<S> {
     private final Name name;
     private final int arity;
     private final ImmutableArray<Boolean> whereToBind;

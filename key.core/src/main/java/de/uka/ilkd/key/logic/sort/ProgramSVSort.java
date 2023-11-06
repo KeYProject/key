@@ -49,6 +49,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
-public abstract class ProgramSVSort extends Sort {
+public abstract class ProgramSVSort extends SortImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to

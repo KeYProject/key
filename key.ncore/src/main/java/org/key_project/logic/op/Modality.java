@@ -14,7 +14,7 @@ import org.key_project.logic.sort.Sort;
  * This class is used to represent a dynamic logic modality like diamond and box for a target
  * language.
  */
-public abstract class Modality<S extends Sort<S>> extends AbstractSortedOperator<S> {
+public abstract class Modality<S extends Sort> extends AbstractSortedOperator<S> {
     protected final Program prg;
     private final Kind kind;
 

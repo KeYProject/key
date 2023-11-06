@@ -7,7 +7,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator<S extends Sort<S>> extends Named {
+public interface Operator<S extends Sort> extends Named {
     /**
      * the arity of this operator
      */

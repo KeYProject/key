@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
+import org.key_project.logic.HasOrigin;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
-public interface Sort<S extends Sort<S>> extends Named {
+public interface Sort extends Named, HasOrigin {
     /**
      * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
      */
-    ImmutableSet<S> extendsSorts();
+    ImmutableSet<Sort> extendsSorts();
 
-    default <Services extends LogicServices> ImmutableSet<S> extendsSorts(Services services) {
+    default <Services extends LogicServices> ImmutableSet<Sort> extendsSorts(Services services) {
         return extendsSorts();
     }
 
@@ -23,7 +24,7 @@ public interface Sort<S extends Sort<S>> extends Named {
      * @param s some sort.
      * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
-    boolean extendsTrans(S s);
+    boolean extendsTrans(Sort s);
 
     /**
      * @return whether this sort has no exact elements.

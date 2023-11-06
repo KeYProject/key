@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * This interface is implemented by classes that represent terms or formulas.
  */
-public interface Term<S extends Sort<S>> extends LogicElement, Sorted<S> {
+public interface Term<S extends Sort> extends LogicElement, Sorted<S> {
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
      */

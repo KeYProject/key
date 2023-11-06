@@ -9,5 +9,5 @@ import org.key_project.logic.sort.Sort;
  * This interface represents the variables that can be bound (by quantifiers or other binding
  * operators).
  */
-public interface QuantifiableVariable<S extends Sort<S>> extends ParsableVariable<S> {
+public interface QuantifiableVariable<S extends Sort> extends ParsableVariable<S> {
 }

@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 
 /**

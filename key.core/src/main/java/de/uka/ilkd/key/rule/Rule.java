@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.HasOrigin;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
