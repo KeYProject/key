@@ -14,13 +14,11 @@ import org.key_project.logic.sort.Sort;
  * This class is used to represent a dynamic logic modality like diamond and box for a target
  * language.
  */
-public abstract class Modality<S extends Sort> extends AbstractSortedOperator<S> {
-    protected final Program prg;
+public abstract class Modality extends AbstractSortedOperator<Sort> {
     private final Kind kind;
 
-    protected Modality(Name name, S formulaSort, Program prg, Kind kind) {
+    protected Modality(Name name, Sort formulaSort, Kind kind) {
         super(name, new Sort[] { formulaSort }, formulaSort, false);
-        this.prg = prg;
         this.kind = kind;
     }
 
@@ -28,9 +26,7 @@ public abstract class Modality<S extends Sort> extends AbstractSortedOperator<S>
         return (K) kind;
     }
 
-    public Program program() {
-        return prg;
-    }
+    public abstract Program program();
 
     public abstract static class Kind implements Named {
         private final Name name;

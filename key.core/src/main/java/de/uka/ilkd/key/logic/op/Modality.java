@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Program;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
@@ -23,7 +22,7 @@ import org.key_project.util.collection.Pair;
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
-public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
+public class Modality extends org.key_project.logic.op.Modality implements Operator {
     /**
      * keeps track of created modalities
      */
@@ -47,18 +46,21 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
         return mod;
     }
 
+    private final JavaBlock javaBlock;
+
     /**
      * Creates a modal operator with the given name
      * <strong>Creation must only be done by {@link de.uka.ilkd.key.logic.TermServices}!</strong>
      *
      */
-    private Modality(Program prg, JavaModalityKind kind) {
-        super(kind.name(), JavaDLTheory.FORMULA, prg, kind);
+    private Modality(JavaBlock prg, JavaModalityKind kind) {
+        super(kind.name(), JavaDLTheory.FORMULA, kind);
+        this.javaBlock = prg;
     }
 
     @Override
     public JavaBlock program() {
-        return (JavaBlock) super.program();
+        return javaBlock;
     }
 
     /**

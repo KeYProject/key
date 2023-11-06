@@ -30,8 +30,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
-import org.key_project.proof.LocationVariableTracker;
 import org.key_project.logic.Name;
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
