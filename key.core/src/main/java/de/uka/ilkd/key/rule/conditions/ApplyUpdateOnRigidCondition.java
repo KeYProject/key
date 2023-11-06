@@ -8,6 +8,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -37,8 +38,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     // 4.3. services.getTermBuilder().subst(old_x, services.getTermBuilder().var(new_x),
     // phi.sub(i));
     private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
-        Term[] updatedSubs = new Term[phi.arity()];
-        updatedSubs = phi.subs().toArray(updatedSubs);
+        final TermBuilder tb = services.getTermBuilder();
+        Term[] updatedSubs =  phi.subs().toArray(new Term[0]);
 
         Set<Name> freeVarNamesInU = new HashSet<>();
         u.freeVars().forEach((freeVar) -> freeVarNamesInU.add(freeVar.name()));
@@ -49,19 +50,20 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
             QuantifiableVariable currentBoundVar = boundVarsinPhi.get(i);
             if (freeVarNamesInU.contains(currentBoundVar.name())) {
                 LogicVariable renamedVar =
-                    new LogicVariable(new Name("tobias" + i), currentBoundVar.sort());
-                Term substTerm = services.getTermBuilder().var(renamedVar);
+                    new LogicVariable(new Name(tb.newName(currentBoundVar.name().toString())), currentBoundVar.sort());
+                Term substTerm = tb.var(renamedVar);
 
                 for (int j = 0; j < updatedSubs.length; j++) {
                     updatedSubs[j] =
-                        services.getTermBuilder().subst(currentBoundVar, substTerm, updatedSubs[j]);
+                            WarySubstOp.SUBST.apply(
+                                    tb.subst(WarySubstOp.SUBST, currentBoundVar, substTerm, updatedSubs[j]), tb);
                 }
 
                 boundVarsinPhi.set(i, renamedVar);
             }
         }
         for (int i = 0; i < updatedSubs.length; i++) {
-            updatedSubs[i] = services.getTermBuilder().apply(u, updatedSubs[i], null);
+            updatedSubs[i] = tb.apply(u, updatedSubs[i], null);
         }
 
         // Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
@@ -91,7 +93,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equals(properResultInst)) {
+        } else if (resultInst.equalsModRenaming(properResultInst)) {
             return mc;
         } else {
             return null;
