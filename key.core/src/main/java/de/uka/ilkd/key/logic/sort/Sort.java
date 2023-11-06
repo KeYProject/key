@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.rule.HasOrigin;
 
@@ -48,10 +47,6 @@ public abstract class Sort extends org.key_project.logic.sort.AbstractSort<Sort>
             }
             return ext;
         }
-    }
-
-    public ImmutableSet<Sort> extendsSorts(Services services) {
-        return extendsSorts();
     }
 
     @Override

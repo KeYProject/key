@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -13,6 +14,10 @@ public interface Sort<S extends Sort<S>> extends Named {
      * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
      */
     ImmutableSet<S> extendsSorts();
+
+    default <Services extends LogicServices> ImmutableSet<S> extendsSorts(Services services) {
+        return extendsSorts();
+    }
 
     /**
      * @param s some sort.

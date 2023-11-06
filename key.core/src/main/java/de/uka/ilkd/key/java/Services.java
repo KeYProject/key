@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.util.lookup.Lookup;
 
@@ -27,7 +28,7 @@ import org.key_project.util.lookup.Lookup;
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, LogicServices {
     /**
      * the proof
      */

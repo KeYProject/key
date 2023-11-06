@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Program;
@@ -132,12 +131,6 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
             return kind().toString();
         }
         return super.toString();
-    }
-
-    @Override
-    protected void finalize() {
-        System.out.println(
-            "Drop modality " + kind() + ": " + ProofSaver.printAnything(program().program(), null));
     }
 
     public static class JavaModalityKind extends Kind implements SVSubstitute {

@@ -8,6 +8,7 @@ import java.lang.ref.WeakReference;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -46,7 +47,8 @@ public final class NullSort extends Sort {
 
 
     @Override
-    public ImmutableSet<Sort> extendsSorts(Services services) {
+    public <S extends LogicServices> ImmutableSet<Sort> extendsSorts(S p_services) {
+        final Services services = (Services) p_services;
         assert services != null;
         assert objectSort == services.getJavaInfo().objectSort();
 

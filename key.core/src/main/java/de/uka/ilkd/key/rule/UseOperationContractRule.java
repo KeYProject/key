@@ -766,11 +766,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         final StatementBlock postSB = replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        Modality mod = Modality.getModality(inst.mod.kind(), postJavaBlock);
         final Term normalPost = tb.apply(anonUpdate,
-            tb.prog(inst.mod.kind(), postJavaBlock, inst.progPost.sub(0),
+            tb.prog(mod.kind(), mod.program(), inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    tb.tf().createTerm(inst.mod,
+                    tb.tf().createTerm(mod,
                         new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
                         inst.progPost.getLabels()))),
             null);
@@ -786,11 +787,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB =
             replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod.kind(), excJavaBlock,
-            inst.progPost.sub(0),
+        final Modality instantiatedMod = Modality.getModality(inst.mod.kind(), excJavaBlock);
+        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(instantiatedMod.kind(),
+            instantiatedMod.program(), inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
-                tb.tf().createTerm(inst.mod,
+                tb.tf().createTerm(instantiatedMod,
                     new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
                     inst.progPost.getLabels()))),
             null);
