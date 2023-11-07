@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -39,38 +40,48 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     // phi.sub(i));
     private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
-        Term[] updatedSubs =  phi.subs().toArray(new Term[0]);
+        final Term[] updatedSubs = phi.subs().toArray(new Term[0]);
 
-        Set<Name> freeVarNamesInU = new HashSet<>();
-        u.freeVars().forEach((freeVar) -> freeVarNamesInU.add(freeVar.name()));
-        List<QuantifiableVariable> boundVarsinPhi = new LinkedList<>();
-        phi.boundVars().forEach(boundVarsinPhi::add);
+        final Set<Name> freeVarNamesInU = new HashSet<>();
+        for (QuantifiableVariable freeVar : u.freeVars()) {
+            freeVarNamesInU.add(freeVar.name());
+        }
 
-        for (int i = 0; i < boundVarsinPhi.size(); i++) {
-            QuantifiableVariable currentBoundVar = boundVarsinPhi.get(i);
+        final ImmutableArray<QuantifiableVariable> boundVarsInPhi = phi.boundVars();
+        final int numOfBoundVars = boundVarsInPhi.size();
+        final List<QuantifiableVariable> newBoundVarsInPhi = new ArrayList<>();
+        for (int i = 0; i < numOfBoundVars; i++) {
+            newBoundVarsInPhi.add(boundVarsInPhi.get(i));
+        }
+
+        // Check for any name clashes and change the variables' names if necessary.
+        for (int i = 0; i < numOfBoundVars; i++) {
+            final QuantifiableVariable currentBoundVar = newBoundVarsInPhi.get(i);
             if (freeVarNamesInU.contains(currentBoundVar.name())) {
+                // find new way to name variable
                 LogicVariable renamedVar =
-                    new LogicVariable(new Name(tb.newName(currentBoundVar.name().toString())), currentBoundVar.sort());
+                    new LogicVariable(new Name(tb.newName(currentBoundVar.name().toString())),
+                        currentBoundVar.sort());
                 Term substTerm = tb.var(renamedVar);
 
                 for (int j = 0; j < updatedSubs.length; j++) {
                     updatedSubs[j] =
-                            WarySubstOp.SUBST.apply(
-                                    tb.subst(WarySubstOp.SUBST, currentBoundVar, substTerm, updatedSubs[j]), tb);
+                        WarySubstOp.SUBST.apply(
+                            tb.subst(WarySubstOp.SUBST, currentBoundVar, substTerm, updatedSubs[j]),
+                            tb);
                 }
 
-                boundVarsinPhi.set(i, renamedVar);
+                newBoundVarsInPhi.set(i, renamedVar);
             }
         }
+
+        // Apply update to all subterms.
         for (int i = 0; i < updatedSubs.length; i++) {
             updatedSubs[i] = tb.apply(u, updatedSubs[i], null);
         }
 
-        // Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
-        //     phi.boundVars(), phi.javaBlock());
-        Term result = services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(boundVarsinPhi), phi.javaBlock());
-        return result;
+        return services.getTermFactory().createTerm(phi.op(), updatedSubs,
+            new ImmutableArray<>(newBoundVarsInPhi), phi.javaBlock());
     }
 
 
