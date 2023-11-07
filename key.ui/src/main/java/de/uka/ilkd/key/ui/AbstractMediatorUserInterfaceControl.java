@@ -12,7 +12,6 @@ import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -233,9 +232,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);
-        for (Proof proof : proofList.getProofs()) {
-            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
-        }
         return env;
     }
 

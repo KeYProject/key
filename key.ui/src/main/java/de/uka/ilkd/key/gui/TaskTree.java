@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -23,10 +24,7 @@ import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -67,6 +65,24 @@ public class TaskTree extends JPanel {
         super();
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new TaskTreeSelectionListener());
+        mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+            // unregister completely when automode starts
+            // reduce unnecessary event propagation and handling when in automode
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().addProofTreeListener(proofTreeListener);
+                }
+            }
+
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().removeProofTreeListener(proofTreeListener);
+                }
+            }
+        });
+
         delegateView = new JTree();
         delegateView.setModel(model);
         delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
@@ -84,7 +100,7 @@ public class TaskTree extends JPanel {
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
-            mediator.getCurrentlyOpenedProofs().addElement(proof);
+            mediator.getCurrentlyOpenedProofs().add(proof);
         }
         delegateView.validate();
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));
@@ -113,9 +129,9 @@ public class TaskTree extends JPanel {
 
         if (path != null) {
             TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
-            mediator.setProof(tn0.proof());
+            mediator.getSelectionModel().setSelectedProof(tn0.proof());
         } else {
-            mediator.setProof(null);
+            mediator.getSelectionModel().setSelectedProof(null);
         }
     }
 
@@ -160,7 +176,7 @@ public class TaskTree extends JPanel {
     private void problemChosen() {
         TaskTreeNode prob = getSelectedTask();
         if (prob != null && prob.proof() != null && mediator != null) {
-            mediator.setProof(prob.proof());
+            mediator.getSelectionModel().setSelectedProof(prob.proof());
         }
     }
 
@@ -267,11 +283,14 @@ public class TaskTree extends JPanel {
             if (e.isPopupTrigger()) {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
                 if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
-                    mediator.setProof(task.proof());
+                    Proof p = task.proof();
+                    mediator.getSelectionModel().setSelectedProof(p);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
+            } else {
+                problemChosen();
             }
         }
     }

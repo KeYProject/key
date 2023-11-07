@@ -6,6 +6,8 @@ package de.uka.ilkd.key.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -13,41 +15,22 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
-import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
-import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -105,7 +88,7 @@ public class KeYMediator {
     /**
      * Currently opened proofs.
      */
-    private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
+    private final List<Proof> currentlyOpenedProofs = new CopyOnWriteArrayList<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
@@ -129,7 +112,7 @@ public class KeYMediator {
         notationInfo = new NotationInfo();
         proofListener = new KeYMediatorProofListener();
         proofTreeListener = new KeYMediatorProofTreeListener();
-        keySelectionModel = new KeYSelectionModel();
+        keySelectionModel = new KeYSelectionModel(new KeYMediatorSelectionListener());
 
         ui.getProofControl().addAutoModeListener(proofListener);
 
@@ -153,82 +136,6 @@ public class KeYMediator {
      */
     public NotationInfo getNotationInfo() {
         return notationInfo;
-    }
-
-    /**
-     * returns the variable namespace
-     *
-     * @return the variable namespace
-     */
-    public Namespace<QuantifiableVariable> var_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.variables() : null;
-    }
-
-    /**
-     * returns the program variable namespace
-     *
-     * @return the program variable namespace
-     */
-    public Namespace<IProgramVariable> progVar_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.programVariables() : null;
-    }
-
-    /**
-     * returns the function namespace
-     *
-     * @return the function namespace
-     */
-    public Namespace<Function> func_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.functions() : null;
-    }
-
-    /**
-     * returns the sort namespace
-     *
-     * @return the sort namespace
-     */
-    public Namespace<Sort> sort_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.sorts() : null;
-    }
-
-    /**
-     * returns the heuristics namespace
-     *
-     * @return the heuristics namespace
-     */
-    public Namespace<RuleSet> heur_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.ruleSets() : null;
-    }
-
-    /**
-     * returns the choice namespace
-     *
-     * @return the choice namespace
-     */
-    public Namespace<Choice> choice_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.choices() : null;
-    }
-
-    /**
-     * returns the namespace set
-     *
-     * @return the namespace set
-     */
-    public NamespaceSet namespaces() {
-        Proof selectedProof = getSelectedProof();
-        return selectedProof != null ? selectedProof.getNamespaces() : null;
-    }
-
-    /** returns the JavaInfo with the java type information */
-    public JavaInfo getJavaInfo() {
-        Proof selectedProof = getSelectedProof();
-        return selectedProof != null ? selectedProof.getJavaInfo() : null;
     }
 
     /** returns the Services with the java service classes */
@@ -304,26 +211,17 @@ public class KeYMediator {
     /**
      * Selects the specified proof and initializes it.
      *
-     * @param p the proof to select.
+     * @param newProof the proof to select.
+     * @param previousProof the previously selected proof
      */
-    public void setProof(Proof p) {
-        if (getSelectedProof() == p) {
+    private void setProof(Proof newProof, Proof previousProof) {
+        if (previousProof == newProof) {
             return;
         }
-        final Proof pp = p;
-        if (SwingUtilities.isEventDispatchThread()) {
-            setProofHelper(pp);
-        } else {
-            Runnable swingProzac = () -> setProofHelper(pp);
-            ThreadUtilities.invokeAndWait(swingProzac);
-        }
-    }
 
-    private void setProofHelper(Proof newProof) {
-        Proof oldProof = getSelectedProof();
-        if (oldProof != null) {
-            oldProof.removeProofTreeListener(proofTreeListener);
-            oldProof.removeRuleAppListener(proofListener);
+        if (previousProof != null) {
+            previousProof.removeProofTreeListener(proofTreeListener);
+            previousProof.removeRuleAppListener(proofListener);
         }
         if (newProof != null) {
             notationInfo.setAbbrevMap(newProof.abbreviations());
@@ -572,7 +470,6 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
-        MainWindow.getInstance().getAutoModeAction().setEnabled(true);
         if (getSelectedProof() != null) {
             if (b) {
                 getSelectedProof().setRuleAppIndexToInteractiveMode();
@@ -630,9 +527,6 @@ public class KeYMediator {
                                                                                   // required?
             }
             ui.notifyAutomodeStopped();
-            if (getSelectedProof() != null) {
-                keySelectionModel.fireSelectedProofChanged();
-            }
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
     }
@@ -790,10 +684,10 @@ public class KeYMediator {
         }
     }
 
-    class KeYMediatorSelectionListener implements KeYSelectionListener {
+    private class KeYMediatorSelectionListener implements KeYSelectionListener {
         /** focused node has changed */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             // empty
         }
 
@@ -801,8 +695,8 @@ public class KeYMediator {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
-            setProof(e.getSource().getSelectedProof());
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            setProof(e.getSource().getSelectedProof(), e.getPreviousSelection());
         }
     }
 
@@ -889,79 +783,6 @@ public class KeYMediator {
     // return ui;
     // }
 
-    public boolean processDelayedCut(final Node invokedNode) {
-        if (ensureProofLoaded()) {
-            final String result =
-                CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null, "",
-                    new InspectorForDecisionPredicates(getSelectedProof().getServices(),
-                        invokedNode, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                        DelayedCutProcessor.getApplicationChecks()),
-                    true);
-
-            if (result == null) {
-                return false;
-            }
-
-            Term formula =
-                InspectorForDecisionPredicates.translate(getSelectedProof().getServices(), result);
-
-            DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
-                formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
-            processor.add(new DelayedCutListener() {
-
-                @Override
-                public void eventRebuildingTree(final int currentTacletNumber,
-                        final int totalNumber) {
-
-                    SwingUtilities.invokeLater(() -> {
-                        ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                            "Rebuilding...", totalNumber));
-                        ui.taskProgress(currentTacletNumber);
-
-                    });
-                }
-
-                @Override
-                public void eventEnd(DelayedCut cutInformation) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.resetStatus(this);
-                            KeYMediator.this.startInterface(true);
-                        }
-                    });
-
-                }
-
-                @Override
-                public void eventCutting() {
-                    SwingUtilities.invokeLater(() -> ui.taskStarted(
-                        new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0)));
-
-                }
-
-                @Override
-                public void eventException(Throwable throwable) {
-                    KeYMediator.this.startInterface(true);
-
-                    KeYMediator.this.notify(new ExceptionFailureEvent(
-                        "The cut could" + "not be processed successfully. In order to "
-                            + "preserve consistency the proof is pruned."
-                            + " For more information see details or output of your console.",
-                        throwable));
-
-                    SwingUtilities.invokeLater(() -> getSelectedProof().pruneProof(invokedNode));
-                }
-            });
-            this.stopInterface(true);
-
-            Thread thread = new Thread(processor, "DelayedCutListener");
-            thread.start();
-        }
-        return true;
-
-    }
 
     /**
      * Returns the {@link AutoSaver} to use.
@@ -978,9 +799,8 @@ public class KeYMediator {
      * You can use this instance directly inside your components or add a listener to observe
      * changes.
      *
-     * @see DefaultListModel#addListDataListener
      */
-    public @NonNull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull List<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
     }
 

@@ -18,7 +18,9 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -89,6 +92,23 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             // the above is optional functionality and may not work on every OS
         }
     }
+
+    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
+            ProofAggregate proofList, InitConfig initConfig) {
+        final ProofEnvironment env =
+            super.createProofEnvironmentAndRegisterProof(proofOblInput, proofList, initConfig);
+        // TODO/Check: the code below emulates phantom actions. Check if this can be solved
+        // differently
+        // in particular as this side-effect is unexpected for a caller of the method
+        // Moved it from the super class to here, as it is only the windowed version and not the
+        // console ui that
+        // needs it.
+        for (Proof proof : proofList.getProofs()) {
+            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
+        }
+        return env;
+    }
+
 
     @Override
     protected MediatorProofControl createProofControl() {
@@ -492,13 +512,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
+            final KeYSelectionModel selectionModel = getMediator().getSelectionModel();
             if (result != null) {
                 if ("".equals(result.getStatus())) {
                     this.resetStatus(this);
                 } else {
                     this.reportStatus(this, result.getStatus());
                 }
-                getMediator().getSelectionModel().setSelectedNode(result.getNode());
+                selectionModel.setSelectedNode(result.getNode());
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
                         "Proof could only be loaded partially.\n" + "In summary "
@@ -511,7 +532,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 // should never happen as replay always returns a result object
                 // TODO (DS): Why is it then there? If this happens, we will get\\
                 // a NullPointerException just a line below...
-                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
+                selectionModel.setSelectedNode(loader.getProof().root());
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();

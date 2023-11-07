@@ -353,12 +353,14 @@ public abstract class SequentView extends JEditorPane {
      */
     protected synchronized PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
-        if (seqText.length() > 0 && p != null) {
-            int characterIndex = correctedViewToModel(p);
-            return getInitialPositionTable().getPosInSequent(characterIndex, getFilter());
-        } else {
-            return null;
+        if (seqText != null && !seqText.isEmpty()) {
+            final InitialPositionTable initialPositionTable = getInitialPositionTable();
+            if (p != null && initialPositionTable != null) {
+                int characterIndex = correctedViewToModel(p);
+                return initialPositionTable.getPosInSequent(characterIndex, getFilter());
+            }
         }
+        return null;
     }
 
     /**

@@ -1159,7 +1159,7 @@ public final class MainWindow extends JFrame {
     }
 
     private Proof setUpNewProof(Proof proof) {
-        getMediator().setProof(proof);
+        getMediator().getSelectionModel().setSelectedProof(proof);
         return proof;
     }
 

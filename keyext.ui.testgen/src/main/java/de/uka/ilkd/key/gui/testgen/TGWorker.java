@@ -122,7 +122,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
                     p.dispose();
                 }
             }
-            mediator.setProof(super.getOriginalProof());
+            mediator.getSelectionModel().setSelectedProof(super.getOriginalProof());
         } else {
             super.dispose();
         }
@@ -167,7 +167,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     @Override
     protected void selectProof(UserInterfaceControl ui, Proof proof) {
         if (showInMainWindow) {
-            mediator.setProof(proof);
+            mediator.getSelectionModel().setSelectedProof(proof);
         }
     }
 }

@@ -35,7 +35,7 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     protected void apply() {
-        mediator.setProof(proofLoaded);
+        mediator.getSelectionModel().setSelectedProof(proofLoaded);
     }
 
     @Override

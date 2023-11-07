@@ -246,8 +246,7 @@ public abstract class AbstractUserInterfaceControl
      * @return The instantiated {@link ProblemInitializer}.
      */
     protected ProblemInitializer createProblemInitializer(Profile profile) {
-        ProblemInitializer pi = new ProblemInitializer(this, new Services(profile), this);
-        return pi;
+        return new ProblemInitializer(this, new Services(profile), this);
     }
 
     @Override
