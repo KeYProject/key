@@ -75,11 +75,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private final GoalListGUIListener guiListener;
 
     public GoalList(KeYMediator mediator) {
-        this();
-        setMediator(mediator);
-    }
-
-    public GoalList() {
         interactiveListener = new GoalListInteractiveListener();
         selectionListener = new GoalListSelectionListener();
         guiListener = new GoalListGUIListener();
@@ -109,6 +104,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         updateUI();
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
+        setMediator(mediator);
     }
 
     @NonNull
@@ -161,33 +157,29 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private void register() {
-        mediator().addKeYSelectionListener(selectionListener);
+        mediator.addKeYSelectionListener(selectionListener);
         // This method delegates the request only to the UserInterfaceControl
         // which implements the functionality.
         // No functionality is allowed in this method body!
-        mediator().getUI().getProofControl().addAutoModeListener(interactiveListener);
-        mediator().addGUIListener(guiListener);
+        mediator.getUI().getProofControl().addAutoModeListener(interactiveListener);
+        mediator.addGUIListener(guiListener);
     }
 
     private void unregister() {
-        if (mediator() != null) {
-            mediator().removeKeYSelectionListener(selectionListener);
+        if (mediator != null) {
+            mediator.removeKeYSelectionListener(selectionListener);
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
             // No functionality is allowed in this method body!
-            mediator().getUI().getProofControl().removeAutoModeListener(interactiveListener);
-            mediator().removeGUIListener(guiListener);
+            mediator.getUI().getProofControl().removeAutoModeListener(interactiveListener);
+            mediator.removeGUIListener(guiListener);
         }
-    }
-
-    private KeYMediator mediator() {
-        return mediator;
     }
 
     private void goalChosen() {
         Goal goal = getSelectedValue();
         if (goal != null) {
-            mediator().goalChosen(goal);
+            mediator.goalChosen(goal);
         }
     }
 
@@ -203,9 +195,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
         // is selected
         clearSelection();
 
-        if (mediator() != null) {
+        if (mediator != null) {
             try {
-                final Goal selGoal = mediator().getSelectedGoal();
+                final Goal selGoal = mediator.getSelectedGoal();
                 if (selGoal != null) {
                     setSelectedValue(selGoal, true);
                 }
@@ -223,7 +215,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         String res = seqToString.get(seq);
         if (res == null) {
             LogicPrinter sp =
-                LogicPrinter.purePrinter(mediator().getNotationInfo(), mediator().getServices());
+                LogicPrinter.purePrinter(mediator.getNotationInfo(), mediator.getServices());
             sp.printSequent(seq);
             res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
@@ -573,20 +565,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * invoked if automatic execution of heuristics has started
          */
-        public void autoModeStarted(ProofEvent e) {
-            if (goalListModel.isAttentive()) {
-                mediator().removeKeYSelectionListener(selectionListener);
-            }
+        public synchronized void autoModeStarted(ProofEvent e) {
             goalListModel.setAttentive(false);
         }
 
         /**
          * invoked if automatic execution of heuristics has stopped
          */
-        public void autoModeStopped(ProofEvent e) {
-            if (!goalListModel.isAttentive()) {
-                mediator().addKeYSelectionListener(selectionListener);
-            }
+        public synchronized void autoModeStopped(ProofEvent e) {
             goalListModel.setAttentive(true);
         }
 

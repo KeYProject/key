@@ -95,7 +95,7 @@ public class TaskTree extends JPanel {
         ToolTipManager.sharedInstance().registerComponent(delegateView);
     }
 
-    public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public synchronized void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {
@@ -116,7 +116,7 @@ public class TaskTree extends JPanel {
         removeTask(taskForProof);
     }
 
-    public void removeTask(TaskTreeNode tn) {
+    public synchronized void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
         mediator.notify(new AbandonTaskEvent());
         for (int i = 0; i < tn.allProofs().length; i++) {
@@ -194,7 +194,7 @@ public class TaskTree extends JPanel {
      * @return {@code true} proof is available in model, {@code false} proof is not available in
      *         model.
      */
-    public boolean containsProof(Proof proof) {
+    public synchronized boolean containsProof(Proof proof) {
         boolean contains = false;
         int i = 0;
         while (!contains && i < model.getChildCount(model.getRoot())) {
@@ -219,7 +219,7 @@ public class TaskTree extends JPanel {
      *
      * @param proof The proof to remove.
      */
-    public void removeProof(Proof proof) {
+    public synchronized void removeProof(Proof proof) {
         if (proof != null) {
             ProofEnvironment env = proof.getEnv();
             // Search EnvNode which contains the environment of the given proof.
