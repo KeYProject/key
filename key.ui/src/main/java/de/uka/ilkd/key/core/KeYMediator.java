@@ -587,7 +587,7 @@ public class KeYMediator {
     }
 
     /**
-     * Get the assocated lookup of user-defined data.
+     * Get the associated lookup of user-defined data.
      *
      * @return
      */
