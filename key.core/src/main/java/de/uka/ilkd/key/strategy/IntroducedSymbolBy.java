@@ -17,8 +17,6 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
-
-
     private final Name ruleSetName;
     private final Name schemaVar;
     private final ProjectionToTerm term;
@@ -46,16 +44,13 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
             if (ra instanceof TacletApp ta) {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
-                    if (svInstValue instanceof Term) {
-                        return term.toTerm(app, pos, goal, mState).op() == ((Term) svInstValue)
-                                .op();
+                    if (svInstValue instanceof Term svInstAsTerm) {
+                        return term.toTerm(app, pos, goal, mState).op() == svInstAsTerm.op();
                     }
                 }
             }
             n = n.parent();
         }
-
         return false;
     }
-
 }

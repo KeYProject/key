@@ -68,7 +68,7 @@ public class Matcher {
         Taclet t = parseTaclet(patternString, copyServices);
 
         // Build Matcher for Matchpattern
-       VMTacletMatcher ltm = new VMTacletMatcher(t);
+        VMTacletMatcher ltm = new VMTacletMatcher(t);
 
         // patternSequent should not be null, as we have created it
         assert t.ifSequent() != null;

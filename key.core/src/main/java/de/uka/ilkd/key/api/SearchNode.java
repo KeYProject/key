@@ -5,11 +5,8 @@ package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.MatchConditions;
-
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Created by sarah on 5/2/17.
