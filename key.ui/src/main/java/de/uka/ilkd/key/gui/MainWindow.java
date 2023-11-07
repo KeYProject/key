@@ -1748,7 +1748,6 @@ public final class MainWindow extends JFrame {
             LOGGER.debug("Automode stopped");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
-            updateSequentView();
             getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
