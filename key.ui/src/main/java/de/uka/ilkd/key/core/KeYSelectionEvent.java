@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.core;
 
 
-
 /**
  * An event that indicates that the users focused node or proof has changed
  */
