@@ -68,7 +68,7 @@ public class Matcher {
         Taclet t = parseTaclet(patternString, copyServices);
 
         // Build Matcher for Matchpattern
-        VMTacletMatcher ltm = new VMTacletMatcher(t);
+        VMTacletMatcher tacletMatcher = new VMTacletMatcher(t);
 
         // patternSequent should not be null, as we have created it
         assert t.ifSequent() != null;
@@ -102,7 +102,7 @@ public class Matcher {
                 boolean inAntecedent = node.isAntecedent();
                 LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
-                IfMatchResult ma = ltm.matchIf((inAntecedent ? antecCand : succCand),
+                IfMatchResult ma = tacletMatcher.matchIf((inAntecedent ? antecCand : succCand),
                     node.getPatternTerm(), node.getMatchConditions(), copyServices);
 
                 if (!ma.getMatchConditions().isEmpty()) {
