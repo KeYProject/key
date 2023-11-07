@@ -31,8 +31,12 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
@@ -215,7 +219,19 @@ public class GoalList extends JList<Goal> implements TabPanel {
         String res = seqToString.get(seq);
         if (res == null) {
             LogicPrinter sp =
-                LogicPrinter.purePrinter(mediator.getNotationInfo(), mediator.getServices());
+                SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
+                    mediator.getServices(),
+                    new VisibleTermLabels() {
+                        @Override
+                        public boolean contains(TermLabel label) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean contains(Name name) {
+                            return false;
+                        }
+                    }); // do not print term labels
             sp.printSequent(seq);
             res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
@@ -263,13 +279,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 add(proof.openGoals());
             }
             attentive = true;
-        }
-
-        /**
-         * returns true if the model respond to changes in the proof immediately
-         */
-        public boolean isAttentive() {
-            return attentive;
         }
 
         /**
