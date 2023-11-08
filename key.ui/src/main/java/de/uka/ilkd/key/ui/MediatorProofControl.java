@@ -81,11 +81,10 @@ public class MediatorProofControl extends AbstractProofControl {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
         }
-
         worker = new AutoModeWorker(proof, goals, ptl);
         ui.getMediator().stopInterface(true);
+        fireAutoModeStarted(new ProofEvent(proof));
         ui.getMediator().setInteractive(false);
-
         worker.execute();
     }
 
@@ -199,7 +198,7 @@ public class MediatorProofControl extends AbstractProofControl {
                 }
                 ui.getMediator().setInteractive(true);
                 ui.getMediator().startInterface(true);
-
+                fireAutoModeStopped(new ProofEvent(proof));
                 emitInteractiveAutoMode(initialGoals, proof, info);
 
                 if (info.getException() != null) {
@@ -227,7 +226,6 @@ public class MediatorProofControl extends AbstractProofControl {
 
             info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
                 ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
-
             return info;
         }
     }

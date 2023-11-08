@@ -499,14 +499,6 @@ public class KeYMediator {
             ui.notifyAutoModeBeingStarted();
             if (b) {
                 inAutoMode = true;
-                getUI().getProofControl()
-                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                  // this
-                                                                                  // wrong use
-                                                                                  // of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
             }
         };
         ThreadUtilities.invokeAndWait(interfaceSignaller);
@@ -517,14 +509,6 @@ public class KeYMediator {
         Runnable interfaceSignaller = () -> {
             if (b) {
                 inAutoMode = false;
-                getUI().getProofControl()
-                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                  // this
-                                                                                  // wrong use
-                                                                                  // of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
             }
             ui.notifyAutomodeStopped();
         };
