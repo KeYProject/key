@@ -53,6 +53,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
@@ -89,6 +90,8 @@ public class KeYMediator {
 
     /**
      * Registered proof load listeners.
+     *
+     * @see #fireProofLoaded(Proof)
      */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
@@ -129,11 +132,13 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+
+        registerProofLoadListener(LocationVariableTracker::handleProofLoad);
     }
 
     /**
      * Register a proof load listener. Will be called whenever a new proof is loaded, but before
-     * it is replayed.
+     * it is replayed. The listener MUST be able to accept the same proof twice!
      *
      * @param listener callback
      */
@@ -519,7 +524,6 @@ public class KeYMediator {
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
     @Nullable
     public Proof getSelectedProof() {

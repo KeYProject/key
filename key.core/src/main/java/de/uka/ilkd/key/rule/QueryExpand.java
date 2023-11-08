@@ -99,11 +99,13 @@ public class QueryExpand implements BuiltInRule {
      * @param services
      * @param query The query on which the query expand rule is applied
      * @param instVars If null, then the result of the query can be stored in a constant (e.g.
-     *        res=query(a)). Otherwise it is a list of logical variables that can be instantiated
+     *        {@code res=query(a)}). Otherwise, it is a list of logical variables that can be
+     *        instantiated
      *        (using the rules allLeft, exRight) and therefore the result of the query must be
-     *        stored by function that depends on instVars (e.g. forall i; res(i)=query(i)). The list
-     *        may be empty even if it not null.
-     * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
+     *        stored by function that depends on instVars (e.g. {@code \forall i; res(i)=query(i)}).
+     *        The list
+     *        may be empty even if it is not null.
+     * @return The formula {@code (!{U}<result=query();>result=res_query) & query()=res_query}
      * @author Richard Bubel
      * @author gladisch
      */

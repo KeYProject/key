@@ -323,7 +323,7 @@ public abstract class SourceVisitor {
     /**
      * visits the specified annotation. The default implementation does nothing.
      *
-     * @param a
+     * @param x
      */
     public void visitElementValuePair(AnnotationElementValuePair x) {
     }

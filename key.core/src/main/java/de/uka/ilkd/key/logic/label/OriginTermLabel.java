@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * <p>
- * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, TermBuilder)} for
+ * For this to work correctly, you must call {@link #collectSubtermOrigins(Term, Services)} for
  * every top-level formula in your original proof obligation.
  * </p>
  *
@@ -481,7 +481,7 @@ public class OriginTermLabel implements TermLabel {
      * </p>
      *
      * <p>
-     * Note that you need to have called {@link #collectSubtermOrigins(Term, TermBuilder)} for this
+     * Note that you need to have called {@link #collectSubtermOrigins(Term, Services)} for this
      * method to work correctly.
      * </p>
      *

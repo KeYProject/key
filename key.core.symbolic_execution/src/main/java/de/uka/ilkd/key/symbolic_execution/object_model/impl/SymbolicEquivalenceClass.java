@@ -67,7 +67,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Adds a new {@link Term}.
      *
-     * @param value The new {@link Term} to add.
+     * @param term The new {@link Term} to add.
      */
     public void addTerm(Term term) {
         terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));

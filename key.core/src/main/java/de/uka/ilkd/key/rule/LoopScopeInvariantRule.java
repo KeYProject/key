@@ -62,6 +62,7 @@ import org.key_project.util.collection.ImmutableList;
  * </p>
  *
  * <pre>
+ * {@code
  * \Gamma ==> {U}Inv, \Delta
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
  *    boolean x = true;
@@ -71,6 +72,7 @@ import org.key_project.util.collection.ImmutableList;
  *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
  * ---------------------------------------------------------- loopInvariant
  * \Gamma ==> {U}[\pi l: while (nse) { p } \omega]\phi, Delta
+ * }
  * </pre>
  *
  * @author Dominic Scheurer

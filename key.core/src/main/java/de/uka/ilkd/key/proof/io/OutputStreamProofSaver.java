@@ -716,7 +716,7 @@ public class OutputStreamProofSaver {
     /**
      * Get the "interesting" instantiations of the provided object.
      *
-     * @see SVInstantiations#interesting
+     * @see SVInstantiations#interesting()
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */

@@ -17,15 +17,30 @@ import recoder.list.generic.ASTList;
 
 /**
  * The object allocation operator. There are two variants for New:
- * <OL>
- * <LI>Class constructor call <BR>
- * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)</tt><BR>
- * if getType() instanceof UserType
- * <LI>Anonymous Inner Class definition and construction <BR>
- * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)
- * { m<sub>1</sub>, ..., m<sub>k</sub> }</tt> <BR>
- * if getType() instanceof UserType && getClassDeclaration() !=<tt>null</tt>
- * </OL>
+ * <ol>
+ * <li>Class constructor call <BR>
+ *
+ * <pre>
+ * {@code
+ *  new XYZ(a_1, ..., a_n)
+ *  if getType() instanceof UserType
+ * }
+ * </pre>
+ *
+ * </li>
+ *
+ * <li>Anonymous Inner Class definition and construction <br/>
+ * {@code new XYZ(a_1, ..., a_n)}
+ *
+ * <pre>
+ * {@code
+ *   m_1, ..., m_k
+ *  if getType() instanceof UserType && getClassDeclaration() != null
+ * }
+ * </pre>
+ *
+ * </li>
+ * </ol>
  * The access path is <tt>null</tt> in most cases, except when an inner class constructor is invoked
  * from an outer instance.
  */
@@ -375,7 +390,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

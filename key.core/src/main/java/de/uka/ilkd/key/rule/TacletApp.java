@@ -1203,7 +1203,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             Services services) {
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.LABEL) {
-            return VariableNamer.parseName(instantiation);
+            return new ProgramElementName(instantiation);
         } else if (svSort == ProgramSVSort.VARIABLE) {
             NewVarcond nvc = taclet.varDeclaredNew(sv);
             if (nvc != null) {

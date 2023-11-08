@@ -371,9 +371,6 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Simplifies the given constrained formula as far as possible using the replace-known rules
      * (hardcoded here). The context formulas available for replace-known are passed in as
      * "context". The positions of the actually used context formulas are passed out as "ifInsts".
-     *
-     * @param proof
-     * @param protocol
      */
     private SequentFormula replaceKnown(Services services, SequentFormula cf, boolean inAntecedent,
             Map<TermReplacementKey, PosInOccurrence> context,
@@ -708,7 +705,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     /**
      * Instances of this class are used in the {@link Map} of
-     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)} to
+     * {@link OneStepSimplifier#replaceKnown} to
      * forece the same behavior as in Taclet rules where names of logical variables and
      * {@link TermLabel}s are ignored.
      *

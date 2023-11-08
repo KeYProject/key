@@ -78,8 +78,6 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * @see MergeIfThenElseAntecedent
  * @see MergeWithLatticeAbstraction
  * @see MergeWithPredicateAbstraction
- * @see de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion
- * @see de.uka.ilkd.key.gui.mergerule.MergePartnerSelectionDialog
  */
 public class MergeRule implements BuiltInRule {
     public static final MergeRule INSTANCE = new MergeRule();
@@ -289,8 +287,9 @@ public class MergeRule implements BuiltInRule {
 
     /**
      * Merges two SE states (U1,C1,p) and (U2,C2,p) according to the method
-     * {@link MergeRule#mergeValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
-     * . p must be the same in both states, so it is supplied separately.
+     * {@link MergeProcedure#mergeValuesInStates}.
+     * The <code>programCounter</code> must be the same in both states, so it is supplied
+     * separately.
      * <p>
      *
      * Override this method for special merge procedures.
@@ -665,8 +664,6 @@ public class MergeRule implements BuiltInRule {
      *
      * @param goal Current goal to merge.
      * @param pio Position of update-program counter formula in goal.
-     * @param start Node to start the search with.
-     * @param services The services object.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,

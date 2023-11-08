@@ -145,7 +145,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param freeModifiesClauses this contract's free modifies clauses on every heap.
      * @param infFlowSpecs this contract's information flow specifications.
      * @param variables this contract's variables.
-     * @param transactionApplicable whether or not this contract is applicable for transactions.
+     * @param transactionApplicable whether this contract is applicable for transactions.
      * @param hasMod a map specifying on which heaps this contract has a modified clause.
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
@@ -173,7 +173,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert variables.breakFlags != null;
         assert variables.continueFlags != null;
         assert variables.exception != null;
-        assert variables.remembranceHeaps != null && variables.remembranceHeaps.size() > 0;
+        assert variables.remembranceHeaps != null && !variables.remembranceHeaps.isEmpty();
         assert variables.remembranceLocalVariables != null;
         this.baseName = baseName;
         this.block = block;
@@ -790,7 +790,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's modifies clauses.
+     * @return an HTML representation of this contract's modifies clauses.
      */
     private String getHtmlMods(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
@@ -815,7 +815,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's preconditions.
+     * @return an HTML representation of this contract's preconditions.
      */
     private String getHtmlPres(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
@@ -835,7 +835,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's postconditions.
+     * @return an HTML representation of this contract's postconditions.
      */
     private String getHtmlPosts(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
@@ -1063,7 +1063,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param returns the contract's postcondition for abrupt termination with {@code return}
          *        statements.
          * @param signals the contract's postcondition for abrupt termination due to abrupt
-         *        termintation.
+         *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
          * @param assignables map from every heap to an assignable term.
@@ -1298,7 +1298,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          *
          * @param flag an abrupt termination flag.
-         * @param postcondition a postcondition for abrupt termination with the specifed flag.
+         * @param postcondition a postcondition for abrupt termination with the specified flag.
          * @return a part of the postcondition.
          */
         private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition) {
@@ -1445,7 +1445,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param postconditions the contracts' postconditions.
          * @param modifiesClauses the contracts' modifies clauses.
          * @param infFlowSpecs the contracts' information flow specifications.
-         * @return a set of one or two contracts (depending on whether the {@code diverges} clause
+         * @return a set of one or two contracts depending on whether the {@code diverges} clause
          *         is trivial (i.e., {@code true} or {@code false}) or not.
          */
         private ImmutableSet<T> create(final Map<LocationVariable, Term> preconditions,
@@ -1487,9 +1487,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param freeModifiesClauses this contract's free modifies clauses on every heap.
          * @param infFlowSpecs this contract's information flow specifications.
          * @param variables this contract's variables.
-         * @param transactionApplicable whether or not this contract is applicable for transactions.
+         * @param transactionApplicable whether this contract is applicable for transactions.
          * @param hasMod a map specifying on which heaps this contract has a modifies clause.
-         * @param hasMod a map specifying on which heaps this contract has a free modifies clause.
+         * @param hasFreeMod a map specifying on which heaps this contract has a free modifies
+         *        clause.
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
@@ -1531,7 +1532,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     /**
-     * This class is used to to combine multiple contracts for the same block and apply them
+     * This class is used to combine multiple contracts for the same block and apply them
      * simultaneously. It should be overridden in every subclass.
      *
      * @param <T> the type of the subclass.
@@ -1602,7 +1603,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          *
          * @param contracts the contract's to sort.
-         * @return an array containg the specified contracts sorted alphabetically by name.
+         * @return an array containing the specified contracts sorted alphabetically by name.
          */
         private T[] sort(final T[] contracts) {
             // sort contracts alphabetically (for determinism)

@@ -31,12 +31,22 @@ import org.jspecify.annotations.Nullable;
  * Adding formulas to the antecedent: '==> p' as goal node and adding q to the antecedent results in
  * two branches:
  * <p>
- * 1) q ==> p 2) ==> p,q <-- this branch is set to interactive such that the automatic strategies do
- * not expand it Adding formulas to the succedent: '==> p' as goal node and adding q to the
+ * <ol>
+ * <li>{@code q ==> p}</li>
+ * <li>{@code ==> p,q} {@code <--} this branch is set to interactive such that the automatic
+ * strategies do
+ * not expand it.</li>
+ * </ol>
+ * Adding formulas to the succedent: '==> p' as goal node and adding q to the
  * succedent results in two branches:
+ * </ol>
  * <p>
- * 1) q ==> p <-- this branch is set to interactive such that the automatic strategies do not expand
- * it 2) ==> p,q
+ * <ol>
+ * <li>{@code q ==> p} {@code <--} this branch is set to interactive such that the automatic
+ * strategies do not expand
+ * it</li>
+ * <li>{@code ==> p,q}</li>
+ * </ol>
  *
  * @author Sarah Grebing
  * @author Alexander Weigl

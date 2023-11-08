@@ -14,16 +14,18 @@ import org.key_project.util.collection.ImmutableList;
 public interface TacletMatcher {
 
     /**
-     * Match the given template (which is probably a formula of the if sequence) against a list of
+     * Match the given template (which is probably a formula of the assumes-sequent) against a list
+     * of
      * constraint formulas (probably the formulas of the antecedent or the succedent), starting with
-     * the given instantiations and constraint p_matchCond.
+     * the given instantiations and constraint {@code p_matchCond}.
      *
      * @param p_toMatch list of constraint formulas to match p_template to
      * @param p_template template formula as in "match"
      * @param p_matchCond already performed instantiations
      * @param p_services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
-     * @return Two lists (in an IfMatchResult object), containing the the elements of p_toMatch that
+     * @return Two lists (in an {@link IfMatchResult} object), containing the elements of
+     *         {@code p_toMatch} that
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
@@ -31,9 +33,12 @@ public interface TacletMatcher {
             Term p_template, MatchConditions p_matchCond, Services p_services);
 
     /**
-     * Match the whole if sequent using the given list of instantiations of all if sequent formulas,
-     * starting with the instantiations given by p_matchCond. PRECONDITION: p_toMatch.size () ==
-     * ifSequent ().size ()
+     * Match the whole if sequent using the given list of instantiations of all assumes-sequent
+     * formulas,
+     * starting with the instantiations given by p_matchCond.
+     * <p>
+     * PRECONDITION: {@code p_toMatch.size () == ifSequent().size()}
+     * </p>
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
@@ -70,18 +75,19 @@ public interface TacletMatcher {
 
     /**
      * matches the given term against the taclet's find term if the taclet has no find term or the
-     * match is unsuccessful <code>null</null>
+     * match is unsuccessful <code>null</code>
      * is returned
-     * &#64;param term the Term to be matched against the find expression
-     * of the taclet
-     * &#64;param matchCond the MatchConditions with side conditions to be
-     * satisfied, eg. partial instantiations of schema variables; before
-     * calling this method the constraint contained in the match conditions
-     * must be ensured to be satisfiable, i.e.
-     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt> must return true
+     *
+     * @param term the Term to be matched against the find expression
+     *        of the taclet
+     * @param matchCond the MatchConditions with side conditions to be
+     *        satisfied, e.g. partial instantiations of schema variables; before
+     *        calling this method the constraint contained in the match conditions
+     *        must be ensured to be satisfiable, i.e.
+     *        {@code matchCond.getConstraint().isSatisfiable()} must return true
      *
      * @param services the Services
-     * @return the found schema variable mapping or <tt>null</tt> if the matching failed
+     * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
     MatchConditions matchFind(Term term, MatchConditions matchCond,
             Services services);
@@ -109,15 +115,13 @@ public interface TacletMatcher {
      * {@link MatchConditions} {@code matchCond}
      *
      * @param sv the {@link SchemaVariable}
-     * @param pe the {@link ProgramElement} as a candidate for instantition of {@code sv}
+     * @param pe the {@link ProgramElement} as a candidate for instantiation of {@code sv}
      * @param matchCond the {@link MatchConditions} with additional constraints that need to be
      *        considered
      * @param services the {@link Services}
      * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the
      *         instantiation {@code sv <- term} added
      */
-    MatchConditions matchSV(SchemaVariable sv, ProgramElement term,
+    MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
             MatchConditions matchCond, Services services);
-
-
 }

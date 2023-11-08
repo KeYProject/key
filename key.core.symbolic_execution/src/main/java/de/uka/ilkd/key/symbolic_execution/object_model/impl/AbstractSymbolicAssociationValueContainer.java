@@ -53,7 +53,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Adds a new {@link ISymbolicAssociation}.
      *
-     * @param value The new {@link ISymbolicAssociation} to add.
+     * @param association The new {@link ISymbolicAssociation} to add.
      */
     public void addAssociation(ISymbolicAssociation association) {
         associations = associations.append(association);

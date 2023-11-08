@@ -3,14 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JMenu;
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
@@ -44,7 +41,7 @@ public abstract class KeyAction extends AbstractAction {
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
      *
-     * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
+     * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
 

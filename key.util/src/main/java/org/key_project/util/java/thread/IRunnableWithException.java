@@ -7,7 +7,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
- * A {@link Runnable} that has a result that is accessible via {@link #getResult()}.
+ * A {@link Runnable} that provides access to an exception that occurred during execution
+ * {@link #getException()}.
  * </p>
  * <p>
  * Concrete implementations should be subclasses of {@link AbstractRunnableWithException}.

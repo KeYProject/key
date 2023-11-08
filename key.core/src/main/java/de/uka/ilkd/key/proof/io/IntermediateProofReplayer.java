@@ -122,7 +122,7 @@ public class IntermediateProofReplayer {
      *
      * @param loader The problem loader, for reporting errors.
      * @param proof The proof object into which to load the replayed proof.
-     * @param intermediate
+     * @param parserResult the result of the proof file parser to be replayed
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
