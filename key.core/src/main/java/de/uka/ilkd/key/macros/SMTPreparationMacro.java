@@ -38,6 +38,10 @@ public class SMTPreparationMacro extends SequentialProofMacro {
         return "SMT Preparation";
     }
 
+    @Override
+    public String getScriptCommandName() {
+        return "smt-prep";
+    }
     /**
      * Gets the category of this macro.
      * <p>
