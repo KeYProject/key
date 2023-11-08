@@ -286,7 +286,6 @@ public class SolverLauncher implements SolverListener {
         // Launch all solvers until the queue is empty or the launcher is
         // interrupted.
         launchLoop(solvers);
-
         // at this point either there are no solvers left to start or
         // the whole launching process was interrupted.
         waitForRunningSolvers();
@@ -294,7 +293,6 @@ public class SolverLauncher implements SolverListener {
         cleanUp(solvers);
 
         notifyListenersOfStop();
-
     }
 
     private void notifyListenersOfStart(Collection<SMTProblem> problems,
@@ -320,7 +318,6 @@ public class SolverLauncher implements SolverListener {
                         // if there is nothing to do, wait for the next solver
                         // finishing its task.
                         wait.await();
-
                     } catch (InterruptedException e) {
                         launcherInterrupted(e);
                     }
@@ -386,8 +383,8 @@ public class SolverLauncher implements SolverListener {
         lock.lock();
         try {
             session.removeCurrentlyRunning(solver);
-            wait.signal();
         } finally {
+            wait.signal();
             lock.unlock();
         }
     }
