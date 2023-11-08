@@ -16,6 +16,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -133,6 +134,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
 
             mediator.setInteractive(true);
             mediator.startInterface(true);
+            mediator.getUI().getProofControl().fireAutoModeStopped(new ProofEvent(node.proof()));
 
             emitProofMacroFinished(node, macro, posInOcc, info);
         }

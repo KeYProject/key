@@ -142,6 +142,7 @@ public class MediatorProofControl extends AbstractProofControl {
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.stopInterface(true);
+        fireAutoModeStarted(new ProofEvent(node.proof()));
         mediator.setInteractive(false);
         mediator.addInterruptedListener(worker);
 
