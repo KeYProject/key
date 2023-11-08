@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,13 +38,12 @@ public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
     private static final org.slf4j.Logger LOGGER =
         LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
-    private int numOfInvokedMacros = 0;
+    protected AtomicInteger numOfInvokedMacros = new AtomicInteger(0);
 
     /**
      * The registered {@link ProverTaskListener}.
      */
-    private final List<ProverTaskListener> proverTaskListener =
-        new LinkedList<>();
+    private final List<ProverTaskListener> proverTaskListener = new CopyOnWriteArrayList<>();
 
     /**
      * Constructor.
@@ -58,7 +58,11 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public void addProverTaskListener(ProverTaskListener ptl) {
         if (ptl != null) {
-            proverTaskListener.add(ptl);
+            if (proverTaskListener.contains(ptl)) {
+                new RuntimeException().printStackTrace();
+            } else {
+                proverTaskListener.add(ptl);
+            }
         }
     }
 
@@ -79,10 +83,10 @@ public abstract class AbstractUserInterfaceControl
      *        just about to start
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskStarted(info);
+        synchronized (proverTaskListener) {
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskStarted(info);
+            }
         }
     }
 
@@ -92,10 +96,10 @@ public abstract class AbstractUserInterfaceControl
      * @param position The current position.
      */
     protected void fireTaskProgress(int position) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskProgress(position);
+        synchronized (proverTaskListener) {
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskProgress(position);
+            }
         }
     }
 
@@ -106,10 +110,10 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         try {
-            ProverTaskListener[] listener =
-                proverTaskListener.toArray(new ProverTaskListener[0]);
-            for (ProverTaskListener l : listener) {
-                l.taskFinished(info);
+            synchronized (proverTaskListener) {
+                for (ProverTaskListener l : proverTaskListener) {
+                    l.taskFinished(info);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("failed to fire task finished event ", e);
@@ -163,16 +167,16 @@ public abstract class AbstractUserInterfaceControl
     }
 
     public boolean isAtLeastOneMacroRunning() {
-        return numOfInvokedMacros != 0;
+        return numOfInvokedMacros.getAcquire() != 0;
     }
 
     protected void macroStarted(TaskStartedInfo info) {
-        numOfInvokedMacros++;
+        numOfInvokedMacros.incrementAndGet();
     }
 
-    protected synchronized void macroFinished(final ProofMacroFinishedInfo info) {
-        if (numOfInvokedMacros > 0) {
-            numOfInvokedMacros--;
+    protected void macroFinished(final ProofMacroFinishedInfo info) {
+        if (numOfInvokedMacros.getAcquire() > 0) {
+            numOfInvokedMacros.decrementAndGet();
         } else {
             LOGGER.warn("Number of running macros became negative.");
         }

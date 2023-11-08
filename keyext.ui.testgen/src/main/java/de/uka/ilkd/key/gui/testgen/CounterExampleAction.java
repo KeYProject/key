@@ -117,9 +117,8 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             Proof oldProof = node.proof();
             Sequent oldSequent = node.sequent();
             // Start SwingWorker (CEWorker) in which counter example search is performed.
-            getMediator().stopInterface(true);
-            getMediator().setInteractive(false);
             CEWorker worker = new CEWorker(oldProof, oldSequent);
+            getMediator().initiateAutoMode(oldProof, true, false);
             getMediator().addInterruptedListener(worker);
             worker.execute();
         } catch (Exception exc) {
@@ -257,8 +256,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
 
         @Override
         protected void done() {
-            getMediator().setInteractive(true);
-            getMediator().startInterface(true);
+            getMediator().finishAutoMode(oldProof, true, true, null);
             getMediator().removeInterruptedListener(this);
         }
     }

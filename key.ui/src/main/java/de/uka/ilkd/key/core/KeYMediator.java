@@ -493,7 +493,7 @@ public class KeYMediator {
         goalsClosedByAutoMode = 0;
     }
 
-    public void stopInterface(boolean fullStop) {
+    public synchronized void stopInterface(boolean fullStop) {
         final boolean b = fullStop;
         Runnable interfaceSignaller = () -> {
             ui.notifyAutoModeBeingStarted();
@@ -504,7 +504,7 @@ public class KeYMediator {
         ThreadUtilities.invokeAndWait(interfaceSignaller);
     }
 
-    public void startInterface(boolean fullStop) {
+    public synchronized void startInterface(boolean fullStop) {
         final boolean b = fullStop;
         Runnable interfaceSignaller = () -> {
             if (b) {
@@ -514,6 +514,55 @@ public class KeYMediator {
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
     }
+
+    /**
+     * performs the standard preparations for starting automode
+     * <ol>
+     * <li>call {@code this.stopInterface(fullstop)}</li>
+     * <li>call {@code getUI().getProofControl().fireAutoModeStarted(proof)}</li>
+     * <li>call {@code this.setInteractive(interactive)}</li>
+     * </ol>
+     *
+     * @param proof the {@link Proof} to be worked on
+     * @param fullStop if a full freeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactove or automatic use
+     *        (normally false)
+     */
+    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+        stopInterface(fullStop);
+        getUI().getProofControl().fireAutoModeStarted(new ProofEvent(proof));
+        setInteractive(interactive);
+    }
+
+    /**
+     * performs the standard preparations for starting automode
+     * <ol>
+     * <li>call {@code this.startInterface(fullstop)}</li>
+     * <li>call {@code getUI().getProofControl().fireAutoModeStopped(proof)}</li>
+     * <li>call {@code this.setInteractive(interactive)}</li>
+     * <li>select a node/proof by running the given selector (null means the default selection is
+     * used)</li>
+     * </ol>
+     *
+     * @param proof the {@link Proof} to be worked on
+     * @param fullStop if a full freeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactive or automatic use shoul
+     *        be selected
+     *        (normally true)
+     * @param selection a Runnable that selects the correct node after unfreezing the interface
+     */
+    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
+            Runnable selection) {
+        setInteractive(interactive);
+        startInterface(fullStop);
+        getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
+        if (selection == null) {
+            keySelectionModel.defaultSelection();
+        } else {
+            selection.run();
+        }
+    }
+
 
     /**
      * Checks if the auto mode is currently running.
@@ -581,7 +630,6 @@ public class KeYMediator {
         }
         return userData;
     }
-
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
         private boolean pruningInProcess;

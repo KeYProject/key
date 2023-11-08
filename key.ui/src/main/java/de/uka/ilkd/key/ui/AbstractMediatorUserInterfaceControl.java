@@ -19,7 +19,6 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -130,8 +129,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = this;
             try {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(proof, true, false);
                 ptl.taskStarted(
                     new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
@@ -144,8 +142,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                 LOGGER.debug("Exception occurred during macro application:", e);
             } finally {
                 ptl.taskFinished(info);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                getMediator().finishAutoMode(proof, true, true, null);
             }
             return true;
         } else {
@@ -176,11 +173,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
             ThreadUtilities.invokeAndWait(() -> {
-                getMediator().stopInterface(true);
-                getMediator().getUI().getProofControl()
-                        .fireAutoModeStarted(new ProofEvent(info.getProof()));
-                getMediator().setInteractive(false);
-
+                getMediator().initiateAutoMode(info.getProof(), true, false);
             });
         }
     }

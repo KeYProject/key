@@ -152,11 +152,9 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      * initiate the GUI stuff and relay to superclass
      */
     public void init() {
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
-        mediator.getUI().getProofControl().fireAutoModeStarted(
-            new ProofEvent(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
-                    : mediator.getSelectedProof()));
+        mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof(),
+            true, false);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);

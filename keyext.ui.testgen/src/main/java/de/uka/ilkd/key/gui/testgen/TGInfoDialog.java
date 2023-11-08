@@ -11,6 +11,7 @@ import javax.swing.text.DefaultCaret;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 
 import org.slf4j.Logger;
@@ -57,9 +58,9 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYMediator mediator = MainWindow.getInstance().getMediator();
-            mediator.stopInterface(true);
-            mediator.setInteractive(false);
+            final KeYMediator mediator = MainWindow.getInstance().getMediator();
+            final Proof proof = mediator.getSelectedProof();
+            mediator.initiateAutoMode(proof, true, false);
             worker = new TGWorker(TGInfoDialog.this);
             mediator.addInterruptedListener(worker);
             worker.execute();

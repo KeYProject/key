@@ -82,9 +82,7 @@ public class MediatorProofControl extends AbstractProofControl {
             return;
         }
         worker = new AutoModeWorker(proof, goals, ptl);
-        ui.getMediator().stopInterface(true);
-        fireAutoModeStarted(new ProofEvent(proof));
-        ui.getMediator().setInteractive(false);
+        ui.getMediator().initiateAutoMode(proof, true, false);
         worker.execute();
     }
 
@@ -141,11 +139,8 @@ public class MediatorProofControl extends AbstractProofControl {
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
         interactionListeners.forEach(worker::addInteractionListener);
-        mediator.stopInterface(true);
-        fireAutoModeStarted(new ProofEvent(node.proof()));
-        mediator.setInteractive(false);
+        mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
-
         worker.execute();
     }
 
@@ -197,9 +192,7 @@ public class MediatorProofControl extends AbstractProofControl {
                     applyStrategy.removeProverTaskObserver(ui);
                     applyStrategy.clear();
                 }
-                ui.getMediator().setInteractive(true);
-                ui.getMediator().startInterface(true);
-                fireAutoModeStopped(new ProofEvent(proof));
+                ui.getMediator().finishAutoMode(proof, true, true, null);
                 emitInteractiveAutoMode(initialGoals, proof, info);
 
                 if (info.getException() != null) {

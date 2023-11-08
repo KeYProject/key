@@ -780,8 +780,8 @@ public final class MainWindow extends JFrame {
      * Hide the progress bar if it is currently visible.
      */
     public void hideStatusProgress() {
-        getStatusLine().setProgress(0);
         statusLine.setProgressPanelVisible(false);
+        getStatusLine().setProgress(0);
     }
 
     private void setStatusLineImmediately(String str, int max) {
