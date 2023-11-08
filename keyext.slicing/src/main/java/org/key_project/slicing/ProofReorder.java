@@ -35,6 +35,7 @@ public final class ProofReorder {
     public static void reorderProof(Proof proof, DependencyGraph depGraph)
             throws IOException, ProofInputException, ProblemLoaderException,
             IntermediateProofReplayer.BuiltInConstructionException {
+        depGraph.ensureProofIsTracked(proof);
         MainWindow.getInstance().getMediator().stopInterface(true);
 
         SortedMap<BranchLocation, List<Node>> steps = new TreeMap<>();
@@ -70,6 +71,10 @@ public final class ProofReorder {
             Node toCheck = root;
             while (toCheck.getBranchLocation() == loc) {
                 DependencyNodeData data = toCheck.lookup(DependencyNodeData.class);
+                if (data == null) {
+                    finalNode = toCheck.parent();
+                    break; // closed goal
+                }
                 if (data.inputs.size() == 1 && data.inputs.get(0).first instanceof PseudoInput) {
                     if (toCheck.childrenCount() > 1) {
                         finalNode = toCheck;

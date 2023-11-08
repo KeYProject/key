@@ -41,7 +41,7 @@ public class ReorderingReplayer extends AbstractProofReplayer {
             nodeQueue.addAll(e.getValue());
         }
 
-        while (!nodeQueue.isEmpty()) {
+        while (!nodeQueue.isEmpty() && !queue.isEmpty()) {
             Node nextNode = nodeQueue.pop();
             Goal nextGoal = queue.pop();
             // skip nextNode if it is a closed goal

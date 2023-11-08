@@ -193,6 +193,12 @@ public class SlicingExtension implements KeYGuiExtension,
         b.setText("Reorder");
         b.addActionListener(e -> {
             KeYMediator m = MainWindow.getInstance().getMediator();
+            Proof p = m.getSelectedProof();
+            if (!p.closed()) {
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "Cannot reorder incomplete proof", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             try {
                 ProofReorder.reorderProof(m.getSelectedProof(),
                     trackers.get(m.getSelectedProof()).getDependencyGraph());
