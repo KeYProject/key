@@ -58,11 +58,7 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public void addProverTaskListener(ProverTaskListener ptl) {
         if (ptl != null) {
-            if (proverTaskListener.contains(ptl)) {
-                new RuntimeException().printStackTrace();
-            } else {
-                proverTaskListener.add(ptl);
-            }
+            proverTaskListener.add(ptl);
         }
     }
 
