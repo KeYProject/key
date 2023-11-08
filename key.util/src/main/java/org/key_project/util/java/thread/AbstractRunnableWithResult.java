@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -18,7 +17,6 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  * @see IRunnableWithResult
  */
-@NullMarked
 public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWithException
         implements IRunnableWithResult<T> {
     /**

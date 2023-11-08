@@ -9,7 +9,6 @@ import java.beans.PropertyChangeSupport;
 
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -19,7 +18,6 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  * @see IBean
  */
-@NullMarked
 public class Bean implements IBean {
     /**
      * The used {@link PropertyChangeSupport}.

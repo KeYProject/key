@@ -4,7 +4,6 @@
 package org.key_project.util.java.thread;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -19,7 +18,6 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  * @see IRunnableWithResult
  */
-@NullMarked
 public abstract class AbstractRunnableWithException implements IRunnableWithException {
     /**
      * An occurred exception.

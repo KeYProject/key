@@ -10,13 +10,11 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * List interface to be implemented by non-destructive lists
  */
-@NullMarked
 public interface ImmutableList<T extends @Nullable Object>
         extends Iterable<T>, java.io.Serializable {
 

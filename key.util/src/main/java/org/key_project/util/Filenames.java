@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jspecify.annotations.NullMarked;
-
 /**
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
-@NullMarked
 public class Filenames {
     // =======================================================
     // Methods operating on Strings

@@ -9,15 +9,12 @@ import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
  * offer a public static final variable .<called>nil()
  */
-
-@NullMarked
 public interface ImmutableSet<T extends @Nullable Object>
         extends Iterable<T>, java.io.Serializable {
 

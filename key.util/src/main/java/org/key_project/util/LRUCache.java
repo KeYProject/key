@@ -6,12 +6,9 @@ package org.key_project.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.jspecify.annotations.NullMarked;
-
 /**
  * Simple realisation of an LRU cache.
  */
-@NullMarked
 public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
     /**

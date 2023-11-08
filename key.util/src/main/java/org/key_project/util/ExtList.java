@@ -7,15 +7,12 @@ package org.key_project.util;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Extends java.util.LinkedList in order to collect elements according to their type.
  * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
-@NullMarked
 public final class ExtList extends LinkedList<Object> {
 
     private static final long serialVersionUID = 9182017368310263908L;

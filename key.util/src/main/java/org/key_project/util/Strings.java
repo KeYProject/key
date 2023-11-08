@@ -11,7 +11,6 @@ import java.util.stream.StreamSupport;
 import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.Nullable;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Helper functions for {@link String}s
@@ -19,7 +18,6 @@ import org.jspecify.annotations.NullMarked;
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
-@NullMarked
 public class Strings {
     /**
      * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.

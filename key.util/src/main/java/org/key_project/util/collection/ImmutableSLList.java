@@ -15,7 +15,6 @@ import java.util.stream.Collector;
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +29,7 @@ import org.slf4j.LoggerFactory;
  * appending and prepending and element can be realized with O(1) costs (see Osaka) then having tail
  * and head with amortized O(1). This will be done later (if necessary).
  */
-
 @SuppressWarnings({ "unchecked" })
-@NullMarked
 public abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableList<T> {
 
     /**

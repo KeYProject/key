@@ -5,8 +5,6 @@ package org.key_project.util.bean;
 
 import java.beans.PropertyChangeListener;
 
-import org.jspecify.annotations.NullMarked;
-
 /**
  * <p>
  * Defines the methods that a Java bean must have.
@@ -18,7 +16,6 @@ import org.jspecify.annotations.NullMarked;
  * @author Martin Hentschel
  * @see Bean
  */
-@NullMarked
 public interface IBean {
     /**
      * Adds the given listener.

@@ -5,8 +5,6 @@ package org.key_project.util.reflection;
 
 import java.util.ServiceLoader;
 
-import org.jspecify.annotations.NullMarked;
-
 /**
  * This class provides utility methods to load classes at runtime which works in all supported
  * application types:
@@ -40,7 +38,6 @@ import org.jspecify.annotations.NullMarked;
  * @see IClassLoader
  * @see JavaApplicationClassLoader
  */
-@NullMarked
 public class ClassLoaderUtil {
     /**
      * The {@link IClassLoader} instance to use.

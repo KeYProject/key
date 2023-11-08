@@ -5,8 +5,6 @@ package org.key_project.util.reflection;
 
 import java.util.ServiceLoader;
 
-import org.jspecify.annotations.NullMarked;
-
 /**
  * An {@link IClassLoader} implementation for Java Applications.
  * <p>
@@ -15,7 +13,6 @@ import org.jspecify.annotations.NullMarked;
  *
  * @author Martin Hentschel
  */
-@NullMarked
 public class JavaApplicationClassLoader implements IClassLoader {
     /**
      * {@inheritDoc}

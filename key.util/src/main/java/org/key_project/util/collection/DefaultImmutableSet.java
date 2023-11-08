@@ -12,7 +12,6 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.Strings;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,7 +20,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> type of object to store
  */
-@NullMarked
 public class DefaultImmutableSet<T extends @Nullable Object> implements ImmutableSet<T> {
 
     /**
