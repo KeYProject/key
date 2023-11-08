@@ -10,7 +10,6 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
@@ -36,9 +35,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 
     @Override
     public Void doInBackground() {
-        getMediator().setInteractive(false);
-        getMediator().startInterface(false);
-        SequentViewInputListener.setRefresh(false);
+        getMediator().initiateAutoMode(originalProof, true, false);
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }
@@ -48,10 +45,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
      */
     @Override
     public void done() {
-        getMediator().setInteractive(true);
-        getMediator().startInterface(true);
+        getMediator().finishAutoMode(originalProof, true, true, null);
         getMediator().removeInterruptedListener(this);
-        SequentViewInputListener.setRefresh(true);
         originalProof = null;
     }
 
