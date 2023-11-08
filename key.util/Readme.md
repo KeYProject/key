@@ -33,7 +33,7 @@ The Checker Framework also checks for initialization: If a constructor does
 not initialize every `@NonNull` field with a non-null value, an error to that
 effect is reported at compile time. If a constructor tries to call a non-helper
 method, an error is also reported, as that method may rely on all `@NonNull`
-being initialized.
+fields being initialized.
 You can mark a method as helper by specifying
 `@UnderInitialization(InitClass.class) ReceiverClass this` as the first
 parameter, where `ReceiverClass` is the name of the current class, and 
@@ -69,7 +69,7 @@ class B extends A {
         fieldB = new Object();
         
         // Allowed now because fieldB was just initialized
-        helper1();
+        helperB();
         
         // Not allowed because B is not final; thus there may be a subclass
         // for which this has not yet been initialized.
