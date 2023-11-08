@@ -33,10 +33,9 @@ import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Proof slicing extension.
