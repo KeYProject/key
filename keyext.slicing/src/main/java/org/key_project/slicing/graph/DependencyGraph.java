@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.proof.FunctionTracker;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
@@ -374,7 +375,7 @@ public class DependencyGraph {
             return candidate;
         }
         graph.addVertex(candidate);
-        var edges = edgeDataReversed.get(function.getIntroducedBy());
+        var edges = edgeDataReversed.get(FunctionTracker.getIntroducedBy(function));
         var sourcesDone = new HashSet<>();
         Collection<AnnotatedEdge> newEdges = new ArrayList<>();
         for (var x : edges) {
@@ -383,12 +384,13 @@ public class DependencyGraph {
                 continue;
             }
             sourcesDone.add(g);
-            AnnotatedEdge e = new AnnotatedEdge(function.getIntroducedBy(), false);
+            AnnotatedEdge e = new AnnotatedEdge(FunctionTracker.getIntroducedBy(function), false);
             graph.addEdge(g, candidate, e);
             newEdges.add(e);
         }
-        edgeDataReversed.get(function.getIntroducedBy()).addAll(newEdges);
-        DependencyNodeData n = function.getIntroducedBy().lookup(DependencyNodeData.class);
+        edgeDataReversed.get(FunctionTracker.getIntroducedBy(function)).addAll(newEdges);
+        DependencyNodeData n =
+            FunctionTracker.getIntroducedBy(function).lookup(DependencyNodeData.class);
         if (n != null) {
             n.outputs.add(candidate);
         }

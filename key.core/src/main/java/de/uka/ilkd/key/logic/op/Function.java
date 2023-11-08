@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
@@ -20,7 +19,6 @@ public class Function extends AbstractSortedOperator {
 
     private final boolean unique;
     private final boolean skolemConstant;
-    private Node introducedBy = null;
 
 
     // -------------------------------------------------------------------------
@@ -128,11 +126,4 @@ public class Function extends AbstractSortedOperator {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
     }
 
-    public void setIntroducedBy(Node introducedBy) {
-        this.introducedBy = introducedBy;
-    }
-
-    public Node getIntroducedBy() {
-        return introducedBy;
-    }
 }

@@ -98,9 +98,9 @@ class ReferenceSearchTable extends JTable implements TableModel {
             if (c == null) {
                 return "no reference found";
             } else {
-                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.getProof()) + 1;
+                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.proof()) + 1;
                 return String.format("reference available (proof %d, node %d)", i,
-                    c.getNode().serialNr());
+                    c.node().serialNr());
             }
         }
     }

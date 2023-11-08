@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.proof.FunctionTracker;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -197,7 +198,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                         continue;
                     }
 
-                    var a = ((Function) z).getIntroducedBy();
+                    var a = FunctionTracker.getIntroducedBy(((Function) z));
                     if (a != null && a != n) {
                         input.add(new Pair<>(
                             graph.getFunctionNode((Function) z, a.getBranchLocation()), false));

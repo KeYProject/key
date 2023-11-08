@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -347,6 +349,7 @@ public class TaskTree extends JPanel {
                         setToolTipText("Open proof");
                     }
                 }
+
             }
             return this;
         }

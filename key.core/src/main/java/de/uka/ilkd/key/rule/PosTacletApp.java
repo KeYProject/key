@@ -71,6 +71,18 @@ public class PosTacletApp extends TacletApp implements PosRuleApp {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
 
+
+    /**
+     * creates a PosTacletApp for the given taclet and a position information
+     *
+     * @param taclet the FindTaclet
+     * @param pos the PosInOccurrence storing the position where to apply the Taclet
+     */
+    private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
+        super(taclet);
+        this.pos = pos;
+    }
+
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
      * information

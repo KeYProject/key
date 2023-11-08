@@ -658,7 +658,7 @@ public final class Goal {
         for (Goal goal : goalList) {
             goal.node().addLocalProgVars(newProgVars);
             for (Function f : newFunctions) {
-                f.setIntroducedBy(goal.node().parent());
+                FunctionTracker.setIntroducedBy(f, goal.node.parent());
             }
             goal.node().addLocalFunctions(newFunctions);
 
