@@ -106,8 +106,6 @@ class TestReferenceSearcher {
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();
         previousProofs.add(p);
-        List<Proof> newProof = new CopyOnWriteArrayList<>();
-        newProof.add(p2);
 
         p2.pruneProof(p2.root());
 

@@ -21,6 +21,7 @@ public class KeYSelectionModel {
     // this is the KeYMediator listener and should be removed later
     // at the moment it is used to ensure a sane state of the mediator
     // before other selection listeners receive change information
+    // TODO: remove usage of primary
     private final KeYSelectionListener primary;
 
     /** the proof to listen to */
