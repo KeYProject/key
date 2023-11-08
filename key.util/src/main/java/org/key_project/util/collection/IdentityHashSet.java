@@ -8,7 +8,6 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,7 +16,6 @@ import org.jspecify.annotations.Nullable;
  * @param <T> elmeent type
  * @author Arne Keller
  */
-@NullMarked
 public final class IdentityHashSet<T extends @Nullable Object> implements Set<T> {
     /**
      * Backing store.
@@ -60,13 +58,13 @@ public final class IdentityHashSet<T extends @Nullable Object> implements Set<T>
         return innerMap.keySet().iterator();
     }
 
-    @SuppressWarnings("nullness") // see https://checkerframework.org/manual/#nullness-collection-toarray
+    @SuppressWarnings("nullness") // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
     @Override
     public @Nullable Object [] toArray() {
         return innerMap.keySet().toArray();
     }
 
-    @SuppressWarnings("nullness") // see https://checkerframework.org/manual/#nullness-collection-toarray
+    @SuppressWarnings("nullness") // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
     @Override
     public <T1> T1[] toArray(T1[] a) {
         return innerMap.keySet().toArray(a);
