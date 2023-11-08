@@ -8,17 +8,21 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Hash set using the object's identity instead of their hashcode to determine uniqueness.
  *
  * @param <T> elmeent type
  * @author Arne Keller
  */
-public class IdentityHashSet<T> implements Set<T> {
+@NullMarked
+public final class IdentityHashSet<T extends @Nullable Object> implements Set<T> {
     /**
      * Backing store.
      */
-    private final IdentityHashMap<T, Object> innerMap = new IdentityHashMap<>();
+    private final IdentityHashMap<T, @Nullable Object> innerMap = new IdentityHashMap<>();
 
     /**
      * Construct an empty set.
@@ -47,7 +51,7 @@ public class IdentityHashSet<T> implements Set<T> {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(@Nullable Object o) {
         return innerMap.containsKey(o);
     }
 
@@ -56,11 +60,13 @@ public class IdentityHashSet<T> implements Set<T> {
         return innerMap.keySet().iterator();
     }
 
+    @SuppressWarnings("nullness") // see https://checkerframework.org/manual/#nullness-collection-toarray
     @Override
-    public Object[] toArray() {
+    public @Nullable Object [] toArray() {
         return innerMap.keySet().toArray();
     }
 
+    @SuppressWarnings("nullness") // see https://checkerframework.org/manual/#nullness-collection-toarray
     @Override
     public <T1> T1[] toArray(T1[] a) {
         return innerMap.keySet().toArray(a);
@@ -72,7 +78,7 @@ public class IdentityHashSet<T> implements Set<T> {
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(@Nullable Object o) {
         var contained = innerMap.containsKey(o);
         innerMap.remove(o);
         return contained;
@@ -100,6 +106,8 @@ public class IdentityHashSet<T> implements Set<T> {
         }
         return changed;
     }
+
+
 
     @Override
     public boolean retainAll(Collection<?> c) {

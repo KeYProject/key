@@ -302,7 +302,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          */
         @Override
         public ImmutableList<S> append(S e) {
-            return new Cons<>(e).prepend(this);
+            return new Cons<S>(e).prepend(this);
         }
 
         /**

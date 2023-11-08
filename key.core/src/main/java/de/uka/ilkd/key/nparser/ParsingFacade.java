@@ -13,9 +13,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -26,6 +23,10 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
@@ -52,12 +53,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-<<<<<<< HEAD
-    public static <T extends ParserRuleContext> T getParseRuleContext(KeyAst<T> ast) {
-=======
     @NonNull
     public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
->>>>>>> upstream/main
         return ast.ctx;
     }
 
@@ -87,11 +84,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-<<<<<<< HEAD
-    public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
-=======
     public static @NonNull ChoiceInformation getChoices(@NonNull List<KeyAst.File> ctxs) {
->>>>>>> upstream/main
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -175,12 +168,8 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-<<<<<<< HEAD
-    public static String getValueDocumentation(KeYParser.String_valueContext ctx) {
-=======
     public static @NonNull String getValueDocumentation(
             KeYParser.@NonNull String_valueContext ctx) {
->>>>>>> upstream/main
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }

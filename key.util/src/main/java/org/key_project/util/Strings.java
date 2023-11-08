@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -50,11 +52,11 @@ public class Strings {
      * @return the CharSequence in the described format
      * @param <S> the type of the elements of the iterated collection
      */
-    public static <S, T> String formatAsList(Iterable<S> it,
+    public static <S extends @Nullable Object, T extends @Nullable Object> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close,
             Function<S, T> mapper) {
         return StreamSupport.stream(it.spliterator(), false)
-                .map(a -> mapper.apply(a).toString())
+                .map(a -> Objects.toString(mapper.apply(a)))
                 .collect(Collectors.joining(sep, open, close));
     }
 
@@ -69,7 +71,7 @@ public class Strings {
      * @return the CharSequence in the described format
      * @param <S> the type of the elements of the iterated collection
      */
-    public static <S> String formatAsList(Iterable<S> it,
+    public static <S extends @Nullable Object> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close) {
         return formatAsList(it, open, sep, close, Function.identity());
     }

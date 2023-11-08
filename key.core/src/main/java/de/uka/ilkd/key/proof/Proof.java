@@ -9,12 +9,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-<<<<<<< HEAD
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-=======
->>>>>>> upstream/main
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -49,6 +43,7 @@ import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -235,35 +230,8 @@ public class Proof implements Named {
         this(new Name(name), initConfig);
 
         final var rootNode = new Node(this, problem);
-
-<<<<<<< HEAD
-        register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
-        var rootNode = new Node(this, problem);
-        var sources = lookup(ProofJavaSourceCollection.class);
-
-        rootNode.sequent().forEach(formula -> {
-            OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
-            if (originLabel != null) {
-                if (originLabel.getOrigin() instanceof FileOrigin) {
-                    ((FileOrigin) originLabel.getOrigin())
-                            .getFileName()
-                            .ifPresent(sources::addRelevantFile);
-                }
-
-                originLabel.getSubtermOrigins().stream()
-                        .filter(o -> o instanceof FileOrigin)
-                        .map(o -> (FileOrigin) o)
-                        .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
-            }
-        });
-
-        var firstGoal =
-                new Goal(rootNode, rules, new BuiltInRuleAppIndex(builtInRules), getServices());
-=======
         final var firstGoal =
             new Goal(rootNode, rules, new BuiltInRuleAppIndex(builtInRules), getServices());
->>>>>>> upstream/main
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 
@@ -743,13 +711,7 @@ public class Proof implements Named {
                 }
 
                 // Merge rule applications: Unlink all merge partners.
-<<<<<<< HEAD
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                    final MergeRuleBuiltInRuleApp mergeApp =
-                            (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
-=======
                 if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
->>>>>>> upstream/main
 
                     for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                         final Goal linkedGoal = mergePartner.getGoal();
@@ -768,11 +730,7 @@ public class Proof implements Named {
 
             // first leaf is closed -> add as goal and reopen
             final Goal firstGoal =
-<<<<<<< HEAD
-                    firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
-=======
                 firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getOpenGoal(firstLeaf);
->>>>>>> upstream/main
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
                 reOpenGoal(firstGoal);
