@@ -23,6 +23,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProofEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,6 +154,9 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     public void init() {
         mediator.stopInterface(true);
         mediator.setInteractive(false);
+        mediator.getUI().getProofControl().fireAutoModeStarted(
+            new ProofEvent(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                    : mediator.getSelectedProof()));
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -177,8 +181,11 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> mediator.startInterface(true), 1000);
-        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
+        mediator.startInterface(true);
+        mediator.setInteractive(true);
+        mediator.getUI().getProofControl().fireAutoModeStopped(
+            new ProofEvent(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                    : mediator.getSelectedProof()));
 
         try {
             if (!mediator.getSelectedProof().closed()) {
@@ -189,7 +196,6 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
             LOGGER.warn("", e);
         }
 
-        mediator.setInteractive(true);
     }
 
     private static void runWithDeadline(Runnable runnable, int milliseconds) {

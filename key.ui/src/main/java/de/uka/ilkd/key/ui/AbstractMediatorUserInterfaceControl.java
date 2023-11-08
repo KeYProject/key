@@ -19,6 +19,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -176,7 +177,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // it again at the right time
             ThreadUtilities.invokeAndWait(() -> {
                 getMediator().stopInterface(true);
+                getMediator().getUI().getProofControl()
+                        .fireAutoModeStarted(new ProofEvent(info.getProof()));
                 getMediator().setInteractive(false);
+
             });
         }
     }
