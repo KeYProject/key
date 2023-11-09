@@ -1703,7 +1703,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) {
+            if (disableCurrentGoalView) {
                 return;
             }
             SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
@@ -1714,6 +1714,9 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+            if (disableCurrentGoalView) {
+                return;
+            }
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
