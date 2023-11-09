@@ -94,7 +94,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the model that is displayed by the delegateView
      */
-    GUIProofTreeModel delegateModel;
+    private GUIProofTreeModel delegateModel;
 
     /**
      * the mediator is stored here

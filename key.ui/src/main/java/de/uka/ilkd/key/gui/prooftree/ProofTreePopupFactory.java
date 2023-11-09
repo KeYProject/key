@@ -79,7 +79,7 @@ public class ProofTreePopupFactory {
             context.invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
         }
 
-        context.delegateModel = view.delegateModel;
+        context.delegateModel = view.getDelegateModel();
         context.delegateView = view.delegateView;
         context.window = MainWindow.getInstance();
         context.mediator = context.window.getMediator();
