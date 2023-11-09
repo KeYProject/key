@@ -454,19 +454,13 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * events.
      */
     protected void fireTreeStructureChanged(Object[] path) {
-        TreeModelEvent event = null;
+        final TreeModelEvent event = new TreeModelEvent(this, path);
         // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
+        final TreeModelListener[] listeners = listenerList.getListeners(TreeModelListener.class);
         // Process the listeners last to first, notifying
         // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (event == null) {
-                    event = new TreeModelEvent(this, path);
-                }
-                ((TreeModelListener) listeners[i + 1]).treeStructureChanged(event);
-            }
+        for (int i = listeners.length - 1; i >= 0; i -= 1) {
+            listeners[i].treeStructureChanged(event);
         }
     }
 
@@ -509,13 +503,15 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Return the GUIBranchNode corresponding to the subtree rooted at n. Generate one if necessary,
      * using label as the subtree label.
      */
-    public synchronized GUIBranchNode getBranchNode(Node n, Object label) {
-        GUIBranchNode res = findBranch(n);
-        if (res == null) {
-            res = new GUIBranchNode(this, n, label);
-            branchNodes.put(n, res);
+    public GUIBranchNode getBranchNode(Node n, Object label) {
+        synchronized (branchNodes) {
+            GUIBranchNode res = findBranch(n);
+            if (res == null) {
+                res = new GUIBranchNode(this, n, label);
+                branchNodes.put(n, res);
+            }
+            return res;
         }
-        return res;
     }
 
 

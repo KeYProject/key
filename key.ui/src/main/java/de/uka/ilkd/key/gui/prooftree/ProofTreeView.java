@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -845,9 +846,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * focused node has changed
          */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
             if (!ignoreNodeSelectionChange) {
-                makeSelectedNodeVisible(mediator.getSelectedNode());
+                ThreadUtilities.invokeOnEventQueue(
+                    () -> makeSelectedNodeVisible(mediator.getSelectedNode()));
             }
         }
 
@@ -855,11 +857,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
             LOGGER.debug("ProofTreeView: initialize with new proof");
-            lastGoalNode = null;
-            setProof(e.getSource().getSelectedProof());
-            delegateView.validate();
+            ThreadUtilities.invokeOnEventQueue(() -> {
+                lastGoalNode = null;
+                setProof(e.getSource().getSelectedProof());
+                delegateView.validate();
+            });
         }
 
         /**
