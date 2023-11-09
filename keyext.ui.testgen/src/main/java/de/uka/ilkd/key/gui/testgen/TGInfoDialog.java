@@ -64,10 +64,8 @@ public class TGInfoDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             final KeYMediator mediator = MainWindow.getInstance().getMediator();
             final Proof proof = mediator.getSelectedProof();
-            mediator.initiateAutoMode(proof, true, false);
             worker = new TGWorker(TGInfoDialog.this);
-            mediator.addInterruptedListener(worker);
-            worker.execute();
+            worker.start();
         }
     };
 

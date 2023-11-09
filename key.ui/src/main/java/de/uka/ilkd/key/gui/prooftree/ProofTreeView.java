@@ -821,7 +821,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             implements AutoModeListener, KeYSelectionListener {
 
         // hack to select Nodes without changing the selection of delegateView
-        public boolean ignoreNodeSelectionChange = false;
+        private boolean ignoreNodeSelectionChange = false;
         /**
          * node of the last known current goal
          */

@@ -70,15 +70,12 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 final Proof proof = getMediator().getSelectedProof();
-
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
                     // Can be applied only to root nodes
-
-
                     setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
                 }
             }
@@ -117,10 +114,8 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             Proof oldProof = node.proof();
             Sequent oldSequent = node.sequent();
             // Start SwingWorker (CEWorker) in which counter example search is performed.
-            CEWorker worker = new CEWorker(oldProof, oldSequent);
-            getMediator().initiateAutoMode(oldProof, true, false);
-            getMediator().addInterruptedListener(worker);
-            worker.execute();
+            final CEWorker worker = new CEWorker(oldProof, oldSequent);
+            worker.start();
         } catch (Exception exc) {
             LOGGER.error("", exc);
             IssueDialog.showExceptionDialog(mainWindow, exc);
@@ -232,6 +227,10 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
     }
 
+    /**
+     * <strong>The worker must be started using method {@link CEWorker#start()} and not
+     * via the standard {@link #execute()}</strong>.
+     */
     private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
         private final Proof oldProof;
         private final Sequent oldSequent;
@@ -239,6 +238,12 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         public CEWorker(Proof oldProof, Sequent oldSequent) {
             this.oldProof = oldProof;
             this.oldSequent = oldSequent;
+        }
+
+        public void start() {
+            getMediator().initiateAutoMode(oldProof, true, false);
+            getMediator().addInterruptedListener(this);
+            execute();
         }
 
         @Override
@@ -259,5 +264,6 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             getMediator().finishAutoMode(oldProof, true, true, null);
             getMediator().removeInterruptedListener(this);
         }
+
     }
 }

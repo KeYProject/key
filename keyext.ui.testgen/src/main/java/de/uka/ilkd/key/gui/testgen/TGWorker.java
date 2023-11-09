@@ -21,6 +21,10 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
 
+/**
+ * <strong>The worker must be started using method {@link TGWorker#start()} and not
+ * via the standard {@link #execute()}</strong>.
+ */
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
     private final TGInfoDialog tgInfoDialog;
     private boolean stop;
@@ -33,9 +37,15 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
         this.testGenerator = new MainWindowTestGenerator(getMediator(), originalProof, false);
     }
 
+    public void start() {
+        final KeYMediator mediator = getMediator();
+        mediator.initiateAutoMode(originalProof, true, false);
+        mediator.addInterruptedListener(this);
+        execute();
+    }
+
     @Override
     public Void doInBackground() {
-        getMediator().initiateAutoMode(originalProof, true, false);
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }
@@ -70,6 +80,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     public boolean shouldStop() {
         return stop;
     }
+
 }
 
 

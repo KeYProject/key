@@ -388,8 +388,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     private synchronized void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-            proofTreeNodes = new WeakHashMap<>();
-            branchNodes = new WeakHashMap<>();
+            proofTreeNodes.clear();
+            branchNodes.clear();
             fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
@@ -467,9 +467,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes and subtrees of the proof.
 
-    private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes =
-        new WeakHashMap<>();
-    private WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
+    private final WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes = new WeakHashMap<>();
+    private final WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
 
     /**
      * Return the GUIProofTreeNode corresponding to node n, if one has already been generated, and
