@@ -19,11 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.replay.AbstractProofReplayer;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
@@ -109,7 +105,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
                 "Preparing proof slicing", 2);
         }
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        originalProof.saveProofObligationToFile(tmpFile.toFile());
+        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), originalProof);
         if (progressMonitor != null) {
             progressMonitor.setProgress(1);
         }
@@ -245,7 +241,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
         }
         filename = filename + ".proof";
         File tempFile = tempDir.resolve(filename).toFile();
-        proof.saveToFile(tempFile);
+        ProofSaver.saveToFile(tempFile, proof);
         proof.dispose();
         return tempFile;
     }
