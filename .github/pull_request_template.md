@@ -42,7 +42,8 @@ This pull request addresses #.
      Leave empty if you are sure the reviewer does not need more
      
      Who apart from yourself is involved in this pull request?
-     Use @mentions to refer to them here -->
+     Use @mentions to refer to them here.
+     Use Co-Authored-By in your git commits if applicable. -->
      
 <!-- DRAFT MODE: Please note that on the button to submit this pull
      request you can select between submitting a merge-ready request
