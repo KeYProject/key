@@ -8,10 +8,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
@@ -62,8 +60,6 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final KeYMediator mediator = MainWindow.getInstance().getMediator();
-            final Proof proof = mediator.getSelectedProof();
             worker = new TGWorker(TGInfoDialog.this);
             worker.start();
         }
