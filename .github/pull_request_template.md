@@ -8,7 +8,7 @@
 
 <!-- Please remove if this PR is not related to an issue. -->
 <!-- Please add number if it is in answer to an issue. -->
-This pull request answers to issue #.
+This pull request addresses #.
 
 ## Intended Change
 
