@@ -50,4 +50,4 @@ This pull request addresses #.
      Please use the draft mode unless you think that your proposal
      should be brought onto master in the current form. -->
 
-The contributions within this pull request will be licensed under GPL2-or-later wihtin KeY.
+The contributions within this pull request are licensed under GPLv2 (only) for inclusion in KeY.
