@@ -8,7 +8,7 @@ You can find more information about KeY on https://key-project.org or use the
 documentation in the companion repository [key-docs](https://github.com/KeYProject/key-docs).
 The content of the latter is also available as HTML version under https://keyproject.github.io/key-docs/.
 
-The current version of KeY is 2.10.0, licensed under GPL v2.
+The current version of KeY is 2.12.2, licensed under GPL v2.
 
 
 ## Requirements
