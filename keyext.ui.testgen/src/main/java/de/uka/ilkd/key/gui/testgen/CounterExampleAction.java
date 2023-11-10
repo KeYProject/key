@@ -108,11 +108,8 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             if (goal != null) {
                 final Node node = goal.node();
                 // Start SwingWorker (CEWorker) in which counter example search is performed.
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
-                CEWorker worker = new CEWorker(node.proof(), node.sequent());
-                getMediator().addInterruptedListener(worker);
-                worker.execute();
+                final CEWorker worker = new CEWorker(node.proof(), node.sequent());
+                worker.start();
             }
         } catch (Exception exc) {
             LOGGER.error("", exc);
@@ -157,6 +154,10 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
     }
 
+    /**
+     * <strong>The worker must be started using method {@link CEWorker#start()} and not
+     * via the standard {@link #execute()}</strong>.
+     */
     private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
         private final Proof oldProof;
         private final Sequent oldSequent;
@@ -164,6 +165,12 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         public CEWorker(Proof oldProof, Sequent oldSequent) {
             this.oldProof = oldProof;
             this.oldSequent = oldSequent;
+        }
+
+        public void start() {
+            getMediator().initiateAutoMode(oldProof, true, false);
+            getMediator().addInterruptedListener(this);
+            execute();
         }
 
         @Override
@@ -181,9 +188,9 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
 
         @Override
         protected void done() {
-            getMediator().setInteractive(true);
-            getMediator().startInterface(true);
+            getMediator().finishAutoMode(oldProof, true, true, null);
             getMediator().removeInterruptedListener(this);
         }
+
     }
 }
