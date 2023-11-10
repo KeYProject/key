@@ -30,10 +30,11 @@ This pull request addresses #.
 
 ## Ensuring quality
     
-- [ ] I made sure that introduced/changed code has been well documented (javadoc).
+- [ ] I made sure that introduced/changed code is well documented (javadoc and inline comments).
+- [ ] I made sure that new/changed end-user features are well documented (https://github.com/KeYProject/key-docs).
 - [ ] I added new test case(s) for new functionality.
 - [ ] I have tested the feature as follows: ...
-- [ ] I have checked that runtime performance has not deteriorated  
+- [ ] I have checked that runtime performance has not deteriorated.
 
 ## Additional information and contact(s)
 
