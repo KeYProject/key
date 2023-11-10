@@ -154,7 +154,10 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
     }
 
-
+    /**
+     * <strong>The worker must be started using method {@link CEWorker#start()} and not
+     * via the standard {@link #execute()}</strong>.
+     */
     private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
         private final Proof oldProof;
         private final Sequent oldSequent;
