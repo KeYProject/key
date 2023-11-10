@@ -24,7 +24,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -285,7 +284,7 @@ public class TaskTree extends JPanel {
     /**
      * a prooftree listener, so that it is known when the proof has closed
      */
-    class TaskTreeProofTreeListener extends ProofTreeAdapter {
+    class TaskTreeProofTreeListener implements ProofTreeListener {
 
         /**
          * invoked if all goals of the proof are closed
@@ -295,17 +294,19 @@ public class TaskTree extends JPanel {
         }
 
         /**
-         * invoked if the list of goals changed (goals were added, removed etc.
+         * invoked if a proof has been pruned, potentially reopening branches
          */
-        public void proofGoalRemoved(ProofTreeEvent e) {
+        public void proofPruned(ProofTreeEvent e) {
+            delegateView.repaint();
         }
 
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsAdded(ProofTreeEvent e) {
-        }
-
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsChanged(ProofTreeEvent e) {
+        /**
+         * The structure of the proof has changed radically. Any client should rescan the whole
+         * proof
+         * tree.
+         */
+        public void proofStructureChanged(ProofTreeEvent e) {
+            delegateView.repaint();
         }
     } // end of prooftreelistener
 

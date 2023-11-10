@@ -265,12 +265,16 @@ public class KeYMediator {
     public void setBack(Node node) {
         getUI().getProofControl().pruneTo(node);
         finishSetBack(node.proof());
+        keySelectionModel.setSelectedNode(node);
     }
 
     public void setBack(Goal goal) {
         if (getSelectedProof() != null) {
             getUI().getProofControl().pruneTo(goal);
-            finishSetBack(goal.proof());
+            final Proof proof = goal.proof();
+            finishSetBack(proof);
+            Node node = goal.node() == proof.root() ? goal.node() : goal.node().parent();
+            keySelectionModel.setSelectedNode(node);
         }
     }
 
