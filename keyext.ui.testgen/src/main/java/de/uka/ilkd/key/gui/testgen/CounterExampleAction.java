@@ -104,7 +104,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
     public void actionPerformed(ActionEvent e) {
         try {
             // Get required information
-            Goal goal = getMediator().getSelectedGoal();
+            final Goal goal = getMediator().getSelectedGoal();
             if (goal != null) {
                 final Node node = goal.node();
                 // Start SwingWorker (CEWorker) in which counter example search is performed.
