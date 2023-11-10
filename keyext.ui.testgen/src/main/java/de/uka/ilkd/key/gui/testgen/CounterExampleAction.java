@@ -9,9 +9,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -22,8 +20,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
@@ -99,7 +95,6 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             @Override
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
-                selListener.selectedNodeChanged(null);
             }
         });
         selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
@@ -110,12 +105,12 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         try {
             // Get required information
             Goal goal = getMediator().getSelectedGoal();
-            Node node = goal.node();
-            Proof oldProof = node.proof();
-            Sequent oldSequent = node.sequent();
-            // Start SwingWorker (CEWorker) in which counter example search is performed.
-            final CEWorker worker = new CEWorker(oldProof, oldSequent);
-            worker.start();
+            if (goal != null) {
+                final Node node = goal.node();
+                // Start SwingWorker (CEWorker) in which counter example search is performed.
+                final CEWorker worker = new CEWorker(node.proof(), node.sequent());
+                worker.start();
+            }
         } catch (Exception exc) {
             LOGGER.error("", exc);
             IssueDialog.showExceptionDialog(mainWindow, exc);
@@ -159,78 +154,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
     }
 
-    /**
-     * Performs the {@link SemanticsBlastingMacro} in a {@link Proof} registered in the
-     * {@link MainWindow} and thus visible to the user. Results are shown with help of the
-     * {@link SolverListener}.
-     * <p>
-     * <b>This class provides only the user interface and no counter example generation logic which
-     * is implemented by the {@link AbstractCounterExampleGenerator}</b>.
-     */
-    public static class MainWindowCounterExampleGenerator extends AbstractCounterExampleGenerator {
-        /**
-         * The {@link KeYMediator} to use.
-         */
-        private final KeYMediator mediator;
 
-        /**
-         * Constructor.
-         *
-         * @param mediator The {@link KeYMediator} to use.
-         */
-        public MainWindowCounterExampleGenerator(KeYMediator mediator) {
-            this.mediator = mediator;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent,
-                String proofName) {
-            Sequent newSequent = createNewSequent(oldSequent);
-            InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
-            Proof proof = new Proof(proofName, newSequent, "", newInitConfig.createTacletIndex(),
-                newInitConfig.createBuiltInRuleIndex(), newInitConfig);
-
-            proof.setEnv(oldProof.getEnv());
-            proof.setNamespaces(oldProof.getNamespaces());
-
-            ProofAggregate pa = new SingleProof(proof, "XXX");
-
-            ui.registerProofAggregate(pa);
-
-            SpecificationRepository spec = proof.getServices().getSpecificationRepository();
-            spec.registerProof(spec.getProofOblInput(oldProof), proof);
-
-            mediator.goalChosen(proof.getOpenGoal(proof.root()));
-
-            return proof;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
-            mediator.setInteractive(true);
-            mediator.startInterface(true);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
-                Proof proof) {
-            return new SolverListener(settings, proof);
-        }
-    }
-
-    /**
-     * <strong>The worker must be started using method {@link CEWorker#start()} and not
-     * via the standard {@link #execute()}</strong>.
-     */
     private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
         private final Proof oldProof;
         private final Sequent oldSequent;
