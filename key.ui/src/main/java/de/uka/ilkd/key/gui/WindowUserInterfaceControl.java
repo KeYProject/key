@@ -200,8 +200,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
             }
             mainWindow.displayResults(info.toString());
-        } else if (info != null && info.getSource() instanceof ProofMacro) {
-            ProofMacro macro = (ProofMacro) info.getSource();
+        } else if (info != null && info.getSource() instanceof ProofMacro macro) {
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
@@ -222,7 +221,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     }
                 }
             }
-        } else if (info != null && info.getSource() instanceof ProblemLoader) {
+        } else if (info != null && info.getSource() instanceof ProblemLoader problemLoader) {
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
@@ -233,7 +232,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
                 if (problemLoader.hasProofScript()) {
                     Pair<String, Location> scriptAndLoc;
                     try {
