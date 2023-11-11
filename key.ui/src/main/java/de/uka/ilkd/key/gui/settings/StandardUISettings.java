@@ -102,7 +102,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         spAutoSaveProof =
             addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
-        notificationAfterMacro = addComboBox("Notification after macro finished", "", 0,
+        notificationAfterMacro = addComboBox("Notification after macro finished", "", 1,
             emptyValidator(), ViewSettings.NOTIFICATION_ALWAYS, ViewSettings.NOTIFICATION_UNFOCUSED,
             ViewSettings.NOTIFICATION_NEVER);
 

@@ -218,7 +218,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     private final PropertyEntry<String> notificationAfterMacro =
-        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_ALWAYS);
+        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
