@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * <p>
  *
  * <pre>
+ * {@code
  * BranchNodeIntermediate "dummy ID"
  * - AppNodeIntermediate
  * - AppNodeIntermediate
@@ -46,6 +47,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *   + BranchNodeIntermediate "x <= 0"
  *     > AppNodeIntermediate
  *     > ...
+ * }
  * </pre>
  * <p>
  * <p>

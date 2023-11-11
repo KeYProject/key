@@ -128,27 +128,27 @@ public interface PropertyNames {
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
@@ -409,16 +409,16 @@ public interface PropertyNames {
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * (1 < < 3)
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * ( 1 < < 3 )
+     * {@code ( 1 < < 3 ) }
      * </PRE>
      *
      * </TD>

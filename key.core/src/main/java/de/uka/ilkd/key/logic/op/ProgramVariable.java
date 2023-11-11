@@ -64,7 +64,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         assert sort() != Sort.UPDATE;
     }
 
-
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
@@ -263,6 +262,5 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      * @param name the new name
      * @return equivalent operator with the new name
      */
-    abstract public Operator rename(Name name);
-
+    public abstract Operator rename(Name name);
 }

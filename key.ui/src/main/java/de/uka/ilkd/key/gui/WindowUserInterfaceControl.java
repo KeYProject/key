@@ -504,6 +504,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
+        getMediator().fireProofLoaded(pa.getFirstProof());
         mainWindow.addProblem(pa);
         mainWindow.setStandardStatusLine();
     }
@@ -525,7 +526,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 } else {
                     this.reportStatus(this, result.getStatus());
                 }
-                getMediator().getSelectionModel().setSelectedNode(result.getNode());
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
                         "Proof could only be loaded partially.\n" + "In summary "
@@ -534,11 +534,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                             + "The first one:\n" + result.getErrorList().get(0).getMessage(),
                         result.getErrorList().get(0));
                 }
-            } else {
-                // should never happen as replay always returns a result object
-                // TODO (DS): Why is it then there? If this happens, we will get\\
-                // a NullPointerException just a line below...
-                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();

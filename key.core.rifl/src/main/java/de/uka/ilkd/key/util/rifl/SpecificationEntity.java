@@ -6,7 +6,7 @@ package de.uka.ilkd.key.util.rifl;
 import java.util.Arrays;
 
 /**
- * Program elements which may be named as sources or sinks in RIFL/Java. Currently fields, method
+ * Program elements which may be named as sources or sinks in RIFL/Java. Currently, fields, method
  * parameters, and method return values can be named both sources and sinks.
  *
  * @author bruns
@@ -138,9 +138,9 @@ public abstract class SpecificationEntity {
          * Creates a new specification element for a method return.
          *
          * @param m name of the method with parameter types in parentheses
-         * @param pt names of the parameter types of the method
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
+         * @param t a type
          */
         ReturnValue(String m, String p, String c, Type t) {
             super(p, c, t);

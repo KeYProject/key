@@ -7,7 +7,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
- * User action to load a proof. Really just calls {@link KeYMediator#setProof(Proof)}.
+ * Virtual user action to undo loading a proof.
  *
  * @author Arne Keller
  */
@@ -35,7 +35,6 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     protected void apply() {
-        mediator.setProof(proofLoaded);
     }
 
     @Override
