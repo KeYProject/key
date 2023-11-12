@@ -54,6 +54,7 @@ public final class ProofReorder {
             done.add(loc);
             System.out.println("doing branch " + loc);
 
+            // q: the list of dependency graph nodes "currently available" for proof steps
             Deque<GraphNode> q = new ArrayDeque<>();
             for (int i = 1; i <= root.sequent().size(); i++) {
                 var node = depGraph.getGraphNode(proof, loc,
@@ -72,7 +73,6 @@ public final class ProofReorder {
             while (toCheck.getBranchLocation() == loc) {
                 DependencyNodeData data = toCheck.lookup(DependencyNodeData.class);
                 if (data == null) {
-                    finalNode = toCheck.parent();
                     break; // closed goal
                 }
                 if (data.inputs.size() == 1 && data.inputs.get(0).first instanceof PseudoInput) {
@@ -88,7 +88,6 @@ public final class ProofReorder {
 
             while (!q.isEmpty()) {
                 var nextNode = q.pop();
-                List<Node> finalNewOrder = newOrder;
                 depGraph.outgoingEdgesOf(nextNode).forEach(node -> {
                     var newLoc = node.getBranchLocation();
                     if (!newLoc.equals(loc)) {
@@ -122,7 +121,7 @@ public final class ProofReorder {
                         q.addLast(nextNode);
                         return;
                     }
-                    finalNewOrder.add(node);
+                    newOrder.add(node);
                     newOrderSorted.add(node);
 
                     var outputs = depGraph.outputsOf(node).collect(Collectors.toList());
