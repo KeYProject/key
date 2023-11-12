@@ -80,7 +80,7 @@ public final class ProofReorder {
                         finalNode = toCheck;
                         break;
                     }
-                    newOrder.add(toCheck);
+                    // Do this one first.
                     newOrder.add(toCheck);
                 }
                 toCheck = toCheck.child(0);
