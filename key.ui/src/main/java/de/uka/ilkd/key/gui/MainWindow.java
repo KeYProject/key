@@ -1174,6 +1174,7 @@ public final class MainWindow extends JFrame {
             addToProofList(plist);
             getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
             disableCurrentGoalView = false;
+            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
