@@ -14,6 +14,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.key_project.util.java.SwingUtil;
+
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import org.slf4j.Logger;
@@ -56,8 +58,8 @@ public class HelpFacade {
 
     private static void openHelpInBrowser(String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
-        } catch (IOException | URISyntaxException e) {
+            SwingUtil.browse(new URI(url));
+        } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.warn("Failed to open help in browser", e);
         }
     }
