@@ -14,7 +14,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
@@ -34,8 +33,6 @@ import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Proof slicing extension.
@@ -54,11 +51,8 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup,
         KeYGuiExtension.LeftPanel,
         KeYGuiExtension.Settings,
-        KeYGuiExtension.Toolbar,
         KeYSelectionListener,
         ProofDisposedListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingExtension.class);
-
     /**
      * Collection of dependency trackers attached to proofs.
      */
@@ -119,7 +113,7 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 
@@ -184,43 +178,5 @@ public class SlicingExtension implements KeYGuiExtension,
      */
     public void enableSafeModeForNextProof() {
         this.enableSafeModeForNextProof = true;
-    }
-
-    @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
-        JToolBar bar = new JToolBar();
-        JButton b = new JButton();
-        b.setText("Reorder");
-        b.addActionListener(e -> {
-            KeYMediator m = MainWindow.getInstance().getMediator();
-            Proof p = m.getSelectedProof();
-            if (!p.closed()) {
-                JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "Cannot reorder incomplete proof", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            try {
-                ProofReorder.reorderProof(m.getSelectedProof(),
-                    trackers.get(m.getSelectedProof()).getDependencyGraph());
-            } catch (Exception exc) {
-                LOGGER.error("failed to reorder proof ", exc);
-                MainWindow.getInstance().getMediator().startInterface(true);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
-            }
-        });
-        bar.add(b);
-        JButton b2 = new JButton();
-        b2.setText("Regroup");
-        b2.addActionListener(e -> {
-            KeYMediator m = MainWindow.getInstance().getMediator();
-            try {
-                ProofRegroup.regroupProof(m.getSelectedProof(),
-                    trackers.get(m.getSelectedProof()).getDependencyGraph());
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        });
-        bar.add(b2);
-        return bar;
     }
 }

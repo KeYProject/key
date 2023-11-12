@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
@@ -21,6 +22,9 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Proof regrouping and reordering extension.
@@ -35,10 +39,59 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class RegroupExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup, KeYGuiExtension.Settings,
         KeYGuiExtension.Toolbar, InteractionListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegroupExtension.class);
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
-        return new JToolBar();
+        JToolBar bar = new JToolBar();
+        JButton b = new JButton();
+        b.setText("Reorder");
+        b.addActionListener(e -> {
+            KeYMediator m = MainWindow.getInstance().getMediator();
+            Proof p = m.getSelectedProof();
+            if (!p.closed()) {
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "Cannot reorder incomplete proof", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                var depTracker = m.getSelectedProof().lookup(DependencyTracker.class);
+                if (depTracker == null) {
+                    JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                        "Cannot reorder proof without dependency tracker", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                var depGraph = depTracker.getDependencyGraph();
+                ProofReorder.reorderProof(m.getSelectedProof(), depGraph);
+            } catch (Exception exc) {
+                LOGGER.error("failed to reorder proof ", exc);
+                MainWindow.getInstance().getMediator().startInterface(true);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
+            }
+        });
+        bar.add(b);
+        JButton b2 = new JButton();
+        b2.setText("Regroup");
+        b2.addActionListener(e -> {
+            KeYMediator m = MainWindow.getInstance().getMediator();
+            try {
+                var depTracker = m.getSelectedProof().lookup(DependencyTracker.class);
+                if (depTracker == null) {
+                    JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                        "Cannot regroup proof without dependency tracker", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                var depGraph = depTracker.getDependencyGraph();
+                ProofRegroup.regroupProof(m.getSelectedProof(), depGraph);
+            } catch (Exception exc) {
+                LOGGER.error("", exc);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
+            }
+        });
+        bar.add(b2);
+        return bar;
     }
 
     @Override
