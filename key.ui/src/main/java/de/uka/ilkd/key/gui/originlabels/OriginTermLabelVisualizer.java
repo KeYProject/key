@@ -117,7 +117,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     null, null);
 
                 if (choice == 0) {
-                    mediator.setProof(getNode().proof());
+                    mediator.getSelectionModel().setSelectedProof(getNode().proof());
                 } else {
                     return;
                 }
