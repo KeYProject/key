@@ -212,7 +212,7 @@ public class SolverListener implements SolverLauncherListener {
             new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
             // no change to selection model yet
-            mediator.startInterface(true, false);
+            mediator.startInterface(true);
             // switch to new open goal
             mediator.getSelectionModel().defaultSelection();
         }

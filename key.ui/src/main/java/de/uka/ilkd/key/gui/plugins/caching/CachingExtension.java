@@ -241,9 +241,14 @@ public class CachingExtension
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
-                mediator.stopInterface(true);
-                newProof.copyCachedGoals(referencedProof, null, null);
-                mediator.startInterface(true, false);
+                mediator.initiateAutoMode(newProof, true, false);
+                try {
+                    newProof.copyCachedGoals(referencedProof, null, null);
+                } finally {
+                    mediator.finishAutoMode(newProof, true, true,
+                        /* do not select a different node */ () -> {
+                        });
+                }
             } else {
                 newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
@@ -364,7 +369,7 @@ public class CachingExtension
             try {
                 mediator.stopInterface(true);
                 new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
-                mediator.startInterface(true, false);
+                mediator.startInterface(true);
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
