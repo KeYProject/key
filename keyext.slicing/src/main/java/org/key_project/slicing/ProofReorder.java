@@ -27,6 +27,11 @@ import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.PseudoInput;
 
+/**
+ * Proof reordering functionality.
+ *
+ * @author Arne Keller
+ */
 public final class ProofReorder {
     private ProofReorder() {
 

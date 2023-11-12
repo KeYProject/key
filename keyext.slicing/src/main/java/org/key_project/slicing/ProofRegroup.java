@@ -36,7 +36,7 @@ public final class ProofRegroup {
          *
          * simplify_enlarging, simplify, simplify_select
          */
-        var GROUPS = ProofRegroupSettingsProvider.getSettings().getGroups();
+        var groups = ProofRegroupSettingsProvider.getSettings().getGroups();
         Deque<Node> q = new ArrayDeque<>();
         q.add(proof.root());
         while (!q.isEmpty()) {
@@ -49,12 +49,12 @@ public final class ProofRegroup {
                 continue;
             }
             Rule rule = r.rule();
-            if (rule instanceof Taclet) {
-                var ruleSets = ((Taclet) rule).getRuleSets();
+            if (rule instanceof Taclet taclet) {
+                var ruleSets = taclet.getRuleSets();
                 String matchingGroup = null;
                 for (var name : ruleSets) {
-                    for (String i : GROUPS.keySet()) {
-                        if (GROUPS.get(i).contains(name.toString())) {
+                    for (String i : groups.keySet()) {
+                        if (groups.get(i).contains(name.toString())) {
                             matchingGroup = i;
                             break;
                         }
@@ -70,8 +70,7 @@ public final class ProofRegroup {
                         var n2 = n.child(0);
                         var r2 = n2.getAppliedRuleApp();
                         var rule2 = r2.rule();
-                        if (r2 instanceof PosRuleApp && rule2 instanceof Taclet) {
-                            var p2 = (PosRuleApp) r2;
+                        if (r2 instanceof PosRuleApp p2 && rule2 instanceof Taclet) {
                             var graphNode = graph.getGraphNode(proof, n2.getBranchLocation(),
                                 p2.posInOccurrence());
                             Node finalN = n;
@@ -82,7 +81,7 @@ public final class ProofRegroup {
                             var ruleSets2 = ((Taclet) rule2).getRuleSets();
                             var found = false;
                             for (var name : ruleSets2) {
-                                if (GROUPS.get(matchingGroup).contains(name.toString())) {
+                                if (groups.get(matchingGroup).contains(name.toString())) {
                                     found = true;
                                     break;
                                 }
