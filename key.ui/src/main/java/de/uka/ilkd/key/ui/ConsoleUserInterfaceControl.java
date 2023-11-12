@@ -224,7 +224,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.setProof(pa.getFirstProof());
+        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
@@ -312,7 +312,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             Proof p = proofStack.head();
             proofStack = proofStack.removeAll(p);
             assert p.name().equals(e.getSource().name());
-            mediator.setProof(proofStack.head());
+            mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
             // happen for symbolic execution tests, if proofCreated was not

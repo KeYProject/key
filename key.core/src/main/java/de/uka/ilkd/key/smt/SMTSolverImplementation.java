@@ -255,7 +255,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         String[] commands;
         try {
             commands = translateToCommand(problem.getSequent());
-        } catch (IllegalFormulaException e) {
+        } catch (Throwable e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
             setSolverState(SolverState.Stopped);

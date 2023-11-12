@@ -14,6 +14,7 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -23,10 +24,17 @@ import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -71,7 +79,7 @@ public class ProofTreePopupFactory {
             context.invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
         }
 
-        context.delegateModel = view.delegateModel;
+        context.delegateModel = view.getDelegateModel();
         context.delegateView = view.delegateView;
         context.window = MainWindow.getInstance();
         context.mediator = context.window.getMediator();
@@ -406,13 +414,98 @@ public class ProofTreePopupFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             context.delegateModel.setAttentive(false);
-            if (context.mediator.processDelayedCut(context.invokedNode)) {
+            if (processDelayedCut(context.invokedNode)) {
                 context.delegateModel.updateTree(null);
             }
             context.delegateModel.setAttentive(true);
             context.proofTreeView.makeNodeVisible(context.mediator.getSelectedNode());
         }
+
+        public boolean processDelayedCut(final Node invokedNode) {
+            KeYMediator mediator = context.mediator;
+            if (mediator.ensureProofLoaded()) {
+                final Proof proof = mediator.getSelectedProof();
+                final String result =
+                    CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null,
+                        "",
+                        new InspectorForDecisionPredicates(proof.getServices(),
+                            invokedNode,
+                            de.uka.ilkd.key.proof.delayedcut.DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                            DelayedCutProcessor.getApplicationChecks()),
+                        true);
+
+                if (result == null) {
+                    return false;
+                }
+
+                Term formula =
+                    InspectorForDecisionPredicates.translate(proof.getServices(), result);
+
+                DelayedCutProcessor processor = new DelayedCutProcessor(proof, invokedNode,
+                    formula,
+                    de.uka.ilkd.key.proof.delayedcut.DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
+                processor.add(new DelayedCutListener() {
+
+                    @Override
+                    public void eventRebuildingTree(final int currentTacletNumber,
+                            final int totalNumber) {
+
+                        SwingUtilities.invokeLater(() -> {
+                            mediator.getUI().taskStarted(
+                                new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
+                                    "Rebuilding...", totalNumber));
+                            mediator.getUI().taskProgress(currentTacletNumber);
+
+                        });
+                    }
+
+                    @Override
+                    public void eventEnd(
+                            de.uka.ilkd.key.proof.delayedcut.DelayedCut cutInformation) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                mediator.getUI().resetStatus(this);
+                                mediator.startInterface(true);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void eventCutting() {
+                        SwingUtilities.invokeLater(() -> mediator.getUI().taskStarted(
+                            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Cutting...",
+                                0)));
+
+                    }
+
+                    @Override
+                    public void eventException(Throwable throwable) {
+                        mediator.startInterface(true);
+
+                        mediator.notify(new ExceptionFailureEvent(
+                            "The cut could" + "not be processed successfully. In order to "
+                                + "preserve consistency the proof is pruned."
+                                + " For more information see details or output of your console.",
+                            throwable));
+
+                        SwingUtilities
+                                .invokeLater(() -> proof.pruneProof(invokedNode));
+                    }
+                });
+                mediator.stopInterface(true);
+
+                Thread thread = new Thread(processor, "DelayedCutListener");
+                thread.start();
+            }
+            return true;
+
+        }
     }
+
+
 
     static class RunStrategyOnNode extends ProofTreeAction {
         private static final long serialVersionUID = -7028621462695539683L;

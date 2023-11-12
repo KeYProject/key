@@ -38,9 +38,9 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
@@ -94,7 +94,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the model that is displayed by the delegateView
      */
-    GUIProofTreeModel delegateModel;
+    private GUIProofTreeModel delegateModel;
 
     /**
      * the mediator is stored here
@@ -155,8 +155,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * auto mode is active
      */
     private ImmutableList<Node> modifiedSubtrees = null;
-
-    private HashSet<Node> modifiedSubtreesCache = null;
 
     /**
      * the search dialog
@@ -483,14 +481,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
         }
 
-        if (proof != null && !proof.isDisposed()) {
-            proof.removeRuleAppListener(proofListener);
-        }
-
         proof = p;
 
         if (proof != null) {
-            proof.addRuleAppListener(proofListener);
             delegateModel = models.get(p);
             if (delegateModel == null) {
                 delegateModel = new GUIProofTreeModel(p);
@@ -554,7 +547,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         for (final Proof p : ps) {
             models.remove(p);
             scrollState.remove(p);
-            mediator.getCurrentlyOpenedProofs().removeElement(p);
+            mediator.getCurrentlyOpenedProofs().remove(p);
         }
     }
 
@@ -664,35 +657,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         delegateModel.storeSelection(delegateView.getSelectionPath());
 
-    }
-
-    /**
-     * In auto mode, add a node which has been modified in a way leading to structural changes of
-     * the proof tree
-     */
-    private void addModifiedNode(Node pNode) {
-        if (modifiedSubtrees == null) {
-            return;
-        }
-
-        try {
-            if (!modifiedSubtrees.isEmpty()) {
-                Node n = pNode;
-                while (true) {
-                    if (modifiedSubtreesCache.contains(n)) {
-                        return;
-                    }
-                    if (n.root()) {
-                        break;
-                    }
-                    n = n.parent();
-                }
-            }
-
-            modifiedSubtrees = modifiedSubtrees.prepend(pNode);
-        } finally {
-            modifiedSubtreesCache.add(pNode);
-        }
     }
 
     public void showSearchPanel() {
@@ -854,10 +818,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
     class GUIProofTreeProofListener
-            implements AutoModeListener, RuleAppListener, KeYSelectionListener {
+            implements AutoModeListener, KeYSelectionListener {
 
         // hack to select Nodes without changing the selection of delegateView
-        public boolean ignoreNodeSelectionChange = false;
+        private boolean ignoreNodeSelectionChange = false;
         /**
          * node of the last known current goal
          */
@@ -882,9 +846,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * focused node has changed
          */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
             if (!ignoreNodeSelectionChange) {
-                makeSelectedNodeVisible(mediator.getSelectedNode());
+                ThreadUtilities.invokeOnEventQueue(
+                    () -> makeSelectedNodeVisible(mediator.getSelectedNode()));
             }
         }
 
@@ -892,24 +857,28 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
             LOGGER.debug("ProofTreeView: initialize with new proof");
-            lastGoalNode = null;
-            setProof(e.getSource().getSelectedProof());
-            delegateView.validate();
+            ThreadUtilities.invokeOnEventQueue(() -> {
+                lastGoalNode = null;
+                setProof(e.getSource().getSelectedProof());
+                delegateView.validate();
+            });
         }
 
         /**
          * invoked if automatic application of rules has started
          */
         @Override
-        public void autoModeStarted(ProofEvent e) {
-            modifiedSubtrees = ImmutableSLList.nil();
-            modifiedSubtreesCache = new LinkedHashSet<>();
+        public synchronized void autoModeStarted(ProofEvent e) {
             if (delegateModel == null) {
                 LOGGER.debug("delegateModel is null");
                 return;
             }
+
+            // save goals on which the prover may work
+            modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
+
             if (delegateModel.isAttentive()) {
                 mediator.removeKeYSelectionListener(proofListener);
             }
@@ -920,39 +889,28 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * invoked if automatic application of rules has stopped
          */
         @Override
-        public void autoModeStopped(ProofEvent e) {
+        public synchronized void autoModeStopped(ProofEvent e) {
             if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
             delegateView.removeTreeSelectionListener(treeSelectionListener);
-            if (delegateModel == null) {
-                setProof(mediator.getSelectedProof());
-            } else if (modifiedSubtrees != null) {
+            setProof(mediator.getSelectedProof());
+            if (modifiedSubtrees != null) {
                 for (final Node n : modifiedSubtrees) {
-                    delegateModel.updateTree(n);
+                    if (proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                        delegateModel.updateTree(n);
+                    }
                 }
             }
             if (!delegateModel.isAttentive()) {
                 delegateModel.setAttentive(true);
-                mediator.addKeYSelectionListener(proofListener);
             }
+            mediator.addKeYSelectionListenerChecked(proofListener);
             makeSelectedNodeVisible(mediator.getSelectedNode());
             delegateView.addTreeSelectionListener(treeSelectionListener);
             delegateView.validate();
             modifiedSubtrees = null;
-            modifiedSubtreesCache = null;
         }
-
-
-        /**
-         * invoked when a rule has been applied
-         */
-        @Override
-        public void ruleApplied(ProofEvent e) {
-            addModifiedNode(e.getRuleAppInfo().getOriginalNode());
-        }
-
-
     }
 
     class GUITreeSelectionListener implements TreeSelectionListener, java.io.Serializable {
