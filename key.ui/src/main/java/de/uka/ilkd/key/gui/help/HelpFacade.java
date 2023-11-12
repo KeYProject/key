@@ -72,11 +72,18 @@ public class HelpFacade {
     }
 
     /**
-     * Opens the specified sub page of the key documentation website in the default system browser.
+     * Opens the specified subpage of the KeY documentation website in the default system browser.
      *
      * @param path a valid suffix to the current URI
      */
     public static void openHelp(String path) {
+        if (path.startsWith("https://")) {
+            openHelpInBrowser(path);
+            return;
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         openHelpInBrowser(HELP_BASE_URL + path);
     }
 
