@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
@@ -188,7 +188,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        SortedOperator op = (SortedOperator) term.op();
+        final SortedOperator op = (SortedOperator) term.op();
         String name = op.name().toString();
         String prefixedname = PREFIX + name;
 

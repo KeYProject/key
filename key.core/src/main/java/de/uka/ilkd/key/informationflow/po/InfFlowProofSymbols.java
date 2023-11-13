@@ -20,6 +20,7 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -324,13 +325,11 @@ public class InfFlowProofSymbols {
         assert symb != null;
         boolean l = true;
 
-        if (symb instanceof Sort) {
-            final Sort s = (Sort) symb;
-            addSort(s, l);
+        if (symb instanceof Sort sort) {
+            addSort(sort, l);
         }
-        if (symb instanceof SortedOperator) {
-            final SortedOperator s = (SortedOperator) symb;
-            addSort(s.sort(), l);
+        if (symb instanceof SortedOperator op) {
+            addSort(op.sort(), l);
         }
         if (symb instanceof Function f) {
             addFunc(f, l);

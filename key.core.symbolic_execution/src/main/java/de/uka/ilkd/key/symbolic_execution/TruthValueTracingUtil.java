@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
@@ -96,8 +96,8 @@ public final class TruthValueTracingUtil {
                 || operator == AbstractTermTransformer.META_LEQ
                 || operator == AbstractTermTransformer.META_LESS) {
             return true; // These Meta constructs evaluate always to true or false
-        } else if (operator instanceof SortedOperator) {
-            return ((SortedOperator) operator).sort() == JavaDLTheory.FORMULA;
+        } else if (operator instanceof final SortedOperator sortedOperator) {
+            return sortedOperator.sort() == JavaDLTheory.FORMULA;
         } else {
             return false;
         }

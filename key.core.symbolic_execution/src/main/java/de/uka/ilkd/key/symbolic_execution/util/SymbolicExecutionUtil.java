@@ -63,6 +63,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -3762,8 +3763,8 @@ public final class SymbolicExecutionUtil {
      *         else.
      */
     public static boolean isHeap(Operator op, HeapLDT heapLDT) {
-        if (op instanceof SortedOperator) {
-            final Sort opSort = ((SortedOperator) op).sort();
+        if (op instanceof final SortedOperator sortedOperator) {
+            final Sort opSort = sortedOperator.sort();
             return CollectionUtil.search(heapLDT.getAllHeaps(),
                 element -> opSort == element.sort()) != null;
         } else {

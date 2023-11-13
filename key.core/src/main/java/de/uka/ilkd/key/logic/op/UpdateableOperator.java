@@ -10,6 +10,6 @@ import org.key_project.logic.sort.Sort;
  * top level operators on the left side of an assignment pair of an update.
  */
 public interface UpdateableOperator extends org.key_project.logic.op.UpdateableOperator<Sort>,
-        ParsableVariable, SortedOperator, Operator {
+        ParsableVariable, org.key_project.logic.op.SortedOperator, Operator {
 
 }

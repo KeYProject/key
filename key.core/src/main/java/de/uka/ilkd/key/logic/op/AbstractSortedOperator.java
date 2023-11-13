@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends org.key_project.logic.op.AbstractSortedOperator
-        implements SortedOperator, Sorted {
+        implements org.key_project.logic.op.SortedOperator, Operator, Sorted {
 
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,

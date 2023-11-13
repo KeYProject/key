@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
 /**

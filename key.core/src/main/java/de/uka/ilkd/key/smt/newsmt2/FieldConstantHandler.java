@@ -11,10 +11,10 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -68,33 +68,37 @@ public class FieldConstantHandler implements SMTHandler {
         String smtName = "field_" + name;
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        Operator op = term.op();
 
-        trans.addSort(((SortedOperator) op).sort());
+        if (term.op() instanceof SortedOperator op) {
 
-        if (op == heapLDT.getArr()) {
-            trans.introduceSymbol("arr");
-            return trans.handleAsFunctionCall("arr", term);
+            trans.addSort(op.sort());
+
+            if (op == heapLDT.getArr()) {
+                trans.introduceSymbol("arr");
+                return trans.handleAsFunctionCall("arr", term);
+            }
+
+            if (!trans.isKnownSymbol(smtName)) {
+                Map<String, Object> state = trans.getTranslationState();
+                Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
+
+                trans.introduceSymbol("fieldIdentifier");
+
+                trans.addDeclaration(new SExpr("declare-const", smtName, "U"));
+
+                trans.addAxiom(HandlerUtil.funTypeAxiom(op, smtName, trans));
+
+                trans.addAxiom(new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
+                        new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+
+                state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
+                trans.addKnownSymbol(smtName);
+            }
+
+            return new SExpr(smtName, Type.UNIVERSE);
+        } else {
+            throw new SMTTranslationException("Expected a sorted operator, but is " + term.op());
         }
-
-        if (!trans.isKnownSymbol(smtName)) {
-            Map<String, Object> state = trans.getTranslationState();
-            Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
-
-            trans.introduceSymbol("fieldIdentifier");
-
-            trans.addDeclaration(new SExpr("declare-const", smtName, "U"));
-
-            trans.addAxiom(HandlerUtil.funTypeAxiom((SortedOperator) op, smtName, trans));
-
-            trans.addAxiom(new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
-                new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
-
-            state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
-            trans.addKnownSymbol(smtName);
-        }
-
-        return new SExpr(smtName, Type.UNIVERSE);
     }
 
 }

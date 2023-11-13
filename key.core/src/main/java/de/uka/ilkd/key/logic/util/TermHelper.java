@@ -8,8 +8,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -30,10 +30,9 @@ public class TermHelper {
      *
      * @param term the Term of which a part of the <tt>i</tt>-th sub term may be replaced
      * @param i an int giving the position of sub term of which a part is to be replaced
-     * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, TermServices services) {
+    public static Sort getMaxSort(Term term, int i) {
         if (term.sub(i).sort() == JavaDLTheory.FORMULA) {
             return JavaDLTheory.FORMULA;
         }
@@ -41,21 +40,19 @@ public class TermHelper {
         if (term.op() instanceof IfThenElse && i > 0) {
             return term.sort();
         }
-        return getMaxSortHelper(term.op(), i, term.sub(i).sort(), services);
+        return getMaxSortHelper(term.op(), i, term.sub(i).sort());
     }
 
     /**
      * @param op the Operator whose argument sorts are to be determined
      * @param i the arguments position
      * @param maxSortDefault if argument sort cannot be determined
-     * @param services the Services object
      * @return the maximal sort allowed at argument <tt>i</tt>
      */
-    private static Sort getMaxSortHelper(final Operator op, int i, Sort maxSortDefault,
-            TermServices services) {
+    private static Sort getMaxSortHelper(final Operator op, int i, Sort maxSortDefault) {
         final Sort newMaxSort;
-        if (op instanceof SortedOperator) {
-            newMaxSort = ((SortedOperator) op).argSort(i);
+        if (op instanceof SortedOperator sortedOp) {
+            newMaxSort = sortedOp.argSort(i);
         } else {
             newMaxSort = maxSortDefault;
         }

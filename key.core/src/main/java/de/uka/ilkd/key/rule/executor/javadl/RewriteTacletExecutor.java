@@ -45,7 +45,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             final Term[] subs = new Term[term.arity()];
             term.subs().arraycopy(0, subs, 0, term.arity());
 
-            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm, services);
+            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm);
             subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with, termLabelState,
                 labelHint, posOfFind, it, mc, newMaxSort, goal, services, ruleApp);
 
