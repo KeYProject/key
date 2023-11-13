@@ -11,10 +11,10 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
@@ -96,7 +96,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     @Override
-    public void validTopLevelException(org.key_project.logic.Term term) throws TermCreationException {
+    public void validTopLevelException(org.key_project.logic.Term term)
+            throws TermCreationException {
         if (1 != term.arity()) {
             throw new TermCreationException(this, term);
         }

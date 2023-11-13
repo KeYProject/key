@@ -4,10 +4,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import org.key_project.logic.Term;
-import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
@@ -34,7 +33,8 @@ public final class IfExThenElse extends AbstractOperator implements Operator {
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+            throws TermCreationException {
         super.validTopLevelException(term);
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();

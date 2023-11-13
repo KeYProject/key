@@ -5,9 +5,9 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
@@ -46,7 +46,8 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * @throws TermCreationException if the check fails
      */
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+            throws TermCreationException {
         super.validTopLevelException(term);
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);

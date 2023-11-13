@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import java.util.Objects;
 
 /**
  * A Name object is created to represent the name of an object which usually implements the
@@ -32,7 +31,8 @@ public class Name implements Comparable<Name> {
     }
 
     @Override
-    @SuppressWarnings("all") // Suppress String comparison ==-warning, which is unnecessary due to interning
+    @SuppressWarnings("all") // Suppress String comparison ==-warning, which is unnecessary due to
+                             // interning
     public boolean equals(Object o) {
         if (!(o instanceof Name other)) {
             return false;

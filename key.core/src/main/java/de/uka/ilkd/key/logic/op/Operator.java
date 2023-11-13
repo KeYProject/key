@@ -5,10 +5,6 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.TermCreationException;
-
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 

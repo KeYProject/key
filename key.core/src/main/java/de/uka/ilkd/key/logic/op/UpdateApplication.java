@@ -5,9 +5,9 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
@@ -33,7 +33,8 @@ public final class UpdateApplication extends AbstractOperator implements Operato
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+            throws TermCreationException {
         super.validTopLevelException(term);
         if (term.sub(0).sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException(this, term);

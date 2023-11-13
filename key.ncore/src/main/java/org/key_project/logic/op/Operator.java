@@ -20,8 +20,8 @@ public interface Operator extends Named {
      * would be allowed is not checked.
      *
      * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with
-     *              this
-     *              operator as top level operator
+     *        this
+     *        operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */
     Sort sort(Sort[] sorts);

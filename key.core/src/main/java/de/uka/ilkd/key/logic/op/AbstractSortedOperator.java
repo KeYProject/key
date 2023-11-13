@@ -5,10 +5,10 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -75,7 +75,8 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+            throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
             if (!possibleSub(i, (Term) term.sub(i))) {

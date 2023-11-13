@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
 import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;

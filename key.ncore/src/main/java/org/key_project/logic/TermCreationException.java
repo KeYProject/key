@@ -5,7 +5,6 @@ package org.key_project.logic;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
-
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 

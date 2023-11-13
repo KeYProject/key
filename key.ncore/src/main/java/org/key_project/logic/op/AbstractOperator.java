@@ -70,7 +70,7 @@ public abstract class AbstractOperator implements Operator {
      * the assumption that the top level operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal is NOT checked.
      *
-     * @throws TermCreationException if a construction error was recognise
+     * @throws TermCreationException if a construction error was recognised
      */
     @Override
     public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
