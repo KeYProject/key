@@ -19,15 +19,13 @@ import org.key_project.util.collection.ImmutableSet;
  * This singleton class implements a general conditional operator
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public final class IfThenElse extends AbstractOperator<Sort> {
+public final class IfThenElse extends AbstractOperator implements Operator {
 
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
-
 
     private IfThenElse() {
         super(new Name("if-then-else"), 3, true);
     }
-
 
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
         if (s1 == JavaDLTheory.FORMULA) {
@@ -61,7 +59,6 @@ public final class IfThenElse extends AbstractOperator<Sort> {
         }
     }
 
-
     @Override
     public Sort sort(Sort[] sorts) {
         final Sort s2 = sorts[1];
@@ -74,7 +71,6 @@ public final class IfThenElse extends AbstractOperator<Sort> {
             return getCommonSuperSort(s2, s3);
         }
     }
-
 
     @Override
     protected <T extends Term<?>> void additionalValidTopLevel(T term) {

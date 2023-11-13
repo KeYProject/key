@@ -16,7 +16,7 @@ import org.key_project.logic.sort.Sort;
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
  * other updates t.
  */
-public final class UpdateApplication extends AbstractOperator<Sort> implements Operator {
+public final class UpdateApplication extends AbstractOperator implements Operator {
 
     public static final UpdateApplication UPDATE_APPLICATION = new UpdateApplication();
 

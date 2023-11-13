@@ -10,8 +10,8 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Operator with well-defined argument and result sorts.
  */
-public interface SortedOperator<S extends Sort> extends Operator<S>, Sorted<S> {
-    S argSort(int i);
+public interface SortedOperator extends Operator, Sorted {
+    Sort argSort(int i);
 
-    ImmutableArray<S> argSorts();
+    ImmutableArray<Sort> argSorts();
 }

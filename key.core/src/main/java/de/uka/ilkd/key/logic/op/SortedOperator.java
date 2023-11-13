@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.logic.sort.Sort;
-
 
 /**
  * Operator with well-defined argument and result sorts.
  */
-public interface SortedOperator extends org.key_project.logic.op.SortedOperator<Sort>, Operator {
+public interface SortedOperator extends org.key_project.logic.op.SortedOperator, Operator {
 
 }

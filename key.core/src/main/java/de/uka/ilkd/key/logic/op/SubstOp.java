@@ -16,7 +16,7 @@ import org.key_project.logic.sort.Sort;
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
  * <code>WarySubstOp</code> is used and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator<Sort> {
+public abstract class SubstOp extends AbstractOperator implements Operator {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);

@@ -9,7 +9,6 @@ import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -17,23 +16,13 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends AbstractOperator<Sort>
+public abstract class AbstractSortedOperator extends org.key_project.logic.op.AbstractSortedOperator
         implements SortedOperator, Sorted {
-
-    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
-
-    private final Sort sort;
-    private final ImmutableArray<Sort> argSorts;
 
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
-        super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, isRigid);
-        if (sort == null) {
-            throw new NullPointerException("Given sort is null");
-        }
-        this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
-        this.sort = sort;
+        super(name, argSorts, sort, whereToBind, isRigid);
     }
 
 
@@ -58,13 +47,6 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort>
     protected AbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
         this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
     }
-
-
-    @Override
-    public final Sort sort(Sort[] sorts) {
-        return sort;
-    }
-
 
     /**
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
@@ -100,23 +82,5 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort>
                 throw new TermCreationException(this, term);
             }
         }
-    }
-
-
-    @Override
-    public final Sort argSort(int i) {
-        return argSorts.get(i);
-    }
-
-
-    @Override
-    public final ImmutableArray<Sort> argSorts() {
-        return argSorts;
-    }
-
-
-    @Override
-    public final Sort sort() {
-        return sort;
     }
 }

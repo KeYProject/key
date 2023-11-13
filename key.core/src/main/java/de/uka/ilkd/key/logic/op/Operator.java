@@ -17,7 +17,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * etc. have to implement this interface.
  */
 public interface Operator
-        extends org.key_project.logic.op.Operator<Sort>, SVSubstitute, EqualsModProofIrrelevancy {
+        extends org.key_project.logic.op.Operator, SVSubstitute, EqualsModProofIrrelevancy {
 
     @Override
     default boolean equalsModProofIrrelevancy(Object obj) {

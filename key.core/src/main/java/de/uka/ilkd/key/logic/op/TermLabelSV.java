@@ -30,11 +30,6 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
     }
 
     @Override
-    public boolean validTopLevel(Term term) {
-        return true;
-    }
-
-    @Override
     public Object getChild(int i) {
         throw new IndexOutOfBoundsException();
     }

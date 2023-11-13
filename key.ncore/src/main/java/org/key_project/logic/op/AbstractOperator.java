@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract operator class offering some common functionality.
  */
-public abstract class AbstractOperator<S extends Sort> implements Operator<S> {
+public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
     private final ImmutableArray<Boolean> whereToBind;
@@ -80,7 +80,7 @@ public abstract class AbstractOperator<S extends Sort> implements Operator<S> {
      * @throws TermCreationException if a construction error was recognise
      */
     @Override
-    public void validTopLevelException(Term<S> term) throws TermCreationException {
+    public void validTopLevelException(Term<Sort> term) throws TermCreationException {
         if (arity != term.arity()) {
             throw new TermCreationException(this, term);
         }

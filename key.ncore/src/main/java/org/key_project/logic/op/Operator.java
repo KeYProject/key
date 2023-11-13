@@ -8,7 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator<S extends Sort> extends Named {
+public interface Operator extends Named {
     /**
      * the arity of this operator
      */
@@ -24,7 +24,7 @@ public interface Operator<S extends Sort> extends Named {
      *              operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */
-    S sort(S[] sorts);
+    Sort sort(Sort[] sorts);
 
     /**
      * Tells whether the operator binds variables at the n-th subterm.
@@ -43,5 +43,5 @@ public interface Operator<S extends Sort> extends Named {
      *
      * @throws TermCreationException if a construction error was recognised
      */
-    void validTopLevelException(Term<S> term) throws TermCreationException;
+    void validTopLevelException(Term<Sort> term) throws TermCreationException;
 }
