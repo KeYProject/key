@@ -143,7 +143,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                         mediator.getUI().reportStatus(this, errorMessage);
                     }
                     fireTaskFinished(runTime, message);
-                    mediator.getSelectionModel().defaultSelection();
                 }
             }
         };
