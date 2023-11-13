@@ -37,12 +37,12 @@ public interface Term extends LogicElement, Sorted {
     /**
      * The logical variables bound by the top level operator.
      */
-    ImmutableArray<? extends QuantifiableVariable<Sort>> boundVars();
+    ImmutableArray<? extends QuantifiableVariable> boundVars();
 
     /**
      * The logical variables bound by the top level operator for the nth subterm.
      */
-    ImmutableArray<? extends QuantifiableVariable<Sort>> varsBoundHere(int n);
+    ImmutableArray<? extends QuantifiableVariable> varsBoundHere(int n);
 
     /**
      * The arity of the term.
@@ -68,7 +68,7 @@ public interface Term extends LogicElement, Sorted {
     /**
      * The set of free quantifiable variables occurring in this term.
      */
-    ImmutableSet<? extends QuantifiableVariable<Sort>> freeVars();
+    ImmutableSet<? extends QuantifiableVariable> freeVars();
 
     /**
      * Returns a serial number for a term. The serial number is not persistent.

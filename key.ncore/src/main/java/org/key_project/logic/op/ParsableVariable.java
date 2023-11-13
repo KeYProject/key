@@ -4,10 +4,8 @@
 package org.key_project.logic.op;
 
 
-import org.key_project.logic.sort.Sort;
-
 /**
  * This interface represents the variables that can be recognized by one of the parsers.
  */
-public interface ParsableVariable<S extends Sort> extends SortedOperator {
+public interface ParsableVariable extends SortedOperator {
 }

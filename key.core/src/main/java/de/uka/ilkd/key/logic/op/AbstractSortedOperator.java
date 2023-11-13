@@ -19,12 +19,10 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class AbstractSortedOperator extends org.key_project.logic.op.AbstractSortedOperator
         implements org.key_project.logic.op.SortedOperator, Operator, Sorted {
 
-
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         super(name, argSorts, sort, whereToBind, isRigid);
     }
-
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
             boolean isRigid) {
@@ -32,17 +30,14 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
             new ImmutableArray<>(whereToBind), isRigid);
     }
 
-
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             boolean isRigid) {
         this(name, argSorts, sort, null, isRigid);
     }
 
-
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort, null, isRigid);
     }
-
 
     protected AbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
         this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
