@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-public class TermProgramVariableCollector extends DefaultVisitor {
+public class TermProgramVariableCollector implements DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<>();
     private final Services services;
@@ -25,9 +25,8 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     /**
      * is called by the execPostOrder-method of a term
      *
-     * @param term the Term to checked if it is a program variable and if true the variable is added
-     *        to
-     *        the list of found variables
+     * @param visited the Term to checked if it is a program variable and if true the variable is added
+     *        to  the list of found variables
      */
     public void visit(Term visited) {
         if (visited.op() instanceof LocationVariable variable) {

@@ -122,7 +122,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         return v.getResult();
     }
 
-    private class ToMultiVisitor extends DefaultVisitor {
+    private class ToMultiVisitor implements DefaultVisitor {
         private final Stack<Term> subStack;
 
         ToMultiVisitor() {

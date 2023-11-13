@@ -38,7 +38,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class to determine all
  * uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends DefaultVisitor {
+public class TacletSchemaVariableCollector implements DefaultVisitor {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;

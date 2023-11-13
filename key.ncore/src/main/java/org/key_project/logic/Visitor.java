@@ -6,16 +6,20 @@ package org.key_project.logic;
 
 public interface Visitor<T extends Term> {
     /**
-     * Checks if the subtree below the visited {@link Term} should be traversed.
-     *
+     * <p>
+     *     Checks if the subtree below the visited {@link Term} should be traversed.
+     *  </p><p>
+     * By default, it always accepts any tree
+     * </p>
      * @param visited The currently visited {@link Term}.
-     * @return {@code true} visit sub tree, {@code false} skip sub tree.
+     * @return {@code true} visit subtree, {@code false} skip sub tree.
      */
-    boolean visitSubtree(T visited);
+    default boolean visitSubtree(T visited) {
+        return true;
+    }
 
     /**
      * the entry method for the visitor pattern
-     *
      * @param visited the Term to be visited
      */
     void visit(T visited);
@@ -25,20 +29,28 @@ public interface Visitor<T extends Term> {
      * subtree rooted in the term subtreeRoot. Default implementation is to do nothing. Subclasses
      * can override this method when the visitor behaviour depends on informations bound to
      * subtrees.
+     * <p>
+     *  By default, it does nothing
+     *  </p>
      *
      * @param subtreeRoot root of the subtree which the visitor enters.
      */
-
-    void subtreeEntered(T subtreeRoot);
+    default void subtreeEntered(T subtreeRoot) {
+        // do nothing
+    }
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when leaving the
      * subtree rooted in the term subtreeRoot. Default implementation is to do nothing. Subclasses
      * can override this method when the visitor behaviour depends on informations bound to
      * subtrees.
+     * <p>
+     *  By default, it does nothing
+     *  </p>
      *
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
-
-    void subtreeLeft(T subtreeRoot);
+    default void subtreeLeft(T subtreeRoot) {
+        //do nothing
+    }
 }

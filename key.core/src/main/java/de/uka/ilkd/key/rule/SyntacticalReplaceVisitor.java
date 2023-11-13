@@ -35,7 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.
  */
-public class SyntacticalReplaceVisitor extends DefaultVisitor {
+public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
@@ -402,7 +402,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeEntered(Term subtreeRoot) {
         tacletTermStack.push(subtreeRoot);
-        super.subtreeEntered(subtreeRoot);
     }
 
     /**

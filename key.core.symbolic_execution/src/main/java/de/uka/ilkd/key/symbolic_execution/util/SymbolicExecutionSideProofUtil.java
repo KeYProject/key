@@ -344,7 +344,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor implements DefaultVisitor {
         /**
          * The result.
          */
@@ -494,7 +494,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsIrrelevantThingsVisitor extends DefaultVisitor {
+    protected static class ContainsIrrelevantThingsVisitor implements DefaultVisitor {
         /**
          * The {@link Services} to use.
          */

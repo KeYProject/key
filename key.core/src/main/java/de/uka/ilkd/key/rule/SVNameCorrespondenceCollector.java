@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableMap;
  * or skolem functions.
  */
 
-public class SVNameCorrespondenceCollector extends DefaultVisitor {
+public class SVNameCorrespondenceCollector implements DefaultVisitor {
 
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet

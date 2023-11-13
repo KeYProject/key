@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 /**
  * Collects all operators occurring in the traversed term.
  */
-public class OpCollector extends DefaultVisitor {
+public class OpCollector implements DefaultVisitor {
     /** the found operators */
     protected final HashSet<Operator> ops;
 

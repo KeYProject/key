@@ -12,7 +12,7 @@ import org.key_project.logic.sort.Sort;
  * @author mihai
  *
  */
-public class SortCollector extends DefaultVisitor {
+public class SortCollector implements DefaultVisitor {
     /** the collected sorts */
     private final Set<Sort> sorts = new HashSet<>();
 

@@ -158,7 +158,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private static class SearchVisitor extends DefaultVisitor {
+    private static class SearchVisitor implements DefaultVisitor {
 
         private boolean termFound = false;
         private final Term[] searchTerms;

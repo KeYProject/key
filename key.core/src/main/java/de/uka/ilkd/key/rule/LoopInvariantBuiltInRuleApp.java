@@ -115,7 +115,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final Term valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);
 
         // set up replacement visitors
-        final class IndexTermReplacementVisitor extends DefaultVisitor {
+        final class IndexTermReplacementVisitor implements DefaultVisitor {
 
             private Term result;
 
@@ -147,7 +147,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 }
             }
         }
-        final class ValuesTermReplacementVisitor extends DefaultVisitor {
+        final class ValuesTermReplacementVisitor implements DefaultVisitor {
 
             private Term result;
 

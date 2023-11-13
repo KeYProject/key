@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Steinhoefel
  */
-public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
+public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     private final SVInstantiations svInst;
     private final Services services;
     private final TermBuilder tb;
@@ -314,7 +314,6 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeEntered(Term subtreeRoot) {
         tacletTermStack.push(subtreeRoot);
-        super.subtreeEntered(subtreeRoot);
     }
 
     /**
