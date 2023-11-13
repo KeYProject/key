@@ -17,12 +17,8 @@ import org.slf4j.LoggerFactory;
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
-    // the listener to be informed before all
-    // this is the KeYMediator listener and should be removed later
-    // at the moment it is used to ensure a sane state of the mediator
-    // before other selection listeners receive change information
-    // TODO: remove usage of primary
-    private final KeYSelectionListener primary;
+    // the KeYMediator is informed before all
+    private final KeYMediator primary;
 
     /** the proof to listen to */
     private Proof proof;
@@ -47,7 +43,7 @@ public class KeYSelectionModel {
 
     /** cached selected node event */
 
-    public KeYSelectionModel(KeYSelectionListener primary) {
+    public KeYSelectionModel(KeYMediator primary) {
         this.primary = primary;
         listenerList = Collections.synchronizedList(new ArrayList<>(5));
         goalIsValid = false;
@@ -83,6 +79,7 @@ public class KeYSelectionModel {
         final Proof previousProof = proof;
         goalIsValid = false;
         proof = p;
+        primary.setProof(p, previousProof);
         if (proof != null) {
             Goal g = proof.openGoals().iterator().next();
             if (g == null) {
@@ -102,6 +99,8 @@ public class KeYSelectionModel {
             selectedRuleApp = null;
             selectedGoal = null;
         }
+
+
         fireSelectedProofChanged(previousProof);
     }
 
@@ -381,7 +380,6 @@ public class KeYSelectionModel {
         synchronized (listenerList) {
             final KeYSelectionEvent<Node> selectionEvent =
                 new KeYSelectionEvent<>(this, previousNode);
-            primary.selectedNodeChanged(selectionEvent);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedNodeChanged(selectionEvent);
             }
@@ -393,7 +391,6 @@ public class KeYSelectionModel {
             LOGGER.debug("Selected Proof changed, firing...");
             final KeYSelectionEvent<Proof> selectionEvent =
                 new KeYSelectionEvent<>(this, previousProof);
-            primary.selectedProofChanged(selectionEvent);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }
