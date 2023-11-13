@@ -1237,6 +1237,7 @@ public final class MainWindow extends JFrame {
     }
 
     void displayResults(String message) {
+        LOGGER.debug("displaying results: {}", message);
         setStatusLine(message);
     }
 
