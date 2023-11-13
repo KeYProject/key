@@ -47,8 +47,6 @@ public abstract class AbstractSortedOperator<S extends Sort> extends AbstractOpe
         this(name, (ImmutableArray<S>) null, sort, null, isRigid);
     }
 
-
-
     @Override
     public final S sort(S[] sorts) {
         return sort;

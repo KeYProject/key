@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -16,7 +17,7 @@ import org.key_project.logic.sort.Sort;
  * where iv is an integer logic variable, phi is a formula, and where t1 and t2 are terms with the
  * same sort. The variable iv is bound in phi and in t1, but not in t2.
  */
-public final class IfExThenElse extends AbstractOperator {
+public final class IfExThenElse extends AbstractOperator<Sort> {
 
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();
 
@@ -33,13 +34,7 @@ public final class IfExThenElse extends AbstractOperator {
 
 
     @Override
-    protected void additionalValidTopLevel(Term term) {
-        for (QuantifiableVariable var : term.varsBoundHere(0)) {
-            if (!var.sort().name().toString().equals("int")) {
-                throw new TermCreationException(this, term);
-            }
-        }
-
+    protected <T extends Term<?>> void additionalValidTopLevel(T term) {
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();

@@ -5,10 +5,11 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -16,7 +17,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends AbstractOperator
+public abstract class AbstractSortedOperator extends AbstractOperator<Sort>
         implements SortedOperator, Sorted {
 
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
@@ -92,7 +93,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 
 
     @Override
-    protected final void additionalValidTopLevel(Term term) {
+    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T p_term) {
+        final Term term = (Term) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
             if (!possibleSub(i, term.sub(i))) {
                 throw new TermCreationException(this, term);

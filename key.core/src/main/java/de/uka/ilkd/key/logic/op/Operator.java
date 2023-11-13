@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
@@ -18,28 +18,6 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  */
 public interface Operator
         extends org.key_project.logic.op.Operator<Sort>, SVSubstitute, EqualsModProofIrrelevancy {
-    /**
-     * Checks whether the top level structure of the given @link Term is syntactically valid, given
-     * the assumption that the top level operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal is NOT checked.
-     *
-     * @throws TermCreationException if a construction error was recognise
-     */
-    void validTopLevelException(Term term) throws TermCreationException;
-
-
-    /**
-     * @return true iff the top level structure of the {@link Term} is valid, i.e. its parameters
-     *         and types are correct.
-     */
-    default boolean validTopLevel(Term term) {
-        try {
-            validTopLevelException(term);
-            return true;
-        } catch (TermCreationException e) {
-            return false;
-        }
-    }
 
     @Override
     default boolean equalsModProofIrrelevancy(Object obj) {

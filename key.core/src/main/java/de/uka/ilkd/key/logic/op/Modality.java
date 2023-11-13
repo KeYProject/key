@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
@@ -86,17 +86,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
                 || argSort(at) instanceof ProgramSVSort || s.extendsTrans(argSort(at));
     }
 
-
-    /*
-     * weigl: disable this method, not used. You should use inheritance!
-     *
-     * Allows subclasses to impose custom demands on what constitutes a valid term using the
-     * operator represented by the subclass. The default implementation here does not impose any
-     * such demands. protected boolean additionalValidTopLevel2(Term term) { return true; }
-     */
-
-
-    protected final void additionalValidTopLevel(Term term) {
+    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T p_term) {
+        final Term term = (Term) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
             if (!possibleSub(i, term.sub(i))) {
                 throw new TermCreationException(this, term);
@@ -105,7 +96,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     @Override
-    public void validTopLevelException(Term term) throws TermCreationException {
+    public void validTopLevelException(org.key_project.logic.Term term) throws TermCreationException {
         if (1 != term.arity()) {
             throw new TermCreationException(this, term);
         }
@@ -118,10 +109,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
             throw new TermCreationException(this, term);
         }
 
-        for (int i = 0; i < 1; i++) {
-            if (term.sub(i) == null) {
-                throw new TermCreationException(this, term);
-            }
+        if (term.sub(0) == null) {
+            throw new TermCreationException(this, term);
         }
 
         additionalValidTopLevel(term);

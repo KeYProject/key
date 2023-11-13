@@ -5,9 +5,10 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -15,7 +16,7 @@ import org.key_project.logic.sort.Sort;
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
  * <code>WarySubstOp</code> is used and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator {
+public abstract class SubstOp extends AbstractOperator<Sort> {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);
@@ -45,7 +46,7 @@ public abstract class SubstOp extends AbstractOperator {
      * @throws TermCreationException if the check fails
      */
     @Override
-    protected void additionalValidTopLevel(Term term) throws TermCreationException {
+    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T term)  {
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);
         }

@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -18,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
  * This singleton class implements a general conditional operator
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public final class IfThenElse extends AbstractOperator {
+public final class IfThenElse extends AbstractOperator<Sort> {
 
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
 
@@ -76,7 +77,7 @@ public final class IfThenElse extends AbstractOperator {
 
 
     @Override
-    protected void additionalValidTopLevel(Term term) {
+    protected <T extends Term<?>> void additionalValidTopLevel(T term) {
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();

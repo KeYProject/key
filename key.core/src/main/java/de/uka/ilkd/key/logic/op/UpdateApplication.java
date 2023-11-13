@@ -5,9 +5,10 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -15,7 +16,7 @@ import org.key_project.logic.sort.Sort;
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
  * other updates t.
  */
-public final class UpdateApplication extends AbstractOperator {
+public final class UpdateApplication extends AbstractOperator<Sort> implements Operator {
 
     public static final UpdateApplication UPDATE_APPLICATION = new UpdateApplication();
 
@@ -32,7 +33,7 @@ public final class UpdateApplication extends AbstractOperator {
 
 
     @Override
-    public void additionalValidTopLevel(Term term) {
+    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T term) {
         if (term.sub(0).sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException(this, term);
         }

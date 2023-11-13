@@ -10,7 +10,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.proof.Goal;
@@ -115,13 +115,12 @@ public abstract class SuperTermGenerator implements TermGenerator {
                     }
 
                     @Override
-                    public void validTopLevelException(Term term) throws TermCreationException {
+                    public void validTopLevelException(org.key_project.logic.Term<Sort> term) throws TermCreationException {
                         if (!(term.arity() == 2 && term.sub(1).sort()
                                 .extendsTrans(numbers.getNumberSymbol().sort()))) {
                             throw new TermCreationException(this, term);
                         }
                     }
-
                 };
 
                 // binFunc = new Function

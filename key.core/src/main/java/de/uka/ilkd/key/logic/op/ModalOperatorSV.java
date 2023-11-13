@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
+import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
@@ -70,11 +70,26 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     }
 
     @Override
-    public void validTopLevelException(Term term) throws TermCreationException {
+    public void validTopLevelException(Term<Sort> term) throws TermCreationException {
+        if (arity() != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
+
+        if (arity() != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
+
+        for (int i = 0; i < arity(); i++) {
+            if (term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
+
         if (!(term.op() instanceof Modality)) {
             throw new TermCreationException("ModalOperatorSV must be contained in a modality");
         }
     }
+
 
     @Override
     public Sort sort() {
@@ -100,6 +115,7 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     public boolean isRigid() {
         throw new RuntimeException("Not supported");
     }
+
 
     @Override
     public Sort argSort(int i) {

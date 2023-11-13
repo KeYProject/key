@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;

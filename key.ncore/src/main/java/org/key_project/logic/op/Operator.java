@@ -5,6 +5,7 @@ package org.key_project.logic.op;
 
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 
 public interface Operator<S extends Sort> extends Named {
@@ -19,8 +20,8 @@ public interface Operator<S extends Sort> extends Named {
      * would be allowed is not checked.
      *
      * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with
-     *        this
-     *        operator as top level operator
+     *              this
+     *              operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */
     S sort(S[] sorts);
@@ -34,4 +35,13 @@ public interface Operator<S extends Sort> extends Named {
      * Tells whether the operator is rigid.
      */
     boolean isRigid();
+
+    /**
+     * Checks whether the top level structure of the given @link Term is syntactically valid, given
+     * the assumption that the top level operator of the term is the same as this Operator. The
+     * assumption that the top level operator and the term are equal is NOT checked.
+     *
+     * @throws TermCreationException if a construction error was recognised
+     */
+    void validTopLevelException(Term<S> term) throws TermCreationException;
 }
