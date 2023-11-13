@@ -43,5 +43,5 @@ public interface Operator extends Named {
      *
      * @throws TermCreationException if a construction error was recognised
      */
-    void validTopLevelException(Term<Sort> term) throws TermCreationException;
+    <T extends Term> void validTopLevelException(T term) throws TermCreationException;
 }

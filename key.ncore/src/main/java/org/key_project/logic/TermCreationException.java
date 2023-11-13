@@ -26,7 +26,7 @@ public class TermCreationException extends RuntimeException {
     }
 
     private static String getErrorMessage(Operator op, Term failed) {
-        ImmutableArray<Term> subs = failed.subs();
+        ImmutableArray<? extends Term> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
             Term sub = subs.get(i);
             assert sub == failed.subs().get(i);
@@ -58,7 +58,7 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
-    private static String subsToString(ImmutableArray<Term> subs) {
+    private static String subsToString(ImmutableArray<? extends Term> subs) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append(i + 1).append(".) ");

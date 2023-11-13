@@ -46,7 +46,8 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * @throws TermCreationException if the check fails
      */
     @Override
-    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T term)  {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+        super.validTopLevelException(term);
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);
         }

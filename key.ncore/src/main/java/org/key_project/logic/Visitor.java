@@ -4,7 +4,7 @@
 package org.key_project.logic;
 
 
-public interface Visitor<T extends Term<?>> {
+public interface Visitor<T extends Term> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      *

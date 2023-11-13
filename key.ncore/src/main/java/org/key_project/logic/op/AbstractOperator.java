@@ -6,7 +6,6 @@ package org.key_project.logic.op;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -67,12 +66,6 @@ public abstract class AbstractOperator implements Operator {
     }
 
     /**
-     * Allows subclasses to impose custom demands on what constitutes a valid term using the
-     * operator represented by the subclass.
-     */
-    protected abstract <T extends Term<?>> void additionalValidTopLevel(T term) throws TermCreationException;
-
-    /**
      * Checks whether the top level structure of the given @link Term is syntactically valid, given
      * the assumption that the top level operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal is NOT checked.
@@ -80,7 +73,7 @@ public abstract class AbstractOperator implements Operator {
      * @throws TermCreationException if a construction error was recognise
      */
     @Override
-    public void validTopLevelException(Term<Sort> term) throws TermCreationException {
+    public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
         if (arity != term.arity()) {
             throw new TermCreationException(this, term);
         }
@@ -98,8 +91,6 @@ public abstract class AbstractOperator implements Operator {
                 throw new TermCreationException(this, term);
             }
         }
-
-        additionalValidTopLevel(term);
     }
 
 }

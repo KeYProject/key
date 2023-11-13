@@ -70,7 +70,7 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     }
 
     @Override
-    public void validTopLevelException(Term<Sort> term) throws TermCreationException {
+    public void validTopLevelException(Term term) throws TermCreationException {
         if (arity() != term.arity()) {
             throw new TermCreationException(this, term);
         }

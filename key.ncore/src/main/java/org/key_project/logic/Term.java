@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * This interface is implemented by classes that represent terms or formulas.
  */
-public interface Term<S extends Sort> extends LogicElement, Sorted {
+public interface Term extends LogicElement, Sorted {
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
      */
@@ -27,22 +27,22 @@ public interface Term<S extends Sort> extends LogicElement, Sorted {
     /**
      * The subterms.
      */
-    ImmutableArray<? extends Term<S>> subs();
+    ImmutableArray<? extends Term> subs();
 
     /**
      * The <code>n</code>-th direct subterm.
      */
-    Term<S> sub(int n);
+    Term sub(int n);
 
     /**
      * The logical variables bound by the top level operator.
      */
-    ImmutableArray<? extends QuantifiableVariable<S>> boundVars();
+    ImmutableArray<? extends QuantifiableVariable<Sort>> boundVars();
 
     /**
      * The logical variables bound by the top level operator for the nth subterm.
      */
-    ImmutableArray<? extends QuantifiableVariable<S>> varsBoundHere(int n);
+    ImmutableArray<? extends QuantifiableVariable<Sort>> varsBoundHere(int n);
 
     /**
      * The arity of the term.
@@ -53,7 +53,7 @@ public interface Term<S extends Sort> extends LogicElement, Sorted {
      * The sort of the term.
      */
     @Override
-    S sort();
+    Sort sort();
 
     /**
      * The nesting depth of this term.
@@ -68,7 +68,7 @@ public interface Term<S extends Sort> extends LogicElement, Sorted {
     /**
      * The set of free quantifiable variables occurring in this term.
      */
-    ImmutableSet<? extends QuantifiableVariable<S>> freeVars();
+    ImmutableSet<? extends QuantifiableVariable<Sort>> freeVars();
 
     /**
      * Returns a serial number for a term. The serial number is not persistent.
@@ -82,7 +82,7 @@ public interface Term<S extends Sort> extends LogicElement, Sorted {
      *
      * @param visitor the Visitor
      */
-    <T extends Term<S>> void execPostOrder(Visitor<T> visitor);
+    <T extends Term> void execPostOrder(Visitor<T> visitor);
 
     /**
      * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
@@ -90,5 +90,5 @@ public interface Term<S extends Sort> extends LogicElement, Sorted {
      *
      * @param visitor the Visitor
      */
-    <T extends Term<S>> void execPreOrder(Visitor<T> visitor);
+    <T extends Term> void execPreOrder(Visitor<T> visitor);
 }

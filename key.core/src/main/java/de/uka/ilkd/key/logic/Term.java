@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -44,7 +43,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, EqualsModProofIrrelevancy, org.key_project.logic.Term<Sort> {
+        extends SVSubstitute, Sorted, EqualsModProofIrrelevancy, org.key_project.logic.Term {
     @Override
     Operator op();
 

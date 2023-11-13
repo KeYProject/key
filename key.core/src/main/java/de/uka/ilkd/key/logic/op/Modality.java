@@ -86,7 +86,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
                 || argSort(at) instanceof ProgramSVSort || s.extendsTrans(argSort(at));
     }
 
-    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T p_term) {
+    protected <T extends org.key_project.logic.Term> void additionalValidTopLevel(T p_term) {
         final Term term = (Term) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
             if (!possibleSub(i, term.sub(i))) {

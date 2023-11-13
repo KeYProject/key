@@ -75,10 +75,10 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
 
 
     @Override
-    protected <T extends org.key_project.logic.Term<?>> void additionalValidTopLevel(T p_term) {
-        final Term term = (Term) p_term;
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term) throws TermCreationException {
+        super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, term.sub(i))) {
+            if (!possibleSub(i, (Term) term.sub(i))) {
                 throw new TermCreationException(this, term);
             }
         }

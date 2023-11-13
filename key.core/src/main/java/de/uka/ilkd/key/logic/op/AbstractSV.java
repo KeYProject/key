@@ -45,7 +45,7 @@ public abstract class AbstractSV extends AbstractSortedOperator implements Schem
     }
 
     @Override
-    public void validTopLevelException(Term<Sort> term) throws TermCreationException {
+    public void validTopLevelException(Term term) throws TermCreationException {
         if (arity() != term.arity()) {
             throw new TermCreationException(this, term);
         }
