@@ -302,9 +302,9 @@ public class TaskTree extends JPanel {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
                 if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
                     Proof p = task.proof();
-                    mediator.getSelectionModel().setSelectedProof(p);
+                    delegateView.setSelectionPath(selPath);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
+                        DefaultContextMenuKind.PROOF_LIST, p, mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
