@@ -308,8 +308,8 @@ public class KeYSelectionModel {
 
     /**
      * selects the first open goal below the given node <tt>old</tt> if no open goal is available
-     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof the
-     * proof root is selected
+     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
+     * proof root is selected.
      *
      * @param old the Node to start looking for open goals
      */

@@ -12,6 +12,8 @@ import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
@@ -58,6 +60,21 @@ public class TaskTree extends JPanel {
     /** listener to the prof tree events */
     private final ProofTreeListener proofTreeListener = new TaskTreeProofTreeListener();
 
+    private final TreeSelectionListener selectionListener = new TreeSelectionListener() {
+        /**
+         * listen to changes in the delegateView {@link JTree} selections and initiate switch
+         * between proofs if necessary
+         *
+         * @param e the event that characterizes the change.
+         */
+        @Override
+        public void valueChanged(TreeSelectionEvent e) {
+            if (e.getSource() == delegateView) {
+                problemChosen();
+            }
+        }
+    };
+
     /** the list model to be used */
     private final TaskTreeModel model = new TaskTreeModel();
 
@@ -87,6 +104,7 @@ public class TaskTree extends JPanel {
         delegateView.setModel(model);
         delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
         delegateView.addMouseListener(mouseListener);
+        delegateView.addTreeSelectionListener(selectionListener);
         this.setLayout(new BorderLayout());
         this.add(delegateView, BorderLayout.CENTER);
         delegateView.setShowsRootHandles(false);
@@ -175,7 +193,8 @@ public class TaskTree extends JPanel {
     /** called when the user has clicked on a problem */
     private void problemChosen() {
         TaskTreeNode prob = getSelectedTask();
-        if (prob != null && prob.proof() != null && mediator != null) {
+        if (prob != null && prob.proof() != null && mediator != null &&
+                mediator.getSelectedProof() != prob.proof()) {
             mediator.getSelectionModel().setSelectedProof(prob.proof());
         }
     }
@@ -255,7 +274,6 @@ public class TaskTree extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            problemChosen();
             checkPopup(e);
         }
 
@@ -289,8 +307,6 @@ public class TaskTree extends JPanel {
                         DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
-            } else {
-                problemChosen();
             }
         }
     }

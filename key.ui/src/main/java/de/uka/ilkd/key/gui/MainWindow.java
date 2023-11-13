@@ -1163,7 +1163,6 @@ public final class MainWindow extends JFrame {
             addToProofList(plist);
             getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
             disableCurrentGoalView = false;
-            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
@@ -1172,11 +1171,9 @@ public final class MainWindow extends JFrame {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-
         if (disableCurrentGoalView) {
             return;
         }
-
         final SequentView newSequentView;
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
@@ -1707,7 +1704,7 @@ public final class MainWindow extends JFrame {
             if (disableCurrentGoalView) {
                 return;
             }
-            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
+            ThreadUtilities.invokeAndWait(MainWindow.this::updateSequentView);
         }
 
         /**
@@ -1729,7 +1726,7 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
+            ThreadUtilities.invokeAndWait(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
