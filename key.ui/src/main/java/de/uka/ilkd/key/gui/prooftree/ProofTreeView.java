@@ -518,8 +518,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateView.setSelectionPath(delegateModel.getSelection());
                 delegateView.scrollPathToVisible(delegateModel.getSelection());
             } else {
-                // new proof, select initial node
-                delegateView.setSelectionRow(1);
+                if (mediator.getSelectedProof() == p && mediator.getSelectedNode() != null) {
+                    makeNodeVisible(mediator.getSelectedNode());
+                } else {
+                    // new proof with not yet selected node, select initial node
+                    delegateView.setSelectionRow(1);
+                }
             }
 
             // Restore previous scroll position.
