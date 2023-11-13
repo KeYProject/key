@@ -1704,7 +1704,7 @@ public final class MainWindow extends JFrame {
             if (disableCurrentGoalView) {
                 return;
             }
-            ThreadUtilities.invokeAndWait(MainWindow.this::updateSequentView);
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         /**
@@ -1726,7 +1726,7 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            ThreadUtilities.invokeAndWait(MainWindow.this::updateSequentView);
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
