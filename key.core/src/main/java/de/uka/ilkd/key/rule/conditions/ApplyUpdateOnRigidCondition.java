@@ -17,11 +17,11 @@ import org.key_project.util.collection.ImmutableSet;
 
 
 /**
- * This variable condition can be used to check whether an update can be performed on a formula.
- * That is the case if the
- * top-level operator is rigid and of arity greater than 0.
+ * This variable condition can be used to check whether an update can be performed on a formula or
+ * term.
+ * That is the case if the top-level operator is rigid and of arity greater than 0.
  *
- * @author Christoph Scheben
+ * @author Benjamin Weiss
  * @author Tobias Reinhold
  */
 public final class ApplyUpdateOnRigidCondition implements VariableCondition {
@@ -32,13 +32,13 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     private final UpdateSV u;
 
     /**
-     * The schema variable matched against a formula
+     * The schema variable matched against a formula or term
      */
     private final SchemaVariable phi;
 
     /**
      * The schema variable containing the result of applying the update <code>u</code> on the
-     * formula <code>phi</code>
+     * formula or term <code>phi</code>
      */
     private final SchemaVariable result;
 
@@ -46,7 +46,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * Creates an instance of the variable condition.
      *
      * @param u the schema variable matched against an update
-     * @param phi the schema variable matched against a formula
+     * @param phi the schema variable matched against a formula or term
      * @param result the schema variable containing the result of applying <code>u</code> on
      *        <code>phi</code>
      */
@@ -58,40 +58,68 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     /**
      * <p>
-     * Apply the update <code>u</code> on the rigid formula <code>phi</code>.
+     * Applies the update <code>u</code> on the rigid formula or term <code>phi</code>.
      * </p>
-     * If any name clashes exist between the free variables in update <code>u</code> and the bound
-     * variables in formula
-     * <code>phi</code>, the names of those problematic bound variables will be changed.
+     * If there are free variables in <code>u</code>,
+     * {@link #applyUpdateOnRigidClashAware(Term, Term, TermServices)} is
+     * called to take care of potential name clashes.
      *
      * @param u the update applied on <code>phi</code>
-     * @param phi the formula the update <code>u</code> is applied on
-     * @param services the {@link Services} to help create terms
+     * @param phi the formula or term the update <code>u</code> is applied on
+     * @param services the {@link TermServices} to help create terms
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
     private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
+        // If there are no free variables in u, we don't have to check for name collisions
+        if (u.freeVars().isEmpty()) {
+            final Term[] updatedSubs = new Term[phi.arity()];
+            for (int i = 0; i < updatedSubs.length; i++) {
+                updatedSubs[i] = services.getTermBuilder().apply(u, phi.sub(i), null);
+            }
+
+            return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
+                phi.javaBlock());
+        }
+
+        // Here we have to check for name collisions as there are free variables in u
+        return applyUpdateOnRigidClashAware(u, phi, services);
+    }
+
+    /**
+     * <p>
+     * This method is used by {@link #applyUpdateOnRigid(Term, Term, TermServices)} if there are
+     * free variables in <code>u</code>.
+     * </p>
+     * If any name clashes exist between the free variables in <code>u</code> and the bound
+     * variables in
+     * <code>phi</code>, the names of those problematic bound variables will be changed.
+     *
+     * @param u the update applied on <code>phi</code>
+     * @param phi the formula or term the update <code>u</code> is applied on
+     * @param services the {@link TermServices} to help create terms
+     * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
+     *         possible renaming
+     */
+    private static Term applyUpdateOnRigidClashAware(Term u, Term phi, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
-        final Term[] updatedSubs = phi.subs().toArray(new Term[0]);
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
         for (QuantifiableVariable freeVar : u.freeVars()) {
             freeVarNamesInU.add(freeVar.name());
         }
 
-        final List<QuantifiableVariable> newBoundVarsInPhi = new ArrayList<>();
-        final ImmutableArray<QuantifiableVariable> boundVarsInPhi = phi.boundVars();
-        final int numOfBoundVars = boundVarsInPhi.size();
-        for (int i = 0; i < numOfBoundVars; i++) {
-            newBoundVarsInPhi.add(boundVarsInPhi.get(i));
-        }
+        final QuantifiableVariable[] boundVarsInPhi =
+            phi.boundVars().toArray(new QuantifiableVariable[0]);
+        final int numOfBoundVars = boundVarsInPhi.length;
 
+        final Term[] updatedSubs = phi.subs().toArray(new Term[0]);
         // Check for any name clashes and change the variables' names if necessary
         for (int i = 0; i < numOfBoundVars; i++) {
-            final QuantifiableVariable currentBoundVar = newBoundVarsInPhi.get(i);
+            final QuantifiableVariable currentBoundVar = boundVarsInPhi[i];
             if (freeVarNamesInU.contains(currentBoundVar.name())) {
                 final LogicVariable renamedVar =
-                    new LogicVariable(createNonCollidingNameFor(currentBoundVar, u, phi),
+                    new LogicVariable(createNonCollidingNameFor(currentBoundVar, u, phi, services),
                         currentBoundVar.sort());
                 final Term substTerm = tb.var(renamedVar);
 
@@ -100,18 +128,17 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                     updatedSubs[j] = subst.apply(updatedSubs[j]);
                 }
 
-                // rename quantifiable variable in set for later term construction
-                newBoundVarsInPhi.set(i, renamedVar);
+                // Rename quantifiable variable in list for later term construction
+                boundVarsInPhi[i] = renamedVar;
             }
         }
 
-        // Apply update to all subterms
         for (int i = 0; i < updatedSubs.length; i++) {
             updatedSubs[i] = tb.apply(u, updatedSubs[i], null);
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(newBoundVarsInPhi), phi.javaBlock());
+            new ImmutableArray<>(boundVarsInPhi), phi.javaBlock());
     }
 
     /**
@@ -119,13 +146,17 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * Creates a new non-colliding {@link Name} for <code>var</code>.
      * </p>
      * Currently, only the variables contained in <code>u</code> and <code>phi</code> are checked
-     * for collisions. In the
-     * future, it might be needed to check for collisions with variable names on higher levels.
+     * for collisions. In the future, it might be needed to check for collisions with variable names
+     * on higher levels.
      *
      * @param var the {@link QuantifiableVariable} to get a new {@link Name} for
+     * @param u the update that is checked for variables
+     * @param phi the formula or term that is checked for variables
+     * @param services the {@link TermServices} to help create terms
      * @return a non-colliding {@link Name} for <code>var</code>
      */
-    private static Name createNonCollidingNameFor(QuantifiableVariable var, Term u, Term phi) {
+    private static Name createNonCollidingNameFor(QuantifiableVariable var, Term u, Term phi,
+            TermServices services) {
         ClashFreeSubst.VariableCollectVisitor vcv = new ClashFreeSubst.VariableCollectVisitor();
         ImmutableSet<QuantifiableVariable> usedVars = u.freeVars();
         phi.execPostOrder(vcv);
@@ -134,30 +165,33 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         // Get a new name by adding a counter to the stem
         String stem = var.name().toString();
         int i = 1;
-        while (nameIsAlreadyUsed(stem + i, usedVars)) {
+        Name newName = new Name(stem + i);
+        while (nameIsAlreadyUsed(newName, usedVars, services)) {
             i++;
+            newName = new Name(stem + i);
         }
-        return new Name(stem + i);
+        return newName;
     }
 
     /**
-     * Checks whether a given <code>name</code> is already used by some {@link QuantifiableVariable}
-     * in the set
-     * <code>qvars</code>.
+     * Checks whether the given <code>name</code> is already used by some
+     * {@link QuantifiableVariable} in the set
+     * <code>qvars</code> or the {@link NamespaceSet}.
      *
-     * @param name the name that is checked for occurrence in set <code>qvars</code>
+     * @param name the {@link Name} that is checked for occurrence in set <code>qvars</code>
      * @param qvars the set of {@link QuantifiableVariable}s to be checked for use of
      *        <code>name</code>
+     * @param services the {@link TermServices} to help create terms
      * @return true iff <code>name</code> is already used in <code>qvars</code>
      */
-    private static boolean nameIsAlreadyUsed(String name,
-            ImmutableSet<QuantifiableVariable> qvars) {
+    private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<QuantifiableVariable> qvars,
+            TermServices services) {
         for (QuantifiableVariable qvar : qvars) {
-            if (qvar.name().toString().equals(name)) {
+            if (qvar.name().equals(name)) {
                 return true;
             }
         }
-        return false;
+        return services.getNamespaces().lookup(name) != null;
     }
 
     @Override
