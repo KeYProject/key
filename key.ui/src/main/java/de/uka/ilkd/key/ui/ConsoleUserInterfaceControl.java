@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -16,6 +12,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
@@ -37,16 +34,24 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -149,14 +154,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             LOGGER.debug("{}", result2);
-            System.exit(-1);
+            //System.exit(-1);
         }
-        if (loadOnly || openGoals == 0) {
+        if (!loadOnly || openGoals == 0) {
             LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
+            //System.exit(0);
         }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
+        if (info.getSource() instanceof ProblemLoader problemLoader && problemLoader.hasProofScript()) {
             try {
                 Pair<String, Location> script = problemLoader.readProofScript();
                 ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
@@ -171,6 +175,29 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         } else if (macroChosen()) {
             applyMacro();
+        } else if (getSmtTranslationPath() != null) {
+            int goalIndex = 0;
+            for (Goal g : proof.openGoals()) {
+                Sequent seq = g.node().sequent();
+                Services services = proof.getServices();
+                SMTSettings settings = new DefaultSMTSettings(
+                    proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(),
+                    proof);
+                var s = new ModularSMTLib2Translator().translateProblem(seq, services, settings);
+                String filename = MiscTools.toValidFileName(proof.name().toString() + "_goal_"
+                    + goalIndex + ".smt2");
+                Path p = getSmtTranslationPath().toPath().resolve(filename);
+                try {
+                    Files.writeString(p, s.toString());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                goalIndex++;
+            }
+            LOGGER.debug("{}", result2);
+            System.exit(0);
         } else {
             finish(proof);
         }
@@ -196,6 +223,18 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          */
         keyProblemFile = file;
         getProblemLoader(file, null, null, null, mediator).runSynchronously();
+    }
+
+    @Override
+    public void loadProblemAndStoreSMT(File file, File smtOutPath) {
+        setSmtTranslationPath(smtOutPath);
+        /*
+         * Current file is stored in a private field. It will be used in method printResults() to
+         * determine file names, in which proofs will be written.
+         */
+        keyProblemFile = file;
+        ProblemLoader loader = getProblemLoader(file, null, null, null, mediator);
+        loader.runSynchronously();
     }
 
     /**

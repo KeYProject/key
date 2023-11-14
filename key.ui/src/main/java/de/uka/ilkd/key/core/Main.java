@@ -3,16 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import javax.xml.parsers.ParserConfigurationException;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -36,14 +26,22 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
-
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import recoder.ParserException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -91,6 +89,7 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
+    private static final String SMT_TRANSLATION = "--openGoalsSmtPath";
 
     /**
      * The user interface modes KeY can operate in.
@@ -156,6 +155,8 @@ public final class Main {
      */
     private static boolean saveAllContracts = false;
 
+    private static File smtTranslationPath;
+
     private static ProofMacro autoMacro = new SkipMacro();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -191,7 +192,7 @@ public final class Main {
             fileArguments = cl.getFileArguments();
             fileArguments = preProcessInput(fileArguments);
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
-            loadCommandLineFiles(userInterface, fileArguments);
+            loadCommandLineFiles(userInterface, fileArguments, smtTranslationPath);
         } catch (ExceptionInInitializerError e) {
             LOGGER.error("D'oh! It seems that KeY was not built properly!", e);
             System.exit(777);
@@ -218,12 +219,12 @@ public final class Main {
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui,
-            List<File> fileArguments) {
+            List<File> fileArguments, File smtOutPath) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
             for (File f : fileArguments) {
-                ui.loadProblem(f);
+                ui.loadProblemAndStoreSMT(f, smtOutPath);
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
@@ -277,6 +278,8 @@ public final class Main {
         cl.addOption(TIMEOUT, "<timeout>",
             "timeout for each automatic proof of a problem in ms (default: "
                 + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
+        cl.addOption(SMT_TRANSLATION, "<dir>", "call the SMT translation on all open goals, put the"
+            + " files into the given directory (overwrites existing files!).");
         cl.addSection("Options for justify rules:");
         cl.addOption(JUSTIFY_RULES, "<filename>",
             "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
@@ -449,6 +452,10 @@ public final class Main {
             if (macro.isEmpty() || autoMacro instanceof SkipMacro) {
                 LOGGER.warn("No automatic proof macro specified.");
             }
+        }
+
+        if (cl.isSet(SMT_TRANSLATION)) {
+            smtTranslationPath = new File(cl.getString(SMT_TRANSLATION, null));
         }
 
         if (cl.isSet(SAVE_ALL_CONTRACTS)) {

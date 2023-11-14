@@ -53,6 +53,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
     private boolean saveOnly = false;
 
+    private File smtTranslationPath;
+
     private final MediatorProofControl proofControl = createProofControl();
 
     private ProofMacro autoMacro = new SkipMacro();
@@ -72,6 +74,14 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
 
     public boolean isSaveOnly() {
         return this.saveOnly;
+    }
+
+    public void setSmtTranslationPath(File f) {
+        this.smtTranslationPath = f;
+    }
+
+    public File getSmtTranslationPath() {
+        return smtTranslationPath;
     }
 
     public void setMacro(ProofMacro macro) {
@@ -105,6 +115,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * @param file the File with the problem description or the proof
      */
     public abstract void loadProblem(File file);
+
+    public abstract void loadProblemAndStoreSMT(File file, File smtOutPath);
 
     /**
      * Loads the proof with the given filename from the proof bundle with the given path.

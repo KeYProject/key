@@ -125,6 +125,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     }
 
     @Override
+    public void loadProblemAndStoreSMT(File file, File smtOutPath) {
+        // TODO: smtOutPath ignored currently
+        loadProblem(file);
+    }
+
+    @Override
     public void loadProofFromBundle(File proofBundle, File proofFilename) {
         mainWindow.addRecentFile(proofBundle.getAbsolutePath());
         ProblemLoader problemLoader =
