@@ -131,11 +131,11 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels, String origin) {
 
-        //TODO: For testing only, remove before merge
+        // TODO: For testing only, remove before merge
         if (op instanceof Modality mod && !mod.program().equals(javaBlock)) {
             throw new RuntimeException("Inconsistent term creation");
         }
-        final Term newTerm =
+        final TermImpl newTerm =
             (labels == null || labels.isEmpty()
                     ? new TermImpl(op, subs, boundVars, javaBlock, origin)
                     : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin));

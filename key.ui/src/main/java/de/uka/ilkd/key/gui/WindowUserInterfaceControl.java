@@ -49,8 +49,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.SwingUtil;
 import org.key_project.util.collection.Pair;
+import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
