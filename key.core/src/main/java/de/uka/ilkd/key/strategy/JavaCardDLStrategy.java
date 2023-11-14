@@ -15,6 +15,7 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -1432,10 +1433,31 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 applyTF("subsumRightBigger", tf.polynomial), PolynomialValuesCmpFeature
                         .lt(instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
 
-        final TermBuffer one = new TermBuffer();
-        one.setContent(getServices().getTermBuilder().zTerm("1"));
-        final TermBuffer two = new TermBuffer();
-        two.setContent(getServices().getTermBuilder().zTerm("2"));
+        final Term tOne = getServices().getTermBuilder().zTerm("1");
+        final TermBuffer one = new TermBuffer() {
+            public void setContent(Term t, MutableState mState) {}
+
+            public Term getContent(MutableState mState) {
+                return tOne;
+            }
+
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+                return tOne;
+            }
+        };
+
+        final Term tTwo = getServices().getTermBuilder().zTerm("2");
+        final TermBuffer two = new TermBuffer() {
+            public void setContent(Term t, MutableState mState) {}
+
+            public Term getContent(MutableState mState) {
+                return tTwo;
+            }
+
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+                return tTwo;
+            }
+        };
 
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
             SumFeature.createSum(applyTF("tautLeft", tf.monomial),
@@ -2021,15 +2043,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param app rule application
      * @param pio corresponding {@link PosInOccurrence}
      * @param goal corresponding goal
+     * @param mState the {@link MutableState} to query for information like current value of
+     *        {@link TermBuffer}s or
+     *        {@link de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         var time = System.nanoTime();
         try {
-            return costComputationF.computeCost(app, pio, goal);
+            return costComputationF.computeCost(app, pio, goal, mState);
         } finally {
             PERF_COMPUTE.addAndGet(System.nanoTime() - time);
         }
@@ -2048,17 +2074,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
-            return !(approvalF.computeCost(app, pio, goal) == TopRuleAppCost.INSTANCE);
+            return !(approvalF.computeCost(app, pio, goal,
+                new MutableState()) == TopRuleAppCost.INSTANCE);
         } finally {
             PERF_APPROVE.addAndGet(System.nanoTime() - time);
         }
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         var time = System.nanoTime();
         try {
-            return instantiationF.computeCost(app, pio, goal);
+            return instantiationF.computeCost(app, pio, goal, mState);
         } finally {
             PERF_INSTANTIATE.addAndGet(System.nanoTime() - time);
         }

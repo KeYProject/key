@@ -17,7 +17,7 @@ public final class MatchedIfFeature extends BinaryTacletAppFeature {
 
     private MatchedIfFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return app.ifInstsComplete();
     }
 
