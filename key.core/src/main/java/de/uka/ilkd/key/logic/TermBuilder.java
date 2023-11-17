@@ -1709,6 +1709,7 @@ public class TermBuilder {
                             break;
                         }
                     }
+                    newLabelList.add(newLabel);
                 }
             }
 

@@ -204,7 +204,7 @@ public final class WhileInvariantTransformer {
             resSta = s;
         }
 
-        var loopBodyModalityKind = modality.kind();
+        Modality.JavaModalityKind loopBodyModalityKind = modality.kind();
         final boolean transaction =
             (loopBodyModalityKind == Modality.JavaModalityKind.DIA_TRANSACTION
                     || loopBodyModalityKind == Modality.JavaModalityKind.BOX_TRANSACTION);
@@ -213,9 +213,10 @@ public final class WhileInvariantTransformer {
                     new TransactionStatement(
                         de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
                 : new StatementBlock(resSta));
-        return services.getTermBuilder().prog(modality.kind(), mainJavaBlock, result,
+        return services.getTermBuilder().prog(loopBodyModalityKind, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
-                goal, modality, result, mainJavaBlock, applicationSequent,
+                goal, Modality.getModality(loopBodyModalityKind, mainJavaBlock), result,
+                mainJavaBlock, applicationSequent,
                 initialPost.getLabels()));
     }
 
@@ -327,7 +328,7 @@ public final class WhileInvariantTransformer {
         Term executeReturn = services.getTermBuilder().prog(modality.kind(), returnJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
-                tf.createTerm(modality,
+                tf.createTerm(Modality.getModality(modality.kind(), returnJavaBlock),
                     new ImmutableArray<>(post),
                     null, returnJavaBlock, post.getLabels())));
 
@@ -434,10 +435,12 @@ public final class WhileInvariantTransformer {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
+        // TODO: can we simplify this? Why create same term twice? Can `prog` be used?
         Term throwException = TB.prog(modality.kind(), throwJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ThrowCaseModality", null,
-                tf.createTerm(modality, new ImmutableArray<>(post), null, throwJavaBlock,
+                tf.createTerm(Modality.getModality(modality.kind(), throwJavaBlock),
+                    new ImmutableArray<>(post), null, throwJavaBlock,
                     post.getLabels())));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
             typeConv.getBooleanLDT().getTrueTerm()), throwException);

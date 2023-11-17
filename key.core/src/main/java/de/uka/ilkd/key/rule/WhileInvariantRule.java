@@ -563,13 +563,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
+        var mod = (Modality) inst.progPost.op();
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
             "UseModality", null,
-            tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
+            tb.tf().createTerm(Modality.getModality(mod.kind(), useJavaBlock),
+                new ImmutableArray<>(inst.progPost.sub(0)),
                 null, useJavaBlock, inst.progPost.getLabels()));
         Term restPsi =
-            tb.prog(((Modality) inst.progPost.op()).kind(), useJavaBlock, inst.progPost.sub(0),
+            tb.prog(mod.kind(), useJavaBlock, inst.progPost.sub(0),
                 instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
         return guardFalseRestPsi;

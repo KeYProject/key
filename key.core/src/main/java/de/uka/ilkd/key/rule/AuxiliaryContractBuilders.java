@@ -1395,7 +1395,8 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    tb.tf().createTerm(instantiation.modality(),
+                    tb.tf().createTerm(
+                        Modality.getModality(instantiation.modality().kind(), newJavaBlock),
                         new ImmutableArray<>(newPost), null, newJavaBlock,
                         instantiation.formula().getLabels()));
 
