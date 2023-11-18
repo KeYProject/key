@@ -47,14 +47,15 @@ public class ApplyTFFeature implements Feature {
         return new ApplyTFFeature(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term te = proj.toTerm(app, pos, goal);
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        final Term te = proj.toTerm(app, pos, goal, mState);
         if (te == null) {
             Debug.assertFalse(demandInst, "ApplyTFFeature: got undefined argument (null)");
             return noInstCost;
         }
 
-        return termFeature.compute(te, goal.proof().getServices());
+        return termFeature.compute(te, mState, goal.proof().getServices());
     }
 
 }

@@ -84,7 +84,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         }
         final ImmutableList<Goal> gs = initNodes.isEmpty() ? proof.openEnabledGoals()
                 : proof.getSubtreeEnabledGoals(initNodes.get(0));
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof, false);
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);
         for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
@@ -94,9 +94,12 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                     synchronized (macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(uic, initNode, posInOcc, pml);
+                        try {
+                            info = macro.applyTo(uic, initNode, posInOcc, pml);
+                        } finally {
+                            pml.taskFinished(info);
+                        }
                     }
-                    pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);
                 }
             }

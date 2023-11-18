@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * The heap generator returns an iterator over all terms of sort heap that
@@ -35,7 +36,8 @@ public class HeapGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
         for (SequentFormula sf : seq) {

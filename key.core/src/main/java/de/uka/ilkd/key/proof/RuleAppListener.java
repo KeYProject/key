@@ -14,5 +14,5 @@ public interface RuleAppListener {
      *
      * @param e the proof event containing the rule application.
      */
-    void ruleApplied(de.uka.ilkd.key.proof.ProofEvent e);
+    void ruleApplied(ProofEvent e);
 }

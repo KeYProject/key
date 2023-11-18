@@ -29,10 +29,10 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal), services);
-        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal), services);
+        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
+        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);
 
         /*
          * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient

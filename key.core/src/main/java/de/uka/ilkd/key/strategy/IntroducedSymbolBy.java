@@ -13,11 +13,10 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
-
-
     private final Name ruleSetName;
     private final Name schemaVar;
     private final ProjectionToTerm term;
@@ -36,7 +35,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Node root = goal.proof().root();
 
         Node n = goal.node();
@@ -45,15 +44,13 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
             if (ra instanceof TacletApp ta) {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
-                    if (svInstValue instanceof Term) {
-                        return term.toTerm(app, pos, goal).op() == ((Term) svInstValue).op();
+                    if (svInstValue instanceof Term svInstAsTerm) {
+                        return term.toTerm(app, pos, goal, mState).op() == svInstAsTerm.op();
                     }
                 }
             }
             n = n.parent();
         }
-
         return false;
     }
-
 }
