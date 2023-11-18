@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteclient;
 
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 

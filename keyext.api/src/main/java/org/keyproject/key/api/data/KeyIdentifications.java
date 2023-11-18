@@ -12,9 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jspecify.annotations.NonNull;
-import org.keyproject.key.api.NodeTextId;
 import org.keyproject.key.api.internal.NodeText;
 
 /**
