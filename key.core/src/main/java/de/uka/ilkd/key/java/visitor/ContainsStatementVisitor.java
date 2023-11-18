@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.statement.While;
 
 /**
  * Utilits class used by
- * {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
+ * SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services).
  *
  * @author Martin Hentschel
  */

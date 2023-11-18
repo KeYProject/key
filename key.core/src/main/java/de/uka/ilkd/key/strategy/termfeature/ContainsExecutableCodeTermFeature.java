@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -26,11 +27,12 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
     public final static TermFeature PROGRAMS_OR_QUERIES =
         new ContainsExecutableCodeTermFeature(true);
 
-    protected boolean filter(Term t, Services services) {
-        return containsExec(t, services);
+    @Override
+    protected boolean filter(Term t, MutableState mState, Services services) {
+        return containsExec(t, mState, services);
     }
 
-    private boolean containsExec(Term t, Services services) {
+    private boolean containsExec(Term t, MutableState mState, Services services) {
         if (t.isRigid()) {
             return false;
         }
@@ -49,7 +51,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         }
 
         for (int i = 0; i != op.arity(); ++i) {
-            final boolean res = filter(t.sub(i), services);
+            final boolean res = filter(t.sub(i), mState, services);
             if (res) {
                 return true;
             }

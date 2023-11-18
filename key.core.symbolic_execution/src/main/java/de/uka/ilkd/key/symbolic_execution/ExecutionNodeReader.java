@@ -2186,7 +2186,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getFormatedMethodReturnCondition() throws ProofInputException {
+        public String getFormattedMethodReturnCondition() throws ProofInputException {
             return formatedMethodReturn;
         }
     }

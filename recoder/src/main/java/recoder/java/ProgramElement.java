@@ -52,7 +52,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
     /**
      * Set comments.
      *
-     * @param c a comment list.
+     * @param list a comment list.
      */
     void setComments(ASTList<Comment> list);
 

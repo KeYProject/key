@@ -125,7 +125,7 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(boolean useAutoSaver) {
         this(null, useAutoSaver);
@@ -134,7 +134,8 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param ptl the ProverTaskListener to be informed about certain events
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;

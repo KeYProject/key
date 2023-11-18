@@ -110,8 +110,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     /**
      *
-     * @param localOuts a set of variables.
+     * @param localOutVariables a set of variables.
      * @param services services.
+     * @param tb the TermBuilder to be used
      * @return an anonymizing update for the specified variables.
      */
     private static Term createLocalAnonUpdate(final ImmutableSet<ProgramVariable> localOutVariables,

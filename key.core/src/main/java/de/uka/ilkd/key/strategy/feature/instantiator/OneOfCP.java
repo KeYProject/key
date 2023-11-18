@@ -10,27 +10,28 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class OneOfCP implements Feature {
 
-    private final BackTrackingManager manager;
     private final Feature[] features;
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP();
 
-    private OneOfCP(BackTrackingManager manager, Feature[] features) {
-        this.manager = manager;
+    private OneOfCP(Feature[] features) {
         this.features = features;
     }
 
-    public static Feature create(Feature[] features, BackTrackingManager manager) {
-        return new OneOfCP(manager, features);
+    public static Feature create(Feature[] features) {
+        return new OneOfCP(features);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(cp, this);
-        return features[theChosenOne].computeCost(app, pos, goal);
+        return features[theChosenOne].computeCost(app, pos, goal, mState);
     }
 
     private final class CP implements ChoicePoint {

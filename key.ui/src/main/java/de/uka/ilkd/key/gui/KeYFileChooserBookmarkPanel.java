@@ -28,7 +28,6 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Jonas Klamroth
  * @author weigl
- * @see ViewSettings#USER_FOLDER_BOOKMARKS
  * @see ViewSettings#getFolderBookmarks()
  */
 public class KeYFileChooserBookmarkPanel extends JPanel {

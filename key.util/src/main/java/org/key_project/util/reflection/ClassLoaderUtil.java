@@ -26,7 +26,7 @@ import java.util.ServiceLoader;
  * should be used instead:
  * <ul>
  * <li>{@link #getClassforName(String)} instead of {@link Class#forName(String)}</li>
- * <li>{@link #loadServices(Class, Class) instead of {@link ServiceLoader#load(Class)}</li>
+ * <li>{@link #loadServices(Class, Class)} instead of {@link ServiceLoader#load(Class)}</li>
  * </ul>
  * <p>
  * The application specific behavior is implemented in {@link IClassLoader} instances. The used

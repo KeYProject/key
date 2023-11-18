@@ -207,9 +207,10 @@ public final class Main {
         LOGGER.debug("OS: {}", System.getProperty("java.os"));
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
-        LOGGER.debug("Total memory: {} MB", (rt.totalMemory() / 1048576.0));
-        LOGGER.debug("Maximum memory:  {} MB", (rt.maxMemory() / 1048576.0));
-        LOGGER.debug("Free memory: {} MB", (rt.freeMemory() / 1048576.0));
+        LOGGER.info("Memory: total {} MB, max {} MB, free {} MB",
+            rt.totalMemory() / 1048576.0,
+            rt.maxMemory() / 1048576.0,
+            rt.freeMemory() / 1048576.0);
         LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 

@@ -18,15 +18,20 @@ import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Executes s given script.
+ */
 public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Message>
         implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
@@ -151,8 +156,9 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      * initiate the GUI stuff and relay to superclass
      */
     public void init() {
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
+        mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof(),
+            true, false);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -177,19 +183,29 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> mediator.startInterface(true), 1000);
-        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
 
-        try {
-            if (!mediator.getSelectedProof().closed()) {
-                mediator.getSelectionModel()
+        final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof();
+        mediator.finishAutoMode(proof, true, true,
+            () -> {
+                selectGoalOrNode();
+            });
+    }
+
+    private void selectGoalOrNode() {
+        final KeYSelectionModel selectionModel = mediator.getSelectionModel();
+        if (!mediator.getSelectedProof().closed()) {
+            try {
+                selectionModel
                         .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
+                return;
+            } catch (ScriptException e) {
+                LOGGER.warn("Script threw exception", e);
+            } catch (Exception e) {
+                LOGGER.warn("Unexpected exception", e);
             }
-        } catch (ScriptException e) {
-            LOGGER.warn("", e);
         }
-
-        mediator.setInteractive(true);
+        selectionModel.defaultSelection();
     }
 
     private static void runWithDeadline(Runnable runnable, int milliseconds) {

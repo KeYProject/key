@@ -120,7 +120,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * Checks if the given node is a parent of the other given node.
      *
      * @param node The {@link Node} to start search in.
-     * @param node The {@link Node} that is thought to be the parent.
+     * @param parent The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
     public boolean isParentNode(Node node, Node parent) {

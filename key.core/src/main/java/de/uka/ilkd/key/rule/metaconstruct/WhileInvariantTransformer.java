@@ -71,7 +71,8 @@ public final class WhileInvariantTransformer {
     /**
      * initialises this meta operator
      *
-     * @param term the instantiated Term passed to the TermTransformer
+     * @param initialPost TODO
+     * @param invariantFramingTermination TODO
      * @param services the Services providing access to signature and type model
      */
     private void init(Term initialPost, Term invariantFramingTermination, Services services) {

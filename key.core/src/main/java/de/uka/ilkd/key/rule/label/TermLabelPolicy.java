@@ -4,24 +4,21 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
  * A {@link TermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels( TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels}
  * to decide for each {@link TermLabel} of an old {@link Term} if it should be re-added to the new
  * {@link Term} or not.
  * </p>

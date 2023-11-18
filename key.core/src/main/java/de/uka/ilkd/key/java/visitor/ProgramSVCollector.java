@@ -61,7 +61,6 @@ public class ProgramSVCollector extends JavaASTWalker {
      * variables must be taken into consideration, but also program meta constructs with implicit
      * schema variables containment
      *
-     * @see ProgramTransformerWithSV
      */
     protected void doAction(ProgramElement node) {
         if (node instanceof SchemaVariable) {

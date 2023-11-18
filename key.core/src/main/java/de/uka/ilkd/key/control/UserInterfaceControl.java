@@ -66,7 +66,7 @@ public interface UserInterfaceControl {
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or
      *        overwrite saved PO {@link Properties}.
      * @param forceNewProfileOfNewProofs {@code} true
-     *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @param callbackProofLoaded receives the proof after it is loaded, but before it is replayed

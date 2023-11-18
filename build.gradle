@@ -73,13 +73,13 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.9")
 
         testImplementation("ch.qos.logback:logback-classic:1.4.11")
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
         testImplementation project(':key.util')
 
         testCompileOnly 'junit:junit:4.13.2'
-        //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.0'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 
         implementation("org.jspecify:jspecify:0.3.0")
     }
@@ -339,9 +339,9 @@ subprojects {
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
             if(project.name == 'recoder') {
-                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|public|class|module|//)')
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
             }else {
-                licenseHeaderFile("$rootDir/gradle/header", '(package|import|public|class|module|//)')
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }
     }

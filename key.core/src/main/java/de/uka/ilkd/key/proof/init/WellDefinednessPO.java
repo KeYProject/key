@@ -34,13 +34,13 @@ import org.key_project.util.collection.ImmutableSet;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * WD(&lt;generalAssumptions&gt; && &lt;preconditions&gt;) &
- * (&lt;generalAssumptions&gt; & &lt;preconditions&gt;
- *    -> WD(&lt;otherClauses&gt;) &
- *       {anon^assignable}WD(&lt;postconditions&gt;)
- * </code>
+ * WD(<generalAssumptions> && <preconditions>) &
+ * (<generalAssumptions> & <preconditions>
+ *    -> WD(<otherClauses>) &
+ *       {anon^assignable}WD(<postconditions>)
+ * }
  * </pre>
  * </p>
  *

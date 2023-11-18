@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.proof.reference;
 
 import java.io.File;
-import javax.swing.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,10 +43,10 @@ class TestReferenceSearcher {
                         .toPath());
         Proof p2 = env2.getLoadedProof();
 
-        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
-        previousProofs.addElement(p2);
-        DefaultListModel<Proof> newProof = new DefaultListModel<>();
-        newProof.addElement(p);
+        List<Proof> previousProofs = new CopyOnWriteArrayList<>();
+        previousProofs.add(p2);
+        List<Proof> newProof = new CopyOnWriteArrayList<>();
+        newProof.add(p);
 
         Node foundReference = null;
         ClosedBy close = null;
@@ -69,7 +70,7 @@ class TestReferenceSearcher {
             // verify that the reference searcher ignores the current proof
             assertNull(ReferenceSearcher.findPreviousProof(newProof, n));
             // verify that no match can be found
-            assertNull(ReferenceSearcher.findPreviousProof(new DefaultListModel<>(), n));
+            assertNull(ReferenceSearcher.findPreviousProof(new CopyOnWriteArrayList<>(), n));
         }
 
         // test that copying works
@@ -79,7 +80,6 @@ class TestReferenceSearcher {
         assertTrue(p.closed());
         foundReference.proof().copyCachedGoals(p2, null, null);
         assertTrue(p.closed());
-
         GeneralSettings.noPruningClosed = true;
         p.dispose();
         p2.dispose();
@@ -106,10 +106,8 @@ class TestReferenceSearcher {
                 "proofCaching/proofWithRule.proof").toPath());
         Proof p3 = env3.getLoadedProof();
 
-        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
-        previousProofs.addElement(p);
-        DefaultListModel<Proof> newProof = new DefaultListModel<>();
-        newProof.addElement(p2);
+        List<Proof> previousProofs = new CopyOnWriteArrayList<>();
+        previousProofs.add(p);
 
         p2.pruneProof(p2.root());
 

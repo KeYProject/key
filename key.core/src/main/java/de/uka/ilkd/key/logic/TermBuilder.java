@@ -1694,10 +1694,11 @@ public class TermBuilder {
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
-            if (labels != null || !labels.isEmpty()) {
+            if (labels != null && !labels.isEmpty()) {
                 for (TermLabel newLabel : labels) {
-                    for (TermLabel oldLabel : newLabelList) {
-                        if (oldLabel.getClass().equals(newLabel.getClass())) {
+                    for (TermLabel oldLabel : term.getLabels()) {
+                        if (oldLabel.equals(newLabel) || (oldLabel.getClass() == newLabel.getClass()
+                                && oldLabel instanceof OriginTermLabel)) {
                             newLabelList.remove(oldLabel);
                             break;
                         }

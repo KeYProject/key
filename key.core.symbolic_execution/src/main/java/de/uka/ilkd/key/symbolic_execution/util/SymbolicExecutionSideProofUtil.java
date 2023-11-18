@@ -32,7 +32,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -340,7 +339,7 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     /**
-     * Utility method used by {@link QuerySideProofRule#containsModalityOrQuery(Term)}.
+     * Utility method used by {@link #containsModalityOrQuery(Term)}.
      *
      * @author Martin Hentschel
      */
@@ -490,7 +489,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     /**
      * Utility class used by
-     * {@link QuerySideProofRule#containsIrrelevantThings(Services, SequentFormula, Set)}.
+     * {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */

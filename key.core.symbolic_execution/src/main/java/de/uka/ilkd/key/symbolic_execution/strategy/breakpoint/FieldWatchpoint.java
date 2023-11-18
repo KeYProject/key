@@ -37,7 +37,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
      * @param fieldName the field to watch
      * @param isAcces flag to watch for accesses
      * @param isModification flag to watch for modifications
-     * @param containerType the type of the element containing the breakpoint
+     * @param containerKJT the type of the element containing the breakpoint
      * @param proof the {@link Proof} that will be executed and should stop
      */
     public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces,

@@ -53,7 +53,6 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      * {@code svInst} by its instantiation
      *
      * @param svInst mapping of schemavariables to their instantiation
-     * @param localSpecRepo TODO
      * @param services the Services
      */
     public LightweightSyntacticalReplaceVisitor(SVInstantiations svInst, Services services) {
