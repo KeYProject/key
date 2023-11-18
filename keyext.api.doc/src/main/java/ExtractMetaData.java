@@ -1,18 +1,6 @@
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
-import com.google.gson.*;
-import de.uka.ilkd.key.proof.Proof;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.keyproject.key.api.remoteapi.KeyApi;
-import org.keyproject.key.api.remoteclient.ClientApi;
-import sun.misc.Unsafe;
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,6 +12,22 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import de.uka.ilkd.key.proof.Proof;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
+import com.google.gson.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
+import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.keyproject.key.api.remoteapi.KeyApi;
+import org.keyproject.key.api.remoteclient.ClientApi;
+import sun.misc.Unsafe;
 
 /**
  * @author Alexander Weigl
@@ -51,7 +55,8 @@ public class ExtractMetaData {
         runGenerator("server.py", PythionGenerator.PyApiGen::new);
     }
 
-    private static void runGenerator(String target, Function<Metamodel.KeyApi, Supplier<String>> api) {
+    private static void runGenerator(String target,
+            Function<Metamodel.KeyApi, Supplier<String>> api) {
         try {
             var n = api.apply(keyApi);
             Files.writeString(Paths.get(target), n.get());
@@ -65,7 +70,8 @@ public class ExtractMetaData {
                 .setPrettyPrinting()
                 .registerTypeAdapter(Type.class, new JsonSerializer<Metamodel.Type>() {
                     @Override
-                    public JsonElement serialize(Metamodel.Type src, Type typeOfSrc, JsonSerializationContext context) {
+                    public JsonElement serialize(Metamodel.Type src, Type typeOfSrc,
+                            JsonSerializationContext context) {
                         JsonObject json = (JsonObject) context.serialize(src);
                         json.addProperty("kind", src.kind());
                         return json;
@@ -76,7 +82,8 @@ public class ExtractMetaData {
 
     private static void addServerEndpoint(Method method) {
         var jsonSegment = method.getDeclaringClass().getAnnotation(JsonSegment.class);
-        if (jsonSegment == null) return;
+        if (jsonSegment == null)
+            return;
         var segment = jsonSegment.value();
 
         var req = method.getAnnotation(JsonRequest.class);
@@ -131,27 +138,41 @@ public class ExtractMetaData {
             return getOrFindType(type.getTypeParameters()[0].getClass());
         }
 
-        if (type == Unsafe.class || type == Class.class || type == Constructor.class || type == Proof.class) {
+        if (type == Unsafe.class || type == Class.class || type == Constructor.class
+                || type == Proof.class) {
             throw new IllegalStateException("Forbidden class reached!");
         }
 
-        if (type == String.class) return Metamodel.BuiltinType.STRING;
-        if (type == Integer.class) return Metamodel.BuiltinType.INT;
-        if (type == Double.class) return Metamodel.BuiltinType.DOUBLE;
-        if (type == Long.class) return Metamodel.BuiltinType.LONG;
-        if (type == Character.class) return Metamodel.BuiltinType.LONG;
-        if (type == File.class) return Metamodel.BuiltinType.STRING;
-        if (type == Boolean.class) return Metamodel.BuiltinType.BOOL;
-        if (type == Boolean.TYPE) return Metamodel.BuiltinType.BOOL;
+        if (type == String.class)
+            return Metamodel.BuiltinType.STRING;
+        if (type == Integer.class)
+            return Metamodel.BuiltinType.INT;
+        if (type == Double.class)
+            return Metamodel.BuiltinType.DOUBLE;
+        if (type == Long.class)
+            return Metamodel.BuiltinType.LONG;
+        if (type == Character.class)
+            return Metamodel.BuiltinType.LONG;
+        if (type == File.class)
+            return Metamodel.BuiltinType.STRING;
+        if (type == Boolean.class)
+            return Metamodel.BuiltinType.BOOL;
+        if (type == Boolean.TYPE)
+            return Metamodel.BuiltinType.BOOL;
 
-        if (type == Integer.TYPE) return Metamodel.BuiltinType.INT;
-        if (type == Double.TYPE) return Metamodel.BuiltinType.DOUBLE;
-        if (type == Long.TYPE) return Metamodel.BuiltinType.LONG;
-        if (type == Character.TYPE) return Metamodel.BuiltinType.LONG;
+        if (type == Integer.TYPE)
+            return Metamodel.BuiltinType.INT;
+        if (type == Double.TYPE)
+            return Metamodel.BuiltinType.DOUBLE;
+        if (type == Long.TYPE)
+            return Metamodel.BuiltinType.LONG;
+        if (type == Character.TYPE)
+            return Metamodel.BuiltinType.LONG;
 
         System.out.println(type);
         var t = types.stream().filter(it -> it.name().equals(type.getSimpleName())).findFirst();
-        if (t.isPresent()) return t.get();
+        if (t.isPresent())
+            return t.get();
         var a = createType(type);
         types.add(a);
         return a;
@@ -161,8 +182,8 @@ public class ExtractMetaData {
         final var documentation = findDocumentation(type);
         if (type.isEnum())
             return new Metamodel.EnumType(type.getSimpleName(),
-                    Arrays.stream(type.getEnumConstants()).map(Object::toString).toList(),
-                    documentation);
+                Arrays.stream(type.getEnumConstants()).map(Object::toString).toList(),
+                documentation);
 
 
         var obj = new Metamodel.ObjectType(type.getSimpleName(), new ArrayList<>(), documentation);
@@ -186,7 +207,8 @@ public class ExtractMetaData {
                 e.printStackTrace();
                 return "";
             }
-        } else return "";
+        } else
+            return "";
     }
 
     private static Path findFileForType(Class<?> type) {
@@ -226,7 +248,8 @@ public class ExtractMetaData {
         }
     }
 
-    private static String callMethodName(String method, String segment, String userValue, boolean useSegment) {
+    private static String callMethodName(String method, String segment, String userValue,
+            boolean useSegment) {
         if (!useSegment) {
             if (userValue == null || userValue.isBlank()) {
                 return method;
@@ -243,9 +266,11 @@ public class ExtractMetaData {
     }
 
     private static Metamodel.Type getOrFindType(Type genericReturnType) {
-        if (genericReturnType instanceof Class c) return getOrFindType(c);
+        if (genericReturnType instanceof Class c)
+            return getOrFindType(c);
         if (genericReturnType instanceof ParameterizedType pt) {
-            if (Objects.equals(pt.getRawType().getTypeName(), CompletableFuture.class.getTypeName())) {
+            if (Objects.equals(pt.getRawType().getTypeName(),
+                CompletableFuture.class.getTypeName())) {
                 return getOrFindType(pt.getActualTypeArguments()[0]);
             }
             if (Objects.equals(pt.getRawType().getTypeName(), List.class.getTypeName())) {

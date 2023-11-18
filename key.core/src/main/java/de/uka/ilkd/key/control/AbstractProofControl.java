@@ -564,7 +564,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals) throws InterruptedException {
+    public void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals)
+            throws InterruptedException {
         startAutoMode(proof, goals);
         waitWhileAutoMode();
     }

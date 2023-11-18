@@ -131,7 +131,8 @@ public class Main {
      * @param env the {@link KeYEnvironment} in which to prove the contract
      * @param contract the {@link Contract} to be proven
      */
-    private static void proveContract(KeYEnvironment<?> env, Contract contract) throws InterruptedException {
+    private static void proveContract(KeYEnvironment<?> env, Contract contract)
+            throws InterruptedException {
         Proof proof = null;
         try {
             // Create proof

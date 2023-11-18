@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -16,10 +19,8 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.ProofStarter;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link ProofControl}.
@@ -45,12 +46,12 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * Constructor.
      *
-     * @param ui                        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
-     *                                  to all started {@link ApplyStrategy} instances.
+     *        to all started {@link ApplyStrategy} instances.
      */
     public DefaultProofControl(UserInterfaceControl ui,
-                               DefaultUserInterfaceControl defaultProverTaskListener) {
+            DefaultUserInterfaceControl defaultProverTaskListener) {
         super(defaultProverTaskListener);
         this.ui = ui;
     }
@@ -58,21 +59,21 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * Constructor.
      *
-     * @param ui                        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
-     *                                  to all started {@link ApplyStrategy} instances.
-     * @param ruleCompletionHandler     An optional {@link RuleCompletionHandler}.
+     *        to all started {@link ApplyStrategy} instances.
+     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
     public DefaultProofControl(UserInterfaceControl ui,
-                               DefaultUserInterfaceControl defaultProverTaskListener,
-                               RuleCompletionHandler ruleCompletionHandler) {
+            DefaultUserInterfaceControl defaultProverTaskListener,
+            RuleCompletionHandler ruleCompletionHandler) {
         super(defaultProverTaskListener, ruleCompletionHandler);
         this.ui = ui;
     }
 
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
-                                           ProverTaskListener ptl) {
+            ProverTaskListener ptl) {
         if (!isInAutoMode()) {
             autoModeThread = new AutoModeThread(proof, goals, ptl);
             autoModeThread.start();
@@ -121,7 +122,7 @@ public class DefaultProofControl extends AbstractProofControl {
                 fireAutoModeStarted(new ProofEvent(proof));
                 ProofStarter starter = ptl != null
                         ? new ProofStarter(
-                        new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
+                            new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
                         : new ProofStarter(getDefaultProverTaskListener(), false);
                 starter.init(proof);
                 if (goals != null) {

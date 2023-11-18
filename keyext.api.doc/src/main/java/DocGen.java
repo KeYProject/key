@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
@@ -47,9 +50,9 @@ public class DocGen implements Supplier<String> {
     }
 
     private void endpoints(Metamodel.Endpoint endpoint) {
-        //out.format("## Group: %s%n%n", getJsonSegment(typeDeclaration));
-        //out.println(getJavaDoc(typeDeclaration));
-        //out.println("\n");
+        // out.format("## Group: %s%n%n", getJsonSegment(typeDeclaration));
+        // out.println(getJavaDoc(typeDeclaration));
+        // out.println("\n");
 
         var direction = "";
         if (endpoint instanceof Metamodel.ServerRequest sr)
@@ -91,9 +94,9 @@ public class DocGen implements Supplier<String> {
                     }
                     ```
                     """.formatted(type.name(),
-                    ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
-                            .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
-                            .collect(Collectors.joining("\n"))));
+                ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
+                        .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
+                        .collect(Collectors.joining("\n"))));
         }
 
         if (type instanceof Metamodel.EnumType et) {
@@ -101,89 +104,87 @@ public class DocGen implements Supplier<String> {
                     ```
                     enum %s { %s }
                     ```
-                    """.formatted(type.name(), String.join(", ", et.values())
-            ));
+                    """.formatted(type.name(), String.join(", ", et.values())));
             out.format(type.documentation());
         }
         out.format(type.documentation());
         out.println();
     }
 
-        /*
-        private static String getCallName (MethodDeclaration m, TypeDeclaration < ?>td){
-            var annotationExpr = m.getAnnotationByName("JsonNotification").or(
-                            () -> m.getAnnotationByName("JsonRequest"))
-                    .orElseThrow();
-
-            var segment = getJsonSegment(td) + "/";
-            String name = "";
-
-            if (annotationExpr.isMarkerAnnotationExpr()) {
-                name = m.getNameAsString();
-            } else if (annotationExpr.isSingleMemberAnnotationExpr()) {
-                var sma = annotationExpr.asSingleMemberAnnotationExpr();
-                name = sma.getMemberValue().asLiteralStringValueExpr().getValue();
-            } else {
-                var ne = annotationExpr.asNormalAnnotationExpr();
-                for (MemberValuePair pair : ne.getPairs()) {
-                    switch (pair.getName().asString()) {
-                        case "value":
-                            name = pair.getValue().asLiteralStringValueExpr().getValue();
-                            break;
-                        case "useSegment":
-                            if (!pair.getValue().asBooleanLiteralExpr().getValue()) {
-                                segment = "";
-                            }
-                    }
-                }
-            }
-            return segment + name;
-        }
-
-        @Nonnull
-        private static String getJavaDoc (NodeWithJavadoc < ? > typeDeclaration){
-            if (typeDeclaration.getJavadoc().isPresent()) {
-                final var javadoc = typeDeclaration.getJavadoc().get();
-                return javadoc.getDescription().toText()
-                        + "\n\n"
-                        + javadoc.getBlockTags().stream().map(it -> "* " + it.toText())
-                        .collect(Collectors.joining("\n"));
-            }
-            return "";
-        }
-
-        private static String type (MethodDeclaration method){
-            if (method.getAnnotationByName("JsonNotification").isPresent())
-                return "notification";
-            if (method.getAnnotationByName("JsonRequest").isPresent())
-                return "request";
-            return "";
-        }
-
-        private static boolean isExported (MethodDeclaration method){
-            return method.getAnnotationByName("JsonNotification").isPresent()
-                    || method.getAnnotationByName("JsonRequest").isPresent();
-        }
-
-        private void printHeader () {
-            out.format("# KeY-API%n%n");
-        }
-
-        private void printFooter () {
-        }
-
-
     /*
-    private static boolean hasJsonSegment(TypeDeclaration<?> it) {
-        return it.getAnnotationByName("JsonSegment").isPresent();
-    }
-
-    private static String getJsonSegment(TypeDeclaration<?> it) {
-        var ae = it.getAnnotationByName("JsonSegment").get();
-        return ae.asSingleMemberAnnotationExpr().getMemberValue()
-                .asLiteralStringValueExpr().getValue();
-    }
+     * private static String getCallName (MethodDeclaration m, TypeDeclaration < ?>td){
+     * var annotationExpr = m.getAnnotationByName("JsonNotification").or(
+     * () -> m.getAnnotationByName("JsonRequest"))
+     * .orElseThrow();
+     *
+     * var segment = getJsonSegment(td) + "/";
+     * String name = "";
+     *
+     * if (annotationExpr.isMarkerAnnotationExpr()) {
+     * name = m.getNameAsString();
+     * } else if (annotationExpr.isSingleMemberAnnotationExpr()) {
+     * var sma = annotationExpr.asSingleMemberAnnotationExpr();
+     * name = sma.getMemberValue().asLiteralStringValueExpr().getValue();
+     * } else {
+     * var ne = annotationExpr.asNormalAnnotationExpr();
+     * for (MemberValuePair pair : ne.getPairs()) {
+     * switch (pair.getName().asString()) {
+     * case "value":
+     * name = pair.getValue().asLiteralStringValueExpr().getValue();
+     * break;
+     * case "useSegment":
+     * if (!pair.getValue().asBooleanLiteralExpr().getValue()) {
+     * segment = "";
+     * }
+     * }
+     * }
+     * }
+     * return segment + name;
+     * }
+     *
+     * @Nonnull
+     * private static String getJavaDoc (NodeWithJavadoc < ? > typeDeclaration){
+     * if (typeDeclaration.getJavadoc().isPresent()) {
+     * final var javadoc = typeDeclaration.getJavadoc().get();
+     * return javadoc.getDescription().toText()
+     * + "\n\n"
+     * + javadoc.getBlockTags().stream().map(it -> "* " + it.toText())
+     * .collect(Collectors.joining("\n"));
+     * }
+     * return "";
+     * }
+     *
+     * private static String type (MethodDeclaration method){
+     * if (method.getAnnotationByName("JsonNotification").isPresent())
+     * return "notification";
+     * if (method.getAnnotationByName("JsonRequest").isPresent())
+     * return "request";
+     * return "";
+     * }
+     *
+     * private static boolean isExported (MethodDeclaration method){
+     * return method.getAnnotationByName("JsonNotification").isPresent()
+     * || method.getAnnotationByName("JsonRequest").isPresent();
+     * }
+     *
+     * private void printHeader () {
+     * out.format("# KeY-API%n%n");
+     * }
+     *
+     * private void printFooter () {
+     * }
+     *
+     *
+     * /*
+     * private static boolean hasJsonSegment(TypeDeclaration<?> it) {
+     * return it.getAnnotationByName("JsonSegment").isPresent();
+     * }
+     *
+     * private static String getJsonSegment(TypeDeclaration<?> it) {
+     * var ae = it.getAnnotationByName("JsonSegment").get();
+     * return ae.asSingleMemberAnnotationExpr().getMemberValue()
+     * .asLiteralStringValueExpr().getValue();
+     * }
      */
 
 }
-

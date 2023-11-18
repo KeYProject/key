@@ -774,7 +774,7 @@ public final class Goal {
             if (just == null) {
                 continue; // do not break system because of this
             }
-            s.add(app.taclet()); //TODO not good
+            s.add(app.taclet()); // TODO not good
         }
         return s;
     }

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.smt.IllegalNumberException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,7 +24,8 @@ public class ProofScriptCommandFacade {
     }
 
     public static ProofScriptCommandFacade instance() {
-        if(INSTANCE == null) INSTANCE = new ProofScriptCommandFacade();
+        if (INSTANCE == null)
+            INSTANCE = new ProofScriptCommandFacade();
         return INSTANCE;
     }
 
