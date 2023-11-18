@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -27,16 +28,16 @@ public class RecSubTermFeature implements TermFeature {
         return new RecSubTermFeature(cond, summand);
     }
 
-    public RuleAppCost compute(Term term, Services services) {
-        RuleAppCost res = summand.compute(term, services);
+    public RuleAppCost compute(Term term, MutableState mState, Services services) {
+        RuleAppCost res = summand.compute(term, mState, services);
 
         if (res instanceof TopRuleAppCost
-                || cond.compute(term, services) instanceof TopRuleAppCost) {
+                || cond.compute(term, mState, services) instanceof TopRuleAppCost) {
             return res;
         }
 
         for (int i = 0; i != term.arity() && !(res instanceof TopRuleAppCost); ++i) {
-            res = res.add(compute(term.sub(i), services));
+            res = res.add(compute(term.sub(i), mState, services));
         }
 
         return res;

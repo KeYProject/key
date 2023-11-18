@@ -11,24 +11,24 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
 
 // a simple cache for the results of the method <code>createList</code>
 public final class IfFormulaInstantiationCache {
 
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableList<IfFormulaInstantiation>>> antecCache =
+    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>>> antecCache =
         new LRUCache<>(50);
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableList<IfFormulaInstantiation>>> succCache =
+    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>>> succCache =
         new LRUCache<>(50);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public ImmutableList<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
+    public ImmutableArray<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
         try {
             readLock.lock();
-            final Pair<Semisequent, ImmutableList<IfFormulaInstantiation>> p =
+            final Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>> p =
                 (antec ? antecCache : succCache).get(System.identityHashCode(s));
             return p != null && p.first == s ? p.second : null;
         } finally {
@@ -37,7 +37,7 @@ public final class IfFormulaInstantiationCache {
     }
 
     public void put(boolean antec, Semisequent s,
-            ImmutableList<IfFormulaInstantiation> value) {
+            ImmutableArray<IfFormulaInstantiation> value) {
         try {
             writeLock.lock();
             (antec ? antecCache : succCache).put(System.identityHashCode(s), new Pair<>(s, value));

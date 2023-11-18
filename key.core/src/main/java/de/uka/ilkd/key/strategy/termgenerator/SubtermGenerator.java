@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -38,8 +39,10 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new LeftIterator(getTermInst(app, pos, goal), goal.proof().getServices());
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
+                    goal.proof().getServices());
             }
         };
     }
@@ -50,27 +53,30 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new RightIterator(getTermInst(app, pos, goal), goal.proof().getServices());
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
+                return new RightIterator(getTermInst(app, pos, goal, mState), mState,
+                    goal.proof().getServices());
             }
         };
     }
 
-    protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return completeTerm.toTerm(app, pos, goal);
+    protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return completeTerm.toTerm(app, pos, goal, mState);
     }
 
-    private boolean descendFurther(Term t, Services services) {
-        return !(cond.compute(t, services) instanceof TopRuleAppCost);
+    private boolean descendFurther(Term t, MutableState mState, Services services) {
+        return !(cond.compute(t, mState, services) instanceof TopRuleAppCost);
     }
 
     abstract static class SubIterator implements Iterator<Term> {
         protected ImmutableList<Term> termStack;
-
+        protected final MutableState mState;
         protected final Services services;
 
-        public SubIterator(Term t, Services services) {
+        public SubIterator(Term t, MutableState mState, Services services) {
             termStack = ImmutableSLList.<Term>nil().prepend(t);
+            this.mState = mState;
             this.services = services;
         }
 
@@ -80,15 +86,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class LeftIterator extends SubIterator {
-        public LeftIterator(Term t, Services services) {
-            super(t, services);
+        public LeftIterator(Term t, MutableState mState, Services services) {
+            super(t, mState, services);
         }
 
         public Term next() {
             final Term res = termStack.head();
             termStack = termStack.tail();
 
-            if (descendFurther(res, services)) {
+            if (descendFurther(res, mState, services)) {
                 for (int i = res.arity() - 1; i >= 0; --i) {
                     termStack = termStack.prepend(res.sub(i));
                 }
@@ -107,15 +113,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class RightIterator extends SubIterator {
-        public RightIterator(Term t, Services services) {
-            super(t, services);
+        public RightIterator(Term t, MutableState mState, Services services) {
+            super(t, mState, services);
         }
 
         public Term next() {
             final Term res = termStack.head();
             termStack = termStack.tail();
 
-            if (descendFurther(res, services)) {
+            if (descendFurther(res, mState, services)) {
                 for (int i = 0; i != res.arity(); ++i) {
                     termStack = termStack.prepend(res.sub(i));
                 }

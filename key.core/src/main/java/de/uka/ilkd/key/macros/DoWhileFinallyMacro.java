@@ -15,9 +15,9 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the
- * macro given by {@link getProofMacro()} as long the given bound of steps is not reached yet, the
- * condition given by {@link getCondition()} holds, and the macro is applicable. When this becomes
- * false and the step bound is not reached yet, the macro given by {@link getAltProofMacro()} is
+ * macro given by {@link #getProofMacro()} as long the given bound of steps is not reached yet, the
+ * condition given by {@link #getCondition()} holds, and the macro is applicable. When this becomes
+ * false and the step bound is not reached yet, the macro given by {@link #getAltProofMacro()} is
  * applied.
  *
  * @author Michael Kirsten

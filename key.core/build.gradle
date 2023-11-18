@@ -70,6 +70,10 @@ task generateSMTListings {
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
     // ${project.buildDir}
+    inputs.files fileTree("$resourcesDir/$pack", {
+        exclude "$resourcesDir/$pack/DefinedSymbolsHandler.preamble.xml"
+    })
+    outputs.files file("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml")
     doLast {
         new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
             list.writeLine '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
@@ -91,6 +95,10 @@ task generateSolverPropsList {
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
     // ${project.buildDir}
+    inputs.files fileTree("$outputDir/$pack/", {
+        exclude "./solvers.txt"
+    })
+    outputs.files file("$outputDir/$pack/solvers.txt")
     doLast {
         def list = []
         def dir = new File("$outputDir/$pack/")
@@ -100,14 +108,12 @@ task generateSolverPropsList {
             }
         })
         list.sort()
-        if (!file("$outputDir/$pack/solvers.txt").exists()) {
-            String files = ''
-            for (String propsFile : list) {
-                files += propsFile + System.lineSeparator()
-            }
-            new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
-                listSolvers.write files
-            }
+        String files = ''
+        for (String propsFile : list) {
+            files += propsFile + System.lineSeparator()
+        }
+        new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
+            listSolvers.write files
         }
     }
 }
@@ -171,6 +177,7 @@ task generateVersionFiles() {
     def branch = new File(outputFolder, "branch")
     def versionf = new File(outputFolder, "version")
 
+    inputs.files "$project.rootDir/.git/HEAD"
     outputs.files sha1, branch, versionf
 
     def gitRevision = gitRevParse('HEAD')
@@ -183,8 +190,18 @@ task generateVersionFiles() {
     }
 }
 
+// Helper function that calls "git rev-parse" to
+// find names/SHAs for commits
+static def gitRevParse(String args) {
+    try {
+        return "git rev-parse $args".execute().text.trim()
+    } catch (Exception e) {
+        return ""
+    }
+}
+
 // @AW: Say something here. From POV this explain by itself.
-processResources.dependsOn generateVersionFiles
+processResources.dependsOn generateVersionFiles, generateSolverPropsList, generateSMTListings
 
 def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
 task runAntlr4Key(type: JavaExec) {

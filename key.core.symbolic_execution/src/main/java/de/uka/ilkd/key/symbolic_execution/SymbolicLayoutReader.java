@@ -504,7 +504,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child {@link ISymbolicEquivalenceClass}.
          *
-         * @param object The {@link ISymbolicEquivalenceClass} to add.
+         * @param ec The {@link ISymbolicEquivalenceClass} to add.
          */
         public void addEquivalenceClass(ISymbolicEquivalenceClass ec) {
             equivalenceClasses = equivalenceClasses.append(ec);
@@ -1096,7 +1096,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child term string.
          *
-         * @param object The term string to add.
+         * @param termString The term string to add.
          */
         public void addTermString(String termString) {
             this.termStrings = termStrings.append(termString);

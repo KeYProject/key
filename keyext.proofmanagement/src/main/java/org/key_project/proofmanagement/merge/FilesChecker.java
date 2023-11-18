@@ -11,9 +11,10 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
@@ -26,7 +27,7 @@ public class FilesChecker {
         R apply(T t) throws IOException;
     }
 
-    static boolean listOfPathsConsistent(@Nonnull List<Path> paths) {
+    static boolean listOfPathsConsistent(@NonNull List<Path> paths) {
         boolean res = true;
         Path reference = paths.get(0);
         for (int i = 1; i < paths.size(); i++) {

@@ -6,26 +6,22 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels( TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link Term}.
  * </p>
  * <p>
@@ -58,16 +54,11 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-     * @param newTermSubs The optional children of the {@link Term} to create.
-     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to
-     *        create.
-     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+     * @param newTerm the template for the new {@link Term} to create
      * @param labels The {@link Set} of {@link TermLabel}s to modify.
      */
     void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
-            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            JavaBlock newTermJavaBlock, Set<TermLabel> labels);
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Set<TermLabel> labels);
 }

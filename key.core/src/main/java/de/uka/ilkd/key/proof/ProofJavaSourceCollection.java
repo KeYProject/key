@@ -33,6 +33,8 @@ public class ProofJavaSourceCollection {
     /** @see #getRelevantFiles() */
     private ImmutableSet<URI> relevantFiles = DefaultImmutableSet.nil();
 
+    public ProofJavaSourceCollection() {}
+
     /**
      * <p>
      * Returns a set containing URIs of all files relevant to this proof.

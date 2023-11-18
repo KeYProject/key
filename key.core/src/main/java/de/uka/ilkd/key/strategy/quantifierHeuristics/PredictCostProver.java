@@ -246,7 +246,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.nil();
+        private ImmutableSet<Term> literals;
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;

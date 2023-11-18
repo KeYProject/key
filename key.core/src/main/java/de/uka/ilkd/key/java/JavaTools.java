@@ -83,10 +83,6 @@ public final class JavaTools {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
 
-            protected void doAction(ProgramElement node) {
-                node.visit(this);
-            }
-
             protected void doDefaultAction(SourceElement node) {
                 if (node instanceof MethodFrame && res == null) {
                     res = (MethodFrame) node;

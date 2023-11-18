@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.Proof;
  * instance that started the strategies.
  *
  * It contains statistic information about the number of applied rules, time needed or number of
- * closed goals. In case the rule application stopped at a non closeable goal, this goal is also
+ * closed goals. In case the rule application stopped at a non-closeable goal, this goal is also
  * stored to allow the caller to e.g. present it to the user for interaction.
  *
  * In case of an unexpected, the thrown exception can be also retrieved from this container.

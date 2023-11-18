@@ -5,8 +5,9 @@ package de.uka.ilkd.key.settings;
 
 import java.io.File;
 import java.util.Properties;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class TestGenerationSettings extends AbstractSettings {
     // region Default Values for option fields
@@ -279,7 +280,7 @@ public class TestGenerationSettings extends AbstractSettings {
     @Nullable
     private static TestGenerationSettings instance;
 
-    public static @Nonnull TestGenerationSettings getInstance() {
+    public static @NonNull TestGenerationSettings getInstance() {
         if (instance == null) {
             instance = new TestGenerationSettings();
             ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(instance);

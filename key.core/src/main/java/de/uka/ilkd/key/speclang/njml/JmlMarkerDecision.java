@@ -8,7 +8,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -37,7 +38,7 @@ public class JmlMarkerDecision {
      *
      * @param markers a collection of keys without prefix ([+-])
      */
-    public void setEnabledKeys(@Nonnull Collection<String> markers) {
+    public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 

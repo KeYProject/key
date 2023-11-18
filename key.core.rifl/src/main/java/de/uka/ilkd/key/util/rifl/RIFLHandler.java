@@ -204,47 +204,23 @@ class RIFLHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
-
         switch (localName) {
-        case "sourcedompair":
-        case "source":
-            startSources();
-            break;
-        case "sinkdompair":
-        case "sink":
-            startSinks();
-            break;
-        case "category": // TODO: different semantics in "domains" and "sinkdompair"
+        case "sourcedompair", "source" -> startSources();
+        case "sinkdompair", "sink" -> startSinks();
+        case "category" -> // TODO: different semantics in "domains" and "sinkdompair"
             setCategory(attributes);
-            break;
-        case "assign":
-            assignHandle(attributes);
-            break;
+        case "assign" -> assignHandle(attributes);
+
         // case "domainassignment":
-        case "domains":
-            startDomains();
-            break;
-        case "domain":
-            putDomain(attributes);
-            break;
-        case "assignable":
-            setAssignable(attributes);
-            break;
-        case "field":
-            putField(attributes);
-            break;
-        case "parameter":
-            putParam(attributes);
-            break;
-        case "returnvalue":
-            putReturn(attributes);
-            break;
-        case "flowrelation":
-            startFlow();
-            break;
-        case "flow":
-            putFlow(attributes);
-            break;
+        case "domains" -> startDomains();
+        case "domain" -> putDomain(attributes);
+        case "assignable" -> setAssignable(attributes);
+        case "field" -> putField(attributes);
+        case "parameter" -> putParam(attributes);
+        case "returnvalue" -> putReturn(attributes);
+        case "flowrelation" -> startFlow();
+        case "flow" -> putFlow(attributes);
+
         // a lot of elements without their own semantics
         // case "riflspec":
         // case "attackerio":
@@ -252,33 +228,25 @@ class RIFLHandler extends DefaultHandler {
         // case "bottom":
         // case "source":
         // case "sink":
-        case "dompair": // TODO
-            // case "domainhierarchy":
-        case "flowpair": // TODO
-            // case "flowpolicy":
-        default:
+        // TODO
+        // case "domainhierarchy":
+        // TODO
+        // case "flowpolicy":
+        default -> {
+        }
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) {
         switch (localName) {
-        case "assignable":
-            unsetAssignable();
-            break;
-        case "category":
-            unsetCategory();
-            break;
-        case "domains":
-            checkDomains();
-            break;
-        case "domainassignment":
-            checkDomainAssignmentsWithFlows();
-            break;
-        case "flowrelation":
-            checkFlows();
-            break;
-        default:
+        case "assignable" -> unsetAssignable();
+        case "category" -> unsetCategory();
+        case "domains" -> checkDomains();
+        case "domainassignment" -> checkDomainAssignmentsWithFlows();
+        case "flowrelation" -> checkFlows();
+        default -> {
+        }
         }
     }
 

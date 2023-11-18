@@ -39,7 +39,6 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *
      * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param vars a variable specification mutable list.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {

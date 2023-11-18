@@ -131,9 +131,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf);
-                        gs.setDocumentation(documentation);
-                        gs.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var gs = new GenericSort(sortName, ext, oneOf, documentation,
+                            BuilderHelpers.getPosition(idCtx));
                         s = gs;
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
@@ -142,14 +141,12 @@ public class DeclarationBuilder extends DefaultBuilder {
                     s = Sort.ANY;
                 } else {
                     if (isProxySort) {
-                        var ps = new ProxySort(sortName, ext);
-                        ps.setDocumentation(documentation);
-                        ps.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var ps = new ProxySort(sortName, ext, documentation,
+                            BuilderHelpers.getPosition(idCtx));
                         s = ps;
                     } else {
-                        var si = new SortImpl(sortName, ext, isAbstractSort);
-                        si.setDocumentation(documentation);
-                        si.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var si = new SortImpl(sortName, ext, isAbstractSort,
+                            documentation, BuilderHelpers.getPosition(idCtx));
                         s = si;
                     }
                 }

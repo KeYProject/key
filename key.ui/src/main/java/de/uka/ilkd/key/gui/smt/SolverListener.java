@@ -206,12 +206,14 @@ public class SolverListener implements SolverLauncherListener {
 
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
-        // To ensure that the next goal is selected correctly, do not fully stop the interface here!
-        mediator.stopInterface(false);
+        // ensure that the goal closing does not lag the UI
+        mediator.stopInterface(true);
         try {
             new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
-            mediator.startInterface(false);
+            mediator.startInterface(true);
+            // switch to new open goal
+            mediator.getSelectionModel().defaultSelection();
         }
 
     }
@@ -377,19 +379,20 @@ public class SolverListener implements SolverLauncherListener {
 
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
-        switch (state) {
-        case Running:
-            running(problem);
-            return true;
-        case Stopped:
-            stopped(problem);
-            return false;
-        case Waiting:
-            waiting(problem);
-            return true;
-
-        }
-        return true;
+        return switch (state) {
+            case Running -> {
+                running(problem);
+                yield true;
+            }
+            case Stopped -> {
+                stopped(problem);
+                yield false;
+            }
+            case Waiting -> {
+                waiting(problem);
+                yield true;
+            }
+        };
 
     }
 
@@ -454,24 +457,17 @@ public class SolverListener implements SolverLauncherListener {
         int x = problem.getSolverIndex();
         int y = problem.getProblemIndex();
         switch (reason) {
-        case Exception:
+        case Exception -> {
             progressModel.setProgress(0, x, y);
             progressModel.setTextColor(RED.get(), x, y);
             progressModel.setText("Exception!", x, y);
-
-
-            break;
-        case NoInterruption:
-            throw new RuntimeException("This position should not be reachable!");
-
-        case Timeout:
+        }
+        case NoInterruption -> throw new RuntimeException("This position should not be reachable!");
+        case Timeout -> {
             progressModel.setProgress(0, x, y);
             progressModel.setText("Timeout.", x, y);
-
-            break;
-        case User:
-            progressModel.setText("Interrupted by user.", x, y);
-            break;
+        }
+        case User -> progressModel.setText("Interrupted by user.", x, y);
         }
     }
 
@@ -578,11 +574,12 @@ public class SolverListener implements SolverLauncherListener {
 
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
-        String message = "You are using a version of " + type.getName()
-            + " which has not been tested for this version of KeY.\nIt can therefore be that"
-            + " errors occur that would not occur\nusing the following version or higher:\n" +
-            type.getMinimumSupportedVersion();
-        return message;
+        return ("""
+                You are using a version of %s which has not been tested for this version of KeY.
+                It can therefore be that errors occur that would not occur
+                using the following version or higher:
+                %s""")
+                .formatted(type.getName(), type.getMinimumSupportedVersion());
     }
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {

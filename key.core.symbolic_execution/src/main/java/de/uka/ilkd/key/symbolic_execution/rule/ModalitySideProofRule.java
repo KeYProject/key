@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -39,6 +38,8 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * A {@link BuiltInRule} which evaluates a modality in a side proof.
@@ -64,7 +65,7 @@ import org.key_project.util.collection.ImmutableList;
  * <li>Succedent: {@code <resultCondition> & <result> = <something>}</li>
  * </ul>
  * The side proof uses the default side proof settings (splitting = delayed) and is started via
- * {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}. In
+ * {@link SymbolicExecutionSideProofUtil#startSideProof}. In
  * case that at least one result branch has applicable rules an exception is thrown and the rule is
  * aborted.
  * </p>
@@ -133,7 +134,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

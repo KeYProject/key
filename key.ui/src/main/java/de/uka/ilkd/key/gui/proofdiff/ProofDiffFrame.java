@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
- *
+ * <p>
  * This class provides a frame which allows the user to display a in-place comparison of two
  * sequents. The comparison happens on the pretty-printed text only, no sophisticated tree
  * comparison. The algorithm is taken from a google library.
@@ -29,15 +29,10 @@ import de.uka.ilkd.key.proof.Proof;
  */
 
 public class ProofDiffFrame extends JFrame {
-
-    private static final long serialVersionUID = -1593379776744771923L;
-
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
     public static class Action extends MainWindowAction {
-
-        private static final long serialVersionUID = -1745515272350810787L;
         private final MainWindow mainWindow;
 
         public Action(MainWindow mainWindow) {
@@ -166,7 +161,7 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Initiate a diff calculation and set the content of the text area.
-     *
+     * <p>
      * It uses the result of {@link diff_match_patch#diff_main(String, String, boolean)} and html
      * markup to show the text.
      */
@@ -177,7 +172,7 @@ public class ProofDiffFrame extends JFrame {
         try {
             int toNo;
             String toText = to.getText();
-            if (toText.length() == 0) {
+            if (toText.isEmpty()) {
                 throw new IllegalArgumentException(
                     "At least the second proof node must be specified");
             } else {
@@ -186,7 +181,7 @@ public class ProofDiffFrame extends JFrame {
             }
 
             String fromText = from.getText();
-            if (fromText.length() == 0) {
+            if (fromText.isEmpty()) {
                 sFrom = getProofNodeText(getParent(toNo));
             } else {
                 int fromNo = Integer.parseInt(fromText);
@@ -209,25 +204,23 @@ public class ProofDiffFrame extends JFrame {
         sb.append("<pre>");
         for (Diff diff : diffs) {
             switch (diff.operation) {
-            case EQUAL:
-                sb.append(toHtml(diff.text));
-                break;
-            case DELETE:
+            case EQUAL -> sb.append(toHtml(diff.text));
+            case DELETE -> {
                 if (onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
                     sb.append("<span style='background-color: #ff8080;'>").append(toHtml(diff.text))
                             .append("</span>");
                 }
-                break;
-            case INSERT:
+            }
+            case INSERT -> {
                 if (onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
                     sb.append("<span style='background-color: #80ff80;'>").append(toHtml(diff.text))
                             .append("</span>");
                 }
-                break;
+            }
             }
         }
         sb.append("</pre>");

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class FocusFormulaProjection implements ProjectionToTerm {
 
@@ -14,7 +15,7 @@ public class FocusFormulaProjection implements ProjectionToTerm {
 
     private FocusFormulaProjection() {}
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         return pos.sequentFormula().formula();
