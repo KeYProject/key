@@ -20,7 +20,6 @@ import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jspecify.annotations.NonNull;
 import org.keyproject.key.api.data.KeyIdentifications;
 import org.keyproject.key.api.data.KeyIdentifications.NodeTextId;

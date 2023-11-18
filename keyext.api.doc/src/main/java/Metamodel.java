@@ -16,7 +16,9 @@ public class Metamodel {
             List<Type> types) {
     }
 
-    sealed interface Endpoint {
+    sealed
+
+    interface Endpoint {
         String name();
 
         String documentation();
@@ -48,12 +50,16 @@ public class Metamodel {
     }
 
     record Field(String name, /* Type */ String type, String documentation) {
+
         Field(String name, String type) {
             this(name, type, "");
         }
     }
 
-    public sealed interface Type {
+    public sealed
+
+
+    interface Type {
         default String kind() {
             return getClass().getSimpleName();
         }
@@ -63,6 +69,7 @@ public class Metamodel {
         String name();
     }
 
+
     enum BuiltinType implements Type {
         INT, LONG, STRING, BOOL, DOUBLE;
 
@@ -70,31 +77,39 @@ public class Metamodel {
         public String documentation() {
             return "built-in data type";
         }
+
     }
 
     record ListType(Type type, String documentation) implements Type {
+
         @Override
         public String name() {
             return type().name() + "[]";
         }
+
     }
 
     record ObjectType(String typeName, List<Field> fields, String documentation) implements Type {
+
         @Override
         public String name() {
             return typeName;
         }
+
     }
 
     public record EitherType(Type a, Type b, String documentation) implements Type {
+
         @Override
         public String name() {
             return "either<a,b>";
         }
+
     }
 
     public record EnumType(String typeName, List<String> values, String documentation)
             implements Type {
+
         @Override
         public String name() {
             return typeName;
