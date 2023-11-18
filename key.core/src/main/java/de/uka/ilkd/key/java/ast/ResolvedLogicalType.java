@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast;
 
 import java.util.*;
 
-
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import com.github.javaparser.resolution.MethodUsage;

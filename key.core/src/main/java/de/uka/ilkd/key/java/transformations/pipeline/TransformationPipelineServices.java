@@ -6,7 +6,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;

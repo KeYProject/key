@@ -16,7 +16,6 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -27,6 +26,8 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 public non-sealed class EmptyMapLiteral extends Literal {
     public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral(null, null);

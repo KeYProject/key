@@ -9,9 +9,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
@@ -23,6 +20,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,9 +6,6 @@ package de.uka.ilkd.key.java.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
@@ -23,6 +20,9 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure

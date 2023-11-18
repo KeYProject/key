@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -16,9 +15,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.io.File;
 
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
@@ -28,8 +27,9 @@ import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

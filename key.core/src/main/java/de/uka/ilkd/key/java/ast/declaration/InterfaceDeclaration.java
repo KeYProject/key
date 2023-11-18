@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -26,11 +25,12 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface declaration.
@@ -40,9 +40,9 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
 
     public InterfaceDeclaration(PositionInfo pi, List<Comment> comments,
-                                @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
-                                ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
-                                boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending) {
+            @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
+            ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
+            boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending) {
         super(pi, comments, modArray, name, fullName, members, parentIsInterfaceDeclaration,
             isLibrary);
         this.extending = extending;

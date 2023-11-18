@@ -5,11 +5,11 @@ package de.uka.ilkd.key.java.loader;
 
 
 import java.net.URI;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 
 import com.github.javaparser.ast.Node;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl

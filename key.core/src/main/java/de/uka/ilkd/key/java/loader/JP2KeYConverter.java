@@ -8,9 +8,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Position;
@@ -73,6 +70,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,7 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
-public record JP2KeYConverter(Services services, KeYJPMapping mapping, @NonNull Namespace<SchemaVariable>schemaVariables, JP2KeYTypeConverter typeConverter){
+public record JP2KeYConverter(Services services,KeYJPMapping mapping,@NonNull Namespace<SchemaVariable>schemaVariables,JP2KeYTypeConverter typeConverter){
 
 public de.uka.ilkd.key.java.ast.CompilationUnit processCompilationUnit(com.github.javaparser.ast.CompilationUnit cu){return(de.uka.ilkd.key.java.ast.CompilationUnit)process(cu);}
 

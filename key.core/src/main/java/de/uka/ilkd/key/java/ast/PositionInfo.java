@@ -9,9 +9,10 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import de.uka.ilkd.key.java.Position;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import de.uka.ilkd.key.java.Position;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition, endPosition

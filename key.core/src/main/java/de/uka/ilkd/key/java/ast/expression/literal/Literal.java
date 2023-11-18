@@ -17,7 +17,6 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -28,6 +27,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Literal.

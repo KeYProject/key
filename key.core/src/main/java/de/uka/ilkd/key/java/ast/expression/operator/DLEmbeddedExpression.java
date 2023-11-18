@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
 
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -22,9 +21,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 public class DLEmbeddedExpression extends Operator {
     private final Function functionSymbol;

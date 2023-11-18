@@ -5,14 +5,14 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
 
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The new enhanced form of a for-loop.
@@ -46,7 +46,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @param info position
      */
     public EnhancedFor(@NonNull LoopInit init, @NonNull Guard guard, @NonNull Statement statement,
-                       ExtList comments, PositionInfo info) {
+            ExtList comments, PositionInfo info) {
         this(info, null, init, null, guard, statement);
     }
 

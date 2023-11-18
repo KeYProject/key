@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.math.BigInteger;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -28,6 +27,8 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 public class LongLiteral extends AbstractIntegerLiteral {
 

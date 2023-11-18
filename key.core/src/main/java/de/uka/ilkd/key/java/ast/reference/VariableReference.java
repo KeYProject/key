@@ -19,7 +19,6 @@ package de.uka.ilkd.key.java.ast.reference;
 import java.util.List;
 import java.util.Objects;
 
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.jspecify.annotations.NonNull;
 
 

@@ -5,9 +5,6 @@ package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -15,6 +12,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

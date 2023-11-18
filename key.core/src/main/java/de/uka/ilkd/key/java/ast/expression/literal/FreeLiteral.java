@@ -17,7 +17,6 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -27,6 +26,8 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 public non-sealed class FreeLiteral extends Literal {
     public final static FreeLiteral INSTANCE = new FreeLiteral(null, null);

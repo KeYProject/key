@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Node;

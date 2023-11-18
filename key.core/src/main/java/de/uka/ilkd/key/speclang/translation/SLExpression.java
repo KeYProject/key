@@ -7,6 +7,7 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 
 /**

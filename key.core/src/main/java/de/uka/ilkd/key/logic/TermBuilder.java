@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -35,8 +34,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>

@@ -19,7 +19,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.net.URI;
 import java.util.*;
 
-
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -28,7 +27,6 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
@@ -45,6 +43,7 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -447,7 +446,7 @@ public final class JMLTransformer extends JavaTransformer {
 
         // call preparser
         PreParser pp = new PreParser(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ImmutableList<TextualJMLConstruct> constructs =
             pp.parseClassLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(pp.getWarnings());
@@ -482,7 +481,8 @@ public final class JMLTransformer extends JavaTransformer {
             astPos);
 
         // call preparser
-        var io = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+        var io = new PreParser(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         String concat = concatenate(comments);
         ImmutableList<TextualJMLConstruct> constructs =
             io.parseMethodLevel(concat, fileName, pos);

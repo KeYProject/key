@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Optional;
 
-
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
