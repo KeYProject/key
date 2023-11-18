@@ -73,9 +73,10 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
         // If there are no free variables in u, we don't have to check for name collisions
         if (u.freeVars().isEmpty()) {
+            final TermBuilder tb = services.getTermBuilder();
             final Term[] updatedSubs = new Term[phi.arity()];
             for (int i = 0; i < updatedSubs.length; i++) {
-                updatedSubs[i] = services.getTermBuilder().apply(u, phi.sub(i), null);
+                updatedSubs[i] = tb.apply(u, phi.sub(i));
             }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
@@ -111,11 +112,10 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
         final QuantifiableVariable[] boundVarsInPhi =
             phi.boundVars().toArray(new QuantifiableVariable[0]);
-        final int numOfBoundVars = boundVarsInPhi.length;
 
         final Term[] updatedSubs = phi.subs().toArray(new Term[0]);
         // Check for any name clashes and change the variables' names if necessary
-        for (int i = 0; i < numOfBoundVars; i++) {
+        for (int i = 0; i < boundVarsInPhi.length; i++) {
             final QuantifiableVariable currentBoundVar = boundVarsInPhi[i];
             if (freeVarNamesInU.contains(currentBoundVar.name())) {
                 final LogicVariable renamedVar =
@@ -134,7 +134,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
 
         for (int i = 0; i < updatedSubs.length; i++) {
-            updatedSubs[i] = tb.apply(u, updatedSubs[i], null);
+            updatedSubs[i] = tb.apply(u, updatedSubs[i]);
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
@@ -165,11 +165,11 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         // Get a new name by adding a counter to the stem
         String stem = var.name().toString();
         int i = 1;
-        Name newName = new Name(stem + i);
-        while (nameIsAlreadyUsed(newName, usedVars, services)) {
-            i++;
+        Name newName;
+        do {
             newName = new Name(stem + i);
-        }
+            i++;
+        } while (nameIsAlreadyUsed(newName, usedVars, services));
         return newName;
     }
 
@@ -191,7 +191,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                 return true;
             }
         }
-        return services.getNamespaces().lookup(name) != null;
+        return services.getNamespaces().lookupLogicSymbol(name) != null;
     }
 
     @Override
