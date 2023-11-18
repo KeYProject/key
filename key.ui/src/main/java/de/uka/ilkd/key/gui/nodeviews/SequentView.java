@@ -132,6 +132,16 @@ public abstract class SequentView extends JEditorPane {
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
+        filter = new IdentitySequentPrintFilter();
+        setTextCache = new Cached<>(text -> {
+            setText(text);
+            return null;
+        });
+
+        printer =
+            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(), getVisibleTermLabels());
+
         setContentType("text/html");
         HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
 
@@ -157,11 +167,6 @@ public abstract class SequentView extends JEditorPane {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
 
-        filter = new IdentitySequentPrintFilter();
-        setTextCache = new Cached<>(text -> {
-            setText(text);
-            return null;
-        });
 
         // Register tooltip
         setToolTipText("");
@@ -169,9 +174,6 @@ public abstract class SequentView extends JEditorPane {
         KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(), this,
             KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
 
-        printer =
-            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(), getVisibleTermLabels());
     }
 
     public final void setFont() {
@@ -353,12 +355,14 @@ public abstract class SequentView extends JEditorPane {
      */
     protected synchronized PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
-        if (seqText.length() > 0 && p != null) {
-            int characterIndex = correctedViewToModel(p);
-            return getInitialPositionTable().getPosInSequent(characterIndex, getFilter());
-        } else {
-            return null;
+        if (seqText != null && !seqText.isEmpty()) {
+            final InitialPositionTable initialPositionTable = getInitialPositionTable();
+            if (p != null && initialPositionTable != null) {
+                int characterIndex = correctedViewToModel(p);
+                return initialPositionTable.getPosInSequent(characterIndex, getFilter());
+            }
         }
+        return null;
     }
 
     /**

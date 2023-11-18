@@ -9,8 +9,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import org.key_project.util.collection.ImmutableList;
-
 public interface TacletMatcher {
 
     /**
@@ -29,7 +27,7 @@ public interface TacletMatcher {
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
+    IfMatchResult matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services);
 
     /**

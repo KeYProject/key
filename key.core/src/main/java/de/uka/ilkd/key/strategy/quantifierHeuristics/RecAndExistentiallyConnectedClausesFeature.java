@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -18,7 +19,8 @@ public class RecAndExistentiallyConnectedClausesFeature extends BinaryTermFeatur
 
     private RecAndExistentiallyConnectedClausesFeature() {}
 
-    protected boolean filter(Term term, Services services) {
+    @Override
+    protected boolean filter(Term term, MutableState mState, Services services) {
         final ClausesGraph graph = ClausesGraph.create(term, services.getCaches());
         return graph.isFullGraph();
     }

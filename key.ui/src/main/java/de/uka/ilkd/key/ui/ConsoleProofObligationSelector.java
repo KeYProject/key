@@ -95,13 +95,13 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
                 ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
 
-                mediator.setProof(pl.getFirstProof());
+                mediator.getSelectionModel().setSelectedProof(pl.getFirstProof());
 
             } catch (ProofInputException exc) {
                 LOGGER.warn("Failed to read proof", exc);
             }
         } else {
-            mediator.setProof(proof);
+            mediator.getSelectionModel().setSelectedProof(proof);
         }
 
 

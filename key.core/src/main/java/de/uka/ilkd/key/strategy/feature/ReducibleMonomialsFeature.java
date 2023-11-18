@@ -40,9 +40,9 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Term dividendT = dividend.toTerm(app, pos, goal);
-        final Term divisorT = divisor.toTerm(app, pos, goal);
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term dividendT = dividend.toTerm(app, pos, goal, mState);
+        final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create(dividendT, services);

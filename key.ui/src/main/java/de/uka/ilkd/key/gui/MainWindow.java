@@ -32,6 +32,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -779,8 +780,8 @@ public final class MainWindow extends JFrame {
      * Hide the progress bar if it is currently visible.
      */
     public void hideStatusProgress() {
-        getStatusLine().setProgress(0);
         statusLine.setProgressPanelVisible(false);
+        getStatusLine().setProgress(0);
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -834,6 +835,15 @@ public final class MainWindow extends JFrame {
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
         proofList.addProof(plist);
+        // TODO/Check: the code below emulates phantom actions. Check if this can be solved
+        // differently
+        // in particular as this side-effect is unexpected for a caller of the method
+        // Moved it from the super class to here, as it is only the windowed version and not the
+        // console ui that
+        // needs it.
+        for (Proof proof : plist.getProofs()) {
+            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
+        }
         // GUI
         proofList.setSize(proofList.getPreferredSize());
         proofListView.setViewportView(proofList);
@@ -1151,16 +1161,11 @@ public final class MainWindow extends JFrame {
         Runnable guiUpdater = () -> {
             disableCurrentGoalView = true;
             addToProofList(plist);
-            setUpNewProof(plist.getFirstProof());
+            getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
             disableCurrentGoalView = false;
             updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
-    }
-
-    private Proof setUpNewProof(Proof proof) {
-        getMediator().setProof(proof);
-        return proof;
     }
 
     /*
@@ -1232,6 +1237,7 @@ public final class MainWindow extends JFrame {
     }
 
     void displayResults(String message) {
+        LOGGER.debug("displaying results: {}", message);
         setStatusLine(message);
     }
 
@@ -1698,7 +1704,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) {
+            if (disableCurrentGoalView) {
                 return;
             }
             SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
@@ -1709,6 +1715,9 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+            if (disableCurrentGoalView) {
+                return;
+            }
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
@@ -1743,7 +1752,6 @@ public final class MainWindow extends JFrame {
             LOGGER.debug("Automode stopped");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
-            updateSequentView();
             getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
