@@ -45,11 +45,19 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         System.arraycopy(arr, 0, content, 0, arr.length);
     }
 
+    @SuppressWarnings("unchecked")
+    public ImmutableArray(S[] arr, int lower, int upper) {
+        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), upper - lower);
+        System.arraycopy(arr, lower, content, 0, upper - lower);
+    }
 
     /**
+     * <p>
      * creates a new immutable array with the contents of the given collection.
-     *
+     * </p>
+     * <p>
      * The order of elements is defined by the collection.
+     * </p>
      *
      * @param list a non-null collection (order is preserved)
      */
@@ -128,7 +136,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         if (o == this) {
             return true;
         }
-        S[] cmp = null;
+
+        final S[] cmp;
         if (o instanceof ImmutableArray) {
             cmp = ((ImmutableArray<S>) o).content;
         } else {

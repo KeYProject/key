@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.Feature;
 
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
@@ -24,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
- * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
+ * {@link Feature#computeCost(RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
