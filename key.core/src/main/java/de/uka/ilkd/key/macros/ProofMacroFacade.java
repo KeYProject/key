@@ -18,7 +18,8 @@ public class ProofMacroFacade {
     private static ProofMacroFacade INSTANCE;
 
     public static ProofMacroFacade instance() {
-        if (INSTANCE == null) INSTANCE = new ProofMacroFacade();
+        if (INSTANCE == null)
+            INSTANCE = new ProofMacroFacade();
         return INSTANCE;
     }
 

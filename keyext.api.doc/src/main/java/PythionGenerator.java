@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
@@ -54,11 +57,11 @@ public abstract class PythionGenerator implements Supplier<String> {
 
         if (t instanceof Metamodel.BuiltinType bt) {
             return switch (bt) {
-                case INT -> "int";
-                case LONG -> "int";
-                case STRING -> "str";
-                case BOOL -> "bool";
-                case DOUBLE -> "float";
+            case INT -> "int";
+            case LONG -> "int";
+            case STRING -> "str";
+            case BOOL -> "bool";
+            case DOUBLE -> "float";
             };
         }
         return t.name();
@@ -85,19 +88,21 @@ public abstract class PythionGenerator implements Supplier<String> {
                     import enum
                     import abc
                     import typing
-                    from abc import abstractmethod                    
+                    from abc import abstractmethod
                     """);
             server(
-                    metamodel.endpoints()
-                            .stream()
-                            .filter(it -> it instanceof Metamodel.ServerRequest || it instanceof Metamodel.ServerNotification)
-                            .sorted(Comparator.comparing(Metamodel.Endpoint::name)));
+                metamodel.endpoints()
+                        .stream()
+                        .filter(it -> it instanceof Metamodel.ServerRequest
+                                || it instanceof Metamodel.ServerNotification)
+                        .sorted(Comparator.comparing(Metamodel.Endpoint::name)));
 
             client(
-                    metamodel.endpoints()
-                            .stream()
-                            .filter(it -> it instanceof Metamodel.ClientRequest || it instanceof Metamodel.ClientNotification)
-                            .sorted(Comparator.comparing(Metamodel.Endpoint::name)));
+                metamodel.endpoints()
+                        .stream()
+                        .filter(it -> it instanceof Metamodel.ClientRequest
+                                || it instanceof Metamodel.ClientNotification)
+                        .sorted(Comparator.comparing(Metamodel.Endpoint::name)));
         }
 
 
@@ -113,7 +118,7 @@ public abstract class PythionGenerator implements Supplier<String> {
             out.format("    @abstractmethod%n");
             if (endpoint instanceof Metamodel.ClientRequest sr) {
                 out.format("    def %s(self, %s) -> %s:%n", endpoint.name().replace("/", "_"), args,
-                        asPython(sr.returnType()));
+                    asPython(sr.returnType()));
             } else {
                 out.format("    def %s(self, %s):%n", endpoint.name().replace("/", "_"), args);
             }
@@ -128,7 +133,7 @@ public abstract class PythionGenerator implements Supplier<String> {
                     class KeyServer(ServerBase):%n
                         def __init__(self, endpoint : LspEndpoint):
                             super().__init__(endpoint)
-                              
+
                      """);
             sorted.forEach(this::serverEndpoint);
         }
@@ -147,13 +152,15 @@ public abstract class PythionGenerator implements Supplier<String> {
 
             if (endpoint instanceof Metamodel.ServerRequest sr) {
                 out.format("    def %s(self, %s) -> %s:%n", endpoint.name().replace("/", "_"), args,
-                        asPython(sr.returnType()));
+                    asPython(sr.returnType()));
                 out.format("       \"\"\"%s\"\"\"%n%n", sr.documentation());
-                out.format("       return self._call_sync(\"%s\", %s)".formatted(endpoint.name(), params));
+                out.format(
+                    "       return self._call_sync(\"%s\", %s)".formatted(endpoint.name(), params));
             } else {
                 out.format("    def %s(self, %s):%n", endpoint.name().replace("/", "_"), args);
                 out.format("        \"\"\"%s\"\"\"%n%n", endpoint.documentation());
-                out.format("        return self._call_async(\"%s\", %s)".formatted(endpoint.name(), params));
+                out.format("        return self._call_async(\"%s\", %s)".formatted(endpoint.name(),
+                    params));
             }
             out.println();
             out.println();
@@ -183,12 +190,13 @@ public abstract class PythionGenerator implements Supplier<String> {
                     import abc
                     import typing
                     from abc import abstractmethod, ABCMeta
-                                                          
+
                     """);
             metamodel.types().forEach(this::printType);
 
-            var names = metamodel.types().stream().map(it -> "\"%s\": %s".formatted(it.name(), it.name()))
-                    .collect(Collectors.joining(","));
+            var names =
+                metamodel.types().stream().map(it -> "\"%s\": %s".formatted(it.name(), it.name()))
+                        .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES = { %s }%n%n", names);
         }
 
@@ -200,10 +208,9 @@ public abstract class PythionGenerator implements Supplier<String> {
                         .formatted(it.name(), asPython(it.type()), it.documentation())));
 
                 out.format("\n    def __init__(self%s):%n".formatted(
-                        ot.fields().stream()
-                                .map(Metamodel.Field::name)
-                                .collect(Collectors.joining(", ", ", ", ""))
-                ));
+                    ot.fields().stream()
+                            .map(Metamodel.Field::name)
+                            .collect(Collectors.joining(", ", ", ", ""))));
 
                 if (ot.fields().isEmpty())
                     out.format("        pass%n%n");

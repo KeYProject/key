@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import org.jspecify.annotations.NonNull;
-import org.keyproject.key.api.internal.NodeText;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import org.jspecify.annotations.NonNull;
+import org.keyproject.key.api.internal.NodeText;
 
 /**
  * @author Alexander Weigl
@@ -19,27 +23,31 @@ public class KeyIdentifications {
     private final BiMap<EnvironmentId, KeyEnvironmentContainer> mapEnv = HashBiMap.create(16);
 
     public KeyEnvironmentContainer getContainer(EnvironmentId environmentId) {
-        return Objects.requireNonNull(mapEnv.get(environmentId), "Could not find environment for id" + environmentId);
+        return Objects.requireNonNull(mapEnv.get(environmentId),
+            "Could not find environment for id" + environmentId);
     }
 
     public ProofContainer getContainer(ProofId proofId) {
         return Objects.requireNonNull(getContainer(proofId.env()).mapProof.get(proofId),
-                "Could not find proof for id" + proofId);
+            "Could not find proof for id" + proofId);
     }
 
     public KeYEnvironment<?> find(EnvironmentId envid) {
-        return Objects.requireNonNull(getContainer(envid).env.get(), "Environment was removed by gc");
+        return Objects.requireNonNull(getContainer(envid).env.get(),
+            "Environment was removed by gc");
     }
 
     @NonNull
     public Proof find(ProofId proofId) {
-        return Objects.requireNonNull(getContainer(proofId).wProof.get(), "Could not find a proof for id " + proofId);
+        return Objects.requireNonNull(getContainer(proofId).wProof.get(),
+            "Could not find a proof for id " + proofId);
     }
 
     @NonNull
     public NodeText find(NodeTextId nodeTextId) {
-        return Objects.requireNonNull(getContainer(nodeTextId.nodeId().proofId()).mapGoalText.get(nodeTextId),
-                "Could not find a print-out with the id " + nodeTextId);
+        return Objects.requireNonNull(
+            getContainer(nodeTextId.nodeId().proofId()).mapGoalText.get(nodeTextId),
+            "Could not find a print-out with the id " + nodeTextId);
     }
 
     public void dispose(NodeTextId nodeTextId) {
@@ -54,7 +62,8 @@ public class KeyIdentifications {
     }
 
     public Node find(NodeId nodeId) {
-        @NonNull Proof p = find(nodeId.proofId);
+        @NonNull
+        Proof p = find(nodeId.proofId);
         var opt = p.findAny(it -> it.serialNr() == nodeId.nodeId());
         return Objects.requireNonNull(opt, "Could not find node with serialNr  " + nodeId.nodeId);
     }

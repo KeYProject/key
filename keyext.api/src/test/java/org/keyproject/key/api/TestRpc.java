@@ -1,12 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api;
-
-import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.keyproject.key.api.remoteapi.KeyApi;
-import org.keyproject.key.api.remoteclient.ClientApi;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -17,6 +12,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.keyproject.key.api.remoteapi.KeyApi;
+import org.keyproject.key.api.remoteclient.ClientApi;
 
 public class TestRpc {
     private Future<Void> clientListening, serverListening;

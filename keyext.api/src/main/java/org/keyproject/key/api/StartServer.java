@@ -1,5 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api;
 
+
+import java.io.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutionException;
+import javax.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
@@ -11,13 +21,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
-import javax.annotation.Nullable;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.ExecutionException;
-
 /**
  * @author Alexander Weigl
  * @version 1 (07.10.23)
@@ -26,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 public class StartServer implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartServer.class);
 
-    //region CLI arguments
+    // region CLI arguments
     @Option(names = "--std", description = "use stdout and stdin for communication")
     boolean stdStreams;
     @Option(names = "--trace", description = "use stdout and stdin for communication")
@@ -41,19 +44,21 @@ public class StartServer implements Runnable {
     Integer clientPort;
 
 
-    @Option(names = "--infile", paramLabel = "FILE or PIPE", description = "read from named pipe or file")
+    @Option(names = "--infile", paramLabel = "FILE or PIPE",
+        description = "read from named pipe or file")
     @Nullable
     File inFile;
 
-    @Option(names = "--outfile", paramLabel = "FILE or PIPE", description = "write to named pipe or file")
+    @Option(names = "--outfile", paramLabel = "FILE or PIPE",
+        description = "write to named pipe or file")
     File outFile;
 
-    @Option(names = {"-h", "--help"}, usageHelp = true, description = "display a help message")
+    @Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     boolean helpRequested = false;
 
     @Option(names = "--websocket")
     boolean websocket = false;
-    //endregion
+    // endregion
 
     public static void main(String[] args) {
         new CommandLine(new StartServer()).execute(args);
@@ -159,12 +164,11 @@ public class StartServer implements Runnable {
                 .validateMessages(true);
 
         launcherBuilder.configureGson(StartServer::configureJson);
-        //if (localServices != null && !localServices.isEmpty())
+        // if (localServices != null && !localServices.isEmpty())
         launcherBuilder.setLocalService(keyApi);
-        //if (remoteInterfaces != null && !remoteInterfaces.isEmpty())
+        // if (remoteInterfaces != null && !remoteInterfaces.isEmpty())
         launcherBuilder.setRemoteInterface(ClientApi.class);
 
         return launcherBuilder.create();
     }
 }
-

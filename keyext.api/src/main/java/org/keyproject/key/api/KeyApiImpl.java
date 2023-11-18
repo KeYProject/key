@@ -1,4 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -23,11 +36,13 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.internal.NodeText;
@@ -35,16 +50,6 @@ import org.keyproject.key.api.remoteapi.ExampleDesc;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.ClientApi;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 public final class KeyApiImpl implements KeyApi {
     private final KeyIdentifications data = new KeyIdentifications();
@@ -74,8 +79,8 @@ public final class KeyApiImpl implements KeyApi {
     @Override
     @JsonRequest
     public CompletableFuture<List<ExampleDesc>> examples() {
-        return CompletableFutures.computeAsync((c) ->
-                ExampleChooser.listExamples(ExampleChooser.lookForExamples())
+        return CompletableFutures
+                .computeAsync((c) -> ExampleChooser.listExamples(ExampleChooser.lookForExamples())
                         .stream().map(ExampleDesc::from).toList());
     }
 
@@ -101,19 +106,20 @@ public final class KeyApiImpl implements KeyApi {
     @Override
     public CompletableFuture<List<ProofMacroDesc>> getAvailableMacros() {
         return CompletableFuture.completedFuture(
-                ProofMacroFacade.instance().getMacros().stream()
-                        .map(ProofMacroDesc::from).toList()
-        );
+            ProofMacroFacade.instance().getMacros().stream()
+                    .map(ProofMacroDesc::from).toList());
     }
 
     @Override
     public CompletableFuture<List<ProofScriptCommandDesc>> getAvailableScriptCommands() {
         return CompletableFuture.completedFuture(
-                ProofScriptCommandFacade.instance().getScriptCommands().stream().map(ProofScriptCommandDesc::from).toList());
+            ProofScriptCommandFacade.instance().getScriptCommands().stream()
+                    .map(ProofScriptCommandDesc::from).toList());
     }
 
     @Override
-    public CompletableFuture<MacroStatistic> script(ProofId proofId, String scriptLine, StreategyOptions options) {
+    public CompletableFuture<MacroStatistic> script(ProofId proofId, String scriptLine,
+            StreategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
@@ -129,14 +135,16 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<MacroStatistic> macro(ProofId proofId, String macroId, StreategyOptions options) {
+    public CompletableFuture<MacroStatistic> macro(ProofId proofId, String macroId,
+            StreategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
             var macro = Objects.requireNonNull(ProofMacroFacade.instance().getMacro(macroId));
 
             try {
-                var info = macro.applyTo(env.getUi(), proof, proof.openGoals(), null, clientListener);
+                var info =
+                    macro.applyTo(env.getUi(), proof, proof.openGoals(), null, clientListener);
                 return MacroStatistic.from(proofId, info);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -152,8 +160,8 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(proofId.env());
             try {
                 env.getProofControl().startAndWaitForAutoMode(proof);
-                //clientListener);
-                return null;//MacroStatistic.from(proofId, info);
+                // clientListener);
+                return null;// MacroStatistic.from(proofId, info);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -172,7 +180,8 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<List<NodeDesc>> goals(ProofId proofId, boolean onlyOpened, boolean onlyEnabled) {
+    public CompletableFuture<List<NodeDesc>> goals(ProofId proofId, boolean onlyOpened,
+            boolean onlyEnabled) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             if (onlyOpened && !onlyEnabled) {
@@ -195,7 +204,7 @@ public final class KeyApiImpl implements KeyApi {
 
     private NodeDesc asNodeDesc(ProofId proofId, Node it) {
         return new NodeDesc(proofId, it.serialNr(), it.getNodeInfo().getBranchLabel(),
-                it.getNodeInfo().getScriptRuleApplication());
+            it.getNodeInfo().getScriptRuleApplication());
     }
 
     @Override
@@ -207,12 +216,12 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     private NodeDesc asNodeDescRecursive(ProofId proofId, Node root) {
-        final List<NodeDesc> list = root.childrenStream().map(it -> asNodeDescRecursive(proofId, it)).toList();
+        final List<NodeDesc> list =
+            root.childrenStream().map(it -> asNodeDescRecursive(proofId, it)).toList();
         return new NodeDesc(new NodeId(proofId, root.serialNr()),
-                root.getNodeInfo().getBranchLabel(),
-                root.getNodeInfo().getScriptRuleApplication(),
-                list
-        );
+            root.getNodeInfo().getBranchLabel(),
+            root.getNodeInfo().getScriptRuleApplication(),
+            list);
     }
 
     @Override
@@ -282,7 +291,8 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFuture.supplyAsync(() -> {
             var env = data.find(envId);
             var contracts = env.getAvailableContracts();
-            return contracts.stream().map(it -> ContractDesc.from(envId, env.getServices(), it)).toList();
+            return contracts.stream().map(it -> ContractDesc.from(envId, env.getServices(), it))
+                    .toList();
         });
     }
 
@@ -291,7 +301,8 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFuture.supplyAsync(() -> {
             var env = data.find(contractId.envId());
             var contracts = env.getAvailableContracts();
-            var contract = contracts.stream().filter(it -> it.id() == contractId.contractId()).findFirst();
+            var contract =
+                contracts.stream().filter(it -> it.id() == contractId.contractId()).findFirst();
             if (contract.isPresent()) {
                 try {
                     var proof = env.createProof(contract.get().createProofObl(env.getInitConfig()));
@@ -311,7 +322,8 @@ public final class KeyApiImpl implements KeyApi {
             var node = data.find(nodeId);
             var env = data.find(nodeId.proofId().env());
             var notInfo = new NotationInfo();
-            final var layouter = new PosTableLayouter(options.width(), options.indentation(), options.pure());
+            final var layouter =
+                new PosTableLayouter(options.width(), options.indentation(), options.pure());
             var lp = new LogicPrinter(notInfo, env.getServices(), layouter);
             lp.printSequent(node.sequent());
 
@@ -332,8 +344,9 @@ public final class KeyApiImpl implements KeyApi {
             var goal = proof.getOpenGoal(node);
             var nodeText = data.find(printId);
             var pis = nodeText.table().getPosInSequent(pos, filter);
-            return new TermActionUtil(printId, data.find(printId.nodeId().proofId().env()), pis, goal)
-                    .getActions();
+            return new TermActionUtil(printId, data.find(printId.nodeId().proofId().env()), pis,
+                goal)
+                        .getActions();
         });
 
     }
@@ -365,19 +378,21 @@ public final class KeyApiImpl implements KeyApi {
                 KeYEnvironment<?> env = null;
                 try {
                     var loader = control.load(JavaProfile.getDefaultProfile(),
-                            ex.getObligationFile(), null, null, null, null, true, null);
+                        ex.getObligationFile(), null, null, null, null, true, null);
                     InitConfig initConfig = loader.getInitConfig();
 
                     env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
-                            loader.getProofScript(), loader.getResult());
+                        loader.getProofScript(), loader.getResult());
                     var envId = new EnvironmentId(env.toString());
                     data.register(envId, env);
                     proof = Objects.requireNonNull(env.getLoadedProof());
                     var proofId = new ProofId(envId, proof.name().toString());
                     return data.register(proofId, proof);
                 } catch (ProblemLoaderException e) {
-                    if (proof != null) proof.dispose();
-                    if (env != null) env.dispose();
+                    if (proof != null)
+                        proof.dispose();
+                    if (env != null)
+                        env.dispose();
                     throw new RuntimeException(e);
                 }
             }
@@ -390,17 +405,19 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFutures.computeAsync((c) -> {
             Proof proof = null;
             KeYEnvironment<?> env = null;
-              /*  var loader = control.load(JavaProfile.getDefaultProfile(),
-                        ex.getObligationFile(), null, null, null, null, true, null);
-                InitConfig initConfig = loader.getInitConfig();
-
-                env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
-                        loader.getProofScript(), loader.getResult());
-                var envId = new EnvironmentId(env.toString());
-                data.register(envId, env);
-                proof = Objects.requireNonNull(env.getLoadedProof());
-                var proofId = new ProofId(envId, proof.name().toString());
-                return data.register(proofId, proof);*/
+            /*
+             * var loader = control.load(JavaProfile.getDefaultProfile(),
+             * ex.getObligationFile(), null, null, null, null, true, null);
+             * InitConfig initConfig = loader.getInitConfig();
+             *
+             * env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
+             * loader.getProofScript(), loader.getResult());
+             * var envId = new EnvironmentId(env.toString());
+             * data.register(envId, env);
+             * proof = Objects.requireNonNull(env.getLoadedProof());
+             * var proofId = new ProofId(envId, proof.name().toString());
+             * return data.register(proofId, proof);
+             */
             return null;
         });
 
@@ -415,18 +432,20 @@ public final class KeyApiImpl implements KeyApi {
                 final var tempFile = File.createTempFile("json-rpc-", ".key");
                 Files.writeString(tempFile.toPath(), content);
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                        tempFile, null, null, null, null, true, null);
+                    tempFile, null, null, null, null, true, null);
                 InitConfig initConfig = loader.getInitConfig();
                 env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
-                        loader.getProofScript(), loader.getResult());
+                    loader.getProofScript(), loader.getResult());
                 var envId = new EnvironmentId(env.toString());
                 data.register(envId, env);
                 proof = Objects.requireNonNull(env.getLoadedProof());
                 var proofId = new ProofId(envId, proof.name().toString());
                 return data.register(proofId, proof);
             } catch (ProblemLoaderException | IOException e) {
-                if (proof != null) proof.dispose();
-                if (env != null) env.dispose();
+                if (proof != null)
+                    proof.dispose();
+                if (env != null)
+                    env.dispose();
                 throw new RuntimeException(e);
             }
         });
@@ -444,16 +463,16 @@ public final class KeyApiImpl implements KeyApi {
             KeYEnvironment<?> env = null;
             try {
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                        params.keyFile(),
-                        params.classPath(),
-                        params.bootClassPath(),
-                        params.includes(),
-                        null,
-                        true,
-                        null);
+                    params.keyFile(),
+                    params.classPath(),
+                    params.bootClassPath(),
+                    params.includes(),
+                    null,
+                    true,
+                    null);
                 InitConfig initConfig = loader.getInitConfig();
                 env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
-                        loader.getProofScript(), loader.getResult());
+                    loader.getProofScript(), loader.getResult());
                 var envId = new EnvironmentId(env.toString());
                 data.register(envId, env);
                 if ((proof = env.getLoadedProof()) != null) {
@@ -463,8 +482,10 @@ public final class KeyApiImpl implements KeyApi {
                     return Either.forLeft(envId);
                 }
             } catch (ProblemLoaderException e) {
-                if (proof != null) proof.dispose();
-                if (env != null) env.dispose();
+                if (proof != null)
+                    proof.dispose();
+                if (env != null)
+                    env.dispose();
                 throw new RuntimeException(e);
             }
         });
@@ -502,7 +523,9 @@ public final class KeyApiImpl implements KeyApi {
         }
 
         @Override
-        public void loadingFinished(AbstractProblemLoader loader, IPersistablePO.LoadedPOContainer poContainer, ProofAggregate proofList, AbstractProblemLoader.ReplayResult result) throws ProblemLoaderException {
+        public void loadingFinished(AbstractProblemLoader loader,
+                IPersistablePO.LoadedPOContainer poContainer, ProofAggregate proofList,
+                AbstractProblemLoader.ReplayResult result) throws ProblemLoaderException {
             super.loadingFinished(loader, poContainer, proofList, result);
         }
 

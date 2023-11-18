@@ -1,49 +1,54 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.adapters;
-
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.macros.ProofMacro;
-import org.keyproject.key.api.data.MacroDescription;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.macros.ProofMacro;
+
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import org.keyproject.key.api.data.MacroDescription;
 
 /**
  * @author Alexander Weigl
  * @version 1 (14.10.23)
  */
 public class KeyAdapter {
-    //private final BiMap<String, WeakReference<Object>> map = HashBiMap.create(1024);
-    //private final TypeAdapter<Object> adaptor;
+    // private final BiMap<String, WeakReference<Object>> map = HashBiMap.create(1024);
+    // private final TypeAdapter<Object> adaptor;
 
     public KeyAdapter(GsonBuilder gson) {
         gson.registerTypeAdapter(File.class, new FileTypeAdapter());
-        //gson.registerTypeAdapter(Function.class, new FunctionSerializer());
-        //gson.registerTypeAdapter(ProofMacro.class, new MacroSerializer());
+        // gson.registerTypeAdapter(Function.class, new FunctionSerializer());
+        // gson.registerTypeAdapter(ProofMacro.class, new MacroSerializer());
     }
 
 
     /*
-    //translating entities to identification strings
-    public void insert(Identifiable p) {
-        var id = p.identification();
-        if (!map.containsKey(id)) {
-            map.put(id, new WeakReference<>(p));
-        }
-    }
-
-    public Object find(String id) {
-        return map.get(id).get();
-    }
-    //endregion
-    */
+     * //translating entities to identification strings
+     * public void insert(Identifiable p) {
+     * var id = p.identification();
+     * if (!map.containsKey(id)) {
+     * map.put(id, new WeakReference<>(p));
+     * }
+     * }
+     *
+     * public Object find(String id) {
+     * return map.get(id).get();
+     * }
+     * //endregion
+     */
 
     static class MacroSerializer implements JsonSerializer<ProofMacro> {
         @Override
-        public JsonElement serialize(ProofMacro src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(ProofMacro src, Type typeOfSrc,
+                JsonSerializationContext context) {
             return context.serialize(MacroDescription.from(src));
         }
     }
@@ -62,7 +67,8 @@ public class KeyAdapter {
 
     static class FunctionSerializer implements JsonSerializer<Function> {
         @Override
-        public JsonElement serialize(Function src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(Function src, Type typeOfSrc,
+                JsonSerializationContext context) {
             var obj = new JsonObject();
             obj.add("name", context.serialize(src.name().toString()));
             obj.add("skolemConstant", context.serialize(src.isSkolemConstant()));
@@ -76,7 +82,8 @@ public class KeyAdapter {
 
     public static class ThrowableAdapter implements JsonSerializer<Throwable> {
         @Override
-        public JsonElement serialize(Throwable src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(Throwable src, Type typeOfSrc,
+                JsonSerializationContext context) {
             var obj = new JsonObject();
             obj.add("$class", context.serialize(src.getClass().getSimpleName()));
             obj.add("message", context.serialize(src.getMessage()));
@@ -85,16 +92,22 @@ public class KeyAdapter {
         }
     }
 
-    /*class IdentifiableTypeAdapter implements JsonSerializer<Identifiable>, JsonDeserializer<Identifiable> {
-        @Override
-        public Identifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return (Identifiable) find(json.getAsString());
-        }
-
-        @Override
-        public JsonElement serialize(Identifiable src, Type typeOfSrc, JsonSerializationContext context) {
-            insert(src);
-            return context.serialize(src.identification());
-        }
-    }*/
+    /*
+     * class IdentifiableTypeAdapter implements JsonSerializer<Identifiable>,
+     * JsonDeserializer<Identifiable> {
+     *
+     * @Override
+     * public Identifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext
+     * context) throws JsonParseException {
+     * return (Identifiable) find(json.getAsString());
+     * }
+     *
+     * @Override
+     * public JsonElement serialize(Identifiable src, Type typeOfSrc, JsonSerializationContext
+     * context) {
+     * insert(src);
+     * return context.serialize(src.identification());
+     * }
+     * }
+     */
 }

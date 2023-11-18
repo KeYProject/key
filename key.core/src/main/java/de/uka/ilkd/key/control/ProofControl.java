@@ -123,7 +123,7 @@ public interface ProofControl {
      *
      * @param proof The {@link Proof} to start auto mode of.
      */
-    default void startAutoMode(Proof proof) { startAutoMode(proof, proof.openEnabledGoals());}
+    default void startAutoMode(Proof proof) { startAutoMode(proof, proof.openEnabledGoals()); }
 
     /**
      * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s.
@@ -158,7 +158,8 @@ public interface ProofControl {
      * @param proof The {@link Proof} to start auto mode and to wait for.
      * @param goals The {@link Goal}s to close.
      */
-    void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals) throws InterruptedException;
+    void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals)
+            throws InterruptedException;
 
     /**
      * Starts the auto mode for the given proof which must be contained in this user interface and

@@ -24,16 +24,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * This class provides an action for KeY UI which runs a set of specified proof files automatically.
  * The intent of this class is to have a massive test feature for the quality assurance of the KeY
@@ -83,7 +73,7 @@ public class RunAllProofsAction extends MainWindowAction {
     @NonNull
     private List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
-                getClass().getSimpleName());
+            getClass().getSimpleName());
 
         InputStream stream;
         if (RUN_ALL_PROOFS_UI == null) {
@@ -97,7 +87,7 @@ public class RunAllProofsAction extends MainWindowAction {
         }
 
         try (BufferedReader in =
-                     new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
                     .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
                             .getAbsoluteFile())
@@ -120,7 +110,7 @@ public class RunAllProofsAction extends MainWindowAction {
 
         setName("Run all proofs");
         setTooltip(
-                "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
+            "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
     }
 
     @Override
@@ -136,7 +126,7 @@ public class RunAllProofsAction extends MainWindowAction {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
                 ProblemLoader problemLoader =
-                        ui.getProblemLoader(absFile, null, null, null, getMediator());
+                    ui.getProblemLoader(absFile, null, null, null, getMediator());
                 problemLoader.runSynchronously();
                 LOGGER.info("Loaded: {}", absFile);
 

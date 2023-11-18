@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteclient;
+
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-
-import javax.annotation.Nullable;
-import java.util.concurrent.CompletableFuture;
 
 @JsonSegment("client")
 public interface ClientApi {
@@ -16,9 +20,13 @@ public interface ClientApi {
 
     /**
      * LogTrace Notification (:arrow_left:)
-     * A notification to log the trace of the server’s execution. The amount and content of these notifications depends on the current trace configuration. If trace is 'off', the server should not send any logTrace notification. If trace is 'messages', the server should not add the 'verbose' field in the LogTraceParams.
+     * A notification to log the trace of the server’s execution. The amount and content of these
+     * notifications depends on the current trace configuration. If trace is 'off', the server
+     * should not send any logTrace notification. If trace is 'messages', the server should not add
+     * the 'verbose' field in the LogTraceParams.
      * <p>
-     * $/logTrace should be used for systematic trace reporting. For single debugging messages, the server should send window/logMessage notifications.
+     * $/logTrace should be used for systematic trace reporting. For single debugging messages, the
+     * server should send window/logMessage notifications.
      * <p>
      * Notification:
      * <p>
@@ -27,11 +35,12 @@ public interface ClientApi {
      */
     @JsonNotification
     void logTrace(LogTraceParams params);
-    //region Window
+    // region Window
 
     /**
      * ShowMessage Notification (:arrow_left:)
-     * The show message notification is sent from a server to a client to ask the client to display a particular message in the user interface.
+     * The show message notification is sent from a server to a client to ask the client to display
+     * a particular message in the user interface.
      * <p>
      * Notification:
      * <p>
@@ -45,7 +54,9 @@ public interface ClientApi {
 
     /**
      * ShowMessage Request (:arrow_right_hook:)
-     * The show message request is sent from a server to a client to ask the client to display a particular message in the user interface. In addition to the show message notification the request allows to pass actions and to wait for an answer from the client.
+     * The show message request is sent from a server to a client to ask the client to display a
+     * particular message in the user interface. In addition to the show message notification the
+     * request allows to pass actions and to wait for an answer from the client.
      */
     @JsonRequest
     @Nullable
@@ -56,7 +67,8 @@ public interface ClientApi {
      * Show Document Request (:arrow_right_hook:)
      * New in version 3.16.0
      * <p>
-     * The show document request is sent from a server to a client to ask the client to display a particular resource referenced by a URI in the user interface.
+     * The show document request is sent from a server to a client to ask the client to display a
+     * particular resource referenced by a URI in the user interface.
      * <p>
      * property path (optional): window.showDocument
      * property type: ShowDocumentClientCapabilities defined as follows:
@@ -66,7 +78,9 @@ public interface ClientApi {
 
 
     void taskFinished(TaskFinishedInfo info);
+
     void taskProgress(int position);
+
     void taskStarted(TaskStartedInfo info);
-    //endregion
+    // endregion
 }

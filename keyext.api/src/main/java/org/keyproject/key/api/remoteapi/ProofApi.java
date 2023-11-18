@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteapi;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import de.uka.ilkd.key.proof.Statistics;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
 import org.keyproject.key.api.data.StreategyOptions;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Alexander Weigl
@@ -16,10 +20,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ProofApi {
     @JsonRequest
-    CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine, StreategyOptions options);
+    CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine,
+            StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<MacroStatistic> macro(ProofId proof, String macroId, StreategyOptions options);
+    CompletableFuture<MacroStatistic> macro(ProofId proof, String macroId,
+            StreategyOptions options);
 
     @JsonRequest
     CompletableFuture<MacroStatistic> auto(ProofId proof, StreategyOptions options);
