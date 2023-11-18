@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Enumeration;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -26,6 +24,8 @@ import de.uka.ilkd.key.proof.Proof;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -46,7 +46,7 @@ public class ProofDifferenceView extends JPanel {
     private final JComboBox<Proof> listLeftProof = new JComboBox<>();
     private final JComboBox<Proof> listRightProof = new JComboBox<>();
 
-    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator,
+    public ProofDifferenceView(@NonNull Node left, @NonNull Node right, KeYMediator mediator,
             VisibleTermLabels termLabels) {
         this.mediator = mediator;
         this.services = mediator.getServices();
@@ -177,7 +177,7 @@ public class ProofDifferenceView extends JPanel {
         return services;
     }
 
-    @Nonnull
+    @NonNull
     public Node getLeft() {
         return left;
     }
@@ -190,7 +190,7 @@ public class ProofDifferenceView extends JPanel {
         propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
     }
 
-    @Nonnull
+    @NonNull
     public Node getRight() {
         return right;
     }
@@ -215,7 +215,6 @@ public class ProofDifferenceView extends JPanel {
     }
 
     static class MyPanel extends JPanel implements Scrollable {
-        private static final long serialVersionUID = -3046025680639399997L;
 
         MyPanel(LayoutManager layout) {
             super(layout);

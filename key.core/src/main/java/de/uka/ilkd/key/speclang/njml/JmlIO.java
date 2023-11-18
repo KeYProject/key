@@ -217,9 +217,9 @@ public class JmlIO {
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
-        term =  services.getTermBuilder().addLabel(term, origin)
+        term = services.getTermBuilder().addLabel(term, origin);
         if (expr.second != null) {
-            term =  services.getTermBuilder().addLabel(term, expr.second);
+            term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(expr.second));
         }
         return term;
     }
@@ -246,7 +246,7 @@ public class JmlIO {
     public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
         Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
         if (condition.second != null) {
-            return services.getTermBuilder().addLabel(term, condition.second);
+            return services.getTermBuilder().addLabel(term, new ImmutableArray<>(condition.second));
         }
         return term;
     }

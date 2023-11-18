@@ -194,7 +194,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(MEASURED_BY,
-            createLabeledRuleContext(ctx, OriginTermLabel.SpecType.MEASURED_BY, ctx.entity_name()));
+            LabeledParserRuleContext.createLabeledParserRuleContext(
+                ctx, OriginTermLabel.SpecType.MEASURED_BY, attachOriginLabel, ctx.entity_name()));
         return null;
     }
 
@@ -235,7 +236,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
-            createLabeledRuleContext(ctx, OriginTermLabel.SpecType.ACCESSIBLE, null, ctx.entity_name());
+            LabeledParserRuleContext.createLabeledParserRuleContext(
+                ctx, OriginTermLabel.SpecType.ACCESSIBLE, attachOriginLabel, null);
         for (Name heap : heaps) {
             if (depends) {
                 TextualJMLDepends d = new TextualJMLDepends(mods, heaps, ctx2);
@@ -278,7 +280,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                OriginTermLabel.SpecType.DECREASES, attachOriginLabel);
+                OriginTermLabel.SpecType.DECREASES, attachOriginLabel, ctx.entity_name());
         if (loopContract != null) {
             loopContract.setVariant(ctx2);
         } else {
@@ -381,15 +383,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
-    private LabeledParserRuleContext createLabeledRuleContext(
-            ParserRuleContext ctx, OriginTermLabel.SpecType specType,
-            @Nullable JmlParser.Entity_nameContext nameContext) {
-        return new LabeledParserRuleContext(ctx,
-            TextualJMLConstruct.createTermLabel(specType, ctx.start,
-                nameContext != null ? nameContext.ident().getText() : null));
-
-    }
-
     @Override
     public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
         raiseError("Name clauses are not supported by KeY.", ctx);
@@ -433,7 +426,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         TextualJMLClassAxiom inv =
             new TextualJMLClassAxiom(mods,
-                createLabeledRuleContext(ctx, OriginTermLabel.SpecType.AXIOM, ctx.entity_name()));
+                LabeledParserRuleContext.createLabeledParserRuleContext(
+                    ctx, OriginTermLabel.SpecType.AXIOM, attachOriginLabel, ctx.entity_name()));
         constructs = constructs.append(inv);
         return null;
     }
@@ -490,7 +484,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
                 LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                     isFree ? OriginTermLabel.SpecType.LOOP_INVARIANT_FREE
                             : OriginTermLabel.SpecType.LOOP_INVARIANT,
-                    attachOriginLabel));
+                    attachOriginLabel, ctx.entity_name()));
         }
         return null;
     }
@@ -512,7 +506,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
                 LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSERT, attachOriginLabel, ctx.entity_name());
+                    OriginTermLabel.SpecType.ASSERT, attachOriginLabel, ctx.entity_name()));
         constructs = constructs.append(b);
         return null;
     }

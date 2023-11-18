@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public final class BranchNamingFunctions {
         functionList.put(name, fn);
     }
 
-    @Nonnull
+    @NonNull
     public static BranchNamingFunction find(String text) {
         if (!text.contains("\\")) { // Shortcut for non-dynamic branch labels
             return new SimpleStringLabel(text);

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.Location;
@@ -23,8 +24,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -146,7 +147,6 @@ public abstract class TextualJMLConstruct {
 
 
     /**
-     *
      * @param type
      * @param start
      * @param name
@@ -159,15 +159,17 @@ public abstract class TextualJMLConstruct {
             label.add(new SpecNameLabel(name));
         }
 
+        final var factory = new OriginTermLabelFactory();
         if (start != null && type != null) {
             String filename = start.getTokenSource().getSourceName();
             if (filename != null && filename.equals("<unknown>"))
                 filename = "unknown";
             int line = start.getLine();
-            label.add(new OriginTermLabel(
+            label.add(factory.createOriginTermLabel(
                 new OriginTermLabel.FileOrigin(type, URI.create("file://" + filename), line)));
         } else if (type != null) {
-            label.add(new OriginTermLabel(new OriginTermLabel.Origin(type)));
+            label.add(factory.createOriginTermLabel(
+                new OriginTermLabel.Origin(type)));
         }
         return label.isEmpty() ? Collections.emptyList() : label;
     }

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,7 +241,7 @@ class JavacData {
     /**
      * The diagnostics emitted by the compiler.
      */
-    @Nonnull
+    @NonNull
     final List<PositionedIssueString> issues = new ArrayList<>(0);
     /**
      * True if there was no Java source file to compile.
