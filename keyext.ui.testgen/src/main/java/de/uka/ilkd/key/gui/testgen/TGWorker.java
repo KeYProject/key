@@ -10,7 +10,6 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,6 +21,10 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
 
+/**
+ * <strong>The worker must be started using method {@link TGWorker#start()} and not
+ * via the standard {@link #execute()}</strong>.
+ */
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
     private final TGInfoDialog tgInfoDialog;
     private boolean stop;
@@ -34,11 +37,15 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
         this.testGenerator = new MainWindowTestGenerator(getMediator(), originalProof, false);
     }
 
+    public void start() {
+        final KeYMediator mediator = getMediator();
+        mediator.initiateAutoMode(originalProof, true, false);
+        mediator.addInterruptedListener(this);
+        execute();
+    }
+
     @Override
     public Void doInBackground() {
-        getMediator().setInteractive(false);
-        getMediator().startInterface(false);
-        SequentViewInputListener.setRefresh(false);
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }
@@ -48,10 +55,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
      */
     @Override
     public void done() {
-        getMediator().setInteractive(true);
-        getMediator().startInterface(true);
+        getMediator().finishAutoMode(originalProof, true, true, null);
         getMediator().removeInterruptedListener(this);
-        SequentViewInputListener.setRefresh(true);
         originalProof = null;
     }
 
@@ -75,6 +80,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     public boolean shouldStop() {
         return stop;
     }
+
 }
 
 
@@ -122,7 +128,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
                     p.dispose();
                 }
             }
-            mediator.setProof(super.getOriginalProof());
+            mediator.getSelectionModel().setSelectedProof(super.getOriginalProof());
         } else {
             super.dispose();
         }
@@ -167,7 +173,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     @Override
     protected void selectProof(UserInterfaceControl ui, Proof proof) {
         if (showInMainWindow) {
-            mediator.setProof(proof);
+            mediator.getSelectionModel().setSelectedProof(proof);
         }
     }
 }

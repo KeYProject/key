@@ -12,7 +12,6 @@ import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -130,8 +129,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = this;
             try {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(proof, true, false);
                 ptl.taskStarted(
                     new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
@@ -144,8 +142,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                 LOGGER.debug("Exception occurred during macro application:", e);
             } finally {
                 ptl.taskFinished(info);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                getMediator().finishAutoMode(proof, true, true, null);
             }
             return true;
         } else {
@@ -176,8 +173,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
             ThreadUtilities.invokeAndWait(() -> {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(info.getProof(), true, false);
             });
         }
     }
@@ -233,9 +229,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);
-        for (Proof proof : proofList.getProofs()) {
-            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
-        }
         return env;
     }
 

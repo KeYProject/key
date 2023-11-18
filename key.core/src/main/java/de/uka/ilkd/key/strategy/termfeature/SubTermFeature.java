@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -36,7 +37,7 @@ public class SubTermFeature implements TermFeature {
     private final TermFeature[] features;
     private final RuleAppCost arityMismatchCost;
 
-    public RuleAppCost compute(Term term, Services services) {
+    public RuleAppCost compute(Term term, MutableState mState, Services services) {
         if (term.arity() != features.length) {
             return arityMismatchCost;
         }
@@ -44,7 +45,7 @@ public class SubTermFeature implements TermFeature {
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
 
         for (int i = 0; i < features.length && !(res instanceof TopRuleAppCost); i++) {
-            res = res.add(features[i].compute(term.sub(i), services));
+            res = res.add(features[i].compute(term.sub(i), mState, services));
         }
 
         return res;

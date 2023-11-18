@@ -25,7 +25,7 @@ public class TaskTreeModel extends DefaultTreeModel {
         super(new DefaultMutableTreeNode("Tasks"));
     }
 
-    public void addTask(TaskTreeNode p) {
+    public synchronized void addTask(TaskTreeNode p) {
         ProofEnvironment env = p.getProofEnv();
         int size = getChildCount(getRoot());
         for (int i = 0; i < size; i++) {
@@ -42,7 +42,7 @@ public class TaskTreeModel extends DefaultTreeModel {
         p.insertNode(this, envNode);
     }
 
-    public void removeTask(TaskTreeNode p) {
+    public synchronized void removeTask(TaskTreeNode p) {
         Proof[] allProofs = p.allProofs();
         for (Proof allProof : allProofs) {
             proofToTask.remove(allProof);
@@ -71,14 +71,14 @@ public class TaskTreeModel extends DefaultTreeModel {
         }
     }
 
-    public TaskTreeNode getTaskForProof(Proof p) {
+    public synchronized TaskTreeNode getTaskForProof(Proof p) {
         if (p == null) {
             return null;
         }
         return proofToTask.get(p);
     }
 
-    public TaskTreeNode addProof(ProofAggregate plist) {
+    public synchronized TaskTreeNode addProof(ProofAggregate plist) {
         TaskTreeNode bp;
         if (plist.size() == 1) {
             bp = new BasicTask(plist);

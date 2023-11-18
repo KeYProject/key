@@ -108,10 +108,11 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private void fillCache() {
         if (cache == null) {
             cache = new ArrayList<>();
-            if (this.proofTreeView.delegateModel != null
-                    && this.proofTreeView.delegateModel.getRoot() != null) {
-                addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
-                fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
+            final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+            if (delegateModel != null
+                    && delegateModel.getRoot() != null) {
+                addNodeToCache((GUIAbstractTreeNode) delegateModel.getRoot());
+                fillCacheHelp((GUIBranchNode) delegateModel.getRoot());
             }
         }
     }
@@ -120,12 +121,12 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         if (branch == null) {
             return;
         }
-        GUIAbstractTreeNode n;
-        for (int i = 0; i < this.proofTreeView.delegateModel.getChildCount(branch); i++) {
-            n = (GUIAbstractTreeNode) this.proofTreeView.delegateModel.getChild(branch, i);
+        final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+        for (int i = 0; i < delegateModel.getChildCount(branch); i++) {
+            final GUIAbstractTreeNode n = (GUIAbstractTreeNode) delegateModel.getChild(branch, i);
             addNodeToCache(n);
-            if (n instanceof GUIBranchNode) {
-                fillCacheHelp((GUIBranchNode) n);
+            if (n instanceof GUIBranchNode branchNode) {
+                fillCacheHelp(branchNode);
             }
         }
     }

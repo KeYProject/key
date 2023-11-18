@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
@@ -70,19 +70,19 @@ public class IfInstantiationCachePool {
 
     public static class IfInstantiationCache {
 
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache =
+        private final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> antecCache =
             new LinkedHashMap<>();
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache =
+        private final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> succCache =
             new LinkedHashMap<>();
 
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         private final ReadLock readLock = lock.readLock();
         private final WriteLock writeLock = lock.writeLock();
 
-        public ImmutableList<IfFormulaInstantiation> get(boolean antec, Long key) {
+        public ImmutableArray<IfFormulaInstantiation> get(boolean antec, Long key) {
             try {
                 readLock.lock();
-                final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
+                final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> cache =
                     antec ? antecCache : succCache;
                 return cache.get(key);
             } finally {
@@ -90,8 +90,8 @@ public class IfInstantiationCachePool {
             }
         }
 
-        public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
-            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
+        public void put(boolean antec, Long key, ImmutableArray<IfFormulaInstantiation> value) {
+            final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> cache =
                 antec ? antecCache : succCache;
             try {
                 writeLock.lock();

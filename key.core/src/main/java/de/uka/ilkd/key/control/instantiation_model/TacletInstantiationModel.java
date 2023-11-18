@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -119,9 +120,9 @@ public class TacletInstantiationModel {
         int size = asize + ifseq.succedent().size();
 
         if (size > 0) {
-            ImmutableList<IfFormulaInstantiation> antecCand =
+            ImmutableArray<IfFormulaInstantiation> antecCand =
                 IfFormulaInstSeq.createList(seq, true, services);
-            ImmutableList<IfFormulaInstantiation> succCand =
+            ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();

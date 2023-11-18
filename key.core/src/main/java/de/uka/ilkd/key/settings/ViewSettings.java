@@ -13,6 +13,7 @@ import javax.swing.*;
  * number is exceeded no SchemaVariables get instantiated in the displayed tooltip. 3) whether
  * intermediate proofsteps should be hidden in the proof tree view
  *
+ * @see de.uka.ilkd.key.gui.settings.StandardUISettings
  * @author unknown
  * @author weigl
  */
@@ -123,7 +124,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Show heatmap for sequent formulas (true) or terms (false)
      */
-    private static final String HEATMAP_SHOW = "Heatmap_enabled";
+    private static final String HEATMAP_SHOW = "
+      _enabled";
     /**
      *
      */
@@ -135,7 +137,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      *
      */
-    private static final String HEATMAP_MAXAGE = "[Heatmap]maxAge";
+    private static final String HEATMAP_MAXAGE = "Heatmap_maxAge";
 
     private static final String HIDE_INTERACTIVE_GOALS = "hideInteractiveGoals";
 
@@ -145,8 +147,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String USER_FOLDER_BOOKMARKS = "folderBookmarks";
 
+    private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
+
     private static final String LOOK_AND_FEEL_DEFAULT =
         UIManager.getCrossPlatformLookAndFeelClassName();
+
+    public static final String NOTIFICATION_ALWAYS = "Always";
+    public static final String NOTIFICATION_UNFOCUSED = "When not focused";
+    public static final String NOTIFICATION_NEVER = "Never";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -206,6 +214,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> hideInteractiveGoals =
         createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
+    private final PropertyEntry<String> notificationAfterMacro =
+        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
+  
     /**
      * User-definable folder bookmarks.
      *
@@ -558,5 +569,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setFolderBookmarks(List<String> bm) {
         folderBookmarks.set(bm);
+    }
+
+    public String notificationAfterMacro() {
+        return notificationAfterMacro.get();
+    }
+
+    public void setNotificationAfterMacro(String value) {
+        if (value.equals(NOTIFICATION_ALWAYS) || value.equals(NOTIFICATION_UNFOCUSED)
+                || value.equals(NOTIFICATION_NEVER)) {
+            notificationAfterMacro.set(value);
+        } else {
+            throw new IllegalStateException("tried to set wrong value for notification setting");
+        }
     }
 }
