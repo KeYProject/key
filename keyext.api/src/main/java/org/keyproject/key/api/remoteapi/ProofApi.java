@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteapi;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import de.uka.ilkd.key.proof.Statistics;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
