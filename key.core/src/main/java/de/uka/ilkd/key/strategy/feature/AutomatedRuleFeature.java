@@ -18,7 +18,7 @@ public class AutomatedRuleFeature extends BinaryTacletAppFeature {
 
     private AutomatedRuleFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
     }
 
