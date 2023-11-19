@@ -4,9 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -19,22 +17,23 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The menu shown by a {@link SequentViewListener} when the user clicks on a {@link SequentView}.
  *
  * @param <T> a type of {@link SequentView} on which this menu is shown.
  */
+@NullMarked
 public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * The position of the selected term.
      */
-    @Nonnull
     private PosInSequent pos;
 
     /**
      * The sequent view associated with this menu.
      */
-    @Nonnull
     private T sequentView;
 
     private final KeyAction actionCopyToClipboard = new CopyToClipboardAction();
@@ -52,7 +51,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
      * @param sequentView the SequentView that is the parent of this menu
      * @param pos the PosInSequent
      */
-    SequentViewMenu(@Nonnull T sequentView, @Nonnull PosInSequent pos) {
+    SequentViewMenu(T sequentView, PosInSequent pos) {
         super();
         this.sequentView = sequentView;
         this.pos = pos;
@@ -61,7 +60,6 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * @return the position at which to show this menu.
      */
-    @Nonnull
     protected PosInSequent getPos() {
         return pos;
     }
@@ -69,7 +67,6 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * @return the sequent view on which to show this menu.
      */
-    @Nonnull
     protected T getSequentView() {
         return sequentView;
     }

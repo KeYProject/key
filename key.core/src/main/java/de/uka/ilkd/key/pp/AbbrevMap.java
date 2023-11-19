@@ -128,7 +128,7 @@ public class AbbrevMap {
      */
     public Term getTerm(String s) {
         var term = string2Term.get(s);
-        return term == null ? null : term.getTerm();
+        return term == null ? null : term.term();
     }
 
     /**
@@ -168,7 +168,7 @@ public class AbbrevMap {
      * Note, this will allocate a new data structure each time.
      */
     public Collection<Pair<Term, String>> export() {
-        return term2String.entrySet().stream().map(e -> new Pair<>(e.getKey().t, e.getValue()))
+        return term2String.entrySet().stream().map(e -> new Pair<>(e.getKey().term, e.getValue()))
                 .collect(Collectors.toList());
 
     }
@@ -197,7 +197,7 @@ public class AbbrevMap {
         setEnabled(t, true);
     }
 
-    public record AbbrevWrapper(Term t) {}
+    public record AbbrevWrapper(Term term) {}
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
@@ -12,8 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -35,6 +36,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +54,14 @@ import org.slf4j.LoggerFactory;
         "Allows storing and loading abbreviations of text files.",
     disabled = false,
     experimental = false)
+@NullMarked
 public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbrevManager.class);
 
     private AbbrevManagerPanel panel;
 
-    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
         if (panel == null)
             panel = new AbbrevManagerPanel(window, mediator);
         return Collections.singleton(panel);
@@ -151,19 +153,16 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
             }
         }
 
-        @Nonnull
         @Override
         public String getTitle() {
             return "Abbrev Manager";
         }
 
-        @Nonnull
         @Override
         public JComponent getComponent() {
             return this;
         }
 
-        @Nonnull
         @Override
         public Collection<Action> getTitleActions() {
             return List.of(actionLoad, actionSave, actionTransfer);

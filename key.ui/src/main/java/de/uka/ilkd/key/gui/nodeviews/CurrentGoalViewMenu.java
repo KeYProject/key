@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.event.ActionEvent;
 import java.io.Serial;
 import java.util.*;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -44,6 +43,8 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
@@ -157,10 +158,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList) {
         ImmutableList<TacletApp> toAdd = sort(find, comp);
-        boolean rulesAvailable = find.size() > 0;
+        boolean rulesAvailable = !find.isEmpty();
 
         if (getPos() != null && getPos().isSequent()) {
-            rulesAvailable |= noFind.size() > 0;
+            rulesAvailable |= !noFind.isEmpty();
             toAdd = toAdd.prepend(noFind);
         }
 
@@ -401,12 +402,12 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         // add globally
-        if (insHiddenItem.size() > 0) {
+        if (!insHiddenItem.isEmpty()) {
             add(createInsertHiddenMenu(insHiddenItem));
         }
 
         // add globally
-        if (insSystemInvItem.size() > 0) {
+        if (!insSystemInvItem.isEmpty()) {
             add(createSystemInvariantMenu(insSystemInvItem));
         }
     }
@@ -486,25 +487,6 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             new FocussedAutoModeUserAction(mediator, mediator.getSelectedProof(),
                 getPos().getPosInOccurrence()).actionPerformed(e);
         }
-    }
-        }
-    }
-
-    static class FocussedRuleApplicationMenuItem extends JMenuItem {
-        private static final String APPLY_RULES_AUTOMATICALLY_HERE =
-            "Apply rules automatically here";
-
-        @Serial
-        private static final long serialVersionUID = -6486650015103963268L;
-
-        public FocussedRuleApplicationMenuItem() {
-            super(APPLY_RULES_AUTOMATICALLY_HERE);
-            setToolTipText("<html>Initiates and restricts automatic rule applications on the "
-                + "highlighted formula, term or sequent.<br> "
-                + "'Shift + left mouse click' on the highlighted "
-                + "entity does the same.</html>");
-        }
-
     }
 
     public static class TacletAppComparator implements Comparator<TacletApp> {
@@ -667,7 +649,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             }
         }
 
-        protected abstract void apply(@Nonnull PosInOccurrence occ);
+        protected abstract void apply(@NonNull PosInOccurrence occ);
     }
 
     class CreateAbbreviationAction extends PIOAction {
@@ -676,7 +658,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         @Override
-        protected void apply(@Nonnull PosInOccurrence occ) {
+        protected void apply(@NonNull PosInOccurrence occ) {
             // trim string, otherwise the main window gets too large (bug #1430)
             final String oldTerm = occ.subTerm().toString();
             final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
@@ -728,7 +710,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
 
         @Override
-        protected void apply(@Nonnull PosInOccurrence occ) {
+        protected void apply(@NonNull PosInOccurrence occ) {
             mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
             getSequentView().printSequent();
         }
@@ -740,7 +722,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         @Override
-        protected void apply(@Nonnull PosInOccurrence occ) {
+        protected void apply(@NonNull PosInOccurrence occ) {
             mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
             getSequentView().printSequent();
         }
@@ -752,7 +734,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         @Override
-        protected void apply(@Nonnull PosInOccurrence occ) {
+        protected void apply(@NonNull PosInOccurrence occ) {
             String abbreviation = (String) JOptionPane.showInputDialog(CurrentGoalViewMenu.this,
                 "Enter abbreviation for term: \n" + occ.subTerm().toString(),
                 "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,

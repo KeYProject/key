@@ -5,16 +5,17 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.annotation.Nullable;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Listener for a {@link SequentView}.
- *
- * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
+ * <p>
+ * Reacts on mouse events to highlight the selected part of the sequent, and it pops up a menu
  * showing all applicable actions at the highlighted position.
  *
  * @param <T> the type of the object this listener is listening to.
