@@ -172,6 +172,7 @@ public class MediatorProofControl extends AbstractProofControl {
         private final ImmutableList<Goal> goals;
         private final ApplyStrategy applyStrategy;
         private ProofSearchInformation<Proof, Goal> info;
+        private final ReentrantLock lock;
         private final Condition ready;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
@@ -191,7 +192,8 @@ public class MediatorProofControl extends AbstractProofControl {
                 applyStrategy.addProverTaskObserver(ui.getMediator().getAutoSaver());
             }
 
-            ready = new ReentrantLock().newCondition();
+            lock = new ReentrantLock();
+            ready = lock.newCondition();
         }
 
         @Override
@@ -211,7 +213,11 @@ public class MediatorProofControl extends AbstractProofControl {
                     applyStrategy.clear();
                 }
                 ui.getMediator().finishAutoMode(proof, true, true, null);
+
+                lock.lock();
                 ready.signalAll();
+                lock.unlock();
+
                 emitInteractiveAutoMode(initialGoals, proof, info);
 
                 if (info.getException() != null) {
