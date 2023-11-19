@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.java;
 
 import java.net.MalformedURLException;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.jspecify.annotations.Nullable;
 import recoder.parser.ParseException;
 
 /**

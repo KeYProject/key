@@ -15,8 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
@@ -38,6 +36,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,7 +226,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
@@ -242,7 +242,7 @@ public class KeYFile implements EnvInput {
         return bootClassPathFile;
     }
 
-    protected @Nonnull ProblemInformation getProblemInformation() {
+    protected @NonNull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
             KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
@@ -251,10 +251,10 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public List<File> readClassPath() {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
@@ -274,7 +274,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
@@ -339,7 +339,7 @@ public class KeYFile implements EnvInput {
         return DefaultImmutableSet.nil();
     }
 
-    @Nonnull
+    @NonNull
     protected ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());

@@ -21,7 +21,7 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
     private OnlyInScopeOfQuantifiersFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final PIOPathIterator it = pos.iterator();

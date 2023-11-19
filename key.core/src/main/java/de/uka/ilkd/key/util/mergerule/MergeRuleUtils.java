@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util.mergerule;
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +138,7 @@ public class MergeRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @Nonnull
+            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {
@@ -759,7 +759,6 @@ public class MergeRuleUtils {
      *         successful.
      *
      * @see #simplify(Proof, Term, int)
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
             boolean countDisjunctions, int timeout) {
@@ -806,7 +805,7 @@ public class MergeRuleUtils {
      *
      * @param se1 First element to check equality (mod renaming) for.
      * @param se2 Second element to check equality (mod renaming) for.
-     * @param goal The goal of the current branch (for getting branch-unique names).
+     * @param node The node of the current branch (for getting branch-unique names).
      * @param services The Services object.
      * @return true iff source elements can be matched, considering branch-unique location names.
      */
@@ -847,7 +846,7 @@ public class MergeRuleUtils {
      * The underlying idea is based upon the observation that many path conditions that should be
      * merged are conjunctions of mostly the same elements and, in addition, formulae phi and !phi
      * that vanish after creating the disjunction of the path conditions. The corresponding valid
-     * formula is <code>(phi & psi) | (phi & !psi) <-> phi</code>
+     * formula is {@code (phi & psi) | (phi & !psi) <-> phi}
      * <p>
      *
      * For formulae that cannot be simplified by this law, the method performs two additional
@@ -860,7 +859,7 @@ public class MergeRuleUtils {
      * @param cond1 First path condition to merge.
      * @param cond2 Second path condition to merge.
      * @param services The services object.
-     * @param timeout Time in milliseconds after which the side proof is aborted.
+     * @param simplificationTimeout Time in milliseconds after which the side proof is aborted.
      * @return A path condition that is equivalent to the disjunction of the two supplied formulae,
      *         but possibly simpler.
      */
@@ -1006,16 +1005,17 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state (U,C).
+     * Thereby, all
      * program variables occurring in the symbolic state are replaced by branch-unique
      * correspondents in order to enable merging of different branches declaring local variables.
      * <p>
      *
-     * @param goal Current goal.
+     * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
+     * @see #sequentToSETriple(Node, PosInOccurrence, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node, PosInOccurrence pio,
             Services services) {
@@ -1026,7 +1026,8 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C,p). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state
+     * (U,C,p). Thereby, all
      * program variables occurring in the program counter and in the symbolic state are replaced by
      * branch-unique correspondents in order to enable merging of different branches declaring local
      * variables.
@@ -1039,7 +1040,7 @@ public class MergeRuleUtils {
      * not effected by the switch to branch-unique names. However, merged nodes are then of course
      * potentially different from their predecessors concerning the involved local variable symbols.
      *
-     * @param goal Current goal.
+     * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C,p).
@@ -1537,7 +1538,7 @@ public class MergeRuleUtils {
 
     /**
      * Simplifies the given {@link Term} in a side proof with splits. This code has been copied from
-     * {@link SymbolicExecutionUtil} and only been slightly modified (to allow for splitting the
+     * {@code SymbolicExecutionUtil} and only been slightly modified (to allow for splitting the
      * proof).
      *
      * @param parentProof The parent {@link Proof}.
@@ -1546,7 +1547,6 @@ public class MergeRuleUtils {
      * @return The simplified {@link Term}.
      * @throws ProofInputException Occurred Exception.
      *
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
@@ -1601,10 +1601,13 @@ public class MergeRuleUtils {
 
     /**
      * Tells whether a name is unique in the passed list of global variables.
+     * <p>
+     * (see also {@code VariableNamer.isUniqueInGlobals(String, Iterable)})
+     * </p>
      *
      * @param name The name to check uniqueness for.
      * @param globals The global variables for the givan branch.
-     * @see VariableNamer#isUniqueInGlobals(String, Iterable)
+     *
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
         for (final IProgramVariable n : globals) {
@@ -1815,7 +1818,7 @@ public class MergeRuleUtils {
     /**
      * Map for renaming variables to their branch-unique names. Putting things into this map has
      * absolutely no effect; the get method just relies on the
-     * {@link LocationVariable#getBranchUniqueName()} method of the respective location variable.
+     * {@link #getBranchUniqueLocVar} method.
      * Therefore, this map is also a singleton object.
      *
      * @author Dominic Scheurer

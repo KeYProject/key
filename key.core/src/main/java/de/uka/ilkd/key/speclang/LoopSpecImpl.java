@@ -78,7 +78,7 @@ public final class LoopSpecImpl implements LoopSpecification {
      * @param invariants the invariant formula for each heap.
      * @param freeInvariants the free invariant formula for each heap.
      * @param modifies the modifies clause for each heap.
-     * @param modifies the free modifies clause for each heap.
+     * @param freeModifies the free modifies clause for each heap.
      * @param infFlowSpecs low variables for information flow.
      * @param variant the variant term.
      * @param selfTerm the term used for the receiver object.

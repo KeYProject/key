@@ -282,7 +282,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            var parser = new PreParser();
+            var parser = new PreParser(services.getOriginFactory() != null);
             ImmutableList<TextualJMLConstruct> constructs =
                 parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
@@ -356,7 +356,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            PreParser parser = new PreParser();
+            PreParser parser = new PreParser(services.getOriginFactory() != null);
             constructs = parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
         } else {
@@ -653,7 +653,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         final String concatenatedComment = concatenate(comments);
         final Position position = comments[0].getStartPosition();
-        final var parser = new PreParser();
+        final var parser = new PreParser(services.getOriginFactory() != null);
         final ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, position);
         warnings = warnings.append(parser.getWarnings());
@@ -684,7 +684,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         Position pos = comments[0].getStartPosition();
 
         // call preparser
-        var parser = new PreParser();
+        var parser = new PreParser(services.getOriginFactory() != null);
         ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());

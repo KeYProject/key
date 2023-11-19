@@ -65,7 +65,7 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
 
     /**
      * @throws UnsupportedOperationException
-     * @see getStatementContainer()
+     * @see #getStatementContainer()
      */
     public void setStatementContainer(@SuppressWarnings("unused") StatementContainer c) {
         throw new UnsupportedOperationException();

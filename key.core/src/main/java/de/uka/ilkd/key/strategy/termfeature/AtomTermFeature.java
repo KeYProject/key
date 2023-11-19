@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class AtomTermFeature extends BinaryTermFeature {
 
@@ -17,7 +18,7 @@ public class AtomTermFeature extends BinaryTermFeature {
 
     private AtomTermFeature() {}
 
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Term term, MutableState mState, Services services) {
         final Operator op = term.op();
         return !(op instanceof Junctor || op == Equality.EQV || op instanceof IfThenElse
                 || op instanceof Quantifier);

@@ -105,7 +105,7 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Term} is a logical operator
      *
-     * @param operator The {@link Term} to check.
+     * @param term The {@link Term} to check.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
     public static boolean isLogicOperator(Term term) {
@@ -403,7 +403,7 @@ public final class TruthValueTracingUtil {
      * @param tacletApp The {@link TacletApp}.
      * @param tacletGoal The {@link TacletGoalTemplate}.
      * @param labels The {@link FormulaTermLabel}s.
-     * @param servies The {@link Services} to use.
+     * @param services The {@link Services} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void analyzeTacletGoal(
@@ -429,10 +429,10 @@ public final class TruthValueTracingUtil {
     }
 
     /**
-     * Updates the {@link PredicateResult}s based on minor ID changes if available in case of
+     * Updates the predicate results based on minor ID changes if available in case of
      * {@link OneStepSimplifier} usage.
      *
-     * @param childNode The child {@link Node}.
+     * @param childPio The child position
      * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
      * @param tb The {@link TermBuilder} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
@@ -513,7 +513,7 @@ public final class TruthValueTracingUtil {
     }
 
     /**
-     * Updates the {@link PredicateResult}s based on minor ID changes if available.
+     * Updates the predicate results based on minor ID changes if available.
      *
      * @param childNode The child {@link Node}.
      * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
@@ -997,7 +997,7 @@ public final class TruthValueTracingUtil {
 
     /**
      * Represents the final predicate evaluation result returned by
-     * {@link TruthValueEvaluationUtil#evaluate(Node, Name, boolean, boolean).
+     * {@link TruthValueTracingUtil#evaluate(Node, Name, boolean, boolean)}
      *
      * @author Martin Hentschel
      */
@@ -1375,7 +1375,8 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code eqv} value.
          *
-         * @param value The {@link TruthValue}.
+         * @param left The left {@link TruthValue}.
+         * @param right The right {@link TruthValue}.
          * @return The computed {@code not} value.
          */
         public static TruthValue eqv(TruthValue left, TruthValue right) {

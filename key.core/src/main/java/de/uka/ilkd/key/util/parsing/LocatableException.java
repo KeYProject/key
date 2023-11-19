@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.MalformedURLException;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple checked exception which holds an location.

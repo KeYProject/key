@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
 import de.uka.ilkd.key.gui.prooftree.Style;
 import de.uka.ilkd.key.gui.prooftree.Styler;
@@ -34,6 +34,8 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Entry point for the Proof Exploration Extension.
  *
@@ -43,6 +45,7 @@ import org.key_project.exploration.ui.ExplorationStepsList;
 @KeYGuiExtension.Info(name = "Exploration",
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
     experimental = true, optional = true, priority = 10000)
+@HelpInfo(path = "/user/Exploration/")
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
@@ -73,14 +76,14 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         }
     };
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
@@ -122,17 +125,17 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
-    private void initLeftPanel(@Nonnull MainWindow window) {
+    private void initLeftPanel(@NonNull MainWindow window) {
         leftPanel = new ExplorationStepsList(window);
         leftPanel.setEnabled(model.isExplorationModeSelected());
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
             e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             initLeftPanel(window);
         }
@@ -150,7 +153,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
             new ShowInteractiveBranchesAction(model, mainWindow));
     }
@@ -176,7 +179,7 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
         ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
 
     @Override
-    public void style(@Nonnull Style style, GUIAbstractTreeNode treeNode) {
+    public void style(@NonNull Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
 

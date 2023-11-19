@@ -14,6 +14,8 @@ import java.net.URL;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.key_project.util.java.SwingUtil;
+
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop
  * system is not supported or internet connection missing.
@@ -22,9 +24,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  *
  */
 public class KeYProjectHomepageAction extends MainWindowAction {
-
     private static final long serialVersionUID = 8657661861116034536L;
-    private final static String url = "http://www.key-project.org/";
+    private final static String url = "https://www.key-project.org/";
 
     public KeYProjectHomepageAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -36,7 +37,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     }
 
     private static boolean desktopEnabled() {
-        return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
+        return SwingUtil.browseIsSupported();
     }
 
     private static URI getURI() {
@@ -52,9 +53,8 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            Desktop.getDesktop().browse(getURI());
-        } catch (IOException e1) {
-            // todo Auto-generated catch block
+            SwingUtil.browse(getURI());
+        } catch (IOException ignored) {
         }
     }
 }

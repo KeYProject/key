@@ -63,6 +63,7 @@ class EndToEndTests {
             assertEquals(producingNodes[i],
                 tracker.getNodeThatProduced(node26, pio).serialNr());
         }
+        proof.dispose();
     }
 
     /**
@@ -78,15 +79,20 @@ class EndToEndTests {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
             new File(testCaseDirectory,
                 "../../../../../key.ui/examples/firstTouch/05-ReverseArray/reverseArray.proof"),
-            6535, 4234, true, true);
+            6535, 4234, true, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 4234, 4227, true, true);
+            sliceProofFullFilename(iteration1.second, 4234, 4227, true, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 4227, 4218, true, true);
+            sliceProofFullFilename(iteration2.second, 4227, 4218, true, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 4218, 4207, true, true);
+            sliceProofFullFilename(iteration3.second, 4218, 4207, true, true, true);
         Pair<Proof, File> iteration5 =
-            sliceProofFullFilename(iteration4.second, 4207, 4195, true, true);
+            sliceProofFullFilename(iteration4.second, 4207, 4195, true, true, true);
+        iteration5.first.dispose();
+        iteration4.first.dispose();
+        iteration3.first.dispose();
+        iteration2.first.dispose();
+        iteration1.first.dispose();
         Files.delete(iteration5.second.toPath());
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
@@ -103,7 +109,10 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false);
+            3238, 1336, true, false).dispose();
+        sliceProofOffline(
+            "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
+            3238, 1336, true, false).dispose();
     }
 
     /**
@@ -113,7 +122,7 @@ class EndToEndTests {
      */
     @Test
     void sliceCutExample() throws Exception {
-        sliceProof("/cutExample.proof", 10, 7, true, false);
+        sliceProof("/cutExample.proof", 10, 7, true, false).dispose();
     }
 
     /**
@@ -123,7 +132,8 @@ class EndToEndTests {
      */
     @Test
     void sliceAgathaWithOpenGoal() throws Exception {
-        sliceProof("/agathaOpenGoal.proof", 145, 124, true, false);
+        sliceProof("/agathaOpenGoal.proof", 145, 124, true, false).dispose();
+        sliceProofOffline("/agathaOpenGoal.proof", 145, 124, true, false).dispose();
     }
 
     /**
@@ -133,8 +143,8 @@ class EndToEndTests {
      */
     @Test
     void sliceWithOpenGoal() throws Exception {
-        sliceProof("/openGoal1.proof", 10, 7, true, false);
-        sliceProof("/openGoal2.proof", 10, 7, true, false);
+        sliceProof("/openGoal1.proof", 10, 7, true, false).dispose();
+        sliceProof("/openGoal2.proof", 10, 7, true, false).dispose();
     }
 
     /**
@@ -150,13 +160,13 @@ class EndToEndTests {
 
         // duplicate analysis: merge duplicated steps (one at a time)
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/ifThenElseSplit.proof"), 12, 11, false, true);
+            new File(testCaseDirectory, "/ifThenElseSplit.proof"), 12, 11, false, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 11, 10, false, true);
+            sliceProofFullFilename(iteration1.second, 11, 10, false, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 10, 9, false, true);
+            sliceProofFullFilename(iteration2.second, 10, 9, false, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 9, 8, false, true);
+            sliceProofFullFilename(iteration3.second, 9, 8, false, true, true);
         assertEquals("w TRUE",
             iteration4.first.findAny(x -> x.serialNr() == 6).getNodeInfo().getBranchLabel());
         assertEquals("w FALSE",
@@ -200,13 +210,13 @@ class EndToEndTests {
     @Test
     void sliceDuplicatesAway() throws Exception {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, false, true);
+            new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, false, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 9, 8, false, true);
+            sliceProofFullFilename(iteration1.second, 9, 8, false, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 8, 7, false, true);
+            sliceProofFullFilename(iteration2.second, 8, 7, false, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 7, 7, false, true);
+            sliceProofFullFilename(iteration3.second, 7, 7, false, true, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -221,13 +231,13 @@ class EndToEndTests {
     @Test
     void sliceDuplicatesAwayOpenGoals() throws Exception {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/exampleDuplicateOpen.proof"), 10, 9, false, true);
+            new File(testCaseDirectory, "/exampleDuplicateOpen.proof"), 10, 9, false, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 9, 8, false, true);
+            sliceProofFullFilename(iteration1.second, 9, 8, false, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 8, 7, false, true);
+            sliceProofFullFilename(iteration2.second, 8, 7, false, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 7, 7, false, true);
+            sliceProofFullFilename(iteration3.second, 7, 7, false, true, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -239,14 +249,24 @@ class EndToEndTests {
             throws Exception {
         Pair<Proof, File> it =
             sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
-                expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
+                expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps, true);
+        Files.delete(it.second.toPath());
+        return it.first;
+    }
+
+    private Proof sliceProofOffline(String filename, int expectedTotal,
+            int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
+            throws Exception {
+        Pair<Proof, File> it =
+            sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
+                expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps, false);
         Files.delete(it.second.toPath());
         return it.first;
     }
 
     private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis,
-            boolean doDeduplicateRuleApps) throws Exception {
+            boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -256,13 +276,19 @@ class EndToEndTests {
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {
-                    tracker.set(new DependencyTracker(proof));
+                    if (trackOnline) {
+                        tracker.set(new DependencyTracker(proof));
+                    }
                 }, true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
             boolean originalProofClosed = proof.closed();
+            // track proof (if not done already)
+            if (!trackOnline) {
+                tracker.set(new DependencyTracker(proof));
+            }
             // analyze proof
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);

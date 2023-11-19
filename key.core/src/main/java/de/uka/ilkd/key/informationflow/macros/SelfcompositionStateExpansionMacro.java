@@ -22,6 +22,7 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -123,14 +124,15 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
-                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
+                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal, mState);
                 if ("orLeft".equals(name)) {
                     costs = costs.add(NumberRuleAppCost.create(100));
                 }

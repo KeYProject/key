@@ -9,12 +9,11 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 
 /**
  * Utilits class used by
- * {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
+ * SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services).
  *
  * @author Martin Hentschel
  */

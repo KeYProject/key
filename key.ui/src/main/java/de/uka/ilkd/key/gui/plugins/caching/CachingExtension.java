@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
@@ -41,6 +41,7 @@ import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
+@HelpInfo(path = "/user/ProofCaching/")
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
@@ -143,10 +145,10 @@ public class CachingExtension
 
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
             List<Action> actions = new ArrayList<>();
@@ -241,9 +243,14 @@ public class CachingExtension
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
-                mediator.stopInterface(true);
-                newProof.copyCachedGoals(referencedProof, null, null);
-                mediator.startInterface(true);
+                mediator.initiateAutoMode(newProof, true, false);
+                try {
+                    newProof.copyCachedGoals(referencedProof, null, null);
+                } finally {
+                    mediator.finishAutoMode(newProof, true, true,
+                        /* do not select a different node */ () -> {
+                        });
+                }
             } else {
                 newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null

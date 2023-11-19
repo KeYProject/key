@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**

@@ -464,19 +464,12 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
 
-
-    /**
-     * {@inheritDoc}
-     */
     protected void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
         if (ruleCompletionHandler != null) {
             ruleCompletionHandler.completeAndApplyTacletMatch(models, goal);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
             boolean forced) {
         if (ruleCompletionHandler == null) {
@@ -596,7 +589,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
         startAutoMode(proof, goals, null);
     }
 
@@ -609,7 +602,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * that goal
      */
     @Override
-    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
+    public synchronized void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

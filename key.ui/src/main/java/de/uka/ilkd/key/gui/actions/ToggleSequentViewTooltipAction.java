@@ -18,7 +18,6 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * @author lanzinger
  *
  * @see SequentView#getToolTipText()
- * @see KeYTooltipExtension
  */
 public class ToggleSequentViewTooltipAction extends MainWindowAction {
     /** This action's name. */

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,7 +152,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
                     }
 
@@ -233,7 +232,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
                     }
                 }

@@ -13,7 +13,8 @@ public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>>, java.io.Serializable {
 
     /**
-     * adds a mapping <key,val> to the Map (old map is not modified) if key exists old entry has to
+     * adds a mapping {@code <key,val>} to the Map (old map is not modified) if key exists old entry
+     * has to
      * be removed
      *
      * @return the new mapping

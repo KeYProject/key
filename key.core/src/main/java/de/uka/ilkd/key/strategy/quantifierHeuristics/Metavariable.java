@@ -43,7 +43,6 @@ public final class Metavariable extends AbstractSortedOperator
         return name() + ":" + sort();
     }
 
-
     @Override
     public int compareTo(Metavariable p_mr) {
         if (p_mr == this) {

@@ -12,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
@@ -31,6 +29,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -121,7 +122,7 @@ public class Node implements Iterable<Node> {
         DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
@@ -454,6 +455,13 @@ public class Node implements Iterable<Node> {
      */
     public Iterator<Node> childrenIterator() {
         return new NodeIterator(children.iterator());
+    }
+
+    /**
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
     }
 
     /**
@@ -804,7 +812,7 @@ public class Node implements Iterable<Node> {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -69,6 +68,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 public final class WhileInvariantRule implements BuiltInRule {
     /**
@@ -563,8 +564,9 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-            "UseModality", null, inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
-            null, useJavaBlock, inst.progPost.getLabels());
+            "UseModality", null,
+            tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
+                null, useJavaBlock, inst.progPost.getLabels()));
         Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
@@ -700,7 +702,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
