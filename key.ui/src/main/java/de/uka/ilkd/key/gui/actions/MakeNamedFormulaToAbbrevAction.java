@@ -16,10 +16,15 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.AbbrevException;
 
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Scans through the current sequent and introduce an abbreviation for each named term.
+ * A named term is a term labeled with a {@link SpecNameLabel}.
+ *
  * @author Alexander Weigl
  * @version 1 (1/16/22)
  */
@@ -30,16 +35,11 @@ public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
     public MakeNamedFormulaToAbbrevAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Introduce abbreviation for named formulas");
-
         setEnabled(mainWindow.getMediator().getSelectedNode() != null);
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 setEnabled(mainWindow.getMediator().getSelectedNode() != null);
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
             }
         });
     }

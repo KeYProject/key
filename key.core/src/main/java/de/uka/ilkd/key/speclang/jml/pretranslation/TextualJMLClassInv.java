@@ -34,6 +34,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         this(mods, inv, null, free);
     }
 
+    /**
+     * User-defined name of the class invariant.
+     */
     public String getName() {
         if (name == null && inv.entity_name() != null) {
             name = inv.entity_name().ident().getText();
