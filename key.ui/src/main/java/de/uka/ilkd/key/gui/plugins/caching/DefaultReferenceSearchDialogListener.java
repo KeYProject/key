@@ -11,13 +11,15 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The default controller for the {@link ReferenceSearchDialog}.
- * When the copy button is clicked, {@link Proof#copyCachedGoals(Proof, Consumer, Runnable)}
+ * When the copy button is clicked,
+ * {@link de.uka.ilkd.key.proof.reference.CopyReferenceResolver#copyCachedGoals(Proof, Proof, Consumer, Runnable)}
  * is started.
  *
  * @author Arne Keller
@@ -43,7 +45,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
         new Thread(() -> {
             try {
                 mediator.initiateAutoMode(p, true, false);
-                p.copyCachedGoals(null,
+                CopyReferenceResolver.copyCachedGoals(p, null,
                     total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
                     () -> SwingUtilities.invokeLater(() -> {
                         if (dialog.incrementProgress()) {
