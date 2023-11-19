@@ -17,6 +17,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -203,7 +204,8 @@ public class TestFile implements Serializable {
 
                 if (testProperty == TestProperty.PROVABLE
                         || testProperty == TestProperty.NOTPROVABLE) {
-                    loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+                    ProofSaver.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"),
+                        loadedProof);
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
@@ -247,7 +249,7 @@ public class TestFile implements Serializable {
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
+            ProofSaver.saveToFile(proofFile, loadedProof);
             reloadProof(proofFile);
             if (verbose) {
                 LOGGER.debug("... success: reloaded.");
