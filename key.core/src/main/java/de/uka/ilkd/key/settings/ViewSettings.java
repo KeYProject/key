@@ -124,8 +124,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Show heatmap for sequent formulas (true) or terms (false)
      */
-    private static final String HEATMAP_SHOW = "
-      _enabled";
+    private static final String HEATMAP_SHOW = "Heatmap_enabled";
     /**
      *
      */
@@ -216,7 +215,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private final PropertyEntry<String> notificationAfterMacro =
         createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
-  
+
     /**
      * User-definable folder bookmarks.
      *
