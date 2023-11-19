@@ -1,8 +1,10 @@
-<!-- Thanks for submitting this pull request for KeY -->
-<!-- Since the project has a strict review policy, please make the -->
-<!-- reviewer's job easier by providing the necessary information -->
-<!-- in the text below. The comments may remain since they will be -->
-<!-- invisible when showing the PR. -->
+<!--
+Thanks for submitting this pull request for KeY.
+Since the project has a strict review policy, please make the
+reviewer's job easier by providing the necessary information
+in the text below. The comments may remain since they will be
+invisible when showing the PR.
+-->
 
 ## Related Issue
 
