@@ -5,7 +5,6 @@ package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -37,6 +36,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
  * PositionTable, which is needed for highlighting.
  *
  * <p>
- * The actual layouting/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
+ * The actual layout/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
  * The concrete syntax for operators is given by an instance of {@link NotationInfo}. The
  * LogicPrinter is responsible for the concrete <em>layout</em>, e.g. how terms with infix operators
  * are indented, and it binds the various needed components together.
@@ -407,8 +407,8 @@ public class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            if (sv.getType() instanceof ArrayType) {
-                layouter.print(((ArrayType) sv.getType()).getAlternativeNameRepresentation());
+            if (sv.getType().getJavaType() instanceof ArrayType at) {
+                layouter.print(at.getAlternativeNameRepresentation());
             } else {
                 layouter.print(sv.getType().getFullName());
             }
@@ -521,7 +521,7 @@ public class LogicPrinter {
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
             }
 
@@ -539,13 +539,13 @@ public class LogicPrinter {
         if (!tgt.rules().isEmpty()) {
             printRules(tgt.rules());
         }
-        if (tgt.addedProgVars().size() > 0) {
+        if (!tgt.addedProgVars().isEmpty()) {
             layouter.nl();
             printAddProgVars(tgt.addedProgVars());
         }
 
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.end();
             }
         }
@@ -787,7 +787,7 @@ public class LogicPrinter {
     /**
      * Determine the Set of labels that will be printed out for a specific {@link Term}. The class
      * {@link SequentViewLogicPrinter} overrides this method. {@link TermLabel} visibility can be
-     * configured via GUI, see {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to
+     * configured via GUI, see de.uka.ilkd.key.gui.actions.TermLabelMenu. Default is to
      * print all TermLabels.
      *
      * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
@@ -1347,7 +1347,7 @@ public class LogicPrinter {
      * the format is like
      *
      * <pre>
-     * p & q
+     * {@code p & q}
      * </pre>
      * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
@@ -1519,7 +1519,7 @@ public class LogicPrinter {
 
         layouter.beginC(0);
         layouter.keyWord(keyword);
-        if (t.varsBoundHere(0).size() > 0) {
+        if (!t.varsBoundHere(0).isEmpty()) {
             layouter.print(" ");
             printVariables(t.varsBoundHere(0), quantifiableVariablePrintMode);
         }

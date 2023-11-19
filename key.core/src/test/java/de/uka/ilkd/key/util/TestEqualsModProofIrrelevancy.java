@@ -57,5 +57,7 @@ class TestEqualsModProofIrrelevancy {
                     node1.getAppliedRuleApp().equalsModProofIrrelevancy(node2.getAppliedRuleApp()));
             }
         }
+        env.dispose();
+        env2.dispose();
     }
 }

@@ -35,9 +35,9 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Term leftTerm = left.toTerm(app, pos, goal);
-        final Term rightTerm = right.toTerm(app, pos, goal);
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         return origLessThan(leftTerm, rightTerm, pos, goal);
     }

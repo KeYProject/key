@@ -68,9 +68,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Creates a static Import.
      *
-     * @param t
-     * @param multi
-     * @param isStatic
+     * @param t the psckage of the type to be imported
+     * @param id the name of the imported type
      */
     public Import(TypeReference t, Identifier id) {
         setReference(t);
@@ -333,7 +332,7 @@ public class Import extends JavaNonTerminalProgramElement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

@@ -205,7 +205,6 @@ public class ProgressDialog extends JDialog {
                 if (modus.equals(Modus.SOLVERS_RUNNING)) {
                     listener.stopButtonClicked();
                 }
-
             });
         }
         return stopButton;

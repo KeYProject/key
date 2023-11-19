@@ -6,7 +6,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

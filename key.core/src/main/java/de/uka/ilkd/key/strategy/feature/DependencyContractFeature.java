@@ -32,7 +32,7 @@ public final class DependencyContractFeature extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
         final Term focus = pos.subTerm();
 

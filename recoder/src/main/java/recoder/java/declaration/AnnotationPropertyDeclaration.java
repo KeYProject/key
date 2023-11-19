@@ -33,8 +33,7 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
      * @param modifiers
      * @param returnType
      * @param name
-     * @param parameters
-     * @param exceptions
+     * @param defaultValue
      */
     public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers,
             TypeReference returnType, Identifier name, Expression defaultValue) {

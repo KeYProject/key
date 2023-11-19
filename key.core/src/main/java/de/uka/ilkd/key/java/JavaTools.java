@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Miscellaneous static methods related to Java blocks or statements in KeY. Mostly moved from

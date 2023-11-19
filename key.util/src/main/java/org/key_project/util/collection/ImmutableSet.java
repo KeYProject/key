@@ -8,7 +8,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
@@ -58,7 +59,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     }
 
 
-    static <T> ImmutableSet<T> fromCollection(@Nonnull Collection<? extends T> seq) {
+    static <T> ImmutableSet<T> fromCollection(@NonNull Collection<? extends T> seq) {
         return fromSet(new HashSet<>(seq));
     }
 

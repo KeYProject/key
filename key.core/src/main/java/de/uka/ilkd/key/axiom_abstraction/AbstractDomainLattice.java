@@ -19,8 +19,6 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitt
  * through the domain elements, thereby respecting the partial order.
  *
  * @author Dominic Scheurer
- *
- * @param <AbstrDomElem>
  */
 public abstract class AbstractDomainLattice
         implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {

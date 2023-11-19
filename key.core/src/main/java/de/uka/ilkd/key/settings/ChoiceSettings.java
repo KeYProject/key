@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -22,6 +21,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  *
@@ -71,7 +72,7 @@ public class ChoiceSettings extends AbstractSettings {
      * <p>
      * The method name is somewhat misleading.
      */
-    @Nonnull
+    @NonNull
     public Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
@@ -80,7 +81,7 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * returns the current selected choices as an immutable set
      */
-    @Nonnull
+    @NonNull
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm {
 
@@ -24,9 +25,9 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         this.polynomial = polynomial;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term coeffT = leftCoefficient.toTerm(app, pos, goal);
-        final Term polyT = polynomial.toTerm(app, pos, goal);
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
+        final Term polyT = polynomial.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
         final BigInteger coeff =

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.pp;
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be

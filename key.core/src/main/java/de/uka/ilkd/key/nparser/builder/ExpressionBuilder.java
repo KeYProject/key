@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -40,6 +39,7 @@ import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,11 +85,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         setSchemaVariables(schemaNamespace);
     }
 
-    public static Term updateOrigin(Term t, ParserRuleContext ctx) {
+    public static Term updateOrigin(Term t, ParserRuleContext ctx, Services services) {
         try {
-            TermImpl ti = (TermImpl) t;
-            ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                + ":" + ctx.start.getCharPositionInLine() + 1);
+            t = services.getTermFactory().createTermWithOrigin(t,
+                ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
+                    + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;
@@ -175,7 +175,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 1; i < t.size(); i++) {
             a = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, t.get(i));
         }
-        return updateOrigin(a, ctx);
+        return updateOrigin(a, ctx, services);
     }
 
     @Override
@@ -188,9 +188,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term a = accept(ctx.a);
         Term b = accept(ctx.b);
         if (b != null) {
-            return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx);
+            return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx, services);
         }
-        return updateOrigin(a, ctx);
+        return updateOrigin(a, ctx, services);
     }
 
     @Override
@@ -211,10 +211,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left, Term right) {
         if (right == null) {
-            return updateOrigin(left, ctx);
+            return updateOrigin(left, ctx, services);
         }
         return capsulateTf(ctx,
-            () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx));
+            () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx, services));
     }
 
     @Override
@@ -306,7 +306,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termR = accept(ctx.b);
 
         if (termR == null) {
-            return updateOrigin(termL, ctx);
+            return updateOrigin(termL, ctx, services);
         }
 
         String op_name = "";
@@ -330,7 +330,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
         Term termL = Objects.requireNonNull(accept(ctx.a));
         if (ctx.op.isEmpty()) {
-            return updateOrigin(termL, ctx);
+            return updateOrigin(termL, ctx, services);
         }
 
         List<Term> terms = mapOf(ctx.b);
@@ -373,7 +373,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
         Term termL = accept(ctx.a);
         if (ctx.b.isEmpty()) {
-            return updateOrigin(termL, ctx);
+            return updateOrigin(termL, ctx, services);
         }
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
@@ -386,7 +386,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitEmptyset(KeYParser.EmptysetContext ctx) {
         var op = services.getTypeConverter().getLocSetLDT().getEmpty();
-        return updateOrigin(getTermFactory().createTerm(op), ctx);
+        return updateOrigin(getTermFactory().createTerm(op), ctx, services);
     }
 
     @Override
@@ -923,7 +923,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 t = getServices().getTermBuilder().addLabel(t, labels);
             }
         }
-        return updateOrigin(t, ctx);
+        return updateOrigin(t, ctx, services);
     }
 
     @Override
@@ -1517,7 +1517,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    private @Nullable Term[] visitArguments(@Nullable KeYParser.Argument_listContext call) {
+    private @Nullable Term[] visitArguments(KeYParser. @Nullable Argument_listContext call) {
         List<Term> arguments = accept(call);
         return arguments == null ? null : arguments.toArray(new Term[0]);
     }

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
@@ -30,6 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -159,7 +159,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
+    public ProofAggregate getPO() {
         assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
@@ -181,7 +181,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+    public Triple<String, Integer, Integer> readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -240,10 +240,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
-     * @throws Exception Occurred Exception.
      */
-    private Profile readProfileFromFile() throws Exception {
-        @Nonnull
+    private Profile readProfileFromFile() {
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

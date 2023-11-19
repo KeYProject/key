@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The SolverSocket class describes the communication between the KeY and the SMT solver process.
@@ -50,7 +51,7 @@ public abstract class AbstractSolverSocket {
      * @param name the name of the solver in use
      * @param query the ModelExtractor used to extract a counterexample
      */
-    protected AbstractSolverSocket(@Nonnull String name, ModelExtractor query) {
+    protected AbstractSolverSocket(@NonNull String name, ModelExtractor query) {
         this.name = name;
         this.query = query;
     }
@@ -74,7 +75,7 @@ public abstract class AbstractSolverSocket {
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
      */
-    public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg)
+    public abstract void messageIncoming(@NonNull Pipe pipe, @NonNull String msg)
             throws IOException;
 
     /**
@@ -96,7 +97,7 @@ public abstract class AbstractSolverSocket {
      *        solvers this can be null)
      * @return the newly created socket
      */
-    public static @Nonnull AbstractSolverSocket createSocket(@Nonnull SolverType type,
+    public static @NonNull AbstractSolverSocket createSocket(@NonNull SolverType type,
             ModelExtractor query) {
         return type.getSocket(query);
     }

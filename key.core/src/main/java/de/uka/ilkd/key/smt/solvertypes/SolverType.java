@@ -16,12 +16,12 @@
 
 package de.uka.ilkd.key.smt.solvertypes;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -201,7 +201,7 @@ public interface SolverType {
      *        solvers this can be null)
      * @return the newly created socket
      */
-    @Nonnull
+    @NonNull
     AbstractSolverSocket getSocket(ModelExtractor query);
 
 }

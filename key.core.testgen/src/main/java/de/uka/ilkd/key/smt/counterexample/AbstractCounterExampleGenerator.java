@@ -68,14 +68,12 @@ public abstract class AbstractCounterExampleGenerator {
             throw new IllegalStateException(
                 "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
         }
-
         final Proof proof =
             createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
         final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
         TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
         final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-
         try {
             synchronized (macro) { // TODO: Useless? No other thread has access to macro wait for
                                    // macro to terminate
@@ -99,8 +97,6 @@ public abstract class AbstractCounterExampleGenerator {
         solvers.add(SolverTypes.Z3_CE_SOLVER);
 
         launcher.launch(solvers, SMTProblem.createSMTProblems(proof), proof.getServices());
-
-
     }
 
     /**

@@ -105,7 +105,6 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
                 (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
-
             currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
         } else {
             // Then there was no replacewith...

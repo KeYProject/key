@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -19,7 +20,6 @@ import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
@@ -109,7 +109,8 @@ public class SetStatementTest {
     private String parseAndCheck(String statementText) {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs =
-            new PreParser().parseMethodLevel(statementText, null, Position.newOneBased(1, 1));
+            new de.uka.ilkd.key.speclang.njml.PreParser(true).parseMethodLevel(statementText, null,
+                Position.newOneBased(1, 1));
         assertEquals(constructs.size(), 1);
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
         var statement = (TextualJMLSetStatement) constructs.head();

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
-        return new PreParser().parseMethodLevel(ms, null, Position.newOneBased(1, 1));
+        return new PreParser(true).parseMethodLevel(ms, null, Position.newOneBased(1, 1));
     }
 
     private static void assertTextRepr(String input, String text) {

@@ -6,11 +6,13 @@ package de.uka.ilkd.key.speclang.njml;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -36,8 +38,9 @@ public class NJmlTranslatorTests {
         JavaInfo javaInfo =
             new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
+        services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        preParser = new PreParser();
+        preParser = new PreParser(services.getOriginFactory() != null);
     }
 
     @Test
@@ -79,7 +82,7 @@ public class NJmlTranslatorTests {
     // }
 
     @Test
-    public void testWarnRequires() throws URISyntaxException {
+    void testWarnRequires() throws URISyntaxException {
         preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
@@ -88,8 +91,9 @@ public class NJmlTranslatorTests {
         ImmutableList<PositionedString> warnings = preParser.getWarnings();
         PositionedString message = warnings.head();
         assertEquals(
-            "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
+            "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
+                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
+                + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 

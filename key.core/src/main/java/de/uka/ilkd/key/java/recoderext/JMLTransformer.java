@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -22,6 +21,7 @@ import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -504,7 +504,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
             // call preparser
-            var parser = new PreParser();
+            var parser = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE
+                    .getTermLabelSettings().getUseOriginLabels());
             ImmutableList<TextualJMLConstruct> constructs =
                 parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
@@ -560,7 +561,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
         // call preparser
-        var parser = new PreParser();
+        var parser = new PreParser(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());
@@ -733,7 +735,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         final HashSet<TypeDeclaration> result = new LinkedHashSet<>();
 
-        public void walk(@Nonnull SourceElement s) {
+        public void walk(@NonNull SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0; i < pe.getChildCount(); i++) {

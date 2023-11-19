@@ -43,17 +43,22 @@ import org.key_project.util.collection.ImmutableSet;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;customCode&gt;}catch(java.lang.Throwable e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <customCode>
+ * } catch (java.lang.Throwable e) {
+ *    exc = e
+ * }
+ * <modalityEnd>
+ * (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  * <p>
@@ -74,7 +79,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * If this is {@code true} an uninterpreted predicate is added to the postconditions which
      * contains the heap and all parameters as arguments.
      *
-     * @see #buildUninterpretedPredicate(ImmutableList, String)
+     * @see #createUninterpretedPredicate(ImmutableList, Term, String, Services)
      * @see #getUninterpretedPredicateName()
      */
     private final boolean addUninterpretedPredicate;
@@ -87,7 +92,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * The used uninterpreted predicate created via
-     * {@link #buildUninterpretedPredicate(ImmutableList, ProgramVariable, String)} and available
+     * {@link #createUninterpretedPredicate(ImmutableList, Term, String, Services)} and available
      * via {@link #getUninterpretedPredicate()}.
      */
     private Term uninterpretedPredicate;
@@ -618,7 +623,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
             selfExactType, paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
+        return tb.addLabelToAllSubs(result, new Origin(SpecType.REQUIRES));
     }
 
     /**

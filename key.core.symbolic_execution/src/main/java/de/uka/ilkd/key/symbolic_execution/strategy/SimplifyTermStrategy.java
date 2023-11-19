@@ -49,7 +49,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
     @Override
     protected Feature setupApprovalF() {
         Feature superFeature = super.setupApprovalF();
-        Feature labelFeature = (app, pos, goal) -> {
+        Feature labelFeature = (app, pos, goal, mState) -> {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
                 Term findTerm = pos.subTerm();

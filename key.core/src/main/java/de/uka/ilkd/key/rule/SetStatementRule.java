@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Optional;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -19,6 +18,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A rule for set statements. This unwraps the contained CopyAssignment
@@ -68,7 +69,7 @@ public final class SetStatementRule implements BuiltInRule {
         return new SetStatementBuiltInRuleApp(this, occurrence);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

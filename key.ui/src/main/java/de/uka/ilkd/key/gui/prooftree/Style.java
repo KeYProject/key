@@ -7,10 +7,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.Icon;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -66,7 +67,7 @@ public class Style {
          * @param value the value
          * @param block whether this should be rendered as a block
          */
-        public void addAdditionalInfo(@Nonnull String key, @Nonnull String value, boolean block) {
+        public void addAdditionalInfo(@NonNull String key, @NonNull String value, boolean block) {
             additionalInfo.add(new Fragment(key, value, block));
         }
 
@@ -75,7 +76,7 @@ public class Style {
          *
          * @param notes the notes
          */
-        public void addNotes(@Nonnull String notes) {
+        public void addNotes(@NonNull String notes) {
             addAdditionalInfo("Notes", notes, false);
         }
 
@@ -84,7 +85,7 @@ public class Style {
          *
          * @param rule the rule
          */
-        public void addRule(@Nonnull String rule) {
+        public void addRule(@NonNull String rule) {
             addAdditionalInfo("Rule", rule, false);
         }
 
@@ -93,7 +94,7 @@ public class Style {
          *
          * @param on the info
          */
-        public void addAppliedOn(@Nonnull String on) {
+        public void addAppliedOn(@NonNull String on) {
             addAdditionalInfo("Applied on", LogicPrinter.escapeHTML(on, true), true);
         }
 
