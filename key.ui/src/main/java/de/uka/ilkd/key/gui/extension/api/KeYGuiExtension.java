@@ -7,7 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -24,6 +23,8 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A marker interface for extension of the KeY GUI. Every extension should implement this interface
@@ -101,8 +102,8 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull
-        List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
+        @NonNull
+        List<Action> getMainMenuActions(@NonNull MainWindow mainWindow);
     }
 
     /**
@@ -138,8 +139,8 @@ public interface KeYGuiExtension {
          * @param window parent of this extension
          * @param mediator the current mediator
          */
-        @Nonnull
-        Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
+        @NonNull
+        Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator);
     }
 
     /**
@@ -162,9 +163,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull
-        List<Action> getContextActions(@Nonnull KeYMediator mediator, @Nonnull ContextMenuKind kind,
-                @Nonnull Object underlyingObject);
+        @NonNull
+        List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
+                @NonNull Object underlyingObject);
     }
 
     /**
@@ -179,7 +180,7 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @Nonnull
+        @NonNull
         JToolBar getToolbar(MainWindow mainWindow);
     }
 
@@ -264,8 +265,8 @@ public interface KeYGuiExtension {
          * @param pos the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @Nonnull
-        List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
+        @NonNull
+        List<String> getTermInfoStrings(@NonNull MainWindow mainWindow, @NonNull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

@@ -8,10 +8,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +34,11 @@ public class TGInfoDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality. No functionality is allowed in this method body!
-            MainWindow.getInstance().getMediator().getUI().getProofControl().stopAndWaitAutoMode();
-            exitButton.setEnabled(true);
+            new Thread(() -> {
+                MainWindow.getInstance().getMediator().getUI().getProofControl()
+                        .stopAndWaitAutoMode();
+                ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
+            }).start();
         }
     };
 
@@ -57,12 +60,8 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYMediator mediator = MainWindow.getInstance().getMediator();
-            mediator.stopInterface(true);
-            mediator.setInteractive(false);
             worker = new TGWorker(TGInfoDialog.this);
-            mediator.addInterruptedListener(worker);
-            worker.execute();
+            worker.start();
         }
     };
 
@@ -74,18 +73,18 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void writeln(String line) {
-            textArea.append(line + "\n");
+            ThreadUtilities.invokeOnEventQueue(() -> textArea.append(line + "\n"));
         }
 
         @Override
         public void writeException(Throwable t) {
             LOGGER.warn("Exception", t);
-            textArea.append("Error: " + t.getMessage());
+            ThreadUtilities.invokeOnEventQueue(() -> textArea.append("Error: " + t.getMessage()));
         }
 
         @Override
         public void testGenerationCompleted() {
-            exitButton.setEnabled(true);
+            ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
         }
     };
 

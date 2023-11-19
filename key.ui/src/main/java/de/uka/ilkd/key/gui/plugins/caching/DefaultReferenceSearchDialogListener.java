@@ -42,11 +42,11 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
         Proof p = mediator.getSelectedProof();
         new Thread(() -> {
             try {
+                mediator.initiateAutoMode(p, true, false);
                 p.copyCachedGoals(null,
                     total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
                     () -> SwingUtilities.invokeLater(() -> {
                         if (dialog.incrementProgress()) {
-                            mediator.startInterface(true);
                             dialog.dispose();
                             new ShowProofStatistics.Window(MainWindow.getInstance(), p)
                                     .setVisible(true);
@@ -56,6 +56,10 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                 mediator.startInterface(true);
                 LOGGER.error("failed to copy cache ", e);
                 IssueDialog.showExceptionDialog(dialog, new CachingException(e));
+            } finally {
+                mediator.finishAutoMode(p, true, false, () -> {
+                    mediator.getSelectionModel().setSelectedNode(p.root());
+                });
             }
         }).start();
     }

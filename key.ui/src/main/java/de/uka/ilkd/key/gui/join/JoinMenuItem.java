@@ -39,16 +39,14 @@ public class JoinMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.stopInterface(true);
                 JoinDialog dialog = new JoinDialog(partner, proof, PredicateEstimator.STD_ESTIMATOR,
                     proof.getServices());
+                dialog.setModal(true);
                 dialog.setVisible(true);
                 if (dialog.okButtonHasBeenPressed()) {
+                    mediator.stopInterface(true);
                     start(dialog.getSelectedPartner(), proof, mediator);
-                } else {
-                    mediator.startInterface(true);
                 }
-
             }
         });
     }
@@ -63,20 +61,16 @@ public class JoinMenuItem extends JMenuItem {
             @Override
             public void exceptionWhileJoining(Throwable e) {
                 mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
-                mediator.startInterface(true);
             }
 
             @Override
             public void endOfJoining(final ImmutableList<Goal> goals) {
                 SwingUtilities.invokeLater(() -> {
-                    mediator.startInterface(true);
                     // This method delegates the request only to the UserInterfaceControl which
                     // implements the functionality.
                     // No functionality is allowed in this method body!
                     mediator.getUI().getProofControl()
                             .startAutoMode(mediator.getSelectedProof(), goals);
-
-
                 });
 
 

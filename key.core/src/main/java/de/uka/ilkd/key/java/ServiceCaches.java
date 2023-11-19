@@ -23,10 +23,12 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>
@@ -147,6 +149,10 @@ public class ServiceCaches {
     private final AppliedRuleAppsNameCache appliedRuleAppsNameCache =
         new AppliedRuleAppsNameCache();
 
+    /** Cache used by EqualityConstraint to speed up meta variable search */
+    private final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<>(2000);
+
+
     /**
      * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
      *
@@ -219,4 +225,9 @@ public class ServiceCaches {
     public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {
         return appliedRuleAppsNameCache;
     }
+
+    public LRUCache<Term, ImmutableSet<Metavariable>> getMVCache() {
+        return mvCache;
+    }
+
 }

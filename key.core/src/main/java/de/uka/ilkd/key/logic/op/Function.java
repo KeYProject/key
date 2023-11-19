@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.overop.FunctionMetaData;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nonnull;
@@ -129,16 +130,7 @@ public class Function extends AbstractSortedOperator {
                 new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
         s.append(name());
         if (arity() > 0) {
-            int i = 0;
-            s.append("(");
-            while (i < arity()) {
-                if (i > 0) {
-                    s.append(",");
-                }
-                s.append(argSort(i));
-                i++;
-            }
-            s.append(")");
+            s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));
         }
         s.append(";\n");
         return s.toString();

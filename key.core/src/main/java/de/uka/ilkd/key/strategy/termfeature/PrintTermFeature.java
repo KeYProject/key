@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class PrintTermFeature implements TermFeature {
 
@@ -14,7 +15,7 @@ public class PrintTermFeature implements TermFeature {
 
     private PrintTermFeature() {}
 
-    public RuleAppCost compute(Term term, Services services) {
+    public RuleAppCost compute(Term term, MutableState mState, Services services) {
         return NumberRuleAppCost.getZeroCost();
     }
 }

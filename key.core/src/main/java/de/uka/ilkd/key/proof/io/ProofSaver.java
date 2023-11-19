@@ -87,7 +87,7 @@ public class ProofSaver extends OutputStreamProofSaver {
         save(new FileOutputStream(file));
     }
 
-    public String save() throws IOException {
+    public String save() {
         String errorMsg = null;
         try {
             save(file);

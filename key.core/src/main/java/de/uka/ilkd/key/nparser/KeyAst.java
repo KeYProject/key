@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URL;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
@@ -22,6 +20,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -35,10 +35,10 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @Nonnull
+    @NonNull
     final T ctx;
 
-    protected KeyAst(@Nonnull T ctx) {
+    protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
     }
 

@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -91,7 +91,7 @@ public class EngineState {
      * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
-    public @Nonnull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -200,7 +200,7 @@ public class EngineState {
                 "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
-    @Nonnull
+    @NonNull
     private KeyIO getKeyIO() throws ScriptException {
         Services services = proof.getServices();
         KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());

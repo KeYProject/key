@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 public class ScriptException extends Exception implements HasLocation {
 

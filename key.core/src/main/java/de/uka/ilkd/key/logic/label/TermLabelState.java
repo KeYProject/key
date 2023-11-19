@@ -21,7 +21,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * </ul>
  * <p>
  * Exactly one {@link TermLabelState} instance is created in each
- * {@link Rule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)}
+ * {@code Rule.apply(...)}
  * implementation and passed to each performed {@link TermLabelManager} call during rule application
  * and thus passed to the participants.
  *

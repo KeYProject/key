@@ -126,10 +126,13 @@ public abstract class ScaleFeature implements Feature {
      * @param cost
      */
     private static long getValue(RuleAppCost cost) {
-        if (!(cost instanceof NumberRuleAppCost)) {
+        if (cost instanceof NumberRuleAppCost costValue) {
+            return costValue.getValue();
+        } else {
             illegalCostError(cost);
+            // should never be reached
+            return 0;
         }
-        return ((NumberRuleAppCost) cost).getValue();
     }
 
     protected static void illegalCostError(final RuleAppCost cost) {
@@ -156,8 +159,9 @@ public abstract class ScaleFeature implements Feature {
             offset = p_offset;
         }
 
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-            final RuleAppCost cost = getFeature().computeCost(app, pos, goal);
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+                MutableState mState) {
+            final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);
             long costVal;
 
             if (cost instanceof TopRuleAppCost) {

@@ -87,7 +87,7 @@ public final class SideProofUtil {
 
     /**
      * removes all choices with the same category as {@code choiceToActivate} from {@code choices}
-     * and adds {@link choiceToActivate} to the set
+     * and adds {@code choiceToActivate} to the set
      *
      * @param choices the currently active choices
      * @param choiceToActivate the {@link Choice} to activate

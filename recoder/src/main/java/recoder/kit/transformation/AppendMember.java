@@ -41,10 +41,9 @@ public class AppendMember extends TwoPassTransformation {
      *
      * @param sc the service configuration to use.
      * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
+     * @param child the declaration to append. may not be <CODE>null</CODE> and must denote a valid
      *        identifier name.
-     * @param code the modifier to create, encoded using the codes from
-     *        {@link recoder.kit.ModifierKit}.
+     * @param parent the TypeDeclaration where to append the member
      */
     public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible,
             MemberDeclaration child, TypeDeclaration parent) {

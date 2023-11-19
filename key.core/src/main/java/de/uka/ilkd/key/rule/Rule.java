@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
@@ -26,7 +26,7 @@ public interface Rule extends HasOrigin {
      *         application
      * @throws RuleAbortException when this rule was aborted
      */
-    @Nonnull
+    @NonNull
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException;
 

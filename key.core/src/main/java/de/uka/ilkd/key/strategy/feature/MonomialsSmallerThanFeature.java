@@ -58,11 +58,12 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
-        m1.collect(left.toTerm(app, pos, goal), goal.proof().getServices());
+        m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
-        m2.collect(right.toTerm(app, pos, goal), goal.proof().getServices());
+        m2.collect(right.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
 
@@ -158,19 +159,17 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, Services services) {
+        protected void collect(Term te, MutableState mState, Services services) {
             if (te.op() == add) {
-                collect(te.sub(0), services);
-                collect(te.sub(1), services);
-            } else if (te.op() == Z) {
-                // nothing
-            } else {
-                addTerm(stripOffLiteral(te, services));
+                collect(te.sub(0), mState, services);
+                collect(te.sub(1), mState, services);
+            } else if (te.op() != Z) {
+                addTerm(stripOffLiteral(te, mState, services));
             }
         }
 
-        private Term stripOffLiteral(Term te, Services services) {
-            if (!(hasCoeff.compute(te, services) instanceof TopRuleAppCost))
+        private Term stripOffLiteral(Term te, MutableState mState, Services services) {
+            if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals
             {

@@ -15,14 +15,12 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 
 /**
  * The macro UseInformationFlowContractMacro applies all applicable information flow contracts.
- * <p/>
- * The rules that are applied can be set in {@link #ADMITTED_RULENAMES}.
- * <p/>
  *
  * @author christoph
  */
@@ -80,14 +78,15 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
-                    goal);
+                    goal, mState);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
-                        .computeCost(ruleApp, pio, goal);
+                        .computeCost(ruleApp, pio, goal, mState);
                 return andRightCost.add(NumberRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -131,8 +130,9 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal);
+        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
+            return computeCost(app, pio, goal, mState);
         }
 
         @Override

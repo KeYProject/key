@@ -18,8 +18,9 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.LRUCache;
 
 /**
- * This class is used to prove some simple arithmetic problem which are a==b, a>=b, a<=b; Besides it
- * can be used to prove that a>=b or a<=b by knowing that c>=d or c<=d;
+ * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
+ * {@code a<=b}; Besides it can be used to prove that {@code a>=b} or {@code a<=b} by
+ * knowing that {@code c>=d} or {@code c<=d;}
  *
  */
 public class HandleArith {

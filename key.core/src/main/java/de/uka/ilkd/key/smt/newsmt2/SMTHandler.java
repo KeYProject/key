@@ -26,7 +26,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
  * SMT handlers are created using the default constructor without parameters They are always used
  * within the same proof, but possibly for several proof obligations.
  *
- * After creation, the {@link #init(MasterHandler, Services, Properties)} method is called that
+ * After creation, the {@link #init} method is called that
  * injects the {@link Services} object belonging to the proof.
  *
  * During translation, an SMT handler can be asked via {@link #canHandle(Term)} if it can translate
