@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -450,7 +451,7 @@ public final class IssueDialog extends JDialog {
             issueTextPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Desktop.getDesktop().browse(hle.getURL().toURI());
+                        SwingUtil.browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         LOGGER.warn("Failed to browse", ex);
                     }
@@ -775,9 +776,9 @@ public final class IssueDialog extends JDialog {
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Desktop.getDesktop().browse(hle.getURL().toURI());
+                        SwingUtil.browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        LOGGER.warn("Failed to browse", ex);
+                        LOGGER.warn("Failed to browse ", ex);
                     }
                 }
             });
