@@ -58,9 +58,9 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
         boolean freeAdt = ctx.FREE() != null;
         var name = ctx.name.getText();
-        var doc =  ctx.DOC_COMMENT() != null 
-            ? ctx.DOC_COMMENT().getText()
-            : null;
+        var doc = ctx.DOC_COMMENT() != null
+                ? ctx.DOC_COMMENT().getText()
+                : null;
         var origin = BuilderHelpers.getPosition(ctx);
         var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
         sorts().add(s);
