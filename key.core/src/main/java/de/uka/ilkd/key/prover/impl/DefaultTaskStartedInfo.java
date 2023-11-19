@@ -8,30 +8,12 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 /**
  * Default implementation of a {@link TaskStartedInfo}.
  */
-public class DefaultTaskStartedInfo implements TaskStartedInfo {
-
-    private final TaskStartedInfo.TaskKind kind;
-    private final String message;
-    private final int size;
-
-    public DefaultTaskStartedInfo(TaskKind kind, String message, int size) {
-        super();
-        this.kind = kind;
-        this.message = message;
-        this.size = size;
-    }
-
-    @Override
-    public String toString() {
-        return "DefaultTaskStartedInfo [kind=" + kind + ", message=" + message + ", size=" + size
-            + "]";
-    }
-
+public record DefaultTaskStartedInfo(TaskKind kind, String message, int size) implements TaskStartedInfo {
     /**
      * {@inheritDoc}
      */
     @Override
-    public TaskKind getKind() {
+    public TaskKind kind() {
         return kind;
     }
 
@@ -39,7 +21,7 @@ public class DefaultTaskStartedInfo implements TaskStartedInfo {
      * {@inheritDoc}
      */
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
@@ -47,7 +29,7 @@ public class DefaultTaskStartedInfo implements TaskStartedInfo {
      * {@inheritDoc}
      */
     @Override
-    public int getSize() {
+    public int size() {
         return size;
     }
 }

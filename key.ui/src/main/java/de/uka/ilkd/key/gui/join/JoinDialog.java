@@ -43,9 +43,12 @@ public class JoinDialog extends StdDialog {
 
     }
 
-    private static final String INFO = "It is not possible to join both goals, "
-        + "because new symbols have been introduced\n on the branches which belong to the goals: "
-        + "Up to now the treatment of new symbols\nis not supported by the joining mechanism.\n\n";
+    private static final String INFO = """
+            It is not possible to join both goals, because new symbols have been introduced
+             on the branches which belong to the goals: Up to now the treatment of new symbols
+            is not supported by the joining mechanism.
+
+            """;
 
 
     private static class ContentPanel extends Box {

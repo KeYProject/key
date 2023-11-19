@@ -34,7 +34,6 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableList;
@@ -110,7 +109,7 @@ import org.key_project.util.collection.ImmutableList;
  * </li>
  * </ol>
  * The side proof uses the default side proof settings (splitting = delayed) and is started via
- * {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}. In
+ * {@link SymbolicExecutionSideProofUtil#startSideProof}. In
  * case that at least one result branch has applicable rules an exception is thrown and the rule is
  * aborted.
  * </p>
@@ -166,8 +165,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @return {@code true} is applicable, {@code false} is not applicable
      */
     private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
-        if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
-            IProgramMethod pm = (IProgramMethod) pmTerm.op();
+        if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
                     || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())

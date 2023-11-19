@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -23,10 +24,7 @@ import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -67,6 +65,24 @@ public class TaskTree extends JPanel {
         super();
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new TaskTreeSelectionListener());
+        mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+            // unregister completely when automode starts
+            // reduce unnecessary event propagation and handling when in automode
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().addProofTreeListener(proofTreeListener);
+                }
+            }
+
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().removeProofTreeListener(proofTreeListener);
+                }
+            }
+        });
+
         delegateView = new JTree();
         delegateView.setModel(model);
         delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
@@ -79,12 +95,12 @@ public class TaskTree extends JPanel {
         ToolTipManager.sharedInstance().registerComponent(delegateView);
     }
 
-    public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public synchronized void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
-            mediator.getCurrentlyOpenedProofs().addElement(proof);
+            mediator.getCurrentlyOpenedProofs().add(proof);
         }
         delegateView.validate();
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));
@@ -100,7 +116,7 @@ public class TaskTree extends JPanel {
         removeTask(taskForProof);
     }
 
-    public void removeTask(TaskTreeNode tn) {
+    public synchronized void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
         mediator.notify(new AbandonTaskEvent());
         for (int i = 0; i < tn.allProofs().length; i++) {
@@ -113,9 +129,9 @@ public class TaskTree extends JPanel {
 
         if (path != null) {
             TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
-            mediator.setProof(tn0.proof());
+            mediator.getSelectionModel().setSelectedProof(tn0.proof());
         } else {
-            mediator.setProof(null);
+            mediator.getSelectionModel().setSelectedProof(null);
         }
     }
 
@@ -160,7 +176,7 @@ public class TaskTree extends JPanel {
     private void problemChosen() {
         TaskTreeNode prob = getSelectedTask();
         if (prob != null && prob.proof() != null && mediator != null) {
-            mediator.setProof(prob.proof());
+            mediator.getSelectionModel().setSelectedProof(prob.proof());
         }
     }
 
@@ -178,18 +194,16 @@ public class TaskTree extends JPanel {
      * @return {@code true} proof is available in model, {@code false} proof is not available in
      *         model.
      */
-    public boolean containsProof(Proof proof) {
+    public synchronized boolean containsProof(Proof proof) {
         boolean contains = false;
         int i = 0;
         while (!contains && i < model.getChildCount(model.getRoot())) {
             Object rootChild = model.getChild(model.getRoot(), i);
-            if (rootChild instanceof EnvNode) {
-                EnvNode envNode = (EnvNode) rootChild;
+            if (rootChild instanceof EnvNode envNode) {
                 int j = 0;
                 while (!contains && j < envNode.getChildCount()) {
                     Object envChild = envNode.getChildAt(j);
-                    if (envChild instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) envChild;
+                    if (envChild instanceof TaskTreeNode taskChild) {
                         contains = taskChild.proof() == proof;
                     }
                     j++;
@@ -205,15 +219,14 @@ public class TaskTree extends JPanel {
      *
      * @param proof The proof to remove.
      */
-    public void removeProof(Proof proof) {
+    public synchronized void removeProof(Proof proof) {
         if (proof != null) {
             ProofEnvironment env = proof.getEnv();
             // Search EnvNode which contains the environment of the given proof.
             EnvNode envNode = null;
             for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
                 Object child = model.getChild(model.getRoot(), i);
-                if (child instanceof EnvNode) {
-                    EnvNode envChild = (EnvNode) child;
+                if (child instanceof EnvNode envChild) {
                     if (env != null ? env.equals(envChild.getProofEnv())
                             : envChild.getProofEnv() == null) {
                         envNode = envChild;
@@ -224,8 +237,7 @@ public class TaskTree extends JPanel {
             if (envNode != null) {
                 for (int i = 0; i < envNode.getChildCount(); i++) {
                     Object child = envNode.getChildAt(i);
-                    if (child instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) child;
+                    if (child instanceof TaskTreeNode taskChild) {
                         if (taskChild.proof() == proof) {
                             removeTask(taskChild);
                         }
@@ -270,13 +282,15 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
-                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
-                    BasicTask task = (BasicTask) selPath.getLastPathComponent();
-                    mediator.setProof(task.proof());
+                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
+                    Proof p = task.proof();
+                    mediator.getSelectionModel().setSelectedProof(p);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
+            } else {
+                problemChosen();
             }
         }
     }
@@ -285,7 +299,7 @@ public class TaskTree extends JPanel {
     /**
      * a prooftree listener, so that it is known when the proof has closed
      */
-    class TaskTreeProofTreeListener extends ProofTreeAdapter {
+    class TaskTreeProofTreeListener implements ProofTreeListener {
 
         /**
          * invoked if all goals of the proof are closed
@@ -295,17 +309,19 @@ public class TaskTree extends JPanel {
         }
 
         /**
-         * invoked if the list of goals changed (goals were added, removed etc.
+         * invoked if a proof has been pruned, potentially reopening branches
          */
-        public void proofGoalRemoved(ProofTreeEvent e) {
+        public void proofPruned(ProofTreeEvent e) {
+            delegateView.repaint();
         }
 
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsAdded(ProofTreeEvent e) {
-        }
-
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsChanged(ProofTreeEvent e) {
+        /**
+         * The structure of the proof has changed radically. Any client should rescan the whole
+         * proof
+         * tree.
+         */
+        public void proofStructureChanged(ProofTreeEvent e) {
+            delegateView.repaint();
         }
     } // end of prooftreelistener
 

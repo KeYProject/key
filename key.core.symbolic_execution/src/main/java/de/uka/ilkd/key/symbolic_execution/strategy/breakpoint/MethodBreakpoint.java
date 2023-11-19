@@ -62,7 +62,6 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param conditionEnabled flag if the condition is enabled
      * @param methodStart the line the containing method of this breakpoint starts at
      * @param methodEnd the line the containing method of this breakpoint ends at
-     * @param containerType the type of the element containing the breakpoint
      * @param isEntry flag to tell whether to stop on method entry
      * @param isExit flag to tell whether to stop on method exit
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
@@ -99,18 +98,15 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
-        if (statement instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs = (MethodBodyStatement) statement;
+        if (statement instanceof MethodBodyStatement mbs) {
             currentPm = mbs.getProgramMethod(getProof().getServices());
         }
         if (currentPm != null && currentPm.equals(getPm())
                 && SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, statement)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
+            if (contract instanceof FunctionalOperationContract methodContract) {
                 return methodContract.getTarget().equals(getPm());
             }
         }
@@ -127,11 +123,9 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
+            if (contract instanceof FunctionalOperationContract methodContract) {
                 return methodContract.getTarget().equals(getPm());
             }
         }

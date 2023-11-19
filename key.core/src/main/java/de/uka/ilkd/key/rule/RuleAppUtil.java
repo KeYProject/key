@@ -34,8 +34,7 @@ public final class RuleAppUtil {
         // replayer requires that ifInsts are provided in order (!)
         Set<PosInOccurrence> inputs = new LinkedHashSet<>();
         // taclets with \find or similar
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp posTacletApp) {
 
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
@@ -50,8 +49,7 @@ public final class RuleAppUtil {
         }
         // built-ins need special treatment:
         // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp) {
-            AbstractBuiltInRuleApp builtIn = (AbstractBuiltInRuleApp) ruleApp;
+        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
             builtIn.ifInsts().forEach(inputs::add);
         }
 

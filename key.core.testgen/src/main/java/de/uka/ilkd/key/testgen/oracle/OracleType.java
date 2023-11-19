@@ -5,14 +5,7 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class OracleType implements OracleTerm {
-
-    private final Sort s;
-
-    public OracleType(Sort s) {
-        super();
-        this.s = s;
-    }
+public record OracleType(Sort s) implements OracleTerm {
 
     public String toString() {
 

@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class Sequent implements Iterable<SequentFormula> {
 
-    public static final Sequent EMPTY_SEQUENT = new NILSequent();
+    public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
      * creates a new Sequent with empty succedent
@@ -184,6 +184,7 @@ public class Sequent implements Iterable<SequentFormula> {
      *         have been added or removed
      */
     public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
+        checkFormulaIndex(formulaNr);
         formulaNr--;
         boolean inAntec = formulaNr < antecedent.size();
 
@@ -275,11 +276,10 @@ public class Sequent implements Iterable<SequentFormula> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Sequent)) {
+        if (!(o instanceof Sequent o1)) {
             return false;
         }
 
-        final Sequent o1 = (Sequent) o;
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
@@ -327,9 +327,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return the sequent formula at that position
      */
     public SequentFormula getFormulabyNr(int formulaNumber) {
-        if (formulaNumber <= 0 || formulaNumber > size()) {
-            throw new RuntimeException("No formula nr. " + formulaNumber + " in seq. " + this);
-        }
+        checkFormulaIndex(formulaNumber);
         if (formulaNumber <= antecedent.size()) {
             return antecedent.get(formulaNumber - 1);
         }
@@ -358,7 +356,12 @@ public class Sequent implements Iterable<SequentFormula> {
         return new SequentIterator(antecedent(), succedent());
     }
 
+    /**
+     * @param formulaNumber formula number (1-based)
+     * @return whether that formula is in the antecedent
+     */
     public boolean numberInAntec(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
         return formulaNumber <= antecedent.size();
     }
 
@@ -420,7 +423,11 @@ public class Sequent implements Iterable<SequentFormula> {
         return false;
     }
 
-    static class NILSequent extends Sequent {
+    private static final class NILSequent extends Sequent {
+        private static final NILSequent INSTANCE = new NILSequent();
+
+        private NILSequent() {
+        }
 
         @Override
         public boolean isEmpty() {
@@ -530,5 +537,18 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public ImmutableList<SequentFormula> asList() {
         return antecedent.asList().append(succedent.asList());
+    }
+
+    /**
+     * Check that the provided formula number is a 1-based index and in bounds.
+     * Throws an {@link IllegalArgumentException} otherwise.
+     *
+     * @param formulaNumber the formula number
+     */
+    private void checkFormulaIndex(int formulaNumber) {
+        if (formulaNumber <= 0 || formulaNumber > size()) {
+            throw new IllegalArgumentException(
+                "No formula nr. " + formulaNumber + " in seq. " + this);
+        }
     }
 }

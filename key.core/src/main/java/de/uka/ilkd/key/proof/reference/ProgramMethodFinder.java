@@ -26,8 +26,7 @@ public class ProgramMethodFinder implements Visitor {
 
     @Override
     public void visit(Term visited) {
-        if (visited.op() instanceof ProgramMethod) {
-            ProgramMethod pm = (ProgramMethod) visited.op();
+        if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;
             }

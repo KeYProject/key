@@ -12,7 +12,8 @@ import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 
@@ -208,7 +209,7 @@ public class ParameterDeclaration extends VariableDeclaration {
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

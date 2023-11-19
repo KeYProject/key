@@ -23,24 +23,18 @@ import java.util.Map;
  * different because the default Java implementation with referenced based equality is used.
  * </p>
  *
+ * @param wrappedElement The wrapped elements on that {@link #equals(Object)} and {@link #hashCode()} is reset to
+ *                       default Java implementation.
  * @author Martin Hentschel
  */
-public class EqualsHashCodeResetter<T> {
-    /**
-     * The wrapped elements on that {@link #equals(Object)} and {@link #hashCode()} is reset to
-     * default Java implementation.
-     */
-    private final T wrappedElement;
-
+public record EqualsHashCodeResetter<T>(T wrappedElement) {
     /**
      * Constructor
      *
      * @param wrappedElement the wrapped elements on that {@link #equals(Object)} and
-     *        {@link #hashCode()} is reset to default Java implementation.
+     *                       {@link #hashCode()} is reset to default Java implementation.
      */
-    public EqualsHashCodeResetter(T wrappedElement) {
-        super();
-        this.wrappedElement = wrappedElement;
+    public EqualsHashCodeResetter {
     }
 
     /**
@@ -49,7 +43,7 @@ public class EqualsHashCodeResetter<T> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof EqualsHashCodeResetter<?>) {
-            return getWrappedElement() == ((EqualsHashCodeResetter<?>) obj).getWrappedElement();
+            return wrappedElement() == ((EqualsHashCodeResetter<?>) obj).wrappedElement();
         } else {
             return false;
         }
@@ -60,7 +54,7 @@ public class EqualsHashCodeResetter<T> {
      */
     @Override
     public int hashCode() {
-        return System.identityHashCode(getWrappedElement());
+        return System.identityHashCode(wrappedElement());
     }
 
     /**
@@ -69,7 +63,8 @@ public class EqualsHashCodeResetter<T> {
      *
      * @return The wrapped element.
      */
-    public T getWrappedElement() {
+    @Override
+    public T wrappedElement() {
         return wrappedElement;
     }
 }

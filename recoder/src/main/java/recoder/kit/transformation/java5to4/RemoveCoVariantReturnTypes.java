@@ -54,8 +54,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration md) {
                 Type returnType = getSourceInfo().getReturnType(md);
                 if (returnType == null || returnType instanceof PrimitiveType) {
                     continue;
@@ -109,9 +108,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     if (targs != null && targs.size() > 0) {
                         castToReference.setTypeArguments(targs.deepClone());
                     }
-                    if (originalType instanceof ParameterizedType) {
-                        recoder.abstraction.ParameterizedType pt =
-                            (recoder.abstraction.ParameterizedType) originalType;
+                    if (originalType instanceof ParameterizedType pt) {
                         targs = TypeKit.makeTypeArgRef(getProgramFactory(), pt.getTypeArgs());
                         originalTypeReference.setTypeArguments(targs);
                     }
@@ -124,8 +121,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private Type makeSomething(Type originalType) {
-        if (originalType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) originalType;
+        if (originalType instanceof ParameterizedType pt) {
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
             ASTList<TypeArgumentDeclaration> targs =
                 new ASTArrayList<>(pt.getTypeArgs().size());
@@ -139,10 +135,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private Type makeSomething0(Type originalType) {
-        if (!(originalType instanceof TypeParameter)) {
+        if (!(originalType instanceof TypeParameter tp)) {
             return originalType;
         }
-        TypeParameter tp = (TypeParameter) originalType;
         if (tp.getBoundCount() == 0) {
             originalType = getNameInfo().getJavaLangObject();
         } else {

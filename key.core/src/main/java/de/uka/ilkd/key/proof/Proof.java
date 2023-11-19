@@ -9,15 +9,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -44,6 +40,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -204,33 +203,9 @@ public class Proof implements Named {
             InitConfig initConfig) {
         this(new Name(name), initConfig);
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                .getUseOriginLabels()) {
-            problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
-        }
+        final var rootNode = new Node(this, problem);
 
-        register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
-        var rootNode = new Node(this, problem);
-        var sources = lookup(ProofJavaSourceCollection.class);
-
-        rootNode.sequent().forEach(formula -> {
-            OriginTermLabel originLabel =
-                (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
-            if (originLabel != null) {
-                if (originLabel.getOrigin() instanceof FileOrigin) {
-                    ((FileOrigin) originLabel.getOrigin())
-                            .getFileName()
-                            .ifPresent(sources::addRelevantFile);
-                }
-
-                originLabel.getSubtermOrigins().stream()
-                        .filter(o -> o instanceof FileOrigin)
-                        .map(o -> (FileOrigin) o)
-                        .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
-            }
-        });
-
-        var firstGoal =
+        final var firstGoal =
             new Goal(rootNode, rules, new BuiltInRuleAppIndex(builtInRules), getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
@@ -240,11 +215,10 @@ public class Proof implements Named {
         }
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig, File proofFile) {
-        this(name,
-            Sequent.createSuccSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
-            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
+    public Proof(String name, Sequent problem, String header, InitConfig initConfig,
+            File proofFile) {
+        this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
+            initConfig);
         problemHeader = header;
         this.proofFile = proofFile;
     }
@@ -706,9 +680,7 @@ public class Proof implements Named {
                 }
 
                 // Merge rule applications: Unlink all merge partners.
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                    final MergeRuleBuiltInRuleApp mergeApp =
-                        (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
+                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
 
                     for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                         final Goal linkedGoal = mergePartner.getGoal();
@@ -908,7 +880,7 @@ public class Proof implements Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@Nonnull Predicate<Node> pred) {
+    public @Nullable Node findAny(@NonNull Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -1451,7 +1423,7 @@ public class Proof implements Named {
      *
      * @return the associated lookup
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
@@ -1481,7 +1453,7 @@ public class Proof implements Named {
             if (c == null) {
                 continue;
             }
-            if (referencedFrom != null && referencedFrom != c.getProof()) {
+            if (referencedFrom != null && referencedFrom != c.proof()) {
                 continue;
             }
             todo.add(g);
@@ -1494,7 +1466,7 @@ public class Proof implements Named {
             ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
-                new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
+                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g);
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }

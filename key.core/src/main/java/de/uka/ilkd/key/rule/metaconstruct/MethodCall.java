@@ -232,8 +232,7 @@ public class MethodCall extends ProgramTransformer {
         } else if (newContext instanceof ThisReference) {
             newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
                 services.getTypeConverter().convertToLogicElement(newContext, execContext));
-        } else if (newContext instanceof FieldReference) {
-            final FieldReference fieldContext = (FieldReference) newContext;
+        } else if (newContext instanceof FieldReference fieldContext) {
             if (fieldContext.referencesOwnInstanceField()) {
                 newContext = fieldContext.setReferencePrefix(execContext.getRuntimeInstance());
             }

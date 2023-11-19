@@ -51,10 +51,9 @@ public class ProgramSVEntry implements Serializable {
      * @return true iff the keys and the mapped values are equal
      */
     public boolean equals(Object o) {
-        if (!(o instanceof ProgramSVEntry)) {
+        if (!(o instanceof ProgramSVEntry cmp)) {
             return false;
         }
-        final ProgramSVEntry cmp = (ProgramSVEntry) o;
         return key().equals(cmp.key()) && value().equals(cmp.value());
     }
 

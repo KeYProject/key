@@ -197,35 +197,7 @@ public class AbbrevMap {
         setEnabled(t, true);
     }
 
-    private static class AbbrevWrapper {
-
-        private final Term t;
-
-        public AbbrevWrapper(Term t) {
-            this.t = t;
-        }
-
-        @Override
-        public int hashCode() {
-            return t.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof AbbrevWrapper)) {
-                return false;
-            }
-            AbbrevWrapper scw = (AbbrevWrapper) o;
-            if (scw.getTerm() == t) {
-                return true;
-            }
-            return t.equals(scw.getTerm());
-        }
-
-        public Term getTerm() {
-            return t;
-        }
-    }
+    public record AbbrevWrapper(Term t) {}
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +32,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -209,7 +210,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         }
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -220,34 +221,34 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final Instantiation instantiation =
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         final LoopContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self);
+        contract.setInstantiationSelf(instantiation.self());
 
-        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
-                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
+        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
+                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                    .createAndRegister(instantiation.self, true);
+                    .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
 
-        final Term[] preconditions = createPreconditions(instantiation.self, contract, heaps,
+        final Term[] preconditions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createUsageAssumptions(localOutVariables, anonymisationHeaps,
             conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
+        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, modifiesClauses, services);
 
         final ImmutableList<Goal> result;

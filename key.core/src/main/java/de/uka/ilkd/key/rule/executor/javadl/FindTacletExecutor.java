@@ -57,7 +57,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
-     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@link null} if it
+     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@code null} if it
      *        should just be added to the head of the sequent (otherwise it will be tried to add the
      *        new formulas close to that position)
      * @param posOfFind the {@link PosInOccurrence} providing the position information where the
@@ -180,7 +180,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 // add it close to the modified formula
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
-                    new PosInOccurrence(head.getNewFormula(), PosInTerm.getTopLevel(), inAntec);
+                    new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {
                 // just add it
                 result = null;

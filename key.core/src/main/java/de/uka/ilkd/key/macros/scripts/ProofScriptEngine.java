@@ -69,7 +69,7 @@ public class ProofScriptEngine {
 
     private static Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
+        var loader = ServiceLoader.load(ProofScriptCommand.class);
 
         for (ProofScriptCommand<?> cmd : loader) {
             result.put(cmd.getName(), cmd);
@@ -92,9 +92,7 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         Optional<URI> uri = initialLocation.getFileURI();
-        if (uri.isPresent()) {
-            stateMap.setBaseFileName(Paths.get(uri.get()).toFile());
-        }
+        uri.ifPresent(value -> stateMap.setBaseFileName(Paths.get(value).toFile()));
 
         // add the observer (if installed) to the state map
         if (commandMonitor != null) {
@@ -112,8 +110,8 @@ public class ProofScriptEngine {
                 // EOF reached
                 break;
             }
-            final Map<String, String> argMap = parsed.args;
-            final Location start = parsed.start;
+            final Map<String, String> argMap = parsed.args();
+            final Location start = parsed.start();
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
             if (cmd.length() > MAX_CHARS_PER_COMMAND) {
@@ -143,7 +141,7 @@ public class ProofScriptEngine {
                 Object o = command.evaluateArguments(stateMap, argMap);
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
-                        firstNode.serialNr(), parsed.start.getPosition().line(), cmd);
+                        firstNode.serialNr(), parsed.start().getPosition().line(), cmd);
                 }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
@@ -153,9 +151,13 @@ public class ProofScriptEngine {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
                         String.format(
-                            "Proof already closed while trying to fetch next goal.\n"
-                                + "This error can be suppressed by setting '@failonclosed off'.\n\n"
-                                + "Command: %s\nLine:%d\n",
+                            """
+                                    Proof already closed while trying to fetch next goal.
+                                    This error can be suppressed by setting '@failonclosed off'.
+
+                                    Command: %s
+                                    Line:%d
+                                    """,
                             argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line()),
                         start, e);
                 } else {
@@ -196,23 +198,9 @@ public class ProofScriptEngine {
     public interface Message {
     }
 
-    public static final class EchoMessage implements Message {
-        public final String message;
-
-        public EchoMessage(String message) {
-            this.message = message;
-        }
+    public record EchoMessage(String message) implements Message {
     }
 
-    public static final class ExecuteInfo implements Message {
-        public final String command;
-        public final Location location;
-        public final int nodeSerial;
-
-        public ExecuteInfo(String command, Location location, int nodeSerial) {
-            this.command = command;
-            this.location = location;
-            this.nodeSerial = nodeSerial;
-        }
+    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
     }
 }

@@ -54,8 +54,16 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         r2k.parseSpecialClasses();
 
         parseDecls(
-            "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
-                + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
+            """
+                    \\sorts { srt; }
+                    \\functions {
+                      srt f(srt);
+                      srt g(srt,srt);
+                    }
+                    \\predicates {
+                      p(srt);
+                      q(srt,srt);
+                    }""");
 
         srt = lookup_sort("srt");
 

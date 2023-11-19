@@ -43,7 +43,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     /**
      * @param name
-     * @param init
+     * @param ref
      */
     public EnumConstantSpecification(Identifier name, EnumConstructorReference ref) {
         super(name);

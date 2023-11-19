@@ -76,7 +76,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement, instantiation.modality, goal);
+            instantiation.statement(), instantiation.modality(), goal);
     }
 
     /**
@@ -90,8 +90,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     public static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
-        if (statement instanceof StatementBlock) {
-            StatementBlock block = (StatementBlock) statement;
+        if (statement instanceof StatementBlock block) {
 
             ImmutableSet<BlockContract> collectedContracts =
                 specifications.getBlockContracts(block, modality);
@@ -136,9 +135,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof BlockContractInternalBuiltInRuleApp) {
-                BlockContractInternalBuiltInRuleApp blockRuleApp =
-                    (BlockContractInternalBuiltInRuleApp) app;
+            if (app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp) {
                 if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
@@ -438,14 +435,14 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
             exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
         final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
-        application.update(ifVars, instantiation.context);
+        application.update(ifVars, instantiation.context());
 
         // generate information flow contract application predicate
         // and associated taclet
         final InfFlowBlockContractTacletBuilder ifContractBuilder =
             new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
-        ifContractBuilder.setExecutionContext(instantiation.context);
+        ifContractBuilder.setExecutionContext(instantiation.context());
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
         final Term contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
@@ -456,7 +453,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             localOutsAtPre, tb.var(baseHeap), tb);
         final Term infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
             localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
-        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context, services);
+        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);

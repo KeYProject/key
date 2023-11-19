@@ -125,10 +125,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             return;
         }
         for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq)) {
+            if (!(inst2 instanceof IfFormulaInstSeq inst)) {
                 continue;
             }
-            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
                 PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);

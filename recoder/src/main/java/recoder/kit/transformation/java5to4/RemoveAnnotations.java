@@ -54,8 +54,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof AnnotationUseSpecification) {
                 toRemove.add((AnnotationUseSpecification) pe);
-            } else if (pe instanceof AnnotationDeclaration) {
-                AnnotationDeclaration ad = (AnnotationDeclaration) pe;
+            } else if (pe instanceof AnnotationDeclaration ad) {
                 List<TypeReference> trl =
                     getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
                 boolean remove = true;
@@ -104,8 +103,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
         ASTList<MemberDeclaration> newMems = new ASTArrayList<>(oldMems.size());
         for (MemberDeclaration md : oldMems) {
             MemberDeclaration newMD;
-            if (md instanceof AnnotationPropertyDeclaration) {
-                AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) md;
+            if (md instanceof AnnotationPropertyDeclaration apd) {
                 MethodDeclaration m = f.createMethodDeclaration();
                 if (apd.getComments() != null) {
                     m.setComments(apd.getComments().deepClone());

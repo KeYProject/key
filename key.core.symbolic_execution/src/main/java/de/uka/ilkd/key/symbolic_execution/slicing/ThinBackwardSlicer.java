@@ -38,8 +38,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             throws ProofInputException {
         try {
             boolean accept = false;
-            if (activeStatement instanceof CopyAssignment) {
-                CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
+            if (activeStatement instanceof CopyAssignment copyAssignment) {
                 ImmutableArray<Expression> arguments = copyAssignment.getArguments();
                 if (arguments.size() >= 1) {
                     SourceElement originalTarget = arguments.get(0);
@@ -53,8 +52,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                         }
                     }
                 }
-            } else if (activeStatement instanceof MethodBodyStatement) {
-                MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+            } else if (activeStatement instanceof MethodBodyStatement mbs) {
                 IProgramVariable resultVariable = mbs.getResultVariable();
                 ReferencePrefix relevantTarget = toReferencePrefix(resultVariable);
                 if (relevantTarget != null

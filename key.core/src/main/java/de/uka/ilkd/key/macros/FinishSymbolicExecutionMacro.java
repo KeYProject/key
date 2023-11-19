@@ -59,8 +59,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             for (RuleSet rs : taclet.getRuleSets()) {
                 if (ruleSetName.equals(rs.name())) {
                     return true;

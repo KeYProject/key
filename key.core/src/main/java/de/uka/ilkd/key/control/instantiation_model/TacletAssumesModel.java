@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -23,7 +22,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.RecognitionException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -117,7 +115,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             return (IfFormulaInstantiation) getSelectedItem();
         }
         try {
-            if (manualInput == null || "".equals(manualInput)) {
+            if (manualInput == null || manualInput.isEmpty()) {
                 throw new MissingInstantiationException(
                     "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services),
                     Position.newOneBased(pos, 1),
@@ -125,13 +123,9 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             }
 
             Term term = parseFormula(manualInput);
-
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                    .getUseOriginLabels()) {
-                term = services.getTermBuilder().addLabelToAllSubs(term,
-                    new OriginTermLabel(new NodeOrigin(SpecType.USER_INTERACTION,
-                        app.rule().displayName(), goal.node().serialNr())));
-            }
+            term = services.getTermBuilder().addLabelToAllSubs(term,
+                new NodeOrigin(SpecType.USER_INTERACTION,
+                    app.rule().displayName(), goal.node().serialNr()));
 
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {

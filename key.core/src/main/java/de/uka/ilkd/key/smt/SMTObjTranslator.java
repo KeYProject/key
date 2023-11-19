@@ -670,25 +670,19 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
-            case "int":
-            case "char":
-            case "byte":
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
-                break;
-            case "java.lang.Object":
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                break;
-            case "boolean":
-                typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
-                break;
-            default:
+            case "int", "char", "byte" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+            case "java.lang.Object" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+            default -> {
                 typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
                 Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
                 addTypePredicate(singleSort);
                 SMTFunction tps = getTypePredicate(singleSort.name().toString());
                 SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
                 typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
-                break;
+            }
             }
             assertion4 = assertion4.and(premise.implies(typeReq));
         }
@@ -907,8 +901,7 @@ public class SMTObjTranslator implements SMTTranslator {
 
 
         addSingleSort(sorts, s);
-        if (term.op() instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) term.op();
+        if (term.op() instanceof SortDependingFunction sdf) {
             Sort d = sdf.getSortDependingOn();
             addSingleSort(sorts, d);
         }
@@ -1029,8 +1022,7 @@ public class SMTObjTranslator implements SMTTranslator {
             // make necessary casts
             if (!left.sort().getId().equals(right.sort().getId())) {
                 if (left.sort().getId().equals(ANY_SORT)) {
-                    if (right instanceof SMTTermCall) {
-                        SMTTermCall tc = (SMTTermCall) right;
+                    if (right instanceof SMTTermCall tc) {
                         if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
                             right = tc.getArgs().get(0);
                         } else {
@@ -1040,8 +1032,7 @@ public class SMTObjTranslator implements SMTTranslator {
                         right = castTermIfNecessary(right, sorts.get(ANY_SORT));
                     }
                 } else if (right.sort().getId().equals(ANY_SORT)) {
-                    if (left instanceof SMTTermCall) {
-                        SMTTermCall tc = (SMTTermCall) left;
+                    if (left instanceof SMTTermCall tc) {
                         if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
                             left = tc.getArgs().get(0);
                         } else {
@@ -1107,9 +1098,8 @@ public class SMTObjTranslator implements SMTTranslator {
             return SMTTerm.FALSE;
         } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
             return nullConstant;
-        } else if (op instanceof QuantifiableVariable) {
+        } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
-            QuantifiableVariable qop = (QuantifiableVariable) op;
             SMTTermVariable var = translateVariable((QuantifiableVariable) op);
             if (quantifiedVariables.contains(var)) {
                 return var;
@@ -1117,8 +1107,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 SMTFunction constant = translateConstant(var.getId(), qop.sort());
                 return SMTTerm.call(constant);
             }
-        } else if (op instanceof ProgramVariable) {
-            ProgramVariable pv = (ProgramVariable) op;
+        } else if (op instanceof ProgramVariable pv) {
             SMTFunction constant = translateConstant(pv.name().toString(), pv.sort());
             return SMTTerm.call(constant);
         } else if (op == services.getTypeConverter().getIntegerLDT().getNumberSymbol()) {
@@ -1135,8 +1124,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof Function) {
-            Function fun = (Function) op;
+        } else if (op instanceof Function fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {

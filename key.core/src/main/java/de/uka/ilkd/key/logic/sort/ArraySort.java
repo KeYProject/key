@@ -40,7 +40,7 @@ public final class ArraySort extends AbstractSort {
 
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
         super(new Name((sk.elemType != null ? sk.elemType.getName() : sk.elemSort.name()) + "[]"),
-            extendsSorts, false);
+            extendsSorts, false, "", "");
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
@@ -148,40 +148,16 @@ public final class ArraySort extends AbstractSort {
     }
 
 
-    private static final class SortKey {
-        final Sort elemSort;
-        final Type elemType;
-        final Sort javaLangObjectSort;
-        final Sort javaLangSerializable;
-        final Sort javaLangCloneable;
-
-        public SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
-                Sort javaLangCloneable, Sort javaLangSerializable) {
-            this.elemSort = elemSort;
-            this.elemType = elemType;
-            this.javaLangObjectSort = javaLangObjectSort;
-            this.javaLangCloneable = javaLangCloneable;
-            this.javaLangSerializable = javaLangSerializable;
-        }
-
-
+    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
+                           Sort javaLangSerializable) {
         public boolean equals(Object o) {
-            if (!(o instanceof SortKey)) {
+            if (!(o instanceof SortKey sk)) {
                 return false;
             }
-            final SortKey sk = (SortKey) o;
             return elemSort == sk.elemSort && elemType == sk.elemType
                     && javaLangObjectSort == sk.javaLangObjectSort
                     && javaLangSerializable == sk.javaLangSerializable
                     && javaLangCloneable == sk.javaLangCloneable;
-        }
-
-
-        public int hashCode() {
-            return elemSort.hashCode() + (elemType == null ? 0 : 31 * elemType.hashCode())
-                    + (javaLangCloneable == null ? 0 : 31 * javaLangCloneable.hashCode())
-                    + (javaLangObjectSort == null ? 0 : 17 * javaLangObjectSort.hashCode())
-                    + (javaLangSerializable == null ? 0 : 3 * javaLangSerializable.hashCode());
         }
     }
 }

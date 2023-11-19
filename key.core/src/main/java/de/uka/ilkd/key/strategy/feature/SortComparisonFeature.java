@@ -22,7 +22,7 @@ public class SortComparisonFeature extends BinaryFeature {
     private final int comparator;
 
     /**
-     * creates a new comparision term feature
+     * creates a new comparison term feature
      */
     private SortComparisonFeature(ProjectionToTerm s1, ProjectionToTerm s2, int comparator) {
         this.s1 = s1;
@@ -30,9 +30,9 @@ public class SortComparisonFeature extends BinaryFeature {
         this.comparator = comparator;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Sort sort1 = s1.toTerm(app, pos, goal).sort();
-        final Sort sort2 = s2.toTerm(app, pos, goal).sort();
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Sort sort1 = s1.toTerm(app, pos, goal, mState).sort();
+        final Sort sort2 = s2.toTerm(app, pos, goal, mState).sort();
 
         return compare(sort1, sort2);
     }
@@ -42,12 +42,10 @@ public class SortComparisonFeature extends BinaryFeature {
      * @param sort2
      */
     protected boolean compare(final Sort sort1, final Sort sort2) {
-        switch (comparator) {
-        case SUBSORT:
+        if (comparator == SUBSORT) {
             return sort1.extendsTrans(sort2);
-        default:
-            return false;
         }
+        return false;
     }
 
 }

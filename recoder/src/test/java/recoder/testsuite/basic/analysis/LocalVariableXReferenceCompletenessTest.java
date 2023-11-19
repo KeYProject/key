@@ -29,8 +29,7 @@ public class LocalVariableXReferenceCompletenessTest extends XReferenceCompleten
             TreeWalker tw = new TreeWalker(u);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                if ((pe instanceof Variable) && !(pe instanceof Field)) {
-                    Variable x = (Variable) pe;
+                if ((pe instanceof Variable x) && !(pe instanceof Field)) {
                     List<? extends VariableReference> list = xrsi.getReferences(x);
                     for (VariableReference r : list) {
                         Variable y = xrsi.getVariable(r);

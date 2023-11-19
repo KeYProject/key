@@ -18,7 +18,8 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -159,8 +161,7 @@ public class NodeInfo {
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp pta) {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
@@ -310,9 +311,7 @@ public class NodeInfo {
             return;
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp) ruleApp; // XXX
-
+        if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
             StringBuffer sb = new StringBuffer();
@@ -332,12 +331,24 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
-                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
                             node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
-                        val = TermLabel.removeIrrelevantLabels(
+                        val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
+                    } else if (val instanceof LocationVariable locVar) {
+                        var originTracker = node.proof().lookup(LocationVariableTracker.class);
+                        if (originTracker != null) {
+                            var origin = originTracker.getCreatedBy(locVar);
+                            if (origin instanceof PosTacletApp posTacletApp) {
+                                var name = posTacletApp.taclet().displayName();
+                                if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
+                                    val =
+                                        posTacletApp.instantiations().lookupValue(new Name("#nse"));
+                                }
+                            }
+                        }
                     }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
                 }

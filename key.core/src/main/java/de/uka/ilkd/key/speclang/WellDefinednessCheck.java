@@ -496,7 +496,6 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption that self is not null.
      *
-     * @param pm The {@link IProgramMethod} to execute.
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
@@ -508,7 +507,6 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption that self is created.
      *
-     * @param pm The {@link IProgramMethod} to execute.
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
@@ -524,9 +522,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption which defines the type of self.
      *
-     * @param pm The {@link IProgramMethod} to execute.
      * @param selfVar The self variable.
-     * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
     private Term generateSelfExactType(ParsableVariable selfVar) {
@@ -630,7 +626,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return conjoined taclet
      */
-    final static RewriteTaclet createTaclet(String name, Term find1, Term find2, Term goal1,
+    static RewriteTaclet createTaclet(String name, Term find1, Term find2, Term goal1,
             Term goal2, TermServices services) {
         assert find1.op().name().equals(TermBuilder.WD_ANY.name());
         assert find2.op().name().equals(TermBuilder.WD_ANY.name());
@@ -666,7 +662,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return created taclet
      */
-    final static RewriteTaclet createTaclet(String name, Term callee, Term callTerm, Term pre,
+    static RewriteTaclet createTaclet(String name, Term callee, Term callTerm, Term pre,
             boolean isStatic, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
@@ -688,7 +684,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return created taclet with false as replacewith term
      */
-    final static RewriteTaclet createExcTaclet(String name, Term callTerm, TermServices services) {
+    static RewriteTaclet createExcTaclet(String name, Term callTerm, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(TB.wd(callTerm));
@@ -902,7 +898,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @return true if on and false if off
      */
-    public final static boolean isOn() {
+    public static boolean isOn() {
         final String setting =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
         if (setting == null) {
@@ -920,7 +916,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     /**
      * collects terms for precondition, assignable clause and other specification elements, and
-     * postcondition & signals-clause
+     * postcondition and signals-clause
      */
     public final POTerms createPOTerms() {
         final Condition pre = this.getRequires();
@@ -1164,7 +1160,7 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!modelField() && !type().equals(Type.CLASS_INVARIANT)) {
             displayName = displayName + " " + id;
         }
-        if (!getBehaviour().equals("")) {
+        if (!getBehaviour().isEmpty()) {
             displayName = displayName + " (" + getBehaviour() + ")";
         }
         return displayName;
@@ -1187,11 +1183,10 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final boolean equals(Object o) {
-        if (!(o instanceof WellDefinednessCheck)
+        if (!(o instanceof WellDefinednessCheck wd)
                 || !((WellDefinednessCheck) o).getKJT().equals(getKJT())) {
             return false;
         }
-        WellDefinednessCheck wd = (WellDefinednessCheck) o;
         return wd.getName().equals(this.name);
     }
 
@@ -1289,45 +1284,30 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * A static data structure for storing and passing two terms, denoting the implicit and the
-     * explicit part of a pre- or post-condition.
-     *
-     * @author Michael Kirsten
-     */
-    final static class Condition {
-        final Term implicit;
-        final Term explicit;
-
-        Condition(Term implicit, Term explicit) {
-            this.implicit = implicit;
-            this.explicit = explicit;
-        }
+         * A static data structure for storing and passing two terms, denoting the implicit and the
+         * explicit part of a pre- or post-condition.
+         *
+         * @author Michael Kirsten
+         */
+        public record Condition(Term implicit, Term explicit) {
 
         /**
-         * Applies a unary operator to every term in this object.
-         *
-         * @param op the operator to apply.
-         * @return this object with the operator applied.
-         */
-        Condition map(UnaryOperator<Term> op) {
-            return new Condition(op.apply(implicit), op.apply(explicit));
+             * Applies a unary operator to every term in this object.
+             *
+             * @param op the operator to apply.
+             * @return this object with the operator applied.
+             */
+            Condition map(UnaryOperator<Term> op) {
+                return new Condition(op.apply(implicit), op.apply(explicit));
+            }
         }
-    }
 
     /**
      * A static data structure for passing a term with a function.
      *
      * @author Michael Kirsten
      */
-    public final static class TermAndFunc {
-        public final Term term;
-        public final Function func;
-
-        TermAndFunc(Term t, Function f) {
-            this.term = t;
-            this.func = f;
-        }
-    }
+    public record TermAndFunc(Term term, Function func) {}
 
     /**
      * A data structure for storing and passing all specifications of a specification element
@@ -1336,17 +1316,6 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public final static class POTerms {
-        public final Condition pre;
-        public final Term mod;
-        public final ImmutableList<Term> rest;
-        public final Condition post;
-
-        POTerms(Condition pre, Term mod, ImmutableList<Term> rest, Condition post) {
-            this.pre = pre;
-            this.mod = mod;
-            this.rest = rest;
-            this.post = post;
-        }
+    public record POTerms(Condition pre, Term mod, ImmutableList<Term> rest, Condition post) {
     }
 }

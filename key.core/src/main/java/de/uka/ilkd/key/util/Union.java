@@ -10,7 +10,7 @@ import java.util.function.Function;
 /**
  * A union type contains a value that can be one of two types. It is also called
  * the "sum" type sometimes. Union containers are immutable.
- *
+ * <p>
  * A union element contains a single reference that can be of type A or of type
  * B. The pure functions {@link #isFirst()} and {@link #isSecond()} can be used
  * to check if stored reference is of the respective types. The functions
@@ -18,38 +18,32 @@ import java.util.function.Function;
  * value with the respective type. An exception is raised if {@link #getFirst()}
  * is invoked while {@link #isFirst()} returns false.
  *
- * @see java.util.Optional
- * @see Pair
- *
  * @param <A> the type for the first alternative
  * @param <B> the type for the second alternative
+ * @see java.util.Optional
+ * @see Pair
  */
-public class Union<A, B> {
-
-    private final boolean isFirst;
-    private final Object value;
+public record Union<A, B>(Object value, boolean isFirst) {
 
     /**
      * private constructor the static methods {@link #fromFirst(Object)} and
      * {@link #fromSecond(Object)}.
      *
-     * @param value the value to store, may be null
+     * @param value   the value to store, may be null
      * @param isFirst true if of first, false if of second type
      */
-    private Union(Object value, boolean isFirst) {
-        this.value = value;
-        this.isFirst = isFirst;
+    public Union {
     }
 
     /**
      * Instantiate a new union type with the value stored from the first type.
-     *
+     * <p>
      * The result will return true for {@link #isFirst()}.
      *
      * @param value the value to store, may be null
+     * @param <A>   the type of the first alternative
+     * @param <B>   the type of the second alternative
      * @return a freshly created immutable union object.
-     * @param <A> the type of the first alternative
-     * @param <B> the type of the second alternative
      */
     public static <A, B> Union<A, B> fromFirst(A value) {
         return new Union<A, B>(value, true);
@@ -57,13 +51,13 @@ public class Union<A, B> {
 
     /**
      * Instantiate a new union type with the value stored from the second type.
-     *
+     * <p>
      * The result will return true for {@link #isSecond()}.
      *
      * @param value the value to store, may be null
+     * @param <A>   the type of the first alternative
+     * @param <B>   the type of the second alternative
      * @return a freshly created immutable union object.
-     * @param <A> the type of the first alternative
-     * @param <B> the type of the second alternative
      */
     public static <A, B> Union<A, B> fromSecond(B value) {
         return new Union<A, B>(value, false);
@@ -74,8 +68,9 @@ public class Union<A, B> {
      * {@link #fromFirst(Object)}.
      *
      * @return true iff this union object has created using
-     *         {@link #fromFirst(Object)}.
+     * {@link #fromFirst(Object)}.
      */
+    @Override
     public boolean isFirst() {
         return isFirst;
     }
@@ -85,7 +80,7 @@ public class Union<A, B> {
      * {@link #fromSecond(Object)}.
      *
      * @return true iff this union object has created using
-     *         {@link #fromSecond(Object)}.
+     * {@link #fromSecond(Object)}.
      */
     public boolean isSecond() {
         return !isFirst;
@@ -126,8 +121,8 @@ public class Union<A, B> {
      * the function is applied to the value, if not the value remains untouched.
      *
      * @param function non-null function to apply to the value
+     * @param <C>      the result type of function
      * @return a fresh union object
-     * @param <C> the result type of function
      */
     public <C> Union<C, B> mapFirst(Function<A, C> function) {
         if (isFirst()) {
@@ -142,8 +137,8 @@ public class Union<A, B> {
      * the function is applied to the value, if not the value remains untouched.
      *
      * @param function non-null function to apply to the value
+     * @param <C>      the result type of function
      * @return a fresh union object
-     * @param <C> the result type of function
      */
     public <C> Union<A, C> mapSecond(Function<B, C> function) {
         if (isSecond()) {
@@ -156,7 +151,7 @@ public class Union<A, B> {
     @Override
     public String toString() {
         return "Union{" + (isFirst ? "first" : "second") +
-            " alternative, value=" + value +
-            '}';
+                " alternative, value=" + value +
+                '}';
     }
 }

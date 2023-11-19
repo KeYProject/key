@@ -139,8 +139,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.taclet() instanceof RewriteTaclet) {
                     if (pta.taclet().displayName().equals("cut_direct")) {
                         continue;

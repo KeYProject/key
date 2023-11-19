@@ -32,7 +32,15 @@ public class FixedBugs {
         ServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         CompilationUnit cu = f.parseCompilationUnit(
-            "public class Test\n{\nTest s;\npublic Test(Test s)" + "\n{\nthis.s = s;\n}\n}");
+            """
+                    public class Test
+                    {
+                    Test s;
+                    public Test(Test s)
+                    {
+                    this.s = s;
+                    }
+                    }""");
         sc.getChangeHistory().attached(cu);
         assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test")
                 .getConstructors().get(0)).getStartPosition().getLine());
@@ -48,7 +56,12 @@ public class FixedBugs {
         ServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         CompilationUnit cu =
-            f.parseCompilationUnit("class A {\n\n\n" + "//some comment\r\nA a; } class B {}");
+            f.parseCompilationUnit("""
+                    class A {
+
+
+                    //some comment\r
+                    A a; } class B {}""");
         sc.getChangeHistory().attached(cu);
         FieldDeclaration fd = (FieldDeclaration) cu.getDeclarations().get(0).getMembers().get(0);
         TypeReference oldType = fd.getTypeReference();

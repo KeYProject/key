@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,10 +79,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String contractName = properties.getProperty("contract");
         int proofNum = 0;
         String baseContractName = null;
@@ -119,11 +116,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalLoopContractPO)) {
+        if (!(po instanceof FunctionalLoopContractPO other)) {
             return false;
         }
 
-        FunctionalLoopContractPO other = (FunctionalLoopContractPO) po;
         return contract.equals(other.contract);
     }
 
@@ -144,10 +140,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FunctionalLoopContractPO)) {
+        if (!(obj instanceof FunctionalLoopContractPO other)) {
             return false;
         }
-        FunctionalLoopContractPO other = (FunctionalLoopContractPO) obj;
         if (contract == null) {
             if (other.contract != null) {
                 return false;
@@ -163,7 +158,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public void readProblem() throws ProofInputException {
+    public void readProblem() {
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
         final Services services = postInit();

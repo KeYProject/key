@@ -5,7 +5,6 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Name;
@@ -59,7 +58,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
             final Node node = goal.node().parent();
             final List<String> matches =
                 node.getNameRecorder().getProposals().stream().map(Name::toString)
-                        .filter(str -> str.matches(stringToMatch)).collect(Collectors.toList());
+                        .filter(str -> str.matches(stringToMatch)).toList();
 
             if (matches.size() != 1) {
                 throw new ScriptException(

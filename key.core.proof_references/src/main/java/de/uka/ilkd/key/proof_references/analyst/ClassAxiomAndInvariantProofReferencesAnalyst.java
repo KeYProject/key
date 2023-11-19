@@ -65,9 +65,8 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                         }
                     }
                 }
-                if (found instanceof PartialInvAxiom) {
+                if (found instanceof PartialInvAxiom axiom) {
                     // Invariant was applied
-                    PartialInvAxiom axiom = (PartialInvAxiom) found;
                     DefaultProofReference<ClassInvariant> reference =
                         new DefaultProofReference<>(IProofReference.USE_INVARIANT,
                             node, axiom.getInv());

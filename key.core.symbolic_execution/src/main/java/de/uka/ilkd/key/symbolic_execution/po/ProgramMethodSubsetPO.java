@@ -26,6 +26,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+// need to switch spotless off for this comment as it replaces @code with &#64;code
+// spotless:off
 /**
  * <p>
  * This proof obligation executes selected statements of the body of a given {@link IProgramMethod}.
@@ -38,11 +40,18 @@ import org.key_project.util.collection.ImmutableSLList;
  * position of the previous statement is exactly the start position of the following statement.
  * </p>
  * <p>
- * Imagine the following snippet: <code><pre>
- * int x = 1; // from 3/59 to 4/16
- * int y = 2; // from 4/16 to 5/16
- * int z = 3; // from 5/16 to 6/16
- * </pre></code> To execute only the last two statements a user would select intuitively the source
+ * Imagine the following snippet:
+ *
+ * <pre>
+ * {@code
+ *     int x = 1; // from 3/59 to 4/16
+ *     int y = 2; // from 4/16 to 5/16
+ *     int z = 3; // from 5/16 to 6/16
+ * }
+ * </pre>
+ * </p>
+ * <p>
+ * To execute only the last two statements a user would select intuitively the source
  * range 5/0 to 6/16 (the text without leading white space) which matches exactly the used selection
  * definition.
  * </p>
@@ -50,22 +59,28 @@ import org.key_project.util.collection.ImmutableSLList;
  * The generated {@link Sequent} has the following form:
  *
  * <pre>
- * <code>
+ * {@code
  * ==>
- * &lt;generalAssumptions&gt; &
- * &lt;preconditions&gt;
+ * <generalAssumptions> &
+ * <preconditions>
  * ->
- * &lt;updatesToStoreInitialValues&gt;
- * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodFrame&gt;&lt;selectedStatements&gt;}catch(java.lang.Exception e) {exc = e}
- * &lt;modalityEnd&gt;
- * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
- * </code>
+ * <updatesToStoreInitialValues>
+ * <modalityStart>
+ * exc=null;
+ * try {
+ *   <methodFrame><selectedStatements>
+ * } catch(java.lang.Exception e) {
+ *  exc = e
+ * }
+ * <modalityEnd>
+ * (exc = null & <postconditions > & <optionalUninterpretedPredicate>)
+ * }
  * </pre>
  * </p>
  *
  * @author Martin Hentschel
  */
+//spotless:on
 public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Contains all undeclared variables used in the method part to execute.
@@ -175,8 +190,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                 // Continue search in children
                 if (s instanceof StatementContainer) {
                     collectStatementsToExecute(toFill, (StatementContainer) s);
-                } else if (s instanceof BranchStatement) {
-                    BranchStatement bs = (BranchStatement) s;
+                } else if (s instanceof BranchStatement bs) {
                     for (int j = 0; j < bs.getBranchCount(); j++) {
                         Branch branch = bs.getBranchAt(j);
                         collectStatementsToExecute(toFill, branch);
@@ -266,8 +280,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodSubsetPO) {
-            ProgramMethodSubsetPO other = (ProgramMethodSubsetPO) obj;
+        if (obj instanceof ProgramMethodSubsetPO other) {
             return super.equals(obj)
                     && Objects.equals(getStartPosition(), other.getStartPosition())
                     && Objects.equals(getEndPosition(), other.getEndPosition());

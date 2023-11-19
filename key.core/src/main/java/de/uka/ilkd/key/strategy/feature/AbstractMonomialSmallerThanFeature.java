@@ -63,8 +63,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             final RuleApp app = appliedRules.head();
             appliedRules = appliedRules.tail();
 
-            if (app instanceof TacletApp) {
-                final TacletApp tapp = (TacletApp) app;
+            if (app instanceof TacletApp tapp) {
                 if (!inNewSmallSymRuleSet(tapp)) {
                     continue;
                 }

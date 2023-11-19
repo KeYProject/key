@@ -18,20 +18,21 @@ public class SMTTermQuant extends SMTTerm {
         FORALL, EXISTS;
 
         public Quant sign(boolean pol) {
-            switch (this) {
-            case FORALL:
-                if (pol) {
-                    return this;
+            return switch (this) {
+                case FORALL -> {
+                    if (pol) {
+                        yield this;
+                    }
+                    yield EXISTS;
                 }
-                return EXISTS;
-            case EXISTS:
-                if (pol) {
-                    return this;
+                case EXISTS -> {
+                    if (pol) {
+                        yield this;
+                    }
+                    yield FORALL;
                 }
-                return FORALL;
-            default:
-                throw new RuntimeException("Unexpected: Quant in neg() : " + this);
-            }
+                default -> throw new RuntimeException("Unexpected: Quant in neg() : " + this);
+            };
         }
     }
 
@@ -96,7 +97,7 @@ public class SMTTermQuant extends SMTTerm {
     }
 
     /**
-     * @param pat the pat to set
+     * @param pats the pat to set
      */
     public void setPats(List<List<SMTTerm>> pats) {
         this.pats = pats;
@@ -231,13 +232,13 @@ public class SMTTermQuant extends SMTTerm {
         }
 
         if (newVars.size() < bindVars.size())
-        /**
+        /*
          * 1. Some SMT solvers like Z3 requires patterns to contains all binded variables 2.
          * Some terms of the patterns can contains more that one variable 3. Instantiation of
          * quantified variables should can destroy the well-sortedness of patterns term. Because
          * of 1-3 and for simplicity, we just drop the entry pattern its the quantifier is
          * instantiated.
-         **/
+         */
         {
             return sub.instantiate(a, b).quant(quant, newVars);
         }
@@ -267,10 +268,9 @@ public class SMTTermQuant extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermQuant)) {
+        if (!(term instanceof SMTTermQuant qt)) {
             return false;
         }
-        SMTTermQuant qt = (SMTTermQuant) term;
 
         if (!this.quant.equals(qt.quant)) {
             return false;

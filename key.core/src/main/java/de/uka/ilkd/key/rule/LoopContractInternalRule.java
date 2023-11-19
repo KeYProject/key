@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -27,6 +26,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -103,7 +104,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      *
      * @param modifiesClauses the loop's modifies clauses.
      * @param freeModifiesClauses the loop's free modifies clauses.
-     * @param conditionsAndClausesBuildera ConditionsAndClausesBuilder.
+     * @param conditionsAndClausesBuilder ConditionsAndClausesBuilder.
      * @return the postconditions for the current loop iteration.
      */
     private static Term[] createPostconditions(
@@ -160,7 +161,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final UpdatesBuilder updatesBuilder, final Instantiation instantiation,
             final Services services) {
         return services.getTermBuilder().sequential(updatesBuilder.buildOuterRemembranceUpdate(),
-            instantiation.update);
+            instantiation.update());
     }
 
     /**
@@ -198,7 +199,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final List<LocationVariable> heaps, final Map<LocationVariable, Function> anonOutHeaps,
             final Map<LocationVariable, Term> modifiesClauses,
             final UpdatesBuilder updatesBuilder) {
-        final Term contextUpdate = instantiation.update;
+        final Term contextUpdate = instantiation.update();
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
             updatesBuilder.buildAnonOutUpdate(anonOutHeaps, modifiesClauses);
@@ -256,7 +257,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new LoopContractInternalBuiltInRuleApp(this, occurrence);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -268,29 +269,30 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         LoopContract contract = application.getContract();
 
-        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
-                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
+        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
+                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
         contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
-        contract.setInstantiationSelf(instantiation.self);
+        contract.setInstantiationSelf(instantiation.self());
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonOutHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars =
-            createVars(goal, instantiation.self, contract, services);
+            createVars(goal, instantiation.self(), contract, services);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self, services);
+            new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self(),
+                services);
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
         final Map<LocationVariable, Term> freeModifiesClauses =
             conditionsAndClausesBuilder.buildFreeModifiesClauses();
-        final Term[] assumptions = createPreconditions(instantiation.self, contract, heaps,
+        final Term[] assumptions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Term[] postconditions =
@@ -300,7 +302,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             localOutVariables, conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
         final Term[] postconditionsNext = createPostconditionsNext(
-            instantiation.self, contract,
+            instantiation.self(), contract,
             heaps, vars[1], modifiesClauses, freeModifiesClauses, services);
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(vars[0], services);
         final Term[] updates =
@@ -322,7 +324,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
             freeModifiesClauses,
             ArrayUtil.add(assumptions, freePrecondition), decreasesCheck, postconditions,
-            postconditionsNext, exceptionParameter, vars[0].termify(instantiation.self), vars[1]);
+            postconditionsNext, exceptionParameter, vars[0].termify(instantiation.self()), vars[1]);
 
         return result;
     }

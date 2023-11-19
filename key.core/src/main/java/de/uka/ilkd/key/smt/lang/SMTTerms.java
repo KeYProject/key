@@ -23,8 +23,7 @@ public class SMTTerms extends SMTTerm {
     public List<SMTTerm> flatten() {
         List<SMTTerm> termList = new LinkedList<>();
         for (SMTTerm arg : this.getTerms()) {
-            if (arg instanceof SMTTerms) {
-                SMTTerms terms = (SMTTerms) arg;
+            if (arg instanceof SMTTerms terms) {
                 termList.addAll(terms.flatten());
 
             }

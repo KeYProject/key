@@ -51,7 +51,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     /**
      * Change notification callback method.
      *
-     * @param config the configuration this services becomes part of.
+     * @param changes the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
 
@@ -189,8 +189,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             }
         }
         for (TreeChange tc : changed) {
-            if (!tc.isMinor() && (tc instanceof AttachChange)) {
-                AttachChange ac = (AttachChange) tc;
+            if (!tc.isMinor() && (tc instanceof AttachChange ac)) {
                 ProgramElement pe = ac.getChangeRoot();
                 // we expect that scopes are valid
                 analyzeReferences(pe);
@@ -384,8 +383,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Collects all Method-, Constructor-, Variable- and TypeReferences in the subtree.
      */
     private void analyzeReferences(ProgramElement pe) {
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement nt) {
             for (int i = 0, c = nt.getChildCount(); i < c; i += 1) {
                 analyzeReferences(nt.getChildAt(i));
             }
@@ -404,8 +402,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 }
             }
             // no else
-            if (pe instanceof VariableReference) {
-                VariableReference vr = (VariableReference) pe;
+            if (pe instanceof VariableReference vr) {
                 Variable v = getVariable(vr);
                 if (v == null) {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
@@ -413,8 +410,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                     v = getNameInfo().getUnknownField();
                 }
                 registerReference(vr, v);
-            } else if (pe instanceof TypeReference) {
-                TypeReference tr = (TypeReference) pe;
+            } else if (pe instanceof TypeReference tr) {
                 Type t = getType(tr);
                 if (t instanceof ParameterizedType) {
                     t = ((ParameterizedType) t).getGenericType();
@@ -438,20 +434,16 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                         }
                     }
                 }
-            } else if (pe instanceof MethodReference) {
-                MethodReference mr = (MethodReference) pe;
+            } else if (pe instanceof MethodReference mr) {
                 Method m = getMethod(mr);
                 registerReference(mr, m);
-            } else if (pe instanceof ConstructorReference) {
-                ConstructorReference cr = (ConstructorReference) pe;
+            } else if (pe instanceof ConstructorReference cr) {
                 Constructor c = getConstructor(cr);
                 registerReference(cr, c);
-            } else if (pe instanceof AnnotationPropertyReference) {
-                AnnotationPropertyReference apr = (AnnotationPropertyReference) pe;
+            } else if (pe instanceof AnnotationPropertyReference apr) {
                 AnnotationProperty ap = getAnnotationProperty(apr);
                 registerReference(apr, ap);
-            } else if (pe instanceof PackageReference) {
-                PackageReference pr = (PackageReference) pe;
+            } else if (pe instanceof PackageReference pr) {
                 Package p = getPackage(pr);
                 registerReference(pr, p);
             }

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
@@ -48,6 +46,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 import static java.lang.String.format;
@@ -919,7 +919,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getThisReceiver();
     }
 
-    @Nonnull
+    @NonNull
     private SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
@@ -1047,7 +1047,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             if (result == null) {
                 raiseError(format("Method %s(%s) not found!", lookupName,
-                    createSignatureString(params.getParameters())), ctx);
+                    createSignatureString(params.parameters())), ctx);
             }
         }
         if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
@@ -1593,16 +1593,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryUnionInf(JmlParser.PrimaryUnionInfContext ctx) {
         addWarning(ctx,
-            "!!! Deprecation Warnung: You used \\infinite_union "
-                + "in the functional syntax \\infinite_union(...)."
-                + "\n\tThis is deprecated and won't be valid in future versions of KeY."
-                + "\n\tPlease use \\infinite_union as a binder instead: "
-                + "(\\infinite_union var type; guard; store-ref-expr).");
+            """
+                    !!! Deprecation Warnung: You used \\infinite_union in the functional syntax \\infinite_union(...).
+                    \tThis is deprecated and won't be valid in future versions of KeY.
+                    \tPlease use \\infinite_union as a binder instead: (\\infinite_union var type; guard; store-ref-expr).""");
         return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(),
             ctx.predicate(), ctx.storeref());
     }
 
-    @Nonnull
+    @NonNull
     private Object createInfiniteUnion(JmlParser.BoundvarmodifiersContext boundvarmodifiers,
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls,
             JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
@@ -1703,18 +1702,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         final Term t2 = e2.getTerm();
         final Term t1 = e1.getTerm();
-        switch (ctx.op.getType()) {
-        case JmlLexer.SEQCONCAT:
-            return termFactory.seqConcat(t1, t2);
-        case JmlLexer.SEQGET:
-            return termFactory.seqGet(t1, t2);
-        case JmlLexer.INDEXOF:
-            return termFactory.createIndexOf(t1, t2);
-        default:
-            raiseError(ctx, "Unexpected syntax case.");
-        }
-        raiseError(ctx, "Unknown operator: %s", ctx.op);
-        return null;
+        return switch (ctx.op.getType()) {
+            case JmlLexer.SEQCONCAT -> termFactory.seqConcat(t1, t2);
+            case JmlLexer.SEQGET -> termFactory.seqGet(t1, t2);
+            case JmlLexer.INDEXOF -> termFactory.createIndexOf(t1, t2);
+            default -> {
+                raiseError(ctx, "Unknown operator: %s", ctx.op);
+                yield null;
+            }
+        };
     }
 
     @Override
@@ -1739,42 +1735,37 @@ class Translator extends JmlParserBaseVisitor<Object> {
             guard = a.getTerm();
         }
         SLExpression expr =
-            ctx.expression().size() == 2 ? accept(ctx.expression(1)) : accept(ctx.expression(0));
+                ctx.expression().size() == 2 ? accept(ctx.expression(1)) : accept(ctx.expression(0));
 
         resolverManager.popLocalVariablesNamespace();
         assert guard != null;
         guard = tb.convertToFormula(guard);
         assert expr != null;
         final Term body = expr.getTerm();
-        switch (ctx.quantifier().start.getType()) {
-        case JmlLexer.FORALL:
-            return termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
-                expr.getType());
-        case JmlLexer.EXISTS:
-            return termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
-                expr.getType());
-        case JmlLexer.MAX:
-            return termFactory.quantifiedMax(guard, body, declVars.first, nullable,
-                declVars.second);
-        case JmlLexer.MIN:
-            return termFactory.quantifiedMin(guard, body, declVars.first, nullable,
-                declVars.second);
-        case JmlLexer.NUM_OF:
-            KeYJavaType kjtInt =
-                services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-            return termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
-                declVars.second, kjtInt);
-        case JmlLexer.SUM:
-            return termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
-                expr.getType());
-        case JmlLexer.PRODUCT:
-            return termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
-                body, expr.getType());
-        default:
-            raiseError(ctx, "Unexpected syntax case.");
-        }
-        raiseError(ctx, "Unexpected syntax case.");
-        return null;
+        return switch (ctx.quantifier().start.getType()) {
+            case JmlLexer.FORALL -> termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
+                    expr.getType());
+            case JmlLexer.EXISTS -> termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
+                    expr.getType());
+            case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
+                    declVars.second);
+            case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
+                    declVars.second);
+            case JmlLexer.NUM_OF -> {
+                KeYJavaType kjtInt =
+                        services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
+                        declVars.second, kjtInt);
+            }
+            case JmlLexer.SUM -> termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
+                    expr.getType());
+            case JmlLexer.PRODUCT -> termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
+                    body, expr.getType());
+            default -> {
+                raiseError(ctx, "Unexpected syntax case.");
+                yield null;
+            }
+        };
     }
 
     @Override
@@ -1904,8 +1895,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             try {
                 javaInfo.readJavaBlock("{" + fullName + " k;}");
                 t = javaInfo.getKeYJavaType(fullName);
-            } catch (Exception e) {
-                t = null;
+            } catch (Exception ignored) {
             }
         }
         return t;
@@ -1962,9 +1952,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             } else {
                 fullName.append(t.getFullName());
             }
-            for (int i = 0; i < dim; i++) {
-                fullName.append("[]");
-            }
+            fullName.append("[]".repeat(dim));
             varType = javaInfo.getKeYJavaType(fullName.toString());
         } else {
             varType = t;
@@ -2037,7 +2025,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @Nonnull
+        @NonNull
         Pair<Label, Term> t = termFactory.createBreaks(pred.getTerm(), label);
         contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
         return t;
@@ -2048,7 +2036,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @Nonnull
+        @NonNull
         Pair<Label, Term> t = termFactory.createContinues(pred.getTerm(), label);
         contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
         return t;
@@ -2133,14 +2121,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ContractClauses.Clauses<LocationVariable, Term> free,
             ContractClauses.Clauses<LocationVariable, Term> redundantly) {
         switch (subType(type)) {
-        case FREE:
-            contractClauses.add(free, heap, t);
-            break;
-        case REDUNDANT:
-            contractClauses.add(redundantly, heap, t);
-            break;
-        default:
-            contractClauses.add(none, heap, t);
+        case FREE -> contractClauses.add(free, heap, t);
+        case REDUNDANT -> contractClauses.add(redundantly, heap, t);
+        default -> contractClauses.add(none, heap, t);
         }
     }
 
@@ -2174,7 +2157,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
-                .collect(Collectors.toList());
+                .toList();
         Optional<SLExpression> t =
             seq.stream().reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();
@@ -2532,19 +2515,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
             String heapName = ctx.SPECIAL_IDENT(i).getText();
             switch (heapName) {
-            case "<permission>":
-            case "<permissions>":
-                heaps[i] = getPermissionHeap();
-                break;
-            case "<savedHeap>":
-            case "<saved>":
-                heaps[i] = getSavedHeap();
-                break;
-            case "<heap>":
-                heaps[i] = getBaseHeap();
-                break;
-            default:
-                heaps[i] = heapLDT.getHeapForName(new Name(heapName));
+            case "<permission>", "<permissions>" -> heaps[i] = getPermissionHeap();
+            case "<savedHeap>", "<saved>" -> heaps[i] = getSavedHeap();
+            case "<heap>" -> heaps[i] = getBaseHeap();
+            default -> heaps[i] = heapLDT.getHeapForName(new Name(heapName));
             }
         }
         return heaps;

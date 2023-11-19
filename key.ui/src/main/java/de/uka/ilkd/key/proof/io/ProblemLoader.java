@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -59,6 +60,12 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
         }
 
         long runTime = System.currentTimeMillis() - currentTime;
+        if (message != null) {
+            final String errorMessage = "Failed to load "
+                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+            mediator.notify(new ExceptionFailureEvent(errorMessage, message));
+            mediator.getUI().reportStatus(this, errorMessage);
+        }
         fireTaskFinished(runTime, message);
     }
 
@@ -67,10 +74,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
-            final String errorMessage = "Failed to load "
-                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
-            mediator.notify(new ExceptionFailureEvent(errorMessage, exception));
-            mediator.getUI().reportStatus(this, errorMessage);
             return exception;
         }
     }
@@ -103,7 +106,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking {@link ProverTaskListener#taskStarted(String, int)} on the
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on
+     * the
      * registered listener.
      *
      * Termination is announced by invoking
@@ -124,7 +128,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
             @Override
             protected void done() {
-                mediator.startInterface(true);
                 Throwable message = null;
                 try {
                     message = get();
@@ -132,7 +135,15 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                     // catch exception if something has been thrown in the meantime
                     message = exception;
                 } finally {
+                    mediator.startInterface(true);
+                    if (message != null) {
+                        final String errorMessage = "Failed to load "
+                            + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                        mediator.notify(new ExceptionFailureEvent(errorMessage, message));
+                        mediator.getUI().reportStatus(this, errorMessage);
+                    }
                     fireTaskFinished(runTime, message);
+                    mediator.getSelectionModel().defaultSelection();
                 }
             }
         };

@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -13,51 +10,28 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Common information that is needed almost everywhere during translation. Class is immutable.
  *
+ * @param specMathMode The spec math mode
+ * @param selfVar      {@code self}
+ * @param classType    The containing class
  * @author Julian Wiesler
  */
-public class Context {
-    /**
-     * The spec math mode
-     */
-    public final SpecMathMode specMathMode;
-
-    /**
-     * {@code self}
-     */
-    public final ProgramVariable selfVar;
-
-    /**
-     * The containing class
-     */
-    public final KeYJavaType classType;
-
-    /**
-     * Constructs a new context from the given parameters
-     *
-     * @param specMathMode spec math mode
-     * @param classType class
-     * @param selfVar self variable
-     */
-    public Context(@Nonnull SpecMathMode specMathMode, @Nonnull KeYJavaType classType,
-            ProgramVariable selfVar) {
-        this.classType = classType;
-        this.specMathMode = specMathMode;
-        this.selfVar = selfVar;
-    }
-
+public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType classType, ProgramVariable selfVar) {
     /**
      * Constructs a self var from the given parameters
      *
-     * @param tb term builder
-     * @param classType class
+     * @param tb              term builder
+     * @param classType       class
      * @param isStaticContext whether this is a static context
      */
     @Nullable
     private static ProgramVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
-            boolean isStaticContext) {
+                                                 boolean isStaticContext) {
         return isStaticContext ? null : tb.selfVar(classType, false);
     }
 
@@ -67,7 +41,7 @@ public class Context {
      * @param pm program method
      * @param tb term builder
      */
-    public static Context inMethod(@Nonnull IProgramMethod pm, TermBuilder tb) {
+    public static Context inMethod(@NonNull IProgramMethod pm, TermBuilder tb) {
         var classType = pm.getContainerType();
         var selfVar = createSelfVar(tb, classType, pm.isStatic());
         return Context.inMethodWithSelfVar(pm, selfVar);
@@ -76,10 +50,10 @@ public class Context {
     /**
      * Constructs a new context in the given program method using the given self var
      *
-     * @param pm program method
+     * @param pm      program method
      * @param selfVar self var
      */
-    public static Context inMethodWithSelfVar(@Nonnull IProgramMethod pm, ProgramVariable selfVar) {
+    public static Context inMethodWithSelfVar(@NonNull IProgramMethod pm, ProgramVariable selfVar) {
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(pm);
         return new Context(mode, pm.getContainerType(), selfVar);
     }
@@ -87,12 +61,12 @@ public class Context {
     /**
      * Constructs a new context in the given class
      *
-     * @param classType class
+     * @param classType       class
      * @param isStaticContext whether this is a static context
-     * @param tb term builder
+     * @param tb              term builder
      */
-    public static Context inClass(@Nonnull KeYJavaType classType, boolean isStaticContext,
-            TermBuilder tb) {
+    public static Context inClass(@NonNull KeYJavaType classType, boolean isStaticContext,
+                                  TermBuilder tb) {
         var selfVar = createSelfVar(tb, classType, isStaticContext);
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(classType);
         return new Context(mode, classType, selfVar);

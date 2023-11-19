@@ -143,12 +143,11 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 }
                 pe = pe.getASTParent();
             }
-            if (!(pe instanceof StatementBlock)) {
+            if (!(pe instanceof StatementBlock block)) {
                 // -- conservative with old behavior of postWork --
                 // Rest assured, KeY does probably some magic later
                 return commentIndex;
             }
-            StatementBlock block = (StatementBlock) pe;
             while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
                 if (current.getText().contains("@")) {
                     // append new empty statement to statement block

@@ -55,8 +55,7 @@ public class ReferenceLister {
             TreeWalker walker = new TreeWalker(cu);
             while (walker.next()) {
                 ProgramElement pe = walker.getProgramElement();
-                if (pe instanceof TypeReference) {
-                    TypeReference typeRef = (TypeReference) pe;
+                if (pe instanceof TypeReference typeRef) {
                     if (si.getType(typeRef) == null && !typeRef.getName().equals("void")) {
                         LOGGER.info("Unresolvable type: {}", typeRef.toSource());
                     }

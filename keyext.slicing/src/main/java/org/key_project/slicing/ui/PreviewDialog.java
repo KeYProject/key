@@ -85,11 +85,11 @@ public class PreviewDialog extends JDialog implements WindowListener {
     private void workerDone(GraphvizResult result) {
         if (result.hasImage()) {
             getContentPane().removeAll();
-            PanZoomImageView pziv = new PanZoomImageView(result.getImage(), 800, 600);
+            PanZoomImageView pziv = new PanZoomImageView(result.image(), 800, 600);
             pziv.setPreferredSize(new Dimension(800, 600));
             getContentPane().add(pziv, BorderLayout.CENTER);
         } else if (result.hasError()) {
-            JLabel label = new JLabel(result.getError());
+            JLabel label = new JLabel(result.error());
             label.setBorder(new EmptyBorder(0, 10, 10, 10));
             getContentPane().add(label, BorderLayout.SOUTH);
         } else {

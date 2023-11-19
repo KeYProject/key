@@ -370,8 +370,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         String superClassName = classFile.getSuperClassName();
         String[] interfaceNames = classFile.getInterfaceNames();
 
-        if (typeDecl instanceof ClassDeclaration) {
-            ClassDeclaration classDecl = (ClassDeclaration) typeDecl;
+        if (typeDecl instanceof ClassDeclaration classDecl) {
             TypeReference tyRef = createTypeReference(superClassName);
             Extends ext = factory.createExtends(tyRef);
             classDecl.setExtendedTypes(ext);
@@ -383,8 +382,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             if (implList.size() > 0) {
                 classDecl.setImplementedTypes(factory.createImplements(implList));
             }
-        } else if (typeDecl instanceof EnumDeclaration) {
-            EnumDeclaration enDecl = (EnumDeclaration) typeDecl;
+        } else if (typeDecl instanceof EnumDeclaration enDecl) {
             ASTList<TypeReference> implList = new ASTArrayList<>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
@@ -392,8 +390,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             if (implList.size() > 0) {
                 enDecl.setImplementedTypes(factory.createImplements(implList));
             }
-        } else if (typeDecl instanceof InterfaceDeclaration) {
-            InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
+        } else if (typeDecl instanceof InterfaceDeclaration intfDecl) {
             ASTList<TypeReference> implList = new ASTArrayList<>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));

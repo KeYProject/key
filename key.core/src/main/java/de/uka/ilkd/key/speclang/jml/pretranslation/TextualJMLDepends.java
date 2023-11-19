@@ -5,7 +5,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -24,7 +25,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         new LinkedHashMap<>();
 
     public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
-            @Nonnull LabeledParserRuleContext depends) {
+            @NonNull LabeledParserRuleContext depends) {
         super(mods);
         setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
@@ -52,10 +53,9 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLDepends)) {
+        if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }
-        TextualJMLDepends a = (TextualJMLDepends) o;
         return mods.equals(a.mods) && depends.equals(a.depends);
     }
 

@@ -57,8 +57,7 @@ public class UpdateHandler implements SMTHandler {
             }
         } else if (update.op() == UpdateJunctor.SKIP) {
             // Do precisely that: skip
-        } else if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate elemUpd = (ElementaryUpdate) update.op();
+        } else if (update.op() instanceof ElementaryUpdate elemUpd) {
             Term target = services.getTermFactory().createTerm(elemUpd.lhs());
             SExpr smtTarget = trans.translate(target);
             SExpr smtValue = trans.translate(update.sub(0), Type.UNIVERSE);

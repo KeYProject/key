@@ -23,22 +23,16 @@ interface Query {
 
     /**
      * Stores the result from the z3 solver.
-     *
-     * @param s
      */
     void setResult(String s);
 
     /**
      * Returns the command that is to be handed over to the z3 solver.
-     *
-     * @return
      */
     String getQuery();
 
     /**
      * Returns the stored result.
-     *
-     * @return
      */
     String getResult();
 }
@@ -671,29 +665,15 @@ public class ModelExtractor {
 
 
     public void addFunction(SMTFunction f) {
-        if (f.getDomainSorts().size() == 0) {
+        if (f.getDomainSorts().isEmpty()) {
             switch (f.getImageSort().getId()) {
-            case SMTObjTranslator.HEAP_SORT:
-                heaps.add(f);
-                break;
-            case SMTObjTranslator.FIELD_SORT:
-                fields.add(f);
-                break;
-            case SMTObjTranslator.LOCSET_SORT:
-                locsets.add(f);
-                break;
-            case SMTObjTranslator.OBJECT_SORT:
-                objects.add(f);
-                break;
-            case SMTObjTranslator.BINT_SORT:
-                ints.add(f);
-                break;
-            case SMTObjTranslator.SEQ_SORT:
-                seqs.add(f);
-                break;
-            default:
-                bools.add(f);
-                break;
+            case SMTObjTranslator.HEAP_SORT -> heaps.add(f);
+            case SMTObjTranslator.FIELD_SORT -> fields.add(f);
+            case SMTObjTranslator.LOCSET_SORT -> locsets.add(f);
+            case SMTObjTranslator.OBJECT_SORT -> objects.add(f);
+            case SMTObjTranslator.BINT_SORT -> ints.add(f);
+            case SMTObjTranslator.SEQ_SORT -> seqs.add(f);
+            default -> bools.add(f);
             }
         } else if (f.getDomainSorts().size() == 2) {
 
@@ -993,11 +973,9 @@ public class ModelExtractor {
 
         for (Query q : queries) {
 
-            if (q instanceof ConstantQuery) {
-                ConstantQuery cq = (ConstantQuery) q;
+            if (q instanceof ConstantQuery cq) {
                 model.addConstant(cq.getConstantID(), cq.getResult());
-            } else if (q instanceof FieldQuery) {
-                FieldQuery fq = (FieldQuery) q;
+            } else if (q instanceof FieldQuery fq) {
 
                 String heapID = fq.getHeapID();
                 String objectID = fq.getObjectID();
@@ -1027,8 +1005,7 @@ public class ModelExtractor {
                 }
 
                 ov.put(fieldID, value);
-            } else if (q instanceof LocSetQuery) {
-                LocSetQuery lq = (LocSetQuery) q;
+            } else if (q instanceof LocSetQuery lq) {
 
                 String locsetID = lq.getLocSetID();
 
@@ -1049,8 +1026,7 @@ public class ModelExtractor {
                     ls.add(new Location(objectID, fieldID));
                 }
 
-            } else if (q instanceof ObjectLengthQuery) {
-                ObjectLengthQuery oq = (ObjectLengthQuery) q;
+            } else if (q instanceof ObjectLengthQuery oq) {
                 String objectID = oq.getObjectID();
 
                 int result = Integer.parseInt(oq.getResult());
@@ -1072,8 +1048,7 @@ public class ModelExtractor {
                         }
                     }
                 }
-            } else if (q instanceof SeqLengthQuery) {
-                SeqLengthQuery sq = (SeqLengthQuery) q;
+            } else if (q instanceof SeqLengthQuery sq) {
 
                 String seqId = sq.getSeqID();
 
@@ -1090,8 +1065,7 @@ public class ModelExtractor {
                 Sequence s = new Sequence(result, seqId);
                 model.addSequence(s);
 
-            } else if (q instanceof FunValueQuery) {
-                FunValueQuery iq = (FunValueQuery) q;
+            } else if (q instanceof FunValueQuery iq) {
 
 
                 String heapID = iq.getHeapID();
@@ -1129,8 +1103,7 @@ public class ModelExtractor {
                 ov.putFunValue(fun, result);
 
 
-            } else if (q instanceof ExactInstanceQuery) {
-                ExactInstanceQuery eq = (ExactInstanceQuery) q;
+            } else if (q instanceof ExactInstanceQuery eq) {
 
                 String objectID = eq.getObjectId();
 
@@ -1257,8 +1230,7 @@ public class ModelExtractor {
 
     private void processTypesQueries() {
         for (Query q : queries) {
-            if (q instanceof ObjectTypeQuery) {
-                ObjectTypeQuery oq = (ObjectTypeQuery) q;
+            if (q instanceof ObjectTypeQuery oq) {
                 String objectID = oq.getObjectId();
                 Sort s = oq.getSort();
                 String result = oq.getResult();
@@ -1294,8 +1266,7 @@ public class ModelExtractor {
 
     private void processArrayQueries() {
         for (Query q : queries) {
-            if (q instanceof ArrayFieldQuery) {
-                ArrayFieldQuery aq = (ArrayFieldQuery) q;
+            if (q instanceof ArrayFieldQuery aq) {
 
                 String heapID = aq.getHeapID();
                 String objectID = aq.getObjectID();
@@ -1313,8 +1284,7 @@ public class ModelExtractor {
 
     private void processSeqQueries() {
         for (Query q : queries) {
-            if (q instanceof SeqFieldQuery) {
-                SeqFieldQuery sq = (SeqFieldQuery) q;
+            if (q instanceof SeqFieldQuery sq) {
 
 
                 Sequence s = sq.getSeq();

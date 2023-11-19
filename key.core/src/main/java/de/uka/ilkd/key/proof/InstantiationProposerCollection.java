@@ -29,8 +29,7 @@ public class InstantiationProposerCollection implements InstantiationProposer {
 
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
-        for (InstantiationProposer proposer1 : proposers) {
-            InstantiationProposer proposer = proposer1;
+        for (InstantiationProposer proposer : proposers) {
             String proposal =
                 proposer.getProposal(app, var, services, undoAnchor, previousProposals);
             if (proposal != null) {

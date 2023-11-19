@@ -678,7 +678,7 @@ public final class GenericSortInstantiations {
         String res = "";
 
         for (final ImmutableMapEntry<GenericSort, Sort> entry : insts) {
-            if (!"".equals(res)) {
+            if (!res.isEmpty()) {
                 res += ", ";
             }
 

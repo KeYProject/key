@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -16,6 +13,9 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
@@ -157,8 +157,7 @@ public final class JMLInfoExtractor {
         int position = 0;
 
         for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md;
+            if (md instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {
@@ -217,7 +216,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure();
         }
     }
 
@@ -231,7 +230,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure();
         }
     }
 
@@ -246,7 +245,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault();
         }
     }
 
@@ -283,7 +282,7 @@ public final class JMLInfoExtractor {
         boolean nullable = checkFor("nullable", comments);
 
         if (!non_null && !nullable) {
-            return td.getJmlModifiers().nullableByDefault;
+            return td.getJmlModifiers().nullableByDefault();
         } else {
             return nullable;
         }
@@ -358,7 +357,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "pure".
      */
     public static boolean isPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().pure
+        return pm.getMethodDeclaration().getJmlModifiers().pure()
                 || isPureByDefault(pm.getContainerType());
     }
 
@@ -367,7 +366,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "helper".
      */
     public static boolean isHelper(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().helper;
+        return pm.getMethodDeclaration().getJmlModifiers().helper();
     }
 
     /**
@@ -375,7 +374,7 @@ public final class JMLInfoExtractor {
      * specified so.
      */
     public static boolean isStrictlyPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure
+        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure()
                 || isStrictlyPureByDefault(pm.getContainerType());
     }
 
@@ -383,15 +382,15 @@ public final class JMLInfoExtractor {
      * Returns the spec math mode of this type
      */
     @Nullable
-    public static SpecMathMode getSpecMathMode(@Nonnull KeYJavaType t) {
+    public static SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
         }
     }
 
-    @Nonnull
+    @NonNull
     private static SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
         return mode == null ? SpecMathMode.defaultMode() : mode;
     }
@@ -399,8 +398,8 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type or the default
      */
-    @Nonnull
-    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull KeYJavaType t) {
+    @NonNull
+    public static SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
         return modeOrDefault(getSpecMathMode(t));
     }
 
@@ -408,16 +407,16 @@ public final class JMLInfoExtractor {
      * Returns the spec math mode of this method
      */
     @Nullable
-    public static SpecMathMode getSpecMathMode(@Nonnull IProgramMethod pm) {
-        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode;
+    public static SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
+        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
 
     /**
      * Returns the spec math mode of this method
      */
-    @Nonnull
-    public static SpecMathMode getSpecMathModeOrDefault(@Nonnull IProgramMethod pm) {
+    @NonNull
+    public static SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
         return modeOrDefault(getSpecMathMode(pm));
     }
 }

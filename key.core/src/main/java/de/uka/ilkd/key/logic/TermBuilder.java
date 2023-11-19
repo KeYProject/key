@@ -19,6 +19,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -1065,6 +1066,11 @@ public class TermBuilder {
         return apply(parallel(updates), target, null);
     }
 
+    public Term applyParallel(ImmutableList<Term> updates, Term target,
+            ImmutableArray<TermLabel> labels) {
+        return apply(parallel(updates), target, labels);
+    }
+
     public Term applyParallel(Term[] lhss, Term[] values, Term target) {
         return apply(parallel(lhss, values), target, null);
     }
@@ -1090,9 +1096,9 @@ public class TermBuilder {
         if (updates.isEmpty()) {
             return target;
         } else {
-            return apply(updates.head().getUpdate(),
+            return apply(updates.head().update(),
                 applyUpdatePairsSequential(updates.tail(), target),
-                updates.head().getUpdateApplicationlabels());
+                updates.head().updateApplicationlabels());
         }
     }
 
@@ -1686,14 +1692,17 @@ public class TermBuilder {
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
-            for (TermLabel newLabel : labels) {
-                for (TermLabel oldLabel : newLabelList) {
-                    if (oldLabel.getClass().equals(newLabel.getClass())) {
-                        newLabelList.remove(oldLabel);
-                        break;
+            if (labels != null && !labels.isEmpty()) {
+                for (TermLabel newLabel : labels) {
+                    for (TermLabel oldLabel : term.getLabels()) {
+                        if (oldLabel.equals(newLabel) || (oldLabel.getClass() == newLabel.getClass()
+                                && oldLabel instanceof OriginTermLabel)) {
+                            newLabelList.remove(oldLabel);
+                            break;
+                        }
                     }
+                    newLabelList.add(newLabel);
                 }
-                newLabelList.add(newLabel);
             }
 
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
@@ -2260,5 +2269,49 @@ public class TermBuilder {
             DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
             return func(doubleLDT.getEquals(), t1, t2);
         }
+    }
+
+
+    // Origin label addition
+
+    /**
+     * add origin information to the term and all its sub terms
+     * nothing will be done if no origin term label factory is present
+     *
+     * @param term the term where to start to add the origin information
+     * @param origin the Origin information
+     * @return the labeled term or the same term, if no origin term label factory is present
+     */
+    public Term addLabelToAllSubs(Term term, OriginTermLabel.Origin origin) {
+        final OriginTermLabelFactory originFactory = services.getOriginFactory();
+        if (originFactory != null) {
+            return addLabelToAllSubs(term, originFactory.createOriginTermLabel(origin));
+        }
+        return term;
+    }
+
+    /**
+     * add origin information to the term
+     * nothing will be done if no origin term label factory is present
+     *
+     * @param term the term where to add the origin information
+     * @param origin the Origin information
+     * @return the labeled term or the same term, if no origin term label factory is present
+     */
+    public Term addLabel(Term term, OriginTermLabel.Origin origin) {
+        final OriginTermLabelFactory originFactory = services.getOriginFactory();
+        if (originFactory != null) {
+            return addLabel(term, originFactory.createOriginTermLabel(origin));
+        }
+        return term;
+    }
+
+    /**
+     * returns the origin term label factory
+     *
+     * @return the OriginTermLabelFactory
+     */
+    public OriginTermLabelFactory getOriginFactory() {
+        return services.getOriginFactory();
     }
 }

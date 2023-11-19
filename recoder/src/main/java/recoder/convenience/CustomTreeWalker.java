@@ -100,8 +100,7 @@ public class CustomTreeWalker extends TreeWalker {
                 } while (current == null);
             }
         }
-        if (current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
+        if (current instanceof NonTerminalProgramElement nt) {
             int s = nt.getChildCount();
             if (count + s + 2 >= stack.length) {
                 ProgramElement[] newStack =

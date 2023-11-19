@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import org.key_project.util.Strings;
+
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation allows
  * list sharing of sublists.
@@ -38,7 +40,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
     public static <T> ImmutableSLList<T> singleton(T obj) {
-        return new Cons(obj, nil());
+        return new Cons<>(obj, nil());
     }
 
     /**
@@ -282,7 +284,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          */
         @Override
         public ImmutableList<S> append(S e) {
-            return new Cons<S>(e).prepend(this);
+            return new Cons<>(e).prepend(this);
         }
 
         /**
@@ -451,16 +453,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public String toString() {
-            Iterator<S> it = this.iterator();
-            StringBuilder str = new StringBuilder("[");
-            while (it.hasNext()) {
-                str.append(it.next());
-                if (it.hasNext()) {
-                    str.append(",");
-                }
-            }
-            str.append("]");
-            return str.toString();
+            return Strings.formatAsList(this, "[", ",", "]");
         }
     }
 

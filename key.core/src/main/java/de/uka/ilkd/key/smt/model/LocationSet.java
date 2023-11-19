@@ -83,20 +83,14 @@ public class LocationSet {
      * Location sets with equal names are equal.
      */
     public boolean equals(Object o) {
-
-        if (o instanceof LocationSet) {
-
-            LocationSet ls = (LocationSet) o;
+        if (o instanceof LocationSet ls) {
             return ls.name.equals(name);
-
-
         }
-
         return false;
-
-
     }
 
-
-
+    @Override
+    public int hashCode() {
+        return 7 * name.hashCode();
+    }
 }

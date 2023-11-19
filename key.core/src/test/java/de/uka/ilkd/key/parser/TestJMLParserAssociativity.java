@@ -37,7 +37,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
     }
 
     /*
-     * Test whether {@link KeYJMLParser} parses left-associatively for operators that have same
+     * Test whether {@link KeYJMLParser} parses left-associatively for operators that have the same
      * precedence.
      *
      * Example 1 + 2 - 3 + 4 = ??? Left-associative parsing: (((1 + 2) - 3) + 4) = 4

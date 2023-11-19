@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which returns as result
  * ({@link #result()}) used {@link LocationVariable} which are undeclared, but used in the given
- * {@link ProgramElement.
+ * {@link ProgramElement}.
  * </p>
  * <p>
  * Declared {@link LocationVariable}s are:

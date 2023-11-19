@@ -29,8 +29,7 @@ public class SMTFunction {
     protected SMTSort imageSort;
 
     /**
-     * @param id
-     * @param domainSorts
+     * creates an inital SMT function
      */
     public SMTFunction() {
         super();
@@ -122,10 +121,9 @@ public class SMTFunction {
             return true;
         }
 
-        if (!(obj instanceof SMTFunction)) {
+        if (!(obj instanceof SMTFunction f)) {
             return false;
         }
-        SMTFunction f = (SMTFunction) obj;
 
         if (!this.id.equals(f.id)) {
             return false;

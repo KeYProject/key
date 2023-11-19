@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -39,7 +40,8 @@ public class LDTInput implements EnvInput {
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
      * @param keyFiles an array containing the LDT .key files
-     * @param main the main class used to report the progress of reading
+     * @param listener an LDTInputListener for stsus reports while loading
+     * @param profile the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -85,15 +87,15 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public String readJavaPath() {
         return "";
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() throws ProofInputException {
-        return null;
+    public List<File> readClassPath() {
+        return new ArrayList<>();
     }
 
 
@@ -111,7 +113,7 @@ public class LDTInput implements EnvInput {
      * declared sorts in all rules, e.g.
      */
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() {
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
@@ -138,11 +140,10 @@ public class LDTInput implements EnvInput {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput)) {
+        if (!(o instanceof LDTInput li)) {
             return false;
         }
 
-        LDTInput li = (LDTInput) o;
         if (keyFiles.length != li.keyFiles.length) {
             return false;
         }
@@ -162,7 +163,6 @@ public class LDTInput implements EnvInput {
 
         return true;
     }
-
 
     @Override
     public int hashCode() {

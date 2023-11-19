@@ -1286,24 +1286,24 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
      * @param current The current results.
      */
     protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
-        Map<String, MultiEvaluationResult> currentResults = current.getResults();
+        Map<String, MultiEvaluationResult> currentResults = current.results();
         Assertions.assertTrue(expected.labelResults.size() <= currentResults.size(),
-            "To many expected results at goal " + current.getLeafNode().serialNr());
+            "To many expected results at goal " + current.leafNode().serialNr());
         for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
             MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
             assertNotNull(currentInstruction, "Current result of " + expectedEntry.getKey()
-                + " is missing at goal " + current.getLeafNode().serialNr() + ".");
+                + " is missing at goal " + current.leafNode().serialNr() + ".");
             TruthValue currentResult =
-                currentInstruction.evaluate(current.getTermLabelName(), currentResults);
+                currentInstruction.evaluate(current.termLabelName(), currentResults);
             TruthValue expectedValue = expectedEntry.getValue();
             if (expectedValue == null) {
                 Assertions.assertNull(currentResult);
             } else {
                 assertNotNull(currentResult, "Current result of " + expectedEntry.getKey()
-                    + " at goal " + current.getLeafNode().serialNr() + " is not available.");
+                    + " at goal " + current.leafNode().serialNr() + " is not available.");
                 Assertions.assertEquals(expectedValue, currentResult,
                     "Wrong truth value of " + expectedEntry.getKey() + " at goal "
-                        + current.getLeafNode().serialNr() + ".");
+                        + current.leafNode().serialNr() + ".");
             }
         }
     }

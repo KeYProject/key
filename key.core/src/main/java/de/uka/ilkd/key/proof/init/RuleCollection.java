@@ -12,30 +12,21 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * This class contains the standard rules provided by a profile.
  */
-public class RuleCollection {
+public record RuleCollection(RuleSource standardTaclets,ImmutableList<BuiltInRule>standardBuiltInRules){
 
-    private final ImmutableList<BuiltInRule> standardBuiltInRules;
-    private final RuleSource standardTaclets;
+/**
+ * returns the rule source containg all taclets for this profile
+ */
+public RuleSource getTacletBase(){return standardTaclets;}
 
-    public RuleCollection(RuleSource standardTaclets,
-            ImmutableList<BuiltInRule> standardBuiltInRules) {
-        this.standardTaclets = standardTaclets;
-        this.standardBuiltInRules = standardBuiltInRules;
-    }
+/**
+ * returns a list of all built in rules to be used
+ */
+@Override public ImmutableList<BuiltInRule>standardBuiltInRules(){return standardBuiltInRules;}
 
-    /** returns the rule source containg all taclets for this profile */
-    public RuleSource getTacletBase() {
-        return standardTaclets;
-    }
-
-    /** returns a list of all built in rules to be used */
-    public ImmutableList<BuiltInRule> getStandardBuiltInRules() {
-        return standardBuiltInRules;
-    }
-
-    /** toString */
-    public String toString() {
-        return "Taclets: " + standardTaclets.toString() + "\n BuiltIn:" + standardBuiltInRules;
-    }
+/**
+ * toString
+ */
+public String toString(){return"Taclets: "+standardTaclets.toString()+"\n BuiltIn:"+standardBuiltInRules;}
 
 }

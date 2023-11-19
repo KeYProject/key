@@ -241,7 +241,12 @@ public class TestDeclParser {
     @Test
     public void testArrayDecl() {
         evaluateDeclarations(
-            "\\sorts { aSort;}\n" + "\\functions {\n" + "  aSort[][] f(aSort);\n" + "}\n");
+            """
+                    \\sorts { aSort;}
+                    \\functions {
+                      aSort[][] f(aSort);
+                    }
+                    """);
         Sort aSort = nss.sorts().lookup(new Name("aSort"));
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
@@ -266,9 +271,16 @@ public class TestDeclParser {
 
     @Test
     public void testFunctionDecl() {
-        evaluateDeclarations("\\sorts { elem; list; }\n" + "\\functions {\n"
-            + "  elem head(list);\n" + "  list tail(list);\n" + "  elem[] tailarray(elem[]);\n"
-            + "  list nil;\n" + "  list cons(elem,list);\n" + "}\n");
+        evaluateDeclarations("""
+                \\sorts { elem; list; }
+                \\functions {
+                  elem head(list);
+                  list tail(list);
+                  elem[] tailarray(elem[]);
+                  list nil;
+                  list cons(elem,list);
+                }
+                """);
 
         Sort elem = nss.sorts().lookup(new Name("elem"));
         Sort list = nss.sorts().lookup(new Name("list"));
@@ -308,8 +320,14 @@ public class TestDeclParser {
 
     @Test
     public void testPredicateDecl() {
-        evaluateDeclarations("\\sorts { elem; list; }\n" + "\\predicates {\n" + "  isEmpty(list);\n"
-            + "  contains(list,elem);\n" + "  maybe;\n" + "}\n");
+        evaluateDeclarations("""
+                \\sorts { elem; list; }
+                \\predicates {
+                  isEmpty(list);
+                  contains(list,elem);
+                  maybe;
+                }
+                """);
 
         Sort elem = nss.sorts().lookup(new Name("elem"));
         Sort list = nss.sorts().lookup(new Name("list"));
@@ -374,11 +392,16 @@ public class TestDeclParser {
     @Disabled("weigl: nparser handles the parsing differently. No Exception is thrown.")
     public void testAmbiguousDecls() {
         try {
-            evaluateDeclarations("\\sorts { elem; list; }\n" + "\\functions {" + "elem x;"
-                + "elem fn;" + "elem p;" + "}" + "\\predicates {" + "fn(elem);" + "y;" + "p;" + "}"
-                + "\\schemaVariables {\n" + "  \\program Statement #s ; \n"
-                + "  \\term elem x,y ;\n" + "  \\variables list lv ;\n" + "  \\formula b;\n"
-                + "}\n");
+            evaluateDeclarations(
+                """
+                        \\sorts { elem; list; }
+                        \\functions {elem x;elem fn;elem p;}\\predicates {fn(elem);y;p;}\\schemaVariables {
+                          \\program Statement #s ;\s
+                          \\term elem x,y ;
+                          \\variables list lv ;
+                          \\formula b;
+                        }
+                        """);
             fail("Ambiguous declaration successfully parsed. Error was expected.");
             // FIXME nparser It seems that the nparser does not check for conflicting declarations
         } catch (RuntimeException e) {

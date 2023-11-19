@@ -23,9 +23,7 @@ public class ContractProofReferencesAnalyst implements IProofReferencesAnalyst {
      */
     @Override
     public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-        if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp) {
-            AbstractContractRuleApp contractRuleApp =
-                (AbstractContractRuleApp) node.getAppliedRuleApp();
+        if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp contractRuleApp) {
             DefaultProofReference<Contract> reference = new DefaultProofReference<>(
                 IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();

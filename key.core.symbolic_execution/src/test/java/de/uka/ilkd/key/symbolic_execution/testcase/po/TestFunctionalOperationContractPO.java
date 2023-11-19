@@ -47,7 +47,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         try {
             // Make sure that the correct taclet options are defined.
-            originalTacletOptions = setDefaultTacletOptions(testCaseDirectory,
+            originalTacletOptions = setDefaultTacletOptions(
                 javaPathInkeyRepDirectory, baseContractName);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,

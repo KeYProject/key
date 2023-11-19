@@ -52,10 +52,9 @@ public class NewDependingOn {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NewDependingOn)) {
+        if (!(o instanceof NewDependingOn nfi)) {
             return false;
         }
-        NewDependingOn nfi = (NewDependingOn) o;
         return (nfi.first == first() && nfi.second == second());
     }
 

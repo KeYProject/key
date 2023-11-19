@@ -221,8 +221,14 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public void setUp() throws IOException {
         nss = new NamespaceSet();
 
-        parseDecls("\\sorts { Nat; testSort1; }\n" + "\\schemaVariables {\n" + "  \\formula b,b0;\n"
-            + "  \\term testSort1 x;\n" + "  \\variables testSort1 z;\n" + "}\n");
+        parseDecls("""
+                \\sorts { Nat; testSort1; }
+                \\schemaVariables {
+                  \\formula b,b0;
+                  \\term testSort1 x;
+                  \\variables testSort1 z;
+                }
+                """);
 
         sort1 = nss.sorts().lookup(new Name("testSort1"));
         nat = nss.sorts().lookup(new Name("Nat"));
@@ -238,7 +244,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
         Term t_test1 = null;
         try {
-            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblemTerm();
+            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
+                    .get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
             fail("Parser Error");

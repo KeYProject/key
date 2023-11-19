@@ -88,8 +88,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             @Override
             public String visit(Taclet taclet, boolean visitAddrules) {
 
-                if (taclet instanceof RewriteTaclet) {
-                    RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
+                if (taclet instanceof RewriteTaclet rwTaclet) {
                     Sequent assumptions = rwTaclet.ifSequent();
                     int appRestr = rwTaclet.getApplicationRestriction();
                     if (!assumptions.isEmpty() && appRestr == 0) {

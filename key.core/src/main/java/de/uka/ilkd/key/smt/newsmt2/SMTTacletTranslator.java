@@ -63,9 +63,7 @@ public class SMTTacletTranslator {
         return quantify(skeleton, variables);
     }
 
-    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables)
-            throws SMTTranslationException {
-
+    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables) {
         if (variables.isEmpty()) {
             return smt;
         }
@@ -103,10 +101,8 @@ public class SMTTacletTranslator {
 
         List<QuantifiableVariable> qvars = new ArrayList<>();
         if (op instanceof Quantifier) {
-            Quantifier q = (Quantifier) op;
             for (QuantifiableVariable boundVar : term.boundVars()) {
-                if (boundVar instanceof SchemaVariable) {
-                    SchemaVariable sv = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable sv) {
                     LogicVariable lv =
                         variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);
@@ -118,7 +114,7 @@ public class SMTTacletTranslator {
         }
 
         if (changes) {
-            ImmutableArray bvars = new ImmutableArray(qvars);
+            var bvars = new ImmutableArray<>(qvars);
             return services.getTermFactory().createTerm(op, subs, bvars, null, term.getLabels());
         } else {
             return term;

@@ -280,7 +280,7 @@ public class OutputStreamProofSaver {
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
+                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
                     relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
                             .append("\"");
                     i = j + 1;
@@ -516,7 +516,7 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -546,8 +546,7 @@ public class OutputStreamProofSaver {
             // for operation contract rules we add the modality under which the rule was applied
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
-                if (appliedRuleApp instanceof ContractRuleApp) {
-                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                if (appliedRuleApp instanceof ContractRuleApp app) {
                     Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());
@@ -717,7 +716,7 @@ public class OutputStreamProofSaver {
     /**
      * Get the "interesting" instantiations of the provided object.
      *
-     * @see SVInstantiations#interesting
+     * @see SVInstantiations#interesting()
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */

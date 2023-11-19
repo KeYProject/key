@@ -163,8 +163,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         displayHiddenFormula.setEditable(false);
 
         selectionList.addListSelectionListener(e -> {
-            if (e.getSource() instanceof JList) {
-                final JList<?> list = (JList<?>) e.getSource();
+            if (e.getSource() instanceof JList<?> list) {
                 if (list.getSelectedIndex() >= 0) {
                     if (list.getSelectedValue() instanceof TacletAppListItem) {
                         displayHiddenFormula.setText(

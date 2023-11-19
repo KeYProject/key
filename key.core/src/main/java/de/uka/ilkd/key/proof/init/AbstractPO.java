@@ -102,8 +102,7 @@ public abstract class AbstractPO implements IPersistablePO {
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
         ImmutableSet<String> names = DefaultImmutableSet.nil();
         for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
-            if (ch instanceof MethodWellDefinedness) {
-                MethodWellDefinedness mwd = (MethodWellDefinedness) ch;
+            if (ch instanceof MethodWellDefinedness mwd) {
                 // WD(callee.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(proofConfig.getServices());
                 String tName = mwdTaclet.name().toString();
@@ -280,8 +279,7 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         public boolean equals(Object o) {
-            if (o instanceof Vertex) {
-                Vertex other = (Vertex) o;
+            if (o instanceof Vertex other) {
                 return core.equals(other.core);
             } else {
                 return false;
@@ -420,12 +418,12 @@ public abstract class AbstractPO implements IPersistablePO {
         final StringBuilder sb = new StringBuilder();
 
         // bootclasspath
-        if (bootClassPath != null && !bootClassPath.equals("")) {
+        if (bootClassPath != null && !bootClassPath.isEmpty()) {
             sb.append("\\bootclasspath \"").append(bootClassPath).append("\";\n\n");
         }
 
         // classpath
-        if (classPath != null && !classPath.equals("")) {
+        if (classPath != null && !classPath.isEmpty()) {
             sb.append("\\classpath ").append(classPath).append(";\n\n");
         }
 
@@ -433,7 +431,7 @@ public abstract class AbstractPO implements IPersistablePO {
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
 
         // include
-        if (includedFiles != null && !includedFiles.equals("")) {
+        if (includedFiles != null && !includedFiles.isEmpty()) {
             sb.append("\\include ").append(includedFiles).append(";\n\n");
         }
 

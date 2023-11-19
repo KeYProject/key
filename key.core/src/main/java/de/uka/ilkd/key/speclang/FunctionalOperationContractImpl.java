@@ -93,11 +93,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /**
      * If a method is strictly pure, it has no modifies clause which could be anonymised.
      *
-     * @see #hasModifiesClause()
+     * @see #hasModifiesClause(LocationVariable)
      */
     final Map<LocationVariable, Boolean> hasRealModifiesClause;
     /**
-     * @see #hasFreeModifiesClause()
+     * @see #hasFreeModifiesClause(LocationVariable)
      */
     final Map<LocationVariable, Boolean> hasRealFreeModifiesClause;
 
@@ -757,8 +757,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         sig.append(pm.getName());
         sig.append("(");
         for (SVSubstitute subst : originalParamVars) {
-            if (subst instanceof Named) {
-                Named named = (Named) subst;
+            if (subst instanceof Named named) {
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,

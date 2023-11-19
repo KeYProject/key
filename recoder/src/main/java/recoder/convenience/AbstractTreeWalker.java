@@ -100,10 +100,9 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof AbstractTreeWalker)) {
+        if (!(x instanceof AbstractTreeWalker atw)) {
             return false;
         }
-        AbstractTreeWalker atw = (AbstractTreeWalker) x;
         if (atw.current != current) {
             return false;
         }

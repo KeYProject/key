@@ -263,8 +263,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 current = comments.get(commentIndex);
                 ProgramElement dest = pe;
                 ProgramElement newDest = null;
-                while (dest instanceof NonTerminalProgramElement) {
-                    NonTerminalProgramElement npe = (NonTerminalProgramElement) dest;
+                while (dest instanceof NonTerminalProgramElement npe) {
                     if (npe.getChildCount() == 0) {
                         break;
                     }

@@ -45,7 +45,7 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * @return The human readable method return condition to reach this node from its
      *         {@link IExecutionMethodCall}.
      */
-    String getFormatedMethodReturnCondition() throws ProofInputException;
+    String getFormattedMethodReturnCondition() throws ProofInputException;
 
     /**
      * Returns the variable value pairs of the state when the method has been called.

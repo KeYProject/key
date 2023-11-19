@@ -28,21 +28,34 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
      */
     private static final String INTRO_LABEL = "Adjust proof analysis algorithm options here.";
     /**
-     * Label for first option.
+     * Label for always track option.
+     */
+    private static final String ALWAYS_TRACK = "Always track dependencies";
+    /**
+     * Explanatory text for always track option.
+     */
+    private static final String ALWAYS_TRACK_INFO =
+        """
+                If enabled, the dependency tracker will construct the dependency graph as the proof
+                is created. When disabled, the dependency graph is created only when needed, and
+                the 'Show proof step that created this formula' action is not available.""";
+    /**
+     * Label for aggressive deduplicate option.
      */
     private static final String AGGRESSIVE_DEDUPLICATE = "Aggressive rule de-duplication";
     /**
      * Explanatory text for first option.
      */
     private static final String AGGRESSIVE_DEDUPLICATE_INFO =
-        "If enabled, the analysis algorithm will de-duplicate more than one duplicate pair"
-            + " at once.\nThis may attempt to combine duplicates in impossible ways."
-            + "\nDisable if you're having trouble slicing a proof using the de-duplication"
-            + " algorithm.";
+        """
+                If enabled, the analysis algorithm will de-duplicate more than one duplicate pair at once.
+                This may attempt to combine duplicates in impossible ways.
+                Disable if you're having trouble slicing a proof using the de-duplication algorithm.""";
     private static final String DOT_EXECUTABLE = "Graphviz dot executable";
     private static final String DOT_EXECUTABLE_INFO =
         "Path to dot executable from the graphviz package.";
 
+    private final JCheckBox alwaysTrack;
     /**
      * Checkbox for first option.
      */
@@ -58,6 +71,8 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
         pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
 
         addSeparator("Dependency graph");
+        alwaysTrack = addCheckBox(ALWAYS_TRACK, ALWAYS_TRACK_INFO, true, e -> {
+        });
         dotExecutable = addTextField(DOT_EXECUTABLE, "dot", DOT_EXECUTABLE_INFO, e -> {
         });
 
@@ -83,6 +98,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     @Override
     public JComponent getPanel(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
+        alwaysTrack.setSelected(ss.getAlwaysTrack());
         dotExecutable.setText(ss.getDotExecutable());
         aggressiveDeduplicate.setSelected(ss.getAggressiveDeduplicate(null));
         return this;
@@ -91,6 +107,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     @Override
     public void applySettings(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
+        ss.setAlwaysTrack(alwaysTrack.isSelected());
         ss.setDotExecutable(dotExecutable.getText());
         ss.setAggressiveDeduplicate(aggressiveDeduplicate.isSelected());
     }

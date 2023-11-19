@@ -93,25 +93,20 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
         if (!proxy1 && !proxy2) {
             // This is the standard case where no proxy sorts are involved
-            switch (mode) {
-            case SAME:
-                return fstSort == sndSort;
-            case NOT_SAME:
-                return fstSort != sndSort;
-            case IS_SUBTYPE:
-                return fstSort.extendsTrans(sndSort);
-            case STRICT_SUBTYPE:
-                return fstSort != sndSort && fstSort.extendsTrans(sndSort);
-            case NOT_IS_SUBTYPE:
-                return !fstSort.extendsTrans(sndSort);
-            case DISJOINTMODULONULL:
-                return checkDisjointness(fstSort, sndSort, services);
-            }
+            return switch (mode) {
+            case SAME -> fstSort == sndSort;
+            case NOT_SAME -> fstSort != sndSort;
+            case IS_SUBTYPE -> fstSort.extendsTrans(sndSort);
+            case STRICT_SUBTYPE -> fstSort != sndSort && fstSort.extendsTrans(sndSort);
+            case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(sndSort);
+            case DISJOINTMODULONULL -> checkDisjointness(fstSort, sndSort, services);
+            };
         } else {
             switch (mode) {
-            case SAME:
+            case SAME -> {
                 return fstSort == sndSort;
-            case IS_SUBTYPE:
+            }
+            case IS_SUBTYPE -> {
                 if (proxy2) {
                     return false;
                 }
@@ -124,7 +119,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     }
                 }
                 return false;
-            case STRICT_SUBTYPE:
+            }
+            case STRICT_SUBTYPE -> {
                 if (proxy2) {
                     return false;
                 }
@@ -137,13 +133,12 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     }
                 }
                 return false;
-
-            case NOT_SAME:
-            case DISJOINTMODULONULL:
-            case NOT_IS_SUBTYPE:
+            }
+            case NOT_SAME, DISJOINTMODULONULL, NOT_IS_SUBTYPE -> {
                 // There are cases where - based on the bounds - true could be returned.
                 // Implement them if needed. There is the Null type to consider as subtype.
                 return false;
+            }
             }
         }
 
@@ -266,21 +261,14 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        switch (mode) {
-        case SAME:
-            return "\\same(" + fst + ", " + snd + ")";
-        case NOT_SAME:
-            return "\\not\\same(" + fst + ", " + snd + ")";
-        case IS_SUBTYPE:
-            return "\\sub(" + fst + ", " + snd + ")";
-        case STRICT_SUBTYPE:
-            return "\\strict\\sub(" + fst + ", " + snd + ")";
-        case NOT_IS_SUBTYPE:
-            return "\\not\\sub(" + fst + ", " + snd + ")";
-        case DISJOINTMODULONULL:
-            return "\\disjointModuloNull(" + fst + ", " + snd + ")";
-        default:
-            return "invalid type comparison mode";
-        }
+        return switch (mode) {
+        case SAME -> "\\same(" + fst + ", " + snd + ")";
+        case NOT_SAME -> "\\not\\same(" + fst + ", " + snd + ")";
+        case IS_SUBTYPE -> "\\sub(" + fst + ", " + snd + ")";
+        case STRICT_SUBTYPE -> "\\strict\\sub(" + fst + ", " + snd + ")";
+        case NOT_IS_SUBTYPE -> "\\not\\sub(" + fst + ", " + snd + ")";
+        case DISJOINTMODULONULL -> "\\disjointModuloNull(" + fst + ", " + snd + ")";
+        default -> "invalid type comparison mode";
+        };
     }
 }

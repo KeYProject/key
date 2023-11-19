@@ -234,24 +234,21 @@ public class OracleGenerator {
             OracleTerm left = generateOracle(term.sub(0), initialSelect);
             OracleTerm right = generateOracle(term.sub(1), initialSelect);
             String javaOp = ops.get(op);
+            return switch (javaOp) {
+            case EQUALS -> eq(left, right);
+            case AND -> and(left, right);
+            case OR -> or(left, right);
+            default ->
+                // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
+                // usages
+                new OracleBinTerm(javaOp, left, right);
+            };
 
-            switch (javaOp) {
-            case EQUALS:
-                return eq(left, right);
-            case AND:
-                return and(left, right);
-            case OR:
-                return or(left, right);
-            }
-
-            // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any usages
-            return new OracleBinTerm(javaOp, left, right);
         } // negation
         else if (op == Junctor.NOT) {
             OracleTerm sub = generateOracle(term.sub(0), initialSelect);
-            if (sub instanceof OracleUnaryTerm) {
-                OracleUnaryTerm neg = (OracleUnaryTerm) sub;
-                return neg.getSub();
+            if (sub instanceof OracleUnaryTerm neg) {
+                return neg.sub();
             }
             return new OracleUnaryTerm(sub, Op.Neg);
         }
@@ -269,8 +266,7 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, notLeft, right);
         }
         // quantifiable variable
-        else if (op instanceof QuantifiableVariable) {
-            QuantifiableVariable qop = (QuantifiableVariable) op;
+        else if (op instanceof QuantifiableVariable qop) {
             return new OracleVariable(qop.name().toString(), qop.sort());
         }
         // integers
@@ -308,8 +304,7 @@ public class OracleGenerator {
             return translateFunction(term, initialSelect);
         }
         // program variables
-        else if (op instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) op;
+        else if (op instanceof ProgramVariable var) {
             return new OracleConstant(var.name().toString(), var.sort());
         } else {
             LOGGER.debug("Could not translate: {}", term);
@@ -342,8 +337,7 @@ public class OracleGenerator {
             OracleTerm o = generateOracle(term.sub(0), initialSelect);
             return new OracleConstant(o + ".length", term.sort());
         } else if (name.endsWith("::<inv>")) {
-            if (fun instanceof IObserverFunction) {
-                IObserverFunction obs = (IObserverFunction) fun;
+            if (fun instanceof IObserverFunction obs) {
 
                 Sort s = obs.getContainerType().getSort();
                 OracleMethod m;
@@ -380,8 +374,7 @@ public class OracleGenerator {
             }
         } else if (name.endsWith("::instance")) {
 
-            if (fun instanceof SortDependingFunction) {
-                SortDependingFunction sdf = (SortDependingFunction) fun;
+            if (fun instanceof SortDependingFunction sdf) {
                 Sort s = sdf.getSortDependingOn();
 
 
@@ -684,7 +677,7 @@ public class OracleGenerator {
     private static OracleTerm neg(OracleTerm t) {
 
         if (t instanceof OracleUnaryTerm) {
-            return ((OracleUnaryTerm) t).getSub();
+            return ((OracleUnaryTerm) t).sub();
         } else {
             return new OracleUnaryTerm(t, Op.Neg);
         }

@@ -19,8 +19,7 @@ public class FreeLabelFinder {
     public boolean findLabel(Label label, ProgramElement node) {
         if (!(node instanceof LabeledStatement
                 && ((LabeledStatement) node).getLabel().equals(label))) {
-            if (node instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement nonTerminalNode = (NonTerminalProgramElement) node;
+            if (node instanceof NonTerminalProgramElement nonTerminalNode) {
                 for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
                     if (nonTerminalNode.getChildAt(i) != null) {
                         if (findLabel(label, nonTerminalNode.getChildAt(i))) {

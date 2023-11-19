@@ -134,7 +134,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@link #getNameIncludingReturnValue()} is called the first time.
      *
      * @return The name including the return value.
-     * @throws Occurred Exception.
+     * @throws ProofInputException
      */
     protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
@@ -177,7 +177,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@link #getNameIncludingReturnValue()} is called the first time.
      *
      * @return The name including the return value.
-     * @throws Occurred Exception.
+     * @throws ProofInputException
      */
     protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
@@ -224,7 +224,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     }
 
     /**
-     * Computes the return value lazily when {@link #getReturnValue()} is called the first time.
+     * Computes the return value lazily when {@link #getReturnValues()} is called the first time.
      *
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
@@ -304,12 +304,12 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     List<Term> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
                                         Term condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().isSimplifyConditions(), false);
+                                            node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
                                     Term condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
-                                        if (getSettings().isSimplifyConditions()) {
+                                        if (getSettings().simplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,
                                                 info.getProof(), condition);
                                         }

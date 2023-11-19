@@ -436,11 +436,10 @@ public abstract class LoopStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LoopStatement)) {
+        if (!(o instanceof LoopStatement cmp)) {
             return false;
         }
 
-        LoopStatement cmp = (LoopStatement) o;
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
                 || this.getStartPosition().line() == cmp.getStartPosition().line());

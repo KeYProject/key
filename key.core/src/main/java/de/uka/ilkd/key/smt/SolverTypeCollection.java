@@ -55,10 +55,9 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof SolverTypeCollection)) {
+        if (!(o instanceof SolverTypeCollection stc)) {
             return false;
         }
-        SolverTypeCollection stc = (SolverTypeCollection) o;
         return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver
                 && types.equals(stc.types);
     }

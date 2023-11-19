@@ -52,8 +52,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof Conditional) {
-                Conditional c = (Conditional) pe;
+            if (pe instanceof Conditional c) {
                 Type t = getSourceInfo().getType(c);
                 Type e1 = getSourceInfo().getType(c.getExpressionAt(1));
                 Type e2 = getSourceInfo().getType(c.getExpressionAt(2));

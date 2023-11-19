@@ -87,9 +87,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
         new HashMap<>();
 
     /**
-     * The already computed human readable block completion conditions.
+     * The already computed human-readable block completion conditions.
      */
-    private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions =
+    private final Map<IExecutionBlockStartNode<?>, String> formattedBlockCompletionConditions =
         new HashMap<>();
 
     /**
@@ -424,7 +424,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
         if (completedBlock != null && completedBlocks.contains(completedBlock)) {
             completedBlocks = completedBlocks.removeAll(completedBlock);
             blockCompletionConditions.remove(completedBlock);
-            formatedBlockCompletionConditions.remove(completedBlock);
+            formattedBlockCompletionConditions.remove(completedBlock);
         }
     }
 
@@ -447,7 +447,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     @Override
     public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
-        String result = formatedBlockCompletionConditions.get(completedNode);
+        String result = formattedBlockCompletionConditions.get(completedNode);
         if (result == null) {
             result = (String) lazyComputeBlockCompletionCondition(completedNode, true);
         }
@@ -455,17 +455,17 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     }
 
     /**
-     * Computes the condition lazily when {@link #getBlockCompletionCondition(IExecutionNode)} or
-     * {@link #getFormatedBlockCompletionCondition(IExecutionNode)} is called the first time.
+     * Computes the condition lazily when {@link #getBlockCompletionCondition} or
+     * {@link #getFormatedBlockCompletionCondition} is called the first time.
      *
      * @param completedNode The completed {@link IExecutionNode} for which the condition is
      *        requested.
-     * @param returnFormatedCondition {@code true} formated condition is returned, {@code false}
+     * @param returnFormattedCondition {@code true} formatted condition is returned, {@code false}
      *        {@link Term} is returned.
      * @throws ProofInputException Occurred Exception
      */
     protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
-            boolean returnFormatedCondition) throws ProofInputException {
+            boolean returnFormattedCondition) throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
         if (initConfig != null && // Otherwise Proof is disposed.
                 completedBlocks.contains(completedNode)) {
@@ -486,16 +486,16 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
             // Add current branch condition to path
             Term condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
             }
             condition = SymbolicExecutionUtil.improveReadability(condition, services);
             // Format path condition
-            String formatedCondition = formatTerm(condition, services);
+            String formattedCondition = formatTerm(condition, services);
             // Update maps
             blockCompletionConditions.put(completedNode, condition);
-            formatedBlockCompletionConditions.put(completedNode, formatedCondition);
-            return returnFormatedCondition ? formatedCondition : condition;
+            formattedBlockCompletionConditions.put(completedNode, formattedCondition);
+            return returnFormattedCondition ? formattedCondition : condition;
         } else {
             return null;
         }

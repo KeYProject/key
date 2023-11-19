@@ -52,7 +52,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
     /**
      * Set comments.
      *
-     * @param c a comment list.
+     * @param list a comment list.
      */
     void setComments(ASTList<Comment> list);
 
@@ -117,7 +117,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
             if (x == null || y == null) {
                 return false;
             }
-            if (x instanceof NonTerminalProgramElement) {
+            if (x instanceof NonTerminalProgramElement a) {
                 if (x.getClass() != y.getClass()) {
                     if (x instanceof UncollatedReferenceQualifier) {
                         if (!(y instanceof ArrayLengthReference) && !(y instanceof PackageReference)
@@ -135,7 +135,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
                         return false;
                     }
                 }
-                NonTerminalProgramElement a = (NonTerminalProgramElement) x;
                 NonTerminalProgramElement b = (NonTerminalProgramElement) y;
                 int n = a.getChildCount();
                 int m = b.getChildCount();

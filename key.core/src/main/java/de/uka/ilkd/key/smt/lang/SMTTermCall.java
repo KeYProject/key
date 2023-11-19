@@ -221,10 +221,9 @@ public class SMTTermCall extends SMTTerm {
             return false;
         }
 
-        if (!(term instanceof SMTTermCall)) {
+        if (!(term instanceof SMTTermCall tc)) {
             return false;
         }
-        SMTTermCall tc = (SMTTermCall) term;
 
         if (!this.func.equals(tc.func)) {
             return false;

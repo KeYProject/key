@@ -51,8 +51,7 @@ public class OracleInvariantTranslator {
 
         for (ClassAxiom c : spec.getClassAxioms(kjt)) {
 
-            if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                RepresentsAxiom ra = (RepresentsAxiom) c;
+            if (c instanceof RepresentsAxiom ra && c.getKJT().equals(kjt)) {
 
                 Term t = ra.getAxiom(h, o, services);
 

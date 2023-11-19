@@ -58,9 +58,11 @@ public class TestParser {
 
     @Test
     public void testGenericSort() throws IOException {
-        String content = "\\sorts { \\generic gen; } \n\n"
-            + "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n"
-            + "\\problem { true }";
+        String content = """
+                \\sorts { \\generic gen; }\s
+
+                \\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }
+                \\problem { true }""";
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);

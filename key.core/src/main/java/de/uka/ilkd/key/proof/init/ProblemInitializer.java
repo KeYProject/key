@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -239,11 +241,7 @@ public final class ProblemInitializer {
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath;
-        try {
-            bootClassPath = envInput.readBootClassPath();
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
+        bootClassPath = envInput.readBootClassPath();
 
         final Includes includes = envInput.readIncludes();
 
@@ -384,8 +382,7 @@ public final class ProblemInitializer {
     }
 
     // what is the purpose of this method?
-    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig)
-            throws ProofInputException {
+    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
             false);
@@ -399,6 +396,7 @@ public final class ProblemInitializer {
         }
 
         // register non-built-in rules
+        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
@@ -408,7 +406,7 @@ public final class ProblemInitializer {
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                profile.getStandardRules().getStandardBuiltInRules();
+                profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -458,6 +456,7 @@ public final class ProblemInitializer {
                 cleanupNamespaces(currentBaseConfig);
                 baseConfig = currentBaseConfig;
             }
+
             InitConfig ic = prepare(envInput, currentBaseConfig);
             if (Debug.ENABLE_DEBUG) {
                 print(ic);
@@ -500,8 +499,7 @@ public final class ProblemInitializer {
             ic.getActivatedChoices().forEach(i -> out.format("\t%s%n", i));
 
             out.format("Activated Taclets: %n");
-            final List<Taclet> taclets = new ArrayList<>();
-            taclets.addAll(ic.activatedTaclets());
+            final List<Taclet> taclets = new ArrayList<>(ic.activatedTaclets());
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
@@ -518,11 +516,20 @@ public final class ProblemInitializer {
     // public interface
     // -------------------------------------------------------------------------
 
+    private void configureTermLabelSupport(InitConfig initConfig) {
+        initConfig.getServices().setOriginFactory(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
+    }
+
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
 
+        configureTermLabelSupport(initConfig);
 
         // read Java
         readJava(envInput, initConfig);
@@ -574,6 +581,8 @@ public final class ProblemInitializer {
         try {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
+
+
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");

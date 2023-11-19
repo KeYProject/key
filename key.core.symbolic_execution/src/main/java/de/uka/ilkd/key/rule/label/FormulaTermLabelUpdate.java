@@ -15,8 +15,6 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -25,7 +23,6 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
@@ -47,36 +44,32 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
-            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
-        if (hint instanceof TacletLabelHint) {
-            TacletLabelHint tacletHint = (TacletLabelHint) hint;
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Set<TermLabel> labels) {
+        if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
-                    && (TruthValueTracingUtil.isPredicate(newTermOp)
-                            || TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs))) {
+                    && (TruthValueTracingUtil.isPredicate(newTerm)
+                            || TruthValueTracingUtil.isLogicOperator(newTerm.op(),
+                                newTerm.subs()))) {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
                         applicationPosInOccurrence, FormulaTermLabel.NAME);
-                    if (label instanceof FormulaTermLabel) {
-                        FormulaTermLabel oldLabel = (FormulaTermLabel) label;
+                    if (label instanceof FormulaTermLabel oldLabel) {
                         int labelSubID = FormulaTermLabel.newLabelSubID(services, oldLabel);
                         FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(),
                             labelSubID, Collections.singletonList(oldLabel.getId()));
                         labels.add(newLabel);
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
+                        FormulaTermLabelRefactoring.setParentRefactoringRequired(state, true);
                     }
                 }
             }
         }
-        if (ruleApp instanceof TacletApp) {
-            TacletApp ta = (TacletApp) ruleApp;
+        if (ruleApp instanceof TacletApp ta) {
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
@@ -88,7 +81,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                     }
                 }
                 if (!ifLabels.isEmpty()) {
-                    if (TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)
+                    if (TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())
                     // || TruthValueEvaluationUtil.isPredicate(newTermOp)
                     ) {
                         for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels

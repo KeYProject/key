@@ -35,58 +35,45 @@ public class SMTTermMultOp extends SMTTerm {
         BVSLE, BVSGT, BVSGE, BVSDIV;
 
         public SMTTerm getIdem() {
-            switch (this) {
-            case AND:
-                return SMTTerm.TRUE;
-            case OR:
-                return SMTTerm.FALSE;
-            default:
-                throw new RuntimeException(
-                    "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
-            }
+            return switch (this) {
+            case AND -> SMTTerm.TRUE;
+            case OR -> SMTTerm.FALSE;
+            default -> throw new RuntimeException(
+                "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
+            };
         }
 
         public Op sign(boolean pol) {
-            switch (this) {
-            case AND:
-                if (pol) {
-                    return this;
+            return switch (this) {
+                case AND -> {
+                    if (pol) {
+                        yield  this;
+                    }
+                    yield OR;
                 }
-                return OR;
-            case OR:
-                if (pol) {
-                    return this;
+                case OR -> {
+                    if (pol) {
+                        yield this;
+                    }
+                    yield AND;
                 }
-                return AND;
-            default:
-                throw new RuntimeException(
-                    "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                        + this);
-            }
+                default -> throw new RuntimeException(
+                        "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
+                                + this);
+            };
         }
     }
 
     public static OpProperty getProperty(SMTTermMultOp.Op op) {
-        switch (op) {
-        case AND:
-        case OR:
-        case PLUS:
-        case MUL:
-            return OpProperty.FULLASSOC;
-        case MINUS:
-        case XOR:
-        case DIV:
-            return OpProperty.LEFTASSOC;
-        case IMPLIES:
-            return OpProperty.RIGHTASSOC;
-        case IFF:
-        case EQUALS:
-            /* case LT: case LTE: case GT: case GTE: */ return OpProperty.CHAINABLE;
-        case DISTINCT:
-            return OpProperty.PAIRWISE;
-        default:
-            return OpProperty.NONE;
-        }
+        return switch (op) {
+        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+        case IMPLIES -> OpProperty.RIGHTASSOC;
+        case IFF, EQUALS ->
+            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+        case DISTINCT -> OpProperty.PAIRWISE;
+        default -> OpProperty.NONE;
+        };
     }
 
     private static void initMaps() {
@@ -223,32 +210,23 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public SMTSort sort() {
 
-        switch (operator) {
-        case PLUS:
-        case MINUS:
-        case MUL:
-        case DIV:
-        case REM:
-        case BVASHR:
-        case BVSHL:
-        case BVSMOD:
-        case BVSREM:
-        case BVSDIV:
-            // Sanity check
-            if (subs.size() > 1) {
-                if (!subs.get(0).sort().equals(subs.get(1).sort())) {
-                    String error = "Unexpected: binary operation with two diff. arg sorts";
-                    error += "\n";
-                    error += this.toSting() + "\n";
-                    error += "First sort: " + subs.get(0).sort() + "\n";
-                    error += "Second sort: " + subs.get(1).sort() + "\n";
-                    throw new RuntimeException(error);
+        return switch (operator) {
+            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM, BVSDIV -> {
+                // Sanity check
+                if (subs.size() > 1) {
+                    if (!subs.get(0).sort().equals(subs.get(1).sort())) {
+                        String error = "Unexpected: binary operation with two diff. arg sorts";
+                        error += "\n";
+                        error += this.toSting() + "\n";
+                        error += "First sort: " + subs.get(0).sort() + "\n";
+                        error += "Second sort: " + subs.get(1).sort() + "\n";
+                        throw new RuntimeException(error);
+                    }
                 }
+                yield subs.get(0).sort();
             }
-            return subs.get(0).sort();
-        default:
-            return SMTSort.BOOL;
-        }
+            default -> SMTSort.BOOL;
+        };
     }
 
     /** {@inheritDoc} */
@@ -383,10 +361,9 @@ public class SMTTermMultOp extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermMultOp)) {
+        if (!(term instanceof SMTTermMultOp lt)) {
             return false;
         }
-        SMTTermMultOp lt = (SMTTermMultOp) term;
 
         if (!this.operator.equals(lt.operator)) {
             return false;
@@ -495,7 +472,7 @@ public class SMTTermMultOp extends SMTTerm {
         StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
-        if (subs.size() == 0) {
+        if (subs.isEmpty()) {
             throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");
         }
 

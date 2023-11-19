@@ -55,8 +55,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
     private List<Field> getFields(ClassDeclaration cd) {
         List<Field> result = new ArrayList<>(cd.getChildCount());
         outer: for (int i = 0; i < cd.getChildCount(); i++) {
-            if (cd.getChildAt(i) instanceof FieldDeclaration) {
-                final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
+            if (cd.getChildAt(i) instanceof FieldDeclaration fd) {
                 for (Modifier mod : fd.getModifiers()) {
                     if (mod instanceof Model) {
                         continue outer;

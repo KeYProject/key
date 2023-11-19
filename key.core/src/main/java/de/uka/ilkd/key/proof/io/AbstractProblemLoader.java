@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
@@ -55,8 +54,8 @@ import org.slf4j.LoggerFactory;
  * in the current {@link Thread} and no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new {@link SingleThreadProblemLoader} or
- * {@link ProblemLoader} instance which should load the file configured by the constructor's
+ * The basic usage of this class is to be subclasses by a problem loader like
+ * {@link SingleThreadProblemLoader} which should load the file configured by the constructor's
  * arguments. The next step is to call {@link #load()} which does the loading process and tries to
  * instantiate a proof and to apply rules again if possible. The result of the loading process is
  * available via the getter methods.
@@ -140,7 +139,7 @@ public abstract class AbstractProblemLoader {
     private final Profile profileOfNewProofs;
 
     /**
-     * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no
+     * {@code true} to call {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no
      * {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to
      * work with the loaded {@link InitConfig}.
      */
@@ -222,7 +221,7 @@ public abstract class AbstractProblemLoader {
      *        will be used for new proofs.
      * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call
-     *        {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is
+     *        {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no {@link Proof} is
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
@@ -381,9 +380,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
         final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException) {
-            final org.antlr.runtime.RecognitionException re =
-                (org.antlr.runtime.RecognitionException) c0;
+        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
             final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
@@ -541,7 +538,6 @@ public abstract class AbstractProblemLoader {
      * Instantiates the {@link ProblemInitializer} to use.
      *
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
-     * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
@@ -571,8 +567,7 @@ public abstract class AbstractProblemLoader {
     protected LoadedPOContainer createProofObligationContainer() throws IOException {
         final String chooseContract;
         final String proofObligation;
-        if (envInput instanceof KeYFile) {
-            KeYFile keyFile = (KeYFile) envInput;
+        if (envInput instanceof KeYFile keyFile) {
             chooseContract = keyFile.chooseContract();
             proofObligation = keyFile.getProofObligation();
         } else {
@@ -679,8 +674,7 @@ public abstract class AbstractProblemLoader {
      * @return <code>true</code> iff there is a proof script to run
      */
     public boolean hasProofScript() {
-        if (envInput instanceof KeYUserProblemFile) {
-            KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+        if (envInput instanceof KeYUserProblemFile kupf) {
             return kupf.hasProofScript();
         }
         return false;
@@ -751,8 +745,8 @@ public abstract class AbstractProblemLoader {
                     : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null
-                    || parserResult.getErrors().isEmpty() || replayer == null
+            if (parserResult == null || parserResult.errors() == null
+                    || parserResult.errors().isEmpty() || replayer == null
                     || replayResult == null || replayResult.getErrors() == null
                     || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
@@ -760,8 +754,8 @@ public abstract class AbstractProblemLoader {
             }
         } finally {
             if (parserResult != null) {
-                status = parserResult.getStatus();
-                errors.addAll(parserResult.getErrors());
+                status = parserResult.status();
+                errors.addAll(parserResult.errors());
             }
             status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
                     + (replayResult != null ? replayResult.getStatus()

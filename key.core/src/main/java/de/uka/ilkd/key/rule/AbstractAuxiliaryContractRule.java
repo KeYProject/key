@@ -35,6 +35,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * Rule for the application of {@link AuxiliaryContract}s.
@@ -160,73 +162,33 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
+     * @param update    The context update.
+     * @param formula   The update target.
+     * @param modality  The contract's modality.
+     * @param self      The self variable.
+     * @param statement The statement the contract belongs to.
+     * @param context   The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-    public static final class Instantiation {
-
-        /**
-         * The context update.
-         */
-        public final Term update;
-
-        /**
-         * The update target.
-         */
-        public final Term formula;
-
-        /**
-         * The contract's modality.
-         */
-        public final Modality modality;
-
-        /**
-         * The self variable.
-         */
-        public final Term self;
-
-        /**
-         * The statement the contract belongs to.
-         */
-        public final JavaStatement statement;
-
-        /**
-         * The execution context in which the block occurs.
-         */
-        public final ExecutionContext context;
-
-        /**
-         *
-         * @param update the context update.
-         * @param formula the update target.
-         * @param modality the modality.
-         * @param self the self variable.
-         * @param statement the statement the contract belongs to.
-         * @param context the execution context in which the block occurs.
-         */
-        public Instantiation(final Term update, final Term formula, final Modality modality,
-                final Term self, final JavaStatement statement, final ExecutionContext context) {
+        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
+                                    @NonNull JavaStatement statement,
+                                    ExecutionContext context) {
+        public Instantiation {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
             assert formula.sort() == Sort.FORMULA;
             assert modality != null;
             assert statement != null;
-            this.update = update;
-            this.formula = formula;
-            this.modality = modality;
-            this.self = self;
-            this.statement = statement;
-            this.context = context;
         }
 
-        /**
-         *
-         * @return {@code true} iff the modality is transactional.
-         */
-        public boolean isTransactional() {
-            return modality.transaction();
+            /**
+             * @return {@code true} iff the modality is transactional.
+             */
+            public boolean isTransactional() {
+                return modality.transaction();
+            }
         }
-    }
 
     /**
      * A builder for {@link Instantiation}s.
@@ -267,10 +229,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality)) {
+            if (!(target.op() instanceof Modality modality)) {
                 return null;
             }
-            final Modality modality = (Modality) target.op();
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
                     target.javaBlock(), goal);

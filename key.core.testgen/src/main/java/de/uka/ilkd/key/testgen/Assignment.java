@@ -50,8 +50,7 @@ public class Assignment {
      */
     public String toString(boolean rfl) {
         if (rfl) {
-            if (left instanceof RefEx) {
-                final RefEx leftEx = (RefEx) left;
+            if (left instanceof RefEx leftEx) {
                 return ReflectionClassCreator.NAME_OF_CLASS + "."
                     + ReflectionClassCreator.SET_PREFIX
                     + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("

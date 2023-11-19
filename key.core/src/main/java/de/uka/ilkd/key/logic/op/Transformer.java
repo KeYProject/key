@@ -48,8 +48,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f instanceof Transformer) {
-            Transformer t = (Transformer) f;
+        if (f instanceof Transformer t) {
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
             return t;

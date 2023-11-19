@@ -40,17 +40,14 @@ public final class EnumConstantValue extends AbstractTermTransformer {
         term = term.sub(0);
         Operator op = term.op();
 
-        if (op instanceof ProgramVariable) {
+        if (op instanceof ProgramVariable pv) {
             int value;
 
-            ProgramVariable pv = (ProgramVariable) op;
             // String varname = pv.getProgramElementName().getProgramName();
 
             if (false) {// varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>
-                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
-                    EnumClassDeclaration ecd =
-                        (EnumClassDeclaration) pv.getContainerType().getJavaType();
+                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration ecd) {
                     value = ecd.getNumberOfConstants();
                 } else {
                     throw new IllegalArgumentException(term + " is not in an enum type.");

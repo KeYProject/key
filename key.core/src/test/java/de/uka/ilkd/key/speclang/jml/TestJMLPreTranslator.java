@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJMLPreTranslator {
     private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
-        return new PreParser().parseClassLevel(ms);
+        return new PreParser(true).parseClassLevel(ms);
     }
 
     // region lexing
@@ -47,7 +47,10 @@ public class TestJMLPreTranslator {
 
     @Test
     public void testLexer1() {
-        String in = "/*@ normal_behavior\n" + "     requires true;\n" + "  */";
+        String in = """
+                /*@ normal_behavior
+                     requires true;
+                  */""";
         lex(in, JML_ML_START, WS, NORMAL_BEHAVIOR, WS, REQUIRES);
     }
 
@@ -77,9 +80,15 @@ public class TestJMLPreTranslator {
 
     @Test
     public void testLexer6() {
-        lex("//@ normal_behaviour\n" + "//@  ensures false\n" + "//@          || true;\n"
-            + "//@  assignable \\nothing;\n" + "//@ also exceptional_behaviour\n"
-            + "//@  requires o == null;\n" + "//@  signals Exception;\n", JML_SL_START, WS,
+        lex("""
+                //@ normal_behaviour
+                //@  ensures false
+                //@          || true;
+                //@  assignable \\nothing;
+                //@ also exceptional_behaviour
+                //@  requires o == null;
+                //@  signals Exception;
+                """, JML_SL_START, WS,
             NORMAL_BEHAVIOR, WS, JML_SL_START, WS, ENSURES, WS);
     }
 
@@ -127,7 +136,10 @@ public class TestJMLPreTranslator {
     @Test
     public void testSimpleSpec() {
         ImmutableList<TextualJMLConstruct> constructs =
-            parseMethodSpec("/*@ normal_behavior\n" + "     requires true;\n" + "  */");
+            parseMethodSpec("""
+                    /*@ normal_behavior
+                         requires true;
+                      */""");
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(1, constructs.size());
@@ -148,10 +160,15 @@ public class TestJMLPreTranslator {
     @Test
     public void testComplexSpec() {
         ImmutableList<TextualJMLConstruct> constructs =
-            parseMethodSpec("/*@ behaviour\n" + "  @  requires true;\n"
-                + "  @  requires a!=null && (\\forall int i; 0 <= i && i <= 2; \\dl_f(i) );\n"
-                + "  @  ensures false;\n" + "  @  signals (Exception) e;\n"
-                + "  @  signals_only onlythis;\n" + "  @  assignable \\nothing;\n" + "  @*/");
+            parseMethodSpec("""
+                    /*@ behaviour
+                      @  requires true;
+                      @  requires a!=null && (\\forall int i; 0 <= i && i <= 2; \\dl_f(i) );
+                      @  ensures false;
+                      @  signals (Exception) e;
+                      @  signals_only onlythis;
+                      @  assignable \\nothing;
+                      @*/""");
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(1, constructs.size());
@@ -183,9 +200,15 @@ public class TestJMLPreTranslator {
     @Test
     public void testMultipleSpecs() {
         ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec(
-            "//@ normal_behaviour\n" + "//@  ensures false\n" + "//@          || true;\n"
-                + "//@  assignable \\nothing;\n" + "//@ also exceptional_behaviour\n"
-                + "//@  requires o == null;\n" + "//@  signals (Exception) e;\n");
+            """
+                    //@ normal_behaviour
+                    //@  ensures false
+                    //@          || true;
+                    //@  assignable \\nothing;
+                    //@ also exceptional_behaviour
+                    //@  requires o == null;
+                    //@  signals (Exception) e;
+                    """);
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(2, constructs.size());
@@ -211,8 +234,13 @@ public class TestJMLPreTranslator {
 
     @Test
     public void testAtInModelmethod() {
-        parseMethodSpec("/*@ model_behaviour\n" + "  @   requires true;\n"
-            + "  @ model int f(int x) {\n" + "  @   return x+1;\n" + "  @ }\n" + "  @*/");
+        parseMethodSpec("""
+                /*@ model_behaviour
+                  @   requires true;
+                  @ model int f(int x) {
+                  @   return x+1;
+                  @ }
+                  @*/""");
     }
 
     @Test
@@ -237,6 +265,9 @@ public class TestJMLPreTranslator {
     @Test
     public void testFailure2() {
         assertThrows(Exception.class, () -> parseMethodSpec(
-            "/*@ behaviour\n" + "  @  requires (;((;;);();();(();;;(;)));\n" + "  @*/"));
+            """
+                    /*@ behaviour
+                      @  requires (;((;;);();();(();;;(;)));
+                      @*/"""));
     }
 }

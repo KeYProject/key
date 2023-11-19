@@ -6,31 +6,21 @@ package de.uka.ilkd.key.logic;
 /**
  * This class is used to hold information about modified formulas.
  *
+ * @param positionOfModification position within the original formula
+ * @param newFormula             modified formula
  * @see SequentChangeInfo
  */
-public class FormulaChangeInfo {
-    /** position within the original formula */
-    private final PosInOccurrence positionOfModification;
-    /** modified formula */
-    private final SequentFormula newFormula;
-
-    public FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
-        this.newFormula = newFormula;
-        this.positionOfModification = positionOfModification;
-    }
-
-    public SequentFormula getNewFormula() {
-        return newFormula;
-    }
+public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
 
     public SequentFormula getOriginalFormula() {
-        return getPositionOfModification().sequentFormula();
+        return positionOfModification().sequentFormula();
     }
 
     /**
      * @return position within the original formula
      */
-    public PosInOccurrence getPositionOfModification() {
+    @Override
+    public PosInOccurrence positionOfModification() {
         return positionOfModification;
     }
 

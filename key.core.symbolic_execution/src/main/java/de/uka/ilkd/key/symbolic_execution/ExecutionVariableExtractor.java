@@ -317,109 +317,67 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Utility class representing a parent definition.
      *
+     * @param parent   The parent.
+     * @param goalNode The {@link Node} on which this result is based on.
      * @author Martin Hentschel
      */
-    private static final class ParentDef {
-        /**
-         * The parent.
-         */
-        private final Term parent;
-
-        /**
-         * The {@link Node} on which this result is based on.
-         */
-        private final Node goalNode;
-
+        private record ParentDef(Term parent, Node goalNode) {
         /**
          * Constructor.
          *
-         * @param parent The parent.
+         * @param parent   The parent.
          * @param goalNode The {@link Node} on which this result is based on.
          */
-        public ParentDef(Term parent, Node goalNode) {
-            this.parent = parent;
-            this.goalNode = goalNode;
+        private ParentDef {
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof ParentDef) {
-                ParentDef other = (ParentDef) obj;
-                return Objects.equals(parent, other.parent)
-                        && Objects.equals(goalNode, other.goalNode);
-            } else {
-                return false;
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ParentDef other) {
+                    return Objects.equals(parent, other.parent)
+                            && Objects.equals(goalNode, other.goalNode);
+                } else {
+                    return false;
+                }
             }
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (parent != null ? parent.hashCode() : 0);
-            result = 31 * result + (goalNode != null ? goalNode.hashCode() : 0);
-            return result;
-        }
     }
 
     /**
      * Utility class representing a location.
      *
+     * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
+     * @param arrayIndex      The array index or {@code null} if a {@link ProgramVariable} is used instead.
      * @author Martin Hentschel
      */
-    private static final class LocationDef {
-        /**
-         * The {@link ProgramVariable} or {@code null} if an array index is used instead.
-         */
-        private final ProgramVariable programVariable;
-
-        /**
-         * The array index or {@code null} if a {@link ProgramVariable} is used instead.
-         */
-        private final Term arrayIndex;
-
+        private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
         /**
          * Constructor.
          *
          * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is
-         *        used instead.
-         * @param arrayIndex The array index or <code>null</code>, if a {@link ProgramVariable} is
-         *        used instead.
+         *                        used instead.
+         * @param arrayIndex      The array index or <code>null</code>, if a {@link ProgramVariable} is
+         *                        used instead.
          */
-        public LocationDef(ProgramVariable programVariable, Term arrayIndex) {
-            this.programVariable = programVariable;
-            this.arrayIndex = arrayIndex;
+        private LocationDef {
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof LocationDef) {
-                LocationDef other = (LocationDef) obj;
-                return programVariable == other.programVariable
-                        && Objects.equals(arrayIndex, other.arrayIndex);
-            } else {
-                return false;
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof LocationDef other) {
+                    return programVariable == other.programVariable
+                            && Objects.equals(arrayIndex, other.arrayIndex);
+                } else {
+                    return false;
+                }
             }
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
-            result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
-            return result;
-        }
     }
 
     /**

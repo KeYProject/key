@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -45,7 +44,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -59,6 +57,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +121,7 @@ public class IntermediateProofReplayer {
      *
      * @param loader The problem loader, for reporting errors.
      * @param proof The proof object into which to load the replayed proof.
-     * @param intermediate
+     * @param parserResult the result of the proof file parser to be replayed
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
@@ -130,7 +129,7 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<>(proof.root(), parserResult.getParsedResult()));
+            new Pair<>(proof.root(), parserResult.parsedResult()));
     }
 
     /**
@@ -216,8 +215,7 @@ public class IntermediateProofReplayer {
                         queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
-                } else if (currNodeInterm instanceof AppNodeIntermediate) {
-                    AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
 
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
@@ -262,8 +260,7 @@ public class IntermediateProofReplayer {
                         BuiltInAppIntermediate appInterm =
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
-                        if (appInterm instanceof MergeAppIntermediate) {
-                            MergeAppIntermediate joinAppInterm = (MergeAppIntermediate) appInterm;
+                        if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
@@ -325,10 +322,8 @@ public class IntermediateProofReplayer {
                                         e);
                                 }
                             }
-                        } else if (appInterm instanceof MergePartnerAppIntermediate) {
+                        } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            MergePartnerAppIntermediate joinPartnerApp =
-                                (MergePartnerAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());
@@ -869,7 +864,7 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    public static TacletApp constructInsts(@Nonnull TacletApp app, Goal currGoal,
+    public static TacletApp constructInsts(@NonNull TacletApp app, Goal currGoal,
             Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null) {
             return app;

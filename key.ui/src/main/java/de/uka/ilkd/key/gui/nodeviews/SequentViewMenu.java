@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -75,8 +76,12 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
 
     /**
      * Add extension actions to this menu.
+     * <p>
+     * (see KeYSequentViewMenuExtension)
+     * </p>
      *
      * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.ContextMenu
+     * @see KeYGuiExtensionFacade#getContextMenuItems
      */
     protected void addExtensionMenu() {
         List<Action> actions =

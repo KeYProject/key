@@ -54,7 +54,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
-     * class should be created by the factory method {@link #create(String, Function)}.
+     * class should be created by the factory methods
+     * {@link #create(Term, LocationVariable, Services)} or
+     * {@link #create(Sort, Function, Services)}}.
      *
      * @param argSort The expected sort for the arguments of the predicate.
      */
@@ -199,7 +201,6 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return The parsed {@link String}.
      * @throws ParserException If there is a syntax error.
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
-     * @throws SortNotKnownException If the given sort is not known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {
@@ -244,11 +245,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractionPredicate)) {
+        if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }
-
-        final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
 
         return otherPred.placeholderVariable.equals(placeholderVariable)
                 && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);

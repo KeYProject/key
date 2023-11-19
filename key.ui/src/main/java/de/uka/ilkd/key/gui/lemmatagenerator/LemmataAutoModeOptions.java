@@ -195,7 +195,7 @@ public class LemmataAutoModeOptions {
     }
 
     private String generatePath(String path, String reference) {
-        if (path.equals("")) {
+        if (path.isEmpty()) {
             File temp = new File(reference);
             int index = temp.getAbsolutePath().lastIndexOf(File.separator);
             path = temp.getAbsolutePath().substring(0, index + 1);
@@ -205,8 +205,12 @@ public class LemmataAutoModeOptions {
 
     public String toString() {
         return String.format(
-            "path of rule file: %s\n" + "path of result: %s\n" + "maximum number of rules: %s\n"
-                + "timeout: %s\n" + "save proof to file: %s",
+            """
+                    path of rule file: %s
+                    path of result: %s
+                    maximum number of rules: %s
+                    timeout: %s
+                    save proof to file: %s""",
             pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
     }
 

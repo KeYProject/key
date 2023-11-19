@@ -57,7 +57,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
@@ -559,9 +558,9 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Helper class which represents the return value of
-     * {@link ExecutionMethodReturn#createExtractReturnVariableValueSequent(TypeReference, ReferencePrefix, Node, IProgramVariable)}
+     * {@link SymbolicExecutionUtil#createExtractReturnVariableValueSequent(Services, TypeReference, IProgramMethod, ReferencePrefix, Node, Node, IProgramVariable)}
      * and
-     * {@link ExecutionMethodReturn#createExtractVariableValueSequent(IExecutionContext, Node, IProgramVariable)}.
+     * {@link SymbolicExecutionUtil#createExtractVariableValueSequent(Services, Node, PosInOccurrence, Term, IProgramVariable)}.
      *
      * @author Martin Hentschel
      */
@@ -745,9 +744,9 @@ public final class SymbolicExecutionUtil {
     public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node,
             Node proofNode, PosInOccurrence modalityPIO, Term condition)
             throws ProofInputException {
-        if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
+        if (node.getSettings().variablesAreOnlyComputedFromUpdates()) {
             ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode,
-                modalityPIO, node, condition, node.getSettings().isSimplifyConditions());
+                modalityPIO, node, condition, node.getSettings().simplifyConditions());
             return extractor.analyse();
         } else {
             return createAllExecutionVariables(node, proofNode, modalityPIO, condition);
@@ -775,9 +774,8 @@ public final class SymbolicExecutionUtil {
             // Add method parameters
             Node callNode = findMethodCallNode(proofNode, modalityPIO);
             if (callNode != null
-                    && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
-                MethodBodyStatement mbs =
-                    (MethodBodyStatement) callNode.getNodeInfo().getActiveStatement();
+                    && callNode.getNodeInfo()
+                            .getActiveStatement() instanceof MethodBodyStatement mbs) {
                 for (Expression e : mbs.getArguments()) {
                     if (e instanceof IProgramVariable) {
                         variables.add((IProgramVariable) e);
@@ -912,8 +910,7 @@ public final class SymbolicExecutionUtil {
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
             Term locationTerm) {
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function) {
-            Function function = (Function) locationTerm.op();
+        if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -1289,7 +1286,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the maximal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
      * @param sequent The {@link Sequent} to search in.
@@ -1308,7 +1305,7 @@ public final class SymbolicExecutionUtil {
                         getSymbolicExecutionLabel(nextAntecedent.subTerm());
                     SymbolicExecutionTermLabel succedentLabel =
                         getSymbolicExecutionLabel(nextSuccedent.subTerm());
-                    return antecedentLabel.getId() > succedentLabel.getId() ? nextAntecedent
+                    return antecedentLabel.id() > succedentLabel.id() ? nextAntecedent
                             : nextSuccedent;
                 } else {
                     return nextAntecedent;
@@ -1323,7 +1320,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
-     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+     * {@link SymbolicExecutionTermLabel#id()} in the given {@link Semisequent}.
      *
      * @param semisequent The {@link Semisequent} to search in.
      * @param inAntec {@code true} antecedent, {@code false} succedent.
@@ -1339,9 +1336,9 @@ public final class SymbolicExecutionUtil {
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
-                    if (maxPio == null || label.getId() > maxId) {
+                    if (maxPio == null || label.id() > maxId) {
                         maxPio = pio;
-                        maxId = label.getId();
+                        maxId = label.id();
                     }
                 }
             }
@@ -1353,7 +1350,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInTerm} with the maximal {@link SymbolicExecutionTermLabel}
-     * ID {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+     * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
      * @param term The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
@@ -1372,7 +1369,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the minimal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
      * @param sequent The {@link Sequent} to search in.
@@ -1391,7 +1388,7 @@ public final class SymbolicExecutionUtil {
                         getSymbolicExecutionLabel(nextAntecedent.subTerm());
                     SymbolicExecutionTermLabel succedentLabel =
                         getSymbolicExecutionLabel(nextSuccedent.subTerm());
-                    return antecedentLabel.getId() < succedentLabel.getId() ? nextAntecedent
+                    return antecedentLabel.id() < succedentLabel.id() ? nextAntecedent
                             : nextSuccedent;
                 } else {
                     return nextAntecedent;
@@ -1406,7 +1403,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInOccurrence} with the minimal
-     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#getId()} in the given
+     * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Semisequent}.
      *
      * @param semisequent The {@link Semisequent} to search in.
@@ -1424,9 +1421,9 @@ public final class SymbolicExecutionUtil {
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
-                    if (minPio == null || label.getId() < maxId) {
+                    if (minPio == null || label.id() < maxId) {
                         minPio = pio;
-                        maxId = label.getId();
+                        maxId = label.id();
                     }
                 }
             }
@@ -1438,7 +1435,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches the modality {@link PosInTerm} with the minimal {@link SymbolicExecutionTermLabel}
-     * ID {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+     * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
      * @param term The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
@@ -1501,9 +1498,9 @@ public final class SymbolicExecutionUtil {
             SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
             if (label != null) {
                 if (posInTerm == null
-                        || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
+                        || (maximum ? label.id() > maxId : label.id() < maxId)) {
                     posInTerm = currentPosInTerm;
-                    maxId = label.getId();
+                    maxId = label.id();
                 }
             }
         }
@@ -2482,12 +2479,11 @@ public final class SymbolicExecutionUtil {
      */
     private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify,
             boolean improveReadability) throws ProofInputException {
-        if (!(parent.getAppliedRuleApp() instanceof TacletApp)) {
+        if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
                     + parent.getAppliedRuleApp() + "\" was found.");
         }
-        TacletApp app = (TacletApp) parent.getAppliedRuleApp();
         Services services = node.proof().getServices();
         // List new sequent formulas in the child node.
         ImmutableList<Term> newAntecedents =
@@ -2641,7 +2637,7 @@ public final class SymbolicExecutionUtil {
      * Searches the by {@link Rule} application instantiated replace {@link Term} which is equal
      * modulo labels to the given replace {@link Term}.
      *
-     * @param terms The available candidates created by {@link Rule} application.
+     * @param semisequent The available candidates created by {@link Rule} application.
      * @param posInOccurrence The {@link PosInOccurrence} on which the rule was applied.
      * @param replaceTerm The {@link Term} to find.
      * @return The found {@link Term} or {@code null} if not available.
@@ -3194,7 +3190,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Checks if the given {@link Term} is a skolem {@link Term} meaning that it has the
-     * {@link SelectSkolemConstantTermLabel}.
+     * {@link ParameterlessTermLabel#SELECT_SKOLEM_LABEL}.
      *
      * @param term The {@link Term} to check.
      * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
@@ -3269,7 +3265,7 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} is a skolem equality.
      *
-     * @param sf The {@link Term} to check.
+     * @param term The {@link Term} to check.
      * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1}
      *         right side of skolem equality.
      */
@@ -3577,8 +3573,7 @@ public final class SymbolicExecutionUtil {
      */
     public static String getDisplayString(IProgramVariable pv) {
         if (pv != null) {
-            if (pv.name() instanceof ProgramElementName) {
-                ProgramElementName name = (ProgramElementName) pv.name();
+            if (pv.name() instanceof ProgramElementName name) {
                 if (SymbolicExecutionUtil.isStaticVariable(pv)) {
                     return name.toString();
                 } else {
@@ -3638,16 +3633,14 @@ public final class SymbolicExecutionUtil {
                 }
                 if (tryStatement != null) {
                     if (tryStatement.getBranchCount() == 1
-                            && tryStatement.getBranchList().get(0) instanceof Catch) {
-                        Catch catchStatement = (Catch) tryStatement.getBranchList().get(0);
+                            && tryStatement.getBranchList()
+                                    .get(0) instanceof Catch catchStatement) {
                         if (catchStatement.getBody() instanceof StatementBlock) {
                             StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
-                                    && catchBlock.getBody().get(0) instanceof Assignment) {
-                                Assignment assignment = (Assignment) catchBlock.getBody().get(0);
-                                if (assignment.getFirstElement() instanceof IProgramVariable) {
-                                    IProgramVariable var =
-                                        (IProgramVariable) assignment.getFirstElement();
+                                    && catchBlock.getBody()
+                                            .get(0) instanceof Assignment assignment) {
+                                if (assignment.getFirstElement() instanceof IProgramVariable var) {
                                     return var;
                                 }
                             }
@@ -3668,7 +3661,8 @@ public final class SymbolicExecutionUtil {
      * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
      * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks
+     * @param aliasChecksImmediately {@code true} immediately alias checks, {@code false} alias
+     *        checks
      *        never.
      */
     public static void updateStrategySettings(Proof proof, boolean useOperationContracts,
@@ -3702,7 +3696,7 @@ public final class SymbolicExecutionUtil {
      * Configures the proof to use the given {@link StrategyProperties}.
      *
      * @param proof The {@link Proof} to configure.
-     * @param sb The {@link StrategyProperties} to set.
+     * @param sp The {@link StrategyProperties} to set.
      */
     public static void updateStrategySettings(Proof proof, StrategyProperties sp) {
         if (proof != null && !proof.isDisposed()) {
@@ -3731,9 +3725,8 @@ public final class SymbolicExecutionUtil {
      */
     public static boolean isLoopBodyTermination(final Node node, RuleApp ruleApp) {
         boolean result = false;
-        if (ruleApp instanceof OneStepSimplifierRuleApp) {
+        if (ruleApp instanceof OneStepSimplifierRuleApp simplifierApp) {
             // Check applied rules in protocol
-            OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp) ruleApp;
             if (simplifierApp.getProtocol() != null) {
                 RuleApp terminationApp =
                     CollectionUtil.search(simplifierApp.getProtocol(),
@@ -3840,7 +3833,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * <p>
-     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+     * Converts the given {@link Term} into a {@link String}
      * </p>
      * <p>
      * The functionality is similar to {@link ProofSaver#printTerm(Term, Services, boolean)} but
@@ -3864,7 +3857,7 @@ public final class SymbolicExecutionUtil {
             logicPrinter.printTerm(term);
             return logicPrinter.result();
         } else {
-            return term != null ? TermLabel.removeIrrelevantLabels(term, services).toString()
+            return term != null ? TermLabelManager.removeIrrelevantLabels(term, services).toString()
                     : null;
         }
     }
@@ -3994,9 +3987,9 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Creates recursive a term which can be used to determine the value of
-     * {@link #getProgramVariable()}.
+     * {@link IExecutionVariable#getProgramVariable()}.
      *
-     * @param services The {@link Services} to use.
+     * @param variable the variable whose value shall be determined
      * @return The created term.
      */
     public static Term createSelectTerm(IExecutionVariable variable) {
@@ -4160,7 +4153,9 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()} is called the
+     * Computes the exception {@link Sort} lazily when
+     * {@link de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination#getExceptionSort()}
+     * is called the
      * first time.
      *
      * @param node the node which is user for computation.
@@ -4201,8 +4196,7 @@ public final class SymbolicExecutionUtil {
             Term term,
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
-        if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate update = (ElementaryUpdate) term.op();
+        if (term.op() instanceof ElementaryUpdate update) {
             if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }

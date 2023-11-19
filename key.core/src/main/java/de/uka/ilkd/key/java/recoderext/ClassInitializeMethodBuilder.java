@@ -249,8 +249,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
             initializerExecutionBody = new ASTArrayList<>(20);
         }
 
-        if (td instanceof ClassDeclaration && td != javaLangObject) {
-            ClassDeclaration cd = (ClassDeclaration) td;
+        if (td instanceof ClassDeclaration cd && td != javaLangObject) {
             initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
                 class2super.get(cd).deepClone(),
                 new ImplicitIdentifier(ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));

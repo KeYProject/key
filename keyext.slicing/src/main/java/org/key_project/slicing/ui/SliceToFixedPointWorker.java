@@ -91,11 +91,6 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
         return null;
     }
 
-    @Override
-    protected void done() {
-
-    }
-
     /**
      * @return the proof sliced by this worker
      */

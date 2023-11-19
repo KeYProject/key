@@ -85,10 +85,9 @@ public class SMTSolverResult {
 
 
     public boolean equals(Object o) {
-        if (!(o instanceof SMTSolverResult)) {
+        if (!(o instanceof SMTSolverResult ssr)) {
             return false;
         }
-        SMTSolverResult ssr = (SMTSolverResult) o;
         return isValid == ssr.isValid;
     }
 

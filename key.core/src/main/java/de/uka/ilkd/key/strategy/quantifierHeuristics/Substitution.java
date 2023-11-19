@@ -114,10 +114,9 @@ public class Substitution {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof Substitution)) {
+        if (!(arg0 instanceof Substitution s)) {
             return false;
         }
-        final Substitution s = (Substitution) arg0;
         return varMap.equals(s.varMap);
     }
 

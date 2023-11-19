@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -51,6 +52,7 @@ import org.key_project.util.java.StringUtil;
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
+    @Serial
     private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
@@ -190,8 +192,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 Term t = occ.subTerm();
                 createAbbrevSection(t);
 
-                if (t.op() instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) t.op();
+                if (t.op() instanceof ProgramVariable var) {
                     if (var.getProgramElementName().getCreationInfo() != null) {
                         createNameCreationInfoSection();
                     }
@@ -486,6 +487,25 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 getPos().getPosInOccurrence()).actionPerformed(e);
         }
     }
+        }
+    }
+
+    static class FocussedRuleApplicationMenuItem extends JMenuItem {
+        private static final String APPLY_RULES_AUTOMATICALLY_HERE =
+            "Apply rules automatically here";
+
+        @Serial
+        private static final long serialVersionUID = -6486650015103963268L;
+
+        public FocussedRuleApplicationMenuItem() {
+            super(APPLY_RULES_AUTOMATICALLY_HERE);
+            setToolTipText("<html>Initiates and restricts automatic rule applications on the "
+                + "highlighted formula, term or sequent.<br> "
+                + "'Shift + left mouse click' on the highlighted "
+                + "entity does the same.</html>");
+        }
+
+    }
 
     public static class TacletAppComparator implements Comparator<TacletApp> {
 
@@ -583,7 +603,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
             final Taclet taclet1 = o1.taclet();
 
-            map.put("closing", taclet1.goalTemplates().size() == 0 ? -1 : 1);
+            map.put("closing", taclet1.goalTemplates().isEmpty() ? -1 : 1);
 
             boolean calc = false;
             for (RuleSet rs : taclet1.getRuleSets()) {

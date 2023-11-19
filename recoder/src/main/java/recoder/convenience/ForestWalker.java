@@ -41,8 +41,7 @@ public class ForestWalker extends AbstractTreeWalker {
             return next();
         }
         current = stack[--count]; // pop
-        if (current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
+        if (current instanceof NonTerminalProgramElement nt) {
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
                 ProgramElement[] newStack =
@@ -58,10 +57,9 @@ public class ForestWalker extends AbstractTreeWalker {
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof ForestWalker)) {
+        if (!(x instanceof ForestWalker fw)) {
             return false;
         }
-        ForestWalker fw = (ForestWalker) x;
         if (!super.equals(x)) {
             return false;
         }

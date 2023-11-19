@@ -13,6 +13,7 @@ import javax.swing.*;
  * number is exceeded no SchemaVariables get instantiated in the displayed tooltip. 3) whether
  * intermediate proofsteps should be hidden in the proof tree view
  *
+ * @see de.uka.ilkd.key.gui.settings.StandardUISettings
  * @author unknown
  * @author weigl
  */
@@ -99,11 +100,6 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
 
-    /**
-     * Heatmap options property
-     */
-    private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
-
     private static final String FONT_SIZE_FACTOR = "[View]uiFontSizeFactor";
 
     private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
@@ -141,12 +137,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     /**
      * A list of bookmark of favourite folders of the user. Can be manipulated with
-     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
+     * {@code de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
      */
     private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
 
+    private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
+
     private static final String LOOK_AND_FEEL_DEFAULT =
         UIManager.getCrossPlatformLookAndFeelClassName();
+
+    public static final String NOTIFICATION_ALWAYS = "Always";
+    public static final String NOTIFICATION_UNFOCUSED = "When not focused";
+    public static final String NOTIFICATION_NEVER = "Never";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -214,6 +216,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private final PropertyEntry<List<String>> folderBookmarks =
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
+
+    private final PropertyEntry<String> notificationAfterMacro =
+        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -554,5 +559,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setFolderBookmarks(List<String> bm) {
         folderBookmarks.set(bm);
+    }
+
+    public String notificationAfterMacro() {
+        return notificationAfterMacro.get();
+    }
+
+    public void setNotificationAfterMacro(String value) {
+        if (value.equals(NOTIFICATION_ALWAYS) || value.equals(NOTIFICATION_UNFOCUSED)
+                || value.equals(NOTIFICATION_NEVER)) {
+            notificationAfterMacro.set(value);
+        } else {
+            throw new IllegalStateException("tried to set wrong value for notification setting");
+        }
     }
 }

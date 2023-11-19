@@ -9,69 +9,44 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 /**
  * The default implementation of {@link ITreeSettings}.
  *
+ * @param mergeBranchConditions               {@code true} merge branch conditions which means that a branch condition never contains
+ *                                            another branch condition or {@code false} allow that branch conditions contains branch
+ *                                            conditions.
+ * @param useUnicode                          {@code true} use unicode characters, {@code false} do not use unicode characters.
+ * @param usePrettyPrinting                   {@code true} use pretty printing, {@code false} do not use pretty printing.
+ * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false}
+ *                                            {@link IExecutionVariable}s are computed according to the type structure of the visible
+ *                                            memory.
+ * @param simplifyConditions                  {@code true} simplify conditions, {@code false} do not simplify conditions.
  * @author Martin Hentschel
  */
-public class TreeSettings implements ITreeSettings {
-    /**
-     * {@code true} merge branch conditions which means that a branch condition never contains
-     * another branch condition or {@code false} allow that branch conditions contains branch
-     * conditions.
-     */
-    private final boolean mergeBranchConditions;
-
-    /**
-     * {@code true} use unicode characters, {@code false} do not use unicode characters.
-     */
-    private final boolean useUnicode;
-
-    /**
-     * {@code true} use pretty printing, {@code false} do not use pretty printing.
-     */
-    private final boolean usePrettyPrinting;
-
-    /**
-     * {@code true} {@link IExecutionVariable} are only computed from updates, {@code false}
-     * {@link IExecutionVariable}s are computed according to the type structure of the visible
-     * memory.
-     */
-    private final boolean variablesAreOnlyComputedFromUpdates;
-
-    /**
-     * {@code true} simplify conditions, {@code false} do not simplify conditions.
-     */
-    private final boolean simplifyConditions;
-
+public record TreeSettings(boolean mergeBranchConditions, boolean useUnicode, boolean usePrettyPrinting,
+                           boolean variablesAreOnlyComputedFromUpdates,
+                           boolean simplifyConditions) implements ITreeSettings {
     /**
      * Constructor.
      *
-     * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch
-     *        condition never contains another branch condition or {@code false} allow that branch
-     *        conditions contains branch conditions.
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
-     *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
-     *        printing.
+     * @param mergeBranchConditions               {@code true} merge branch conditions which means that a branch
+     *                                            condition never contains another branch condition or {@code false} allow that branch
+     *                                            conditions contains branch conditions.
+     * @param useUnicode                          {@code true} use unicode characters, {@code false} do not use unicode
+     *                                            characters.
+     * @param usePrettyPrinting                   {@code true} use pretty printing, {@code false} do not use pretty
+     *                                            printing.
      * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
-     *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
-     *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
-     *        conditions.
+     *                                            computed from updates, {@code false} {@link IExecutionVariable}s are computed
+     *                                            according to the type structure of the visible memory.
+     * @param simplifyConditions                  {@code true} simplify conditions, {@code false} do not simplify
+     *                                            conditions.
      */
-    public TreeSettings(boolean mergeBranchConditions, boolean useUnicode,
-            boolean usePrettyPrinting, boolean variablesAreOnlyComputedFromUpdates,
-            boolean simplifyConditions) {
-        this.mergeBranchConditions = mergeBranchConditions;
-        this.useUnicode = useUnicode;
-        this.usePrettyPrinting = usePrettyPrinting;
-        this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
-        this.simplifyConditions = simplifyConditions;
+    public TreeSettings {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isMergeBranchConditions() {
+    public boolean mergeBranchConditions() {
         return mergeBranchConditions;
     }
 
@@ -79,7 +54,7 @@ public class TreeSettings implements ITreeSettings {
      * {@inheritDoc}
      */
     @Override
-    public boolean isUseUnicode() {
+    public boolean useUnicode() {
         return useUnicode;
     }
 
@@ -87,7 +62,7 @@ public class TreeSettings implements ITreeSettings {
      * {@inheritDoc}
      */
     @Override
-    public boolean isUsePrettyPrinting() {
+    public boolean usePrettyPrinting() {
         return usePrettyPrinting;
     }
 
@@ -95,7 +70,7 @@ public class TreeSettings implements ITreeSettings {
      * {@inheritDoc}
      */
     @Override
-    public boolean isVariablesAreOnlyComputedFromUpdates() {
+    public boolean variablesAreOnlyComputedFromUpdates() {
         return variablesAreOnlyComputedFromUpdates;
     }
 
@@ -103,7 +78,7 @@ public class TreeSettings implements ITreeSettings {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSimplifyConditions() {
+    public boolean simplifyConditions() {
         return simplifyConditions;
     }
 }

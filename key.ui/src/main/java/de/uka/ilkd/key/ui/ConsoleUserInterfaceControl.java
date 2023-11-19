@@ -180,11 +180,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        progressMax = info.getSize();
-        if (TaskKind.Strategy.equals(info.getKind())) {
-            System.out.println(info.getMessage() + " ["); // start progress bar
+        progressMax = info.size();
+        if (TaskKind.Strategy.equals(info.kind())) {
+            System.out.println(info.message() + " ["); // start progress bar
         } else {
-            System.out.println(info.getMessage());
+            System.out.println(info.message());
         }
     }
 
@@ -224,7 +224,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.setProof(pa.getFirstProof());
+        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
@@ -312,7 +312,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             Proof p = proofStack.head();
             proofStack = proofStack.removeAll(p);
             assert p.name().equals(e.getSource().name());
-            mediator.setProof(proofStack.head());
+            mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
             // happen for symbolic execution tests, if proofCreated was not

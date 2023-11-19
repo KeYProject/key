@@ -18,7 +18,7 @@ import org.key_project.util.java.CollectionUtil;
  * The labeled term class is used for terms that have a label attached.
  *
  * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast
- * the method {@link Term#equalsModRenaming(Object)} does not care about annotations and will just
+ * the method {@link Term#equalsModRenaming(Term)} does not care about annotations and will just
  * compare the term structure alone modula renaming.
  *
  * @see Term
@@ -39,11 +39,30 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
      * @param boundVars logic variables bound by the operator
      * @param javaBlock contains the program part of the term (if any)
      * @param labels the terms labels (must not be null or empty)
+     * @param origin a String with origin information
+     */
+    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<TermLabel> labels, String origin) {
+        super(op, subs, boundVars, javaBlock, origin);
+        assert labels != null : "Term labels must not be null";
+        assert !labels.isEmpty() : "There must be at least one term label";
+        this.labels = labels;
+    }
+
+    /**
+     * creates an instance of a labeled term.
+     *
+     * @param op the top level operator
+     * @param subs the Term that are the subterms of this term
+     * @param boundVars logic variables bound by the operator
+     * @param javaBlock contains the program part of the term (if any)
+     * @param labels the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels) {
-        super(op, subs, boundVars, javaBlock);
+        super(op, subs, boundVars, javaBlock, "");
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
@@ -90,19 +109,28 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
+        if (o == this) {
+            return true;
         }
 
-        final LabeledTermImpl cmp = (LabeledTermImpl) o;
-        if (labels.size() == cmp.labels.size()) {
-            for (int i = 0, sz = labels.size(); i < sz; i++) {
-                // this is not optimal, but as long as number of labels limited ok
-                if (!cmp.labels.contains(labels.get(i))) {
-                    return false;
-                }
+        if (o instanceof final LabeledTermImpl cmp) {
+            if (labels.size() != cmp.labels.size()) {
+                return false;
             }
-            return true;
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            if (labels.size() == cmp.labels.size()) {
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    // this is not optimal, but as long as number of labels limited ok
+                    if (!cmp.labels.contains(labels.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     }
@@ -122,8 +150,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (o instanceof LabeledTermImpl) {
-            final LabeledTermImpl cmp = (LabeledTermImpl) o;
+        if (o instanceof LabeledTermImpl cmp) {
             if (labels.size() == cmp.labels.size()) {
                 for (int i = 0, sz = labels.size(); i < sz; i++) {
                     // skip irrelevant (origin) labels that differ for no real reason

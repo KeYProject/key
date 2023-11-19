@@ -42,14 +42,11 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
     @Override
     public AbstractDomainElement join(AbstractDomainElement elem1, AbstractDomainElement elem2) {
 
-        if (!(elem1 instanceof SignAnalysisDomainElem)
-                || !(elem2 instanceof SignAnalysisDomainElem)) {
+        if (!(elem1 instanceof SignAnalysisDomainElem a)
+                || !(elem2 instanceof SignAnalysisDomainElem b)) {
             throw new IllegalArgumentException(
                 "Expected arguments of the abstract domain of sign analysis.");
         }
-
-        SignAnalysisDomainElem a = (SignAnalysisDomainElem) elem1;
-        SignAnalysisDomainElem b = (SignAnalysisDomainElem) elem2;
 
         if (a.isTop() || b.isTop()) {
             return Top.getInstance();

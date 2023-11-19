@@ -50,10 +50,9 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLClassAxiom)) {
+        if (!(o instanceof TextualJMLClassAxiom ci)) {
             return false;
         }
-        TextualJMLClassAxiom ci = (TextualJMLClassAxiom) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
 

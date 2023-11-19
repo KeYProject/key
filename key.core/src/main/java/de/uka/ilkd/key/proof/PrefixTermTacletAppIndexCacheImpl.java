@@ -93,11 +93,10 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey)) {
+            if (!(obj instanceof CacheKey objKey)) {
                 return false;
             }
 
-            final CacheKey objKey = (CacheKey) obj;
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 

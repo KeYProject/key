@@ -41,15 +41,11 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     public boolean checkHelp(Object o1, Object o2) {
-        if (o1 instanceof Term && o2 instanceof Term) {
-            final Term t1 = (Term) o1;
-            final Term t2 = (Term) o2;
+        if (o1 instanceof Term t1 && o2 instanceof Term t2) {
 
             if (t1.op() == t2.op()) {
                 return false;
-            } else if (t1.op() instanceof Function && t2.op() instanceof Function) {
-                final Function op1 = (Function) t1.op();
-                final Function op2 = (Function) t2.op();
+            } else if (t1.op() instanceof Function op1 && t2.op() instanceof Function op2) {
 
                 return op1.isUnique() && op2.isUnique();
             }

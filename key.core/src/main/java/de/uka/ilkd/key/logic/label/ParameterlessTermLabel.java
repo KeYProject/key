@@ -166,8 +166,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ParameterlessTermLabel) {
-            ParameterlessTermLabel other = (ParameterlessTermLabel) obj;
+        if (obj instanceof ParameterlessTermLabel other) {
             return name.equals(other.name);
         } else {
             return false;

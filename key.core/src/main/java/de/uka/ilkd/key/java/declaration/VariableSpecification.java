@@ -264,10 +264,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof VariableSpecification)) {
+        if (!(se instanceof VariableSpecification vs)) {
             return false;
         }
-        final VariableSpecification vs = (VariableSpecification) se;
         if (dimensions != vs.getDimensions()) {
             return false;
         }

@@ -125,7 +125,7 @@ public class SemisequentTacletAppIndex {
 
         while (infoIt.hasNext()) {
             final FormulaChangeInfo info = infoIt.next();
-            final SequentFormula newFor = info.getNewFormula();
+            final SequentFormula newFor = info.newFormula();
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 
             if (oldIndex == null)
@@ -133,7 +133,7 @@ public class SemisequentTacletAppIndex {
             {
                 addTermIndex(newFor, services, tacletIndex, listener);
             } else {
-                final PosInOccurrence oldPos = info.getPositionOfModification();
+                final PosInOccurrence oldPos = info.positionOfModification();
                 final PosInOccurrence newPos = oldPos.replaceConstrainedFormula(newFor);
                 termIndices = termIndices.put(newFor,
                     oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));

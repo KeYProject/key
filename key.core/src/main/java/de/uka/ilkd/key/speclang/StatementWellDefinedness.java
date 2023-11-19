@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Thus the technical difference to other well-definedness checks is the context update and that it
  * is not a separate contract, but another branch of the specific rule of the overlying proof. The
  * according proof sequent is built in
- * {@link #generateSequent(ProgramVariable, ProgramVariable, ProgramVariable, LocationVariable, ProgramVariable, Term, ImmutableSet, Term, Services)}
+ * {@link #generateSequent}
  * Nevertheless it is imaginable to make them separate contracts.
  *
  * @author Michael Kirsten
@@ -98,13 +98,14 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      */
     final SequentTerms createSeqTerms(POTerms po, Variables vars, Term leadingUpdate,
             Term localAnon, Services services) {
-        final Term pre = getPre(po.pre, vars.self, vars.heap, vars.params, false, services).term;
-        final Term post = getPost(po.post, vars.result, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest);
+        final Term pre =
+            getPre(po.pre(), vars.self, vars.heap, vars.params, false, services).term();
+        final Term post = getPost(po.post(), vars.result, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,
-            getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services));
+            getUpdates(po.mod(), vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost,
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod(), po.rest(), uPost,
             services);
     }
 

@@ -220,8 +220,7 @@ public class ProofJavaProgramFactoryTest {
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
         for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
             TypeDeclaration td = cu.getTypeDeclarationAt(i);
-            if (td instanceof ClassDeclaration) {
-                ClassDeclaration clazz = (ClassDeclaration) td;
+            if (td instanceof ClassDeclaration clazz) {
                 if (clazz.getName().equals(className)) {
                     return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();

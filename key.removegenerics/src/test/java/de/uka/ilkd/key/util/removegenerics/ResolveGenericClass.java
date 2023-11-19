@@ -52,14 +52,14 @@ public class ResolveGenericClass {
         } catch (Exception ex) {
             StringBuilder sb = new StringBuilder();
             if (cu1before != null) {
-                sb.append("CU1 (before): " + cu1before.toSource() + "\n");
+                sb.append("CU1 (before): ").append(cu1before.toSource()).append("\n");
             } else {
-                sb.append("CU1 (source): " + string1 + "\n");
+                sb.append("CU1 (source): ").append(string1).append("\n");
             }
             if (cu1 != null) {
-                sb.append("CU1 (after) : " + cu1.toSource() + "\n");
+                sb.append("CU1 (after) : ").append(cu1.toSource()).append("\n");
             }
-            sb.append("CU2         : " + string2 + "\n");
+            sb.append("CU2         : ").append(string2).append("\n");
             throw new Exception(sb.toString(), ex);
         }
     }

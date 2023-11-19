@@ -11,20 +11,13 @@ import de.uka.ilkd.key.logic.Named;
  * this class represents a heuristic. Taclets can belong to different heuristics and are executed
  * automatic if these are selected. A heuristic is just a name.
  */
-public class RuleSet implements Named {
-    /**
-     * name of the heuristic
-     */
-    private final Name name;
-
-
+public record RuleSet(Name name) implements Named {
     /**
      * creates a heuristic
      *
      * @param name Name object that contains name of the heuristic
      */
-    public RuleSet(Name name) {
-        this.name = name;
+    public RuleSet {
     }
 
     /**
@@ -32,6 +25,7 @@ public class RuleSet implements Named {
      *
      * @return Name object that is the name of the heuristic
      */
+    @Override
     public Name name() {
         return name;
     }

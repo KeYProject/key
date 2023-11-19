@@ -69,8 +69,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
             Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
-        } else if (kind == DefaultContextMenuKind.PROOF_TREE && underlyingObject instanceof Node) {
-            Node node = (Node) underlyingObject;
+        } else if (kind == DefaultContextMenuKind.PROOF_TREE
+                && underlyingObject instanceof Node node) {
             return NodeInfoVisualizer.getInstances(node).stream().map(OpenVisualizerAction::new)
                     .collect(Collectors.toList());
         } else {

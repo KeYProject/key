@@ -38,7 +38,7 @@ public final class JavaInfo {
 
 
     private final Services services;
-    private KeYProgModelInfo kpmi;
+    private final KeYProgModelInfo kpmi;
 
     /**
      * the type of null
@@ -130,10 +130,6 @@ public final class JavaInfo {
         return kpmi;
     }
 
-    void setKeYProgModelInfo(KeYProgModelInfo kpmi) {
-        this.kpmi = kpmi;
-    }
-
     /**
      * convenience method that returns the Recoder-to-KeY mapping underlying the KeYProgModelInfo of
      * this JavaInfo
@@ -218,10 +214,8 @@ public final class JavaInfo {
         nameCachedSize = kpmi.rec2key().size();
         name2KJTCache = new LinkedHashMap<>();
         for (final Object o : kpmi.allElements()) {
-            if (o instanceof KeYJavaType) {
-                final KeYJavaType oKJT = (KeYJavaType) o;
-                if (oKJT.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) oKJT.getJavaType();
+            if (o instanceof KeYJavaType oKJT) {
+                if (oKJT.getJavaType() instanceof ArrayType at) {
                     name2KJTCache.put(at.getFullName(), oKJT);
                     name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
                 } else {
@@ -402,8 +396,7 @@ public final class JavaInfo {
         final Type t = kjt.getJavaType();
         if (t instanceof ClassType) {
             return ((ClassType) t).isPrivate();
-        } else if (t instanceof ArrayType) {
-            final ArrayType at = (ArrayType) t;
+        } else if (t instanceof ArrayType at) {
             return isPrivate(at.getBaseType().getKeYJavaType());
         } else // primitive type or null
         {
@@ -460,8 +453,7 @@ public final class JavaInfo {
             sortCachedSize = kpmi.rec2key().size();
             sort2KJTCache = new HashMap<>();
             for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
+                if (o instanceof KeYJavaType oKJT) {
                     Sort s = oKJT.getSort();
                     List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
                     if (!l.contains(oKJT)) {
@@ -484,8 +476,7 @@ public final class JavaInfo {
         if (type2KJTCache == null) {
             type2KJTCache = new LinkedHashMap<>();
             for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
+                if (o instanceof KeYJavaType oKJT) {
                     type2KJTCache.put(oKJT.getJavaType(), oKJT);
                 }
             }
@@ -1445,7 +1436,7 @@ public final class JavaInfo {
      * the free class
      * invariant of an object.
      *
-     * @see #getFreeInv()
+     * @see #getInvFree()
      */
     public ProgramVariable getFreeInvProgramVar() {
         if (invFreeProgVar == null) {
@@ -1481,7 +1472,7 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt$inv_free&gt;</code> which stands for the static
+     * Returns the special symbol {@code <$inv_free&>}, which stands for the static
      * invariant of a type.
      */
     public IObserverFunction getStaticInvFree(KeYJavaType target) {

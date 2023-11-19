@@ -15,13 +15,13 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     private TriggerVarInstantiatedFeature() {
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection
-                .create(app.taclet().getTrigger().getTriggerVar().name(), false);
+                .create(app.taclet().getTrigger().triggerVar().name(), false);
 
-        return instProj.toTerm(app, pos, goal) != null;
+        return instProj.toTerm(app, pos, goal, mState) != null;
     }
 
 

@@ -66,10 +66,9 @@ public class MatchConditions implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof MatchConditions)) {
+        if (!(obj instanceof MatchConditions that)) {
             return false;
         }
-        MatchConditions that = (MatchConditions) obj;
         return instantiations.equalsModProofIrrelevancy(that.instantiations)
                 && renameTable.equals(that.renameTable);
     }

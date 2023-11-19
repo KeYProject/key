@@ -14,20 +14,7 @@ import org.key_project.util.collection.ImmutableSLList;
 /**
  * Wraps a list of expressions.
  */
-public final class SLParameters {
-
-    private final ImmutableList<SLExpression> parameters;
-
-    public SLParameters(ImmutableList<SLExpression> parameters) {
-        this.parameters = parameters;
-    }
-
-
-    public ImmutableList<SLExpression> getParameters() {
-        return parameters;
-    }
-
-
+public record SLParameters(ImmutableList<SLExpression> parameters) {
     public boolean isListOfTerm() {
         for (SLExpression expr : parameters) {
             if (!expr.isTerm()) {
@@ -63,6 +50,5 @@ public final class SLParameters {
     public String toString() {
         return parameters == null ? "" : parameters.toString();
     }
-
 
 }

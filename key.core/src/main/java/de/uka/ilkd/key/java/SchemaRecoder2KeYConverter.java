@@ -185,12 +185,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             (StatementBlock) callConvert(l.getBody()));
     }
 
-    public LoopScopeBlock convert(de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
-        return new LoopScopeBlock(
-            (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
-            (StatementBlock) callConvert(l.getBody()));
-    }
-
     /**
      * translate method body statements.
      */
@@ -413,10 +407,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public MethodReference convert(recoder.java.reference.MethodReference mr) {
         // convert reference prefix
         final ReferencePrefix prefix;
-        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier) {
+        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier uncoll) {
             // type references would be allowed
-            final recoder.java.reference.UncollatedReferenceQualifier uncoll =
-                (recoder.java.reference.UncollatedReferenceQualifier) mr.getReferencePrefix();
             prefix = convert(new recoder.java.reference.TypeReference(uncoll.getReferencePrefix(),
                 uncoll.getIdentifier()));
         } else {

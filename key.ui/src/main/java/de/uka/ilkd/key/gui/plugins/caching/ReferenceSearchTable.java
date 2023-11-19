@@ -76,14 +76,11 @@ class ReferenceSearchTable extends JTable implements TableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-        case 0:
-            return "Goal";
-        case 1:
-            return "Reference";
-        default:
-            return "??";
-        }
+        return switch (column) {
+        case 0 -> "Goal";
+        case 1 -> "Reference";
+        default -> "??";
+        };
     }
 
     @Override
@@ -101,9 +98,9 @@ class ReferenceSearchTable extends JTable implements TableModel {
             if (c == null) {
                 return "no reference found";
             } else {
-                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.getProof()) + 1;
+                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.proof()) + 1;
                 return String.format("reference available (proof %d, node %d)", i,
-                    c.getNode().serialNr());
+                    c.node().serialNr());
             }
         }
     }

@@ -247,7 +247,7 @@ public final class ProofCorrectnessMgt {
         for (RuleApp ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if (ruleJusti instanceof RuleJustificationBySpec) {
-                Contract contract = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                Contract contract = ((RuleJustificationBySpec) ruleJusti).spec();
                 ImmutableSet<Contract> atomicContracts = specRepos.splitContract(contract);
                 assert atomicContracts != null;
                 atomicContracts = specRepos.getInheritedContracts(atomicContracts);

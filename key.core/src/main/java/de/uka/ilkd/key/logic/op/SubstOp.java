@@ -39,12 +39,14 @@ public abstract class SubstOp extends AbstractOperator {
 
 
     /**
-     * @return true iff the sort of the subterm 0 of the given term has the same sort as or a
-     *         subsort of the variable to be substituted and the term's arity is 2 and the numer of
-     *         variables bound there is 0 for the 0th subterm and 1 for the 1st subterm.
+     * checks whether the sort of the subterm 0 of the given term has the same sort as or a
+     * subsort of the variable to be substituted and the term's arity is 2 and the number of
+     * variables bound there is 0 for the 0th subterm and 1 for the 1st subterm.
+     *
+     * @throws TermCreationException if the check fails
      */
     @Override
-    protected void additionalValidTopLevel(Term term) {
+    protected void additionalValidTopLevel(Term term) throws TermCreationException {
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);
         }

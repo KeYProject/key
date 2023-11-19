@@ -76,10 +76,9 @@ public class ContextStatementBlockInstantiation {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof ContextStatementBlockInstantiation)) {
+        if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }
-        final ContextStatementBlockInstantiation inst = (ContextStatementBlockInstantiation) o;
 
         if (isDifferent(suffixStart, inst.suffixStart)) {
             return false;

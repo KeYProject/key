@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,9 +114,9 @@ public class CachingExtension
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
-                c.getProof()
+                c.proof()
                         .addProofDisposedListenerFirst(
-                            new CopyBeforeDispose(mediator, c.getProof(), p));
+                            new CopyBeforeDispose(mediator, c.proof(), p));
             }
         }
     }
@@ -143,10 +143,10 @@ public class CachingExtension
 
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
             List<Action> actions = new ArrayList<>();
@@ -166,8 +166,8 @@ public class CachingExtension
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-        if (info.getKind().equals(TaskStartedInfo.TaskKind.Macro)
-                && info.getMessage().equals(new TryCloseMacro().getName())) {
+        if (info.kind().equals(TaskStartedInfo.TaskKind.Macro)
+                && info.message().equals(new TryCloseMacro().getName())) {
             tryToClose = false;
         }
     }
@@ -241,13 +241,18 @@ public class CachingExtension
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
-                mediator.stopInterface(true);
-                newProof.copyCachedGoals(referencedProof, null, null);
-                mediator.startInterface(true);
+                mediator.initiateAutoMode(newProof, true, false);
+                try {
+                    newProof.copyCachedGoals(referencedProof, null, null);
+                } finally {
+                    mediator.finishAutoMode(newProof, true, true,
+                        /* do not select a different node */ () -> {
+                        });
+                }
             } else {
                 newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
-                                && x.node().lookup(ClosedBy.class).getProof() == referencedProof)
+                                && x.node().lookup(ClosedBy.class).proof() == referencedProof)
                         .forEach(x -> {
                             newProof.reOpenGoal(x);
                             x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
@@ -363,7 +368,7 @@ public class CachingExtension
             Goal current = node.proof().getClosedGoal(node);
             try {
                 mediator.stopInterface(true);
-                new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
                 mediator.startInterface(true);
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);

@@ -94,10 +94,9 @@ public class SMTTermITE extends SMTTerm {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SMTTermITE)) {
+        if (!(o instanceof SMTTermITE that)) {
             return false;
         }
-        SMTTermITE that = (SMTTermITE) o;
         return condition.equals(that.condition) && trueCase.equals(that.trueCase)
                 && falseCase.equals(that.falseCase);
     }

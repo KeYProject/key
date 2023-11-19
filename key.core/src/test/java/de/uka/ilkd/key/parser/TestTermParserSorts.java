@@ -59,10 +59,10 @@ public class TestTermParserSorts extends AbstractTestTermParser {
      * The KeY type int has several possible corresponding KeYJavaTypes. Those types are: char,
      * byte, short, int, long
      *
-     * This test checks if the parser finds a suitable function, if a query with integer arguments
+     * This test checks if the parser finds a suitable function if a query with integer arguments
      * is provided.
      *
-     * Sometimes several functions are available that the parser may select. For example a query of
+     * Sometimes several functions are available that the parser may select. For example, a query of
      * the form "a.query(0)" with Java functions available that have the following signatures:
      *
      * public int query(int i); public int query(byte b);

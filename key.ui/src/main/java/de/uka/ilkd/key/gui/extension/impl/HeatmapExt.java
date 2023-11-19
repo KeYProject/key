@@ -104,26 +104,32 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
     enum HeatmapMode {
         DEFAULT("No heatmaps", "No heatmaps are shown.", false, false, false),
         SF_AGE("Sequent formulae up to age",
-                "All sequent formulae that have been added or changed in the last k steps are highlighted. \n"
-                    + "More recent formulae will have a stronger highlight. It is possible that less \n"
-                    + "than k formulae are highlighted, e.g. if one formula has changed multiple times.\n",
+                """
+                        All sequent formulae that have been added or changed in the last k steps are highlighted.\s
+                        More recent formulae will have a stronger highlight. It is possible that less\s
+                        than k formulae are highlighted, e.g. if one formula has changed multiple times.
+                        """,
                 true, true, false),
         SF_NEWEST("Newest sequent formulae",
-                "All formulae in the sequent are sorted by how new they are, i.e., how recently they have\n"
-                    + " been added or changed. The first k formulae of the sorted list are highlighted\n"
-                    + "according to their position in the list,\n"
-                    + " with the most recent formula receiving the strongest highlight.\n",
+                """
+                        All formulae in the sequent are sorted by how new they are, i.e., how recently they have
+                         been added or changed. The first k formulae of the sorted list are highlighted
+                        according to their position in the list,
+                         with the most recent formula receiving the strongest highlight.
+                        """,
                 true, true, true),
         TERMS_AGE("Terms up to age",
-                "All terms that have been added or changed in the last k steps are highlighted. \n"
-                    + "More recent terms will have a stronger highlight. It is possible that less than \n"
-                    + "k terms are highlighted, e.g. if one term has changed multiple times.",
+                """
+                        All terms that have been added or changed in the last k steps are highlighted.\s
+                        More recent terms will have a stronger highlight. It is possible that less than\s
+                        k terms are highlighted, e.g. if one term has changed multiple times.""",
                 true, false, false),
         TERMS_NEWEST("Newest terms",
-                "All terms in the sequent are sorted by how new they are, i.e., how recently they\n"
-                    + "have been added or changed. The first k terms of the sorted list are highlighted\n"
-                    + "according to their position in the list,\n"
-                    + " with the most recent term receiving the strongest highlight.",
+                """
+                        All terms in the sequent are sorted by how new they are, i.e., how recently they
+                        have been added or changed. The first k terms of the sorted list are highlighted
+                        according to their position in the list,
+                         with the most recent term receiving the strongest highlight.""",
                 true, false, true);
 
         final String text;

@@ -110,7 +110,7 @@ public class PathList {
             result = split_paths.length;
             for (int i = 0; i < result; i++) {
                 String path = split_paths[i].trim();
-                if (!path.equals("")) {
+                if (!path.isEmpty()) {
                     addPath(path);
                 }
             }
@@ -147,8 +147,7 @@ public class PathList {
     }
 
     private DataLocation getLocation(Object p, String relativeName) {
-        if (p instanceof ZipFile) {
-            ZipFile zf = (ZipFile) p;
+        if (p instanceof ZipFile zf) {
             if (zf.getEntry(relativeName) != null) {
                 return new ArchiveDataLocation(zf, relativeName);
             } else {
@@ -158,8 +157,7 @@ public class PathList {
                     return new ArchiveDataLocation(zf, hs);
                 }
             }
-        } else if (p instanceof File) {
-            File dir = (File) p;
+        } else if (p instanceof File dir) {
             int sep = relativeName.lastIndexOf(File.separatorChar);
             if (sep >= 0) {
                 dir = getDir(dir, relativeName.substring(0, sep));
@@ -209,8 +207,7 @@ public class PathList {
      */
     public String getRelativeName(String absoluteFilename) {
         for (Object o : paths) {
-            if (o instanceof File) {
-                File p = (File) o;
+            if (o instanceof File p) {
                 if (p.isDirectory()) {
                     String pathfilename = p.getAbsolutePath();
                     if (absoluteFilename.startsWith(pathfilename)) {
@@ -257,8 +254,7 @@ public class PathList {
     public DataLocation[] findAll(FilenameFilter filter) {
         List<DataLocation> res = new ArrayList<>();
         for (Object f : paths) {
-            if (f instanceof ZipFile) {
-                ZipFile zf = (ZipFile) f;
+            if (f instanceof ZipFile zf) {
                 Enumeration enum2 = zf.entries();
                 while (enum2.hasMoreElements()) {
                     ZipEntry e = (ZipEntry) enum2.nextElement();

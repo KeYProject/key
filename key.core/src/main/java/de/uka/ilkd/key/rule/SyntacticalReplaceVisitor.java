@@ -257,8 +257,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
-                if (boundVar instanceof SchemaVariable) {
-                    final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final Term instantiationForBoundSchemaVariable =
                         (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
@@ -343,8 +342,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
             JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
-            applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm, newTermOp,
-            newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
+            applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
+            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock,
+                newTermOriginalLabels));
     }
 
     private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
@@ -418,8 +418,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
-        if (subtreeRoot.op() instanceof TermTransformer) {
-            final TermTransformer mop = (TermTransformer) subtreeRoot.op();
+        if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, subtreeRoot, newTerm);

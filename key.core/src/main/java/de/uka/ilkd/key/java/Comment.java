@@ -63,10 +63,9 @@ public class Comment extends JavaSourceElement {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Comment)) {
+        if (!(o instanceof Comment cmp)) {
             return false;
         }
-        Comment cmp = (Comment) o;
         return (getText().equals(cmp.getText()));
     }
 }

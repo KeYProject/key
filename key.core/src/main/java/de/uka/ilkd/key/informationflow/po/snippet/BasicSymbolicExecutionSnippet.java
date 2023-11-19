@@ -106,12 +106,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        if (!(targetMethod instanceof IProgramMethod)) {
+        if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "java-block for an observer which is no program method.");
         }
         JavaInfo javaInfo = d.services.getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) targetMethod;
 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);

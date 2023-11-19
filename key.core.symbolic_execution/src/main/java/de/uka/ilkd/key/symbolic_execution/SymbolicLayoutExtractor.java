@@ -31,6 +31,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 
+// need to switch spotless off for this comment as it replaces @code with &#64;code
+// spotless:off
 /**
  * <p>
  * Instances of this class can be used to compute memory layouts (objects with values and
@@ -41,24 +43,26 @@ import org.key_project.util.java.CollectionUtil;
  * started. Such memory layouts are named <i>initial memory layouts</i>.
  * </p>
  * <p>
- * Example program:
+ * Example program:<br/>
  *
  * <pre>
- * <code>
- * public class Example {
- *    private int value;
+ * {@code
+ *     public class Example {
+ *         private int value;
  *
- *    private Example next;
+ *         private Example next;
  *
- *    public static int main(Example e) {
- *       e.value = 1;
- *       e.next.value = 2;
- *       return e.value + e.next.value; // Current node in KeY's proof tree
- *    }
+ *         public static int main(Example e) {
+ *             e.value = 1;
+ *             e.next.value = 2;
+ *             return e.value + e.next.value; // Current node in KeY's proof tree
+ *         }
+ *     }
  * }
- * </code>
  * </pre>
  *
+ * </p>
+ * <p>
  * If the symbolic execution stops at the return statement, two memory layouts are possible. In the
  * first case refers {@code e} and {@code e.next} to different objects (result is {@code 3}). In the
  * second case refers both to the same object (result is {@code 4}). That both objects can't be
@@ -68,15 +72,15 @@ import org.key_project.util.java.CollectionUtil;
  * The following code snippet shows how to use this class:
  *
  * <pre>
- * <code>
- * SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
- * e.analyse();
- * for (int i = 0; i < e.getLayoutsCount(); i++) {
- *    ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
- *    ISymbolicLayout initial = e.getInitialLayout(i);
- *    ISymbolicLayout current = e.getCurrentLayout(i);
+ * {@code
+ *     SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
+ *     e.analyse();
+ *     for (int i = 0; i < e.getLayoutsCount(); i++) {
+ *         ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
+ *         ISymbolicLayout initial = e.getInitialLayout(i);
+ *         ISymbolicLayout current = e.getCurrentLayout(i);
+ *     }
  * }
- * </code>
  * </pre>
  * </p>
  * <p>
@@ -110,7 +114,7 @@ import org.key_project.util.java.CollectionUtil;
  * </ol>
  * </li>
  * <li>Compute a concrete initial or current memory layout when they are requested the first time
- * via {@link #lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+ * via {@link #lazyComputeLayout}.
  * <ol>
  * <li>Start side proof based on node's sequent for a current memory layout or root's sequent for an
  * initial memory layout. The sequent is modified by adding the pre updates and on initial memory
@@ -128,6 +132,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see ISymbolicLayout
  * @see ExecutionNodeSymbolicLayoutExtractor
  */
+// spotless:on
 public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * The used {@link IModelSettings}.
@@ -466,8 +471,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         while (!(goalnode.serialNr() == root.serialNr())) {
             final Node oldNode = goalnode;
             goalnode = goalnode.parent();
-            if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp) {
-                NoPosTacletApp npta = (NoPosTacletApp) goalnode.getAppliedRuleApp();
+            if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp npta) {
                 if ("CUT".equalsIgnoreCase(npta.taclet().name().toString())) {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
@@ -599,7 +603,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * <p>
      * Computes a memory layout lazily when it is first time requested via
-     * {@link #getLayout(Map, int, Term, Set, String, boolean)}.
+     * {@link #getLayout}.
      * </p>
      * <p>
      * Finally, the last step is to create the {@link ISymbolicLayout} instance and to fill it with

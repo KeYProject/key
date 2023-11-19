@@ -106,9 +106,7 @@ public class OverflowChecker {
 
     private void getSubTerms(SMTTerm t, Set<SMTTerm> result) {
 
-        if (t instanceof SMTTermMultOp) {
-
-            SMTTermMultOp tm = (SMTTermMultOp) t;
+        if (t instanceof SMTTermMultOp tm) {
 
             if (isArithmeticOperator(tm.getOperator())) {
 
@@ -143,8 +141,7 @@ public class OverflowChecker {
 
         for (SMTTerm t : terms) {
 
-            if (t instanceof SMTTermMultOp) {
-                SMTTermMultOp tm = (SMTTermMultOp) t;
+            if (t instanceof SMTTermMultOp tm) {
                 SMTTerm guard = null;
                 // create guard for addition
                 if (isAddOp(tm.getOperator())) {
@@ -201,8 +198,7 @@ public class OverflowChecker {
     private SMTTerm addGuardIfNecessary(SMTTerm t, Set<SMTTermVariable> quantifiedVars) {
 
 
-        if (t instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) t;
+        if (t instanceof SMTTermMultOp tm) {
             // we look for comparison terms like a < b
             if (isComparisonOp(tm.getOperator())) {
                 SMTTerm left = tm.getSubs().get(0);
@@ -244,24 +240,21 @@ public class OverflowChecker {
     private void processTerm(SMTTerm t, Set<SMTTermVariable> universalVars,
             Set<SMTTermVariable> existentialVars) {
 
-        if (t instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) t;
+        if (t instanceof SMTTermMultOp tm) {
             List<SMTTerm> subs = tm.getSubs();
             for (SMTTerm sub : subs) {
                 processTerm(sub, universalVars, existentialVars);
             }
 
 
-        } else if (t instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) t;
+        } else if (t instanceof SMTTermCall tc) {
             List<SMTTerm> subs = tc.getArgs();
 
             for (SMTTerm sub : subs) {
                 processTerm(sub, universalVars, existentialVars);
             }
 
-        } else if (t instanceof SMTTermQuant) {
-            SMTTermQuant tq = (SMTTermQuant) t;
+        } else if (t instanceof SMTTermQuant tq) {
             SMTTerm sub = tq.getSub();
             if (tq.getQuant().equals(SMTTermQuant.Quant.FORALL)) {
                 universalVars.addAll(tq.getBindVars());
@@ -286,16 +279,14 @@ public class OverflowChecker {
             }
 
 
-        } else if (t instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp tu = (SMTTermUnaryOp) t;
+        } else if (t instanceof SMTTermUnaryOp tu) {
             SMTTerm sub = tu.getSub();
             SMTTerm guarded = addGuardIfNecessary(sub, universalVars);
             if (!sub.equals(guarded)) {
                 tu.setSub(guarded);
             }
             processTerm(tu.getSub(), universalVars, existentialVars);
-        } else if (t instanceof SMTTermITE) {
-            SMTTermITE ite = (SMTTermITE) t;
+        } else if (t instanceof SMTTermITE ite) {
             SMTTerm cond = ite.getCondition();
             SMTTerm trueCase = ite.getTrueCase();
             SMTTerm falseCase = ite.getFalseCase();
@@ -338,8 +329,7 @@ public class OverflowChecker {
             Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars,
             List<SMTTermVariable> bind) {
 
-        if (sub instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) sub;
+        if (sub instanceof SMTTermMultOp tm) {
             for (SMTTerm t : tm.getSubs()) {
                 searchArithTerms(terms, t, universalVars, existentialVars, bind);
             }
@@ -347,21 +337,17 @@ public class OverflowChecker {
                     && acceptableTerm(tm, universalVars, existentialVars, bind)) {
                 terms.add(tm);
             }
-        } else if (sub instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) sub;
+        } else if (sub instanceof SMTTermCall tc) {
             for (SMTTerm t : tc.getArgs()) {
                 searchArithTerms(terms, t, universalVars, existentialVars, bind);
             }
-        } else if (sub instanceof SMTTermQuant) {
-            SMTTermQuant tq = (SMTTermQuant) sub;
+        } else if (sub instanceof SMTTermQuant tq) {
             searchArithTerms(terms, tq.getSub(), universalVars, existentialVars, bind);
-        } else if (sub instanceof SMTTermITE) {
-            SMTTermITE ite = (SMTTermITE) sub;
+        } else if (sub instanceof SMTTermITE ite) {
             searchArithTerms(terms, ite.getCondition(), universalVars, existentialVars, bind);
             searchArithTerms(terms, ite.getTrueCase(), universalVars, existentialVars, bind);
             searchArithTerms(terms, ite.getFalseCase(), universalVars, existentialVars, bind);
-        } else if (sub instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp tu = (SMTTermUnaryOp) sub;
+        } else if (sub instanceof SMTTermUnaryOp tu) {
             searchArithTerms(terms, tu.getSub(), universalVars, existentialVars, bind);
         }
 
@@ -372,29 +358,24 @@ public class OverflowChecker {
      */
     public void searchArithGroundTerms(Set<SMTTerm> terms, SMTTerm sub) {
 
-        if (sub instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) sub;
+        if (sub instanceof SMTTermMultOp tm) {
             for (SMTTerm t : tm.getSubs()) {
                 searchArithGroundTerms(terms, t);
             }
             if (isArithmeticOperator(tm.getOperator()) && !containsVars(tm)) {
                 terms.add(tm);
             }
-        } else if (sub instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) sub;
+        } else if (sub instanceof SMTTermCall tc) {
             for (SMTTerm t : tc.getArgs()) {
                 searchArithGroundTerms(terms, t);
             }
-        } else if (sub instanceof SMTTermQuant) {
-            SMTTermQuant tq = (SMTTermQuant) sub;
+        } else if (sub instanceof SMTTermQuant tq) {
             searchArithGroundTerms(terms, tq.getSub());
-        } else if (sub instanceof SMTTermITE) {
-            SMTTermITE ite = (SMTTermITE) sub;
+        } else if (sub instanceof SMTTermITE ite) {
             searchArithGroundTerms(terms, ite.getCondition());
             searchArithGroundTerms(terms, ite.getTrueCase());
             searchArithGroundTerms(terms, ite.getFalseCase());
-        } else if (sub instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp tu = (SMTTermUnaryOp) sub;
+        } else if (sub instanceof SMTTermUnaryOp tu) {
             searchArithGroundTerms(terms, tu.getSub());
         }
 
@@ -422,29 +403,24 @@ public class OverflowChecker {
 
 
     private void getVariables(SMTTerm term, Set<SMTTerm> vars) {
-        if (term instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) term;
+        if (term instanceof SMTTermMultOp tm) {
             for (SMTTerm t : tm.getSubs()) {
                 getVariables(t, vars);
             }
 
 
-        } else if (term instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) term;
+        } else if (term instanceof SMTTermCall tc) {
             for (SMTTerm t : tc.getArgs()) {
                 getVariables(t, vars);
             }
 
-        } else if (term instanceof SMTTermQuant) {
-            SMTTermQuant tq = (SMTTermQuant) term;
+        } else if (term instanceof SMTTermQuant tq) {
             getVariables(tq.getSub(), vars);
-        } else if (term instanceof SMTTermITE) {
-            SMTTermITE ite = (SMTTermITE) term;
+        } else if (term instanceof SMTTermITE ite) {
             getVariables(ite.getTrueCase(), vars);
             getVariables(ite.getFalseCase(), vars);
             getVariables(ite.getCondition(), vars);
-        } else if (term instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp tu = (SMTTermUnaryOp) term;
+        } else if (term instanceof SMTTermUnaryOp tu) {
             getVariables(tu.getSub(), vars);
         } else if (term instanceof SMTTermVariable) {
             vars.add(term);
@@ -454,8 +430,7 @@ public class OverflowChecker {
 
     private boolean containsVars(SMTTerm term) {
 
-        if (term instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) term;
+        if (term instanceof SMTTermMultOp tm) {
             for (SMTTerm t : tm.getSubs()) {
                 if (containsVars(t)) {
                     return true;
@@ -464,23 +439,19 @@ public class OverflowChecker {
 
             return false;
 
-        } else if (term instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) term;
+        } else if (term instanceof SMTTermCall tc) {
             for (SMTTerm t : tc.getArgs()) {
                 if (containsVars(t)) {
                     return true;
                 }
             }
             return false;
-        } else if (term instanceof SMTTermQuant) {
-            SMTTermQuant tq = (SMTTermQuant) term;
+        } else if (term instanceof SMTTermQuant tq) {
             return containsVars(tq.getSub());
-        } else if (term instanceof SMTTermITE) {
-            SMTTermITE ite = (SMTTermITE) term;
+        } else if (term instanceof SMTTermITE ite) {
             return containsVars(ite.getCondition()) || containsVars(ite.getTrueCase())
                     || containsVars(ite.getFalseCase());
-        } else if (term instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp tu = (SMTTermUnaryOp) term;
+        } else if (term instanceof SMTTermUnaryOp tu) {
             return containsVars(tu.getSub());
         } else {
             return term instanceof SMTTermVariable;
@@ -505,8 +476,7 @@ public class OverflowChecker {
 
     private boolean isUniversalSub(SMTTerm t, Set<SMTTermVariable> universalVars) {
 
-        if (t instanceof SMTTermMultOp) {
-            SMTTermMultOp tm = (SMTTermMultOp) t;
+        if (t instanceof SMTTermMultOp tm) {
             for (SMTTerm sub : tm.getSubs()) {
                 if (universalVars.contains(sub) || isUniversalSub(sub, universalVars)) {
                     return true;

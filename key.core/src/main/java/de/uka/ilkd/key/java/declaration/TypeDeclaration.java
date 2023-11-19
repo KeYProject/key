@@ -3,17 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeScope;
-import de.uka.ilkd.key.java.VariableScope;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -45,26 +36,16 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     protected final boolean isLibrary;
 
-    /** JML modifiers of a type */
-    public static final class JMLModifiers {
-        /** strictly pure */
-        public final boolean strictlyPure;
-        /** pure */
-        public final boolean pure;
-        /** nullable by default */
-        public final boolean nullableByDefault;
-        /** spec math mode */
-        public final SpecMathMode specMathMode;
-
-        /** constructor */
-        public JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-                SpecMathMode specMathMode) {
-            this.strictlyPure = strictlyPure;
-            this.pure = pure;
-            this.nullableByDefault = nullableByDefault;
-            this.specMathMode = specMathMode;
-        }
-    }
+    /**
+     * JML modifiers of a type
+     *
+     * @param strictlyPure strictly pure
+     * @param pure pure
+     * @param nullableByDefault nullable by default
+     * @param specMathMode spec math mode
+     */
+    public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+            SpecMathMode specMathMode) {}
 
     protected final JMLModifiers jmlModifiers;
 
@@ -128,7 +109,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public SourceElement getFirstElement() {
-        if (modArray != null && (modArray.size() > 0)) {
+        if (modArray != null && (!modArray.isEmpty())) {
             return modArray.get(0);
         } else {
             return this;

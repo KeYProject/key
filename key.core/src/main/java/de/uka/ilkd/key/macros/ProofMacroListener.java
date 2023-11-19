@@ -35,8 +35,8 @@ public class ProofMacroListener implements ProverTaskListener {
         numOfInvokedMacros++;
         if (superordinateListener != null) {
             superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
-                macroName + (macroName.length() == 0 ? "" : " -- ") + info.getMessage(),
-                info.getSize()));
+                macroName + (macroName.length() == 0 ? "" : " -- ") + info.message(),
+                info.size()));
         }
     }
 

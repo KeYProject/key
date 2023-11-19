@@ -75,8 +75,7 @@ public class Heap {
      */
     public boolean equals(Object that) {
 
-        if (that instanceof Heap) {
-            Heap thatHeap = (Heap) that;
+        if (that instanceof Heap thatHeap) {
             return thatHeap.name.equals(name);
         }
 

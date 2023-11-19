@@ -36,14 +36,28 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTacletParser {
     private static final String DECLS =
-        ("\\sorts { s; }\n" + "\\functions {\n" + "  s f(s);\n" + "}\n" + "\\schemaVariables {\n"
-            + "  \\formula b,b0,post;\n" + "  \\program Statement #p1, #s ; \n"
-            + "  \\program Expression #e2, #e ; \n" + "  \\program SimpleExpression #se ; \n"
-            + "  \\program Variable #slhs, #arr, #ar, #ar1 ; \n" + "  \\program LoopInit #i ; \n"
-            + "  \\program Label #lab, #lb0, #lb1 ; \n" + "  \\program Label #inner, #outer ; \n"
-            + "  \\program Type #typ ; \n" + "  \\program Variable #v0, #v, #v1, #k, #boolv ; \n"
-            + "  \\program[list] Catch #cf ; \n" + "  \\term s x,x0 ;\n" + "  \\skolemTerm s sk ;\n"
-            + "  \\variables s z,z0 ;\n" + "}\n");
+        ("""
+                \\sorts { s; }
+                \\functions {
+                  s f(s);
+                }
+                \\schemaVariables {
+                  \\formula b,b0,post;
+                  \\program Statement #p1, #s ;\s
+                  \\program Expression #e2, #e ;\s
+                  \\program SimpleExpression #se ;\s
+                  \\program Variable #slhs, #arr, #ar, #ar1 ;\s
+                  \\program LoopInit #i ;\s
+                  \\program Label #lab, #lb0, #lb1 ;\s
+                  \\program Label #inner, #outer ;\s
+                  \\program Type #typ ;\s
+                  \\program Variable #v0, #v, #v1, #k, #boolv ;\s
+                  \\program[list] Catch #cf ;\s
+                  \\term s x,x0 ;
+                  \\skolemTerm s sk ;
+                  \\variables s z,z0 ;
+                }
+                """);
 
     private Namespace<SchemaVariable> schemaVariableNS;
     private KeyIO io;

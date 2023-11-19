@@ -40,7 +40,7 @@ public class ExecutionValue extends AbstractExecutionValue {
     private final boolean valueUnknown;
 
     /**
-     * The value as human readable {@link String}.
+     * The value as human-readable {@link String}.
      */
     private final String valueString;
 
@@ -50,7 +50,7 @@ public class ExecutionValue extends AbstractExecutionValue {
     private final String typeString;
 
     /**
-     * The condition under which the variable has this value as human readable {@link String}.
+     * The condition under which the variable has this value as human-readable {@link String}.
      */
     private final String conditionString;
 
@@ -65,12 +65,13 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      * @param variable The parent {@link ExecutionVariable} which contains this value.
-     * @param valueProofNode The {@link Node} in the value site proof from which this value was
-     *        extracted.
      * @param valueUnknown Is the value unknown?
      * @param value The value.
-     * @param valueString The value as human readable string.
+     * @param valueString The value as human-readable string.
      * @param typeString The type of the value.
+     * @param condition The condition under which the variable has this value
+     * @param conditionString the condition under which the variable has this value as
+     *        human-readable {@link String}
      */
     public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
             Term value, String valueString, String typeString, Term condition,
@@ -137,9 +138,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                     KeYJavaType keyType = services.getJavaInfo().getKeYJavaType(valueSort);
                     if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
                         Type javaType = keyType.getJavaType();
-                        if (javaType instanceof ArrayDeclaration) {
+                        if (javaType instanceof ArrayDeclaration ad) {
                             // Array value
-                            ArrayDeclaration ad = (ArrayDeclaration) javaType;
                             Set<IProgramVariable> pvs =
                                 SymbolicExecutionUtil.getProgramVariables(ad.length());
                             if (pvs.size() == 1) {
@@ -152,7 +152,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                                 if (!ArrayUtil.isEmpty(lengthValues)) {
                                     for (ExecutionValue lengthValue : lengthValues) {
                                         try {
-                                            int length = getSettings().isUsePrettyPrinting()
+                                            int length = getSettings().usePrettyPrinting()
                                                     ? Integer.valueOf(lengthValue.getValueString())
                                                     : Integer.valueOf(SymbolicExecutionUtil
                                                             .formatTerm(lengthValue.getValue(),

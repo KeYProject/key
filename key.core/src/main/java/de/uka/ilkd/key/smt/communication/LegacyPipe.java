@@ -8,11 +8,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * On each side of the pipe there are sender and receivers: **** Receiver ====<=Output======= Sender
@@ -162,7 +163,7 @@ class LegacyPipe implements Pipe {
     }
 
     @Override
-    public synchronized void sendMessage(@Nonnull String message) throws IOException {
+    public synchronized void sendMessage(@NonNull String message) throws IOException {
         outputWriter.write(message + System.lineSeparator());
         outputWriter.flush();
     }
@@ -184,7 +185,7 @@ class LegacyPipe implements Pipe {
             } else {
                 // just to fix compile problems, the message type is completely thrown away here
                 // (the class only exists as unused legacy code)
-                return result.getContent();
+                return result.content();
             }
         }
         return null;
@@ -194,7 +195,7 @@ class LegacyPipe implements Pipe {
         return stderrReceiver.alive && stdoutReceiver.alive;
     }
 
-    public @Nonnull SolverCommunication getSolverCommunication() {
+    public @NonNull SolverCommunication getSolverCommunication() {
         return session;
     }
 }

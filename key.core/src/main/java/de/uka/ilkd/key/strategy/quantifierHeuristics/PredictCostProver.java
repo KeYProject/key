@@ -246,7 +246,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.nil();
+        private ImmutableSet<Term> literals;
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -254,10 +254,9 @@ public class PredictCostProver {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Clause)) {
+            if (!(o instanceof Clause other)) {
                 return false;
             }
-            final Clause other = (Clause) o;
             if (other.literals.size() != literals.size()) {
                 return false;
             }

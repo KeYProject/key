@@ -63,7 +63,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
             rule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
             AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
-        setStatement(instantiation.statement);
+        setStatement(instantiation.statement());
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.nil();
         for (LoopContract cont : contracts) {
             if (cont.isOnBlock() && cont.getBlock().getStartPosition().line() == getStatement()

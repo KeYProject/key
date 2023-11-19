@@ -156,11 +156,13 @@ public final class XMLUtil {
      * The following signs are replaced:
      *
      * <pre>
-     * " => &quot;quot;
-     * & => &quot;amp;
-     * ' => &quot;apos;
-     * < => &quot;lt;
-     * > => &quot;gt;
+     * {@code
+     * " => &quot;
+     * & => &amp;
+     * ' => &apos;
+     * < => &lt;
+     * > => &gt;
+     * }
      * </pre>
      * </p>
      *
@@ -173,24 +175,12 @@ public final class XMLUtil {
             StringBuilder sb = new StringBuilder();
             for (char sign : signs) {
                 switch (sign) {
-                case '"':
-                    sb.append("&quot;");
-                    break;
-                case '&':
-                    sb.append("&amp;");
-                    break;
-                case '\'':
-                    sb.append("&apos;");
-                    break;
-                case '<':
-                    sb.append("&lt;");
-                    break;
-                case '>':
-                    sb.append("&gt;");
-                    break;
-                default:
-                    sb.append(sign);
-                    break;
+                case '"' -> sb.append("&quot;");
+                case '&' -> sb.append("&amp;");
+                case '\'' -> sb.append("&apos;");
+                case '<' -> sb.append("&lt;");
+                case '>' -> sb.append("&gt;");
+                default -> sb.append(sign);
                 }
             }
             return sb.toString();

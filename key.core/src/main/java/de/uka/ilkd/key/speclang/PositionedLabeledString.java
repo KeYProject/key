@@ -10,9 +10,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
- * moment, this is used to distinguish implicit specifications from explicit ones and '&' from '&&'
- * (logical and shortcut 'and') as well as '|' from '||' (logical and shortcut 'or'). Cf.
- * {@link de.uka.ilkd.key.logic.TermImpl} and {@link de.uka.ilkd.key.logic.LabeledTermImpl}.
+ * moment, this is used to distinguish implicit specifications from explicit ones and {@code &} from
+ * {@code &&}
+ * (logical and shortcut 'and') as well as {@code |} from {@code ||} (logical and shortcut 'or').
  *
  * @author Michael Kirsten
  */
@@ -71,10 +71,9 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString)) {
+        if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }
-        final PositionedLabeledString cmp = (PositionedLabeledString) o;
         if (labels.size() == cmp.labels.size()) {
             if (!super.equals(o)) {
                 return false;

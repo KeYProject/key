@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -11,8 +11,8 @@ import javax.annotation.Nonnull;
  */
 public abstract class AbstractConditionBuilder extends AbstractTacletBuilderCommand
         implements ConditionBuilder {
-    public AbstractConditionBuilder(@Nonnull String triggerName,
-            @Nonnull ArgumentType... argumentsTypes) {
+    public AbstractConditionBuilder(@NonNull String triggerName,
+            @NonNull ArgumentType... argumentsTypes) {
         super(triggerName, argumentsTypes);
     }
 }

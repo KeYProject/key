@@ -117,7 +117,7 @@ public abstract class AbstractSlicer {
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException;
 
     /**
-     * The result returned by {@link AbstractSlicer#analyzeSequent(Node)}.
+     * The result returned by {@link AbstractSlicer#analyzeSequent}.
      *
      * @author Martin Hentschel
      */
@@ -138,7 +138,7 @@ public abstract class AbstractSlicer {
         private final ExecutionContext executionContext;
 
         /**
-         * The this reference if available.
+         * The 'this'-reference if available.
          */
         private final ReferencePrefix thisReference;
 
@@ -146,7 +146,7 @@ public abstract class AbstractSlicer {
          * Constructor.
          *
          * @param aliases The found aliases.
-         * @param thisReference The this reference if available.
+         * @param thisReference The this-reference if available.
          */
         public SequentInfo(Map<Location, SortedSet<Location>> aliases,
                 Map<ProgramVariable, Term> localValues, ExecutionContext executionContext,
@@ -187,9 +187,9 @@ public abstract class AbstractSlicer {
         }
 
         /**
-         * Returns the this reference if available.
+         * Returns the this-reference if available.
          *
-         * @return The this reference if available.
+         * @return The this-reference if available.
          */
         public ReferencePrefix getThisReference() {
             return thisReference;
@@ -232,7 +232,7 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Analyzes the gievn {@link ISymbolicEquivalenceClass}es.
+     * Analyzes the given {@link ISymbolicEquivalenceClass}es.
      *
      * @param services The {@link Services} to use.
      * @param sec The {@link ISymbolicEquivalenceClass} to analyze.
@@ -321,7 +321,7 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Utility method used by {@link #analyzeSequent(Node)} to analyze the given updates.
+     * Utility method used by {@link #analyzeSequent} to analyze the given updates.
      *
      * @param updates The update {@link Term}s to analyze.
      * @param services The {@link Services} to use.
@@ -342,7 +342,7 @@ public abstract class AbstractSlicer {
 
     /**
      * Recursive utility method used by
-     * {@link #analyzeUpdates(ImmutableList, Services, HeapLDT, Map)} to analyze a given update.
+     * {@link #analyzeUpdates} to analyze a given update.
      *
      * @param term The update {@link Term} to analyze.
      * @param services The {@link Services} to use.
@@ -383,7 +383,7 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Recursive utility method used by {@link #analyzeUpdate(Term, Services, HeapLDT, Map)} to
+     * Recursive utility method used by {@link #analyzeUpdate} to
      * analyze a given update.
      *
      * @param term The heap update {@link Term} to analyze.
@@ -461,7 +461,7 @@ public abstract class AbstractSlicer {
 
     /**
      * Recursive utility method used by
-     * {@link #listModifiedLocations(Term, Services, HeapLDT, List, ReferencePrefix)} to analyze a
+     * {@link #listModifiedLocations} to analyze a
      * given update.
      *
      * @param term The heap update {@link Term} to analyze.
@@ -884,7 +884,7 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Utility method used by {@link #toLocation(Services, ReferencePrefix, ReferencePrefix)} to
+     * Utility method used by {@link #toLocation} to
      * recursively extract the {@link Access} instances.
      *
      * @param services The {@link Services} to use.
@@ -900,8 +900,7 @@ public abstract class AbstractSlicer {
             ExecutionContext ec, ReferencePrefix thisReference, ImmutableList<Access> children) {
         if (prefix instanceof ProgramVariable) {
             return children.prepend(new Access((ProgramVariable) prefix));
-        } else if (prefix instanceof FieldReference) {
-            FieldReference fr = (FieldReference) prefix;
+        } else if (prefix instanceof FieldReference fr) {
             ReferencePrefix parent = fr.getReferencePrefix();
             children = children.prepend(new Access(fr.getProgramVariable()));
             if (parent != null) {
@@ -918,8 +917,7 @@ public abstract class AbstractSlicer {
                 throw new IllegalStateException(
                     "Unsupported this reference '" + thisReference + "'.");
             }
-        } else if (prefix instanceof ArrayReference) {
-            ArrayReference ar = (ArrayReference) prefix;
+        } else if (prefix instanceof ArrayReference ar) {
             children =
                 children.prepend(new Access(toTerm(services, ar.getDimensionExpressions(), ec)));
             return toLocationRecursive(services, ar.getReferencePrefix(), ec, thisReference,

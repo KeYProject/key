@@ -49,10 +49,9 @@ public class NotFreeIn {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NotFreeIn)) {
+        if (!(o instanceof NotFreeIn nfi)) {
             return false;
         }
-        NotFreeIn nfi = (NotFreeIn) o;
         return nfi.first == first() && nfi.second == second();
     }
 

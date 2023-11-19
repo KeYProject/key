@@ -145,11 +145,9 @@ public final class TypeConverter {
         } else if (op instanceof Conditional) {
             assert subs.length == 3;
             return tb.ife(subs[0], subs[1], subs[2]);
-        } else if (op instanceof DLEmbeddedExpression) {
-            DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
+        } else if (op instanceof DLEmbeddedExpression emb) {
             return emb.makeTerm(heapLDT.getHeap(), subs, services);
-        } else if (op instanceof TypeCast) {
-            TypeCast tc = (TypeCast) op;
+        } else if (op instanceof TypeCast tc) {
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
         } else {
             LOGGER.warn("no data type model " + "available to convert:{} {}", op,
@@ -175,8 +173,7 @@ public final class TypeConverter {
             return convertArrayReference((ArrayReference) prefix, ec);
         } else if (prefix instanceof ThisReference) {
             if (prefix.getReferencePrefix() != null
-                    && (prefix.getReferencePrefix() instanceof TypeReference)) {
-                TypeReference tr = (TypeReference) prefix.getReferencePrefix();
+                    && (prefix.getReferencePrefix() instanceof TypeReference tr)) {
                 KeYJavaType kjt = tr.getKeYJavaType();
                 return findThisForSortExact(kjt.getSort(), ec);
             }
@@ -523,8 +520,7 @@ public final class TypeConverter {
         assert term != null;
         if (term.op() == heapLDT.getNull()) {
             return NullLiteral.NULL;
-        } else if (term.op() instanceof Function) {
-            Function function = (Function) term.op();
+        } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
@@ -539,8 +535,7 @@ public final class TypeConverter {
 
         if (term.op() instanceof ProgramInLogic) {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
-        } else if (term.op() instanceof Function) {
-            Function function = (Function) term.op();
+        } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
@@ -557,10 +552,8 @@ public final class TypeConverter {
 
 
     private Expression translateJavaCast(Term term, ExtList children) {
-        if (term.op() instanceof Function) {
-            Function function = (Function) term.op();
-            if (function instanceof SortDependingFunction) {
-                SortDependingFunction sdf = (SortDependingFunction) function;
+        if (term.op() instanceof Function function) {
+            if (function instanceof SortDependingFunction sdf) {
                 SortDependingFunction castFunction =
                     SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
                 if (sdf.isSimilar(castFunction)) {

@@ -16,7 +16,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if (!app.ifInstsComplete()) {
             return true;
         }

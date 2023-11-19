@@ -18,14 +18,14 @@ public class ImplicitCastNecessary extends BinaryFeature {
         this.projection = projection;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();
 
         final Sort maxSort =
             TermHelper.getMaxSort(pos.up().subTerm(), subPos, goal.proof().getServices());
-        return projection.toTerm(app, pos, goal).sort().extendsTrans(maxSort);
+        return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 
     public static Feature create(ProjectionToTerm s1) {

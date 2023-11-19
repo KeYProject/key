@@ -393,8 +393,7 @@ public final class ExampleChooser extends JDialog {
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 
-        if (nodeObj instanceof Example) {
-            Example example = (Example) nodeObj;
+        if (nodeObj instanceof Example example) {
 
             if (example != selectedExample) {
                 addTab(example.getDescription(), "Description", true);
