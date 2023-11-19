@@ -171,14 +171,14 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         @Override
         public String toString() {
             return "SyntaxError{" +
-                    "recognizer=" + recognizer +
-                    ", line=" + line +
-                    ", offendingSymbol=" + offendingSymbol +
-                    ", charPositionInLine=" + charPositionInLine +
-                    ", msg='" + msg + '\'' +
-                    ", source=" + source +
-                    ", stack='" + stack + '\'' +
-                    '}';
+                "recognizer=" + recognizer +
+                ", line=" + line +
+                ", offendingSymbol=" + offendingSymbol +
+                ", charPositionInLine=" + charPositionInLine +
+                ", msg='" + msg + '\'' +
+                ", source=" + source +
+                ", stack='" + stack + '\'' +
+                '}';
         }
     }
 

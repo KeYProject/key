@@ -11,14 +11,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * Objects of this class represent function and predicate symbols. Note that program variables are a
  * separate syntactic category, and not a type of function.
  */
+@NullMarked
 public class Function extends AbstractSortedOperator {
 
     private final boolean unique;
@@ -32,8 +33,8 @@ public class Function extends AbstractSortedOperator {
     // -------------------------------------------------------------------------
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-             boolean isSkolemConstant, @Nullable ImmutableArray<FunctionMetaData> metaData) {
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            boolean isSkolemConstant, @Nullable ImmutableArray<FunctionMetaData> metaData) {
         super(name, argSorts, sort, whereToBind, isRigid);
         this.unique = unique;
         this.skolemConstant = isSkolemConstant;
@@ -46,25 +47,25 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-                    ImmutableArray<Boolean> whereToBind, boolean unique) {
+            ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false, null);
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-                    ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant, null);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
-                whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
-                    boolean isSkolemConstant) {
+            boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),
-                whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
-                isSkolemConstant);
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
+            isSkolemConstant);
     }
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
@@ -91,11 +92,12 @@ public class Function extends AbstractSortedOperator {
         this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant, null);
     }
 
-    public Function(Name name, Sort retSort, @Nonnull Sort[] argSort, @Nullable Boolean[] whereToBind, boolean unique,
-                    @Nullable ImmutableArray<FunctionMetaData> metaData) {
+    public Function(Name name, Sort retSort, Sort[] argSort,
+            @Nullable Boolean[] whereToBind, boolean unique,
+            @Nullable ImmutableArray<FunctionMetaData> metaData) {
         this(name, retSort, new ImmutableArray<>(argSort),
-                whereToBind == null ? null : new ImmutableArray<>(whereToBind),
-                unique, false, false, metaData);
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind),
+            unique, false, false, metaData);
     }
 
 
@@ -127,7 +129,7 @@ public class Function extends AbstractSortedOperator {
      */
     public final String proofToString() {
         StringBuilder s =
-                new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+            new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
         s.append(name());
         if (arity() > 0) {
             s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));

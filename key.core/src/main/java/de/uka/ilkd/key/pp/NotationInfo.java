@@ -466,7 +466,7 @@ public final class NotationInfo {
             }
         }
 
-        if(op instanceof Function) {
+        if (op instanceof Function) {
             return new Notation.FunctionNotation();
         }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.overop;
 
 import de.uka.ilkd.key.logic.op.Function;
@@ -9,15 +12,15 @@ public interface FunctionMetaData {
         return false;
     }
 
-    default boolean isPrefix(){
+    default boolean isPrefix() {
         return false;
     }
 
-    default boolean isSuffix(){
+    default boolean isSuffix() {
         return false;
     }
 
-    default boolean isShortcut(){
+    default boolean isShortcut() {
         return false;
     }
 

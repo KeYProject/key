@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
@@ -51,7 +50,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
 
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
-            "Expecting select term before '@', not: ";
+        "Expecting select term before '@', not: ";
 
     /**
      * The current abbreviation used for resolving "@name" terms.
@@ -78,7 +77,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     public ExpressionBuilder(Services services, NamespaceSet nss,
-                             Namespace<SchemaVariable> schemaNamespace) {
+            Namespace<SchemaVariable> schemaNamespace) {
         super(services, nss);
         setSchemaVariables(schemaNamespace);
     }
@@ -219,15 +218,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         var op = lookupOperator(ctx, left.sort(), right.sort(), opToken.getText());
         if (op == null) {
             semanticError(ctx, "Could not find an operator with name '%s' and sorts [%s,%s]",
-                    opToken.getText(), left.sort(), right.sort());
+                opToken.getText(), left.sort(), right.sort());
         }
         return binaryTerm(ctx, op, left, right);
     }
 
-    private Term binaryTermWithNegationFallback(ParserRuleContext ctx, Token opToken, Term left, Term right) {
+    private Term binaryTermWithNegationFallback(ParserRuleContext ctx, Token opToken, Term left,
+            Term right) {
         var op = lookupOperator(ctx, left.sort(), right.sort(), opToken.getText());
         if (op == null) {
-            // we look up on UTFOperator if we find information about the operator, e.g., if there is a know
+            // we look up on UTFOperator if we find information about the operator, e.g., if there
+            // is a know
             // positive entry for example NOT_EQUALS is modelted by NEGATION of EQUALS
             var opTableEntry = OperatorInfo.find(opToken);
             if (opTableEntry != null && opTableEntry.getPositiveForm() != null) {
@@ -240,20 +241,22 @@ public class ExpressionBuilder extends DefaultBuilder {
         return binaryTerm(ctx, op, left, right);
     }
 
-    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right, String... opTexts) {
+    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right,
+            String... opTexts) {
         return lookupOperator(ctx, left, right, new ImmutableArray<>(opTexts));
     }
 
-    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right, ImmutableArray<String> opTexts) {
+    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right,
+            ImmutableArray<String> opTexts) {
         if (left == null || right == null) {
             semanticError(ctx, "Expected sort available on both sides");
         }
 
-        if(isMetaSort(left)) {
+        if (isMetaSort(left)) {
             left = right;
         }
 
-        if(isMetaSort(right)) {
+        if (isMetaSort(right)) {
             right = left;
         }
 
@@ -339,7 +342,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 final Function neglit = functions().lookup("neglit");
                 final Term num = result.sub(0);
                 return capsulateTf(ctx,
-                        () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
+                    () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
             } else if (result.sort() != Sort.FORMULA) {
                 Sort sort = result.sort();
                 if (sort == null) {
@@ -379,7 +382,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return termL;
         }
 
-        if (ctx.op.EQUALS() != null || ctx.op.NOT_EQUALS() != null) { //overloaded and built-in
+        if (ctx.op.EQUALS() != null || ctx.op.NOT_EQUALS() != null) { // overloaded and built-in
             Term eq = binaryTerm(ctx, Equality.EQUALS, termL, accept(ctx.right));
             if (ctx.op.NOT_EQUALS() != null) {
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
@@ -441,7 +444,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term getBinaryOperatorChain(ParserRuleContext ctx, Term left,
-                                        List<? extends ParserRuleContext> operators, List<Term> right) {
+            List<? extends ParserRuleContext> operators, List<Term> right) {
         if (operators.size() != right.size()) {
             throw new IllegalArgumentException();
         }
@@ -452,8 +455,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             var op = lookupOperator(operators.get(i), left.sort(), cur.sort(), opText);
             if (op == null) {
                 var help = "";
-                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]\n%s", operators.get(i).getText(),
-                        left.sort(), cur.sort(),help);
+                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]\n%s",
+                    operators.get(i).getText(),
+                    left.sort(), cur.sort(), help);
             }
             left = binaryTerm(ctx, op, left, cur);
         }
@@ -480,7 +484,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return termSupplier.get();
         } catch (TermCreationException e) {
             throw new BuildingException(ctx,
-                    String.format("Could not build term on: %s", ctx.getText()), e);
+                String.format("Could not build term on: %s", ctx.getText()), e);
         }
     }
 
@@ -571,7 +575,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         for (int i = 0; i < s.length(); i++) {
             result = getTermFactory().createTerm(functions.lookup(new Name(s.substring(i, i + 1))),
-                    result);
+                result);
         }
 
         if (negative) {
@@ -653,7 +657,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     jr.setSVNamespace(schemaVariables());
                     try {
                         sjb.javaBlock =
-                                jr.readBlockWithProgramVariables(programVariables(), cleanJava);
+                            jr.readBlockWithProgramVariables(programVariables(), cleanJava);
                     } catch (Exception e) {
                         sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
                     }
@@ -708,8 +712,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(null, "Cannot use schema variable " + sv + " as an attribute");
             }
             result = getServices().getTermBuilder().select(sv.sort(),
-                    getServices().getTermBuilder().getBaseHeap(), prefix,
-                    capsulateTf(ctx, () -> getTermFactory().createTerm(attribute)));
+                getServices().getTermBuilder().getBaseHeap(), prefix,
+                capsulateTf(ctx, () -> getTermFactory().createTerm(attribute)));
         } else {
             if (attribute instanceof LogicVariable) {
                 Term attrTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
@@ -719,7 +723,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else if (attribute == getServices().getJavaInfo().getArrayLength()) {
                 Term finalResult = result;
                 result =
-                        capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
+                    capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
@@ -761,19 +765,19 @@ public class ExpressionBuilder extends DefaultBuilder {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {
                 semanticError(null,
-                        "Could not find type '" + prefixSort + "'. Maybe mispelled or "
-                                + "you use an array or object type in a .key-file with missing "
-                                + "\\javaSource section.");
+                    "Could not find type '" + prefixSort + "'. Maybe mispelled or "
+                        + "you use an array or object type in a .key-file with missing "
+                        + "\\javaSource section.");
             }
 
             ProgramVariable var =
-                    javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+                javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
             if (var == null) {
                 LogicVariable logicalvar =
-                        (LogicVariable) namespaces().variables().lookup(attributeName);
+                    (LogicVariable) namespaces().variables().lookup(attributeName);
                 if (logicalvar == null) {
                     semanticError(null, "There is no attribute '%s' declared in type '%s' and no "
-                            + "logical variable of that name.", attributeName, prefixSort);
+                        + "logical variable of that name.", attributeName, prefixSort);
                 } else {
                     result = logicalvar;
                 }
@@ -799,15 +803,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                    case 'n' -> sb.append("\n");
-                    case 'f' -> sb.append("\f");
-                    case 'r' -> sb.append("\r");
-                    case 't' -> sb.append("\t");
-                    case 'b' -> sb.append("\b");
-                    case ':' -> sb.append("\\:");
-                    // this is so in KeY ...
-                    default -> sb.append(chars[i]);
-                    // this more relaxed than before, \a becomes a ...
+                case 'n' -> sb.append("\n");
+                case 'f' -> sb.append("\f");
+                case 'r' -> sb.append("\r");
+                case 't' -> sb.append("\t");
+                case 'b' -> sb.append("\b");
+                case ':' -> sb.append("\\:");
+                // this is so in KeY ...
+                default -> sb.append(chars[i]);
+                // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);
@@ -836,7 +840,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else if (objectSort != null && !s.extendsTrans(objectSort)
                 && result.sort().extendsTrans(objectSort)) {
             semanticError(ctx, "Illegal cast from " + result.sort() + " to sort " + s
-                    + ". Casts between primitive and reference types are not allowed. ");
+                + ". Casts between primitive and reference types are not allowed. ");
         }
         assert s != null;
         SortDependingFunction castSymbol = s.getCastSymbol(getServices());

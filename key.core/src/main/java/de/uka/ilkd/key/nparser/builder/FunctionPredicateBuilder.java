@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -20,11 +17,9 @@ import de.uka.ilkd.key.logic.overop.InfixMetaData;
 import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
-
 import de.uka.ilkd.key.pp.NotationInfo;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -81,15 +76,16 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                        new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false, metaData);
+                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false,
+                    metaData);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
             p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false,
-                    metaData);
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false,
+                metaData);
         }
 
 
@@ -173,20 +169,20 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                        new Name(baseName),
-                        retSort,
-                        argSorts.toArray(new Sort[0]),
-                        unique,
-                        metaData);
+                    new Name(baseName),
+                    retSort,
+                    argSorts.toArray(new Sort[0]),
+                    unique,
+                    metaData);
             }
         }
 
         if (f == null) {
             f = new Function(new Name(func_name),
-                    retSort, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    unique,
-                    metaData);
+                retSort, argSorts.toArray(new Sort[0]),
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
+                unique,
+                metaData);
         }
 
         if (lookup(f.name()) == null) {
@@ -209,7 +205,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =
-                new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
+            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }

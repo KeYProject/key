@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.overop.FunctionMetaData;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -80,7 +81,7 @@ public final class SortDependingFunction extends Function {
     }
 
     public static SortDependingFunction createFirstInstance(GenericSort sortDependingOn, Name kind,
-            Sort sort, Sort[] argSorts, boolean unique) {
+            Sort sort, Sort[] argSorts, boolean unique, ImmutableArray<FunctionMetaData> metaData) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
             kind, sort, new ImmutableArray<>(argSorts), unique);
         return new SortDependingFunction(template, Sort.ANY);

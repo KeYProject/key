@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -18,16 +17,14 @@ import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,28 +51,26 @@ public class ExprTest {
         out.println(":-: | -----------");
         var levels = Arrays.stream(NotationInfo.class.getFields())
                 .filter(it -> it.getName().startsWith("PRIORITY_"))
-                .collect(Collectors.toList());
-
-        levels.sort(Comparator.comparing(it -> {
-            try {
-                return it.getInt(null);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }));
+                .sorted(Comparator.comparing(it -> {
+                    try {
+                        return it.getInt(null);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                })).toList();
 
         for (Field f : levels) {
             int level = f.getInt(null);
             var values = map.get(level);
             var a = "";
-            if (values != null) a = values.stream()
-                    .flatMap(it -> it.getNames().stream())
-                    .map(it -> "`"+it+"`")
-                    .collect(Collectors.joining(" "));
+            if (values != null)
+                a = values.stream()
+                        .flatMap(it -> it.getNames().stream())
+                        .map(it -> "`" + it + "`")
+                        .collect(Collectors.joining(" "));
             out.format("| %d | %s | %s |\n",
-                    level, f.getName().substring(9),
-                    a
-            );
+                level, f.getName().substring(9),
+                a);
         }
         System.out.println(sw);
     }
@@ -86,13 +81,13 @@ public class ExprTest {
     public void parseAndVisit(String expr) throws IOException {
         Assumptions.assumeFalse(expr.startsWith("#"));
         KeyIO io = getIo();
-        @Nonnull
+        @NonNull
         Term actual = io.parseExpression(expr);
         assertNotNull(actual);
         LOGGER.info("Actual Term: {}", actual);
 
         LOGGER.warn("Actual Term: {}",
-                LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
+            LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
     }
 
     private KeyIO getIo() throws IOException {
