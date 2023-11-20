@@ -41,7 +41,6 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -595,7 +594,8 @@ public final class AuxiliaryContractBuilders {
          * @param modifiesClauses modifies clauses for the specified heaps.
          * @return an anonymization update for the specified modifies clauses.
          */
-        public Term buildAnonOutUpdate(final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+        public Term buildAnonOutUpdate(
+                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses) {
             return buildAnonOutUpdate(variables.remembranceLocalVariables.keySet(),
                 anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
@@ -667,7 +667,8 @@ public final class AuxiliaryContractBuilders {
          * @param anonymisationHeaps anonymization heaps.
          * @return an anonymization update for all heap locations.
          */
-        public Term buildAnonInUpdate(final Map<LocationVariable, JavaDLFunction> anonymisationHeaps) {
+        public Term buildAnonInUpdate(
+                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps) {
             Term result = buildLocalVariablesAnonUpdate(
                 variables.outerRemembranceVariables.keySet(), ANON_IN_PREFIX);
 

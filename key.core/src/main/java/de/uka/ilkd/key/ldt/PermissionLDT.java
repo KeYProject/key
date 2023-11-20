@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
+
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 

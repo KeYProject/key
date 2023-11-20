@@ -116,14 +116,16 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             setName(lazyComputeName()); // Update name because constant has changed
             Term arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
-            JavaDLFunction arrayLengthFunction = sideServices.getTypeConverter().getHeapLDT().getLength();
+            JavaDLFunction arrayLengthFunction =
+                sideServices.getTypeConverter().getHeapLDT().getLength();
             Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
                 tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
             Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
-            JavaDLFunction resultPredicate = new JavaDLFunction(new Name(tb.newName("ResultPredicate")),
-                JavaDLTheory.FORMULA, resultIf.sort());
+            JavaDLFunction resultPredicate =
+                new JavaDLFunction(new Name(tb.newName("ResultPredicate")),
+                    JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
             Term resultTerm = tb.func(resultPredicate, resultIf);
             // Create Sequent to prove with new succedent.

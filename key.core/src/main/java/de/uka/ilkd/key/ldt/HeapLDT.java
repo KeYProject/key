@@ -258,7 +258,8 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JavaDLFunction getClassInitializationInProgress(Sort instanceSort, TermServices services) {
+    public JavaDLFunction getClassInitializationInProgress(Sort instanceSort,
+            TermServices services) {
         return classInitializationInProgress.getInstanceFor(instanceSort, services);
     }
 
@@ -417,7 +418,7 @@ public final class HeapLDT extends LDT {
 
     @Override
     public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-                                         ExecutionContext ec) {
+            ExecutionContext ec) {
         assert false;
         return null;
     }

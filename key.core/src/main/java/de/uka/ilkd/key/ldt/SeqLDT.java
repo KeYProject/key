@@ -142,7 +142,7 @@ public final class SeqLDT extends LDT {
 
     @Override
     public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-                                         ExecutionContext ec) {
+            ExecutionContext ec) {
         if (op instanceof SeqSingleton) {
             return seqSingleton;
         } else if (op instanceof SeqConcat) {

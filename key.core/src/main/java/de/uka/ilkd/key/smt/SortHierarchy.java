@@ -8,8 +8,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.op.Function;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 

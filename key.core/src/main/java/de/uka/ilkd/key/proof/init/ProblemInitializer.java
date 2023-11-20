@@ -41,7 +41,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -538,7 +537,8 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<JavaDLFunction> functions = initConfig.getServices().getNamespaces().functions();
+        final Namespace<JavaDLFunction> functions =
+            initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {

@@ -172,7 +172,8 @@ public class QueryExpand implements BuiltInRule {
                 lvSorts[i] = instVars[i].sort();
             }
             ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
-            placeHolderResult = new JavaDLFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
+            placeHolderResult =
+                new JavaDLFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
             placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
                                                                              // the third parameter!
         }

@@ -58,7 +58,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     }
 
     /**
-     * Creates the result {@link JavaDLFunction} used in a predicate to compute the result in the side
+     * Creates the result {@link JavaDLFunction} used in a predicate to compute the result in the
+     * side
      * proof.
      *
      * @param services The {@link Services} to use.

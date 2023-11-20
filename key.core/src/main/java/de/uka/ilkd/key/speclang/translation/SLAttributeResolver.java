@@ -106,7 +106,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
-                        final JavaDLFunction thisFieldSymbol = heapLDT.getFieldSymbolForPV(et, services);
+                        final JavaDLFunction thisFieldSymbol =
+                            heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
                             services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }

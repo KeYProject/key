@@ -18,7 +18,7 @@ public abstract class AbstractOperator implements Operator {
     private final Modifier modifier;
 
     protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
-                               Modifier modifier) {
+            Modifier modifier) {
         assert name != null;
         assert arity >= 0;
         assert whereToBind == null || whereToBind.size() == arity;
@@ -30,7 +30,7 @@ public abstract class AbstractOperator implements Operator {
 
     protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
             boolean isRigid) {
-       this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
+        this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
     protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {

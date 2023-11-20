@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
-
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 
 public class Modifier implements Named {
     private final int bitMask;
@@ -23,7 +26,8 @@ public class Modifier implements Named {
 
     protected Modifier(String name, int bitMask) {
         if (MODIFIERS.containsKey(bitMask)) {
-            throw new IllegalArgumentException("Modifier with bitmask '" + bitMask + "' already declared with name: "
+            throw new IllegalArgumentException(
+                "Modifier with bitmask '" + bitMask + "' already declared with name: "
                     + MODIFIERS.get(bitMask).name);
         }
         this.bitMask = bitMask;

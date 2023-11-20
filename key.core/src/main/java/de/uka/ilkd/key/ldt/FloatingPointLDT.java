@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
+
+import org.key_project.logic.op.Function;
 
 public interface FloatingPointLDT {
 

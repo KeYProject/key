@@ -366,7 +366,8 @@ public class MergeRule implements BuiltInRule {
                     && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm =
-                    tb.func(new JavaDLFunction(new Name("P"), JavaDLTheory.FORMULA, v.sort()), tb.var(v));
+                    tb.func(new JavaDLFunction(new Name("P"), JavaDLTheory.FORMULA, v.sort()),
+                        tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);
                 Term toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
@@ -563,7 +564,8 @@ public class MergeRule implements BuiltInRule {
                 sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                    tb.func((JavaDLFunction) heap1.op(), mergedSubHeap.mergeVal(), pointer1), newNames,
+                    tb.func((JavaDLFunction) heap1.op(), mergedSubHeap.mergeVal(), pointer1),
+                    newNames,
                     sideConditionsToProve);
             }
 

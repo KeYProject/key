@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -165,7 +164,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps, final Term contextUpdate,
+            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Term contextUpdate,
             final Term remembranceUpdate, final ImmutableSet<ProgramVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
         final ImmutableList<Goal> result;

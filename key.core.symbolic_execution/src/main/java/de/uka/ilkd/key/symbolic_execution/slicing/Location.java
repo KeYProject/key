@@ -142,8 +142,9 @@ public class Location {
             } else if (SymbolicExecutionUtil.isStaticVariable(access.getProgramVariable())) {
                 // Static field access
                 assert parent == null;
-                JavaDLFunction function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) access.getProgramVariable(), services);
+                JavaDLFunction function =
+                    services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                        (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().staticDot(access.getProgramVariable().sort(),
                     function);
             } else if (parent == null) {
@@ -158,8 +159,9 @@ public class Location {
             } else {
                 // Field access on the parent variable
                 assert parent != null;
-                JavaDLFunction function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) access.getProgramVariable(), services);
+                JavaDLFunction function =
+                    services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                        (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().dot(access.getProgramVariable().sort(), parent,
                     function);
             }

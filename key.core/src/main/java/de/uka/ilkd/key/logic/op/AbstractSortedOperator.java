@@ -21,7 +21,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
         implements Operator, Sorted {
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                     ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 

@@ -1,20 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 public abstract class Function extends org.key_project.logic.op.AbstractSortedOperator {
-    public Function(Name name, ImmutableArray<Sort> argSorts, Sort sort, ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique, boolean isSkolemConstant) {
+    public Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+            ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
+            boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, toModifier(isRigid, unique, isSkolemConstant));
     }
 
     private static Modifier toModifier(boolean isRigid, boolean unique, boolean isSkolemConstant) {
         Modifier mod = Modifier.NONE;
-        if (isRigid) mod = mod.combine(Modifier.RIGID);
-        if (unique) mod = mod.combine(Modifier.UNIQUE);
-        if (isSkolemConstant) mod = mod.combine(Modifier.SKOLEM);
+        if (isRigid)
+            mod = mod.combine(Modifier.RIGID);
+        if (unique)
+            mod = mod.combine(Modifier.UNIQUE);
+        if (isSkolemConstant)
+            mod = mod.combine(Modifier.SKOLEM);
         return mod;
     }
 

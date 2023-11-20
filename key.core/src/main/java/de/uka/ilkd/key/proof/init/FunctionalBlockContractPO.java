@@ -30,7 +30,6 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -233,7 +232,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the validity formula for the contract.
      */
     private static Term setUpValidityTerm(final List<LocationVariable> heaps,
-            Map<LocationVariable, JavaDLFunction> anonHeaps, Map<LocationVariable, JavaDLFunction> anonOutHeaps,
+            Map<LocationVariable, JavaDLFunction> anonHeaps,
+            Map<LocationVariable, JavaDLFunction> anonOutHeaps,
             final ImmutableSet<ProgramVariable> localInVariables,
             final ImmutableSet<ProgramVariable> localOutVariables,
             final ProgramVariable exceptionParameter, final Term[] assumptions,

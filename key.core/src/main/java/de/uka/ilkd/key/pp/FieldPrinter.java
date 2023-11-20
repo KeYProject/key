@@ -9,10 +9,10 @@ import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 /**

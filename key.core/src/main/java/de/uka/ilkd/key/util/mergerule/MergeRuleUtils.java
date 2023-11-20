@@ -400,7 +400,7 @@ public class MergeRuleUtils {
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
     public static JavaDLFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
-                                                               Services services) {
+            Services services) {
         JavaDLFunction result = null;
         String newName = "";
 
@@ -1161,22 +1161,22 @@ public class MergeRuleUtils {
                 Operator newOp2;
                 if (partnerStateOp instanceof JavaDLFunction partnerFun) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())), (JavaDLFunction) mergeStateOp);
+                        thisGoal.getLocalNamespaces())), (JavaDLFunction) mergeStateOp);
                     thisGoalNamespaces.functions().add((JavaDLFunction) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())), partnerFun);
+                        thisGoal.getLocalNamespaces())), partnerFun);
                     thisGoalNamespaces.functions().add((JavaDLFunction) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable partnerLV) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
+                        thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())), partnerLV);
+                        thisGoal.getLocalNamespaces())), partnerLV);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else {
@@ -1343,7 +1343,8 @@ public class MergeRuleUtils {
      * @return equivalent operator with the new name
      */
     private static JavaDLFunction rename(Name newName, JavaDLFunction old) {
-        return new JavaDLFunction(newName, old.sort(), old.argSorts(), old.whereToBind(), old.isUnique(), old.isSkolemConstant());
+        return new JavaDLFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
+            old.isUnique(), old.isSkolemConstant());
     }
 
     /**
@@ -1355,8 +1356,9 @@ public class MergeRuleUtils {
      */
     public static LocationVariable rename(Name newName, LocationVariable lv) {
         if (lv.getKeYJavaType() != null) {
-            return new LocationVariable(new ProgramElementName(newName.toString()), lv.getKeYJavaType(),
-                    lv.getContainerType(), lv.isStatic(), lv.isModel());
+            return new LocationVariable(new ProgramElementName(newName.toString()),
+                lv.getKeYJavaType(),
+                lv.getContainerType(), lv.isStatic(), lv.isModel());
         } else {
             return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
         }

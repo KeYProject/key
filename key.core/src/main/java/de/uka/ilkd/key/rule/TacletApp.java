@@ -21,7 +21,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
@@ -760,7 +759,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
             boolean interesting, Services services) {
-        final JavaDLFunction c = new JavaDLFunction(new Name(instantiation), sort, true, new Sort[0]);
+        final JavaDLFunction c =
+            new JavaDLFunction(new Name(instantiation), sort, true, new Sort[0]);
         return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
 

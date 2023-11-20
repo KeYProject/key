@@ -347,10 +347,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
 
         private Variables(final ProgramVariable self, final ProgramVariable result,
-                          final ProgramVariable exception,
-                          final Map<LocationVariable, ProgramVariable> atPres,
-                          final ImmutableList<ProgramVariable> params, final LocationVariable heap,
-                          final JavaDLFunction anonHeap, TermServices services) {
+                final ProgramVariable exception,
+                final Map<LocationVariable, ProgramVariable> atPres,
+                final ImmutableList<ProgramVariable> params, final LocationVariable heap,
+                final JavaDLFunction anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap, services.getTermBuilder().label(
                 services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }

@@ -29,13 +29,13 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
-                                     Modifier modifier) {
+            Modifier modifier) {
         this(name, new ImmutableArray<>(argSorts), sort, new ImmutableArray<>(whereToBind),
-                modifier);
+            modifier);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                     Modifier modifier) {
+            Modifier modifier) {
         this(name, argSorts, sort, null, modifier);
     }
 

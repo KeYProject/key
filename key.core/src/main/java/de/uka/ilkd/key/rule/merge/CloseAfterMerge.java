@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -202,7 +202,8 @@ public class CloseAfterMerge implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final JavaDLFunction predicateSymb =
-            new JavaDLFunction(predicateSymbName, JavaDLTheory.FORMULA, new ImmutableArray<>(argSorts));
+            new JavaDLFunction(predicateSymbName, JavaDLTheory.FORMULA,
+                new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
             services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());

@@ -30,7 +30,6 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -370,7 +369,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private Map<LocationVariable, JavaDLFunction> createAnonOutHeaps(final List<LocationVariable> heaps,
+    private Map<LocationVariable, JavaDLFunction> createAnonOutHeaps(
+            final List<LocationVariable> heaps,
             final Services services, final TermBuilder tb) {
         Map<LocationVariable, JavaDLFunction> anonOutHeaps =
             new LinkedHashMap<>(40);

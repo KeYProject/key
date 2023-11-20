@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.key_project.logic.Name;
 
 /**
  * This class represents currently only static final fields initialised with a compile time

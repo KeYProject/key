@@ -101,7 +101,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameAndAddToReplaceMap(Term term) {
         if (term.op() instanceof ProgramVariable) {
             renameProgramVariable(term);
-        } else if (term.op() instanceof JavaDLFunction && ((Function) term.op()).isSkolemConstant()) {
+        } else if (term.op() instanceof JavaDLFunction
+                && ((Function) term.op()).isSkolemConstant()) {
             renameSkolemConstant(term);
         } else if (term.op() instanceof ElementaryUpdate) {
             applyRenamingsOnUpdate(term);
@@ -114,7 +115,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameProgramVariable(Term term) {
         assert term.arity() == 0;
         final ProgramVariable pv = (ProgramVariable) term.op();
-        final Name newName =             VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
+        final Name newName =
+            VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
         final ProgramVariable renamedPv = rename(newName, pv);
 
         // for the taclet application dialog (which gets the declared
@@ -136,14 +138,16 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     public static ProgramVariable rename(Name newName, ProgramVariable pv) {
         if (pv instanceof LocationVariable lv) {
             if (lv.getKeYJavaType() != null) {
-                return new LocationVariable(new ProgramElementName(newName.toString()), lv.getKeYJavaType(),
-                        lv.getContainerType(), lv.isStatic(), lv.isModel());
+                return new LocationVariable(new ProgramElementName(newName.toString()),
+                    lv.getKeYJavaType(),
+                    lv.getContainerType(), lv.isStatic(), lv.isModel());
             } else {
                 return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
             }
         } else if (pv instanceof ProgramConstant pc) {
-            return new ProgramConstant(new ProgramElementName(newName.toString()), pc.getKeYJavaType(),
-                    pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
+            return new ProgramConstant(new ProgramElementName(newName.toString()),
+                pc.getKeYJavaType(),
+                pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
         } else {
             throw new IllegalArgumentException("Unknown type for pv: " + pv);
         }
@@ -155,7 +159,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Function f = (Function) term.op();
         final Name newName =
             VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
-        final JavaDLFunction renamedF = new JavaDLFunction(newName, f.sort(), f.argSorts(), f.whereToBind(), f.isUnique(), f.isSkolemConstant());
+        final JavaDLFunction renamedF = new JavaDLFunction(newName, f.sort(), f.argSorts(),
+            f.whereToBind(), f.isUnique(), f.isSkolemConstant());
         services.getNamespaces().functions().addSafely(renamedF);
         final Term fTerm = label(func(renamedF), term.getLabels());
         replaceMap.put(term, fTerm);

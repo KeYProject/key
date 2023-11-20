@@ -2003,8 +2003,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(JavaDLFunction fun,
-                                                           List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
-                                                           Services services) throws IllegalFormulaException {
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such
         // it has to be made a difference between binding functions and those not binding

@@ -116,8 +116,9 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
-                                         ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+            Services services,
+            ExecutionContext ec) {
         assert false;
         return null;
     }

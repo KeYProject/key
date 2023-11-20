@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
@@ -65,8 +64,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private JavaDLFunction generateContApplPredicate(String nameString, Sort[] argSorts, TermBuilder tb,
-                                                     Services services) {
+    private JavaDLFunction generateContApplPredicate(String nameString, Sort[] argSorts,
+            TermBuilder tb,
+            Services services) {
         final Name name = new Name(nameString);
         Namespace<JavaDLFunction> functionNS = services.getNamespaces().functions();
 
@@ -89,7 +89,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
 
     private Term instantiateContApplPredicate(JavaDLFunction pred, ImmutableList<Term> termList,
-                                              TermBuilder tb) {
+            TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];

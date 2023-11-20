@@ -546,7 +546,8 @@ public final class SymbolicExecutionUtil {
         assert term != null;
         // Create predicate which will be used in formulas to store the value interested in.
         JavaDLFunction newPredicate =
-            new JavaDLFunction(new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")),
+            new JavaDLFunction(
+                new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")),
                 JavaDLTheory.FORMULA, term.sort());
         // Create formula which contains the value interested in.
         Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, term);
@@ -4019,7 +4020,8 @@ public final class SymbolicExecutionUtil {
                 if (variable.getProgramVariable() != null) {
                     if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                         // Special handling for length attribute of arrays
-                        JavaDLFunction function = services.getTypeConverter().getHeapLDT().getLength();
+                        JavaDLFunction function =
+                            services.getTypeConverter().getHeapLDT().getLength();
                         return services.getTermBuilder().func(function, parentTerm);
                     } else {
                         // Field access on the parent variable

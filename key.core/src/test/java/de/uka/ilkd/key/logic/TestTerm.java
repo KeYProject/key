@@ -38,7 +38,8 @@ public class TestTerm {
     // q(:Whatever):BOOL
     private final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
     private final LogicVariable zz = new LogicVariable(new Name("zz"), sort1); // zz:S1
-    private final JavaDLFunction r = new JavaDLFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
+    private final JavaDLFunction r =
+        new JavaDLFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     private final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2

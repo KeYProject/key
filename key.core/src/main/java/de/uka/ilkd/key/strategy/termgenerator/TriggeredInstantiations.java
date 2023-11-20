@@ -158,7 +158,8 @@ public class TriggeredInstantiations implements TermGenerator {
 
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof JavaDLFunction || sf.formula().op() == Equality.EQUALS) {
+            if (sf.formula().op() instanceof JavaDLFunction
+                    || sf.formula().op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }

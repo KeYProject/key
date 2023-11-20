@@ -7,8 +7,8 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
-
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
@@ -20,7 +20,8 @@ import org.key_project.util.collection.ImmutableArray;
  * Objects of this class represent function and predicate symbols. Note that program variables are a
  * separate syntactic category, and not a type of function.
  * <br>
- * <strong>As soon as there is a solution for {@link org.key_project.util.EqualsModProofIrrelevancy}, this class
+ * <strong>As soon as there is a solution for
+ * {@link org.key_project.util.EqualsModProofIrrelevancy}, this class
  * may be deleted.</strong>
  */
 public class JavaDLFunction extends Function implements Operator, Sorted {
@@ -31,8 +32,8 @@ public class JavaDLFunction extends Function implements Operator, Sorted {
     // -------------------------------------------------------------------------
 
     JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-                   ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-                   boolean isSkolemConstant) {
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
 
         assert sort != JavaDLTheory.UPDATE;
@@ -42,22 +43,24 @@ public class JavaDLFunction extends Function implements Operator, Sorted {
     }
 
     public JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-                          ImmutableArray<Boolean> whereToBind, boolean unique) {
+            ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
     public JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-                          ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
+            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
+    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+            boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
-                          boolean isSkolemConstant) {
+    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+            boolean unique,
+            boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
             isSkolemConstant);

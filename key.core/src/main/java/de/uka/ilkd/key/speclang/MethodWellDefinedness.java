@@ -210,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     Term generateMbyAtPreDef(ParsableVariable self, ImmutableList<ParsableVariable> params,
-                             JavaDLFunction mbyAtPreFunc, Services services) {
+            JavaDLFunction mbyAtPreFunc, Services services) {
         final Term mbyAtPreDef;
         if (hasMby()) {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);

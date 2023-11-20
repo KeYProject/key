@@ -12,9 +12,8 @@ import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import org.key_project.logic.op.Function;
-
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
+
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -182,8 +181,9 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
-                                         ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+            Services services,
+            ExecutionContext ec) {
         if (op instanceof Negative) {
             return getJavaUnaryMinus();
         } else {

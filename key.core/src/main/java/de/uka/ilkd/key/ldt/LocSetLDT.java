@@ -16,8 +16,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
+
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -171,7 +171,7 @@ public final class LocSetLDT extends LDT {
 
     @Override
     public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-                                         ExecutionContext ec) {
+            ExecutionContext ec) {
         if (op instanceof Singleton) {
             return singleton;
         } else if (op instanceof SetUnion) {

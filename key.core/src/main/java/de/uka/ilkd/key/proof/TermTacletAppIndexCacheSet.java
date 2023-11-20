@@ -205,7 +205,8 @@ public class TermTacletAppIndexCacheSet {
      * @return <code>true</code> if <code>op</code> is an operator below which we are caching
      */
     private boolean isAcceptedOperator(Operator op) {
-        return op instanceof IfThenElse || (op instanceof JavaDLFunction && !(op instanceof Transformer))
+        return op instanceof IfThenElse
+                || (op instanceof JavaDLFunction && !(op instanceof Transformer))
                 || op instanceof Junctor || op instanceof Equality || op instanceof Quantifier
                 || op instanceof UpdateApplication || op instanceof Modality;
     }

@@ -6,9 +6,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.op.Function;
 
 
 public final class IsHeapFunctionTermFeature extends BinaryTermFeature {

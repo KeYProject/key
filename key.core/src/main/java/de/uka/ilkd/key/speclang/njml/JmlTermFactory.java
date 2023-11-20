@@ -32,7 +32,6 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.TermCreationException;
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -669,7 +668,8 @@ public final class JmlTermFactory {
 
             Sort os = typeExpr.getType().getSort();
 
-            JavaDLFunction ioFunc = services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
+            JavaDLFunction ioFunc =
+                services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
             Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
             if (os == ldt.targetSort()) {
@@ -1225,7 +1225,8 @@ public final class JmlTermFactory {
         if (symbol != null) {
             // Function or predicate symbol found
 
-            assert symbol instanceof JavaDLFunction : "Expecting a function symbol in this namespace";
+            assert symbol instanceof JavaDLFunction
+                    : "Expecting a function symbol in this namespace";
             JavaDLFunction function = (JavaDLFunction) symbol;
 
             Term[] args;

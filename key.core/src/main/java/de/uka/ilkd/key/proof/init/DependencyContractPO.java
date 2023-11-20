@@ -185,7 +185,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             // prepare anon heap
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
-            final JavaDLFunction anonHeapFunc = new JavaDLFunction(anonHeapName, heapLDT.targetSort());
+            final JavaDLFunction anonHeapFunc =
+                new JavaDLFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
             final Term anonHeap =
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
