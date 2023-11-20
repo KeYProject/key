@@ -10,6 +10,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 
 import org.jspecify.annotations.NonNull;
 
@@ -21,6 +22,7 @@ import org.jspecify.annotations.NonNull;
     optional = true,
     description = "Allows to run soundness checks on proof bundles.",
     experimental = false)
+@HelpInfo(path = "https://github.com/KeYProject/key/blob/main/keyext.proofmanagement/README.md")
 public class ProofManagementExt implements
         KeYGuiExtension, KeYGuiExtension.MainMenu {
 
