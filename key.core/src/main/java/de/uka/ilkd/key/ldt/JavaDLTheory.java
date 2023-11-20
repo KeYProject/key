@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -175,13 +175,13 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JavaDLFunction f) {
         assert false;
         return false;
     }

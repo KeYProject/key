@@ -36,6 +36,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
@@ -274,7 +275,7 @@ public class MergeRuleUtils {
     public static HashSet<Function> getSkolemConstants(Term term) {
         HashSet<Function> result = new HashSet<>();
 
-        if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()) {
+        if (term.op() instanceof JavaDLFunction && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
         } else {
             for (Term sub : term.subs()) {
@@ -398,14 +399,14 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
-    public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort,
-            Services services) {
-        Function result = null;
+    public static JavaDLFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
+                                                               Services services) {
+        JavaDLFunction result = null;
         String newName = "";
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new Function(new Name(newName), sort, true);
+            result = new JavaDLFunction(new Name(newName), sort, true);
             services.getNamespaces().functions().add(result);
         } while (newName.equals(prefix));
 
@@ -1158,28 +1159,24 @@ public class MergeRuleUtils {
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof Function) {
-                    newOp1 = ((Function) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
-                    thisGoalNamespaces.functions().add((Function) newOp1);
+                if (partnerStateOp instanceof JavaDLFunction partnerFun) {
+                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                thisGoal.getLocalNamespaces())), (JavaDLFunction) mergeStateOp);
+                    thisGoalNamespaces.functions().add((JavaDLFunction) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((Function) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
-                    thisGoalNamespaces.functions().add((Function) newOp2);
+                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                thisGoal.getLocalNamespaces())), partnerFun);
+                    thisGoalNamespaces.functions().add((JavaDLFunction) newOp2);
                     thisGoalNamespaces.flushToParent();
-                } else if (partnerStateOp instanceof LocationVariable) {
-                    newOp1 = ((LocationVariable) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
+                } else if (partnerStateOp instanceof LocationVariable partnerLV) {
+                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((LocationVariable) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
+                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                                thisGoal.getLocalNamespaces())), partnerLV);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else {
@@ -1336,6 +1333,33 @@ public class MergeRuleUtils {
 
         return new Pair<>(
             tb.apply(tb.parallel(elementaries), term), freeVars);
+    }
+
+    /**
+     * Returns an equivalent function with the new name.
+     *
+     * @param newName the new name
+     * @param old the function to be renamed
+     * @return equivalent operator with the new name
+     */
+    private static JavaDLFunction rename(Name newName, JavaDLFunction old) {
+        return new JavaDLFunction(newName, old.sort(), old.argSorts(), old.whereToBind(), old.isUnique(), old.isSkolemConstant());
+    }
+
+    /**
+     * Returns an equivalent variable with the new name.
+     *
+     * @param newName the new name
+     * @param lv the location variable to be renamed
+     * @return equivalent operator with the new name
+     */
+    public static LocationVariable rename(Name newName, LocationVariable lv) {
+        if (lv.getKeYJavaType() != null) {
+            return new LocationVariable(new ProgramElementName(newName.toString()), lv.getKeYJavaType(),
+                    lv.getContainerType(), lv.isStatic(), lv.isModel());
+        } else {
+            return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
+        }
     }
 
     /**

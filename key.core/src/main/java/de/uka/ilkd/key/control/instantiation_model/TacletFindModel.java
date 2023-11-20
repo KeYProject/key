@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -177,7 +178,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace
      */
     private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<Function> functNS) throws ParserException {
+            Namespace<JavaDLFunction> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -233,7 +234,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the parsed term
      */
     private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<Function> functNS)
+            Namespace<JavaDLFunction> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -411,7 +412,7 @@ public class TacletFindModel extends AbstractTableModel {
                         final Namespace<QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<Function> functNS =
+                        Namespace<JavaDLFunction> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);

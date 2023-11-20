@@ -30,6 +30,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -170,7 +171,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        final Map<LocationVariable, Function> anonOutHeaps =
+        final Map<LocationVariable, JavaDLFunction> anonOutHeaps =
             createAnonOutHeaps(heaps, services, tb);
 
         final BlockContract.Variables variables =
@@ -346,16 +347,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private static Map<LocationVariable, Function> createAnonInHeaps(
+    private static Map<LocationVariable, JavaDLFunction> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Function> anonInHeaps =
+        Map<LocationVariable, JavaDLFunction> anonInHeaps =
             new LinkedHashMap<>(40);
 
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
-            final Function anonymisationFunction =
-                new Function(new Name(anonymisationName), heap.sort(), true);
+            final JavaDLFunction anonymisationFunction =
+                new JavaDLFunction(new Name(anonymisationName), heap.sort(), true);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonInHeaps.put(heap, anonymisationFunction);
         }
@@ -369,16 +370,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private Map<LocationVariable, Function> createAnonOutHeaps(final List<LocationVariable> heaps,
+    private Map<LocationVariable, JavaDLFunction> createAnonOutHeaps(final List<LocationVariable> heaps,
             final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Function> anonOutHeaps =
+        Map<LocationVariable, JavaDLFunction> anonOutHeaps =
             new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
-                final Function anonymisationFunction =
-                    new Function(new Name(anonymisationName), heap.sort(), true);
+                final JavaDLFunction anonymisationFunction =
+                    new JavaDLFunction(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
             }
@@ -434,7 +435,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the validity formula for the contract.
      */
     private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonOutHeaps,
+            final Map<LocationVariable, JavaDLFunction> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
             final Map<LocationVariable, Term> modifiesClauses,
             final Map<LocationVariable, Term> freeModifiesClauses, final Term[] assumptions,
@@ -452,7 +453,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term nextRemembranceUpdate =
             new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
 
-        Map<LocationVariable, Function> anonInHeaps = createAnonInHeaps(heaps, services, tb);
+        Map<LocationVariable, JavaDLFunction> anonInHeaps = createAnonInHeaps(heaps, services, tb);
 
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);

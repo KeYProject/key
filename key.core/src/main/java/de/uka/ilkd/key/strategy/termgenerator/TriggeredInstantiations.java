@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.Goal;
@@ -158,7 +158,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof Function || sf.formula().op() == Equality.EQUALS) {
+            if (sf.formula().op() instanceof JavaDLFunction || sf.formula().op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }

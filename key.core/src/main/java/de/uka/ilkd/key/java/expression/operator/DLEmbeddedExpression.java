@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.logic.sort.Sort;
@@ -20,16 +20,16 @@ import org.key_project.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {
 
-    private final Function functionSymbol;
+    private final JavaDLFunction functionSymbol;
 
     /**
      * @return the functionSymbol
      */
-    public Function getFunctionSymbol() {
+    public JavaDLFunction getFunctionSymbol() {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(Function f, ExtList children) {
+    public DLEmbeddedExpression(JavaDLFunction f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }
@@ -144,7 +144,7 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
-        Function f = getFunctionSymbol();
+        JavaDLFunction f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 
         if (f.arity() == subs.length) {

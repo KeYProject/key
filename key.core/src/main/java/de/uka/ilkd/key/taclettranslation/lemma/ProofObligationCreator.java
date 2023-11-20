@@ -8,7 +8,7 @@ import java.util.Collection;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Proof;
@@ -113,11 +113,11 @@ public class ProofObligationCreator {
             final Sort sort = op.sort();
             userDefinedSymbols.addSort(sort);
 
-            if (term.op() instanceof Function) {
+            if (term.op() instanceof JavaDLFunction) {
                 if (sort == JavaDLTheory.FORMULA) {
-                    userDefinedSymbols.addPredicate((Function) term.op());
+                    userDefinedSymbols.addPredicate((JavaDLFunction) term.op());
                 } else {
-                    userDefinedSymbols.addFunction((Function) term.op());
+                    userDefinedSymbols.addFunction((JavaDLFunction) term.op());
                 }
             }
             if (term.op() instanceof LogicVariable) {

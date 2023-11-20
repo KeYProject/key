@@ -29,11 +29,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -47,6 +43,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -177,17 +174,17 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
+    protected static Map<LocationVariable, JavaDLFunction> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, JavaDLFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final Function anonymisationFunction =
-                    new Function(new Name(anonymisationName), variable.sort(), true);
+                final JavaDLFunction anonymisationFunction =
+                    new JavaDLFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -322,7 +319,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         final Term heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
         final Name heapAtPostName = new Name(tb.newName("heap_After_BLOCK"));
-        final Term heapAtPost = tb.func(new Function(heapAtPostName, heapAtPre.sort(), true));
+        final Term heapAtPost = tb.func(new JavaDLFunction(heapAtPostName, heapAtPre.sort(), true));
         final Term selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
         final Term selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 
@@ -407,7 +404,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
-            final BlockContract contract, final Map<LocationVariable, Function> anonymisationHeaps,
+            final BlockContract contract, final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,

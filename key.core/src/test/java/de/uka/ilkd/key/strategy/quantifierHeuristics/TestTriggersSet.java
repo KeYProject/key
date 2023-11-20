@@ -5,7 +5,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
@@ -29,7 +30,7 @@ public class TestTriggersSet {
 
     private final Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-    private final Namespace<Function> functions = new Namespace<>();
+    private final Namespace<JavaDLFunction> functions = new Namespace<>();
 
     private final Namespace<Sort> sorts = new Namespace<>();
 
@@ -41,47 +42,47 @@ public class TestTriggersSet {
 
 
     // constant function
-    private Function r_a;
-    private Function r_b;
-    private Function r_c;
+    private JavaDLFunction r_a;
+    private JavaDLFunction r_b;
+    private JavaDLFunction r_c;
 
-    private Function s_a;
-    private Function s_b;
-    private Function s_c;
+    private JavaDLFunction s_a;
+    private JavaDLFunction s_b;
+    private JavaDLFunction s_c;
 
-    private Function t_a;
-    private Function t_b;
-    private Function t_c;
+    private JavaDLFunction t_a;
+    private JavaDLFunction t_b;
+    private JavaDLFunction t_c;
 
     // Rigid function
-    private Function frr; // r->r
-    private Function f2rr; // r->r
-    private Function fsr; // s-> r
-    private Function ftr; // t->r
-    private Function fstr;// s->t->r
-    private Function frstr;// r->s->t->r;
+    private JavaDLFunction frr; // r->r
+    private JavaDLFunction f2rr; // r->r
+    private JavaDLFunction fsr; // s-> r
+    private JavaDLFunction ftr; // t->r
+    private JavaDLFunction fstr;// s->t->r
+    private JavaDLFunction frstr;// r->s->t->r;
 
-    private Function gss; // s->s
-    private Function grs; // r->s
-    private Function gts; // t->s
-    private Function grts; // r->t->s
-    private Function grsts;// r->s->t->s
+    private JavaDLFunction gss; // s->s
+    private JavaDLFunction grs; // r->s
+    private JavaDLFunction gts; // t->s
+    private JavaDLFunction grts; // r->t->s
+    private JavaDLFunction grsts;// r->s->t->s
 
-    private Function htt; // t->t
-    private Function hrt; // r -> t
-    private Function hst; // s->t
-    private Function hrst;// r->s->t
-    private Function hrstt;// t->s->t->t
+    private JavaDLFunction htt; // t->t
+    private JavaDLFunction hrt; // r -> t
+    private JavaDLFunction hst; // s->t
+    private JavaDLFunction hrst;// r->s->t
+    private JavaDLFunction hrstt;// t->s->t->t
 
     // Formular function
-    private Function pp;// Formula->Formula
-    private Function pr;// r->Formula
-    private Function ps;// s->Formula
-    private Function pt;// t->Formula
-    private Function prs;// r->s->Formula
-    private Function pst;// s->t->Formula
-    private Function prt;// r->t->Formula
-    private Function prst;// r->s->t->Formula
+    private JavaDLFunction pp;// Formula->Formula
+    private JavaDLFunction pr;// r->Formula
+    private JavaDLFunction ps;// s->Formula
+    private JavaDLFunction pt;// t->Formula
+    private JavaDLFunction prs;// r->s->Formula
+    private JavaDLFunction pst;// s->t->Formula
+    private JavaDLFunction prt;// r->t->Formula
+    private JavaDLFunction prst;// r->s->t->Formula
     // private Function pi;//ints->Formula
     private Goal g;
 
@@ -103,35 +104,35 @@ public class TestTriggersSet {
         // sorts.add(ints);
 
         // constant
-        r_a = new Function(new Name("r_a"), r, new Sort[0]);
-        r_b = new Function(new Name("r_b"), r, new Sort[0]);
-        r_c = new Function(new Name("r_c"), r, new Sort[0]);
+        r_a = new JavaDLFunction(new Name("r_a"), r, new Sort[0]);
+        r_b = new JavaDLFunction(new Name("r_b"), r, new Sort[0]);
+        r_c = new JavaDLFunction(new Name("r_c"), r, new Sort[0]);
         functions.add(r_a);
         functions.add(r_b);
         functions.add(r_c);
 
-        s_a = new Function(new Name("s_a"), s, new Sort[0]);
-        s_b = new Function(new Name("s_b"), s, new Sort[0]);
-        s_c = new Function(new Name("s_c"), s, new Sort[0]);
+        s_a = new JavaDLFunction(new Name("s_a"), s, new Sort[0]);
+        s_b = new JavaDLFunction(new Name("s_b"), s, new Sort[0]);
+        s_c = new JavaDLFunction(new Name("s_c"), s, new Sort[0]);
         functions.add(s_a);
         functions.add(s_b);
         functions.add(s_c);
 
-        t_a = new Function(new Name("t_a"), s, new Sort[0]);
-        t_b = new Function(new Name("t_b"), s, new Sort[0]);
-        t_c = new Function(new Name("t_c"), s, new Sort[0]);
+        t_a = new JavaDLFunction(new Name("t_a"), s, new Sort[0]);
+        t_b = new JavaDLFunction(new Name("t_b"), s, new Sort[0]);
+        t_c = new JavaDLFunction(new Name("t_c"), s, new Sort[0]);
         functions.add(t_a);
         functions.add(t_b);
         functions.add(t_c);
 
 
         // function
-        frr = new Function(new Name("frr"), r, r);
-        f2rr = new Function(new Name("f2rr"), r, r);
-        fsr = new Function(new Name("fsr"), r, s);
-        ftr = new Function(new Name("ftr"), r, t);
-        fstr = new Function(new Name("fst"), r, s, t);
-        frstr = new Function(new Name("frstr"), r, r, s, t);
+        frr = new JavaDLFunction(new Name("frr"), r, r);
+        f2rr = new JavaDLFunction(new Name("f2rr"), r, r);
+        fsr = new JavaDLFunction(new Name("fsr"), r, s);
+        ftr = new JavaDLFunction(new Name("ftr"), r, t);
+        fstr = new JavaDLFunction(new Name("fst"), r, s, t);
+        frstr = new JavaDLFunction(new Name("frstr"), r, r, s, t);
 
         functions.add(frr);
         functions.add(f2rr);
@@ -140,11 +141,11 @@ public class TestTriggersSet {
         functions.add(fstr);
         functions.add(frstr);
 
-        gss = new Function(new Name("gss"), s, s);
-        grs = new Function(new Name("grs"), s, r);
-        gts = new Function(new Name("gts"), s, t);
-        grts = new Function(new Name("grts"), s, r, t);
-        grsts = new Function(new Name("grsts"), s, r, s, t);
+        gss = new JavaDLFunction(new Name("gss"), s, s);
+        grs = new JavaDLFunction(new Name("grs"), s, r);
+        gts = new JavaDLFunction(new Name("gts"), s, t);
+        grts = new JavaDLFunction(new Name("grts"), s, r, t);
+        grsts = new JavaDLFunction(new Name("grsts"), s, r, s, t);
 
         functions.add(gss);
         functions.add(grs);
@@ -152,11 +153,11 @@ public class TestTriggersSet {
         functions.add(grts);
         functions.add(grsts);
 
-        htt = new Function(new Name("htt"), t, t);
-        hrt = new Function(new Name("hrt"), t, r);
-        hst = new Function(new Name("hst"), t, s);
-        hrst = new Function(new Name("hrst"), t, r, s);
-        hrstt = new Function(new Name("hrstt"), t, r, s, t);
+        htt = new JavaDLFunction(new Name("htt"), t, t);
+        hrt = new JavaDLFunction(new Name("hrt"), t, r);
+        hst = new JavaDLFunction(new Name("hst"), t, s);
+        hrst = new JavaDLFunction(new Name("hrst"), t, r, s);
+        hrstt = new JavaDLFunction(new Name("hrstt"), t, r, s, t);
 
         functions.add(htt);
         functions.add(hrt);
@@ -165,14 +166,14 @@ public class TestTriggersSet {
         functions.add(hrstt);
 
         // Formula function
-        pp = new Function(new Name("pp"), JavaDLTheory.FORMULA, JavaDLTheory.FORMULA);
-        pr = new Function(new Name("pr"), JavaDLTheory.FORMULA, r);
-        ps = new Function(new Name("ps"), JavaDLTheory.FORMULA, s);
-        pt = new Function(new Name("pt"), JavaDLTheory.FORMULA, t);
-        prs = new Function(new Name("prs"), JavaDLTheory.FORMULA, r, s);
-        prt = new Function(new Name("prt"), JavaDLTheory.FORMULA, r, t);
-        pst = new Function(new Name("pst"), JavaDLTheory.FORMULA, s, t);
-        prst = new Function(new Name("prst"), JavaDLTheory.FORMULA, r, s, t);
+        pp = new JavaDLFunction(new Name("pp"), JavaDLTheory.FORMULA, JavaDLTheory.FORMULA);
+        pr = new JavaDLFunction(new Name("pr"), JavaDLTheory.FORMULA, r);
+        ps = new JavaDLFunction(new Name("ps"), JavaDLTheory.FORMULA, s);
+        pt = new JavaDLFunction(new Name("pt"), JavaDLTheory.FORMULA, t);
+        prs = new JavaDLFunction(new Name("prs"), JavaDLTheory.FORMULA, r, s);
+        prt = new JavaDLFunction(new Name("prt"), JavaDLTheory.FORMULA, r, t);
+        pst = new JavaDLFunction(new Name("pst"), JavaDLTheory.FORMULA, s, t);
+        prst = new JavaDLFunction(new Name("prst"), JavaDLTheory.FORMULA, r, s, t);
         // pi=new Function(new Name("pi"),Sort.FORMULA,new Sort[]{});
         functions.add(pp);
         functions.add(pr);

@@ -12,8 +12,9 @@ import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
 
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -23,49 +24,49 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public static final Name DOUBLELIT_NAME = new Name("DFP");
     public static final Name NEGATIVE_LITERAL = new Name("javaUnaryMinusDouble");
 
-    private final Function doubleLit;
-    private final Function lessThan;
-    private final Function greaterThan;
-    private final Function greaterOrEquals;
-    private final Function lessOrEquals;
-    private final Function eqDouble;
+    private final JavaDLFunction doubleLit;
+    private final JavaDLFunction lessThan;
+    private final JavaDLFunction greaterThan;
+    private final JavaDLFunction greaterOrEquals;
+    private final JavaDLFunction lessOrEquals;
+    private final JavaDLFunction eqDouble;
 
-    private final Function javaUnaryMinusDouble;
-    private final Function javaAddDouble;
-    private final Function javaSubDouble;
-    private final Function javaMulDouble;
-    private final Function javaDivDouble;
-    private final Function javaModDouble;
+    private final JavaDLFunction javaUnaryMinusDouble;
+    private final JavaDLFunction javaAddDouble;
+    private final JavaDLFunction javaSubDouble;
+    private final JavaDLFunction javaMulDouble;
+    private final JavaDLFunction javaDivDouble;
+    private final JavaDLFunction javaModDouble;
 
-    private final Function javaMinDouble;
-    private final Function javaMaxDouble;
+    private final JavaDLFunction javaMinDouble;
+    private final JavaDLFunction javaMaxDouble;
 
-    private final Function addDouble;
-    private final Function subDouble;
-    private final Function mulDouble;
-    private final Function divDouble;
-    private final Function doubleAbs;
-    private final Function negDouble;
+    private final JavaDLFunction addDouble;
+    private final JavaDLFunction subDouble;
+    private final JavaDLFunction mulDouble;
+    private final JavaDLFunction divDouble;
+    private final JavaDLFunction doubleAbs;
+    private final JavaDLFunction negDouble;
 
-    private final Function isNormal;
-    private final Function isSubnormal;
-    private final Function isNaN;
-    private final Function isZero;
-    private final Function isNice;
-    private final Function isInfinite;
-    private final Function isNegative;
-    private final Function isPositive;
+    private final JavaDLFunction isNormal;
+    private final JavaDLFunction isSubnormal;
+    private final JavaDLFunction isNaN;
+    private final JavaDLFunction isZero;
+    private final JavaDLFunction isNice;
+    private final JavaDLFunction isInfinite;
+    private final JavaDLFunction isNegative;
+    private final JavaDLFunction isPositive;
 
-    private final Function sinDouble;
-    private final Function cosDouble;
-    private final Function acosDouble;
-    private final Function asinDouble;
-    private final Function tanDouble;
-    private final Function atan2Double;
-    private final Function sqrtDouble;
-    private final Function powDouble;
-    private final Function expDouble;
-    private final Function atanDouble;
+    private final JavaDLFunction sinDouble;
+    private final JavaDLFunction cosDouble;
+    private final JavaDLFunction acosDouble;
+    private final JavaDLFunction asinDouble;
+    private final JavaDLFunction tanDouble;
+    private final JavaDLFunction atan2Double;
+    private final JavaDLFunction sqrtDouble;
+    private final JavaDLFunction powDouble;
+    private final JavaDLFunction expDouble;
+    private final JavaDLFunction atanDouble;
 
     public DoubleLDT(TermServices services) {
         super(NAME, services);
@@ -154,7 +155,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
+    public JavaDLFunction getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();
@@ -181,8 +182,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
-            ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+                                         ExecutionContext ec) {
         if (op instanceof Negative) {
             return getJavaUnaryMinus();
         } else {
@@ -191,13 +192,13 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JavaDLFunction f) {
         return containsFunction(f) && (f.arity() == 0);
     }
 
     @Override
     public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
-        Function f = (Function) t.op();
+        JavaDLFunction f = (JavaDLFunction) t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
         if (f == doubleLit) {
@@ -222,156 +223,156 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
         }
     }
 
-    public Function getDoubleSymbol() {
+    public JavaDLFunction getDoubleSymbol() {
         return doubleLit;
     }
 
-    public Function getLessThan() {
+    public JavaDLFunction getLessThan() {
         return lessThan;
     }
 
-    public Function getGreaterThan() {
+    public JavaDLFunction getGreaterThan() {
         return greaterThan;
     }
 
-    public Function getLessOrEquals() {
+    public JavaDLFunction getLessOrEquals() {
         return lessOrEquals;
     }
 
-    public Function getGreaterOrEquals() {
+    public JavaDLFunction getGreaterOrEquals() {
         return greaterOrEquals;
     }
 
-    public Function getEquals() {
+    public JavaDLFunction getEquals() {
         return eqDouble;
     }
 
-    public Function getJavaUnaryMinus() {
+    public JavaDLFunction getJavaUnaryMinus() {
         return javaUnaryMinusDouble;
     }
 
-    public Function getJavaAdd() {
+    public JavaDLFunction getJavaAdd() {
         return javaAddDouble;
     }
 
-    public Function getJavaSub() {
+    public JavaDLFunction getJavaSub() {
         return javaSubDouble;
     }
 
-    public Function getJavaMul() {
+    public JavaDLFunction getJavaMul() {
         return javaMulDouble;
     }
 
-    public Function getJavaDiv() {
+    public JavaDLFunction getJavaDiv() {
         return javaDivDouble;
     }
 
-    public Function getJavaMod() {
+    public JavaDLFunction getJavaMod() {
         return javaModDouble;
     }
 
-    public Function getJavaMin() {
+    public JavaDLFunction getJavaMin() {
         return javaMinDouble;
     }
 
-    public Function getJavaMax() {
+    public JavaDLFunction getJavaMax() {
         return javaMaxDouble;
     }
 
-    public Function getIsNormal() {
+    public JavaDLFunction getIsNormal() {
         return isNormal;
     }
 
-    public Function getIsSubnormal() {
+    public JavaDLFunction getIsSubnormal() {
         return isSubnormal;
     }
 
-    public Function getIsNaN() {
+    public JavaDLFunction getIsNaN() {
         return isNaN;
     }
 
-    public Function getIsZero() {
+    public JavaDLFunction getIsZero() {
         return isZero;
     }
 
     @Override
-    public Function getIsNice() {
+    public JavaDLFunction getIsNice() {
         return isNice;
     }
 
-    public Function getIsInfinite() {
+    public JavaDLFunction getIsInfinite() {
         return isInfinite;
     }
 
-    public Function getIsPositive() {
+    public JavaDLFunction getIsPositive() {
         return isPositive;
     }
 
-    public Function getIsNegative() {
+    public JavaDLFunction getIsNegative() {
         return isNegative;
     }
 
-    public Function getAdd() {
+    public JavaDLFunction getAdd() {
         return addDouble;
     }
 
-    public Function getSub() {
+    public JavaDLFunction getSub() {
         return subDouble;
     }
 
-    public Function getMul() {
+    public JavaDLFunction getMul() {
         return mulDouble;
     }
 
-    public Function getDiv() {
+    public JavaDLFunction getDiv() {
         return divDouble;
     }
 
-    public Function getAbs() {
+    public JavaDLFunction getAbs() {
         return doubleAbs;
     }
 
-    public Function getNeg() {
+    public JavaDLFunction getNeg() {
         return negDouble;
     }
 
-    public Function getSinDouble() {
+    public JavaDLFunction getSinDouble() {
         return sinDouble;
     }
 
-    public Function getCosDouble() {
+    public JavaDLFunction getCosDouble() {
         return cosDouble;
     }
 
-    public Function getAcosDouble() {
+    public JavaDLFunction getAcosDouble() {
         return acosDouble;
     }
 
-    public Function getAsinDouble() {
+    public JavaDLFunction getAsinDouble() {
         return asinDouble;
     }
 
-    public Function getTanDouble() {
+    public JavaDLFunction getTanDouble() {
         return tanDouble;
     }
 
-    public Function getAtan2Double() {
+    public JavaDLFunction getAtan2Double() {
         return atan2Double;
     }
 
-    public Function getSqrtDouble() {
+    public JavaDLFunction getSqrtDouble() {
         return sqrtDouble;
     }
 
-    public Function getPowDouble() {
+    public JavaDLFunction getPowDouble() {
         return powDouble;
     }
 
-    public Function getExpDouble() {
+    public JavaDLFunction getExpDouble() {
         return expDouble;
     }
 
-    public Function getAtanDouble() {
+    public JavaDLFunction getAtanDouble() {
         return atanDouble;
     }
 }

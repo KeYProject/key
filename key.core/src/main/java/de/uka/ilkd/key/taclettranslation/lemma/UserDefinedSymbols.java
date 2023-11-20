@@ -8,7 +8,8 @@ import java.util.*;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -31,8 +32,8 @@ public class UserDefinedSymbols {
     }
 
     final UserDefinedSymbols parent;
-    final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
-    final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<JavaDLFunction> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<JavaDLFunction> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<QuantifiableVariable> usedExtraVariables =
         new TreeSet<>(NamedComparator.INSTANCE);
@@ -74,11 +75,11 @@ public class UserDefinedSymbols {
         return set.contains(symbol);
     }
 
-    public void addFunction(Function symbol) {
+    public void addFunction(JavaDLFunction symbol) {
         addUserDefinedSymbol(symbol, usedExtraFunctions, referenceNamespaces.functions());
     }
 
-    public void addPredicate(Function symbol) {
+    public void addPredicate(JavaDLFunction symbol) {
         addUserDefinedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
     }
 

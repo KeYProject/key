@@ -15,14 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -38,6 +31,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -587,7 +581,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final Function mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final JavaDLFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
         if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
@@ -694,7 +688,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return tb.getTaclet();
     }
 
-    abstract Function generateMbyAtPreFunc(Services services);
+    abstract JavaDLFunction generateMbyAtPreFunc(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
@@ -1274,10 +1268,10 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
-        private final Function func;
+        private final JavaDLFunction func;
 
 
-        private TermListAndFunc(ImmutableList<Term> ts, Function f) {
+        private TermListAndFunc(ImmutableList<Term> ts, JavaDLFunction f) {
             this.terms = ts;
             this.func = f;
         }
@@ -1307,7 +1301,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, Function func) {}
+    public record TermAndFunc(Term term, JavaDLFunction func) {}
 
     /**
      * A data structure for storing and passing all specifications of a specification element

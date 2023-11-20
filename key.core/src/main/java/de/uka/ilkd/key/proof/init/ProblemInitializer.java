@@ -41,6 +41,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -306,13 +307,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<Function> newFuncNS = new Namespace<>();
+        Namespace<JavaDLFunction> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (Function n : initConfig.funcNS().allElements()) {
+        for (JavaDLFunction n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -345,8 +346,8 @@ public final class ProblemInitializer {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof Function) {
-            namespaces.functions().add((Function) term.op());
+        if (term.op() instanceof JavaDLFunction) {
+            namespaces.functions().add((JavaDLFunction) term.op());
         } else if (term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -537,7 +538,7 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
+        final Namespace<JavaDLFunction> functions = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {

@@ -14,8 +14,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
 
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -34,11 +35,11 @@ public final class CharListLDT extends LDT {
     // LexPathOrdering and into CharListNotation!
 
     // functions
-    private final Function clIndexOfChar;
+    private final JavaDLFunction clIndexOfChar;
     private final Function clIndexOfCl;
-    private final Function clLastIndexOfChar;
+    private final JavaDLFunction clLastIndexOfChar;
     private final Function clLastIndexOfCl;
-    private final Function clReplace;
+    private final JavaDLFunction clReplace;
     private final Function clTranslateInt;
     private final Function clRemoveZeros;
     private final Function clHashCode;
@@ -108,7 +109,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
 
-    public Function getClIndexOfChar() {
+    public JavaDLFunction getClIndexOfChar() {
         return clIndexOfChar;
     }
 
@@ -118,7 +119,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public Function getClLastIndexOfChar() {
+    public JavaDLFunction getClLastIndexOfChar() {
         return clLastIndexOfChar;
     }
 
@@ -128,7 +129,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public Function getClReplace() {
+    public JavaDLFunction getClReplace() {
         return clReplace;
     }
 
@@ -216,15 +217,15 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-            ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+                                         ExecutionContext ec) {
         assert false;
         return null;
     }
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JavaDLFunction f) {
         return false;
     }
 
@@ -249,7 +250,7 @@ public final class CharListLDT extends LDT {
 
     @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
+    public JavaDLFunction getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
         if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");

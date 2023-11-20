@@ -53,17 +53,6 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         v.performActionOnLocationVariable(this);
     }
 
-
-    @Override
-    public UpdateableOperator rename(Name name) {
-        if (getKeYJavaType() != null) {
-            return new LocationVariable(new ProgramElementName(name.toString()), getKeYJavaType(),
-                getContainerType(), isStatic(), isModel());
-        } else {
-            return new LocationVariable(new ProgramElementName(name.toString()), sort());
-        }
-    }
-
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
         if (!(obj instanceof LocationVariable that)) {

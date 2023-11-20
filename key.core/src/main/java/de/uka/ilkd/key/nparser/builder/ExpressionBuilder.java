@@ -36,6 +36,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -258,7 +259,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
                 // This mimics the old KeyParser behaviour. Unknown if necessary.
-                final Function neglit = functions().lookup("neglit");
+                final JavaDLFunction neglit = functions().lookup("neglit");
                 final Term num = result.sub(0);
                 return capsulateTf(ctx,
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
@@ -272,7 +273,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     // falling back to integer ldt (for instance for untyped schema variables)
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
-                Function op = ldt.getFunctionFor("neg", services);
+                JavaDLFunction op = ldt.getFunctionFor("neg", services);
                 if (op == null) {
                     semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
@@ -366,7 +367,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             // falling back to integer ldt (for instance for untyped schema variables)
             ldt = services.getTypeConverter().getIntegerLDT();
         }
-        Function op = ldt.getFunctionFor(opname, services);
+        JavaDLFunction op = ldt.getFunctionFor(opname, services);
         if (op == null) {
             semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
         }
@@ -421,7 +422,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         for (int i = 0; i < termL.size(); i++) {
             var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
-            Function op = ldt.getFunctionFor(opName, services);
+            JavaDLFunction op = ldt.getFunctionFor(opName, services);
             if (op == null) {
                 semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
                     sort);
@@ -498,7 +499,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         namespaces().setVariables(new Namespace<>(variables()));
     }
 
-    private Term toZNotation(String literal, Namespace<Function> functions) {
+    private Term toZNotation(String literal, Namespace<JavaDLFunction> functions) {
         literal = literal.replace("_", "");
         final boolean negative = (literal.charAt(0) == '-');
         if (negative) {
@@ -520,7 +521,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return toZNotation(bi, functions);
     }
 
-    private Term toZNotation(BigInteger bi, Namespace<Function> functions) {
+    private Term toZNotation(BigInteger bi, Namespace<JavaDLFunction> functions) {
         boolean negative = bi.signum() < 0;
         String s = bi.abs().toString();
         Term result = getTermFactory().createTerm(functions.lookup(new Name("#")));
@@ -678,7 +679,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
-                Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
+                JavaDLFunction fieldSymbol = getServices().getTypeConverter().getHeapLDT()
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
                 if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
@@ -833,7 +834,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         String id = accept(ctx.simple_ident());
         List<Term> args = accept(ctx.args);
-        Function f = functions().lookup(new Name(id));
+        JavaDLFunction f = functions().lookup(new Name(id));
         if (f == null) {
             semanticError(ctx, "Unknown heap constructor " + id);
         }
@@ -893,7 +894,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
                 Term indexTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(indexVar));
 
-                Function leq = functions().lookup(new Name("leq"));
+                JavaDLFunction leq = functions().lookup(new Name("leq"));
                 Term fromTerm =
                     capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
                 Term toTerm =
@@ -1499,7 +1500,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
             } else {
                 // sanity check
-                assert op instanceof Function;
+                assert op instanceof JavaDLFunction;
                 for (int i = 0; i < args.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
                         for (QuantifiableVariable qv : args[i].freeVars()) {

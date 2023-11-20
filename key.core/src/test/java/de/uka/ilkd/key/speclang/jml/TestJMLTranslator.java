@@ -21,6 +21,7 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -409,9 +410,9 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
-        Function ioFuncObject =
+        JavaDLFunction ioFuncObject =
             services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
-        Function ioFuncInt =
+        JavaDLFunction ioFuncInt =
             services.getJavaDLTheory()
                     .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
 
@@ -431,7 +432,7 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final Function fieldSymbol =
+        final JavaDLFunction fieldSymbol =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = TB.all(qv,
             TB.imp(

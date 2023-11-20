@@ -771,7 +771,7 @@ public class Recoder2KeYConverter {
         }
 
 
-        Function named = namespaceSet.functions().lookup(new Name(name));
+        JavaDLFunction named = namespaceSet.functions().lookup(new Name(name));
 
         if (named == null) {
             // TODO provide position information?!

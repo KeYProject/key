@@ -14,18 +14,13 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -57,30 +52,30 @@ public final class HeapLDT extends LDT {
 
     // select/store
     private final SortDependingFunction select;
-    private final Function store;
-    private final Function create;
-    private final Function anon;
+    private final JavaDLFunction store;
+    private final JavaDLFunction create;
+    private final JavaDLFunction anon;
     private final Function memset;
 
     // fields
-    private final Function arr;
-    private final Function created;
-    private final Function initialized;
+    private final JavaDLFunction arr;
+    private final JavaDLFunction created;
+    private final JavaDLFunction initialized;
     private final SortDependingFunction classPrepared;
     private final SortDependingFunction classInitialized;
     private final SortDependingFunction classInitializationInProgress;
     private final SortDependingFunction classErroneous;
 
     // length
-    private final Function length;
+    private final JavaDLFunction length;
 
     // null
-    private final Function nullFunc;
+    private final JavaDLFunction nullFunc;
 
     // predicates
-    private final Function wellFormed;
-    private final Function acc;
-    private final Function reach;
+    private final JavaDLFunction wellFormed;
+    private final JavaDLFunction acc;
+    private final JavaDLFunction reach;
     private final Function prec;
 
     // heap pv
@@ -218,17 +213,17 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public Function getStore() {
+    public JavaDLFunction getStore() {
         return store;
     }
 
 
-    public Function getCreate() {
+    public JavaDLFunction getCreate() {
         return create;
     }
 
 
-    public Function getAnon() {
+    public JavaDLFunction getAnon() {
         return anon;
     }
 
@@ -238,62 +233,62 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public Function getArr() {
+    public JavaDLFunction getArr() {
         return arr;
     }
 
 
-    public Function getCreated() {
+    public JavaDLFunction getCreated() {
         return created;
     }
 
 
-    public Function getInitialized() {
+    public JavaDLFunction getInitialized() {
         return initialized;
     }
 
 
-    public Function getClassPrepared(Sort instanceSort, TermServices services) {
+    public JavaDLFunction getClassPrepared(Sort instanceSort, TermServices services) {
         return classPrepared.getInstanceFor(instanceSort, services);
     }
 
 
-    public Function getClassInitialized(Sort instanceSort, TermServices services) {
+    public JavaDLFunction getClassInitialized(Sort instanceSort, TermServices services) {
         return classInitialized.getInstanceFor(instanceSort, services);
     }
 
 
-    public Function getClassInitializationInProgress(Sort instanceSort, TermServices services) {
+    public JavaDLFunction getClassInitializationInProgress(Sort instanceSort, TermServices services) {
         return classInitializationInProgress.getInstanceFor(instanceSort, services);
     }
 
 
-    public Function getClassErroneous(Sort instanceSort, TermServices services) {
+    public JavaDLFunction getClassErroneous(Sort instanceSort, TermServices services) {
         return classErroneous.getInstanceFor(instanceSort, services);
     }
 
 
-    public Function getLength() {
+    public JavaDLFunction getLength() {
         return length;
     }
 
 
-    public Function getNull() {
+    public JavaDLFunction getNull() {
         return nullFunc;
     }
 
 
-    public Function getWellFormed() {
+    public JavaDLFunction getWellFormed() {
         return wellFormed;
     }
 
 
-    public Function getAcc() {
+    public JavaDLFunction getAcc() {
         return acc;
     }
 
 
-    public Function getReach() {
+    public JavaDLFunction getReach() {
         return reach;
     }
 
@@ -335,12 +330,12 @@ public final class HeapLDT extends LDT {
      * the appropriate symbol does not yet exist in the namespace, this method creates and adds it
      * to the namespace as a side effect.
      */
-    public Function getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
+    public JavaDLFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        Function result = services.getNamespaces().functions().lookup(name);
+        JavaDLFunction result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;
@@ -364,7 +359,7 @@ public final class HeapLDT extends LDT {
                         fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
                         fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
-                    result = new Function(name, fieldSort, new Sort[0], null, true);
+                    result = new JavaDLFunction(name, fieldSort, new Sort[0], null, true);
                 }
                 services.getNamespaces().functions().addSafely(result);
             }
@@ -421,15 +416,15 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
-            ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+                                         ExecutionContext ec) {
         assert false;
         return null;
     }
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JavaDLFunction f) {
         return false;
     }
 
@@ -449,7 +444,7 @@ public final class HeapLDT extends LDT {
                 return new FieldReference(field, null);
             }
             return new FieldReference(field, prefix);
-        } else if (t.sort() == getFieldSort() && t.op() instanceof Function
+        } else if (t.sort() == getFieldSort() && t.op() instanceof JavaDLFunction
                 && ((Function) t.op()).isUnique()) {
             return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()),
                 getClassName((Function) t.op()));

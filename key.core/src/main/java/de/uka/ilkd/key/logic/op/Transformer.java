@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Michael Kirsten
  */
-public class Transformer extends Function {
+public class Transformer extends JavaDLFunction {
 
     public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);

@@ -52,12 +52,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public static RewriteTaclet switchfirstsucc;
     public static SuccTaclet closewitheq;
 
-    static Function func_0;
-    static Function func_eq;
-    static Function func_plus;
-    static Function func_min1;
-    static Function func_plus1;
-    static Function func_p; // Sort.FORMULA
+    static JavaDLFunction func_0;
+    static JavaDLFunction func_eq;
+    static JavaDLFunction func_plus;
+    static JavaDLFunction func_min1;
+    static JavaDLFunction func_plus1;
+    static JavaDLFunction func_p; // Sort.FORMULA
 
     static Sequent seq_test1;
     static Sequent seq_test2;
@@ -107,11 +107,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void createNatTaclets() {
         // decls for nat
-        func_0 = new Function(new Name("zero"), nat, new Sort[] {});
-        func_eq = new Function(new Name("="), JavaDLTheory.FORMULA, nat, nat);
-        func_plus = new Function(new Name("+"), nat, nat, nat);
-        func_min1 = new Function(new Name("pred"), nat, nat);
-        func_plus1 = new Function(new Name("succ"), nat, nat);
+        func_0 = new JavaDLFunction(new Name("zero"), nat, new Sort[] {});
+        func_eq = new JavaDLFunction(new Name("="), JavaDLTheory.FORMULA, nat, nat);
+        func_plus = new JavaDLFunction(new Name("+"), nat, nat, nat);
+        func_min1 = new JavaDLFunction(new Name("pred"), nat, nat);
+        func_plus1 = new JavaDLFunction(new Name("succ"), nat, nat);
 
         nss.functions().add(func_0);
         nss.functions().add(func_eq);
@@ -262,13 +262,13 @@ public class CreateTacletForTests extends AbstractTestTermParser {
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
 
 
-        func_p = new Function(new Name("P"), JavaDLTheory.FORMULA, sort1);
+        func_p = new JavaDLFunction(new Name("P"), JavaDLTheory.FORMULA, sort1);
         nss.functions().add(func_p);
 
         // nat problem:
-        Function const_c = new Function(new Name("c"), nat, new SortImpl[0]);
+        JavaDLFunction const_c = new JavaDLFunction(new Name("c"), nat, new SortImpl[0]);
         nss.functions().add(const_c);
-        Function const_d = new Function(new Name("d"), nat, new SortImpl[0]);
+        JavaDLFunction const_d = new JavaDLFunction(new Name("d"), nat, new SortImpl[0]);
         nss.functions().add(const_d);
 
         Term t_c = tf.createTerm(const_c);

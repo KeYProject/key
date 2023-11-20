@@ -18,7 +18,7 @@ public abstract class Modality extends AbstractSortedOperator {
     private final Kind kind;
 
     protected Modality(Name name, Sort formulaSort, Kind kind) {
-        super(name, new Sort[] { formulaSort }, formulaSort, false);
+        super(name, new Sort[] { formulaSort }, formulaSort, Modifier.NONE);
         this.kind = kind;
     }
 

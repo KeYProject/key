@@ -13,16 +13,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
@@ -202,9 +193,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    Function generateMbyAtPreFunc(Services services) {
+    JavaDLFunction generateMbyAtPreFunc(Services services) {
         return hasMby()
-                ? new Function(new Name(TB.newName("mbyAtPre")),
+                ? new JavaDLFunction(new Name(TB.newName("mbyAtPre")),
                     services.getTypeConverter().getIntegerLDT().targetSort())
                 : null;
     }
@@ -219,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     Term generateMbyAtPreDef(ParsableVariable self, ImmutableList<ParsableVariable> params,
-            Function mbyAtPreFunc, Services services) {
+                             JavaDLFunction mbyAtPreFunc, Services services) {
         final Term mbyAtPreDef;
         if (hasMby()) {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);

@@ -27,7 +27,7 @@ public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private Function head, tail, nil, cons, isempty;
+    private JavaDLFunction head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;

@@ -31,6 +31,12 @@ public interface Operator extends Named {
      */
     boolean bindVarsAt(int n);
 
+    Modifier modifier();
+
+    default boolean hasModifier(Modifier mod) {
+        return mod.match(modifier());
+    }
+
     /**
      * Tells whether the operator is rigid.
      */

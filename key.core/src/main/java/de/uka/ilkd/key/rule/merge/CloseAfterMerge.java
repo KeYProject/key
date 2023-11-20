@@ -19,7 +19,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -200,8 +201,8 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
 
-        final Function predicateSymb =
-            new Function(predicateSymbName, JavaDLTheory.FORMULA, new ImmutableArray<>(argSorts));
+        final JavaDLFunction predicateSymb =
+            new JavaDLFunction(predicateSymbName, JavaDLTheory.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
             services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());

@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Observer symbols serve as the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
-public class ObserverFunction extends Function implements IObserverFunction {
+public class ObserverFunction extends JavaDLFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;

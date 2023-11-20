@@ -15,17 +15,22 @@ public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
     private final ImmutableArray<Boolean> whereToBind;
-    private final boolean isRigid;
+    private final Modifier modifier;
 
     protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
-            boolean isRigid) {
+                               Modifier modifier) {
         assert name != null;
         assert arity >= 0;
         assert whereToBind == null || whereToBind.size() == arity;
         this.name = name;
         this.arity = arity;
         this.whereToBind = whereToBind;
-        this.isRigid = isRigid;
+        this.modifier = modifier;
+    }
+
+    protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
+            boolean isRigid) {
+       this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
     protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {
@@ -36,7 +41,7 @@ public abstract class AbstractOperator implements Operator {
         this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
 
-    protected final ImmutableArray<Boolean> whereToBind() {
+    public final ImmutableArray<Boolean> whereToBind() {
         return whereToBind;
     }
 
@@ -56,8 +61,13 @@ public abstract class AbstractOperator implements Operator {
     }
 
     @Override
+    public final Modifier modifier() {
+        return modifier;
+    }
+
+    @Override
     public final boolean isRigid() {
-        return isRigid;
+        return hasModifier(Modifier.RIGID);
     }
 
     @Override

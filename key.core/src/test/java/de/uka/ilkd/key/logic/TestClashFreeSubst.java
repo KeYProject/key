@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -98,8 +99,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         return s;
     }
 
-    public Function lookup_func(String name) {
-        Function f = nss.functions().lookup(new Name(name));
+    public JavaDLFunction lookup_func(String name) {
+        JavaDLFunction f = nss.functions().lookup(new Name(name));
         if (f == null) {
             throw new RuntimeException("Function named " + name + " not found");
         }

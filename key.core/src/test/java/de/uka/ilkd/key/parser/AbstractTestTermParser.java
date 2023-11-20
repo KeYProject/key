@@ -9,7 +9,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -47,7 +47,7 @@ public class AbstractTestTermParser {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected Function lookup_func(String name) {
+    protected JavaDLFunction lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 

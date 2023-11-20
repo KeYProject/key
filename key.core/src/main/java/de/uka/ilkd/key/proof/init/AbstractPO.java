@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -167,8 +168,8 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    protected final void register(JavaDLFunction f, Services services) {
+        Namespace<JavaDLFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             if (f.sort() == JavaDLTheory.FORMULA) {

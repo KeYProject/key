@@ -8,7 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -57,7 +57,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        Function p = null;
+        JavaDLFunction p = null;
 
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -73,7 +73,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name), JavaDLTheory.FORMULA,
+            p = new JavaDLFunction(new Name(pred_name), JavaDLTheory.FORMULA,
                 argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
@@ -97,7 +97,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        Function f = null;
+        JavaDLFunction f = null;
         assert func_name != null;
         int separatorIndex = func_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -111,7 +111,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         if (f == null) {
-            f = new Function(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
+            f = new JavaDLFunction(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 

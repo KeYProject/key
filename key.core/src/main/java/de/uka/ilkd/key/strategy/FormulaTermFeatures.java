@@ -4,15 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
@@ -60,7 +52,7 @@ class FormulaTermFeatures extends StaticFeatureCollection {
         notContainsExecutable = not(ContainsExecutableCodeTermFeature.PROGRAMS);
 
         cutAllowed = add(notContainsExecutable, tf.notContainsProduct,
-            or(tf.eqF, OperatorClassTF.create(Function.class),
+            or(tf.eqF, OperatorClassTF.create(JavaDLFunction.class),
                 OperatorClassTF.create(ParsableVariable.class))); // XXX
         cutAllowedBelowQuantifier = add(not(propJunctor), notContainsExecutable);
         cutPriority = add(

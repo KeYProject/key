@@ -19,8 +19,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     private final ImmutableArray<Sort> argSorts;
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
-        super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, isRigid);
+            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+        super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, modifier);
         if (sort == null) {
             throw new NullPointerException("Given sort is null");
         }
@@ -29,22 +29,22 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
-            boolean isRigid) {
+                                     Modifier modifier) {
         this(name, new ImmutableArray<>(argSorts), sort, new ImmutableArray<>(whereToBind),
-            isRigid);
+                modifier);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            boolean isRigid) {
-        this(name, argSorts, sort, null, isRigid);
+                                     Modifier modifier) {
+        this(name, argSorts, sort, null, modifier);
     }
 
-    protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
-        this(name, new ImmutableArray<>(argSorts), sort, null, isRigid);
+    protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Modifier modifier) {
+        this(name, new ImmutableArray<>(argSorts), sort, null, modifier);
     }
 
-    protected AbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
-        this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
+    protected AbstractSortedOperator(Name name, Sort sort, Modifier modifier) {
+        this(name, (ImmutableArray<Sort>) null, sort, null, modifier);
     }
 
     @Override

@@ -39,11 +39,4 @@ public final class ProgramConstant extends ProgramVariable {
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnProgramConstant(this);
     }
-
-
-    @Override
-    public Operator rename(Name name) {
-        return new ProgramConstant(new ProgramElementName(name.toString()), getKeYJavaType(),
-            getContainerType(), isStatic(), compileTimeConstant);
-    }
 }

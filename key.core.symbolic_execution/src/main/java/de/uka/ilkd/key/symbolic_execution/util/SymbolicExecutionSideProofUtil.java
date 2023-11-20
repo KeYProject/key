@@ -37,6 +37,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -300,14 +301,14 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
-        final Namespace<Function> functions = services.getNamespaces().functions();
+        final Namespace<JavaDLFunction> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-                if (visited.op() instanceof Function) {
-                    functions.add((Function) visited.op());
+                if (visited.op() instanceof JavaDLFunction) {
+                    functions.add((JavaDLFunction) visited.op());
                 } else if (visited.op() instanceof IProgramVariable) {
                     progVars.add((IProgramVariable) visited.op());
                 }
@@ -412,7 +413,7 @@ public final class SymbolicExecutionSideProofUtil {
     private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
-        } else if (term.op() instanceof Function) {
+        } else if (term.op() instanceof JavaDLFunction) {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
                 return true;

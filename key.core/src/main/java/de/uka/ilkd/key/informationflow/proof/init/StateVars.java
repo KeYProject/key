@@ -15,13 +15,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -204,7 +201,7 @@ public class StateVars {
         if (t == null) {
             return null;
         }
-        if (!(t.op() instanceof Function)) {
+        if (!(t.op() instanceof JavaDLFunction)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
             // in this case.
@@ -223,7 +220,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        final Function newFunc = new Function(new Name(name), t.sort());
+        final JavaDLFunction newFunc = new JavaDLFunction(new Name(name), t.sort());
         register(newFunc, services);
         return tb.func(newFunc);
     }
@@ -339,7 +336,7 @@ public class StateVars {
             return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
-            Function heap = new Function(heapName, heapLDT.getHeap().sort());
+            JavaDLFunction heap = new JavaDLFunction(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
@@ -359,7 +356,7 @@ public class StateVars {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
-        final Function mbyAtPreFunc = new Function(new Name(newName), intSort);
+        final JavaDLFunction mbyAtPreFunc = new JavaDLFunction(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
     }
@@ -380,8 +377,8 @@ public class StateVars {
     }
 
 
-    static void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    static void register(JavaDLFunction f, Services services) {
+        Namespace<JavaDLFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             if (f.sort() == JavaDLTheory.FORMULA) {

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -255,7 +256,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private void addFunc(Function f, boolean labeled) {
+    private void addFunc(JavaDLFunction f, boolean labeled) {
         if (isPredicate(f)) {
             addPredicate(f, labeled);
         } else {
@@ -307,7 +308,7 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof Function f) {
+        if (symb instanceof JavaDLFunction f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {
@@ -331,7 +332,7 @@ public class InfFlowProofSymbols {
         if (symb instanceof SortedOperator op) {
             addSort(op.sort(), l);
         }
-        if (symb instanceof Function f) {
+        if (symb instanceof JavaDLFunction f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {

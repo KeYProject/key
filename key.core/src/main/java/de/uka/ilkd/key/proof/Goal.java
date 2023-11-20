@@ -11,8 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -579,7 +580,7 @@ public final class Goal {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (Function op : node.getLocalFunctions()) {
+        for (JavaDLFunction op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -650,7 +651,7 @@ public final class Goal {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<Function> newFunctions = localNamespaces.functions().elements();
+        Collection<JavaDLFunction> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 

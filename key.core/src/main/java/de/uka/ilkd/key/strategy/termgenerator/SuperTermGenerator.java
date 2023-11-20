@@ -19,6 +19,7 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -129,6 +130,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
 
             public boolean bindVarsAt(int n) {
                 return false;
+            }
+
+            @Override
+            public Modifier modifier() {
+                return Modifier.RIGID;
             }
 
             public boolean isRigid() {

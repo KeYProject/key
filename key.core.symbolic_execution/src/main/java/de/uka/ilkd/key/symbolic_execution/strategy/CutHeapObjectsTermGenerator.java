@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
@@ -94,7 +94,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param term The {@link Term} to start search in.
      * @param storeLocations The result {@link Set} to fill.
      * @param heapLDT The {@link HeapLDT} to use (it provides the store and create
-     *        {@link Function}).
+     *        {@link JavaDLFunction}).
      */
     protected void collectStoreLocations(Term term, final Set<Term> storeLocations,
             final HeapLDT heapLDT) {

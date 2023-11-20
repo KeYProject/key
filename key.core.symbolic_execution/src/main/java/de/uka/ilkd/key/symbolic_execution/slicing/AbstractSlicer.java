@@ -30,6 +30,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -523,7 +524,7 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        Function newPredicate = new Function(
+                        JavaDLFunction newPredicate = new JavaDLFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
@@ -590,7 +591,7 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        Function newPredicate = new Function(
+                        JavaDLFunction newPredicate = new JavaDLFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));

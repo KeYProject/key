@@ -29,6 +29,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
@@ -392,19 +393,19 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
-    public Term func(Function f) {
+    public Term func(JavaDLFunction f) {
         return tf.createTerm(f);
     }
 
-    public Term func(Function f, Term s) {
+    public Term func(JavaDLFunction f, Term s) {
         return tf.createTerm(f, s);
     }
 
-    public Term func(Function f, Term s1, Term s2) {
+    public Term func(JavaDLFunction f, Term s1, Term s2) {
         return tf.createTerm(f, s1, s2);
     }
 
-    public Term func(Function f, Term... s) {
+    public Term func(JavaDLFunction f, Term... s) {
         return tf.createTerm(f, s, null, null);
     }
 
@@ -412,7 +413,7 @@ public class TermBuilder {
         return tf.createTerm(f, s, null, null);
     }
 
-    public Term func(Function f, Term[] s, ImmutableArray<QuantifiableVariable> boundVars) {
+    public Term func(JavaDLFunction f, Term[] s, ImmutableArray<QuantifiableVariable> boundVars) {
         return tf.createTerm(f, s, boundVars, null);
     }
 
@@ -523,7 +524,7 @@ public class TermBuilder {
     }
 
     public Term bsum(QuantifiableVariable qv, Term a, Term b, Term t) {
-        Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
+        JavaDLFunction bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum, new Term[] { a, b, t }, new ImmutableArray<>(qv));
     }
 
@@ -531,7 +532,7 @@ public class TermBuilder {
      * General (unbounded) sum
      */
     public Term sum(ImmutableList<QuantifiableVariable> qvs, Term range, Term t) {
-        final Function sum = services.getNamespaces().functions().lookup("sum");
+        final JavaDLFunction sum = services.getNamespaces().functions().lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -545,7 +546,7 @@ public class TermBuilder {
      * Constructs a bounded product comprehension expression.
      */
     public Term bprod(QuantifiableVariable qv, Term a, Term b, Term t, Services services) {
-        Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
+        JavaDLFunction bprod = services.getTypeConverter().getIntegerLDT().getBprod();
         return func(bprod, new Term[] { a, b, t }, new ImmutableArray<>(qv));
     }
 
@@ -554,7 +555,7 @@ public class TermBuilder {
      */
     public Term prod(ImmutableList<QuantifiableVariable> qvs, Term range, Term t,
             TermServices services) {
-        final Function prod = services.getNamespaces().functions().lookup("prod");
+        final JavaDLFunction prod = services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -570,7 +571,7 @@ public class TermBuilder {
      */
     public Term min(ImmutableList<? extends QuantifiableVariable> qvs, Term range, Term t,
             TermServices services) {
-        final Function min = services.getNamespaces().functions().lookup("min");
+        final JavaDLFunction min = services.getNamespaces().functions().lookup("min");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(min, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -586,7 +587,7 @@ public class TermBuilder {
      */
     public Term max(ImmutableList<? extends QuantifiableVariable> qvs, Term range, Term t,
             TermServices services) {
-        final Function max = services.getNamespaces().functions().lookup("max");
+        final JavaDLFunction max = services.getNamespaces().functions().lookup("max");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(max, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -796,8 +797,8 @@ public class TermBuilder {
     // ------------------------------
 
     public Term pair(Term first, Term second) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("pair"));
+        final Namespace<JavaDLFunction> funcNS = services.getNamespaces().functions();
+        final JavaDLFunction f = funcNS.lookup(new Name("pair"));
         if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
@@ -808,8 +809,8 @@ public class TermBuilder {
     }
 
     public Term prec(Term mby, Term mbyAtPre) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("prec"));
+        final Namespace<JavaDLFunction> funcNS = services.getNamespaces().functions();
+        final JavaDLFunction f = funcNS.lookup(new Name("prec"));
         if (f == null) {
             throw new RuntimeException("LDT: Function prec not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
@@ -819,8 +820,8 @@ public class TermBuilder {
     }
 
     public Term measuredByCheck(Term mby) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("measuredByCheck"));
+        final Namespace<JavaDLFunction> funcNS = services.getNamespaces().functions();
+        final JavaDLFunction f = funcNS.lookup(new Name("measuredByCheck"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredByCheck not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
@@ -829,8 +830,8 @@ public class TermBuilder {
     }
 
     public Term measuredBy(Term mby) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("measuredBy"));
+        final Namespace<JavaDLFunction> funcNS = services.getNamespaces().functions();
+        final JavaDLFunction f = funcNS.lookup(new Name("measuredBy"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredBy not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
@@ -838,9 +839,9 @@ public class TermBuilder {
         return func(f, mby);
     }
 
-    public Function getMeasuredByEmpty() {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("measuredByEmpty"));
+    public JavaDLFunction getMeasuredByEmpty() {
+        final Namespace<JavaDLFunction> funcNS = services.getNamespaces().functions();
+        final JavaDLFunction f = funcNS.lookup(new Name("measuredByEmpty"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredByEmpty not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
@@ -1267,27 +1268,27 @@ public class TermBuilder {
     }
 
     public Term inByte(Term var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inByte"));
+        JavaDLFunction f = services.getNamespaces().functions().lookup(new Name("inByte"));
         return func(f, var);
     }
 
     public Term inShort(Term var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inShort"));
+        JavaDLFunction f = services.getNamespaces().functions().lookup(new Name("inShort"));
         return func(f, var);
     }
 
     public Term inChar(Term var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inChar"));
+        JavaDLFunction f = services.getNamespaces().functions().lookup(new Name("inChar"));
         return func(f, var);
     }
 
     public Term inInt(Term var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inInt"));
+        JavaDLFunction f = services.getNamespaces().functions().lookup(new Name("inInt"));
         return func(f, var);
     }
 
     public Term inLong(Term var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inLong"));
+        JavaDLFunction f = services.getNamespaces().functions().lookup(new Name("inLong"));
         return func(f, var);
     }
 
@@ -1506,7 +1507,7 @@ public class TermBuilder {
      * recursively defined for arrays. See bug #1392.
      */
     public Term deepNonNull(Term o, Term d) {
-        final Function nonNull = services.getNamespaces().functions().lookup("nonNull");
+        final JavaDLFunction nonNull = services.getNamespaces().functions().lookup("nonNull");
         final Term heap = getBaseHeap();
         return func(nonNull, heap, o, d);
     }
@@ -1598,7 +1599,7 @@ public class TermBuilder {
      * Get the select expression for a location variabe representing the field.
      */
     public Term select(Sort asSort, Term h, Term o, LocationVariable field) {
-        final Function f =
+        final JavaDLFunction f =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
         return select(asSort, h, o, func(f));
     }
@@ -1613,13 +1614,13 @@ public class TermBuilder {
         // return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
-    public Term dot(Sort asSort, Term o, Function f) {
+    public Term dot(Sort asSort, Term o, JavaDLFunction f) {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? dot(asSort, o, func(f)) : func(f, getBaseHeap(), o);
     }
 
     public Term dot(Sort asSort, Term o, LocationVariable field) {
-        final Function f =
+        final JavaDLFunction f =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
         return dot(asSort, o, f);
     }
@@ -1628,7 +1629,7 @@ public class TermBuilder {
         return dot(asSort, NULL(), f);
     }
 
-    public Term staticDot(Sort asSort, Function f) {
+    public Term staticDot(Sort asSort, JavaDLFunction f) {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? staticDot(asSort, func(f)) : func(f, getBaseHeap());
     }
@@ -1858,11 +1859,11 @@ public class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getAnon(), h1, s, h2);
     }
 
-    public Term fieldStore(TermServices services, Term o, Function f, Term v) {
+    public Term fieldStore(TermServices services, Term o, JavaDLFunction f, Term v) {
         return store(getBaseHeap(), o, func(f), v);
     }
 
-    public Term staticFieldStore(Function f, Term v) {
+    public Term staticFieldStore(JavaDLFunction f, Term v) {
         return fieldStore(services, NULL(), f, v);
     }
 

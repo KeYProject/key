@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Quadruple;
@@ -61,7 +61,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         final TermBuilder tb = services.getTermBuilder();
 
-        Function newSkolemConst = MergeRuleUtils
+        JavaDLFunction newSkolemConst = MergeRuleUtils
                 .getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());

@@ -18,10 +18,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -41,6 +38,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -368,7 +366,7 @@ public class MergeRule implements BuiltInRule {
                     && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm =
-                    tb.func(new Function(new Name("P"), JavaDLTheory.FORMULA, v.sort()), tb.var(v));
+                    tb.func(new JavaDLFunction(new Name("P"), JavaDLTheory.FORMULA, v.sort()), tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);
                 Term toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
@@ -480,7 +478,7 @@ public class MergeRule implements BuiltInRule {
             return new ValuesMergeResult(newConstraints, heap1, newNames, sideConditionsToProve);
         }
 
-        if (!(heap1.op() instanceof Function) || !(heap2.op() instanceof Function)) {
+        if (!(heap1.op() instanceof JavaDLFunction) || !(heap2.op() instanceof JavaDLFunction)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
                 MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2,
@@ -537,7 +535,7 @@ public class MergeRule implements BuiltInRule {
 
                 }
 
-                return new ValuesMergeResult(newConstraints, tb.func((Function) heap1.op(),
+                return new ValuesMergeResult(newConstraints, tb.func((JavaDLFunction) heap1.op(),
                     mergedSubHeap.mergeVal(), heap1.sub(1), field1, mergedVal), newNames,
                     sideConditionsToProve);
 
@@ -565,7 +563,7 @@ public class MergeRule implements BuiltInRule {
                 sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                    tb.func((Function) heap1.op(), mergedSubHeap.mergeVal(), pointer1), newNames,
+                    tb.func((JavaDLFunction) heap1.op(), mergedSubHeap.mergeVal(), pointer1), newNames,
                     sideConditionsToProve);
             }
 

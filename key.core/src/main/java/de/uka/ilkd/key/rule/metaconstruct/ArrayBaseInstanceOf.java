@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -47,7 +47,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol =
+        JavaDLFunction instanceofSymbol =
             services.getJavaDLTheory().getInstanceofSymbol(arrayElementSort, services);
         Debug.assertTrue(instanceofSymbol != null, "Instanceof symbol not found for ",
             arrayElementSort);

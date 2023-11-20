@@ -12,10 +12,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableList;
@@ -109,7 +106,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
-                        final Function thisFieldSymbol = heapLDT.getFieldSymbolForPV(et, services);
+                        final JavaDLFunction thisFieldSymbol = heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
                             services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }
@@ -131,7 +128,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     attribute.getKeYJavaType());
             } else {
                 try {
-                    final Function fieldSymbol =
+                    final JavaDLFunction fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     Term attributeTerm;
                     if (attribute.isStatic()) {

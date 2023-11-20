@@ -5,11 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -56,7 +52,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
-            if (op instanceof Function) {
+            if (op instanceof JavaDLFunction) {
                 String name = op.name().toString();
 
                 String className;

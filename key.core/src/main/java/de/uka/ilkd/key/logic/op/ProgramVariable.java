@@ -256,12 +256,4 @@ public abstract class ProgramVariable extends AbstractSortedOperator
             return null;
         }
     }
-
-    /**
-     * Returns an equivalent variable with the new name.
-     *
-     * @param name the new name
-     * @return equivalent operator with the new name
-     */
-    public abstract Operator rename(Name name);
 }

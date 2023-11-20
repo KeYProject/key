@@ -8,6 +8,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -124,6 +125,12 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
 
     @Override
     public ImmutableArray<Sort> argSorts() {
+        throw new RuntimeException("Not supported");
+    }
+
+    @Override
+    public final Modifier modifier() {
+        // TODO: remove
         throw new RuntimeException("Not supported");
     }
 }

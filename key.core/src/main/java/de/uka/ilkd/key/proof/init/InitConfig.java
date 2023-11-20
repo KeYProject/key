@@ -9,7 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import org.key_project.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
@@ -346,7 +347,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<Function> funcNS() {
+    public Namespace<JavaDLFunction> funcNS() {
         return namespaces().functions();
     }
 

@@ -11,7 +11,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -234,7 +235,7 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof Function) || (op.getClass().equals(Function.class)
+            return !(op instanceof JavaDLFunction) || (op.getClass().equals(JavaDLFunction.class)
                     && ((Function) op).sort().extendsTrans(JavaDLTheory.FORMULA));
         }
     }

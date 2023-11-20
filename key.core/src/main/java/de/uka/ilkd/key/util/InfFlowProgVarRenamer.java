@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 
 
 /**
@@ -99,7 +101,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameAndAddToReplaceMap(Term term) {
         if (term.op() instanceof ProgramVariable) {
             renameProgramVariable(term);
-        } else if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()) {
+        } else if (term.op() instanceof JavaDLFunction && ((Function) term.op()).isSkolemConstant()) {
             renameSkolemConstant(term);
         } else if (term.op() instanceof ElementaryUpdate) {
             applyRenamingsOnUpdate(term);
@@ -112,17 +114,40 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameProgramVariable(Term term) {
         assert term.arity() == 0;
         final ProgramVariable pv = (ProgramVariable) term.op();
-        final Name newName =
-            VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
-        final Operator renamedPv = pv.rename(newName);
+        final Name newName =             VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
+        final ProgramVariable renamedPv = rename(newName, pv);
 
         // for the taclet application dialog (which gets the declared
         // program variables in a strange way and not directly from the
         // namespace); adds the renamedPv also to the namespace
-        goalForVariableRegistration.addProgramVariable((ProgramVariable) renamedPv);
+        goalForVariableRegistration.addProgramVariable(renamedPv);
 
-        final Term pvTerm = label(var((ProgramVariable) renamedPv), term.getLabels());
+        final Term pvTerm = label(var(renamedPv), term.getLabels());
         replaceMap.put(term, pvTerm);
+    }
+
+    /**
+     * Returns an equivalent variable with the new name.
+     *
+     * @param newName the new name
+     * @param pv the program variable to be renamed
+     * @return equivalent operator with the new name
+     */
+    public static ProgramVariable rename(Name newName, ProgramVariable pv) {
+        if (pv instanceof LocationVariable lv) {
+            if (lv.getKeYJavaType() != null) {
+                return new LocationVariable(new ProgramElementName(newName.toString()), lv.getKeYJavaType(),
+                        lv.getContainerType(), lv.isStatic(), lv.isModel());
+            } else {
+                return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
+            }
+        } else if (pv instanceof ProgramConstant pc) {
+            return new ProgramConstant(new ProgramElementName(newName.toString()), pc.getKeYJavaType(),
+                    pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
+        } else {
+            throw new IllegalArgumentException("Unknown type for pv: " + pv);
+        }
+
     }
 
 
@@ -130,7 +155,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Function f = (Function) term.op();
         final Name newName =
             VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
-        final Function renamedF = f.rename(newName);
+        final JavaDLFunction renamedF = new JavaDLFunction(newName, f.sort(), f.argSorts(), f.whereToBind(), f.isUnique(), f.isSkolemConstant());
         services.getNamespaces().functions().addSafely(renamedF);
         final Term fTerm = label(func(renamedF), term.getLabels());
         replaceMap.put(term, fTerm);

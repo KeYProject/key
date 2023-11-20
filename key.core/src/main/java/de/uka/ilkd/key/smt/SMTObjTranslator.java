@@ -20,6 +20,7 @@ import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -1126,7 +1127,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof Function fun) {
+        } else if (op instanceof JavaDLFunction fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {

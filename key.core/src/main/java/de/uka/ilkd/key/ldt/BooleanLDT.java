@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JavaDLFunction;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
@@ -28,9 +28,9 @@ public final class BooleanLDT extends LDT {
     public static final Name NAME = new Name("boolean");
 
     /** the boolean literals as function symbols and terms */
-    private final Function bool_true;
+    private final JavaDLFunction bool_true;
     private final Term term_bool_true;
-    private final Function bool_false;
+    private final JavaDLFunction bool_false;
     private final Term term_bool_false;
 
 
@@ -65,7 +65,7 @@ public final class BooleanLDT extends LDT {
     /**
      * returns the function representing the boolean value <tt>FALSE</tt>
      */
-    public Function getFalseConst() {
+    public JavaDLFunction getFalseConst() {
         return bool_false;
     }
 
@@ -73,7 +73,7 @@ public final class BooleanLDT extends LDT {
     /**
      * returns the function representing the boolean value <tt>TRUE</tt>
      */
-    public Function getTrueConst() {
+    public JavaDLFunction getTrueConst() {
         return bool_true;
     }
 
@@ -116,15 +116,15 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
-            ExecutionContext ec) {
+    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+                                         ExecutionContext ec) {
         assert false;
         return null;
     }
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JavaDLFunction f) {
         return containsFunction(f) && f.arity() == 0;
     }
 

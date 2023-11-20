@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -17,11 +18,16 @@ import org.key_project.util.collection.ImmutableArray;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends org.key_project.logic.op.AbstractSortedOperator
-        implements org.key_project.logic.op.SortedOperator, Operator, Sorted {
+        implements Operator, Sorted {
+
+    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+                                     ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+        super(name, argSorts, sort, whereToBind, modifier);
+    }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
-        super(name, argSorts, sort, whereToBind, isRigid);
+        this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
