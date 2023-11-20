@@ -90,7 +90,7 @@ class BasicSnippetData {
         FREE_PRECONDITION(Term.class), POSTCONDITION(Term.class),
         LOOP_INVARIANT(LoopSpecification.class), LOOP_INVARIANT_TERM(Term.class),
         MODIFIES(Term.class), DEPENDENS(Term.class), MEASURED_BY(Term.class),
-        MODALITY(Modality.class), INF_FLOW_SPECS(ImmutableList.class),
+        MODALITY(Modality.JavaModalityKind.class), INF_FLOW_SPECS(ImmutableList.class),
         /**
          * Self term of the transformed block contract
          */

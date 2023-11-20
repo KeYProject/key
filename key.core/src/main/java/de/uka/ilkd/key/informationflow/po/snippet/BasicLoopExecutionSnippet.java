@@ -59,12 +59,12 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
                 "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
-        Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind = (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
         final Modality.JavaModalityKind symbExecMod;
-        if (modality.kind() == Modality.JavaModalityKind.BOX) {
+        if (kind == Modality.JavaModalityKind.BOX) {
             symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
             symbExecMod = Modality.JavaModalityKind.BOX;
@@ -76,7 +76,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
         final Term guardPreAndTrueTerm =
-            tb.prog(modality.kind(), jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+            tb.prog(kind, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
         final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         // create update
