@@ -1005,7 +1005,7 @@ public final class MainWindow extends JFrame {
         JMenu options = new JMenu("Options");
         options.setMnemonic(KeyEvent.VK_O);
 
-        options.add(SettingsManager.getInstance().getActionShowSettings(this));
+        options.add(SettingsManager.getActionShowSettings(this));
         options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
         // options.add(setupSpeclangMenu()); // legacy since only JML supported

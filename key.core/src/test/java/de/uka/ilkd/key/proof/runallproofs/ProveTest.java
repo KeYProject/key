@@ -47,12 +47,12 @@ public class ProveTest {
 
     protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
-    protected final String statisticsFile = "tmp.csv";
+    protected String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
-    protected final boolean reloadEnabled = false;
+    protected boolean reloadEnabled = false;
     protected String tempDir = "/tmp";
-    protected final String globalSettings = "";
-    protected final String localSettings = "";
+    protected String globalSettings = "";
+    protected String localSettings = "";
     private StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {
@@ -73,10 +73,10 @@ public class ProveTest {
 
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
-        if (localSettings != null && !localSettings.isEmpty()) {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(globalSettings);
+        if (localSettings != null && !"".equals(localSettings)) {
             // local settings must be complete to have desired effect
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(localSettings);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
         }
 
         File keyFile = new File(file);
