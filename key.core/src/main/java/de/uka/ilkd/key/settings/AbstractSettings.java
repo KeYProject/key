@@ -24,7 +24,6 @@ public abstract class AbstractSettings implements Settings {
         changeSupport.removePropertyChangeListener(listener);
     }
 
-    @Override
     public PropertyChangeListener[] getPropertyChangeListeners() {
         return changeSupport.getPropertyChangeListeners();
     }
