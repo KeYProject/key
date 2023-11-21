@@ -67,7 +67,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
                 "Tried to produce a " + "program-term for a contract without modality.");
         }
         assert Modality.JavaModalityKind.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality.JavaModalityKind kind = (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
 
 
         // create java block

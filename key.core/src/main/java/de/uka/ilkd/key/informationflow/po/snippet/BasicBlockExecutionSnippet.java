@@ -61,7 +61,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
         }
 
         // create java block
-        Modality.JavaModalityKind kind = (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final JavaBlock jb = buildJavaBlock(d, vs);
 
         // create program term

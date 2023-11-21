@@ -59,7 +59,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
                 "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
-        Modality.JavaModalityKind kind = (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
