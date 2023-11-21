@@ -6,6 +6,7 @@ package de.uka.ilkd.key.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -199,15 +200,18 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Term applyRenamingsToPrograms(Term term,
             Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
 
-        if (term != null) {
-            final JavaBlock renamedJavaBlock = renameJavaBlock(progVarReplaceMap, term, services);
+        if (term == null) {
+            return null;
+        } else if (term.op() instanceof Modality mod) {
+            final JavaBlock renamedJavaBlock =
+                renameJavaBlock(progVarReplaceMap, mod.program().program(), services);
             final Term[] appliedSubs = applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
-            final Term renamedTerm = tf().createTerm(term.op(), appliedSubs, term.boundVars(),
+            return tf().createTerm(Modality.getModality(mod.kind(), renamedJavaBlock), appliedSubs,
+                term.boundVars(),
                 renamedJavaBlock, term.getLabels());
-            return renamedTerm;
         } else {
-            return null;
+            return term;
         }
     }
 
@@ -223,9 +227,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
-            Term term, Services services) {
+            JavaProgramElement program, Services services) {
         final ProgVarReplaceVisitor paramRepl =
-            new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
+            new ProgVarReplaceVisitor(program, progVarReplaceMap, services);
         paramRepl.start();
         final JavaBlock renamedJavaBlock =
             JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
