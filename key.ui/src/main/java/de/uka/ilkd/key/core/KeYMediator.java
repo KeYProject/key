@@ -112,7 +112,7 @@ public class KeYMediator {
         notationInfo = new NotationInfo();
         proofListener = new KeYMediatorProofListener();
         proofTreeListener = new KeYMediatorProofTreeListener();
-        keySelectionModel = new KeYSelectionModel(new KeYMediatorSelectionListener());
+        keySelectionModel = new KeYSelectionModel(this);
 
         ui.getProofControl().addAutoModeListener(proofListener);
 
@@ -214,11 +214,15 @@ public class KeYMediator {
 
     /**
      * Selects the specified proof and initializes it.
+     * <br/>
+     * This method is called by the selection model, which fires the event.
+     * The method itself does not fire
+     * {@link KeYSelectionListener#selectedProofChanged(KeYSelectionEvent)}
      *
      * @param newProof the proof to select.
      * @param previousProof the previously selected proof
      */
-    private void setProof(Proof newProof, Proof previousProof) {
+    void setProof(Proof newProof, Proof previousProof) {
         if (previousProof == newProof) {
             return;
         }
@@ -239,8 +243,6 @@ public class KeYMediator {
         }
 
         OneStepSimplifier.refreshOSS(newProof);
-
-        keySelectionModel.setSelectedProof(newProof);
     }
 
     /**
@@ -672,23 +674,7 @@ public class KeYMediator {
         }
 
         @Override
-        public void proofStructureChanged(ProofTreeEvent e) {
-            if (isInAutoMode() || pruningInProcess) {
-                return;
-            }
-            Proof p = e.getSource();
-            if (p == getSelectedProof()) {
-                Node sel_node = getSelectedNode();
-                if (!p.find(sel_node)) {
-                    keySelectionModel.defaultSelection();
-                } else {
-                    // %%% hack does need to be done proper
-                    // needed top update that the selected node nay have
-                    // changed its status
-                    keySelectionModel.setSelectedNode(sel_node);
-                }
-            }
-        }
+        public void proofStructureChanged(ProofTreeEvent e) {}
     }
 
     private final class KeYMediatorProofListener implements RuleAppListener, AutoModeListener {
@@ -717,22 +703,6 @@ public class KeYMediator {
          */
         @Override
         public void autoModeStopped(ProofEvent e) {
-        }
-    }
-
-    private class KeYMediatorSelectionListener implements KeYSelectionListener {
-        /** focused node has changed */
-        @Override
-        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-            // empty
-        }
-
-        /**
-         * the selected proof has changed (e.g. a new proof has been loaded)
-         */
-        @Override
-        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            setProof(e.getSource().getSelectedProof(), e.getPreviousSelection());
         }
     }
 
