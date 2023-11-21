@@ -100,10 +100,9 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      * @param subs the sub terms of the constructed term (whose type is constrained by the used
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
-     * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
@@ -114,8 +113,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     }
 
     TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
-        this(op, subs, boundVars, javaBlock, "");
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        this(op, subs, boundVars, "");
     }
 
     /**

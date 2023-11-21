@@ -253,7 +253,7 @@ public final class ProgVarReplacer {
         }
 
         if (changedSubTerm || newJb != jb) {
-            result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(), newJb,
+            result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
                 t.getLabels());
         }
         return result;

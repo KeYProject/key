@@ -10,7 +10,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -159,7 +158,6 @@ class GenericTranslator {
         }
 
         if (term.op() instanceof Quantifier) {
-
             QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
             assert copy.length == 1;
             int i = 0;
@@ -180,12 +178,9 @@ class GenericTranslator {
             if ((term.op()).equals(Quantifier.EX)) {
                 term = services.getTermBuilder().ex(copy[0], subTerms[0]);
             }
-
         } else {
-
             term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-                JavaBlock.EMPTY_JAVABLOCK);
-
+                null);
         }
 
         return term;

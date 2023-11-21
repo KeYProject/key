@@ -1399,8 +1399,7 @@ public final class AuxiliaryContractBuilders {
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
                     tb.tf().createTerm(
                         Modality.getModality(instantiation.modality().kind(), newJavaBlock),
-                        new ImmutableArray<>(newPost), null, newJavaBlock,
-                        instantiation.formula().getLabels()));
+                        new ImmutableArray<>(newPost), null, instantiation.formula().getLabels()));
 
                 term = tb.applySequential(updates,
                     tb.prog(instantiation.modality().kind(), newJavaBlock, newPost, labels));
@@ -1626,7 +1625,7 @@ public final class AuxiliaryContractBuilders {
                     services.getTermBuilder().tf().createTerm(
                         instantiation.modality(),
                         new ImmutableArray<>(instantiation.formula().sub(0)),
-                        null, instantiation.formula().javaBlock(),
+                        null,
                         instantiation.formula().getLabels())));
         }
 

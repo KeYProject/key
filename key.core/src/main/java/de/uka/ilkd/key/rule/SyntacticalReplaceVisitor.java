@@ -313,18 +313,18 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
-                    new ImmutableArray<>(neededsubs), boundVars, jb, visited.getLabels());
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels);
+                    new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visitedOp,
-                    visited.subs(), visited.boundVars(), visited.javaBlock(), visited.getLabels());
+                    visited.subs(), visited.boundVars(), visited.getLabels());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                     t = visited;
                 } else {
                     t = tb.tf().createTerm(visitedOp, visited.subs(), visited.boundVars(),
-                        visited.javaBlock(), labels);
+                        labels);
                 }
                 t = resolveSubst(t);
                 if (t == visited) {
@@ -338,10 +338,10 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm, Operator newTermOp,
             ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels) {
+            ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
-            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock,
+            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars,
                 newTermOriginalLabels));
     }
 

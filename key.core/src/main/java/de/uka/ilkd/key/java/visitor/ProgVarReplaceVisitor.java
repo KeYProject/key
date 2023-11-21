@@ -193,7 +193,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 }
             }
             return changed ? services.getTermFactory().createTerm(op, subTerms, t.boundVars(),
-                t.javaBlock(), t.getLabels()) : t;
+                t.getLabels()) : t;
         }
     }
 

@@ -590,7 +590,7 @@ public class TacletGenerator {
             resultProgSV, new ImmutableArray<>(paramProgSVs));
         final JavaBlock findBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(mbs, null));
 
-        SchemaVariable modalitySV =
+        final var modalitySV =
             SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
                 JavaDLTheory.FORMULA,
                 DefaultImmutableSet.<Modality.JavaModalityKind>nil()
@@ -601,7 +601,8 @@ public class TacletGenerator {
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
         final Term findTerm =
-            TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, findBlock);
+            TB.tf().createTerm(Modality.getModality(modalitySV, findBlock),
+                new Term[] { TB.var(postSV) }, null, null);
 
         final JavaBlock replaceBlock =
             JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(), null));
@@ -621,7 +622,8 @@ public class TacletGenerator {
 
         final Term replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, replaceBlock));
+                TB.tf().createTerm(Modality.getModality(modalitySV, replaceBlock),
+                    new Term[] { TB.var(postSV) }, null, null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder =
             new RewriteTacletBuilder<>();
@@ -889,7 +891,7 @@ public class TacletGenerator {
             newTerm = t;
         } else {
             newTerm = services.getTermBuilder().tf().createTerm(t.op(), newSubs,
-                new ImmutableArray<>(newBoundVars), t.javaBlock());
+                new ImmutableArray<>(newBoundVars), null);
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -924,7 +926,7 @@ public class TacletGenerator {
 
         // reassemble, return
         final Term term =
-            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
+            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null);
         return new Pair<>(term, taclets);
     }
 

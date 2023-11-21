@@ -256,7 +256,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final Term newTerm =
-                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, visited.getLabels());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term term = resolveSubst(visited);

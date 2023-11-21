@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -57,7 +56,7 @@ public final class TermFactory {
      * entire system.
      */
     public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
@@ -67,56 +66,43 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
-        return doCreateTerm(op, subs, boundVars, javaBlock, labels, "");
+        return doCreateTerm(op, subs, boundVars, labels, "");
     }
 
     public Term createTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
 
-        return createTerm(op, subs, boundVars, javaBlock, null);
+        return createTerm(op, subs, boundVars, null);
     }
-
-
-    public Term createTerm(@NonNull Operator op, Term[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
-        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
-    }
-
 
     public Term createTerm(@NonNull Operator op, Term... subs) {
-        return createTerm(op, subs, null, null);
+        return createTerm(op, createSubtermArray(subs), null, null);
     }
 
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
-    }
-
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, TermLabel label) {
-        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock,
-            new ImmutableArray<>(label));
+            ImmutableArray<TermLabel> labels) {
+        return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
-        return createTerm(op, subs, null, null, label);
+        return createTerm(op, subs, null, new ImmutableArray<>(label));
     }
 
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, createSubtermArray(subs), null, null, labels);
+        return createTerm(op, createSubtermArray(subs), null, labels);
     }
 
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new ImmutableArray<>(sub), null, null, labels);
+        return createTerm(op, new ImmutableArray<>(sub), null, labels);
     }
 
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new Term[] { sub1, sub2 }, null, null, labels);
+        return createTerm(op, new Term[] { sub1, sub2 }, labels);
     }
 
 
     public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, NO_SUBTERMS, null, null, labels);
+        return createTerm(op, NO_SUBTERMS, null, labels);
     }
 
     // -------------------------------------------------------------------------
@@ -128,17 +114,13 @@ public final class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
 
-        // TODO: For testing only, remove before merge
-        if (op instanceof Modality mod && !mod.program().equals(javaBlock)) {
-            throw new RuntimeException("Inconsistent term creation");
-        }
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
-                    ? new TermImpl(op, subs, boundVars, javaBlock, origin)
-                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin));
+                    ? new TermImpl(op, subs, boundVars, origin)
+                    : new LabeledTermImpl(op, subs, boundVars, labels, origin));
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -180,6 +162,6 @@ public final class TermFactory {
     }
 
     public Term createTermWithOrigin(Term t, String origin) {
-        return doCreateTerm(t.op(), t.subs(), t.boundVars(), t.javaBlock(), t.getLabels(), origin);
+        return doCreateTerm(t.op(), t.subs(), t.boundVars(), t.getLabels(), origin);
     }
 }

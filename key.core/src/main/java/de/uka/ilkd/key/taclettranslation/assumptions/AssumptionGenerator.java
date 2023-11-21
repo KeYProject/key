@@ -105,8 +105,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-            JavaBlock.EMPTY_JAVABLOCK);
+        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, null);
 
         term = changeTerm(term);
 
@@ -395,7 +394,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             ImmutableArray<QuantifiableVariable> array = new ImmutableArray<>(list);
 
             term = services.getTermFactory().createTerm(term.op(), term.subs(), array,
-                JavaBlock.EMPTY_JAVABLOCK, term.getLabels());
+                term.getLabels());
 
         }
 

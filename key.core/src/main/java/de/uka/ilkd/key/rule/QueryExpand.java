@@ -569,8 +569,8 @@ public class QueryExpand implements BuiltInRule {
 
         final Term result;
         if (changedSubTerm) {
-            result = services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars,
-                term.javaBlock());
+            result =
+                services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars, null);
         } else {
             result = term;
         }

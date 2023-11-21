@@ -50,7 +50,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 labelHint, posOfFind, it, mc, newMaxSort, goal, services, ruleApp);
 
             return services.getTermFactory().createTerm(term.op(), subs, term.boundVars(),
-                term.javaBlock(), term.getLabels());
+                term.getLabels());
         }
 
         with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp,

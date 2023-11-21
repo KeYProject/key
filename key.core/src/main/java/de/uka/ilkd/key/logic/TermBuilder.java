@@ -406,11 +406,11 @@ public class TermBuilder {
     }
 
     public Term func(JavaDLFunction f, Term... s) {
-        return tf.createTerm(f, s, null, null);
+        return tf.createTerm(f, s);
     }
 
     public Term func(IObserverFunction f, Term... s) {
-        return tf.createTerm(f, s, null, null);
+        return tf.createTerm(f, s);
     }
 
     public Term func(JavaDLFunction f, Term[] s, ImmutableArray<QuantifiableVariable> boundVars) {
@@ -426,12 +426,12 @@ public class TermBuilder {
     // }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
-        return tf.createTerm(Modality.getModality(modKind, jb), new Term[] { t }, null, jb);
+        return tf.createTerm(Modality.getModality(modKind, jb), new Term[] { t }, null, null);
     }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t,
             ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(Modality.getModality(modKind, jb), new Term[] { t }, null, jb, labels);
+        return tf.createTerm(Modality.getModality(modKind, jb), new Term[] { t }, null, labels);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -1665,7 +1665,7 @@ public class TermBuilder {
 
 
         Term result =
-            tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), term.getLabels());
+            tf.createTerm(term.op(), newSubs, term.boundVars(), term.getLabels());
         result = addLabel(result, labels);
         return result;
     }
@@ -1696,7 +1696,7 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                 labels);
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
@@ -1714,7 +1714,7 @@ public class TermBuilder {
                 }
             }
 
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                 new ImmutableArray<>(newLabelList));
         }
     }
@@ -1745,7 +1745,7 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                 labels);
         }
     }
@@ -1770,7 +1770,7 @@ public class TermBuilder {
     }
 
     public Term unlabel(Term term) {
-        return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock());
+        return tf.createTerm(term.op(), term.subs(), term.boundVars());
     }
 
     public Term unlabelRecursive(Term term) {
@@ -1778,7 +1778,7 @@ public class TermBuilder {
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
-        return tf.createTerm(term.op(), subs, term.boundVars(), term.javaBlock());
+        return tf.createTerm(term.op(), subs, term.boundVars(), null);
     }
 
     public Term dotArr(Term ref, Term idx) {
@@ -2087,7 +2087,7 @@ public class TermBuilder {
             }
         }
 
-        return tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(),
+        return tf.createTerm(term.op(), newSubs, term.boundVars(),
             term.getLabels());
     }
 

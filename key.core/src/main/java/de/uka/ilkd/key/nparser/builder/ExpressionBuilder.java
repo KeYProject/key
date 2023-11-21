@@ -1135,7 +1135,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         return capsulateTf(ctx,
-            () -> getTermFactory().createTerm(op, new Term[] { a1 }, null, sjb.javaBlock));
+            () -> getTermFactory().createTerm(op, new Term[] { a1 }, null, null));
     }
 
     @Override

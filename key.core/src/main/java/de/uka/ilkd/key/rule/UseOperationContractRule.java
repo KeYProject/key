@@ -767,7 +767,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
                     tb.tf().createTerm(mod,
-                        new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
+                        new ImmutableArray<>(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels()))),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
@@ -788,8 +788,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
                 tb.tf().createTerm(instantiatedMod,
-                    new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
-                    inst.progPost.getLabels()))),
+                    new ImmutableArray<>(inst.progPost.sub(0)), null, inst.progPost.getLabels()))),
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);

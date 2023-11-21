@@ -127,12 +127,12 @@ public class TestSchemaModalOperators {
 
         Term find = TB.tf().createTerm(
             Modality.getModality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
-            new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
+            new Term[] { tpost }, null, null);
 
         Term replace =
             TB.tf().createTerm(
                 Modality.getModality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
-                new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
+                new Term[] { TB.tt() }, null, null);
 
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);

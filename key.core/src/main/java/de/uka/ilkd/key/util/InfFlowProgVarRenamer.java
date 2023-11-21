@@ -183,7 +183,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void applyRenamingsOnSubterms(Term term) {
         final Term[] renamedSubs = renameSubs(term);
         final Term renamedTerm = tf().createTerm(term.op(), renamedSubs, term.boundVars(),
-            term.javaBlock(), term.getLabels());
+            term.getLabels());
         replaceMap.put(term, renamedTerm);
     }
 
@@ -209,7 +209,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
             return tf().createTerm(Modality.getModality(mod.kind(), renamedJavaBlock), appliedSubs,
                 term.boundVars(),
-                renamedJavaBlock, term.getLabels());
+                term.getLabels());
         } else {
             return term;
         }
