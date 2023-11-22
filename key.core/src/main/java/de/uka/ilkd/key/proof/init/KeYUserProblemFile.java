@@ -129,10 +129,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
 
-        readSorts();
-        readFuncAndPred();
-        readRules();
-
         try {
             problem = getProblemFinder().getProblem();
             if (problem == null) {

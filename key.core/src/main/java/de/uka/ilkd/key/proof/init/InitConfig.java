@@ -53,7 +53,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private Map<String, String> category2DefaultChoice;
+    private Map<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains

@@ -4,7 +4,15 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import org.jspecify.annotations.NonNull;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -21,7 +29,8 @@ import org.jspecify.annotations.NonNull;
  *
  */
 public class ChoiceSettings extends AbstractSettings {
-    private static final String KEY_DEFAULT_CHOICES = "[Choice]DefaultChoices";
+    public static final String CATEGORY = "Choice";
+    private static final String KEY_DEFAULT_CHOICES = "DefaultChoices";
 
     private static final String PROP_CHOICE_DEFAULT = "category2Default";
     private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
@@ -140,7 +149,7 @@ public class ChoiceSettings extends AbstractSettings {
      * object in a way that it represents the stored settings
      */
     public void readSettings(Properties props) {
-        String choiceSequence = props.getProperty(KEY_DEFAULT_CHOICES);
+        String choiceSequence = props.getProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES);
         // set choices
         if (choiceSequence != null) {
             StringTokenizer st = new StringTokenizer(choiceSequence, ",");
@@ -160,21 +169,33 @@ public class ChoiceSettings extends AbstractSettings {
      * given Properties object. Only entries of
      * the form &lt; key &gt; = &lt; value &gt; (,&lt;
      * value &gt;)* are allowed.
-     *
-     ** @param props the Properties object where to write the
-     *        settings as (key, value) pair
+     * <p>
+     * * @param props the Properties object where to write the
+     * settings as (key, value) pair
      */
     @Override
     public void writeSettings(Properties props) {
-        StringBuilder choiceSequence = new StringBuilder();
-        var keys = category2Default.keySet().stream().sorted().toArray(String[]::new);
-        for (var key : keys) {
-            if (choiceSequence.length() > 0) {
-                choiceSequence.append(", ");
-            }
-            choiceSequence.append(key).append("-").append(category2Default.get(key));
+        var choiceSequence = category2Default.entrySet().stream()
+                .map(entry -> entry.getKey() + "-" + entry.getValue())
+                .collect(Collectors.joining(" , "));
+        props.setProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES, choiceSequence);
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        var category = props.getSection(CATEGORY);
+        if (category == null)
+            return;
+        for (Map.Entry<String, Object> entry : category.getEntries()) {
+            assert entry.getValue() instanceof String;
+            category2Default.put(entry.getKey(), entry.getValue().toString());
         }
-        props.setProperty(KEY_DEFAULT_CHOICES, choiceSequence.toString());
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var category = props.getOrCreateSection(CATEGORY);
+        category2Default.forEach(category::set);
     }
 
 
