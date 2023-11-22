@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.

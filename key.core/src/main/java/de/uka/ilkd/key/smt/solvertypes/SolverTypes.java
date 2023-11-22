@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
 import java.util.*;
+
 import org.jspecify.annotations.NonNull;
 
 /**

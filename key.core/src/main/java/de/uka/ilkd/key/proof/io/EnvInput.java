@@ -5,8 +5,6 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -15,6 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**

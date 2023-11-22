@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * The unique environment a proof is performed in. The environment consists of a java model,

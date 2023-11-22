@@ -5,7 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.List;
 import java.util.Objects;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;

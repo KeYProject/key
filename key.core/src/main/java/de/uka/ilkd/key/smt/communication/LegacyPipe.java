@@ -8,11 +8,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * On each side of the pipe there are sender and receivers: **** Receiver ====<=Output======= Sender

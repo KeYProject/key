@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util.mergerule;
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

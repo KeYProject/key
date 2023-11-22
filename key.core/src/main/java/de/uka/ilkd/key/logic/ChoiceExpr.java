@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
 import java.util.Set;
+
 import org.jspecify.annotations.NonNull;
 
 /**

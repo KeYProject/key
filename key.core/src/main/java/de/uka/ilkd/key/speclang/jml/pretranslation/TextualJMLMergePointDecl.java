@@ -4,14 +4,13 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.Objects;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
-import org.jspecify.annotations.NullMarked;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A JML merge point declaration in textual form.
@@ -25,7 +24,8 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
 
     private final JmlParser.Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(ImmutableList<JMLModifier> mods, JmlParser.Merge_point_statementContext mergeProc) {
+    public TextualJMLMergePointDecl(ImmutableList<JMLModifier> mods,
+            JmlParser.Merge_point_statementContext mergeProc) {
         super(mods);
         this.mergeProc = mergeProc;
         setPosition(mergeProc);
@@ -38,7 +38,7 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-                + ", name='" + name + '\'' + '}';
+            + ", name='" + name + '\'' + '}';
     }
 
     @Override

@@ -5,13 +5,14 @@ package de.uka.ilkd.key.speclang;
 
 import java.net.URI;
 import java.util.Objects;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A string with associated position information (file and line number). The position information is

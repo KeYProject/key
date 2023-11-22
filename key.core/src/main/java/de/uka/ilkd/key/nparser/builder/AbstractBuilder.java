@@ -5,8 +5,6 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class brings some nice features to the visitors of key's ast.

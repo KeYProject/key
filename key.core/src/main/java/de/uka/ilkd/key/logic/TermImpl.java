@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;

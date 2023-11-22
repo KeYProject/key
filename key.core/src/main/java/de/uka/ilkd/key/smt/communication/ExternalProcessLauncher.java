@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
+
 import org.jspecify.annotations.NonNull;
 
 /**

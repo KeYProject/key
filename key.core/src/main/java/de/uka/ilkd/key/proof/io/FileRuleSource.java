@@ -7,10 +7,10 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
-import org.jspecify.annotations.NonNull;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class FileRuleSource extends RuleSource {
 

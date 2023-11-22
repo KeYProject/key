@@ -15,9 +15,10 @@ import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy of

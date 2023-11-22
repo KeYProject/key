@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

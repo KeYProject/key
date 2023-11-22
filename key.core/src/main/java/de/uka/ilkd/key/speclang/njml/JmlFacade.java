@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -14,6 +13,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This facade provides facilities for the creation of lexer and parser of JML. It is the

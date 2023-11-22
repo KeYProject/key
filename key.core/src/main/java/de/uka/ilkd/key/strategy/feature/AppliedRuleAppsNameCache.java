@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.util.LRUCache;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Establishes a cache for the applied rule apps to query them by name.

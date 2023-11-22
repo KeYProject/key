@@ -50,7 +50,8 @@ public class Strings {
      * @return the CharSequence in the described format
      * @param <S> the type of the elements of the iterated collection
      */
-    public static <S extends @Nullable Object, T extends @Nullable Object> String formatAsList(Iterable<S> it,
+    public static <S extends @Nullable Object, T extends @Nullable Object> String formatAsList(
+            Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close,
             Function<S, T> mapper) {
         return StreamSupport.stream(it.spliterator(), false)

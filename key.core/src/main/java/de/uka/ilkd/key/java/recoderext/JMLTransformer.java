@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.net.URI;
 import java.util.*;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

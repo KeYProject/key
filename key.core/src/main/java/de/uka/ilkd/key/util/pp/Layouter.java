@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util.pp;
 
 import java.util.*;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for

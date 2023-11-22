@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +32,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>

@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+
+import org.jspecify.annotations.NonNull;
 
 public class CVC4Socket extends AbstractSolverSocket {
 

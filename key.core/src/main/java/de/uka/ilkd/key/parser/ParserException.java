@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.Nullable;

@@ -5,8 +5,8 @@
 package recoder.testsuite.basic;
 
 import java.io.File;
-import org.jspecify.annotations.NonNull;
 
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.service.DefaultErrorHandler;
 

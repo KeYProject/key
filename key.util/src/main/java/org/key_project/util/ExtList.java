@@ -7,6 +7,7 @@ package org.key_project.util;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import org.jspecify.annotations.Nullable;
 
 /**

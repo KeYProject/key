@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;

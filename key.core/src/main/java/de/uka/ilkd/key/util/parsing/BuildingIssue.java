@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.java.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;

@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface describes a syntactical check on JML parse trees.

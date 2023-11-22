@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.communication;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+
 import org.jspecify.annotations.NonNull;
 
 /**

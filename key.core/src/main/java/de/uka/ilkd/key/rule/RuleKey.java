@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import org.jspecify.annotations.NonNull;
-
 import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Name;
 

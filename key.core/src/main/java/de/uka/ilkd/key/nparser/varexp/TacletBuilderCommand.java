@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 

@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Socket for CVC5 (<a href="https://cvc5.github.io/">...</a>).

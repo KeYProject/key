@@ -9,9 +9,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 
 import org.key_project.util.Streams;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class providing various methods to read properties.

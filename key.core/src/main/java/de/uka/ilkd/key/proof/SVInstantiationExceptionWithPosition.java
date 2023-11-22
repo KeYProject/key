@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.proof;
 
 import java.net.MalformedURLException;
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an exception with position information. The row position is absolut this means, if in

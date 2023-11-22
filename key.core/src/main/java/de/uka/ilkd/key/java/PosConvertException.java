@@ -6,8 +6,6 @@ package de.uka.ilkd.key.java;
 
 import java.net.MalformedURLException;
 
-import org.jspecify.annotations.Nullable;
-
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 

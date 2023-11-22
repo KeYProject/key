@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import org.jspecify.annotations.NonNull;
-
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.LRUCache;

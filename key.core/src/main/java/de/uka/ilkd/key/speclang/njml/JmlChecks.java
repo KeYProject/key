@@ -6,12 +6,12 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
