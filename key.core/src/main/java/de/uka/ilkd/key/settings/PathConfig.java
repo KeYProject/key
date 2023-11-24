@@ -78,7 +78,7 @@ public final class PathConfig {
      */
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = keyConfigDir;
-        PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
+        PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
         PathConfig.proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
         PathConfig.logDirectory = new File(keyConfigDir, "logs");

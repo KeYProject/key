@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -245,7 +246,7 @@ public class CachingExtension
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.initiateAutoMode(newProof, true, false);
                 try {
-                    newProof.copyCachedGoals(referencedProof, null, null);
+                    CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
                 } finally {
                     mediator.finishAutoMode(newProof, true, true,
                         /* do not select a different node */ () -> {
