@@ -10,13 +10,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import org.slf4j.Logger;
@@ -46,16 +49,22 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
      * path of the properties file
      */
     public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), KeyStrokeSettings.SETTINGS_FILENAME);
+        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    private static final File SETTINGS_FILE_NEW =
+        new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
+
 
     /**
      * singleton instance
      */
     private static KeyStrokeSettings INSTANCE = null;
 
-    private static final Properties DEFAULT_KEYSTROKES = new Properties();
+    /**
+     * default {@link KeyStroke}s
+     */
+    private static Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
 
     // define the default mappings
     static {
@@ -120,18 +129,31 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     private KeyStrokeSettings(Properties init) {
+        super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
             if (value != null && !value.toString().isEmpty()) {
-                this.properties.put(key, value);
+                this.properties.put(key.toString(), value);
             }
         });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
+    public KeyStrokeSettings(Configuration config) {
+        super("");
+        this.properties.putAll(DEFAULT_KEYSTROKES);
+        readSettings(config);
+        save();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::save));
+    }
+
+    public static <T> void defineDefault(T any, KeyStroke ks) {
+        defineDefault(any.getClass(), ks);
+    }
+
     public static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
-        DEFAULT_KEYSTROKES.setProperty(clazz.getName(), ks.toString());
+        DEFAULT_KEYSTROKES.put(clazz.getName(), ks.toString());
     }
 
     // convenience method to make the definitions above better readable
@@ -144,28 +166,37 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public static KeyStrokeSettings getInstance() {
+
         if (INSTANCE == null) {
-            INSTANCE = KeyStrokeSettings.loadFromConfig();
+            if (SETTINGS_FILE.exists()) {
+                try {
+                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
+                    return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE_NEW));
+                } catch (IOException e) {
+                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                }
+            }
+            return INSTANCE = KeyStrokeSettings.loadFromConfig();
         }
         return INSTANCE;
     }
 
     @Override
     public void readSettings(Properties props) {
-        properties.putAll(props);
+        props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 
     void setKeyStroke(String key, KeyStroke stroke, boolean override) {
         var old = getKeyStroke(key, null);
         if (override || (old == null)) {
-            properties.setProperty(key, stroke != null ? stroke.toString() : "");
+            properties.put(key, stroke != null ? stroke.toString() : "");
             firePropertyChange(key, old, stroke);
         }
     }
 
     KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
         try {
-            KeyStroke ks = KeyStroke.getKeyStroke(properties.getProperty(key));
+            KeyStroke ks = KeyStroke.getKeyStroke(properties.get(key).toString());
             if (ks != null) {
                 return ks;
             }
@@ -178,7 +209,20 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
         try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-            properties.store(writer, "KeY's KeyStrokes");
+            Properties props = new Properties();
+            for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                props.setProperty(entry.getKey(), entry.getValue().toString());
+            }
+            props.store(writer, "KeY's KeyStrokes");
+            writer.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
+        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+            var config = new Configuration(properties);
+            config.save(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {
             LOGGER.warn("Failed to save", ex);
