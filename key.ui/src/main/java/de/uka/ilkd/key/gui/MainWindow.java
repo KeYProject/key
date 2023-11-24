@@ -1163,7 +1163,6 @@ public final class MainWindow extends JFrame {
             addToProofList(plist);
             getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
             disableCurrentGoalView = false;
-            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
@@ -1172,11 +1171,9 @@ public final class MainWindow extends JFrame {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-
         if (disableCurrentGoalView) {
             return;
         }
-
         final SequentView newSequentView;
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
@@ -1656,7 +1653,6 @@ public final class MainWindow extends JFrame {
 
         @Override
         public void modalDialogOpened(EventObject e) {
-
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), false);
