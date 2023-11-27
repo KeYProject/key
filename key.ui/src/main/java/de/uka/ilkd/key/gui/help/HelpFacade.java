@@ -14,6 +14,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.key_project.util.java.SwingUtil;
+
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import org.slf4j.Logger;
@@ -56,8 +58,8 @@ public class HelpFacade {
 
     private static void openHelpInBrowser(String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
-        } catch (IOException | URISyntaxException e) {
+            SwingUtil.browse(new URI(url));
+        } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.warn("Failed to open help in browser", e);
         }
     }
@@ -70,11 +72,18 @@ public class HelpFacade {
     }
 
     /**
-     * Opens the specified sub page of the key documentation website in the default system browser.
+     * Opens the specified subpage of the KeY documentation website in the default system browser.
      *
      * @param path a valid suffix to the current URI
      */
     public static void openHelp(String path) {
+        if (path.startsWith("https://")) {
+            openHelpInBrowser(path);
+            return;
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         openHelpInBrowser(HELP_BASE_URL + path);
     }
 

@@ -19,7 +19,7 @@ import javax.swing.*;
  */
 public class ViewSettings extends AbstractPropertiesSettings {
 
-    private static final String CLUTTER_RULES = "[View]clutterRules";
+    private static final String CLUTTER_RULES = "clutterRules";
 
     private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
         + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
@@ -29,7 +29,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
         + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
         + "divide_equation,equal_add_one,add_eq";
 
-    private static final String CLUTTER_RULESSETS = "[View]clutterRuleSets";
+    private static final String CLUTTER_RULESSETS = "clutterRuleSets";
 
     private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete,"
         + "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx,"
@@ -39,107 +39,112 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * default max number of displayed tooltip lines is 40
      */
-    private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
+    private static final String MAX_TOOLTIP_LINES_KEY = "MaxTooltipLines";
 
     /**
      * Show the Load examples dialog window on startup by default
      */
-    private static final String SHOW_LOAD_EXAMPLES_DIALOG = "[View]ShowLoadExamplesDialog";
+    private static final String SHOW_LOAD_EXAMPLES_DIALOG = "ShowLoadExamplesDialog";
 
     /**
      * do not print the find, varcond and heuristics part of taclets in the TacletMenu by default
      */
-    private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
+    private static final String SHOW_WHOLE_TACLET = "ShowWholeTaclet";
 
     /**
      * default font size
      */
-    private static final String FONT_INDEX = "[View]FontIndex";
+    private static final String FONT_INDEX = "FontIndex";
 
     /**
      * do not hide intermediate proofsteps by default
      */
-    private static final String HIDE_INTERMEDIATE_PROOFSTEPS = "[View]HideIntermediateProofsteps";
+    private static final String HIDE_INTERMEDIATE_PROOFSTEPS = "HideIntermediateProofsteps";
 
-    private static final String HIDE_AUTOMODE_PROOFSTEPS = "[View]HideAutomodeProofsteps";
+    private static final String HIDE_AUTOMODE_PROOFSTEPS = "HideAutomodeProofsteps";
 
     /**
      * do not hide closed subtrees by default
      */
-    private static final String HIDE_CLOSED_SUBTREES = "[View]HideClosedSubtrees";
+    private static final String HIDE_CLOSED_SUBTREES = "HideClosedSubtrees";
 
     /**
      * Which look and feel to use.
      */
-    private static final String LOOK_AND_FEEL = "[View]LookAndFeel";
+    private static final String LOOK_AND_FEEL = "LookAndFeel";
 
-    private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
+    private static final String SHOW_JAVA_WARNING = "ShowJavaWarning";
 
     /**
      * Pretty Syntax is true by default, use Unicode symbols not
      */
-    private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
+    private static final String PRETTY_SYNTAX = "PrettySyntax";
 
     /**
      *
      */
-    private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
+    private static final String USE_UNICODE = "UseUnicodeSymbols";
 
     /**
      *
      */
-    private static final String SYNTAX_HIGHLIGHTING = "[View]SyntaxHighlighting";
+    private static final String SYNTAX_HIGHLIGHTING = "SyntaxHighlighting";
 
     /**
      *
      */
-    private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
+    private static final String HIDE_PACKAGE_PREFIX = "HidePackagePrefix";
 
     /**
      * confirm exiting by default
      */
-    private static final String CONFIRM_EXIT = "[View]ConfirmExit";
+    private static final String CONFIRM_EXIT = "ConfirmExit";
 
-    private static final String FONT_SIZE_FACTOR = "[View]uiFontSizeFactor";
+    /**
+     * Heatmap options property
+     */
+    private static final String HEATMAP_OPTIONS = "HeatmapOptions";
 
-    private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
+    private static final String FONT_SIZE_FACTOR = "uiFontSizeFactor";
+
+    private static final String SEQUENT_VIEW_TOOLTIP = "SequentViewTooltips";
 
     /** this setting enables/disables tool tips in the source view */
-    private static final String SOURCE_VIEW_TOOLTIP = "[View]SourceViewTooltips";
+    private static final String SOURCE_VIEW_TOOLTIP = "SourceViewTooltips";
 
-    private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";
+    private static final String HIGHLIGHT_ORIGIN = "HighlightOrigin";
     /**
      *
      */
-    private static final String NOTIFY_LOAD_BEHAVIOUR = "[View]notifyLoadBehaviour";
+    private static final String NOTIFY_LOAD_BEHAVIOUR = "notifyLoadBehaviour";
     /**
      *
      */
-    private static final String SHOW_UNINSTANTIATED_TACLET = "[View]showUninstantiatedTaclet";
+    private static final String SHOW_UNINSTANTIATED_TACLET = "showUninstantiatedTaclet";
     /**
      * Show heatmap for sequent formulas (true) or terms (false)
      */
-    private static final String HEATMAP_SHOW = "[View][Heatmap]enabled";
+    private static final String HEATMAP_SHOW = "Heatmap_enabled";
     /**
      *
      */
-    private static final String HEATMAP_SF = "[View][Heatmap]sf";
+    private static final String HEATMAP_SF = "Heatmap_sf";
     /**
      *
      */
-    private static final String HEATMAP_NEWEST = "[View][Heatmap]newest";
+    private static final String HEATMAP_NEWEST = "Heatmap_newest";
     /**
      *
      */
-    private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
+    private static final String HEATMAP_MAXAGE = "Heatmap_maxAge";
 
-    private static final String HIDE_INTERACTIVE_GOALS = "[View]hideInteractiveGoals";
+    private static final String HIDE_INTERACTIVE_GOALS = "hideInteractiveGoals";
 
     /**
      * A list of bookmark of favourite folders of the user. Can be manipulated with
      * {@code de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
      */
-    private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
+    private static final String USER_FOLDER_BOOKMARKS = "folderBookmarks";
 
     private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
 
@@ -208,6 +213,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> hideInteractiveGoals =
         createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
+    private final PropertyEntry<String> notificationAfterMacro =
+        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
+
     /**
      * User-definable folder bookmarks.
      *
@@ -217,8 +225,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<List<String>> folderBookmarks =
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
-    private final PropertyEntry<String> notificationAfterMacro =
-        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
+    public ViewSettings() {
+        super("View");
+    }
 
     /**
      * Clutter rules are rules with less priority in the taclet menu

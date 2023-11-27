@@ -856,7 +856,8 @@ profile: PROFILE name=string_value SEMI;
 
 preferences
 :
-	KEYSETTINGS LBRACE (s=string_value)? RBRACE
+	KEYSETTINGS (LBRACE s=string_value? RBRACE
+	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
 proofScript
@@ -866,3 +867,23 @@ proofScript
 
 // PROOF
 proof: PROOF EOF;
+
+// Config
+cfile: cvalue* EOF;
+//csection: LBRACKET IDENT RBRACKET;
+ckv: doc=DOC_COMMENT? ckey ':' cvalue;
+ckey: IDENT | STRING_LITERAL;
+cvalue:
+    IDENT #csymbol
+  | STRING_LITERAL #cstring
+  | BIN_LITERAL #cintb
+  | HEX_LITERAL #cinth
+  | MINUS? INT_LITERAL #cintd
+  | MINUS? FLOAT_LITERAL #cfpf
+  | MINUS? DOUBLE_LITERAL #cfpd
+  | MINUS? REAL_LITERAL #cfpr
+  | (TRUE|FALSE) #cbool
+  | LBRACE
+     (ckv (COMMA ckv)*)? COMMA?
+    RBRACE #table
+  | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;

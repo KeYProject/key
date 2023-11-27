@@ -15,18 +15,21 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
  * @author Arne Keller
  */
 public class SlicingSettings extends AbstractPropertiesSettings {
+
+    public static final String CATEGORY = "ProofSlicing";
+
     /**
      * Config key for {@link #alwaysTrack}.
      */
-    private static final String KEY_ALWAYS_TRACK = "[ProofSlicing]alwaysTrack";
+    private static final String KEY_ALWAYS_TRACK = "alwaysTrack";
     /**
      * Config key for {@link #aggressiveDeduplicate}.
      */
-    private static final String KEY_AGGRESSIVE_DEDUPLICATE = "[ProofSlicing]aggressiveDeduplicate";
+    private static final String KEY_AGGRESSIVE_DEDUPLICATE = "aggressiveDeduplicate";
     /**
      * Config key for {@link #dotExecutable}.
      */
-    private static final String KEY_DOT_EXECUTABLE = "[ProofSlicing]dotExecutable";
+    private static final String KEY_DOT_EXECUTABLE = "dotExecutable";
 
     /**
      * Always track dependencies config key.
@@ -52,6 +55,10 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     private final Map<Proof, Boolean> aggressiveDeduplicateOverride = new WeakHashMap<>();
 
+    public SlicingSettings() {
+        super(CATEGORY);
+    }
+
     public boolean getAlwaysTrack() {
         return alwaysTrack.get();
     }
@@ -75,7 +82,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     /**
      * Disable aggressive de-duplication for a particular proof.
      *
-     * @param proof proof to disable aggresive de-duplication for
+     * @param proof proof to disable aggressive de-duplication for
      */
     public void deactivateAggressiveDeduplicate(Proof proof) {
         aggressiveDeduplicateOverride.put(proof, false);

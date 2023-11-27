@@ -1073,6 +1073,8 @@ STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 QUOTED_STRING_LITERAL
     : '"' ('\\' . | '\n' | ~('\n' | '"' | '\\') )* '"' ;
 
+DOC_COMMENT: '/*!' -> more, pushMode(docComment);
+ML_COMMENT: '/*' -> more, pushMode(COMMENT);
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
 
 HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F' | '_')+ ('l'|'L')?;
@@ -1113,7 +1115,7 @@ DOUBLE_LITERAL:
     ;
 
 REAL_LITERAL:
-    RATIONAL_LITERAL ('r' | 'R')
+    RATIONAL_LITERAL ('r' | 'R')?
     ;
 
 
