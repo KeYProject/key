@@ -177,7 +177,10 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\working_space", "\\values", "\\inv",
         // clause keywords:
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
-        "assignable_free", "assignable_redundantly", "assume", "assume_redudantly", "breaks",
+        "assignable_free", "assignable_redundantly", "assigns", "assigns_free",
+        "assigns_redundantly", "assigning", "assigning_free", "assigning_redundantly",
+        "loop_modifies", "loop_modifies_free", "loop_modifies_redundantly", "loop_writes",
+        "loop_writes_free", "loop_writes_redundantly"," assume", "assume_redudantly", "breaks",
         "breaks_redundantly", "\\by", "callable", "callable_redundantly", "captures",
         "captures_redundantly", "continues", "continues_redundantly", "debug", "\\declassifies",
         "decreases", "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
