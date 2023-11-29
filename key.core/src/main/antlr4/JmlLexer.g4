@@ -75,7 +75,7 @@ ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
 ASSIGNABLE: ('assignable' | 'assigns' | 'assigning') Pfree -> pushMode(expr);
-LOOP_ASSIGNABLE: ('loop_modifies' | 'loop_writes') (Pfree|Pred) -> pushMode(expr);
+LOOP_ASSIGNABLE: ('loop_modifies' | 'loop_writes') Pfree -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);
 CAPTURES: 'captures' Pred -> pushMode(expr);
