@@ -174,7 +174,6 @@ loop_specification
     | determines_clause
     | loop_separates_clause
     | loop_determines_clause
-    | assignable_clause
     | loop_assignable_clause
     | variant_function)*;
 
