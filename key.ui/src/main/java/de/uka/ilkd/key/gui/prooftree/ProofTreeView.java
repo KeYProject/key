@@ -654,13 +654,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofListener.ignoreNodeSelectionChange = false;
         TreePath tp = new TreePath(node.getPath());
         treeSelectionListener.ignoreChange = true;
+        delegateModel.storeSelection(delegateView.getSelectionPath());
         delegateView.getSelectionModel().setSelectionPath(tp);
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
         treeSelectionListener.ignoreChange = false;
-
-        delegateModel.storeSelection(delegateView.getSelectionPath());
-
     }
 
     public void showSearchPanel() {
@@ -689,14 +687,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return false;
         }
 
-        final TreePath selectedPath = delegateModel.getSelection();
+        final TreePath selectedPath = delegateView.getSelectionPath();
+
         if (selectedPath == null) {
             return false;
         }
 
         // Save expansion state to restore.
         List<TreePath> rowsToExpand = new ArrayList<>(expansionState);
-
 
         final TreePath branch;
         final Node invokedNode;
@@ -942,7 +940,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             TreePath newTP = e.getNewLeadSelectionPath();
             delegateModel.storeSelection(newTP);
-
 
             if (treeNode.getNode().proof().isDisposed()) {
                 setProof(null);
