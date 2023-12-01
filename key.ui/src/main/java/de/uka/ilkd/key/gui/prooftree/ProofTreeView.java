@@ -474,6 +474,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 final HashSet<ProofTreeViewFilter> activeFilters = new HashSet<>();
                 for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
                     if (f.isActive()) {
+                        // ignore node filters as only one might be active at a given time
+                        // their state is saved independently
                         activeFilters.add(f);
                     }
                 }
@@ -488,6 +490,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
                 viewStates.put(proof, memorizeProofTreeViewState);
 
+                if (nodeFilter != null) {
+                    delegateModel.setFilter(nodeFilter, false);
+                }
                 delegateModel.unregister();
                 delegateModel.removeTreeModelListener(proofTreeSearchPanel);
             }
@@ -713,66 +718,34 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         final TreePath branch;
         final Node invokedNode;
-        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
+        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode guiNode) {
             branch = selectedPath.getParentPath();
-            invokedNode =
-                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+            invokedNode = guiNode.getNode();
         } else {
             branch = selectedPath;
             invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
         }
 
+        delegateModel.setFilter(filter, selected);
+
         if (!filter.global()) {
-            delegateModel.setFilter(filter, selected);
             if (branch == selectedPath) {
-                if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                    TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
-                            .findBranch(invokedNode);
-                    if (node instanceof GUIBranchNode) {
-                        selectBranchNode((GUIBranchNode) node);
-                    }
-                }
+                selectedNodeIsBranchNode(invokedNode);
             } else {
                 delegateView.scrollPathToVisible(selectedPath);
                 delegateView.setSelectionPath(selectedPath);
             }
+        } else if (branch == selectedPath &&
+                (!selected || invokedNode.parent() == null ||
+                        delegateModel
+                                .getProofTreeNode(invokedNode.parent())
+                                .findChild(invokedNode.parent()) == null)) {
+            selectedNodeIsBranchNode(invokedNode);
         } else {
-            delegateModel.setFilter(filter, selected);
-            if (branch == selectedPath) {
-                if (!selected) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
-                                .findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode) node);
-                        }
-                    }
-                } else {
-                    if (invokedNode.parent() == null || delegateModel
-                            .getProofTreeNode(invokedNode.parent())
-                            .findChild(invokedNode.parent()) == null) {
-                        // it's still a branch
-                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node =
-                                ((GUIAbstractTreeNode) delegateModel.getRoot())
-                                        .findBranch(invokedNode);
-                            if (node instanceof GUIBranchNode) {
-                                selectBranchNode((GUIBranchNode) node);
-                            }
-                        }
-                    } else {
-                        TreePath tp = new TreePath(delegateModel
-                                .getProofTreeNode(invokedNode).getPath());
-                        delegateView.scrollPathToVisible(tp);
-                        delegateView.setSelectionPath(tp);
-                    }
-                }
-            } else {
-                TreePath tp = new TreePath(
-                    delegateModel.getProofTreeNode(invokedNode).getPath());
-                delegateView.scrollPathToVisible(tp);
-                delegateView.setSelectionPath(tp);
-            }
+            final TreePath tp = new TreePath(delegateModel
+                    .getProofTreeNode(invokedNode).getPath());
+            delegateView.scrollPathToVisible(tp);
+            delegateView.setSelectionPath(tp);
         }
 
         // Expand previously visible rows.
@@ -786,6 +759,20 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateView.expandPath(newTp);
         }
         return true;
+    }
+
+    /**
+     * if invoked node is modelled as branch node, select the branch node
+     *
+     * @param invokedNode the selected node in the proof
+     */
+    private void selectedNodeIsBranchNode(Node invokedNode) {
+        if (delegateModel.getRoot() instanceof GUIBranchNode rootNode) {
+            final TreeNode node = rootNode.findBranch(invokedNode);
+            if (node instanceof GUIBranchNode childAsBranchNode) {
+                selectBranchNode(childAsBranchNode);
+            }
+        }
     }
 
     @NonNull

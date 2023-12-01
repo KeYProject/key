@@ -263,13 +263,17 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     public synchronized void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
-            activeNodeFilter = null;
+            if (activeNodeFilter != null) {
+                activeNodeFilter.setActive(false);
+                activeNodeFilter = null;
+            }
             updateTree((TreeNode) null);
             return;
         }
         if (!filter.global()) {
-            if (activeNodeFilter != null)
+            if (activeNodeFilter != null) {
                 activeNodeFilter.setActive(false);
+            }
             activeNodeFilter = active ? (NodeFilter) filter : null;
         }
         filter.setActive(active);
