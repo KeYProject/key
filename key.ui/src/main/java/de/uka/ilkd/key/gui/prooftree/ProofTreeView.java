@@ -760,7 +760,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * if invoked node is modelled as branch node, select the branch node
      *
      * @param invokedNode the selected node in the proof
-     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an associated branch node
+     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an
+     *        associated branch node
      * @return the path to the branch node if available otherwise {@code defaultPath}
      */
     private TreePath getPathForBranchNode(Node invokedNode, TreePath defaultPath) {
