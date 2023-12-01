@@ -491,8 +491,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateModel.unregister();
                 delegateModel.removeTreeModelListener(proofTreeSearchPanel);
             }
-
-
         }
 
         proof = p;
@@ -524,6 +522,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Collections.sort(rowsToExpand);
 
 
+
+            // Restore previous scroll position.
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            Integer scrollState = memorizedState.scrollState;
+            if (scrollState != null) {
+                scroller.getVerticalScrollBar().setValue(scrollState);
+            }
+
+            // restore filters
+            for (var viewFilter : ProofTreeViewFilter.ALL) {
+                setFilter(viewFilter,
+                    memorizedState.activeFilters.contains(viewFilter));
+            }
+
+            delegateModel.setFilter(memorizedState.nodeFilterState.first,
+                memorizedState.nodeFilterState.second);
+
             // Expand previously visible rows.
             for (int i : rowsToExpand) {
                 delegateView.expandRow(i);
@@ -540,23 +555,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     delegateView.setSelectionRow(1);
                 }
             }
-
-            // Restore previous scroll position.
-            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
-            Integer i = memorizedState.scrollState;
-            if (i != null) {
-                scroller.getVerticalScrollBar().setValue(i);
-            }
-
-            // restore filters
-            for (var viewFilter : ProofTreeViewFilter.ALL) {
-                setFilter(viewFilter,
-                    memorizedState.activeFilters.contains(viewFilter));
-            }
-
-            delegateModel.setFilter(memorizedState.nodeFilterState.first,
-                memorizedState.nodeFilterState.second);
-
         } else {
             delegateModel = null;
             delegateView
@@ -672,7 +670,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofListener.ignoreNodeSelectionChange = false;
         TreePath tp = new TreePath(node.getPath());
         treeSelectionListener.ignoreChange = true;
-        delegateModel.storeSelection(delegateView.getSelectionPath());
         delegateView.getSelectionModel().setSelectionPath(tp);
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
@@ -957,7 +954,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             TreePath newTP = e.getNewLeadSelectionPath();
-            delegateModel.storeSelection(newTP);
 
             if (treeNode.getNode().proof().isDisposed()) {
                 setProof(null);

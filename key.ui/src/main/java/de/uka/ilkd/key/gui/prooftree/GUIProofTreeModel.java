@@ -512,16 +512,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         }
     }
 
-    TreePath selection;
-
-    public void storeSelection(TreePath t) {
-        selection = t;
-    }
-
-    public TreePath getSelection() {
-        return selection;
-    }
-
     public NodeFilter getActiveNodeFilter() {
         return activeNodeFilter;
     }
