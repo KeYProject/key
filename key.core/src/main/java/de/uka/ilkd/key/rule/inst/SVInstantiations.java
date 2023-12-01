@@ -30,9 +30,10 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
- * This class wraps a ImmMap<SchemaVariable,InstantiationEntry<?>> and is used to store
- * instantiations of schemavariables. The class is immutable, this means changing its content will
- * result in creating a new object.
+ * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
+ * {@link InstantiationEntry}
+ * and is used to store instantiations of schemavariables. The class is immutable,
+ * this means changing its content results in creating a new object.
  */
 public class SVInstantiations implements EqualsModProofIrrelevancy {
     /** the empty instantiation */
@@ -251,7 +252,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?>
+     * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
@@ -288,7 +289,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * instantiated already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?> the SchemaVariable is instantiated with
+     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -379,7 +380,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * returns the instantiation of the given SchemaVariable
      *
-     * @return the InstantiationEntry<?> the SchemaVariable will be instantiated with, null if no
+     * @return the InstantiationEntry the SchemaVariable will be instantiated with, {@code null} if
+     *         no
      *         instantiation is stored
      */
     public InstantiationEntry<?> getInstantiationEntry(SchemaVariable sv) {
@@ -484,9 +486,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
     /**
-     * returns iterator of the mapped pair (SchemaVariables, InstantiationEntry<?>)
+     * returns iterator of the mapped pair {@code (SchemaVariables, InstantiationEntry)}
      *
-     * @return the Iterator<IEntry><SchemaVariable,InstantiationEntry<?>>
+     * @return the Iterator
      */
     public Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
         return map.iterator();

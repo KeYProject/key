@@ -22,7 +22,7 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
         super(false);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars();
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getIfFindVariables();
         for (SchemaVariable neededVar : neededVars) {

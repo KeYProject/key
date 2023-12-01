@@ -195,7 +195,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * retrieve the recoder<->key mapping from the associated Recoder2KeY.
+     * retrieve the recoder {@code <->} key mapping from the associated Recoder2KeY.
      *
      * @return the mapping, not null.
      */
@@ -584,7 +584,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * store an element to the recoder<->key mapping.
+     * store an element to the recoder {@code <->} key mapping.
      *
      * @param r the recoder element (not null)
      * @param k the key element (not null)
@@ -842,7 +842,14 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder Identifier to a KeY Identifier */
     public ProgramElementName convert(recoder.java.Identifier id) {
-        return VariableNamer.parseName(id.getText(), collectComments(id).collect(Comment.class));
+        final NonTerminalProgramElement parent = id.getParent();
+        if (parent instanceof recoder.java.reference.VariableReference ||
+                parent instanceof recoder.java.declaration.VariableSpecification) {
+            return VariableNamer.parseName(id.getText(),
+                collectComments(id).collect(Comment.class));
+        } else {
+            return new ProgramElementName(id.getText(), collectComments(id).collect(Comment.class));
+        }
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {

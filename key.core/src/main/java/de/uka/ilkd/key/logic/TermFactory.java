@@ -128,12 +128,11 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels, String origin) {
-        final Term newTerm =
+        final TermImpl newTerm =
             (labels == null || labels.isEmpty()
                     ? new TermImpl(op, subs, boundVars, javaBlock, origin)
-                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin))
-                            .checked();
-        // Check if caching is possible. It is not possible if a non empty JavaBlock is available
+                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin));
+        // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
@@ -142,14 +141,14 @@ public final class TermFactory {
                 term = cache.get(newTerm);
             }
             if (term == null) {
-                term = newTerm;
+                term = newTerm.checked();
                 synchronized (cache) {
                     cache.put(term, term);
                 }
             }
             return term;
         } else {
-            return newTerm;
+            return newTerm.checked();
         }
     }
 

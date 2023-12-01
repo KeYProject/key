@@ -17,6 +17,7 @@ import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class TestGenMacro extends StrategyProofMacro {
     @Override
@@ -78,11 +79,12 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         if (TestGenStrategy.isUnwindRule(app.rule())) {
             return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
         }
-        return super.computeCost(app, pio, goal);
+        return super.computeCost(app, pio, goal, mState);
     }
 
     private int computeUnwindRules(Goal goal) {

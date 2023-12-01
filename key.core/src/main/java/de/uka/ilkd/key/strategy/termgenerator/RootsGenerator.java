@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.util.collection.ImmutableSLList;
@@ -25,9 +26,9 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Term generator for inferring the range of values that a variable can have from a given non-linear
- * (in)equation. The generator may only be called on formulas of the form <tt>v^n = l</tt>,
- * <tt>v^n <= l</tt>, <tt>v^n >= l</tt>, where <tt>v</tt> is an atomic term (does not start with
- * addition or multiplication) and <tt>l</tt> is a literal. The generator will then produce at most
+ * (in)equation. The generator may only be called on formulas of the form {@code v^n = l},
+ * {@code v^n <= l}, {@code v^n >= l}, where {@code v} is an atomic term (does not start with
+ * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
 public class RootsGenerator implements TermGenerator {
@@ -48,11 +49,12 @@ public class RootsGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
-        final Term powerRel = powerRelation.toTerm(app, pos, goal);
+        final Term powerRel = powerRelation.toTerm(app, pos, goal, mState);
 
         final Operator op = powerRel.op();
 

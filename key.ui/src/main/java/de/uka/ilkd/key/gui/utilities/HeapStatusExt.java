@@ -65,7 +65,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             progressBar.setInheritsPopupMenu(true);
 
             update();
-            var timer = new Timer(5000, (evt) -> update());
+            var timer = new Timer(5000, evt -> update());
             timer.setRepeats(true);
             timer.start();
         }
@@ -80,7 +80,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
 
             progressBar.setMaximumSize(new Dimension(100, 25));
 
-            progressBar.setMaximum(total);
+            progressBar.setMaximum(max);
             final var used = total - free;
             progressBar.setValue(used);
             progressBar.setString("%sM of %sM".formatted(used, max));
@@ -131,7 +131,7 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
 
                 LOGGER.info("Execute jconsole: {} {}", pathJConsole, pid);
                 try {
-                    var process = new ProcessBuilder().command(pathJConsole, "" + pid).start();
+                    new ProcessBuilder().command(pathJConsole, String.valueOf(pid)).start();
                 } catch (IOException e) {
                     JOptionPane.showConfirmDialog(HeapStatusComponent.this, e.getMessage());
                 }

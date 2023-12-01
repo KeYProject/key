@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Projection for dividing one monomial by another.
@@ -26,9 +27,9 @@ public class ReduceMonomialsProjection implements ProjectionToTerm {
         return new ReduceMonomialsProjection(dividend, divisor);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term dividendT = dividend.toTerm(app, pos, goal);
-        final Term divisorT = divisor.toTerm(app, pos, goal);
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term dividendT = dividend.toTerm(app, pos, goal, mState);
+        final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create(dividendT, services);

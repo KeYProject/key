@@ -34,7 +34,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     }
 
     protected Term toTerm(Term t) {
-        if (EqualityConstraint.metaVars(t).size() != 0 && !metavariableInst.isBottom()) {
+        if (!EqualityConstraint.metaVars(t, services).isEmpty() && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
@@ -48,9 +48,9 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     }
 
     public void visited(Term visited) {
-        if (visited.op() instanceof Metavariable && metavariableInst
-                .getInstantiation((Metavariable) visited.op(), services).op() != visited.op()) {
-            pushNew(metavariableInst.getInstantiation((Metavariable) visited.op(), services));
+        if (visited.op() instanceof Metavariable mv &&
+                metavariableInst.getInstantiation(mv, services).op() != visited.op()) {
+            pushNew(metavariableInst.getInstantiation(mv, services));
         } else {
             super.visit(visited);
         }

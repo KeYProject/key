@@ -11,13 +11,15 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The default controller for the {@link ReferenceSearchDialog}.
- * When the copy button is clicked, {@link Proof#copyCachedGoals(Proof, Consumer, Runnable)}
+ * When the copy button is clicked,
+ * {@link de.uka.ilkd.key.proof.reference.CopyReferenceResolver#copyCachedGoals(Proof, Proof, Consumer, Runnable)}
  * is started.
  *
  * @author Arne Keller
@@ -42,11 +44,11 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
         Proof p = mediator.getSelectedProof();
         new Thread(() -> {
             try {
-                p.copyCachedGoals(null,
+                mediator.initiateAutoMode(p, true, false);
+                CopyReferenceResolver.copyCachedGoals(p, null,
                     total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
                     () -> SwingUtilities.invokeLater(() -> {
                         if (dialog.incrementProgress()) {
-                            mediator.startInterface(true);
                             dialog.dispose();
                             new ShowProofStatistics.Window(MainWindow.getInstance(), p)
                                     .setVisible(true);
@@ -56,6 +58,10 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                 mediator.startInterface(true);
                 LOGGER.error("failed to copy cache ", e);
                 IssueDialog.showExceptionDialog(dialog, new CachingException(e));
+            } finally {
+                mediator.finishAutoMode(p, true, false, () -> {
+                    mediator.getSelectionModel().setSelectedNode(p.root());
+                });
             }
         }).start();
     }

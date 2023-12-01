@@ -12,7 +12,8 @@ import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 public final class WarySubstOp extends SubstOp {
 
     /**
-     * the wary substitution operator {var<-term}'. {x<-d}'A(x) means replace all free occurrences
+     * the wary substitution operator {@code {var<-term}'}. {@code {x<-d}'A(x)} means replace all
+     * free occurrences
      * of variable x in A with d, however without replacing x with a non-rigid A below modalities
      */
     public static final SubstOp SUBST = new WarySubstOp(new Name("subst"));

@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * <p>
  *
  * <pre>
+ * {@code
  * BranchNodeIntermediate "dummy ID"
  * - AppNodeIntermediate
  * - AppNodeIntermediate
@@ -46,6 +47,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *   + BranchNodeIntermediate "x <= 0"
  *     > AppNodeIntermediate
  *     > ...
+ * }
  * </pre>
  * <p>
  * <p>
@@ -325,8 +327,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @param preferences The preferences to load.
      */
     private void loadPreferences(String preferences) {
-        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
-        proofSettings.loadSettingsFromString(preferences);
+        final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+        proofSettings.loadSettingsFromPropertyString(preferences);
     }
 
     /**
