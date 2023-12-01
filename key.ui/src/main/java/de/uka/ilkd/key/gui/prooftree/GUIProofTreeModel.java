@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -511,18 +510,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             }
             return res;
         }
-    }
-
-
-    /** stores exactly the paths that are expanded in the proof tree */
-    private @NonNull Collection<TreePath> expansionState = Collections.emptySet();
-
-    public void setExpansionState(@NonNull Collection<TreePath> c) {
-        expansionState = c;
-    }
-
-    public @NonNull Collection<TreePath> getExpansionState() {
-        return expansionState;
     }
 
     TreePath selection;
