@@ -838,6 +838,7 @@ public final class MainWindow extends JFrame {
             getMediator().getNotationInfo().refresh(mediator.getServices());
             getMediator().getSelectedProof().fireProofGoalsChanged();
         }
+        SwingUtilities.invokeLater(this::updateSequentView);
     }
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -1808,5 +1809,4 @@ public final class MainWindow extends JFrame {
     public void setSequentView(SequentView sequentView) {
         sequentViewSearchBar.setSequentView(sequentView);
     }
-
 }
