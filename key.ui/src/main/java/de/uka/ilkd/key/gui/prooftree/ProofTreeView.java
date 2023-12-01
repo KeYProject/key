@@ -526,15 +526,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             Collections.sort(rowsToExpand);
 
-
-
             // Restore previous scroll position.
             JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
             Integer scrollState = memorizedState.scrollState;
             if (scrollState != null) {
                 scroller.getVerticalScrollBar().setValue(scrollState);
             }
-
 
             // this selection must happen before and later after restoring the filters
             // as setting a filter immediately applies it and
@@ -597,7 +594,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (node == null) {
             return;
         }
-
         TreeNode[] obs = node.getPath();
         TreePath tp = new TreePath(obs);
         treeSelectionListener.ignoreChange = true;
@@ -675,19 +671,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Selects the given Branchnode in the ProofTreeView and displays the first child in the main
      * view.
      */
-    void selectBranchNode(GUIBranchNode node) {
+    TreePath selectBranchNode(GUIBranchNode node) {
         if (node == null) {
-            return;
+            return null;
         }
         proofListener.ignoreNodeSelectionChange = true;
         mediator.getSelectionModel().setSelectedNode(node.getNode());
         proofListener.ignoreNodeSelectionChange = false;
-        TreePath tp = new TreePath(node.getPath());
-        treeSelectionListener.ignoreChange = true;
-        delegateView.getSelectionModel().setSelectionPath(tp);
-        delegateView.scrollPathToVisible(tp);
-        delegateView.validate();
-        treeSelectionListener.ignoreChange = false;
+        return new TreePath(node.getPath());
     }
 
     public void showSearchPanel() {
@@ -716,7 +707,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return false;
         }
 
-        final TreePath selectedPath = delegateView.getSelectionPath();
+        TreePath selectedPath = delegateView.getSelectionPath();
 
         if (selectedPath == null) {
             return false;
@@ -737,25 +728,20 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         delegateModel.setFilter(filter, selected);
 
-        if (!filter.global()) {
-            if (branch == selectedPath) {
-                selectedNodeIsBranchNode(invokedNode);
-            } else {
-                delegateView.scrollPathToVisible(selectedPath);
-                delegateView.setSelectionPath(selectedPath);
-            }
+        if (!filter.global() && branch == selectedPath) {
+            selectedPath = getPathForBranchNode(invokedNode, selectedPath);
         } else if (branch == selectedPath &&
                 (!selected || invokedNode.parent() == null ||
                         delegateModel
                                 .getProofTreeNode(invokedNode.parent())
                                 .findChild(invokedNode.parent()) == null)) {
-            selectedNodeIsBranchNode(invokedNode);
+            selectedPath = getPathForBranchNode(invokedNode, selectedPath);
         } else {
-            final TreePath tp = new TreePath(delegateModel
-                    .getProofTreeNode(invokedNode).getPath());
-            delegateView.scrollPathToVisible(tp);
-            delegateView.setSelectionPath(tp);
+            selectedPath = new TreePath(delegateModel.getProofTreeNode(invokedNode).getPath());
         }
+
+        delegateView.setSelectionPath(selectedPath);
+        delegateView.scrollPathToVisible(selectedPath);
 
         // Expand previously visible rows.
         for (TreePath tp : rowsToExpand) {
@@ -774,14 +760,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * if invoked node is modelled as branch node, select the branch node
      *
      * @param invokedNode the selected node in the proof
+     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an associated branch node
+     * @return the path to the branch node if available otherwise {@code defaultPath}
      */
-    private void selectedNodeIsBranchNode(Node invokedNode) {
+    private TreePath getPathForBranchNode(Node invokedNode, TreePath defaultPath) {
         if (delegateModel.getRoot() instanceof GUIBranchNode rootNode) {
             final TreeNode node = rootNode.findBranch(invokedNode);
             if (node instanceof GUIBranchNode childAsBranchNode) {
-                selectBranchNode(childAsBranchNode);
+                return selectBranchNode(childAsBranchNode);
             }
         }
+        return defaultPath;
     }
 
     @NonNull
@@ -955,8 +944,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 setProof(null);
                 return;
             }
+
             if (treeNode instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode) treeNode);
+                newTP = selectBranchNode((GUIBranchNode) treeNode);
             } else {
                 Node node = treeNode.getNode();
                 Goal selected = proof.getOpenGoal(node);
@@ -972,14 +962,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
                             .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
                         ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
-
-                    // ensure the proper node is selected in the tree
-                    ignoreChange = true;
-                    delegateView.setSelectionPath(newTP);
-                    ignoreChange = false;
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
+            }
+            // ensure the proper node is selected in the tree
+            if (newTP != null && !newTP.equals(e.getNewLeadSelectionPath())) {
+                ignoreChange = true;
+                delegateView.setSelectionPath(newTP);
+                ignoreChange = false;
             }
         }
     }

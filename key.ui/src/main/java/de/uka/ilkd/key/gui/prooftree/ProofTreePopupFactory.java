@@ -309,7 +309,11 @@ public class ProofTreePopupFactory {
                 }
             }
             if (sibling instanceof GUIBranchNode) {
-                context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
+                var tp = context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
+                if (tp != null) {
+                    context.delegateView.setSelectionPath(tp);
+                    context.delegateView.scrollPathToVisible(tp);
+                }
             }
         }
     }
@@ -342,7 +346,11 @@ public class ProofTreePopupFactory {
                 }
             }
             if (sibling instanceof GUIBranchNode) {
-                context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
+                var tp = context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
+                if (tp != null) {
+                    context.delegateView.setSelectionPath(tp);
+                    context.delegateView.scrollPathToVisible(tp);
+                }
             }
         }
     }
