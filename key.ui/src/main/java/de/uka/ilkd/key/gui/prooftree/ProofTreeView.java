@@ -535,6 +535,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 scroller.getVerticalScrollBar().setValue(scrollState);
             }
 
+
+            // this selection must happen before and later after restoring the filters
+            // as setting a filter immediately applies it and
+            if (memorizedState.selectionPath != null) {
+                delegateView.setSelectionPath(memorizedState.selectionPath);
+            } else {
+                delegateView.setSelectionRow(0);
+            }
+
             // restore filters
             for (var viewFilter : ProofTreeViewFilter.ALL) {
                 setFilter(viewFilter,
