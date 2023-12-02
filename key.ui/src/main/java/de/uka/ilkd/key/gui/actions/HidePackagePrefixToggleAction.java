@@ -59,10 +59,8 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (ViewSettings.HIDE_PACKAGE_PREFIX.equals(e.getPropertyName())) {
-            updateSelectedState();
-            mainWindow.makePrettyView();
-        }
+        updateSelectedState();
+        mainWindow.makePrettyView();
     }
 
 }

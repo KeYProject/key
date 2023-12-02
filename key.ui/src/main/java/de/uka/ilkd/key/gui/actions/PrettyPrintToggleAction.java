@@ -64,11 +64,9 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (ViewSettings.PRETTY_SYNTAX.equals(e.getPropertyName())) {
-            updateSelectedState();
-            final boolean prettySyntax =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-            updateMainWindow(prettySyntax);
-        }
+        updateSelectedState();
+        final boolean prettySyntax =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        updateMainWindow(prettySyntax);
     }
 }
