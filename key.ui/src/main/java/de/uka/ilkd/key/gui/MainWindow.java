@@ -829,7 +829,6 @@ public final class MainWindow extends JFrame {
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
         SwingUtilities.invokeLater(this::updateSequentView);
     }
@@ -1726,7 +1725,6 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
