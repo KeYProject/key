@@ -11,6 +11,7 @@ import javax.swing.JCheckBoxMenuItem;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 public class UnicodeToggleAction extends MainWindowAction {
@@ -38,7 +39,7 @@ public class UnicodeToggleAction extends MainWindowAction {
         // Attention: The listener is never// removed, because there is only one
         // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addPropertyChangeListener(viewSettingsListener);
+                .addPropertyChangeListener(ViewSettings.USE_UNICODE, viewSettingsListener);
         updateSelectedState();
     }
 
@@ -64,7 +65,6 @@ public class UnicodeToggleAction extends MainWindowAction {
                                                                         // UI will react on the
                                                                         // settings change event!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
-        updateMainWindow();
     }
 
     protected void updateMainWindow() {
@@ -72,7 +72,7 @@ public class UnicodeToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (NAME.equals(e.getPropertyName())) {
+        if (ViewSettings.USE_UNICODE.equals(e.getPropertyName())) {
             updateSelectedState();
             updateMainWindow();
         }
