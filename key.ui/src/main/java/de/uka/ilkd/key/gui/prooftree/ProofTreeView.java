@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableList;
@@ -404,8 +403,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         int row = delegateView.getRowForPath(path);
         row--;
         while (delegateView.getPathForRow(row) != null) {
-            TreePath tp = delegateView.getPathForRow(row);
-            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            final TreePath tp = delegateView.getPathForRow(row);
+            final var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
             if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
                     && treeNode.getNode().parent().childrenCount() > 1
                     && !delegateView.isExpanded(tp)) {
@@ -464,35 +463,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return; // proof is already loaded
         }
 
+        ProofTreeViewFilter.NodeFilter previousNodeFilter = null;
+        boolean previousNodeFilterState = false;
         if (proof != null) {
             // save old view state
-            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
             if (delegateModel != null) { // is it ever not null when proof != null?
-                var nodeFilter = delegateModel.getActiveNodeFilter();
+                JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
                 expansionState.disconnect();
-
-                final HashSet<ProofTreeViewFilter> activeFilters = new HashSet<>();
-                for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
-                    if (f.isActive()) {
-                        // ignore node filters as only one might be active at a given time
-                        // their state is saved independently
-                        activeFilters.add(f);
-                    }
-                }
-
+                previousNodeFilter = delegateModel.getActiveNodeFilter();
+                previousNodeFilterState =
+                    previousNodeFilter != null && previousNodeFilter.isActive();
                 ProofTreeViewState memorizeProofTreeViewState = new ProofTreeViewState(
                     delegateModel,
                     expansionState.copyState(),
                     delegateView.getSelectionPath(),
-                    activeFilters,
-                    new Pair<>(nodeFilter, nodeFilter != null && nodeFilter.isActive()),
                     scroller.getVerticalScrollBar().getValue());
-
                 viewStates.put(proof, memorizeProofTreeViewState);
-
-                if (nodeFilter != null) {
-                    delegateModel.setFilter(nodeFilter, false);
-                }
                 delegateModel.unregister();
                 delegateModel.removeTreeModelListener(proofTreeSearchPanel);
             }
@@ -504,9 +490,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             ProofTreeViewState memorizedState = viewStates.get(proof);
 
             if (memorizedState == null) {
-                memorizedState = new ProofTreeViewState(new GUIProofTreeModel(p),
-                    Collections.emptyList(), null, new HashSet<>(),
-                    new Pair<>(null, false), 0);
+                memorizedState = new ProofTreeViewState(new GUIProofTreeModel(proof),
+                    Collections.emptyList(), null, 0);
             }
 
             delegateModel = memorizedState.model;
@@ -526,35 +511,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             Collections.sort(rowsToExpand);
 
-            // Restore previous scroll position.
-            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
-            Integer scrollState = memorizedState.scrollState;
-            if (scrollState != null) {
-                scroller.getVerticalScrollBar().setValue(scrollState);
-            }
-
-            // this selection must happen before and later after restoring the filters
-            // as setting a filter immediately applies it and
-            if (memorizedState.selectionPath != null) {
-                delegateView.setSelectionPath(memorizedState.selectionPath);
-            } else {
-                delegateView.setSelectionRow(0);
-            }
-
             // restore filters
             for (var viewFilter : ProofTreeViewFilter.ALL) {
-                setFilter(viewFilter,
-                    memorizedState.activeFilters.contains(viewFilter));
+                setFilter(viewFilter, viewFilter.isActive());
             }
 
-            delegateModel.setFilter(memorizedState.nodeFilterState.first,
-                memorizedState.nodeFilterState.second);
+            // restore node filter
+            delegateModel.setFilter(previousNodeFilter, previousNodeFilterState);
 
-            // Expand previously visible rows.
-            for (int i : rowsToExpand) {
-                delegateView.expandRow(i);
-            }
-
+            // restore selection
             if (memorizedState.selectionPath != null) {
                 delegateView.setSelectionPath(memorizedState.selectionPath);
                 delegateView.scrollPathToVisible(memorizedState.selectionPath);
@@ -565,6 +530,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     // new proof with not yet selected node, select initial node
                     delegateView.setSelectionRow(1);
                 }
+            }
+
+            // Expand previously visible rows.
+            for (int i : rowsToExpand) {
+                delegateView.expandRow(i);
+            }
+
+            // Restore previous scroll position.
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            Integer scrollState = memorizedState.scrollState;
+            if (scrollState != null) {
+                scroller.getVerticalScrollBar().setValue(scrollState);
             }
         } else {
             delegateModel = null;
@@ -589,7 +566,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (n == null) {
             return;
         }
-
         final GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node == null) {
             return;
@@ -1286,7 +1262,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 : null;
     }
 
-
     /**
      * Record used to store the state of the proof tree view for a particular proof such that it can
      * be stored and
@@ -1295,15 +1270,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param model the {@link GUIProofTreeModel} of the proof
      * @param expansionState the expanded tree paths
      * @param selectionPath the path to the currently selected node
-     * @param activeFilters the activated {@link ProofTreeViewFilter}s
-     * @param nodeFilterState the activated (if any) {@link ProofTreeViewFilter.NodeFilter}
      * @param scrollState the state of the scroll pane
      */
     record ProofTreeViewState(GUIProofTreeModel model,
             Collection<TreePath> expansionState,
             TreePath selectionPath,
-            HashSet<ProofTreeViewFilter> activeFilters,
-            Pair<ProofTreeViewFilter.NodeFilter, Boolean> nodeFilterState,
             Integer scrollState) {
     }
 }
