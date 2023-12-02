@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -71,8 +71,10 @@ public class UnicodeToggleAction extends MainWindowAction {
         mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
-        updateSelectedState();
-        updateMainWindow();
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
+        if (NAME.equals(e.getPropertyName())) {
+            updateSelectedState();
+            updateMainWindow();
+        }
     }
 }

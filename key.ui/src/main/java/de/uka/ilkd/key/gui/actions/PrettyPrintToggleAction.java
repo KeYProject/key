@@ -5,8 +5,8 @@ package de.uka.ilkd.key.gui.actions;
 
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -67,10 +67,12 @@ public class PrettyPrintToggleAction extends MainWindowAction {
         mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
-        updateSelectedState();
-        final boolean prettySyntax =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-        updateMainWindow(prettySyntax);
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
+        if (NAME.equals(e.getPropertyName())) {
+            updateSelectedState();
+            final boolean prettySyntax =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+            updateMainWindow(prettySyntax);
+        }
     }
 }
