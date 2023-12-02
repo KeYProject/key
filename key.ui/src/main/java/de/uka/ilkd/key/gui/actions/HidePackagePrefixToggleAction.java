@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -55,16 +55,13 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
                                                              // the UI will react on the settings
                                                              // change event!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
-        updateMainWindow();
     }
 
-    private void updateMainWindow() {
-        mainWindow.makePrettyView();
-    }
-
-    private void handleViewSettingsChanged(EventObject e) {
-        updateSelectedState();
-        updateMainWindow();
+    private void handleViewSettingsChanged(PropertyChangeEvent e) {
+        if (NAME.equals(e.getPropertyName())) {
+            updateSelectedState();
+            mainWindow.makePrettyView();
+        }
     }
 
 }
