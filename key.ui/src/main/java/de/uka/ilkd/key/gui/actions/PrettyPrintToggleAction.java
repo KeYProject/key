@@ -12,6 +12,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
     public static final String NAME = "Use Pretty Syntax";
@@ -25,9 +26,6 @@ public class PrettyPrintToggleAction extends MainWindowAction {
 
     /**
      * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
-     * <p>
-     * Such changes can occur in the Eclipse context when settings are changed in for instance the
-     * KeYIDE.
      */
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
@@ -39,7 +37,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
         // removed, because there is only one
         // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addPropertyChangeListener(viewSettingsListener);
+                .addPropertyChangeListener(ViewSettings.PRETTY_SYNTAX, viewSettingsListener);
         updateSelectedState();
     }
 
@@ -48,7 +46,6 @@ public class PrettyPrintToggleAction extends MainWindowAction {
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
         NotationInfo.DEFAULT_PRETTY_SYNTAX = prettySyntax;
         setSelected(prettySyntax);
-        // setSelected(NotationInfo.PRETTY_SYNTAX);
     }
 
     @Override
@@ -58,7 +55,6 @@ public class PrettyPrintToggleAction extends MainWindowAction {
         // will react on the settings change event!
         NotationInfo.DEFAULT_PRETTY_SYNTAX = selected;
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
-        updateMainWindow(selected);
     }
 
     protected void updateMainWindow(boolean prettySyntax) {
@@ -68,7 +64,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (NAME.equals(e.getPropertyName())) {
+        if (ViewSettings.PRETTY_SYNTAX.equals(e.getPropertyName())) {
             updateSelectedState();
             final boolean prettySyntax =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();

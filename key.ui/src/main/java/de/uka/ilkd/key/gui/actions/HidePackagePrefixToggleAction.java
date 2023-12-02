@@ -11,6 +11,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
@@ -36,7 +37,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         // removed, because there is only one
         // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addPropertyChangeListener(viewSettingsListener);
+                .addPropertyChangeListener(ViewSettings.HIDE_PACKAGE_PREFIX, viewSettingsListener);
         updateSelectedState();
     }
 
@@ -57,8 +58,8 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
     }
 
-    private void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (NAME.equals(e.getPropertyName())) {
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
+        if (ViewSettings.HIDE_PACKAGE_PREFIX.equals(e.getPropertyName())) {
             updateSelectedState();
             mainWindow.makePrettyView();
         }
