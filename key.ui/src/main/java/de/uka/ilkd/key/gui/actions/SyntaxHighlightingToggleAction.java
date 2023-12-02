@@ -47,8 +47,6 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (SYNTAX_HIGHLIGHTING.equals(e.getPropertyName())) {
-            mainWindow.makePrettyView();
-        }
+        mainWindow.makePrettyView();
     }
 }
