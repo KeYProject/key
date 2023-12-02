@@ -72,9 +72,7 @@ public class UnicodeToggleAction extends MainWindowAction {
     }
 
     protected void handleViewSettingsChanged(PropertyChangeEvent e) {
-        if (ViewSettings.USE_UNICODE.equals(e.getPropertyName())) {
-            updateSelectedState();
-            updateMainWindow();
-        }
+        updateSelectedState();
+        updateMainWindow();
     }
 }
