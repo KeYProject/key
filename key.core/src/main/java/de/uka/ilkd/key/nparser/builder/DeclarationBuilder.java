@@ -18,10 +18,14 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.util.Debug;
 
 /**
  * This visitor evaluates all basic (level 0) declarations. This includes:
@@ -41,6 +45,7 @@ import org.antlr.v4.runtime.Token;
  */
 public class DeclarationBuilder extends DefaultBuilder {
     private final Map<String, String> category2Default = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeclarationBuilder.class);
 
     public DeclarationBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -154,7 +159,11 @@ public class DeclarationBuilder extends DefaultBuilder {
                 sorts().add(s);
                 createdSorts.add(s);
             } else {
-                addWarning(ctx, "Sort declaration is ignored, due to collision.");
+                // weigl: agreement on KaKeY meeting: this should be ignored until we finally have local namespaces
+                // for generic sorts
+                //addWarning(ctx, "Sort declaration is ignored, due to collision.");
+                LOGGER.info("Sort declaration is ignored, due to collision in {}",
+                        BuilderHelpers.getPosition(ctx));
             }
         }
         return createdSorts;
