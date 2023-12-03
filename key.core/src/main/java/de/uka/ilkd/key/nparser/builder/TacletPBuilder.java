@@ -48,7 +48,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private final Deque<TacletBuilder<?>> currentTBuilder = new ArrayDeque<>(8);
 
-    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
+    private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
 
     private boolean axiomMode;
 
@@ -69,7 +69,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     public TacletPBuilder(Services services, NamespaceSet namespaces,
-            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
+            Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
         this(services, namespaces);
         this.taclet2Builder = taclet2Builder;
     }

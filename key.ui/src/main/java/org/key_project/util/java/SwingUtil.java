@@ -6,6 +6,7 @@ package org.key_project.util.java;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +32,36 @@ public final class SwingUtil {
 
 
     private SwingUtil() {
+    }
+
+    /**
+     * Wrapper for {@link java.awt.Desktop#browse(URI)} that also works on Linux.
+     *
+     * @param uri the URI to be displayed in the user's default browser
+     */
+    public static void browse(URI uri) throws IOException {
+        try {
+            Desktop.getDesktop().browse(uri);
+        } catch (UnsupportedOperationException e) {
+            if (System.getProperty("os.name").startsWith("Linux")) {
+                // try fallback: xdg-open
+                Runtime.getRuntime().exec(new String[] { "xdg-open", uri.toString() });
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Wrapper for {@link Desktop#isSupported(Desktop.Action)} BROWSE that always returns true on
+     * Linux.
+     *
+     * @return whether BROWSE is supported
+     * @see #browse(URI)
+     */
+    public static boolean browseIsSupported() {
+        return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+                || System.getProperty("os.name").startsWith("Linux");
     }
 
     /**

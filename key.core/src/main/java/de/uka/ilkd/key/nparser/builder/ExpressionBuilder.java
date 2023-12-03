@@ -702,8 +702,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 throw new BuildingException(ex);
             }
         } else if (attributeName.equals("<inv>")) {
-            // The invariant observer "<inv>" is implicit and
-            // not part of the class declaration
+            // The invariant observer "<inv>" is implicit and not part of the class declaration
             // A special case is needed, hence.
             result = javaInfo.getInvProgramVar();
         } else if (attributeName.equals("<inv_free>")) {
@@ -1525,16 +1524,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitFloatLiteral(FloatLiteralContext ctx) {
         String txt = ctx.getText(); // full text of node incl. unary minus.
-        char lastChar = txt.charAt(txt.length() - 1);
-        assert lastChar == 'F' || lastChar == 'f';
         return toFPNotation(txt);
     }
 
     @Override
     public Object visitDoubleLiteral(DoubleLiteralContext ctx) {
         String txt = ctx.getText(); // full text of node incl. unary minus.
-        char lastChar = txt.charAt(txt.length() - 1);
-        assert lastChar == 'D' || lastChar == 'd';
         return toDFPNotation(txt.substring(0, txt.length() - 1));
     }
 
@@ -1542,7 +1537,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitRealLiteral(RealLiteralContext ctx) {
         String txt = ctx.getText(); // full text of node incl. unary minus.
         char lastChar = txt.charAt(txt.length() - 1);
-        assert lastChar == 'R' || lastChar == 'r';
+        if(lastChar == 'R' || lastChar == 'r') {
+            semanticError(ctx, "The given float literal does not have a suffix. This is essential to determine its exact meaning. You probably want to add 'r' as a suffix.");
+        }
         throw new Error("not yet implemented");
     }
 
