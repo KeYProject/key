@@ -46,7 +46,6 @@ public class QuantifierHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-
         term = collectQuantifications(term);
 
         Set<Term> triggerTerms = new HashSet<>();
