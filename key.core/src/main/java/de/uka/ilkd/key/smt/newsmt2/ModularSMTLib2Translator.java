@@ -127,7 +127,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append(System.lineSeparator());
 
         sb.append("; --- Declarations\n");
-        extractSortDeclarations(sequent, services, master, sequentAsserts);
+        extractSortDeclarations(services, master);
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -179,16 +179,15 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return sb;
     }
 
-    /*
+    /**
      * precompute the information on the required sources from the translation.
      */
-    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master,
-            List<Term> sequentAsserts) {
+    private void extractSortDeclarations(Services services, MasterHandler master) {
         TypeManager tm = new TypeManager(services);
         tm.handle(master);
     }
 
-    /*
+    /**
      * extract a sequent into an SMT collection.
      *
      * The translation adds elements to the lists in the master handler on the way.
@@ -221,7 +220,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
-    /*
+    /**
      * Turn a sequent to a collection of formulas. Antecedent positive, succedent negated.
      */
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
