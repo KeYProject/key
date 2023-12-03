@@ -1,9 +1,15 @@
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+
 github_checks:
   annotations: false
 
 ignore:
-  - "key.ui/"  
-  - "keyext.ui.testgen/"  
-  - "key.removegenerics/"  
-  - "key.core.symbolic_execution.example/"  
-  - "key.core.example/"    
+  - "key.ui/"
+  - "keyext.ui.testgen/" 
+  - "key.removegenerics/"
+  - "key.core.symbolic_execution.example/"
+  - "key.core.example/"
