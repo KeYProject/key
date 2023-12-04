@@ -31,13 +31,14 @@ public abstract class GenericSortCondition {
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
-                                                       InstantiationEntry<?> p_entry) {
+            InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
         }
 
-        return createCondition(((AbstractSV) sv).sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
+        return createCondition(((AbstractSV) sv).sort(), ti.getInstantiation().sort(),
+            !subSortsAllowed(sv));
     }
 
     /**

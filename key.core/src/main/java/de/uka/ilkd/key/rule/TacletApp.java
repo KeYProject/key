@@ -482,7 +482,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      */
     public final TacletApp tryToInstantiateAsMuchAsPossible(Services services) {
         TacletApp app = instantiationHelper(false, services);
-        if (app == null) return null;
+        if (app == null)
+            return null;
 
         if (app != this) {
             final MatchConditions appMC =
@@ -503,7 +504,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     @Nullable
     public final TacletApp tryToInstantiate(Services services) {
         TacletApp app = instantiationHelper(true, services);
-        if (app == null) return null;
+        if (app == null)
+            return null;
 
         if (app != this) {
             final MatchConditions appMC =
@@ -537,17 +539,21 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             }
 
             if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
-                String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
+                String proposal =
+                    varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
                         services, proposals);
-                ProgramElement pe = app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+                ProgramElement pe =
+                    app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
                 app = app.addCheckedInstantiation(operatorSv, pe, services, true);
                 proposals = proposals.append(proposal);
             } else if (operatorSv.sort() == ProgramSVSort.LABEL) {
                 boolean nameclash;
                 do {
-                    String proposal = VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services,
-                        null, proposals);
-                    ProgramElement pe = app.getProgramElement(proposal,(ProgramSV) operatorSv, services);
+                    String proposal =
+                        VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services,
+                            null, proposals);
+                    ProgramElement pe =
+                        app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
                     proposals = proposals.prepend(proposal);
                     try {
                         app = app.addCheckedInstantiation(operatorSv, pe, services, true);
@@ -570,7 +576,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 }
 
                 String proposal =
-                    VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null, proposals);
+                    VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null,
+                        proposals);
 
                 proposals = proposals.append(proposal);
 
@@ -587,12 +594,14 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 String proposal;
                 Collection<String> conflictNames = collectClashNames(operatorSv, services);
                 do {
-                    proposal = VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
-                        proposals);
+                    proposal =
+                        VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
+                            proposals);
                     proposals = proposals.prepend(proposal);
                 } while (conflictNames.contains(proposal));
 
-                LogicVariable v = new LogicVariable(new Name(proposal), getRealSort(operatorSv, services));
+                LogicVariable v =
+                    new LogicVariable(new Name(proposal), getRealSort(operatorSv, services));
 
                 app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
             } else {

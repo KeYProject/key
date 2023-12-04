@@ -16,7 +16,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
@@ -57,7 +56,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     public RepresentsAxiom(String name, String displayName, IObserverFunction target,
             KeYJavaType kjt, VisibilityModifier visibility, Term pre, Term rep,
-                           LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
         assert kjt != null;

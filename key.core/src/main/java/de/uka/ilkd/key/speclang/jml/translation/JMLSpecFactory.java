@@ -562,7 +562,7 @@ public class JMLSpecFactory {
 
     private ImmutableList<InfFlowSpec> translateInfFlowSpecClauses(Context context,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                                                   LocationVariable excVar, ImmutableList<LabeledParserRuleContext> originalClauses) {
+            LocationVariable excVar, ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalClauses.isEmpty()) {
             return ImmutableSLList.nil();
         } else {
@@ -584,7 +584,7 @@ public class JMLSpecFactory {
      * be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
      */
     private Term translateAndClauses(Context context, ImmutableList<LocationVariable> paramVars,
-                                     LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores,
             ImmutableList<LabeledParserRuleContext> originalClauses, SpecType specType) {
         // The array is used to invert the order in which the elements are read.
@@ -643,7 +643,7 @@ public class JMLSpecFactory {
 
     private Map<Label, Term> translateBreaks(Context context,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                             LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
@@ -661,7 +661,7 @@ public class JMLSpecFactory {
 
     private Map<Label, Term> translateContinues(Context context,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                                LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
@@ -678,7 +678,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateReturns(Context context, ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
@@ -691,7 +691,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateSignals(Context context, ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
@@ -711,7 +711,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateEnsures(Context context, ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+            LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
@@ -760,7 +760,8 @@ public class JMLSpecFactory {
             SpecType.ASSIGNABLE_FREE);
     }
 
-    private boolean translateStrictlyPure(Context context, ImmutableList<LocationVariable> paramVars,
+    private boolean translateStrictlyPure(Context context,
+            ImmutableList<LocationVariable> paramVars,
             ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
         for (LabeledParserRuleContext expr : assignableClauses) {

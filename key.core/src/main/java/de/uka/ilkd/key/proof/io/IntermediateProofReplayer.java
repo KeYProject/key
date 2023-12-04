@@ -1002,9 +1002,12 @@ public class IntermediateProofReplayer {
             result = app.addCheckedInstantiation(sv, pe, services, true);
         } else if (sv instanceof SkolemTermSV skolemSv) {
             result = app.createSkolemConstant(value, skolemSv, true, services);
-        } if (sv instanceof ModalOperatorSV msv) {
-            result = app.addInstantiation(app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services), services);
-        }else {
+        }
+        if (sv instanceof ModalOperatorSV msv) {
+            result = app.addInstantiation(
+                app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services),
+                services);
+        } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();

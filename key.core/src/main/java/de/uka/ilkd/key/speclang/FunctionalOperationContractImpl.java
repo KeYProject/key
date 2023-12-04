@@ -157,8 +157,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasRealMod,
             Map<LocationVariable, Boolean> hasRealFreeMod,
-                                    LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                                    LocationVariable resultVar, LocationVariable excVar,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, LocationVariable excVar,
             Map<LocationVariable, LocationVariable> atPreVars, Term globalDefs, int id,
             boolean toBeSaved, boolean transaction, TermServices services) {
         assert !(name == null && baseName == null);
@@ -262,7 +262,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      */
     protected Map<LocationVariable, LocationVariable> getReplaceMap(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                                                    LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<>();
 

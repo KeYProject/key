@@ -181,7 +181,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private Term replaceSV(Term t, AbstractSV selfVar, AbstractSV resultVar,
-                           AbstractSV excVar, Map<LocationVariable, AbstractSV> atPreVars,
+            AbstractSV excVar, Map<LocationVariable, AbstractSV> atPreVars,
             ImmutableList<AbstractSV> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
         var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
@@ -190,7 +190,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private Term replace(Term t, LocationVariable selfVar, LocationVariable resultVar,
-                         LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             ImmutableList<LocationVariable> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
         Map<LocationVariable, LocationVariable> map =
@@ -200,7 +200,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private static Map<LocationVariable, AbstractSV> getSchemaMap(AbstractSV selfVar,
-                                                                     AbstractSV resultVar, AbstractSV excVar,
+            AbstractSV resultVar, AbstractSV excVar,
             Map<LocationVariable, AbstractSV> atPreVars,
             ImmutableList<AbstractSV> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
@@ -247,7 +247,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private static Map<LocationVariable, LocationVariable> getReplaceMap(LocationVariable selfVar,
-                                                                       LocationVariable resultVar, LocationVariable excVar,
+            LocationVariable resultVar, LocationVariable excVar,
             Map<LocationVariable, LocationVariable> atPreVars,
             ImmutableList<LocationVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
@@ -538,7 +538,8 @@ public abstract class WellDefinednessCheck implements Contract {
         } else {
             for (ProgramVariable paramVar : paramVars) {
                 paramsOK =
-                    TB.and(paramsOK, TB.reachableValue(TB.var(paramVar), paramVar.getKeYJavaType()));
+                    TB.and(paramsOK,
+                        TB.reachableValue(TB.var(paramVar), paramVar.getKeYJavaType()));
             }
         }
         return paramsOK;
@@ -556,7 +557,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The {@link Term} containing the general assumptions.
      */
     private TermListAndFunc buildFreePre(Term implicitPre, LocationVariable self,
-                                         LocationVariable heap, ImmutableList<LocationVariable> params, boolean taclet,
+            LocationVariable heap, ImmutableList<LocationVariable> params, boolean taclet,
             Services services) {
         ImmutableList<Term> resList = ImmutableSLList.nil();
 
@@ -937,7 +938,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *         function
      */
     public final TermAndFunc getPre(final Condition pre, LocationVariable self,
-                                    LocationVariable heap, ImmutableList<LocationVariable> parameters,
+            LocationVariable heap, ImmutableList<LocationVariable> parameters,
             boolean taclet, Services services) {
         ImmutableList<LocationVariable> params = ImmutableSLList.nil();
         for (var pv : parameters) {

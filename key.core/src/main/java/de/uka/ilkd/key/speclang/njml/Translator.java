@@ -87,7 +87,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     Translator(Services services, KeYJavaType specInClass, LocationVariable self,
             SpecMathMode specMathMode, ImmutableList<LocationVariable> paramVars,
-               LocationVariable result, LocationVariable exc, Map<LocationVariable, Term> atPres,
+            LocationVariable result, LocationVariable exc, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores) {
         assert self == null || specInClass != null;
 

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -94,7 +93,7 @@ public interface FunctionalOperationContract extends OperationContract {
 
     Term getFreePost(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable,LocationVariable> atPreVars,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
     /**

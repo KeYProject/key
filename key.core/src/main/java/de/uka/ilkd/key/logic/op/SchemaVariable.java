@@ -5,8 +5,8 @@ package de.uka.ilkd.key.logic.op;
 
 
 import de.uka.ilkd.key.util.pp.Layouter;
+
 import org.key_project.logic.Named;
-import org.key_project.logic.op.SortedOperator;
 
 /**
  * This interface represents the root of a schema variable hierarchy to be express termstructures

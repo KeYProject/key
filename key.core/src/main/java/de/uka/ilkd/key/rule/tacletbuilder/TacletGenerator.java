@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -108,7 +107,7 @@ public class TacletGenerator {
 
     public Taclet generateRelationalRepresentsTaclet(Name tacletName, Term originalAxiom,
             KeYJavaType kjt, IObserverFunction target, List<LocationVariable> heaps,
-                                                     LocationVariable self, ImmutableList<LocationVariable> paramVars,
+            LocationVariable self, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, boolean satisfiabilityGuard,
             TermServices services) {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();

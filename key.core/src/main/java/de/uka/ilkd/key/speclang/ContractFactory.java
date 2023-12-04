@@ -219,11 +219,11 @@ public class ContractFactory {
     }
 
     public InformationFlowContract createInformationFlowContract(KeYJavaType forClass,
-                                                                 IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
-                                                                 Term requires,
-                                                                 Term requiresFree, Term measuredBy, Term modifies, boolean hasMod,
-                                                                 ProgramVariableCollection progVars, Term accessible,
-                                                                 ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
+            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
+            Term requires,
+            Term requiresFree, Term measuredBy, Term modifies, boolean hasMod,
+            ProgramVariableCollection progVars, Term accessible,
+            ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
         final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
@@ -513,7 +513,8 @@ public class ContractFactory {
     }
 
     private static Map<LocationVariable, Term> joinDependencies(FunctionalOperationContractImpl t,
-            Map<LocationVariable, Term> deps, FunctionalOperationContract other, Services services) {
+            Map<LocationVariable, Term> deps, FunctionalOperationContract other,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term a1 = deps.get(h);
@@ -805,7 +806,8 @@ public class ContractFactory {
     }
 
     /** replace in original the variables used for self, result, exception, heap, and parameters */
-    private Term replaceVariables(Term original, LocationVariable selfVar, LocationVariable resultVar,
+    private Term replaceVariables(Term original, LocationVariable selfVar,
+            LocationVariable resultVar,
             LocationVariable excVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
             LocationVariable originalResultVar, LocationVariable originalExcVar,

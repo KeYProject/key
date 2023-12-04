@@ -356,8 +356,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                     basename = DEFAULT_BASENAME;
                 }
                 int cnt =
-                        getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                                + 1;
+                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                            + 1;
 
                 Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
                 while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
@@ -479,10 +479,10 @@ public abstract class VariableNamer implements InstantiationProposer {
             PosInOccurrence posOfFind, PosInProgram posOfDeclaration) {
         boolean result = true;
 
-            Sort svSort = sv.sort();
-            if (svSort == ProgramSVSort.VARIABLE) {
-                result = isUniqueInProgram(name, getProgramFromPIO(posOfFind), posOfDeclaration);
-            }
+        Sort svSort = sv.sort();
+        if (svSort == ProgramSVSort.VARIABLE) {
+            result = isUniqueInProgram(name, getProgramFromPIO(posOfFind), posOfDeclaration);
+        }
 
         return result;
     }

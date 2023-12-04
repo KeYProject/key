@@ -504,7 +504,8 @@ public final class JmlTermFactory {
         return translateToJDLTerm(name, list);
     }
 
-    public SLExpression commentary(String desc, LocationVariable selfVar, LocationVariable resultVar,
+    public SLExpression commentary(String desc, LocationVariable selfVar,
+            LocationVariable resultVar,
             ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
@@ -1278,7 +1279,8 @@ public final class JmlTermFactory {
         assert symbol instanceof ProgramVariable : "Expecting a program variable";
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
-            Term resultTerm = pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
+            Term resultTerm =
+                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);

@@ -178,7 +178,7 @@ public final class TypeConverter {
         } else if (prefix instanceof LocationVariable lv) {
             // the base case: the leftmost item is a local variable
             return tb.var(lv);
-        }else if (prefix instanceof ArrayReference) {
+        } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
         } else if (prefix instanceof ThisReference) {
             if (prefix.getReferencePrefix() != null

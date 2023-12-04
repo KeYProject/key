@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -70,7 +69,7 @@ public class ProgramVariableCollection {
      */
     public ProgramVariableCollection(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                     LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, Term> atPres) {
         this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
@@ -92,7 +91,7 @@ public class ProgramVariableCollection {
      */
     public ProgramVariableCollection(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                     LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, Term> atPres,
             Map<LocationVariable, LocationVariable> atBeforeVars,
             Map<LocationVariable, Term> atBefores) {
