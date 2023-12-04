@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
@@ -186,7 +187,7 @@ class EndToEndTests {
     void sliceSimpleSMT() throws Exception {
         // only run this test if at least one SMT solver is available
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                .getUsableSolverUnions(Main.isExperimentalMode()).isEmpty()) {
+                .getUsableSolverUnions().isEmpty()) {
             return;
         }
         sliceProof("/simpleSMT.proof", 1, 1, true, false);
