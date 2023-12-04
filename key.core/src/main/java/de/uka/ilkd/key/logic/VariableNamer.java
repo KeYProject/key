@@ -350,13 +350,14 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         if (sv instanceof ProgramSV psv) {
             Sort svSort = psv.sort();
+
             if (svSort == ProgramSVSort.VARIABLE) {
                 if (basename == null || basename.isEmpty()) {
                     basename = DEFAULT_BASENAME;
                 }
                 int cnt =
-                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                            + 1;
+                        getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                                + 1;
 
                 Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
                 while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
@@ -382,7 +383,6 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
             }
         }
-
 
         return result;
     }
@@ -475,14 +475,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be checked, else false
      */
-    public boolean isUniqueNameForSchemaVariable(String name, SchemaVariable sv,
+    public boolean isUniqueNameForSchemaVariable(String name, ProgramSV sv,
             PosInOccurrence posOfFind, PosInProgram posOfDeclaration) {
         boolean result = true;
 
-        Sort svSort = sv.sort();
-        if (svSort == ProgramSVSort.VARIABLE) {
-            result = isUniqueInProgram(name, getProgramFromPIO(posOfFind), posOfDeclaration);
-        }
+            Sort svSort = sv.sort();
+            if (svSort == ProgramSVSort.VARIABLE) {
+                result = isUniqueInProgram(name, getProgramFromPIO(posOfFind), posOfDeclaration);
+            }
 
         return result;
     }

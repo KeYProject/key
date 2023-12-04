@@ -504,8 +504,8 @@ public final class JmlTermFactory {
         return translateToJDLTerm(name, list);
     }
 
-    public SLExpression commentary(String desc, ProgramVariable selfVar, ProgramVariable resultVar,
-            ImmutableList<ProgramVariable> paramVars, Term heapAtPre) {
+    public SLExpression commentary(String desc, LocationVariable selfVar, LocationVariable resultVar,
+            ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
         text = text.substring(2, text.length() - 2);
@@ -997,7 +997,7 @@ public final class JmlTermFactory {
 
 
     // region clauses
-    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
+    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
             JFunction instance =
@@ -1008,12 +1008,12 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Term signals(Term result, LogicVariable eVar, ProgramVariable excVar,
+    public Term signals(Term result, LogicVariable eVar, LocationVariable excVar,
             KeYJavaType excType) {
         if (result == null) {
             result = tb.tt();
         } else {
-            Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+            Map /* Operator -> Operator */<LogicVariable, LocationVariable> replaceMap =
                 new LinkedHashMap<>();
             replaceMap.put(eVar, excVar);
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
@@ -1278,7 +1278,7 @@ public final class JmlTermFactory {
         assert symbol instanceof ProgramVariable : "Expecting a program variable";
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
-            Term resultTerm = tb.var(pv);
+            Term resultTerm = pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);

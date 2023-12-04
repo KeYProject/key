@@ -103,7 +103,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<ProgramVariable, Term> deps = new LinkedHashMap<>();
+        Map<LocationVariable, Term> deps = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
@@ -141,8 +141,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param params schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
-    private Term[] getArgs(SchemaVariable sv, ParsableVariable heap, ParsableVariable heapAtPre,
-            boolean isStatic, boolean twoState, ImmutableList<ParsableVariable> params) {
+    private Term[] getArgs(AbstractSV sv, AbstractSV heap, AbstractSV heapAtPre,
+            boolean isStatic, boolean twoState, ImmutableList<AbstractSV> params) {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
@@ -152,8 +152,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (!isStatic) {
             args[i++] = TB.var(sv);
         }
-        for (ParsableVariable arg : params) {
-            assert arg instanceof SchemaVariable;
+        for (var arg : params) {
             args[i++] = TB.var(arg);
         }
         return args;
@@ -183,9 +182,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      *
      * @return a list of schema variables
      */
-    private ImmutableList<ParsableVariable> paramsSV() {
-        ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.nil();
-        for (ProgramVariable pv : getOrigVars().params) {
+    private ImmutableList<AbstractSV> paramsSV() {
+        ImmutableList<AbstractSV> paramsSV = ImmutableSLList.nil();
+        for (var pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
                 SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
         }
@@ -209,20 +208,17 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the measured by at pre equation for the precondition
      */
-    Term generateMbyAtPreDef(ParsableVariable self, ImmutableList<ParsableVariable> params,
+    Term generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
             JFunction mbyAtPreFunc, Services services) {
         final Term mbyAtPreDef;
         if (hasMby()) {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);
             assert params != null;
-            final ProgramVariable selfVar =
-                self instanceof ProgramVariable ? (ProgramVariable) self : null;
-            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.nil();
-            for (ParsableVariable pv : params) {
-                assert pv instanceof ProgramVariable : pv.toString();
-                paramVars = paramVars.append((ProgramVariable) pv);
+            ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
+            for (var pv : params) {
+                paramVars = paramVars.append(pv);
             }
-            final Term mby = contract.getMby(selfVar, paramVars, services);
+            final Term mby = contract.getMby(self, paramVars, services);
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
@@ -283,12 +279,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         } else {
             heapAtPre = heap;
         }
-        final SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
-        final SchemaVariable heapAtPreSV =
+        final var heapSV = SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
+        final var heapAtPreSV =
             SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
-        final SchemaVariable selfSV =
+        final var selfSV =
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
-        final ImmutableList<ParsableVariable> paramsSV = paramsSV();
+        final ImmutableList<AbstractSV> paramsSV = paramsSV();
         StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
             ps.append(" ").append(pv.getKeYJavaType().getFullName());

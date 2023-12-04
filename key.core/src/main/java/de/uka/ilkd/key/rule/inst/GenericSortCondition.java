@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.op.AbstractSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -30,13 +31,13 @@ public abstract class GenericSortCondition {
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
-            InstantiationEntry<?> p_entry) {
+                                                       InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
         }
 
-        return createCondition(sv.sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
+        return createCondition(((AbstractSV) sv).sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
     }
 
     /**

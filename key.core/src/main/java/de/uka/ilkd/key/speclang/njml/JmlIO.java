@@ -48,11 +48,11 @@ public class JmlIO {
 
     private Services services;
     private KeYJavaType specInClass;
-    private ProgramVariable selfVar;
+    private LocationVariable selfVar;
     private SpecMathMode specMathMode;
-    private ImmutableList<ProgramVariable> paramVars;
-    private ProgramVariable resultVar;
-    private ProgramVariable excVar;
+    private ImmutableList<LocationVariable> paramVars;
+    private LocationVariable resultVar;
+    private LocationVariable excVar;
     private Map<LocationVariable, Term> atPres;
     private Map<LocationVariable, Term> atBefores;
 
@@ -85,8 +85,8 @@ public class JmlIO {
      * @param atBefores i do not know
      */
     public JmlIO(@NonNull Services services, @Nullable KeYJavaType specInClass,
-            @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
-            @Nullable ProgramVariable resultVar, @Nullable ProgramVariable excVar,
+            @Nullable LocationVariable selfVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable LocationVariable resultVar, @Nullable LocationVariable excVar,
             @Nullable Map<LocationVariable, Term> atPres,
             @Nullable Map<LocationVariable, Term> atBefores) {
         this.services = services;
@@ -313,7 +313,7 @@ public class JmlIO {
     /**
      * Sets the variable representing the {@code this} reference.
      */
-    public JmlIO selfVar(ProgramVariable selfVar) {
+    public JmlIO selfVar(LocationVariable selfVar) {
         this.selfVar = selfVar;
         return this;
     }
@@ -329,7 +329,7 @@ public class JmlIO {
     /**
      * Sets the current list of known parameter. Can also be used to give additionally variables.
      */
-    public JmlIO parameters(ImmutableList<ProgramVariable> params) {
+    public JmlIO parameters(ImmutableList<LocationVariable> params) {
         this.paramVars = params;
         return this;
     }
@@ -337,7 +337,7 @@ public class JmlIO {
     /**
      * Sets the variable that is used to store exceptions.
      */
-    public JmlIO exceptionVariable(ProgramVariable excVar) {
+    public JmlIO exceptionVariable(LocationVariable excVar) {
         this.excVar = excVar;
         return this;
     }
@@ -350,7 +350,7 @@ public class JmlIO {
     /**
      * Sets the variable representing {@code \result}.
      */
-    public JmlIO resultVariable(ProgramVariable resultVar) {
+    public JmlIO resultVariable(LocationVariable resultVar) {
         this.resultVar = resultVar;
         return this;
     }

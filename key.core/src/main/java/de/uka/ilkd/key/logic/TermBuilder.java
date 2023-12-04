@@ -217,9 +217,9 @@ public class TermBuilder {
     /**
      * Creates program variables for the parameters. Take care to register them in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(IObserverFunction obs,
+    public ImmutableList<LocationVariable> paramVars(IObserverFunction obs,
             boolean makeNamesUnique) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
             String name;
@@ -238,11 +238,11 @@ public class TermBuilder {
     /**
      * Creates program variables for the parameters. Take care to register them in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(String postfix, IObserverFunction obs,
+    public ImmutableList<LocationVariable> paramVars(String postfix, IObserverFunction obs,
             boolean makeNamesUnique) {
-        final ImmutableList<ProgramVariable> paramVars = paramVars(obs, makeNamesUnique);
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
-        for (ProgramVariable paramVar : paramVars) {
+        final ImmutableList<LocationVariable> paramVars = paramVars(obs, makeNamesUnique);
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        for (LocationVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(paramVar.name() + postfix);
             LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
             result = result.append(formalParamVar);
@@ -359,6 +359,10 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
+    public Term var(ProgramSV v) {
+        return tf.createTerm(v);
+    }
+
     public Term var(ProgramVariable v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
@@ -377,7 +381,7 @@ public class TermBuilder {
         return result;
     }
 
-    public ImmutableList<Term> var(Iterable<ProgramVariable> vs) {
+    public ImmutableList<Term> var(Iterable<? extends ProgramVariable> vs) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
@@ -385,11 +389,11 @@ public class TermBuilder {
         return result;
     }
 
-    public Term var(SchemaVariable v) {
+    public Term var(AbstractSV v) {
         return tf.createTerm(v);
     }
 
-    public Term var(ParsableVariable v) {
+    public Term var(VariableSV v) {
         return tf.createTerm(v);
     }
 
@@ -1609,7 +1613,7 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var((ProgramVariable) services.getNamespaces().programVariables()
+        return var((LocationVariable) services.getNamespaces().programVariables()
                 .lookup(HeapLDT.BASE_HEAP_NAME));
         // return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
@@ -1893,7 +1897,7 @@ public class TermBuilder {
         return reachableValue(getBaseHeap(), t, kjt);
     }
 
-    public Term reachableValue(ProgramVariable pv) {
+    public Term reachableValue(LocationVariable pv) {
         return reachableValue(var(pv), pv.getKeYJavaType());
     }
 

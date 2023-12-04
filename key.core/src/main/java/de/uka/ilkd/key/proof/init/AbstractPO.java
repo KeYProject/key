@@ -152,7 +152,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ProgramVariable pv, Services services) {
+    protected final void register(LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -160,8 +160,8 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ImmutableList<ProgramVariable> pvs, Services services) {
-        for (ProgramVariable pv : pvs) {
+    protected final void register(ImmutableList<LocationVariable> pvs, Services services) {
+        for (LocationVariable pv : pvs) {
             register(pv, services);
         }
     }

@@ -86,7 +86,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static ProgramVariable createResult(IProgramMethod pm, TermServices services) {
+    private static LocationVariable createResult(IProgramMethod pm, TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -94,7 +94,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static ProgramVariable createException(IProgramMethod pm, TermServices services) {
+    private static LocationVariable createException(IProgramMethod pm, TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -102,22 +102,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
+    private static Map<LocationVariable, LocationVariable> createAtPres(LocationVariable heap,
             TermServices services) {
-        final Map<LocationVariable, ProgramVariable> res =
+        final Map<LocationVariable, LocationVariable> res =
             new LinkedHashMap<>();
-        final ProgramVariable atPre =
+        final LocationVariable atPre =
             services.getTermBuilder().atPreVar(heap.name().toString(), heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
 
     /** Make sure ghost parameters appear in the list of parameter variables. */
-    private static ImmutableList<ProgramVariable> addGhostParams(
-            ImmutableList<ProgramVariable> paramVars, ImmutableList<ProgramVariable> origParams) {
+    private static ImmutableList<LocationVariable> addGhostParams(
+            ImmutableList<LocationVariable> paramVars, ImmutableList<LocationVariable> origParams) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
-        for (ProgramVariable param : origParams) {
+        ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
+        for (LocationVariable param : origParams) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
             }
@@ -126,9 +126,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return paramVars;
     }
 
-    private static ImmutableList<ProgramVariable> createParams(IObserverFunction target,
-            ImmutableList<ProgramVariable> origParams, TermServices services) {
-        final ImmutableList<ProgramVariable> params =
+    private static ImmutableList<LocationVariable> createParams(IObserverFunction target,
+            ImmutableList<LocationVariable> origParams, TermServices services) {
+        final ImmutableList<LocationVariable> params =
             services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
@@ -153,26 +153,26 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             pm = null;
         }
         final JFunction anonHeap = createAnonHeap(heap, services);
-        final ProgramVariable self;
+        final LocationVariable self;
         if (vars.self != null) {
             self = createSelf(pm, kjt, services);
         } else {
             self = null;
         }
-        final ProgramVariable result;
+        final LocationVariable result;
         if (vars.result != null) {
             result = createResult(pm, services);
         } else {
             result = null;
         }
-        final ProgramVariable exception;
+        final LocationVariable exception;
         if (vars.exception != null) {
             exception = createException(pm, services);
         } else {
             exception = null;
         }
-        final Map<LocationVariable, ProgramVariable> atPres = createAtPres(heap, services);
-        final ImmutableList<ProgramVariable> params;
+        final Map<LocationVariable, LocationVariable> atPres = createAtPres(heap, services);
+        final ImmutableList<LocationVariable> params;
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
         } else {
@@ -321,19 +321,19 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @author Michael Kirsten
      */
     public static class Variables {
-        public final ProgramVariable self;
-        public final ProgramVariable result;
-        public final ProgramVariable exception;
-        public final Map<LocationVariable, ProgramVariable> atPres;
-        public final ImmutableList<ProgramVariable> params;
+        public final LocationVariable self;
+        public final LocationVariable result;
+        public final LocationVariable exception;
+        public final Map<LocationVariable, LocationVariable> atPres;
+        public final ImmutableList<LocationVariable> params;
         public final LocationVariable heap;
-        public final ProgramVariable heapAtPre;
+        public final LocationVariable heapAtPre;
         public final Term anonHeap;
 
-        public Variables(final ProgramVariable self, final ProgramVariable result,
-                final ProgramVariable exception,
-                final Map<LocationVariable, ProgramVariable> atPres,
-                final ImmutableList<ProgramVariable> params, final LocationVariable heap,
+        public Variables(final LocationVariable self, final LocationVariable result,
+                final LocationVariable exception,
+                final Map<LocationVariable, LocationVariable> atPres,
+                final ImmutableList<LocationVariable> params, final LocationVariable heap,
                 final Term anonHeap) {
             this.self = self;
             this.result = result;
@@ -346,10 +346,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             this.anonHeap = anonHeap;
         }
 
-        private Variables(final ProgramVariable self, final ProgramVariable result,
-                final ProgramVariable exception,
-                final Map<LocationVariable, ProgramVariable> atPres,
-                final ImmutableList<ProgramVariable> params, final LocationVariable heap,
+        private Variables(final LocationVariable self, final LocationVariable result,
+                final LocationVariable exception,
+                final Map<LocationVariable, LocationVariable> atPres,
+                final ImmutableList<LocationVariable> params, final LocationVariable heap,
                 final JFunction anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap, services.getTermBuilder().label(
                 services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));

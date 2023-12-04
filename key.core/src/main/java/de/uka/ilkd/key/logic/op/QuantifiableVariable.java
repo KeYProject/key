@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
@@ -10,5 +11,5 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * operators).
  */
 public interface QuantifiableVariable extends org.key_project.logic.op.QuantifiableVariable,
-        ParsableVariable, EqualsModProofIrrelevancy {
+        ParsableVariable, SortedOperator, Operator, EqualsModProofIrrelevancy {
 }
