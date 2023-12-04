@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.23.0"
+    id "com.diffplug.spotless" version "6.23.3"
 }
 
 // Configure this project for use inside IntelliJ:
