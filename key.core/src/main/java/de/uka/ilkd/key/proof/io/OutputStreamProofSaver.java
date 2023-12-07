@@ -149,7 +149,7 @@ public class OutputStreamProofSaver {
     }
 
     public String writeSettings(ProofSettings ps) {
-        return "\\settings {\n\"" + escapeCharacters(ps.settingsToString()) + "\"\n}\n";
+        return String.format("\\settings %s \n", ps.settingsToString());
     }
 
     public void save(OutputStream out) throws IOException {

@@ -73,10 +73,10 @@ public class ProveTest {
 
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
-        if (localSettings != null && !localSettings.isEmpty()) {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(globalSettings);
+        if (localSettings != null && !"".equals(localSettings)) {
             // local settings must be complete to have desired effect
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(localSettings);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
         }
 
         File keyFile = new File(file);

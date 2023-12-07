@@ -143,9 +143,9 @@ public class TestFile implements Serializable {
 
             // Initialize KeY settings.
             String gks = settings.getGlobalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(gks);
             String lks = settings.getLocalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(lks);
 
             // Name resolution for the available KeY file.
             File keyFile = getKeYFile();
