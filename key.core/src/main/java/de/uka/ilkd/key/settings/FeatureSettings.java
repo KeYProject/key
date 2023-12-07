@@ -8,9 +8,12 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * The {@code experimental} is a bad idea. You cannot control which feature you want to activate.
+ * Feature flags for the selected and deselected of experimental features.
+ * <p>
+ * In the old days of KeY, we used to have {@code --experimental} flag, which was a bad idea.
+ * You cannot control which feature you want to activate.
  * Instead, you are getting the full load of fun(ctionality). This class allows you to have more
- * fine-grained feature flags.
+ * fine-grained feature flags by defining feature flags which are controllable by the user.
  *
  * @author Alexander Weigl
  * @version 1 (04.12.23)
