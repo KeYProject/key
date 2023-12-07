@@ -23,6 +23,32 @@ import org.slf4j.LoggerFactory;
 public class ProofSaver extends OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
 
+    /**
+     * Save this proof to a file
+     *
+     * @param file file to save proof in
+     * @param proof the {@link Proof} to be saved
+     * @throws IOException on any I/O error
+     */
+    public static void saveToFile(File file, Proof proof) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, file);
+        saver.save();
+    }
+
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @param proof the {@link Proof} to be saved
+     * @throws IOException on any I/O error
+     */
+    public static void saveProofObligationToFile(File file, Proof proof) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, file, false);
+        saver.save();
+    }
+
+
     private final File file;
 
     /**
@@ -162,4 +188,5 @@ public class ProofSaver extends OutputStreamProofSaver {
     private String filename() {
         return file.getAbsolutePath();
     }
+
 }

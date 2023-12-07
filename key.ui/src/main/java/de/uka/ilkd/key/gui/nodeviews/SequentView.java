@@ -167,7 +167,6 @@ public abstract class SequentView extends JEditorPane {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
 
-
         // Register tooltip
         setToolTipText("");
 

@@ -1005,7 +1005,7 @@ public final class MainWindow extends JFrame {
         JMenu options = new JMenu("Options");
         options.setMnemonic(KeyEvent.VK_O);
 
-        options.add(SettingsManager.getInstance().getActionShowSettings(this));
+        options.add(SettingsManager.getActionShowSettings(this));
         options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
         // options.add(setupSpeclangMenu()); // legacy since only JML supported
@@ -1163,7 +1163,6 @@ public final class MainWindow extends JFrame {
             addToProofList(plist);
             getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
             disableCurrentGoalView = false;
-            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
@@ -1172,11 +1171,9 @@ public final class MainWindow extends JFrame {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-
         if (disableCurrentGoalView) {
             return;
         }
-
         final SequentView newSequentView;
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
@@ -1656,7 +1653,6 @@ public final class MainWindow extends JFrame {
 
         @Override
         public void modalDialogOpened(EventObject e) {
-
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), false);

@@ -138,7 +138,6 @@ public class MasterHandler {
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem) {
-
         try {
             SMTHandler cached = handlerMap.get(problem.op());
             if (cached != null) {
@@ -211,11 +210,32 @@ public class MasterHandler {
             return unknownValues.get(problem);
         }
         int number = unknownValues.size();
+        SExpr translation;
         SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
-        SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
-        addAxiom(e);
+        var freeVars = problem.freeVars();
+        if (freeVars.isEmpty()) {
+            // simple case: unknown value does not depend on anything else
+            SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
+            addAxiom(e);
+            translation = abbr;
+        } else {
+            // unknown value depends on quantified variables
+            var names = freeVars.stream()
+                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name().toString()))
+                    .toList();
+            var types = freeVars.stream()
+                    .map(x -> LogicalVariableHandler.makeVarDecl("", x.sort()).getChildren().get(0))
+                    .toList();
+            SExpr signature = new SExpr(types);
+            SExpr e = new SExpr("declare-fun", abbr, signature, new SExpr("U"));
+            addAxiom(e);
+            List<SExpr> list = new ArrayList<>();
+            list.add(abbr);
+            list.addAll(names);
+            translation = new SExpr("", Type.UNIVERSE, list);
+        }
         unknownValues.put(problem, abbr);
-        return abbr;
+        return translation;
     }
 
     /**
