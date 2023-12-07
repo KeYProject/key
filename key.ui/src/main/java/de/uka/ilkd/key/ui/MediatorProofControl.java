@@ -28,9 +28,9 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,8 @@ public class MediatorProofControl extends AbstractProofControl {
     private AutoModeWorker worker;
 
     /**
-     * This is condition is non-null during auto-mode execution. You can wait on it to block until auto-mode has finished.
+     * This is condition is non-null during auto-mode execution. You can wait on it to block until
+     * auto-mode has finished.
      */
     @Nullable
     private Condition notInAutoMode;
@@ -118,7 +119,7 @@ public class MediatorProofControl extends AbstractProofControl {
                 "tried to block the UI thread whilst waiting for auto mode to finish"));
             return; // do not block the UI thread
         }
-        if(notInAutoMode != null) {
+        if (notInAutoMode != null) {
             try {
                 notInAutoMode.await();
             } catch (InterruptedException ignore) {
