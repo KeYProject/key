@@ -97,7 +97,7 @@ public class FeatureSettings extends AbstractSettings {
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         for (String activatedFeature : activatedFeatures) {
-            props.put(prefix + activatedFeature, true);
+            props.put(prefix + activatedFeature, "true");
         }
     }
 

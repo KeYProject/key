@@ -91,12 +91,12 @@ public class ProofIndependentSettings {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not load settings from {}", filename, e);
         }
     }
 
     private void load(File file) throws IOException {
-        if (!file.getName().endsWith(".toml")) {
+        if (!file.getName().endsWith(".json")) {
             try (FileInputStream in = new FileInputStream(file)) {
                 Properties properties = new Properties();
                 properties.load(in);
@@ -107,11 +107,14 @@ public class ProofIndependentSettings {
             }
         } else {
             this.lastReadedConfiguration = Configuration.load(file);
+            for (Settings settings : settings) {
+                settings.readSettings(lastReadedConfiguration);
+            }
         }
     }
 
     public void saveSettings() {
-        if (!filename.getName().endsWith(".toml")) {
+        if (!filename.getName().endsWith(".json")) {
             Properties result = new Properties();
             for (Settings settings : settings) {
                 settings.writeSettings(result);
@@ -124,7 +127,7 @@ public class ProofIndependentSettings {
             try (var out = new FileOutputStream(filename)) {
                 result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Could not store settings to {}", filename, e);
             }
         }
 
@@ -139,7 +142,7 @@ public class ProofIndependentSettings {
                      new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not store settings to {}", filename, e);
         }
     }
 

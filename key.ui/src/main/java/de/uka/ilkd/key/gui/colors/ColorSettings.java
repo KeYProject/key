@@ -20,6 +20,7 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,6 +164,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
             } catch (NumberFormatException e) {
                 return toHex(Color.MAGENTA);
             }
+        }
+
+        @Override
+        public Color fromObject(@Nullable Object o) {
+            return fromHex(o.toString());
         }
 
         @Override

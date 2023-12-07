@@ -111,7 +111,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         if (cat == null)
             return;
         propertyEntries.forEach(it -> {
-            final var value = cat.get(it.getKey());
+            final var value = it.fromObject( cat.get(it.getKey()) );
             if (value != null) {
                 properties.put(it.getKey(), value);
             }
@@ -127,31 +127,32 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     }
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
-        PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble);
+        PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble, (it) -> (double) it);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
-        PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt);
+        PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
+                (it) -> Math.toIntExact((Long) it));
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
-        PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat);
+        PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat, (it) -> (float) (double) it);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<String> createStringProperty(String key, String defValue) {
-        PropertyEntry<String> pe = new DefaultPropertyEntry<>(key, defValue, id -> id);
+        PropertyEntry<String> pe = new DefaultPropertyEntry<>(key, defValue, id -> id, Object::toString);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
-        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, defValue, parseBoolean);
+        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, defValue, parseBoolean, (it) -> (Boolean) it);
         propertyEntries.add(pe);
         return pe;
     }
@@ -159,7 +160,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
             AbstractPropertiesSettings::parseStringSet,
-            AbstractPropertiesSettings::stringSetToString);
+            AbstractPropertiesSettings::stringSetToString, (it)->new LinkedHashSet<>((Collection<String>) it));
         propertyEntries.add(pe);
         return pe;
     }
@@ -174,8 +175,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
             @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
-            AbstractPropertiesSettings::parseStringList,
-            AbstractPropertiesSettings::stringListToString);
+                AbstractPropertiesSettings::parseStringList,
+                AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);
         propertyEntries.add(pe);
         return pe;
     }
@@ -195,6 +196,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         String value();
+
+        T fromObject(@Nullable Object o);
     }
 
 
@@ -204,16 +207,19 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         private final Function<String, T> convert;
         private final Function<T, String> toString;
 
-        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert) {
-            this(key, defaultValue, convert, Objects::toString);
+        private final Function<Object, T> fromObject;
+
+        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert, Function<Object, T> fromObject) {
+            this(key, defaultValue, convert, Objects::toString, fromObject);
         }
 
         private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
-                Function<T, String> toString) {
+                                     Function<T, String> toString, Function<Object, T> fromObject) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;
             this.toString = toString;
+            this.fromObject = fromObject;
         }
 
         @Override
@@ -254,6 +260,11 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             } else {
                 return toString.apply(v);
             }
+        }
+
+        @Override
+        public T fromObject(@Nullable Object o) {
+            return null;
         }
     }
 }
