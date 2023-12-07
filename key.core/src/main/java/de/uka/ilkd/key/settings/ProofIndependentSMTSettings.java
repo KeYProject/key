@@ -52,7 +52,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         "PROP_STORE_TACLET_TRANSLATION_FILE";
 
     private static final FeatureSettings.Feature FEATURE_EXPERIMENTAL_SMT_SOLVERS =
-            createFeature("EXPERIMENTAL_SMT_SOLVERS", "Activate experimental SMT solvers");
+        createFeature("EXPERIMENTAL_SMT_SOLVERS", "Activate experimental SMT solvers");
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
@@ -503,7 +503,8 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
 
     public Collection<SolverTypeCollection> getUsableSolverUnions() {
-        return getUsableSolverUnions(FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
+        return getUsableSolverUnions(
+            FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
     }
 
     public Collection<SolverTypeCollection> getUsableSolverUnions(boolean experimental) {
@@ -517,7 +518,8 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     }
 
     public Collection<SolverTypeCollection> getSolverUnions() {
-        return getSolverUnions(FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
+        return getSolverUnions(
+            FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
     }
 
     public Collection<SolverTypeCollection> getSolverUnions(boolean experimental) {

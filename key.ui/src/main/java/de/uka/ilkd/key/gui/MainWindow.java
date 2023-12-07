@@ -30,7 +30,6 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -101,8 +100,9 @@ public final class MainWindow extends JFrame {
         "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
-    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST = createFeature("BULK_UI_TEST",
-            "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.");
+    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST = createFeature(
+        "BULK_UI_TEST",
+        "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.");
 
     private static MainWindow instance = null;
     /**

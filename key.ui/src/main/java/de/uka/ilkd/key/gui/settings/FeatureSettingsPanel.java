@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
-import javax.swing.*;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 /**
  * @author Alexander Weigl
@@ -27,11 +30,12 @@ public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvi
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        pCenter.removeAll(); //start fresh
+        pCenter.removeAll(); // start fresh
         checkboxes.clear();
         var fs = ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings();
         for (FeatureSettings.Feature feature : FeatureSettings.Feature.FEATURES) {
-            var cb = addCheckBox(feature.id(), feature.documentation(), fs.isActivated(feature), null);
+            var cb =
+                addCheckBox(feature.id(), feature.documentation(), fs.isActivated(feature), null);
             checkboxes.put(feature, cb);
         }
         return this;

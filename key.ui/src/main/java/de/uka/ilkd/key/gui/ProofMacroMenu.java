@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
+import java.util.*;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
@@ -12,10 +15,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
-import javax.swing.*;
-import java.util.*;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
@@ -56,7 +57,8 @@ public class ProofMacroMenu extends JMenu {
     public static final Iterable<ProofMacro> REGISTERED_MACROS =
         ClassLoaderUtil.loadServices(ProofMacro.class);
 
-    private static final FeatureSettings.Feature FEATURE_PROOF_SCRIPTS = createFeature("PROOF_SCRIPTS");
+    private static final FeatureSettings.Feature FEATURE_PROOF_SCRIPTS =
+        createFeature("PROOF_SCRIPTS");
 
     /**
      * The number of defined macros.
@@ -115,13 +117,14 @@ public class ProofMacroMenu extends JMenu {
             }
 
             FeatureSettings.on(FEATURE_PROOF_SCRIPTS, (newValue) -> {
-                if(newValue){
+                if (newValue) {
                     add(menuItemPSFile);
                     add(menuItemPSString);
-                }else{
+                } else {
                     remove(menuItemPSFile);
                     remove(menuItemPSString);
-                }});
+                }
+            });
         }
 
         mediator.enableWhenProofLoaded(this);

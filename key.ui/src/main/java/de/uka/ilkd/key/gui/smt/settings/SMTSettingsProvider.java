@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
@@ -13,12 +19,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-import javax.swing.*;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
@@ -101,7 +101,8 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         "Overrides timeout for this solver. Values in seconds. If value <= 0, global timeout is used.";
     public static final String INFO_SOLVER_INFO = "Information about this solver.";
 
-    private static final FeatureSettings.Feature FEATURE_SMT_TRANSLATION_OPTIONS = createFeature("SMT_TRANS_OPTIONS");
+    private static final FeatureSettings.Feature FEATURE_SMT_TRANSLATION_OPTIONS =
+        createFeature("SMT_TRANS_OPTIONS");
 
     private final JTextField saveToFilePanel;
     private final JComboBox<String> progressModeBox;
@@ -144,7 +145,8 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
             solverTypes.removeAll(SolverTypes.getLegacySolvers());
         }
         /*
-         * Only add options for those solvers that are actually theoretically available, according to
+         * Only add options for those solvers that are actually theoretically available, according
+         * to
          * the settings. Note that these aren't necessarily all the types provided by SolverTypes,
          * depending on the implementation of the ProofIndependentSettings.
          */

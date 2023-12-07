@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Feature flags for the selected and deselected of experimental features.
@@ -47,16 +50,16 @@ public class FeatureSettings extends AbstractSettings {
      * Helper function for notification on feature flag changes.
      *
      * @param feature the feature to be listening on
-     * @param update  a callback function which gets informed on changes with the new value
+     * @param update a callback function which gets informed on changes with the new value
      */
     public static void on(Feature feature, Consumer<Boolean> update) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().addPropertyChangeListener(
-                feature.id, evt -> update.accept((Boolean) evt.getNewValue())
-        );
+            feature.id, evt -> update.accept((Boolean) evt.getNewValue()));
     }
 
     /**
-     * Use the system properties ({@code -P FEATURE:XXX=true} to activate a feature from the command line.
+     * Use the system properties ({@code -P FEATURE:XXX=true} to activate a feature from the command
+     * line.
      */
     private void readFromSystemProperties() {
         var prefix = CATEGORY.toUpperCase() + ":";
@@ -77,8 +80,8 @@ public class FeatureSettings extends AbstractSettings {
      */
     private boolean isTrue(Object value) {
         return switch (value.toString().toLowerCase()) {
-            case "true", "yes", "on" -> true;
-            default -> false;
+        case "true", "yes", "on" -> true;
+        default -> false;
         };
     }
 
@@ -122,7 +125,8 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     private boolean isActivated(String id) {
-        if (activateAll) return true;
+        if (activateAll)
+            return true;
         return activatedFeatures.contains(id);
     }
 

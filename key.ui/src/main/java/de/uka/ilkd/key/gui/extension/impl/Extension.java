@@ -6,11 +6,10 @@ package de.uka.ilkd.key.gui.extension.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-
 import de.uka.ilkd.key.settings.FeatureSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,8 @@ public class Extension<T> implements Comparable<Extension<T>> {
     }
 
     public boolean isOptional() {
-        return info != null && info.optional() && (!isExperimental() || FeatureSettings.isFeatureActivated(getName()));
+        return info != null && info.optional()
+                && (!isExperimental() || FeatureSettings.isFeatureActivated(getName()));
     }
 
     public int getPriority() {
