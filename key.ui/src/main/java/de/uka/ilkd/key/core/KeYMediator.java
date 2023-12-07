@@ -6,7 +6,6 @@ package de.uka.ilkd.key.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.concurrent.locks.Condition;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
