@@ -2,9 +2,6 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
-/**
- * this class implements a TreeModel that can be displayed using the JTree class framework
- */
 
 import java.util.ArrayList;
 import javax.swing.tree.TreeNode;
@@ -13,6 +10,9 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * this class implements a TreeModel that can be displayed using the JTree class framework
+ */
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
     private final Object label;

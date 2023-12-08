@@ -32,6 +32,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
@@ -570,7 +571,25 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (node == null) {
             return;
         }
+
         TreeNode[] obs = node.getPath();
+
+        if (n.sequent() != mediator.getSelectionModel().getSelectedSequent()) {
+            // in this case we have to select a child of an OSS node
+            ArrayList<TreeNode> pathToOSSChild = new ArrayList<>();
+            pathToOSSChild.addAll(Arrays.asList(obs));
+            for (int i = 0; i<node.getChildCount(); i++) {
+                final var child = node.getChildAt(i);
+                if (child instanceof GUIOneStepChildTreeNode ossChild) {
+                    if (ossChild.getRuleApp() == mediator.getSelectionModel().getSelectedRuleApp()) {
+                        pathToOSSChild.add(ossChild);
+                        break;
+                    }
+                }
+            }
+            obs = pathToOSSChild.toArray(new TreeNode[0]);
+        }
+
         TreePath tp = new TreePath(obs);
         treeSelectionListener.ignoreChange = true;
         delegateView.getSelectionModel().setSelectionPath(tp);
@@ -694,12 +713,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         final TreePath branch;
         final Node invokedNode;
-        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode guiNode) {
+
+        final var lastPathComponent = selectedPath.getLastPathComponent();
+        if (lastPathComponent instanceof GUIProofTreeNode guiNode) {
             branch = selectedPath.getParentPath();
             invokedNode = guiNode.getNode();
         } else {
             branch = selectedPath;
-            invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+            invokedNode = ((GUIAbstractTreeNode)lastPathComponent).getNode();
         }
 
         delegateModel.setFilter(filter, selected);
@@ -714,6 +735,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             selectedPath = getPathForBranchNode(invokedNode, selectedPath);
         } else {
             selectedPath = new TreePath(delegateModel.getProofTreeNode(invokedNode).getPath());
+            if (lastPathComponent instanceof GUIOneStepChildTreeNode) {
+                selectedPath = selectedPath.pathByAddingChild(lastPathComponent);
+            }
         }
 
         delegateView.setSelectionPath(selectedPath);
@@ -723,9 +747,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         for (TreePath tp : rowsToExpand) {
             TreePath newTp = delegateView.getPathForRow(0);
             for (int i = 1; i < tp.getPathCount(); i++) {
-                Node n = ((GUIBranchNode) tp.getPathComponent(i)).getNode();
-                newTp = newTp.pathByAddingChild(
-                    delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+                if (tp.getPathComponent(i) instanceof GUIBranchNode pathComp) {
+                    final Node n = pathComp.getNode();
+                    newTp = newTp.pathByAddingChild(
+                            delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+                }
             }
             delegateView.expandPath(newTp);
         }
@@ -743,7 +769,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private TreePath getPathForBranchNode(Node invokedNode, TreePath defaultPath) {
         if (delegateModel.getRoot() instanceof GUIBranchNode rootNode) {
             final TreeNode node = rootNode.findBranch(invokedNode);
-            if (node instanceof GUIBranchNode childAsBranchNode) {
+            if (node instanceof GUIBranchNode childAsBranchNode &&
+                !(defaultPath.getLastPathComponent() instanceof GUIOneStepChildTreeNode)) {
                 return selectBranchNode(childAsBranchNode);
             }
         }
