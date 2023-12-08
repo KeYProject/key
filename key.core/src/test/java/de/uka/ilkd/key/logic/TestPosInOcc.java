@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -31,8 +31,8 @@ public class TestPosInOcc {
     public void testIterator() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JavaDLFunction f = new JavaDLFunction(new Name("f"), sort1, sort1);
-        JavaDLFunction p = new JavaDLFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        JFunction f = new JFunction(new Name("f"), sort1, sort1);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
 
         Term[] terms = new Term[3];
@@ -76,9 +76,9 @@ public class TestPosInOcc {
     public void testReplaceConstrainedFormula() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JavaDLFunction c = new JavaDLFunction(new Name("c"), sort1, new Sort[] {});
-        JavaDLFunction f = new JavaDLFunction(new Name("f"), sort1, sort1);
-        JavaDLFunction p = new JavaDLFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        JFunction c = new JFunction(new Name("c"), sort1, new Sort[] {});
+        JFunction f = new JFunction(new Name("f"), sort1, sort1);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
         Term[] terms = new Term[3];
         terms[0] = TB.var(x);

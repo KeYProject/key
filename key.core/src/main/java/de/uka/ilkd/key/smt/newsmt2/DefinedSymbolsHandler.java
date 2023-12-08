@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
@@ -126,7 +126,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return op instanceof JavaDLFunction && supportedFunctions.contains(op.name().toString());
+        return op instanceof JFunction && supportedFunctions.contains(op.name().toString());
     }
 
     private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {

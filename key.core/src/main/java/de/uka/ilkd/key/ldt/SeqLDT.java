@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
@@ -35,17 +35,17 @@ public final class SeqLDT extends LDT {
 
     // getters
     private final SortDependingFunction seqGet;
-    private final JavaDLFunction seqLen;
-    private final JavaDLFunction seqIndexOf;
+    private final JFunction seqLen;
+    private final JFunction seqIndexOf;
 
     // constructors
-    private final JavaDLFunction seqEmpty;
-    private final JavaDLFunction seqSingleton;
-    private final JavaDLFunction seqConcat;
-    private final JavaDLFunction seqSub;
-    private final JavaDLFunction seqReverse;
-    private final JavaDLFunction seqDef;
-    private final JavaDLFunction values;
+    private final JFunction seqEmpty;
+    private final JFunction seqSingleton;
+    private final JFunction seqConcat;
+    private final JFunction seqSub;
+    private final JFunction seqReverse;
+    private final JFunction seqDef;
+    private final JFunction values;
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
@@ -67,37 +67,37 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JavaDLFunction getSeqLen() {
+    public JFunction getSeqLen() {
         return seqLen;
     }
 
 
-    public JavaDLFunction getSeqEmpty() {
+    public JFunction getSeqEmpty() {
         return seqEmpty;
     }
 
 
-    public JavaDLFunction getSeqSingleton() {
+    public JFunction getSeqSingleton() {
         return seqSingleton;
     }
 
 
-    public JavaDLFunction getSeqConcat() {
+    public JFunction getSeqConcat() {
         return seqConcat;
     }
 
 
-    public JavaDLFunction getSeqSub() {
+    public JFunction getSeqSub() {
         return seqSub;
     }
 
 
-    public JavaDLFunction getSeqReverse() {
+    public JFunction getSeqReverse() {
         return seqReverse;
     }
 
 
-    public JavaDLFunction getSeqDef() {
+    public JFunction getSeqDef() {
         return seqDef;
     }
 
@@ -105,7 +105,7 @@ public final class SeqLDT extends LDT {
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
      */
-    public JavaDLFunction getValues() {
+    public JFunction getValues() {
         return values;
     }
 
@@ -141,7 +141,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof SeqSingleton) {
             return seqSingleton;
@@ -164,7 +164,7 @@ public final class SeqLDT extends LDT {
 
     @Nullable
     @Override
-    public JavaDLFunction getFunctionFor(String operationName, Services services) {
+    public JFunction getFunctionFor(String operationName, Services services) {
         if (operationName.equals("add")) {
             return getSeqConcat();
         }
@@ -173,7 +173,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JavaDLFunction f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return f.equals(seqEmpty);
     }
 
@@ -195,7 +195,7 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JavaDLFunction getSeqIndexOf() {
+    public JFunction getSeqIndexOf() {
         return seqIndexOf;
     }
 }

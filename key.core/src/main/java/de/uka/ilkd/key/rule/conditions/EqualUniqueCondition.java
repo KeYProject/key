@@ -29,7 +29,7 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     private static Term equalUnique(Term t1, Term t2, TermServices services) {
-        if (!(t1.op() instanceof JavaDLFunction && t2.op() instanceof JavaDLFunction
+        if (!(t1.op() instanceof JFunction && t2.op() instanceof JFunction
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
         } else if (t1.op() == t2.op()) {

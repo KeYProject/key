@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -153,7 +153,7 @@ public class TacletForTests {
         return nss.ruleSets();
     }
 
-    public static Namespace<JavaDLFunction> getFunctions() {
+    public static Namespace<JFunction> getFunctions() {
         return nss.functions();
     }
 

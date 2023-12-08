@@ -256,7 +256,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private void addFunc(JavaDLFunction f, boolean labeled) {
+    private void addFunc(JFunction f, boolean labeled) {
         if (isPredicate(f)) {
             addPredicate(f, labeled);
         } else {
@@ -308,7 +308,7 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof JavaDLFunction f) {
+        if (symb instanceof JFunction f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {
@@ -332,7 +332,7 @@ public class InfFlowProofSymbols {
         if (symb instanceof SortedOperator op) {
             addSort(op.sort(), l);
         }
-        if (symb instanceof JavaDLFunction f) {
+        if (symb instanceof JFunction f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {

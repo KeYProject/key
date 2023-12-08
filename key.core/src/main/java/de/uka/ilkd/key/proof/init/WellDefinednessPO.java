@@ -69,11 +69,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     // Internal Methods
     // -------------------------------------------------------------------------
 
-    private static JavaDLFunction createAnonHeap(LocationVariable heap, Services services) {
+    private static JFunction createAnonHeap(LocationVariable heap, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name anonHeapName =
             new Name(services.getTermBuilder().newName("anon_" + heap.toString()));
-        final JavaDLFunction anonHeap = new JavaDLFunction(anonHeapName, heapLDT.targetSort());
+        final JFunction anonHeap = new JFunction(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
 
@@ -152,7 +152,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         } else {
             pm = null;
         }
-        final JavaDLFunction anonHeap = createAnonHeap(heap, services);
+        final JFunction anonHeap = createAnonHeap(heap, services);
         final ProgramVariable self;
         if (vars.self != null) {
             self = createSelf(pm, kjt, services);
@@ -187,7 +187,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @param vars variables to be used in the check
      */
     private void register(Variables vars, Services proofServices) {
-        register((JavaDLFunction) vars.anonHeap.op(), proofServices);
+        register((JFunction) vars.anonHeap.op(), proofServices);
         register(vars.self, proofServices);
         register(vars.result, proofServices);
         register(vars.exception, proofServices);
@@ -350,7 +350,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                 final ProgramVariable exception,
                 final Map<LocationVariable, ProgramVariable> atPres,
                 final ImmutableList<ProgramVariable> params, final LocationVariable heap,
-                final JavaDLFunction anonHeap, TermServices services) {
+                final JFunction anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap, services.getTermBuilder().label(
                 services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }

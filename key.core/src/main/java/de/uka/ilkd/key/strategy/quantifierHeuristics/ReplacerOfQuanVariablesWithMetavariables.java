@@ -34,7 +34,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                JavaDLFunction f = new JavaDLFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                JFunction f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);

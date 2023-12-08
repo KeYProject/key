@@ -595,7 +595,7 @@ public final class AuxiliaryContractBuilders {
          * @return an anonymization update for the specified modifies clauses.
          */
         public Term buildAnonOutUpdate(
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+                final Map<LocationVariable, JFunction> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses) {
             return buildAnonOutUpdate(variables.remembranceLocalVariables.keySet(),
                 anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
@@ -610,7 +610,7 @@ public final class AuxiliaryContractBuilders {
          *         variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+                final Map<LocationVariable, JFunction> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses) {
             return buildAnonOutUpdate(el, anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
         }
@@ -625,7 +625,7 @@ public final class AuxiliaryContractBuilders {
          *         variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+                final Map<LocationVariable, JFunction> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
@@ -644,10 +644,10 @@ public final class AuxiliaryContractBuilders {
          *         in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+                final Map<LocationVariable, JFunction> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
-            for (Map.Entry<LocationVariable, JavaDLFunction> anonymisationHeap : anonymisationHeaps
+            for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
@@ -668,11 +668,11 @@ public final class AuxiliaryContractBuilders {
          * @return an anonymization update for all heap locations.
          */
         public Term buildAnonInUpdate(
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps) {
+                final Map<LocationVariable, JFunction> anonymisationHeaps) {
             Term result = buildLocalVariablesAnonUpdate(
                 variables.outerRemembranceVariables.keySet(), ANON_IN_PREFIX);
 
-            for (Map.Entry<LocationVariable, JavaDLFunction> anonymisationHeap : anonymisationHeaps
+            for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
 
@@ -699,8 +699,8 @@ public final class AuxiliaryContractBuilders {
 
             for (LocationVariable variable : vars) {
                 final String anonymisationName = newName(prefix + variable.name());
-                final JavaDLFunction anonymisationFunction =
-                    new JavaDLFunction(new Name(anonymisationName), variable.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);
@@ -989,9 +989,9 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all anonymisation heaps are well-formed.
          */
         public Term buildWellFormedAnonymisationHeapsCondition(
-                final Map<LocationVariable, JavaDLFunction> anonymisationHeaps) {
+                final Map<LocationVariable, JFunction> anonymisationHeaps) {
             Term result = tt();
-            for (JavaDLFunction anonymisationFunction : anonymisationHeaps.values()) {
+            for (JFunction anonymisationFunction : anonymisationHeaps.values()) {
                 result = and(result,
                     wellFormed(services.getTermBuilder().label(
                         services.getTermBuilder().func(anonymisationFunction),
@@ -1342,7 +1342,7 @@ public final class AuxiliaryContractBuilders {
          * @return the well-definedness formula.
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
-                final Term anonUpdate, final LocationVariable heap, final JavaDLFunction anonHeap,
+                final Term anonUpdate, final LocationVariable heap, final JFunction anonHeap,
                 final ImmutableSet<ProgramVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
@@ -1439,7 +1439,7 @@ public final class AuxiliaryContractBuilders {
          */
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
-                final Map<LocationVariable, JavaDLFunction> anonOutHeaps,
+                final Map<LocationVariable, JFunction> anonOutHeaps,
                 final Map<LocationVariable, Term> modifiesClauses,
                 final Map<LocationVariable, Term> freeModifiesClauses,
                 final Term[] assumptions,
@@ -1475,12 +1475,12 @@ public final class AuxiliaryContractBuilders {
             Term anonOut = new UpdatesBuilder(variables, services)
                     .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
 
-            Map<LocationVariable, JavaDLFunction> anonOutHeaps2 = new HashMap<>();
+            Map<LocationVariable, JFunction> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
                 final String anonymisationName =
                     tb.newName("init_" + ANON_OUT_PREFIX + heap.name());
-                final JavaDLFunction anonymisationFunction =
-                    new JavaDLFunction(new Name(anonymisationName), heap.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }

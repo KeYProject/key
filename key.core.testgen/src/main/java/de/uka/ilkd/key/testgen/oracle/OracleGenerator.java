@@ -206,7 +206,7 @@ public class OracleGenerator {
 
     private void findConstants(Set<Term> constants, Term term) {
         LOGGER.debug("FindConstants: {} cls {} ", term, term.getClass().getName());
-        if (term.op() instanceof JavaDLFunction && term.arity() == 0) {
+        if (term.op() instanceof JFunction && term.arity() == 0) {
             constants.add(term);
         }
         if (term.op() instanceof ProgramVariable) {
@@ -303,7 +303,7 @@ public class OracleGenerator {
             return new OracleMethodCall(method, args);
         }
         // functions
-        else if (op instanceof JavaDLFunction) {
+        else if (op instanceof JFunction) {
             return translateFunction(term, initialSelect);
         }
         // program variables

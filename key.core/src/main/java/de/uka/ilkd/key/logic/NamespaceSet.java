@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic;
 
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 
@@ -18,7 +18,7 @@ public class NamespaceSet {
     private Namespace<QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<IProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
-    private Namespace<JavaDLFunction> funcNS = new Namespace<>();
+    private Namespace<JFunction> funcNS = new Namespace<>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
@@ -27,7 +27,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-            Namespace<JavaDLFunction> funcNS,
+            Namespace<JFunction> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
@@ -74,11 +74,11 @@ public class NamespaceSet {
         this.progVarNS = progVarNS;
     }
 
-    public Namespace<JavaDLFunction> functions() {
+    public Namespace<JFunction> functions() {
         return funcNS;
     }
 
-    public void setFunctions(Namespace<JavaDLFunction> funcNS) {
+    public void setFunctions(Namespace<JFunction> funcNS) {
         this.funcNS = funcNS;
     }
 

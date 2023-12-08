@@ -155,11 +155,11 @@ public class QueryExpand implements BuiltInRule {
         final MethodReference mr =
             new MethodReference(args, method.getProgramElementName(), callee);
 
-        final JavaDLFunction placeHolderResult;
+        final JFunction placeHolderResult;
         final Term placeHolderResultTrm;
 
         if (instVars == null || instVars.length == 0) {
-            placeHolderResult = new JavaDLFunction(new Name(logicResultName), query.sort());
+            placeHolderResult = new JFunction(new Name(logicResultName), query.sort());
             placeHolderResultTrm = tb.func(placeHolderResult);
         } else {
             // If the query expansion depends on logical variables, then store the result in a
@@ -173,7 +173,7 @@ public class QueryExpand implements BuiltInRule {
             }
             ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
             placeHolderResult =
-                new JavaDLFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
+                new JFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
             placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
                                                                              // the third parameter!
         }

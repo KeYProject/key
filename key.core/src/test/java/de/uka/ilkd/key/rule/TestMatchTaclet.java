@@ -329,7 +329,7 @@ public class TestMatchTaclet {
         Sort osort3 = new SortImpl(new Name("os3"), osort1);
         Sort osort4 = new SortImpl(new Name("os4"),
             DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
-        JavaDLFunction v4 = new JavaDLFunction(new Name("v4"), osort4, new Sort[0]);
+        JFunction v4 = new JFunction(new Name("v4"), osort4, new Sort[0]);
         Term match = TB.tf().createTerm(v4);
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_subsort_termSV").taclet();
@@ -347,7 +347,7 @@ public class TestMatchTaclet {
         Sort osort3 = new SortImpl(new Name("os3"), osort1);
         Sort osort4 = new SortImpl(new Name("os4"),
             DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
-        JavaDLFunction aPred = TacletForTests.getFunctions().lookup(new Name("A"));
+        JFunction aPred = TacletForTests.getFunctions().lookup(new Name("A"));
         Term sub = TB.tf().createTerm(aPred);
         Term match = TB.all(new LogicVariable(new Name("lv"), osort4), sub);
         FindTaclet taclet =

@@ -306,13 +306,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<JavaDLFunction> newFuncNS = new Namespace<>();
+        Namespace<JFunction> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (JavaDLFunction n : initConfig.funcNS().allElements()) {
+        for (JFunction n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -345,8 +345,8 @@ public final class ProblemInitializer {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof JavaDLFunction) {
-            namespaces.functions().add((JavaDLFunction) term.op());
+        if (term.op() instanceof JFunction) {
+            namespaces.functions().add((JFunction) term.op());
         } else if (term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -537,7 +537,7 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<JavaDLFunction> functions =
+        final Namespace<JFunction> functions =
             initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;

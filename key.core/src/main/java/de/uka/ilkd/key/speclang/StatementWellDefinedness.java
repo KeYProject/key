@@ -73,7 +73,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final JavaDLFunction generateMbyAtPreFunc(Services services) {
+    final JFunction generateMbyAtPreFunc(Services services) {
         return null;
     }
 

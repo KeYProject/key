@@ -200,7 +200,7 @@ public class StateVars {
         if (t == null) {
             return null;
         }
-        if (!(t.op() instanceof JavaDLFunction)) {
+        if (!(t.op() instanceof JFunction)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
             // in this case.
@@ -219,7 +219,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        final JavaDLFunction newFunc = new JavaDLFunction(new Name(name), t.sort());
+        final JFunction newFunc = new JFunction(new Name(name), t.sort());
         register(newFunc, services);
         return tb.func(newFunc);
     }
@@ -335,7 +335,7 @@ public class StateVars {
             return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
-            JavaDLFunction heap = new JavaDLFunction(heapName, heapLDT.getHeap().sort());
+            JFunction heap = new JFunction(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
@@ -355,7 +355,7 @@ public class StateVars {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
-        final JavaDLFunction mbyAtPreFunc = new JavaDLFunction(new Name(newName), intSort);
+        final JFunction mbyAtPreFunc = new JFunction(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
     }
@@ -376,8 +376,8 @@ public class StateVars {
     }
 
 
-    static void register(JavaDLFunction f, Services services) {
-        Namespace<JavaDLFunction> functionNames = services.getNamespaces().functions();
+    static void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             if (f.sort() == JavaDLTheory.FORMULA) {

@@ -29,8 +29,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
     private static boolean clearlyDisjoint(Term t1, Term t2, Services services) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if (t1.op() instanceof JavaDLFunction && ((Function) t1.op()).isUnique()
-                && t2.op() instanceof JavaDLFunction && ((Function) t2.op()).isUnique()
+        if (t1.op() instanceof JFunction && ((Function) t1.op()).isUnique()
+                && t2.op() instanceof JFunction && ((Function) t2.op()).isUnique()
                 && !t1.equals(t2)) {
             return true;
         } else if (t1.sort().equals(setLDT.targetSort()) && t2.sort().equals(setLDT.targetSort())) {
@@ -40,7 +40,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
             ImmutableSet<Operator> t1Ops = DefaultImmutableSet.nil();
             ImmutableSet<Operator> t2Ops = DefaultImmutableSet.nil();
             for (Term t : t1set) {
-                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JavaDLFunction
+                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JFunction
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t1Ops = t1Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
@@ -49,7 +49,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
                 }
             }
             for (Term t : t2set) {
-                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JavaDLFunction
+                if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof JFunction
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t2Ops = t2Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Given two sort-depending functions f1 and f2 then from f1.isSimilar(f2) and
  * f1.getSortDependingOn() == f2.getSortDependingOn() follows f1 == f2
  */
-public final class SortDependingFunction extends JavaDLFunction {
+public final class SortDependingFunction extends JFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SortDependingFunction.class);
 
     private final SortDependingFunctionTemplate template;
@@ -117,7 +117,7 @@ public final class SortDependingFunction extends JavaDLFunction {
         }
 
         final NamespaceSet namespaces = services.getNamespaces();
-        Namespace<JavaDLFunction> functions = namespaces.functions();
+        Namespace<JFunction> functions = namespaces.functions();
 
         SortDependingFunction result;
         synchronized (namespaces) {

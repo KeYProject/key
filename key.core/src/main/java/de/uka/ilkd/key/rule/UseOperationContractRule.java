@@ -275,12 +275,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
-        final JavaDLFunction methodHeapFunc =
-            new JavaDLFunction(methodHeapName, heapLDT.targetSort(), true);
+        final JFunction methodHeapFunc =
+            new JFunction(methodHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(methodHeapFunc);
         final Term methodHeap = tb.func(methodHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
-        final JavaDLFunction anonHeapFunc = new JavaDLFunction(anonHeapName, heap.sort());
+        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeap =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);

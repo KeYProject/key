@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -44,7 +44,7 @@ public class HeuristicInstantiation implements TermGenerator {
         private final QuantifiableVariable quantifiedVar;
 
         private final Sort quantifiedVarSort;
-        private final JavaDLFunction quantifiedVarSortCast;
+        private final JFunction quantifiedVarSortCast;
 
         private Term nextInst = null;
         private final TermServices services;

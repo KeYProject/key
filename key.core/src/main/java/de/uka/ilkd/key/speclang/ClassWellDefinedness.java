@@ -59,7 +59,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JavaDLFunction generateMbyAtPreFunc(Services services) {
+    JFunction generateMbyAtPreFunc(Services services) {
         return null;
     }
 

@@ -275,7 +275,7 @@ public class MergeRuleUtils {
     public static HashSet<Function> getSkolemConstants(Term term) {
         HashSet<Function> result = new HashSet<>();
 
-        if (term.op() instanceof JavaDLFunction && ((Function) term.op()).isSkolemConstant()) {
+        if (term.op() instanceof JFunction && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
         } else {
             for (Term sub : term.subs()) {
@@ -399,14 +399,14 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
-    public static JavaDLFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
+    public static JFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
             Services services) {
-        JavaDLFunction result = null;
+        JFunction result = null;
         String newName = "";
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new JavaDLFunction(new Name(newName), sort, true);
+            result = new JFunction(new Name(newName), sort, true);
             services.getNamespaces().functions().add(result);
         } while (newName.equals(prefix));
 
@@ -1159,15 +1159,15 @@ public class MergeRuleUtils {
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof JavaDLFunction partnerFun) {
+                if (partnerStateOp instanceof JFunction partnerFun) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (JavaDLFunction) mergeStateOp);
-                    thisGoalNamespaces.functions().add((JavaDLFunction) newOp1);
+                        thisGoal.getLocalNamespaces())), (JFunction) mergeStateOp);
+                    thisGoalNamespaces.functions().add((JFunction) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
                         thisGoal.getLocalNamespaces())), partnerFun);
-                    thisGoalNamespaces.functions().add((JavaDLFunction) newOp2);
+                    thisGoalNamespaces.functions().add((JFunction) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable partnerLV) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
@@ -1342,8 +1342,8 @@ public class MergeRuleUtils {
      * @param old the function to be renamed
      * @return equivalent operator with the new name
      */
-    private static JavaDLFunction rename(Name newName, JavaDLFunction old) {
-        return new JavaDLFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
+    private static JFunction rename(Name newName, JFunction old) {
+        return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
             old.isUnique(), old.isSkolemConstant());
     }
 

@@ -9,7 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -75,8 +75,8 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
             final TermBuilder tb = //
                 stateMap.getProof().getServices().getTermBuilder();
             final Term t;
-            if (lookupResult instanceof JavaDLFunction) {
-                t = tb.func((JavaDLFunction) lookupResult);
+            if (lookupResult instanceof JFunction) {
+                t = tb.func((JFunction) lookupResult);
             } else if (lookupResult instanceof ProgramVariable) {
                 t = tb.var((ProgramVariable) lookupResult);
             } else {

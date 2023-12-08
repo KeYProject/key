@@ -167,8 +167,8 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(JavaDLFunction f, Services services) {
-        Namespace<JavaDLFunction> functionNames = services.getNamespaces().functions();
+    protected final void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             if (f.sort() == JavaDLTheory.FORMULA) {

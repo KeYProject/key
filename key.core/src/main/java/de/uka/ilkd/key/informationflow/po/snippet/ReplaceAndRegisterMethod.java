@@ -138,8 +138,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(JavaDLFunction f, Services services) {
-        Namespace<JavaDLFunction> functionNames = services.getNamespaces().functions();
+    final void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             functionNames.addSafely(f);

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -70,8 +70,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        JavaDLFunction notAValueFunction =
-            new JavaDLFunction(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
+        JFunction notAValueFunction =
+            new JFunction(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
 
@@ -109,22 +109,22 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
                     : getParentValue().getCondition();
             Term arrayTerm = createArrayTerm();
             // Create index constant
-            JavaDLFunction constantFunction =
-                new JavaDLFunction(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
+            JFunction constantFunction =
+                new JFunction(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
                     sideServices.getTypeConverter().getIntegerLDT().targetSort());
             constant = tb.func(constantFunction);
             setName(lazyComputeName()); // Update name because constant has changed
             Term arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
-            JavaDLFunction arrayLengthFunction =
+            JFunction arrayLengthFunction =
                 sideServices.getTypeConverter().getHeapLDT().getLength();
             Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
                 tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
             Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
-            JavaDLFunction resultPredicate =
-                new JavaDLFunction(new Name(tb.newName("ResultPredicate")),
+            JFunction resultPredicate =
+                new JFunction(new Name(tb.newName("ResultPredicate")),
                     JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
             Term resultTerm = tb.func(resultPredicate, resultIf);

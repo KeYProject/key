@@ -580,7 +580,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final JavaDLFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
         if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
@@ -687,7 +687,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return tb.getTaclet();
     }
 
-    abstract JavaDLFunction generateMbyAtPreFunc(Services services);
+    abstract JFunction generateMbyAtPreFunc(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
@@ -1267,10 +1267,10 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
-        private final JavaDLFunction func;
+        private final JFunction func;
 
 
-        private TermListAndFunc(ImmutableList<Term> ts, JavaDLFunction f) {
+        private TermListAndFunc(ImmutableList<Term> ts, JFunction f) {
             this.terms = ts;
             this.func = f;
         }
@@ -1300,7 +1300,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, JavaDLFunction func) {}
+    public record TermAndFunc(Term term, JFunction func) {}
 
     /**
      * A data structure for storing and passing all specifications of a specification element

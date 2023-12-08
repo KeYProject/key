@@ -99,8 +99,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         return s;
     }
 
-    public JavaDLFunction lookup_func(String name) {
-        JavaDLFunction f = nss.functions().lookup(new Name(name));
+    public JFunction lookup_func(String name) {
+        JFunction f = nss.functions().lookup(new Name(name));
         if (f == null) {
             throw new RuntimeException("Function named " + name + " not found");
         }

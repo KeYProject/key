@@ -221,7 +221,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goalSequent, equalitySF);
-            JavaDLFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
+            JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
                 sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
@@ -247,7 +247,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                 }
             } else {
-                JavaDLFunction resultFunction = createResultConstant(services, varTerm.sort());
+                JFunction resultFunction = createResultConstant(services, varTerm.sort());
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,

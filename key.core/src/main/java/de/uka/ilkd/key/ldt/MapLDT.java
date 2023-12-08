@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -27,7 +27,7 @@ public final class MapLDT extends LDT {
 
     public static final Name NAME = new Name("Map");
 
-    public final JavaDLFunction mapEmpty;
+    public final JFunction mapEmpty;
 
     public MapLDT(TermServices services) {
         super(NAME, services);
@@ -59,13 +59,13 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public JavaDLFunction getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+    public JFunction getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
         assert false;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(JavaDLFunction f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return f.equals(mapEmpty);
     }
 

@@ -410,9 +410,9 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
-        JavaDLFunction ioFuncObject =
+        JFunction ioFuncObject =
             services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
-        JavaDLFunction ioFuncInt =
+        JFunction ioFuncInt =
             services.getJavaDLTheory()
                     .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
 
@@ -432,7 +432,7 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final JavaDLFunction fieldSymbol =
+        final JFunction fieldSymbol =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = TB.all(qv,
             TB.imp(

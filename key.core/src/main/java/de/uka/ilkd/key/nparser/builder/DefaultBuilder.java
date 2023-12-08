@@ -232,7 +232,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<JavaDLFunction> functions() {
+    protected Namespace<JFunction> functions() {
         return namespaces().functions();
     }
 

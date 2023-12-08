@@ -193,9 +193,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JavaDLFunction generateMbyAtPreFunc(Services services) {
+    JFunction generateMbyAtPreFunc(Services services) {
         return hasMby()
-                ? new JavaDLFunction(new Name(TB.newName("mbyAtPre")),
+                ? new JFunction(new Name(TB.newName("mbyAtPre")),
                     services.getTypeConverter().getIntegerLDT().targetSort())
                 : null;
     }
@@ -210,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     Term generateMbyAtPreDef(ParsableVariable self, ImmutableList<ParsableVariable> params,
-            JavaDLFunction mbyAtPreFunc, Services services) {
+            JFunction mbyAtPreFunc, Services services) {
         final Term mbyAtPreDef;
         if (hasMby()) {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);

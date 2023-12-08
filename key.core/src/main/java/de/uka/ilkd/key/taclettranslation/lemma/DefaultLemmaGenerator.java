@@ -219,8 +219,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Term[] args = computeArgs(owner, prefix, services);
         Name name = createUniqueName(services, "f_" + sv.name().toString());
 
-        JavaDLFunction function =
-            new JavaDLFunction(name, replaceSort(sv.sort(), services), argSorts);
+        JFunction function =
+            new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }
 

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
@@ -19,14 +19,14 @@ public class PermissionLDT extends LDT {
 
     public static final Name NAME = new Name("Permission");
 
-    private final JavaDLFunction permissionsFor;
+    private final JFunction permissionsFor;
 
     public PermissionLDT(Services services) {
         super(NAME, services);
         permissionsFor = addFunction(services, "permissionsFor");
     }
 
-    public JavaDLFunction getPermissionsFor() {
+    public JFunction getPermissionsFor() {
         return permissionsFor;
     }
 
@@ -55,13 +55,13 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public JavaDLFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false : "PermissionLDT: there are no permission operators: " + op;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(JavaDLFunction f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return false;
     }
 

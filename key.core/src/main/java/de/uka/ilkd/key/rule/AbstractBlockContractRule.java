@@ -173,17 +173,17 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected static Map<LocationVariable, JavaDLFunction> createAndRegisterAnonymisationVariables(
+    protected static Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, JavaDLFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JavaDLFunction anonymisationFunction =
-                    new JavaDLFunction(new Name(anonymisationName), variable.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -318,7 +318,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         final Term heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
         final Name heapAtPostName = new Name(tb.newName("heap_After_BLOCK"));
-        final Term heapAtPost = tb.func(new JavaDLFunction(heapAtPostName, heapAtPre.sort(), true));
+        final Term heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), true));
         final Term selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
         final Term selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 
@@ -404,7 +404,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,

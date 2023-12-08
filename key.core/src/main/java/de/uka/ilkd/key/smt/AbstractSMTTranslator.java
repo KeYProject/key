@@ -164,7 +164,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * If the solver supports only simple multiplications, complex multiplications are translated
      * into a uninterpreted function. The name of the function is stored here.
      */
-    private JavaDLFunction multiplicationFunction = null;
+    private JFunction multiplicationFunction = null;
 
     private static final String BSUM_STRING = "bsum";
 
@@ -203,12 +203,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return smtSettings;
     }
 
-    private JavaDLFunction getMultiplicationFunction(Services services) {
+    private JFunction getMultiplicationFunction(Services services) {
         if (multiplicationFunction == null) {
             Function reference = services.getTypeConverter().getIntegerLDT().getMul();
 
             TermBuilder tb = services.getTermBuilder();
-            multiplicationFunction = new JavaDLFunction(new Name(tb.newName("unin_mult")),
+            multiplicationFunction = new JFunction(new Name(tb.newName("unin_mult")),
                 reference.sort(), reference.argSorts());
         }
         return multiplicationFunction;
@@ -796,7 +796,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         ArrayList<StringBuilder> result = new ArrayList<>();
         Sort sort = services.getTypeConverter().getIntegerLDT().getMul().sort();
-        JavaDLFunction mult = getMultiplicationFunction(services);
+        JFunction mult = getMultiplicationFunction(services);
         TermBuilder tb = services.getTermBuilder();
         Term zero = tb.zero();
         Term one = tb.one();
@@ -1595,7 +1595,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else if (op == Junctor.FALSE) {
             return this.translateLogicalFalse();
         } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-            JavaDLFunction nullOp = services.getTypeConverter().getHeapLDT().getNull();
+            JFunction nullOp = services.getTypeConverter().getHeapLDT().getNull();
 
             addFunction(nullOp, new ArrayList<>(), nullOp.sort(), services);
             translateSort(nullOp.sort(), services);
@@ -1619,7 +1619,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 return translateFunc(op, subterms);
             }
-        } else if (op instanceof JavaDLFunction fun) {
+        } else if (op instanceof JFunction fun) {
             if (fun.sort() == JavaDLTheory.FORMULA) {
                 // This Function is a predicate, so translate it
                 // as such
@@ -2002,7 +2002,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
     }
 
-    private StringBuilder translateAsUninterpretedFunction(JavaDLFunction fun,
+    private StringBuilder translateAsUninterpretedFunction(JFunction fun,
             List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
@@ -2126,7 +2126,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
         }
         // invent a new predicate
-        JavaDLFunction fun = new JavaDLFunction(new Name("modConst"), t.sort(), argsorts);
+        JFunction fun = new JFunction(new Name("modConst"), t.sort(), argsorts);
 
         // Build the final predicate
         Term temp = tb.func(fun, subs);
@@ -2235,7 +2235,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else {
             name = translateFunctionName(new StringBuilder(o.name().toString()));
             usedFunctionNames.put(o, name);
-            if (o instanceof JavaDLFunction) {
+            if (o instanceof JFunction) {
                 usedFunctions.add(new FunctionWrapper(name, (Function) o));
             }
         }

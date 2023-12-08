@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -56,9 +56,9 @@ public final class MetaDiv extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         if (bigIntArg2.compareTo(new BigInteger("0")) == 0) {
             Name undefName = new Name("undef(" + term + ")");
-            JavaDLFunction undef = services.getNamespaces().functions().lookup(undefName);
+            JFunction undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
-                undef = new JavaDLFunction(undefName,
+                undef = new JFunction(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }

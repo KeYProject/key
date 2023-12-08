@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -378,10 +378,10 @@ public class LexPathOrdering implements TermOrdering {
             if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) {
                 return 1;
             }
-            if (p_op instanceof JavaDLFunction && ((Function) p_op).sort() instanceof NullSort) {
+            if (p_op instanceof JFunction && ((Function) p_op).sort() instanceof NullSort) {
                 return 2;
             }
-            if (p_op instanceof JavaDLFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
+            if (p_op instanceof JFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
                 return 3;
             }
 
@@ -435,7 +435,7 @@ public class LexPathOrdering implements TermOrdering {
             if (opStr.equals("heap")) {
                 return 0;
             }
-            if (p_op instanceof JavaDLFunction && ((Function) p_op).isUnique()) {
+            if (p_op instanceof JFunction && ((Function) p_op).isUnique()) {
                 return 5;
             }
             if (opStr.equals("pair")) {

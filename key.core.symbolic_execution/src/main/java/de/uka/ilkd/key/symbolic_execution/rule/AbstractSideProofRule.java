@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -50,24 +50,24 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created constant.
      */
-    protected JavaDLFunction createResultConstant(Services services, Sort sort) {
+    protected JFunction createResultConstant(Services services, Sort sort) {
         String functionName = services.getTermBuilder().newName("QueryResult");
-        JavaDLFunction function = new JavaDLFunction(new Name(functionName), sort);
+        JFunction function = new JFunction(new Name(functionName), sort);
         services.getNamespaces().functions().addSafely(function);
         return function;
     }
 
     /**
-     * Creates the result {@link JavaDLFunction} used in a predicate to compute the result in the
+     * Creates the result {@link JFunction} used in a predicate to compute the result in the
      * side
      * proof.
      *
      * @param services The {@link Services} to use.
      * @param sort The {@link Sort} to use.
-     * @return The created result {@link JavaDLFunction}.
+     * @return The created result {@link JFunction}.
      */
-    protected JavaDLFunction createResultFunction(Services services, Sort sort) {
-        return new JavaDLFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
+    protected JFunction createResultFunction(Services services, Sort sort) {
+        return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
 
@@ -83,13 +83,13 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param goal The {@link Goal} on which this {@link BuiltInRule} should be applied on.
      * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
      * @param sequentToProve The {@link Sequent} to prove in a side proof.
-     * @param newPredicate The {@link JavaDLFunction} which is used to compute the result.
+     * @param newPredicate The {@link JFunction} which is used to compute the result.
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
     protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
             Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
-            JavaDLFunction newPredicate) throws ProofInputException {
+            JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,
             "Side proof rule on node " + goal.node().serialNr() + ".",

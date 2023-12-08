@@ -185,7 +185,7 @@ public final class NotationInfo {
         tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
         tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());
 
-        tbl.put(JavaDLFunction.class, new Notation.FunctionNotation());
+        tbl.put(JFunction.class, new Notation.FunctionNotation());
         tbl.put(LogicVariable.class, new Notation.VariableNotation());
         tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());

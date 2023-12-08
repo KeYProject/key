@@ -9,7 +9,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -58,7 +58,7 @@ public class FieldConstantHandler implements SMTHandler {
     public boolean canHandle(Operator op) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
-                && op instanceof JavaDLFunction && ((Function) op).isUnique()
+                && op instanceof JFunction && ((Function) op).isUnique()
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr();
     }

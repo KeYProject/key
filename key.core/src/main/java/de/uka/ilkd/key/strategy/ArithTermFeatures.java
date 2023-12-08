@@ -5,7 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
@@ -90,18 +90,18 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
     final Sort intS;
 
-    final JavaDLFunction Z;
-    final JavaDLFunction C;
-    final JavaDLFunction add;
-    final JavaDLFunction mul;
-    final JavaDLFunction mod;
-    final JavaDLFunction div;
-    final JavaDLFunction jmod;
-    final JavaDLFunction jdiv;
+    final JFunction Z;
+    final JFunction C;
+    final JFunction add;
+    final JFunction mul;
+    final JFunction mod;
+    final JFunction div;
+    final JFunction jmod;
+    final JFunction jdiv;
 
     final Operator eq;
-    final JavaDLFunction leq;
-    final JavaDLFunction geq;
+    final JFunction leq;
+    final JFunction geq;
 
     final TermFeature intF;
 

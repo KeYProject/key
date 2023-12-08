@@ -524,7 +524,7 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        JavaDLFunction newPredicate = new JavaDLFunction(
+                        JFunction newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
@@ -591,7 +591,7 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        JavaDLFunction newPredicate = new JavaDLFunction(
+                        JFunction newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));

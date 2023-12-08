@@ -24,14 +24,14 @@ import org.key_project.util.collection.ImmutableArray;
  * {@link org.key_project.util.EqualsModProofIrrelevancy}, this class
  * may be deleted.</strong>
  */
-public class JavaDLFunction extends Function implements Operator, Sorted {
+public class JFunction extends Function implements Operator, Sorted {
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+    JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
@@ -42,23 +42,23 @@ public class JavaDLFunction extends Function implements Operator, Sorted {
                 : "Functions with sort \"null\" are not allowed: " + this;
     }
 
-    public JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+    public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
-    public JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+    public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JavaDLFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
             boolean unique,
             boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),
@@ -66,27 +66,27 @@ public class JavaDLFunction extends Function implements Operator, Sorted {
             isSkolemConstant);
     }
 
-    JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
+    JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
 
-    public JavaDLFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
+    public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         this(name, sort, argSorts, null, false);
     }
 
-    public JavaDLFunction(Name name, Sort sort, Sort... argSorts) {
+    public JFunction(Name name, Sort sort, Sort... argSorts) {
         this(name, sort, argSorts, null, false);
     }
 
-    public JavaDLFunction(Name name, Sort sort, boolean isSkolemConstant, Sort... argSorts) {
+    public JFunction(Name name, Sort sort, boolean isSkolemConstant, Sort... argSorts) {
         this(name, sort, argSorts, null, false, isSkolemConstant);
     }
 
-    public JavaDLFunction(Name name, Sort sort) {
+    public JFunction(Name name, Sort sort) {
         this(name, sort, new ImmutableArray<>(), null, false);
     }
 
-    public JavaDLFunction(Name name, Sort sort, boolean isSkolemConstant) {
+    public JFunction(Name name, Sort sort, boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant);
     }
 

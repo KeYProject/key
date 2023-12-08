@@ -62,8 +62,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JavaDLFunction p = new JavaDLFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JavaDLFunction q = new JavaDLFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         Term t_x = services.getTermFactory().createTerm(x);
         Term t_p_x = services.getTermFactory().createTerm(p, new Term[] { t_x }, null, null);
@@ -99,8 +99,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JavaDLFunction p = new JavaDLFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JavaDLFunction q = new JavaDLFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         TermBuilder tb = services.getTermBuilder();
 

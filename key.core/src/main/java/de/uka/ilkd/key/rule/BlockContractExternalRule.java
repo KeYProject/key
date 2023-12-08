@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -114,7 +114,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
@@ -138,7 +138,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final BlockContract.Variables variables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
@@ -211,7 +211,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JavaDLFunction> anonymisationHeaps =
+        final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)

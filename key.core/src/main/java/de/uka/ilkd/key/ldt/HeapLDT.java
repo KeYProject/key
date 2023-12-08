@@ -52,30 +52,30 @@ public final class HeapLDT extends LDT {
 
     // select/store
     private final SortDependingFunction select;
-    private final JavaDLFunction store;
-    private final JavaDLFunction create;
-    private final JavaDLFunction anon;
+    private final JFunction store;
+    private final JFunction create;
+    private final JFunction anon;
     private final Function memset;
 
     // fields
-    private final JavaDLFunction arr;
-    private final JavaDLFunction created;
-    private final JavaDLFunction initialized;
+    private final JFunction arr;
+    private final JFunction created;
+    private final JFunction initialized;
     private final SortDependingFunction classPrepared;
     private final SortDependingFunction classInitialized;
     private final SortDependingFunction classInitializationInProgress;
     private final SortDependingFunction classErroneous;
 
     // length
-    private final JavaDLFunction length;
+    private final JFunction length;
 
     // null
-    private final JavaDLFunction nullFunc;
+    private final JFunction nullFunc;
 
     // predicates
-    private final JavaDLFunction wellFormed;
-    private final JavaDLFunction acc;
-    private final JavaDLFunction reach;
+    private final JFunction wellFormed;
+    private final JFunction acc;
+    private final JFunction reach;
     private final Function prec;
 
     // heap pv
@@ -213,17 +213,17 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JavaDLFunction getStore() {
+    public JFunction getStore() {
         return store;
     }
 
 
-    public JavaDLFunction getCreate() {
+    public JFunction getCreate() {
         return create;
     }
 
 
-    public JavaDLFunction getAnon() {
+    public JFunction getAnon() {
         return anon;
     }
 
@@ -233,63 +233,63 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JavaDLFunction getArr() {
+    public JFunction getArr() {
         return arr;
     }
 
 
-    public JavaDLFunction getCreated() {
+    public JFunction getCreated() {
         return created;
     }
 
 
-    public JavaDLFunction getInitialized() {
+    public JFunction getInitialized() {
         return initialized;
     }
 
 
-    public JavaDLFunction getClassPrepared(Sort instanceSort, TermServices services) {
+    public JFunction getClassPrepared(Sort instanceSort, TermServices services) {
         return classPrepared.getInstanceFor(instanceSort, services);
     }
 
 
-    public JavaDLFunction getClassInitialized(Sort instanceSort, TermServices services) {
+    public JFunction getClassInitialized(Sort instanceSort, TermServices services) {
         return classInitialized.getInstanceFor(instanceSort, services);
     }
 
 
-    public JavaDLFunction getClassInitializationInProgress(Sort instanceSort,
+    public JFunction getClassInitializationInProgress(Sort instanceSort,
             TermServices services) {
         return classInitializationInProgress.getInstanceFor(instanceSort, services);
     }
 
 
-    public JavaDLFunction getClassErroneous(Sort instanceSort, TermServices services) {
+    public JFunction getClassErroneous(Sort instanceSort, TermServices services) {
         return classErroneous.getInstanceFor(instanceSort, services);
     }
 
 
-    public JavaDLFunction getLength() {
+    public JFunction getLength() {
         return length;
     }
 
 
-    public JavaDLFunction getNull() {
+    public JFunction getNull() {
         return nullFunc;
     }
 
 
-    public JavaDLFunction getWellFormed() {
+    public JFunction getWellFormed() {
         return wellFormed;
     }
 
 
-    public JavaDLFunction getAcc() {
+    public JFunction getAcc() {
         return acc;
     }
 
 
-    public JavaDLFunction getReach() {
+    public JFunction getReach() {
         return reach;
     }
 
@@ -331,12 +331,12 @@ public final class HeapLDT extends LDT {
      * the appropriate symbol does not yet exist in the namespace, this method creates and adds it
      * to the namespace as a side effect.
      */
-    public JavaDLFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
+    public JFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        JavaDLFunction result = services.getNamespaces().functions().lookup(name);
+        JFunction result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;
@@ -360,7 +360,7 @@ public final class HeapLDT extends LDT {
                         fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
                         fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
-                    result = new JavaDLFunction(name, fieldSort, new Sort[0], null, true);
+                    result = new JFunction(name, fieldSort, new Sort[0], null, true);
                 }
                 services.getNamespaces().functions().addSafely(result);
             }
@@ -417,7 +417,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public JavaDLFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -425,7 +425,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JavaDLFunction f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return false;
     }
 
@@ -445,7 +445,7 @@ public final class HeapLDT extends LDT {
                 return new FieldReference(field, null);
             }
             return new FieldReference(field, prefix);
-        } else if (t.sort() == getFieldSort() && t.op() instanceof JavaDLFunction
+        } else if (t.sort() == getFieldSort() && t.op() instanceof JFunction
                 && ((Function) t.op()).isUnique()) {
             return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()),
                 getClassName((Function) t.op()));

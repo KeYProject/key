@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -77,7 +77,7 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<JavaDLFunction> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -254,12 +254,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<JavaDLFunction> getLocalFunctions() {
+    public Iterable<JFunction> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends JavaDLFunction> elements) {
-        for (JavaDLFunction op : elements) {
+    public void addLocalFunctions(Collection<? extends JFunction> elements) {
+        for (JFunction op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }

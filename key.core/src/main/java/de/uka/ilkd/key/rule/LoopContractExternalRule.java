@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -94,7 +94,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final LoopContract.Variables variables,
             final Map<LocationVariable, Term> modifiesClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
@@ -139,7 +139,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createUsageAssumptions(
             final ImmutableSet<ProgramVariable> localOutVariables,
-            final Map<LocationVariable, JavaDLFunction> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
@@ -231,7 +231,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JavaDLFunction> anonymisationHeaps =
+        final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)

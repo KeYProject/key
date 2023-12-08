@@ -936,7 +936,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS, Namespace<JavaDLFunction> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
                 varNS, functNS, proof.getNamespaces().sorts(),
@@ -1006,7 +1006,7 @@ public class IntermediateProofReplayer {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
-            Namespace<JavaDLFunction> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<JFunction> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

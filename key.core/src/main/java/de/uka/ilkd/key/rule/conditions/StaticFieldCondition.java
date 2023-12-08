@@ -37,7 +37,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
             return false;
         }
         final Operator op = f.op();
-        if (op instanceof JavaDLFunction) {
+        if (op instanceof JFunction) {
             final String name = op.name().toString();
 
             // check for normal attribute

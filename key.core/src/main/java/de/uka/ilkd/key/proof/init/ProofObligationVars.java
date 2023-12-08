@@ -96,7 +96,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
-        if (pre.heap.op() instanceof JavaDLFunction
+        if (pre.heap.op() instanceof JFunction
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
             ImmutableArray<TermLabel> labels = pre.heap.getLabels();
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];

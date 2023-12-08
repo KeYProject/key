@@ -7,7 +7,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -66,7 +66,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                 if (ruleApp instanceof TacletApp tacletApp) {
                     final Object inst = tacletApp.matchConditions().getInstantiations()
                             .lookupValue(new Name(value));
-                    if (inst != null && ((Term) inst).op() instanceof JavaDLFunction) {
+                    if (inst != null && ((Term) inst).op() instanceof JFunction) {
                         abbrMap.put((Term) inst, key, true);
                     } else {
                         throw new ScriptException(String.format(

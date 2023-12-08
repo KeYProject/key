@@ -27,7 +27,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
         Operator op = term.sub(0).op();
         if (op instanceof LocationVariable fieldPV) {
-            JavaDLFunction fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
+            JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
             return services.getTermBuilder().func(fieldSymbol);
         } else if (heapLDT.getSortOfSelect(op) != null) {
             return term.sub(0).sub(2);

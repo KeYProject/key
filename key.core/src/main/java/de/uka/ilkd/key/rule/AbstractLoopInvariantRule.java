@@ -219,8 +219,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         return localOuts.stream().map(pv -> {
-            final JavaDLFunction anonFunc =
-                new JavaDLFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
+            final JFunction anonFunc =
+                new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
 
             return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
@@ -428,13 +428,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final JavaDLFunction loopHeapFunc =
-            new JavaDLFunction(loopHeapName, heapLDT.targetSort(), true);
+        final JFunction loopHeapFunc =
+            new JFunction(loopHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
-        final JavaDLFunction anonHeapFunc = new JavaDLFunction(anonHeapName, heap.sort());
+        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);

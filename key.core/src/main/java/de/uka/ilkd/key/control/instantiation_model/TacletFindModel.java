@@ -177,7 +177,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace
      */
     private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<JavaDLFunction> functNS) throws ParserException {
+            Namespace<JFunction> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -233,7 +233,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the parsed term
      */
     private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<JavaDLFunction> functNS)
+            Namespace<JFunction> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -411,7 +411,7 @@ public class TacletFindModel extends AbstractTableModel {
                         final Namespace<QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<JavaDLFunction> functNS =
+                        Namespace<JFunction> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);

@@ -209,17 +209,17 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected Map<LocationVariable, JavaDLFunction> createAndRegisterAnonymisationVariables(
+    protected Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, JavaDLFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JavaDLFunction anonymisationFunction =
-                    new JavaDLFunction(new Name(anonymisationName), variable.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }

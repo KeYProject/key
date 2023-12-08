@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JavaDLFunction;
+import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -30,7 +30,7 @@ public final class FreeLDT extends LDT {
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private final JavaDLFunction atom;
+    private final JFunction atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);
@@ -63,20 +63,20 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public JavaDLFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         assert false;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(JavaDLFunction f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return "atom".equals(f.name().toString());
     }
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof JavaDLFunction && hasLiteralFunction((JavaDLFunction) t.op())) {
+        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;
