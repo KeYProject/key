@@ -168,7 +168,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         setSmtSettings(pi.clone());
         return this;

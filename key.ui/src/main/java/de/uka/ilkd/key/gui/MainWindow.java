@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -78,7 +79,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
-import static de.uka.ilkd.key.settings.FeatureSettings.isFeatureActivated;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -102,7 +102,8 @@ public final class MainWindow extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
     private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST = createFeature(
         "BULK_UI_TEST",
-        "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.");
+        "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
+        false);
 
     private static MainWindow instance = null;
     /**
@@ -893,10 +894,20 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if (isFeatureActivated(FEATURE_BULK_UI_TEST)) {
+
+        {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
-            submenu.add(runAllProofsAction);
+            var rapItem = new JMenuItem(runAllProofsAction);
+            final Consumer<Boolean> showRAPAction = active -> {
+                if (active) {
+                    submenu.add(rapItem);
+                } else {
+                    submenu.remove(rapItem);
+                }
+            };
+            FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST, showRAPAction);
         }
+
         fileMenu.addSeparator();
         fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();

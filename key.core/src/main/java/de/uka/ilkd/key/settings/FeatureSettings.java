@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class FeatureSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeatureSettings.class);
     private static final String CATEGORY = "Feature";
+
     /**
      * unstored, set by {@code --experimental}
      */
@@ -55,6 +56,17 @@ public class FeatureSettings extends AbstractSettings {
     public static void on(Feature feature, Consumer<Boolean> update) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().addPropertyChangeListener(
             feature.id, evt -> update.accept((Boolean) evt.getNewValue()));
+    }
+
+    /**
+     * Helper function for notification on feature flag changes which also calls the consumer.
+     *
+     * @param feature the feature to be listening on
+     * @param update a callback function which gets informed on changes with the new value
+     */
+    public static void onAndActivate(Feature feature, Consumer<Boolean> update) {
+        on(feature, update);
+        update.accept(isFeatureActivated(feature));
     }
 
     /**
@@ -130,24 +142,36 @@ public class FeatureSettings extends AbstractSettings {
         return activatedFeatures.contains(id);
     }
 
+    /**
+     * Activates the given feature {@code f}.
+     */
     public void activate(Feature f) {
         activate(f.id);
     }
 
+    /**
+     * Activates the given feature by {@code id}.
+     */
     private void activate(String id) {
         if (!isActivated(id)) {
             activatedFeatures.add(id);
-            firePropertyChange(id, false, true);
+            firePropertyChange(id, false, isActivated(id));
         }
     }
 
+    /**
+     * Deactivates the given feature {@code f}.
+     */
     public void deactivate(Feature f) {
         deactivate(f.id);
     }
 
+    /**
+     * Deactivates the given feature by {@code id}.
+     */
     private void deactivate(String id) {
         if (isActivated(id)) {
-            firePropertyChange(id, true, false);
+            firePropertyChange(id, true, isActivated(id));
             activatedFeatures.remove(id);
         }
     }
@@ -161,14 +185,18 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     public static Feature createFeature(String id) {
-        return new Feature(id, "");
+        return createFeature(id, "", true);
     }
 
     public static Feature createFeature(String id, String doc) {
-        return new Feature(id, doc);
+        return new Feature(id, doc, true);
     }
 
-    public record Feature(String id, String documentation) {
+    public static Feature createFeature(String id, String doc, boolean restartRequired) {
+        return new Feature(id, doc, restartRequired);
+    }
+
+    public record Feature(String id, String documentation, boolean restartRequired) {
         public static final List<Feature> FEATURES = new ArrayList<>();
 
         public Feature {
