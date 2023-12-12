@@ -487,7 +487,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         TacletApp app = this;
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
-        for (final SchemaVariable sv : uninstantiatedVars()) {
+        for (final SchemaVariable usv : uninstantiatedVars()) {
+            if (!(usv instanceof AbstractSV sv)) {
+                continue;
+            }
             if (sv.arity() != 0) {
                 continue;
             }
@@ -588,7 +591,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         TacletApp app = this;
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
-        for (final SchemaVariable sv : uninstantiatedVars()) {
+        for (final SchemaVariable usv : uninstantiatedVars()) {
+            if (!(usv instanceof AbstractSV sv)) {
+                continue;
+            }
             if (sv.arity() != 0) {
                 continue;
             }

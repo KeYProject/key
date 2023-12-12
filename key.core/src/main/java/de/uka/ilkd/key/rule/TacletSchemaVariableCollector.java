@@ -87,7 +87,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     @Override
     public void visit(Term visited) {
         final Operator op = visited.op();
-        if (op instanceof Modality || op instanceof ModalOperatorSV) {
+        if (op instanceof Modality mod) {
+            if (mod.kind() instanceof ModalOperatorSV msv) {
+                varList = varList.prepend(msv);
+            }
             varList = collectSVInProgram(visited.javaBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);

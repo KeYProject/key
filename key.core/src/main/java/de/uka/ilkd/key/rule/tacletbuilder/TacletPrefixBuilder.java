@@ -63,6 +63,10 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Term t) {
+        if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
+            // TODO: Is false correct?
+            prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
+        }
         if (t.op() instanceof SchemaVariable && t.arity() == 0 && !(t.op() instanceof VariableSV)
                 && !(t.op() instanceof ProgramSV) && !(t.op() instanceof SkolemTermSV)) {
             SchemaVariable sv = (SchemaVariable) t.op();
