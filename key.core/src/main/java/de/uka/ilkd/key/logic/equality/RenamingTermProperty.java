@@ -1,9 +1,10 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -14,6 +15,19 @@ import org.key_project.util.collection.ImmutableSLList;
 
 
 public class RenamingTermProperty implements TermProperty {
+    /**
+     * The single instance of this property.
+     */
+    public static final RenamingTermProperty RENAMING_TERM_PROPERTY = new RenamingTermProperty();
+
+    /**
+     * This constructor is private as a single instance of this class should be shared. The instance
+     * can be accessed
+     * through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
+     * {@link TermProperty#equalsModThisProperty(Term, Object)}.
+     */
+    private RenamingTermProperty() {}
+
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
         if (o == term) {
@@ -32,12 +46,10 @@ public class RenamingTermProperty implements TermProperty {
             "Hashing of terms modulo renaming not yet implemented!");
     }
 
-    //
     // equals modulo renaming logic
 
-
     /**
-     * compare two quantifiable variables if they are equal modulo renaming
+     * Compare two quantifiable variables if they are equal modulo renaming.
      *
      * @param ownVar first QuantifiableVariable to be compared
      * @param cmpVar second QuantifiableVariable to be compared
@@ -79,7 +91,7 @@ public class RenamingTermProperty implements TermProperty {
     }
 
     /**
-     * Compares two terms modulo bound renaming
+     * Compares two terms modulo bound renaming.
      *
      * @param t0 the first term
      * @param t1 the second term
