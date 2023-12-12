@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -39,7 +40,8 @@ import org.jspecify.annotations.Nullable;
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted, EqualsModProperty, EqualsModProofIrrelevancy {
+public interface Term
+        extends SVSubstitute, Sorted, TermEqualsModProperty, EqualsModProofIrrelevancy {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").

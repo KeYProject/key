@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.logic.equality.TermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -492,6 +493,16 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
         return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
+    }
+
+    @Override
+    public boolean equalsModProperty(TermProperty property, Object o) {
+        return property.equalsModThisProperty(this, o);
+    }
+
+    @Override
+    public int hashCodeModProperty(TermProperty property) {
+        return property.hashCodeModThisProperty(this);
     }
 
     @Override
