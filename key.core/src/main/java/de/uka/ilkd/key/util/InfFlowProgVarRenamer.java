@@ -170,7 +170,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private void applyRenamingsOnUpdate(Term term) {
         final ElementaryUpdate u = (ElementaryUpdate) term.op();
-        final Term lhsTerm = var(u.lhs());
+        final Term lhsTerm = varOfUpdateableOp(u.lhs());
         final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
         final Term[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =

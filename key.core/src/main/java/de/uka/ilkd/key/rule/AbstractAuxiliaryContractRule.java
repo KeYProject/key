@@ -147,7 +147,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return a new local variable with the specified base name of the specified type.
      */
-    protected static ProgramVariable createLocalVariable(final String nameBase,
+    protected static LocationVariable createLocalVariable(final String nameBase,
             final KeYJavaType type, final Services services) {
         return KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal(nameBase), type);

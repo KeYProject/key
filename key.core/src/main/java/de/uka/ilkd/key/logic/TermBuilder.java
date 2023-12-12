@@ -26,6 +26,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
@@ -397,6 +398,17 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
+    public Term var(Metavariable pMv) {
+        return tf.createTerm(pMv);
+    }
+
+    // TODO: Inline?
+    public Term varOfUpdateableOp(UpdateableOperator op) {
+        if (op instanceof LocationVariable lv)
+            return var(lv);
+        return var((ProgramSV) op);
+    }
+
     public Term func(JFunction f) {
         return tf.createTerm(f);
     }
@@ -535,9 +547,9 @@ public class TermBuilder {
     /**
      * General (unbounded) sum
      */
-    public Term sum(ImmutableList<QuantifiableVariable> qvs, Term range, Term t) {
+    public Term sum(ImmutableList<LogicVariable> qvs, Term range, Term t) {
         final JFunction sum = services.getNamespaces().functions().lookup("sum");
-        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
@@ -557,10 +569,10 @@ public class TermBuilder {
     /**
      * General (unbounded) product
      */
-    public Term prod(ImmutableList<QuantifiableVariable> qvs, Term range, Term t,
+    public Term prod(ImmutableList<LogicVariable> qvs, Term range, Term t,
             TermServices services) {
         final JFunction prod = services.getNamespaces().functions().lookup("prod");
-        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {

@@ -1125,7 +1125,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#remembranceLocalVariables
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localOutVariables =
+            ImmutableSet<LocationVariable> localOutVariables =
                 MiscTools.getLocalOuts(statement, services);
 
             SourceElement first;

@@ -89,7 +89,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // prepare reachableOut.
         // TODO: reachableIn has been removed since it was not even used in the
         // old invariant rule. Is that OK or was there an earlier mistake?
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
+        final ImmutableSet<LocationVariable> localOuts =
+            MiscTools.getLocalOuts(inst.loop, services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
             new LinkedHashMap<>();
@@ -171,7 +172,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return The "...Before_LOOP" update needed for the variant.
      */
     protected static Term createBeforeLoopUpdate(Services services,
-            final List<LocationVariable> heapContext, final ImmutableSet<ProgramVariable> localOuts,
+            final List<LocationVariable> heapContext,
+            final ImmutableSet<LocationVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
         final TermBuilder tb = services.getTermBuilder();
         final Namespace<IProgramVariable> progVarNS = services.getNamespaces().programVariables();
@@ -214,7 +216,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param services The {@link Services} object.
      * @return The anonymizing update.
      */
-    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    protected static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -223,7 +225,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
 
-            return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            return tb.elementary(pv, tb.func(anonFunc));
         }).reduce(tb.skip(), tb::parallel);
     }
 
@@ -467,7 +469,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static AdditionalHeapTerms createAdditionalHeapTerms(Services services,
             final Instantiation inst, final List<LocationVariable> heapContext,
-            final ImmutableSet<ProgramVariable> localOuts,
+            final ImmutableSet<LocationVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop,
             Map<LocationVariable, Term> atPres) {
         final TermBuilder tb = services.getTermBuilder();

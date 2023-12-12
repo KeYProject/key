@@ -680,16 +680,16 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void setupWdGoal(final Goal goal, final LoopSpecification inv, final Term update,
             final Term selfTerm, final LocationVariable heap, final Term anonHeap,
-            final Term localAnonUpdate, final ImmutableSet<ProgramVariable> localIns,
+            final Term localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
             PosInOccurrence pio, Services services) {
         if (goal == null) {
             return;
         }
         goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
         final LoopWellDefinedness lwd = new LoopWellDefinedness(inv, localIns, services);
-        final ProgramVariable self;
-        if (selfTerm != null && selfTerm.op() instanceof ProgramVariable) {
-            self = (ProgramVariable) selfTerm.op();
+        final LocationVariable self;
+        if (selfTerm != null && selfTerm.op() instanceof LocationVariable) {
+            self = (LocationVariable) selfTerm.op();
         } else {
             self = null;
         }

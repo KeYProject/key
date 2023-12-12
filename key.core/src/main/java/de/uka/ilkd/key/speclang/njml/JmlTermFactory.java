@@ -157,11 +157,11 @@ public final class JmlTermFactory {
 
     // region quantification
     private Term typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));
@@ -362,8 +362,8 @@ public final class JmlTermFactory {
         Term t;
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
-            ImmutableList<QuantifiableVariable> _qvs =
-                ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+            ImmutableList<LogicVariable> _qvs =
+                ImmutableSLList.<LogicVariable>nil().prepend(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -421,7 +421,7 @@ public final class JmlTermFactory {
 
 
     private interface UnboundedNumericalQuantifier {
-        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs,
+        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<LogicVariable> qvs,
                 Term range, Term body);
     }
 
@@ -1313,11 +1313,11 @@ public final class JmlTermFactory {
     @NonNull
     private Term typerestrict(
             @NonNull KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));

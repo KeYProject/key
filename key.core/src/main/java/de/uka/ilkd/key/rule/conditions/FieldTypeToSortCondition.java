@@ -27,13 +27,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
-    public FieldTypeToSortCondition(final SchemaVariable exprOrTypeSV, final GenericSort sort) {
+    public FieldTypeToSortCondition(final AbstractSV exprOrTypeSV, final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
     }
 
-    public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
+    public static boolean checkSortedSV(final AbstractSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
