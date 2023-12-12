@@ -1478,7 +1478,7 @@ public class JMLSpecFactory {
                     ((For) s).getVariablesInScope();
                 for (int j = 0; j < variables.size(); j++) {
                     result =
-                        result.prepend((ProgramVariable) variables.get(j).getProgramVariable());
+                        result.prepend((LocationVariable) variables.get(j).getProgramVariable());
                 }
             }
             if (s == statement) {
@@ -1488,7 +1488,7 @@ public class JMLSpecFactory {
                     ((LocalVariableDeclaration) s).getVariables();
                 for (int j = 0; j < variables.size(); j++) {
                     result =
-                        result.prepend((ProgramVariable) variables.get(j).getProgramVariable());
+                        result.prepend((LocationVariable) variables.get(j).getProgramVariable());
                 }
             } else if (s instanceof StatementContainer) {
                 final ImmutableList<LocationVariable> visibleLocalVariables =
@@ -1530,8 +1530,8 @@ public class JMLSpecFactory {
         // atPre-Functions
         var context = Context.inMethod(pm, tb);
         final ImmutableList<LocationVariable> paramVars = pm.collectParameters();
-        ProgramVariable resultVar = tb.resultVar(pm, false);
-        ProgramVariable excVar = tb.excVar(pm, false); // only for information
+        LocationVariable resultVar = tb.resultVar(pm, false);
+        LocationVariable excVar = tb.excVar(pm, false); // only for information
         // flow
 
         final ImmutableList<LocationVariable> allHeaps =
@@ -1587,7 +1587,7 @@ public class JMLSpecFactory {
     }
 
     private Map<LocationVariable, ImmutableList<InfFlowSpec>> translateToTermInfFlowSpecs(
-            Context context, ProgramVariable resultVar, ProgramVariable excVar,
+            Context context, LocationVariable resultVar, LocationVariable excVar,
             ImmutableList<LocationVariable> allVars, final ImmutableList<LocationVariable> allHeaps,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs) {
         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<>();

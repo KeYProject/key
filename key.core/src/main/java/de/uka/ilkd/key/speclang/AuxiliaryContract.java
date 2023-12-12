@@ -176,7 +176,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's precondition on the specified heap.
      */
-    Term getPrecondition(LocationVariable heap, ProgramVariable self,
+    Term getPrecondition(LocationVariable heap, LocationVariable self,
             Map<LocationVariable, LocationVariable> atPres, Services services);
 
     /**
@@ -261,7 +261,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's free precondition on the specified heap.
      */
-    Term getFreePrecondition(LocationVariable heap, ProgramVariable self,
+    Term getFreePrecondition(LocationVariable heap, LocationVariable self,
             Map<LocationVariable, LocationVariable> atPres, Services services);
 
     /**
@@ -324,7 +324,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's modifies clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    Term getModifiesClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -364,7 +364,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    Term getFreeModifiesClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -501,7 +501,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
-    Term getMby(ProgramVariable selfVar, Services services);
+    Term getMby(LocationVariable selfVar, Services services);
 
     /**
      *
@@ -1180,7 +1180,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#outerRemembranceVariables
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localInVariables =
+            ImmutableSet<LocationVariable> localInVariables =
                 MiscTools.getLocalIns(statement, services);
 
             SourceElement first;
@@ -1212,8 +1212,8 @@ public interface AuxiliaryContract extends SpecificationElement {
             Map<LocationVariable, LocationVariable> result =
                 new LinkedHashMap<>();
 
-            for (ProgramVariable var : localInVariables) {
-                result.put((LocationVariable) var,
+            for (LocationVariable var : localInVariables) {
+                result.put(var,
                     createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
             }
             return result;

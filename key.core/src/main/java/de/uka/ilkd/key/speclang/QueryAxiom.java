@@ -21,13 +21,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -127,19 +121,19 @@ public final class QueryAxiom extends ClassAxiom {
         final TermBuilder tb = services.getTermBuilder();
 
         // create schema variables
-        final List<SchemaVariable> heapSVs = new ArrayList<>();
+        final List<TermSV> heapSVs = new ArrayList<>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
             heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
                 false, false));
         }
-        final SchemaVariable selfSV = target.isStatic() ? null
+        final var selfSV = target.isStatic() ? null
                 : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort(), false, false);
-        final SchemaVariable[] paramSVs = new SchemaVariable[target.getNumParams()];
+        final TermSV[] paramSVs = new TermSV[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
             paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("p" + i),
                 target.getParamType(i).getSort(), false, false);
         }
-        final SchemaVariable skolemSV = SchemaVariableFactory
+        final var skolemSV = SchemaVariableFactory
                 .createSkolemTermSV(new Name(target.getName() + "_sk"), target.sort());
 
         // create schema variables for program variables
@@ -203,7 +197,7 @@ public final class QueryAxiom extends ClassAxiom {
         // create find
         final Term[] subs = new Term[target.arity()];
         int offset = 0;
-        for (SchemaVariable heapSV : heapSVs) {
+        for (var heapSV : heapSVs) {
             subs[offset] = tb.var(heapSV);
             offset++;
         }
@@ -211,7 +205,7 @@ public final class QueryAxiom extends ClassAxiom {
             subs[offset] = tb.var(selfSV);
             offset++;
         }
-        for (SchemaVariable paramSV : paramSVs) {
+        for (var paramSV : paramSVs) {
             subs[offset] = tb.var(paramSV);
             offset++;
         }

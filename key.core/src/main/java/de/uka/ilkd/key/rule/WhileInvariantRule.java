@@ -731,15 +731,16 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // collect input and output local variables,
         // prepare reachableIn and reachableOut
-        final ImmutableSet<ProgramVariable> localIns = MiscTools.getLocalIns(inst.loop, services);
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
+        final ImmutableSet<LocationVariable> localIns = MiscTools.getLocalIns(inst.loop, services);
+        final ImmutableSet<LocationVariable> localOuts =
+            MiscTools.getLocalOuts(inst.loop, services);
         Term reachableIn = tb.tt();
-        for (ProgramVariable pv : localIns) {
+        for (var pv : localIns) {
             reachableIn = tb.and(reachableIn, tb.reachableValue(pv));
         }
         Term reachableOut = tb.tt();
 
-        for (ProgramVariable pv : localOuts) {
+        for (var pv : localOuts) {
             reachableOut = tb.and(reachableOut, tb.reachableValue(pv));
         }
 

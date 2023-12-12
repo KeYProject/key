@@ -14,7 +14,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -92,7 +91,7 @@ public final class ContractAxiom extends ClassAxiom {
 
         final boolean satisfiabilityGuard = true; // XXX
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
+        LocationVariable self = (!target.isStatic() ? originalSelfVar : null);
 
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();

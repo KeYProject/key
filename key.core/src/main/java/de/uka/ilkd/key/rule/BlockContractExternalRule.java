@@ -92,7 +92,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      */
     private static Term[] createPreconditions(final Instantiation instantiation,
             final BlockContract contract, final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
@@ -113,7 +113,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
-    private static Term[] createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
+    private static Term[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
             final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
@@ -207,9 +207,9 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         assert contract.getBlock().equals(instantiation.statement());
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
+        final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);

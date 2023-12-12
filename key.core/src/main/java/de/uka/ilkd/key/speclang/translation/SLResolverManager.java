@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -37,7 +38,7 @@ public abstract class SLResolverManager {
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;
 
-    private ImmutableList<Namespace<ParsableVariable>> localVariablesNamespaces =
+    private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
         ImmutableSLList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
@@ -83,7 +84,7 @@ public abstract class SLResolverManager {
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
         for (Namespace<?> ns : localVariablesNamespaces) {
-            ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
+            var localVar = (LocationVariable) ns.lookup(n);
             if (localVar != null) {
                 Term varTerm = tb.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));
