@@ -123,7 +123,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public TacletBuilder<?> visitTriggers(KeYParser.TriggersContext ctx) {
         String id = (String) ctx.id.accept(this);
-        SchemaVariable triggerVar = schemaVariables().lookup(new Name(id));
+        AbstractSV triggerVar = (AbstractSV) schemaVariables().lookup(new Name(id));
         if (triggerVar == null) {
             semanticError(ctx, "Undeclared schemavariable: " + id);
         }
@@ -837,7 +837,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         Name name = new Name(id);
         Operator v = variables().lookup(name);
         if (v == null) {
-            v = schemaVariables().lookup(name);
+            v = (AbstractSV) schemaVariables().lookup(name);
         }
         if (v == null) {
             semanticError(ctx, "Could not find Variable %s", id);
@@ -942,7 +942,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     protected SchemaVariable declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
             boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
             SchemaVariableModifierSet mods) {
-        SchemaVariable v;
+        AbstractSV v;
         if (s == JavaDLTheory.FORMULA && !makeSkolemTermSV) {
             v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
         } else if (s == JavaDLTheory.UPDATE) {
@@ -969,7 +969,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
-            SchemaVariable old = schemaVariables().lookup(v.name());
+            AbstractSV old = (AbstractSV) schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort())) {
                 semanticError(null,
                     "Schema variables clashes with previous declared schema variable: %s.",

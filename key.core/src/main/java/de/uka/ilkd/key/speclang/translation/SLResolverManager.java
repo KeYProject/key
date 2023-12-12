@@ -34,7 +34,7 @@ public abstract class SLResolverManager {
     private ImmutableList<SLExpressionResolver> resolvers =
         ImmutableSLList.nil();
     private final KeYJavaType specInClass;
-    private final ParsableVariable selfVar;
+    private final LocationVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;
 
@@ -48,7 +48,7 @@ public abstract class SLResolverManager {
     // -------------------------------------------------------------------------
 
     protected SLResolverManager(SLExceptionFactory excManager, KeYJavaType specInClass,
-            ParsableVariable selfVar, boolean useLocalVarsAsImplicitReceivers, TermBuilder tb) {
+            LocationVariable selfVar, boolean useLocalVarsAsImplicitReceivers, TermBuilder tb) {
         // assert excManager != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
@@ -103,7 +103,7 @@ public abstract class SLResolverManager {
         if (useLocalVarsAsImplicitReceivers) {
             for (Namespace<?> ns : localVariablesNamespaces) {
                 for (Named n : ns.elements()) {
-                    ParsableVariable localVar = (ParsableVariable) n;
+                    var localVar = (LocationVariable) n;
                     SLExpression receiver = new SLExpression(tb.var(localVar), kjts.get(localVar));
 
                     SLExpression result = resolveExplicit(receiver, name, parameters);
@@ -203,7 +203,7 @@ public abstract class SLResolverManager {
      * Pushes a new, empty namespace onto the stack.
      */
     public void pushLocalVariablesNamespace() {
-        var ns = new Namespace<ParsableVariable>();
+        var ns = new Namespace<LocationVariable>();
         localVariablesNamespaces = localVariablesNamespaces.prepend(ns);
     }
 

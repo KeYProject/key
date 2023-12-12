@@ -19,10 +19,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -358,7 +355,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             goal.addProgramVariable(renamedInst);
             services.addNameProposal(renamedInst.name());
 
-            final HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            final HashMap<LocationVariable, LocationVariable> renamingMap = vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {
                 // execute renaming
                 final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);

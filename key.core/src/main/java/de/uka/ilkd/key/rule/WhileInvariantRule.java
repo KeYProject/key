@@ -85,8 +85,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
             final AnonUpdateData anonUpdateData, final Term guardTerm, final Instantiation inst,
             LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
-            final ImmutableSet<ProgramVariable> localIns,
-            final ImmutableSet<ProgramVariable> localOuts, final Term anonUpdate,
+            final ImmutableSet<LocationVariable> localIns,
+            final ImmutableSet<LocationVariable> localOuts, final Term anonUpdate,
             final JavaBlock guardJb) throws RuleAbortException {
         final TermBuilder tb = services.getTermBuilder();
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
@@ -224,15 +224,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         return result;
     }
 
-    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    private static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
+        for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
             } else {
@@ -422,8 +422,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
             LoopInvariantBuiltInRuleApp ruleApp, final Instantiation inst, final JavaBlock guardJb,
-            final ImmutableSet<ProgramVariable> localIns,
-            final ImmutableSet<ProgramVariable> localOuts,
+            final ImmutableSet<LocationVariable> localIns,
+            final ImmutableSet<LocationVariable> localOuts,
             final ImmutableList<AnonUpdateData> anonUpdateDatas, final Term anonUpdate,
             Services services) throws RuleAbortException {
         assert anonUpdateDatas.size() == 1 : "information flow " + "extension is at the "

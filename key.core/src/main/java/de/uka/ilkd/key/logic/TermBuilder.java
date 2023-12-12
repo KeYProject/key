@@ -409,6 +409,13 @@ public class TermBuilder {
         return var((ProgramSV) op);
     }
 
+    // TODO: Inline?
+    public Term varOfQuantVar(QuantifiableVariable op) {
+        if (op instanceof LogicVariable lv)
+            return var(lv);
+        return var((VariableSV) op);
+    }
+
     public Term func(JFunction f) {
         return tf.createTerm(f);
     }

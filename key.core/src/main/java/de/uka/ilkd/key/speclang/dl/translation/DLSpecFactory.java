@@ -89,7 +89,7 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractExcVar(Term fma) {
+    private LocationVariable extractExcVar(Term fma) {
         final Term modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
@@ -216,7 +216,7 @@ public final class DLSpecFactory {
         // extract parts of fma
         final Term pre = extractPre(fma);
         LocationVariable heapAtPreVar = extractHeapAtPre(fma);
-        ProgramVariable excVar = extractExcVar(fma);
+        LocationVariable excVar = extractExcVar(fma);
         final UseOperationContractRule.Instantiation inst = extractInst(fma);
         final IProgramMethod pm = extractProgramMethod(inst);
         final Modality.JavaModalityKind modalityKind = extractModalityKind(inst);
