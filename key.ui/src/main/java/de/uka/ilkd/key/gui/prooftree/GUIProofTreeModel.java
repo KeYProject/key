@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,13 +263,17 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     public synchronized void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
-            activeNodeFilter = null;
+            if (activeNodeFilter != null) {
+                activeNodeFilter.setActive(false);
+                activeNodeFilter = null;
+            }
             updateTree((TreeNode) null);
             return;
         }
         if (!filter.global()) {
-            if (activeNodeFilter != null)
+            if (activeNodeFilter != null) {
                 activeNodeFilter.setActive(false);
+            }
             activeNodeFilter = active ? (NodeFilter) filter : null;
         }
         filter.setActive(active);
@@ -511,28 +514,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             }
             return res;
         }
-    }
-
-
-    /** stores exactly the paths that are expanded in the proof tree */
-    private @NonNull Collection<TreePath> expansionState = Collections.emptySet();
-
-    public void setExpansionState(@NonNull Collection<TreePath> c) {
-        expansionState = c;
-    }
-
-    public @NonNull Collection<TreePath> getExpansionState() {
-        return expansionState;
-    }
-
-    TreePath selection;
-
-    public void storeSelection(TreePath t) {
-        selection = t;
-    }
-
-    public TreePath getSelection() {
-        return selection;
     }
 
     public NodeFilter getActiveNodeFilter() {

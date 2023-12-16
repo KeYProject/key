@@ -829,8 +829,8 @@ public final class MainWindow extends JFrame {
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
+        SwingUtilities.invokeLater(this::updateSequentView);
     }
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -1728,7 +1728,6 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
@@ -1794,5 +1793,4 @@ public final class MainWindow extends JFrame {
     public void setSequentView(SequentView sequentView) {
         sequentViewSearchBar.setSequentView(sequentView);
     }
-
 }
