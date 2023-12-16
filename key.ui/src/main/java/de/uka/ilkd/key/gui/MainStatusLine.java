@@ -13,7 +13,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 /**
  * Status line of the KeY MainWindow.
  * <p>
- * The status line hold a lblStatusText and a progress panel.
+ * The status line holds a lblStatusText and a progress panel.
  * <p>
  * You add additional components by using the extension points
  * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
@@ -28,7 +28,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
  */
 class MainStatusLine extends JPanel {
-    private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
 
@@ -120,3 +119,4 @@ class MainStatusLine extends JPanel {
         lblStatusText.setText(s);
     }
 }
+

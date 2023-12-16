@@ -34,14 +34,14 @@ public class GeneralSettings extends AbstractSettings {
 
     private static final String CATEGORY = "General";
 
-    private static final String TACLET_FILTER = "StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY = "DnDDirectionSensitive";
-    private static final String USE_JML_KEY = "UseJML";
+    public static final String TACLET_FILTER = "StupidMode";
+    public static final String DND_DIRECTION_SENSITIVE_KEY = "DnDDirectionSensitive";
+    public static final String USE_JML_KEY = "UseJML";
 
-    private static final String KEY_JML_ENABLED_KEYS = "JML_ENABLED_KEYS";
+    public static final String KEY_JML_ENABLED_KEYS = "JML_ENABLED_KEYS";
 
-    private static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
-    private static final String AUTO_SAVE = "AutoSavePeriod";
+    public static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
+    public static final String AUTO_SAVE = "AutoSavePeriod";
 
     /**
      * The key for storing the ensureSourceConsistency flag in settings
