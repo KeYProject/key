@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -41,7 +40,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, TermEqualsModProperty, EqualsModProofIrrelevancy {
+        extends SVSubstitute, Sorted, TermEqualsModProperty {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -123,15 +122,6 @@ public interface Term
     void execPreOrder(Visitor visitor);
 
     /**
-     * Compares if two terms are equal modulo bound renaming
-     *
-     * @param o another term,
-     * @return true iff the given term has the same values in operator, sort, arity, varsBoundHere
-     *         and javaBlock as this object modulo bound renaming
-     */
-    boolean equalsModRenaming(Term o);
-
-    /**
      * returns true if the term is labeled
      */
     boolean hasLabels();
@@ -172,26 +162,6 @@ public interface Term
      *         non-empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     boolean containsJavaBlockRecursive();
-
-    /**
-     * Checks if {@code o} is a term syntactically equal to this one, except for some irrelevant
-     * labels.
-     *
-     * @param o an object
-     * @return {@code true} iff {@code o} is a term syntactically equal to this one, except for
-     *         their labels.
-     * @see TermLabel#isProofRelevant() isStrategyRelevant
-     */
-    boolean equalsModIrrelevantTermLabels(Object o);
-
-    /**
-     * Checks if {@code o} is a term syntactically equal to this one, ignoring <b>all</b> term
-     * labels.
-     *
-     * @param o an object
-     * @return {@code true} iff {@code o} is a term syntactically equal to this ignoring term labels
-     */
-    boolean equalsModTermLabels(Object o);
 
     /**
      * Returns a human-readable source of this term. For example the filename with line and offset.

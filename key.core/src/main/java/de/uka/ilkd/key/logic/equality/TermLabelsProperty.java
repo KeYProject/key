@@ -21,6 +21,15 @@ public class TermLabelsProperty implements TermProperty {
      */
     private TermLabelsProperty() {}
 
+    /**
+     * Checks if {@code o} is a term syntactically equal to {@code term}, ignoring <b>all</b> term
+     * labels.
+     *
+     * @param term a term
+     * @param o the object compared to {@code term}
+     * @return {@code true} iff {@code o} is a term syntactically equal to this ignoring <b>all</b>
+     *         term labels
+     */
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
         if (o == term) {

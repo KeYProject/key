@@ -24,6 +24,16 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      */
     private IrrelevantTermLabelsProperty() {}
 
+    /**
+     * Checks if {@code o} is a term syntactically equal to {@code term}, except for some irrelevant
+     * labels.
+     *
+     * @param term a term
+     * @param o the object compared to {@code term}
+     * @return {@code true} iff {@code o} is a term syntactically equal to {@code term}, except for
+     *         their labels.
+     * @see TermLabel#isProofRelevant() isStrategyRelevant
+     */
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
         if (o == term) {

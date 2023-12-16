@@ -28,6 +28,14 @@ public class RenamingTermProperty implements TermProperty {
      */
     private RenamingTermProperty() {}
 
+    /**
+     * Checks if {@code o} is a term syntactically equal to {@code term} modulo bound renaming.
+     *
+     * @param term a term
+     * @param o the object compared to {@code term}
+     * @return true iff {@code o} has the same values in operator, sort, arity, varsBoundHere
+     *         and javaBlock as {@code term} modulo bound renaming
+     */
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
         if (o == term) {
