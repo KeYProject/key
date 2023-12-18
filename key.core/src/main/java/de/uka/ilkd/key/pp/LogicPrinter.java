@@ -1657,9 +1657,9 @@ public class LogicPrinter {
     public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
-        if ((phi.op() instanceof Modality mod) && mod.kind() instanceof ModalOperatorSV) {
+        if (phi.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation(mod.kind());
-            if (o != null) {
+            if (o instanceof Modality.JavaModalityKind kind) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
@@ -1669,13 +1669,12 @@ public class LogicPrinter {
                         ta[i] = phi.sub(i);
                     }
                     JavaBlock jb1 = mod.program();
-                    Modality m = Modality.getModality(mod.kind(), jb1);
+                    Modality m = Modality.getModality(kind, jb1);
                     Term term = services.getTermFactory().createTerm(m, ta,
                         phi.boundVars(), null);
                     notationInfo.getNotation(m).print(term, this);
                     return;
                 }
-
             }
         }
 
