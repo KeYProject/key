@@ -827,18 +827,15 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Operator visitVarId(KeYParser.VarIdContext ctx) {
+    public SchemaVariable visitVarId(KeYParser.VarIdContext ctx) {
         String id = ctx.id.getText();
         return varId(ctx, id);
     }
 
     @Nullable
-    private Operator varId(ParserRuleContext ctx, String id) {
+    private SchemaVariable varId(ParserRuleContext ctx, String id) {
         Name name = new Name(id);
-        Operator v = variables().lookup(name);
-        if (v == null) {
-            v = (AbstractSV) schemaVariables().lookup(name);
-        }
+        SchemaVariable v = schemaVariables().lookup(name);
         if (v == null) {
             semanticError(ctx, "Could not find Variable %s", id);
         }
