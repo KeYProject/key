@@ -96,7 +96,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     final SequentTerms createSeqTerms(POTerms po, Variables vars, Term leadingUpdate,
             Term localAnon, Services services) {
         final Term pre =
-            getPre(po.pre(), vars.self, vars.heap, vars.params, false, services).term();
+            getPre(po.pre(), vars.self, vars.heap, vars.params, services).term();
         final Term post = getPost(po.post(), vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,

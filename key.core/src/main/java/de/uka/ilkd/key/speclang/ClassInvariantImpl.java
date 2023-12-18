@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -115,7 +116,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(LocationVariable selfVar, TermServices services) {
+    private Map<Operator, Operator> getReplaceMap(AbstractSortedOperator selfVar,
+            TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
@@ -157,7 +159,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public Term getInv(LocationVariable selfVar, TermServices services) {
+    public Term getInv(AbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);

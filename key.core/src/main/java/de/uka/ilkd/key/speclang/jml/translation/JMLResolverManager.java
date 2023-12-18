@@ -22,7 +22,7 @@ public final class JMLResolverManager extends SLResolverManager {
 
     public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, LocationVariable selfVar,
             SLExceptionFactory eManager) {
-        super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
+        super(eManager, specInClass, selfVar, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));

@@ -236,7 +236,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-            check.getPre(po.pre(), vars.self, vars.heap, vars.params, false, proofServices);
+            check.getPre(po.pre(), vars.self, vars.heap, vars.params, proofServices);
         final Term wdPre = tb.wd(preCond.term());
         final Term wdMod = tb.wd(po.mod());
         final Term wdRest = tb.and(tb.wd(po.rest()));

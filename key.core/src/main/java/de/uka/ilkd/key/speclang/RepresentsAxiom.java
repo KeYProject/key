@@ -109,10 +109,11 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public Term getAxiom(ProgramVariable heapVar, ProgramVariable selfVar, Services services) {
+    public Term getAxiom(AbstractSortedOperator heapVar, AbstractSortedOperator selfVar,
+            Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
-        final Map<ProgramVariable, ProgramVariable> map =
+        final Map<ProgramVariable, AbstractSortedOperator> map =
             new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {

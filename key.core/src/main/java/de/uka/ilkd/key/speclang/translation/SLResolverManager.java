@@ -14,10 +14,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -35,10 +33,12 @@ public abstract class SLResolverManager {
         ImmutableSLList.nil();
     private final KeYJavaType specInClass;
     private final LocationVariable selfVar;
-    private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;
 
     private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
+        ImmutableSLList.nil();
+
+    private ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
         ImmutableSLList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
@@ -48,12 +48,11 @@ public abstract class SLResolverManager {
     // -------------------------------------------------------------------------
 
     protected SLResolverManager(SLExceptionFactory excManager, KeYJavaType specInClass,
-            LocationVariable selfVar, boolean useLocalVarsAsImplicitReceivers, TermBuilder tb) {
+            LocationVariable selfVar, TermBuilder tb) {
         // assert excManager != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
         this.selfVar = selfVar;
-        this.useLocalVarsAsImplicitReceivers = useLocalVarsAsImplicitReceivers;
         this.tb = tb;
     }
 
@@ -83,11 +82,18 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        for (Namespace<?> ns : localVariablesNamespaces) {
-            var localVar = (LocationVariable) ns.lookup(n);
+        for (Namespace<LocationVariable> ns : localVariablesNamespaces) {
+            var localVar = ns.lookup(n);
             if (localVar != null) {
                 Term varTerm = tb.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));
+            }
+        }
+        for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
+            var logicVar = ns.lookup(n);
+            if (logicVar != null) {
+                Term varTerm = tb.var(logicVar);
+                return new SLExpression(varTerm, kjts.get(logicVar));
             }
         }
 
@@ -100,19 +106,7 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveImplicit(String name, SLParameters parameters)
             throws SLTranslationException {
-        if (useLocalVarsAsImplicitReceivers) {
-            for (Namespace<?> ns : localVariablesNamespaces) {
-                for (Named n : ns.elements()) {
-                    var localVar = (LocationVariable) n;
-                    SLExpression receiver = new SLExpression(tb.var(localVar), kjts.get(localVar));
-
-                    SLExpression result = resolveExplicit(receiver, name, parameters);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-        } else if (selfVar != null) {
+        if (selfVar != null) {
             SLExpression receiver = new SLExpression(tb.var(selfVar), specInClass);
             SLExpression result = resolveExplicit(receiver, name, parameters);
             if (result != null) {
@@ -205,14 +199,23 @@ public abstract class SLResolverManager {
     public void pushLocalVariablesNamespace() {
         var ns = new Namespace<LocationVariable>();
         localVariablesNamespaces = localVariablesNamespaces.prepend(ns);
+        logicVariablesNamespaces = logicVariablesNamespaces.prepend(new Namespace<>());
     }
 
 
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(ParsableVariable pv, KeYJavaType kjt) {
+    public void putIntoTopLocalVariablesNamespace(LocationVariable pv, KeYJavaType kjt) {
         localVariablesNamespaces.head().addSafely(pv);
+        kjts.put(pv, kjt);
+    }
+
+    /**
+     * Puts a local variable into the topmost namespace on the stack
+     */
+    public void putIntoTopLogicVariablesNamespace(LogicVariable pv, KeYJavaType kjt) {
+        logicVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
 
@@ -220,10 +223,9 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(ProgramVariable pv) {
+    public void putIntoTopLocalVariablesNamespace(LocationVariable pv) {
         putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
     }
-
 
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
@@ -231,7 +233,7 @@ public abstract class SLResolverManager {
     public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs,
             KeYJavaType kjt) {
         for (LogicVariable pv : pvs) {
-            putIntoTopLocalVariablesNamespace(pv, kjt);
+            putIntoTopLogicVariablesNamespace(pv, kjt);
         }
     }
 
@@ -239,8 +241,8 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
      */
-    public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends ProgramVariable> pvs) {
-        for (ProgramVariable pv : pvs) {
+    public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends LocationVariable> pvs) {
+        for (var pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }
     }
@@ -251,6 +253,7 @@ public abstract class SLResolverManager {
      */
     public void popLocalVariablesNamespace() {
         localVariablesNamespaces = localVariablesNamespaces.tail();
+        logicVariablesNamespaces = logicVariablesNamespaces.tail();
     }
 
 

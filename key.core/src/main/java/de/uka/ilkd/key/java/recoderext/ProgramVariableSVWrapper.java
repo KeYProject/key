@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.AbstractSV;
 
 import recoder.java.Identifier;
 
@@ -13,29 +13,21 @@ public class ProgramVariableSVWrapper extends Identifier implements KeYRecoderEx
      *
      */
     private static final long serialVersionUID = 8398356228769806560L;
-    SchemaVariable sv = null;
+    private final AbstractSV sv;
 
-    public ProgramVariableSVWrapper(SchemaVariable sv) {
+    public ProgramVariableSVWrapper(AbstractSV sv) {
         this.sv = sv;
     }
 
     protected ProgramVariableSVWrapper(ProgramVariableSVWrapper proto) {
         super(proto);
-    }
-
-    /**
-     * sets the schema variable of sort label
-     *
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
+        sv = proto.getSV();
     }
 
     /**
      * returns the schema variable of this type sv wrapper
      */
-    public SchemaVariable getSV() {
+    public AbstractSV getSV() {
         return sv;
     }
 

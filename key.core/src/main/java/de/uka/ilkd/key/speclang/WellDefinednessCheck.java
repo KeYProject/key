@@ -489,9 +489,9 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfNotNull(ProgramVariable selfVar) {
+    private Term generateSelfNotNull(AbstractSortedOperator selfVar) {
         return selfVar == null || isConstructor() ? TB.tt()
-                : TB.not(TB.equals(TB.var(selfVar), TB.NULL()));
+                : TB.not(TB.equals(TB.tf().createTerm(selfVar), TB.NULL()));
     }
 
     /**
@@ -500,11 +500,11 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfCreated(ProgramVariable selfVar, ProgramVariable heap) {
+    private Term generateSelfCreated(AbstractSortedOperator selfVar, AbstractSortedOperator heap) {
         if (selfVar == null || isConstructor()) {
             return TB.tt();
         } else {
-            return TB.created(TB.var(heap), TB.var(selfVar));
+            return TB.created(TB.tf().createTerm(heap), TB.tf().createTerm(selfVar));
         }
     }
 
@@ -515,9 +515,9 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfExactType(ProgramVariable selfVar) {
+    private Term generateSelfExactType(AbstractSortedOperator selfVar) {
         return selfVar == null || isConstructor() ? TB.tt()
-                : TB.exactInstance(getKJT().getSort(), TB.var(selfVar));
+                : TB.exactInstance(getKJT().getSort(), TB.tf().createTerm(selfVar));
     }
 
     /**
@@ -526,21 +526,25 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param paramVars The parameters {@link LocationVariable}s.
      * @return The term representing the general assumption.
      */
-    private Term generateParamsOK(ImmutableList<LocationVariable> paramVars) {
+    private Term generateParamsOK(ImmutableList<? extends AbstractSortedOperator> paramVars) {
         Term paramsOK = TB.tt();
         if (paramVars.size() == getOrigVars().params.size()) {
             final Iterator<LocationVariable> origParams = getOrigVars().params.iterator();
-            for (ProgramVariable paramVar : paramVars) {
+            for (AbstractSortedOperator paramVar : paramVars) {
                 assert origParams.hasNext();
                 paramsOK = TB.and(paramsOK,
-                    TB.reachableValue(TB.var(paramVar), origParams.next().getKeYJavaType()));
+                    TB.reachableValue(TB.tf().createTerm(paramVar),
+                        origParams.next().getKeYJavaType()));
             }
         } else {
-            for (ProgramVariable paramVar : paramVars) {
-                paramsOK =
-                    TB.and(paramsOK,
-                        TB.reachableValue(TB.var(paramVar), paramVar.getKeYJavaType()));
-            }
+            throw new RuntimeException("Unequal number of params!");
+            /*
+             * for (AbstractSortedOperator paramVar : paramVars) {
+             * paramsOK =
+             * TB.and(paramsOK,
+             * TB.reachableValue(TB.var(paramVar), paramVar.getKeYJavaType()));
+             * }
+             */
         }
         return paramsOK;
     }
@@ -552,12 +556,11 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param self self variable
      * @param heap heap variable
      * @param params list of parameter variables
-     * @param taclet boolean is true if used for a wd-taclet
      * @param services
      * @return The {@link Term} containing the general assumptions.
      */
     private TermListAndFunc buildFreePre(Term implicitPre, LocationVariable self,
-            LocationVariable heap, ImmutableList<LocationVariable> params, boolean taclet,
+            LocationVariable heap, ImmutableList<LocationVariable> params,
             Services services) {
         ImmutableList<Term> resList = ImmutableSLList.nil();
 
@@ -578,7 +581,7 @@ public abstract class WellDefinednessCheck implements Contract {
         // initial value of measured_by clause
         final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
-        if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
+        if (type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
             mbyAtPreDef = mwd.generateMbyAtPreDef(self, params, mbyAtPreFunc, services);
         } else {
@@ -591,13 +594,53 @@ public abstract class WellDefinednessCheck implements Contract {
                 ? TB.inv(new Term[] { TB.var(heap) }, TB.var(self))
                 : TB.tt();
 
-        final Term[] result;
-        if (!taclet) {
-            result = new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
+        final Term[] result =
+            new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
                 paramsOK, implicitPre, mbyAtPreDef };
-        } else {
-            result = new Term[] { wellFormed, paramsOK, implicitPre };
+
+        for (Term t : result) {
+            resList = resList.append(t);
         }
+        return new TermListAndFunc(resList, mbyAtPreFunc);
+    }
+
+    /**
+     * Builds the "general assumption"
+     *
+     * @param implicitPre the implicit precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param params list of parameter variables
+     * @param services
+     * @return The {@link Term} containing the general assumptions.
+     */
+    private TermListAndFunc buildFreePreForTaclet(Term implicitPre, TermSV self,
+            TermSV heap, ImmutableList<AbstractSV> params,
+            Services services) {
+        ImmutableList<Term> resList = ImmutableSLList.nil();
+
+        // "self != null"
+        final Term selfNotNull = generateSelfNotNull(self);
+
+        // "self.<created> = TRUE"
+        final Term selfCreated = generateSelfCreated(self, heap);
+
+        // "MyClass::exactInstance(self) = TRUE"
+        final Term selfExactType = generateSelfExactType(self);
+
+        // conjunction of...
+        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
+        // - "inBounds(p_i)" for integer parameters
+        final Term paramsOK = generateParamsOK(params);
+
+        // initial value of measured_by clause
+        final JavaDLFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+
+        final Term wellFormed = TB.wellFormed(TB.var(heap));
+
+        final Term[] result;
+        result = new Term[] { wellFormed, paramsOK, implicitPre };
+
         for (Term t : result) {
             resList = resList.append(t);
         }
@@ -932,30 +975,46 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param self the new self variable
      * @param heap the new heap variable
      * @param parameters the new parameter list
-     * @param taclet is true if the precondition will be used in a taclet
      * @param services
      * @return the full valid pre-condition assumed in the pre-state including the measured-by
      *         function
      */
     public final TermAndFunc getPre(final Condition pre, LocationVariable self,
             LocationVariable heap, ImmutableList<LocationVariable> parameters,
-            boolean taclet, Services services) {
-        ImmutableList<LocationVariable> params = ImmutableSLList.nil();
-        for (var pv : parameters) {
-            params = params.append(pv);
-        }
+            Services services) {
         final IObserverFunction target = getTarget();
         final TermListAndFunc freePre =
-            buildFreePre(pre.implicit, self, heap, params, taclet, services);
+            buildFreePre(pre.implicit, self, heap, parameters, services);
         final ImmutableList<Term> preTerms = freePre.terms.append(pre.explicit);
         Term res = TB.andSC(preTerms);
-        if (!taclet && target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
+        if (target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
                 && !JMLInfoExtractor.isHelper((IProgramMethod) target)) {
             final Term constructorPre = appendFreePre(res, self, heap, services);
             return new TermAndFunc(constructorPre, freePre.func);
         } else {
             return new TermAndFunc(res, freePre.func);
         }
+    }
+
+    /**
+     * Gets the full valid precondition, which holds in the element's pre-state.
+     *
+     * @param pre the precondition with the original variables
+     * @param self the new self variable
+     * @param heap the new heap variable
+     * @param parameters the new parameter list
+     * @param services
+     * @return the full valid pre-condition assumed in the pre-state including the measured-by
+     *         function
+     */
+    public final TermAndFunc getPreForTaclet(final Condition pre, TermSV self,
+            TermSV heap, ImmutableList<AbstractSV> parameters,
+            Services services) {
+        final TermListAndFunc freePre =
+            buildFreePreForTaclet(pre.implicit, self, heap, parameters, services);
+        final ImmutableList<Term> preTerms = freePre.terms.append(pre.explicit);
+
+        return new TermAndFunc(TB.andSC(preTerms), freePre.func);
     }
 
     /**

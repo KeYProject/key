@@ -2327,7 +2327,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert excType != null;
             eVar = new LogicVariable(new Name(vName), excType.getSort());
             resolverManager.pushLocalVariablesNamespace();
-            resolverManager.putIntoTopLocalVariablesNamespace(eVar, excType);
+            resolverManager.putIntoTopLogicVariablesNamespace(eVar, excType);
         }
         SLExpression result = accept(ctx.predornot());
         if (vName != null) {

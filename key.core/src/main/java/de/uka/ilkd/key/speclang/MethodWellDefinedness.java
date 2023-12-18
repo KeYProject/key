@@ -294,8 +294,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             prefix = WellDefinednessCheck.OP_TACLET;
             final boolean isConstructor =
                 target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
-            final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV), selfSV, heapSV,
-                paramsSV, true, services).term();
+            final Term pre =
+                getPreForTaclet(replaceSV(getRequires(), selfSV, paramsSV), selfSV, heapSV,
+                    paramsSV, services).term();
             final Term wdArgs = TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV,
                 isStatic || isConstructor, twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
