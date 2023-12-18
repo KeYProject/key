@@ -383,7 +383,8 @@ public class TestDeclParser {
 
         assertEquals(new Name("b"), variables.lookup(new Name("b")).name(), "find SV ");
         assertFormulaSV("SV b type", variables.lookup(new Name("b")));
-        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) variables.lookup(new Name("b"))).sort(), "SV b sort");
+        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) variables.lookup(new Name("b"))).sort(),
+            "SV b sort");
     }
 
 

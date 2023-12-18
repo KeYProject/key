@@ -50,7 +50,8 @@ public class TestTacletBuild {
     public void test0() {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
-        Term b = tf.createTerm((AbstractSV) TacletForTests.getSchemaVariables().lookup("b"), NO_SUBTERMS);
+        Term b = tf.createTerm((AbstractSV) TacletForTests.getSchemaVariables().lookup("b"),
+            NO_SUBTERMS);
         Term t1 = tb.ex((QuantifiableVariable) u, b);
         Term t2 = tb.ex((QuantifiableVariable) v, b);
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();

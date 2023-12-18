@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
@@ -25,7 +24,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
                 && op.getModalities().contains(mod1.kind())) {
             SVInstantiations inst = mc.getInstantiations();
             return mc.setInstantiations(
-                    inst.add(op, mod1.<Modality.JavaModalityKind>kind(), services));
+                inst.add(op, mod1.<Modality.JavaModalityKind>kind(), services));
         } else {
             return null;
         }

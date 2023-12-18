@@ -75,7 +75,7 @@ public class TacletPrefixBuilder {
                     setPrefixOfOccurrence(sv, relevantBoundVars);
                 } else {
                     throw new InvalidPrefixException(tacletBuilder.getName().toString(), sv, prefix,
-                            relevantBoundVars);
+                        relevantBoundVars);
                 }
             }
         }

@@ -185,7 +185,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     @Override
     protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                           LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         return tb.tt();
     }
@@ -195,7 +195,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-                                    LocationVariable selfVar, ImmutableList<LocationVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         return tb.tt();
     }
 

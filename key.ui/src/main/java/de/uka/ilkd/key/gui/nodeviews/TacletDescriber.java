@@ -79,7 +79,8 @@ class TacletDescriber {
         /*
          * TODO: Add an explanation for the following if-statement. (Kai Wallisch 01/2015)
          */
-        if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
+        if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV
+                || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
             out.append(" ").append(((AbstractSV) schemaVar).sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
