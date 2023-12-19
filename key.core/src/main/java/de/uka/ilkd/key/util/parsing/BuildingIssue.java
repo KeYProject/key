@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
