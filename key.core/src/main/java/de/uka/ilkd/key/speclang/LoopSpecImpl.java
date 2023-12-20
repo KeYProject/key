@@ -252,8 +252,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
-            Services services) {
+    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
@@ -267,17 +266,12 @@ public final class LoopSpecImpl implements LoopSpecification {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return or.replace(originalFreeModifiable.get(heap));
-    }
-
-    @Override
-    public Term getFreeModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
-            Services services) {
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return or.replace(originalFreeModifiable.get(baseHeap));
+        final Term originalFreeModForHeap = originalFreeModifiable.get(heap);
+        if (originalFreeModForHeap != null) {
+            return or.replace(originalFreeModForHeap);
+        } else {
+            return services.getTermBuilder().strictlyNothing();
+        }
     }
 
     @Override
