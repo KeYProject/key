@@ -74,6 +74,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      *
      */
     protected boolean javaSchemaModeAllowed = false;
+    private KeYParser.Unary_minus_termContext ctx;
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
         this(services, nss, new Namespace<>());
@@ -232,11 +233,28 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         return t;
     }
+    @Override
+    public Term visitChop_term(KeYParser.Chop_termContext ctx) {
+        Term t = accept(ctx.a);
+        for (KeYParser.Term60Context c : ctx.b) {
+            t = binaryTerm(ctx, Junctor.CHOP, t, accept(c));
+        }
+        return t;
+    }
 
+    @Override
+    public Term visitStateFml_term(KeYParser.StateFml_termContext ctx) {
+        Term termL = accept(ctx.sub);
+        if (ctx.STATEFML() != null) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.STATEFML, termL));
+        } else {
+            return termL;
+        }
+    }
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
         Term t = accept(ctx.a);
-        for (KeYParser.Term60Context c : ctx.b) {
+        for (KeYParser.Chop_termContext c : ctx.b) {
             t = binaryTerm(ctx, Junctor.AND, t, accept(c));
         }
         return t;
@@ -246,6 +264,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
+        this.ctx = ctx;
         Term result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {

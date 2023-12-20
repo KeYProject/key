@@ -88,6 +88,7 @@ public final class NotationInfo {
     static final int PRIORITY_IMP = 30;
     static final int PRIORITY_OR = 40;
     static final int PRIORITY_AND = 50;
+    static final int PRIORITY_CHOP = 55;
     static final int PRIORITY_NEGATION = 60;
     static final int PRIORITY_QUANTIFIER = 60;
     static final int PRIORITY_MODALITY = 60;
@@ -199,6 +200,11 @@ public final class NotationInfo {
         tbl.put(Sort.CAST_NAME,
             new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
+
+
+        tbl.put(Junctor.CHOP, new Notation.Infix("**", PRIORITY_CHOP,PRIORITY_CHOP,PRIORITY_CHOP));
+        tbl.put(Junctor.STATEFML, new Notation.StateFmlNotation("`","`"));
+
         return tbl;
     }
 

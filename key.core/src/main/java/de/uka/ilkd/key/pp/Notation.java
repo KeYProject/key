@@ -320,7 +320,20 @@ public abstract class Notation {
             sp.printCast(pre, post, t, ass);
         }
     }
+    public static final class StateFmlNotation extends Notation {
 
+        final String pre, post;
+
+        public StateFmlNotation(String pre, String post) {
+            super(130);
+            this.pre = pre;
+            this.post = post;
+        }
+
+        public void print(Term t, LogicPrinter sp) {
+            sp.printStateFml(pre, post, t);
+        }
+    }
 
     /**
      * The standard concrete syntax for observer function terms.

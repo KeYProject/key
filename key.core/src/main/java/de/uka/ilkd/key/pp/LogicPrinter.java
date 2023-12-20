@@ -968,6 +968,17 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
 
+    public void printStateFml(String pre, String post, Term t) {
+
+        layouter.startTerm(t.arity());
+        layouter.print(pre);
+        layouter.startTerm(1);
+        layouter.markStartSub(0);
+        printTerm(t.sub(0));
+        layouter.markEndSub();
+        layouter.print(post);
+    }
+
     protected boolean printEmbeddedHeapConstructorTerm(Term t) {
 
         Notation notation = notationInfo.getNotation(t.op());

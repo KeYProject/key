@@ -47,6 +47,13 @@ public final class Junctor extends AbstractSortedOperator {
      */
     public static final Junctor IMP = new Junctor(new Name("imp"), 2);
 
+    /**
+     * Trace-logic connectors
+     */
+
+    public static final Junctor CHOP = new Junctor(new Name("chop"), 2);
+    public static final Junctor STATEFML = new Junctor(new Name("stateFml"), 1);
+
 
     private static Sort[] createFormulaSortArray(int arity) {
         Sort[] result = new Sort[arity];
