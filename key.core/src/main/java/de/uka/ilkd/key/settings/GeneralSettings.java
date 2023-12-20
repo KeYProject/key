@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 
 public class GeneralSettings extends AbstractSettings {
@@ -206,11 +206,11 @@ public class GeneralSettings extends AbstractSettings {
         }
 
         {
-            var sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
+            String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
             if (sysProp != null) {
                 val = sysProp;
                 LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
-            }else {
+            } else {
                 val = props.getProperty(prefix + KEY_JML_ENABLED_KEYS);
             }
 
@@ -261,7 +261,7 @@ public class GeneralSettings extends AbstractSettings {
         if (sysProp != null) {
             LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
             setJmlEnabledKeys(new TreeSet<>(Arrays.stream(sysProp.split(",")).toList()));
-        }else {
+        } else {
             setJmlEnabledKeys(new TreeSet<>(props.getStringList(KEY_JML_ENABLED_KEYS)));
         }
     }
