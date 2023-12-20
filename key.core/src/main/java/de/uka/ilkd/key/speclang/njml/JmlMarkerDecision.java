@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -30,7 +31,8 @@ public class JmlMarkerDecision {
      */
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
-        setEnabledKeys(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
+        setEnabledKeys(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
     }
 
     /**
