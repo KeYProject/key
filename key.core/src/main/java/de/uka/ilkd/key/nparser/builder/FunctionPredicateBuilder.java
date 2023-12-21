@@ -78,6 +78,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (lookup(p.name()) == null) {
             functions().add(p);
+        } else {
+            // weigl: agreement on KaKeY meeting: this should be an error.
+            semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");
         }
         return null;
     }
