@@ -13,6 +13,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -124,7 +125,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        return tb.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? tb.skip()
+        return tb.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, mod) ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }
 

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -130,7 +131,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                         changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
                     return beforeChangeOp == afterChangeTerm.op() && beforeChangeTerm.sub(0)
-                            .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));
+                            .equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, afterChangeTerm.sub(0));
                 }
 
                 return false;

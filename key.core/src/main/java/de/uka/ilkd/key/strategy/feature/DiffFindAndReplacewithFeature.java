@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -29,7 +30,7 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
         for (TacletGoalTemplate temp : ((Taclet) app.rule()).goalTemplates()) {
             RewriteTacletGoalTemplate rwtemp = (RewriteTacletGoalTemplate) temp;
-            if (rwtemp.replaceWith().equalsModIrrelevantTermLabels(pos.subTerm())) {
+            if (rwtemp.replaceWith().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, pos.subTerm())) {
                 return false;
             }
         }

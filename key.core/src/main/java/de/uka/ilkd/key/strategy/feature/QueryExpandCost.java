@@ -8,6 +8,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -179,7 +180,7 @@ public class QueryExpandCost implements Feature {
                     final Term oldterm = pio.subTerm();
                     final Term curterm = pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
-                            && oldterm.equalsModIrrelevantTermLabels(curterm)) {
+                            && oldterm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, curterm)) {
                         count++;
                         if (count > maxRepetitionsOnSameTerm) {
                             break;

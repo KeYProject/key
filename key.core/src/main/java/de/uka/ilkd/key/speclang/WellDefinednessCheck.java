@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -397,7 +398,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods = LogicPrinter.quickPrintTerm(
-                getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
+                getAssignable(null).equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, TB.strictlyNothing()) ? TB.empty()
                         : this.getAssignable(null),
                 services);
             mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
@@ -729,19 +730,19 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, TermServices services) {
         this.assignable = ass;
-        if (ass == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass)
-                || TB.FALSE().equalsModIrrelevantTermLabels(ass)) {
+        if (ass == null || TB.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass)
+                || TB.FALSE().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass)) {
             this.assignable = TB.strictlyNothing();
-        } else if (TB.tt().equalsModIrrelevantTermLabels(ass)
-                || TB.TRUE().equalsModIrrelevantTermLabels(ass)) {
+        } else if (TB.tt().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass)
+                || TB.TRUE().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass1)) {
+        if (ass1 == null || TB.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass1)) {
             setAssignable(ass2, services);
-        } else if (ass2 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass2)) {
+        } else if (ass2 == null || TB.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ass2)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);

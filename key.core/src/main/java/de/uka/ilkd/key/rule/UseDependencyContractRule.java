@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Goal;
@@ -207,7 +208,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
+            if (!(candidate.sub(i).equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, focus.sub(i))
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }

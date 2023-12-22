@@ -27,6 +27,14 @@ public class ProofIrrelevancyProperty implements TermProperty {
      */
     private ProofIrrelevancyProperty() {}
 
+    /**
+     * Checks if {@code o} is a term syntactically equal to {@code term}, except for attributes that are not relevant
+     * for the purpose of these terms in the proof.
+     *
+     * @param term a term
+     * @param o the object compared to {@code term}
+     * @return true iff {@code o} is a term syntactically equal to {@code term}, except for proof-irrelevant attributes.
+     */
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
         if (o == term) {
@@ -62,7 +70,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProofIrrelevancy(otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, otherSubs.get(i))) {
                 return false;
             }
         }
@@ -70,6 +78,12 @@ public class ProofIrrelevancyProperty implements TermProperty {
         return true;
     }
 
+    /**
+     * Computes a hashcode that represents the proof-relevant fields of {@code term}.
+     *
+     * @param term the term to compute the hashcode for
+     * @return the hashcode
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
         int hashcode2 = -1; // this line is just so the code compiles
@@ -84,5 +98,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
         return hashcode2;
+//        throw new UnsupportedOperationException("Hashing of terms modulo term proof-irrelevancy not yet implemented!");
+
     }
 }

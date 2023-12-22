@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * TODO: rewrite, this seems pretty inefficient ...
  */
@@ -343,7 +345,7 @@ public class PredictCostProver {
                 if (op == Junctor.TRUE) {
                     return true;
                 }
-                if (op == Junctor.FALSE && terms[0].equalsModIrrelevantTermLabels(terms[j])) {
+                if (op == Junctor.FALSE && terms[0].equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, terms[j])) {
                     next = next.remove(terms[j]);
                     literals = literals.remove(terms[j]);
                 }

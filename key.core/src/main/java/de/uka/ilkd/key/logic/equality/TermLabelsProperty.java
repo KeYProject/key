@@ -49,7 +49,7 @@ public class TermLabelsProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModTermLabels(otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(TERM_LABELS_PROPERTY, otherSubs.get(i))) {
                 return false;
             }
         }

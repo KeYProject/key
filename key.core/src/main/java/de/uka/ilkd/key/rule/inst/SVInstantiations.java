@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -544,7 +545,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -574,7 +575,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
