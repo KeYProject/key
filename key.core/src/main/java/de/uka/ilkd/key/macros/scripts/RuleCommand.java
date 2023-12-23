@@ -8,7 +8,6 @@ import java.util.*;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the
@@ -354,7 +355,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
-                    add &= userInst == null || userInst.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, ptaInst);
+                    add &= userInst == null
+                            || userInst.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, ptaInst);
                 }
 
                 if (add) {

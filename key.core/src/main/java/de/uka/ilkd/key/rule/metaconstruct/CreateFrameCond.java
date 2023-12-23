@@ -13,7 +13,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Creates the frame condition (aka "assignable clause") for the given loop. Also accepts the
@@ -92,7 +93,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             final Term mod = mods.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
+            if (tb.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);

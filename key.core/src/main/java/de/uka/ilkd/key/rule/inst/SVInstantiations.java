@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -29,6 +28,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
@@ -545,7 +546,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                    cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -575,7 +577,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(
+                    IRRELEVANT_TERM_LABELS_PROPERTY,
+                    cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {

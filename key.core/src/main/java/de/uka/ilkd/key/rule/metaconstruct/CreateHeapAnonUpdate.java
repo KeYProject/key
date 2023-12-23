@@ -13,7 +13,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Creates the anonymizing update for the heap. Expects as arguments the loop formula (for
@@ -125,7 +126,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        return tb.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, mod) ? tb.skip()
+        return tb.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod)
+                ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }
 

@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -17,6 +16,8 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
@@ -53,7 +54,7 @@ public class HandleArith {
         final Term falseT = tb.ff();
 
         final Term arithTerm = formatArithTerm(problem, tb, integerLDT, services.getCaches());
-        if (arithTerm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, falseT)) {
+        if (arithTerm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, falseT)) {
             result = provedArithEqual(problem, tb, services);
             putInTermCache(provedByArithCache, problem, result);
             return result;

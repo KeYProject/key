@@ -109,9 +109,12 @@ public class TestTerm {
     public void testProgramElementEqualsModRenaming() {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
-        assertTrue(match1.sub(0).equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match2),
+        assertTrue(
+            match1.sub(0).equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match2),
             "Terms should be equalModRenaming (0).");
-        assertTrue(match1.sub(0).equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match1.sub(1)),
+        assertTrue(
+            match1.sub(0).equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY,
+                match1.sub(1)),
             "Terms should be equalModRenaming (1).");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
         assertNotEquals(match1, match3, "Terms should not be equal.");
@@ -122,13 +125,16 @@ public class TestTerm {
     public void testEqualsModRenamingWithLabels() {
         Term match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
-        assertTrue(match1.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match2), "Terms should be equalModRenaming.");
+        assertTrue(match1.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match2),
+            "Terms should be equalModRenaming.");
         Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");
-        assertTrue(match3.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match4), "Terms should be equalModRenaming.");
+        assertTrue(match3.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match4),
+            "Terms should be equalModRenaming.");
         Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-        assertTrue(match5.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match6), "Terms should be equalModRenaming.");
+        assertTrue(match5.equalsModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY, match6),
+            "Terms should be equalModRenaming.");
     }
 
     @Test

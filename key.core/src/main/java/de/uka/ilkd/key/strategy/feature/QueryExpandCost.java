@@ -8,7 +8,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -24,6 +23,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * A Feature that computes the cost for using the query expand rule.
@@ -180,7 +181,8 @@ public class QueryExpandCost implements Feature {
                     final Term oldterm = pio.subTerm();
                     final Term curterm = pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
-                            && oldterm.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, curterm)) {
+                            && oldterm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                curterm)) {
                         count++;
                         if (count > maxRepetitionsOnSameTerm) {
                             break;

@@ -626,7 +626,8 @@ public class JMLSpecFactory {
                     .atPres(atPres).atBefore(atBefores).translateTerm(expr, specType);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, tb.strictlyNothing())) {
+            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                tb.strictlyNothing())) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                         "\"assignable \\less_than_nothing\" does not go with other "
@@ -769,7 +770,8 @@ public class JMLSpecFactory {
                 new JmlIO(services).context(context).parameters(paramVars).translateTerm(expr);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, tb.strictlyNothing())) {
+            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                tb.strictlyNothing())) {
                 return true;
             }
         }

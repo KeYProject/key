@@ -28,12 +28,14 @@ public class ProofIrrelevancyProperty implements TermProperty {
     private ProofIrrelevancyProperty() {}
 
     /**
-     * Checks if {@code o} is a term syntactically equal to {@code term}, except for attributes that are not relevant
+     * Checks if {@code o} is a term syntactically equal to {@code term}, except for attributes that
+     * are not relevant
      * for the purpose of these terms in the proof.
      *
      * @param term a term
      * @param o the object compared to {@code term}
-     * @return true iff {@code o} is a term syntactically equal to {@code term}, except for proof-irrelevant attributes.
+     * @return true iff {@code o} is a term syntactically equal to {@code term}, except for
+     *         proof-irrelevant attributes.
      */
     @Override
     public Boolean equalsModThisProperty(Term term, Object o) {
@@ -98,7 +100,8 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
         return hashcode2;
-//        throw new UnsupportedOperationException("Hashing of terms modulo term proof-irrelevancy not yet implemented!");
+        // throw new UnsupportedOperationException("Hashing of terms modulo term proof-irrelevancy
+        // not yet implemented!");
 
     }
 }

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -46,6 +45,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
@@ -650,7 +651,8 @@ public final class AuxiliaryContractBuilders {
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, strictlyNothing())) {
+                if (!modifiesClause.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                    strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
                         services.getTermBuilder().label(
                             services.getTermBuilder().func(anonymisationHeap.getValue()),

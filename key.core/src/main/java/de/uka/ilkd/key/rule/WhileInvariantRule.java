@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -71,6 +70,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 public final class WhileInvariantRule implements BuiltInRule {
     /**
@@ -270,7 +271,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
+        if (tb.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
@@ -829,14 +830,17 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term freeMod = freeMods.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
-            if (strictlyNothing.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
-                if (strictlyNothing.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, freeMod)) {
+            if (strictlyNothing.equalsModProperty(
+                IRRELEVANT_TERM_LABELS_PROPERTY, mod)) {
+                if (strictlyNothing.equalsModProperty(
+                    IRRELEVANT_TERM_LABELS_PROPERTY, freeMod)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
                 }
             } else {
-                if (strictlyNothing.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, freeMod)) {
+                if (strictlyNothing.equalsModProperty(
+                    IRRELEVANT_TERM_LABELS_PROPERTY, freeMod)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
                 } else {
                     currentFrame = tb.frame(

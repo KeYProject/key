@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
 /**
@@ -91,7 +92,8 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModProperty(IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY, tb.ff())) {
+        if (res.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+            tb.ff())) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
