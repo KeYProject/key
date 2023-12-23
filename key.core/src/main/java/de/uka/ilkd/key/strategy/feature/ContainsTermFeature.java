@@ -13,6 +13,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 /**
  * Feature for checking if the term of the first projection contains the term of the second
@@ -81,7 +83,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = found || visited.equalsModRenaming(term);
+            found = found || visited.equalsModProperty(RENAMING_TERM_PROPERTY, term);
         }
 
         @Override

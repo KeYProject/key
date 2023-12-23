@@ -46,6 +46,8 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 public final class OneStepSimplifier implements BuiltInRule {
 
@@ -747,8 +749,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 obj = ((TermReplacementKey) obj).term;
             }
             if (obj instanceof Term t) {
-                return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
-                                                  // taclet rule does.
+                return term.equalsModProperty(RENAMING_TERM_PROPERTY, t); // Ignore naming and term
+                                                                          // labels in the way a
+                                                                          // taclet rule does.
             } else {
                 return false;
             }

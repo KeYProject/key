@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 
+import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
+
 
 /**
  * A sequent formula is a wrapper around a formula that occurs as top level formula in a sequent.
@@ -41,7 +43,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         }
         this.term = term;
         this.hashCode = term.hashCode() * 13;
-        this.hashCode2 = term.hashCodeModProofIrrelevancy();
+        this.hashCode2 = term.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
     }
 
     /** @return the stored Term */
@@ -75,9 +77,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
             return true;
         }
         if (obj instanceof SequentFormula cmp) {
-            if (term.equalsModProofIrrelevancy(cmp.formula())) {
-                return true;
-            }
+            return term.equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, cmp.formula());
         }
         return false;
     }

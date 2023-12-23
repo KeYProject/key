@@ -22,6 +22,8 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 /**
  *
  * @author christoph
@@ -67,7 +69,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
-        return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
+        return posInOcc.subTerm().equalsModProperty(RENAMING_TERM_PROPERTY, selfComposedExec);
     }
 
     @Override

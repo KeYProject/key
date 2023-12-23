@@ -8,6 +8,8 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 /**
  * This class represents the succedent or antecendent part of a sequent. It is more or less a list
@@ -157,7 +159,8 @@ public class Semisequent implements Iterable<SequentFormula> {
             searchList = searchList.tail();
 
             if (sequentFormula != null
-                    && cf.formula().equalsModRenaming(sequentFormula.formula())) {
+                    && cf.formula().equalsModProperty(RENAMING_TERM_PROPERTY,
+                        sequentFormula.formula())) {
                 semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 

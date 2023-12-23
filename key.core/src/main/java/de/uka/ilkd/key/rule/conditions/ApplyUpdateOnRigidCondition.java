@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 /**
  * This variable condition can be used to check whether an update can be performed on a formula or
@@ -212,7 +214,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equalsModRenaming(properResultInst)) {
+        } else if (resultInst.equalsModProperty(RENAMING_TERM_PROPERTY, properResultInst)) {
             return mc;
         } else {
             return null;

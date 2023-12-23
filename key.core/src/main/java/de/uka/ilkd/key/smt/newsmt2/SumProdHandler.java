@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 // W I P
 public class SumProdHandler implements SMTHandler {
 
@@ -41,7 +43,7 @@ public class SumProdHandler implements SMTHandler {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
-                if (t.equalsModRenaming(term)) {
+                if (t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
                     return usedBsumTerms.get(t);
                 }
             }
@@ -55,7 +57,7 @@ public class SumProdHandler implements SMTHandler {
             return ret;
         } else if (op == bprodOp) {
             for (Term t : usedBprodTerms.keySet()) {
-                if (t.equalsModRenaming(term)) {
+                if (t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
                     return usedBprodTerms.get(t);
                 }
             }

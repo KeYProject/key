@@ -52,6 +52,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES;
@@ -971,13 +972,14 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModRenaming(tb.allLocs())) {
+            if (clauses.accessibles.get(heap).equalsModProperty(RENAMING_TERM_PROPERTY,
+                tb.allLocs())) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
                 if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModRenaming(tb.allLocs())) {
+                        .equalsModProperty(RENAMING_TERM_PROPERTY, tb.allLocs())) {
                     createContract = false;
                     break;
                 }

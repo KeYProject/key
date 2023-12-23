@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.inst.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 public abstract class ElementMatcher<T extends Operator> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ElementMatcher.class);
@@ -123,7 +125,7 @@ public abstract class ElementMatcher<T extends Operator> {
 
             final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
             if (t != null) {
-                if (!t.equalsModRenaming(term)) {
+                if (!t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
                     LOGGER.debug(
                         "FAILED. Adding instantiations leads to unsatisfiable constraint. {} {}",
                         op, term);
