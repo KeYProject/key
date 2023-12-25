@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -29,8 +29,11 @@ public class ProofIrrelevancyProperty implements TermProperty {
 
     /**
      * Checks if {@code o} is a term syntactically equal to {@code term}, except for attributes that
-     * are not relevant
-     * for the purpose of these terms in the proof.
+     * are not relevant for the purpose of these terms in the proof.
+     * <p>
+     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
+     * LabeledTermImpl.
+     * </p>
      *
      * @param term a term
      * @param o the object compared to {@code term}
@@ -77,31 +80,51 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
 
+        // This would be the only new thing from LabeledTermImpl, but this doesn't seem right
+        if (term.hasLabels() && other.hasLabels()) {
+            if (other.getLabels().size() != term.getLabels().size()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
     /**
+     * <p>
      * Computes a hashcode that represents the proof-relevant fields of {@code term}.
+     * </p>
+     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
+     * LabeledTermImpl.
      *
      * @param term the term to compute the hashcode for
      * @return the hashcode
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        int hashcode2 = -1; // this line is just so the code compiles
-        if (hashcode2 == -1) {
-            // compute into local variable first to be thread-safe.
-            hashcode2 = Objects.hash(term.op(),
-                EqualsModProofIrrelevancyUtil
-                        .hashCodeIterable(term.subs()),
-                EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
-            if (hashcode2 == -1) {
-                hashcode2 = 0;
-            }
-        }
-        return hashcode2;
-        // throw new UnsupportedOperationException("Hashing of terms modulo term proof-irrelevancy
-        // not yet implemented!");
-
+        // int hashcode2 = -1; // this line is just so the code compiles
+        // // part from TermImpl
+        // if (hashcode2 == -1) {
+        // // compute into local variable first to be thread-safe.
+        // hashcode2 = Objects.hash(term.op(),
+        // EqualsModProofIrrelevancyUtil
+        // .hashCodeIterable(term.subs()),
+        // EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+        // if (hashcode2 == -1) {
+        // hashcode2 = 0;
+        // }
+        // }
+        // // part from LabeledTermImpl
+        // final ImmutableArray<TermLabel> labels = term.getLabels();
+        // final int numOfLabels = labels.size();
+        // for (int i = 0; i < numOfLabels; i++) {
+        // final TermLabel currentLabel = labels.get(i);
+        // if (currentLabel.isProofRelevant()) {
+        // hashcode2 += 7 * currentLabel.hashCode();
+        // }
+        // }
+        // return hashcode2;
+        throw new UnsupportedOperationException(
+            "Hashing of terms modulo term proof-irrelevancy not yet implemented!");
     }
 }
