@@ -20,7 +20,7 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.2'
+    api 'com.miglayout:miglayout-swing:11.3'
 
     //logging implementation used by the slf4j
     implementation 'ch.qos.logback:logback-classic:1.4.14'
