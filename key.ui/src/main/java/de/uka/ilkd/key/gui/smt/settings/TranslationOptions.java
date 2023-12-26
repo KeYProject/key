@@ -135,6 +135,9 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
                 settings.setMaxInteger(e.longValue());
             }
             long result = 0;
+            if (maxField == null) {
+                return;
+            }
             try {
                 result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);
@@ -166,7 +169,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPdSettings(window).clone());
         return this;
     }
