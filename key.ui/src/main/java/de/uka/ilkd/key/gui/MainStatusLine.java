@@ -119,4 +119,3 @@ class MainStatusLine extends JPanel {
         lblStatusText.setText(s);
     }
 }
-
