@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.settings.FeatureSettings;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -216,9 +218,12 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
+
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         term = services.getTermBuilder().addLabel(term, origin);
-        if (expr.second != null) {
+
+        if (FeatureSettings
+                .isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
             term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(expr.second));
         }
         return term;

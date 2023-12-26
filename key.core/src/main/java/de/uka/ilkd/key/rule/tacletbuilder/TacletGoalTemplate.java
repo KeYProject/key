@@ -147,7 +147,8 @@ public class TacletGoalTemplate {
     }
 
     /**
-     * Returns the branch naming function for this goal. It is either given by directly, via the name of the goal or
+     * Returns the branch naming function for this goal. It is either given by directly, via the
+     * name of the goal or
      * null.
      */
     @Nullable

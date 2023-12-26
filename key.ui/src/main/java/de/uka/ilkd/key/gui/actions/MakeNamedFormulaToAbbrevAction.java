@@ -15,9 +15,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.AbbrevException;
-
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

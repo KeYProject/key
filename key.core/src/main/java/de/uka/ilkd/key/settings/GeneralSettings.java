@@ -8,6 +8,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
+
 
 public class GeneralSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneralSettings.class);
@@ -42,6 +44,10 @@ public class GeneralSettings extends AbstractSettings {
 
     private static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
     private static final String AUTO_SAVE = "AutoSavePeriod";
+
+    public static final FeatureSettings.Feature FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL =
+        createFeature("JML_ENTITY_NAMES_AS_TERMLABEL", "Translates the names for JML entities " +
+            "as term labels on the sequents.");
 
     /**
      * The key for storing the ensureSourceConsistency flag in settings

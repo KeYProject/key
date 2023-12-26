@@ -42,7 +42,7 @@ public class LabeledParserRuleContext {
 
     public static LabeledParserRuleContext createLabeledParserRuleContext(
             ParserRuleContext ctx, OriginTermLabel.SpecType specType, boolean attachOriginLabel,
-            JmlParser.Entity_nameContext name) {
+            JmlParser.@Nullable Entity_nameContext name) {
         return attachOriginLabel
                 ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType, name))
                 : new LabeledParserRuleContext(ctx);
@@ -58,13 +58,13 @@ public class LabeledParserRuleContext {
     }
 
     private static List<TermLabel> constructTermLabel(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType, JmlParser.Entity_nameContext name) {
+            OriginTermLabel.SpecType specType, JmlParser.@Nullable Entity_nameContext name) {
         URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
         var originLabel = new OriginTermLabelFactory().createOriginTermLabel(origin);
         if (name != null) {
-            var nameLabel = new SpecNameLabel(name.getText());
+            var nameLabel = new SpecNameLabel(name.ident().getText());
             return List.of(originLabel, nameLabel);
         }
         return List.of(originLabel);

@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -14,17 +20,13 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -108,7 +110,7 @@ public abstract class TextualJMLConstruct {
      */
     @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
-                              @NonNull LabeledParserRuleContext ps) {
+            @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
@@ -119,8 +121,8 @@ public abstract class TextualJMLConstruct {
         List<String> hs = new ArrayList<>();
         while (t.startsWith("<") && !t.startsWith("<inv>") && !t.startsWith("<inv_free>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-                for (String hName : new String[]{heapName.toString(),
-                        heapName + "AtPre"}) {
+                for (String hName : new String[] { heapName.toString(),
+                    heapName + "AtPre" }) {
                     String h = "<" + hName + ">";
                     if (t.startsWith(h)) {
                         hs.add(hName);
@@ -146,10 +148,11 @@ public abstract class TextualJMLConstruct {
 
 
     /**
-     * Returns a list of term labels based on the specification type, the start position and a specification name.
+     * Returns a list of term labels based on the specification type, the start position and a
+     * specification name.
      */
     public static List<TermLabel> createTermLabel(OriginTermLabel.@Nullable SpecType type,
-                                                  @Nullable Token start, @Nullable String name) {
+            @Nullable Token start, @Nullable String name) {
         List<TermLabel> label = new ArrayList<>();
         if (name != null) {
             label.add(new SpecNameLabel(name));
@@ -162,7 +165,7 @@ public abstract class TextualJMLConstruct {
                 filename = "unknown";
             int line = start.getLine();
             label.add(factory.createOriginTermLabel(
-                    new OriginTermLabel.FileOrigin(type, URI.create("file://" + filename), line)));
+                new OriginTermLabel.FileOrigin(type, URI.create("file://" + filename), line)));
         } else if (type != null) {
             label.add(factory.createOriginTermLabel(new OriginTermLabel.Origin(type)));
         }

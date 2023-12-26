@@ -51,8 +51,10 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     public static final String PROP_STORE_TACLET_TRANSLATION_FILE =
         "PROP_STORE_TACLET_TRANSLATION_FILE";
 
-    private static final FeatureSettings.Feature FEATURE_EXPERIMENTAL_SMT_SOLVERS =
+    public static final FeatureSettings.Feature FEATURE_EXPERIMENTAL_SMT_SOLVERS =
         createFeature("EXPERIMENTAL_SMT_SOLVERS", "Activate experimental SMT solvers");
+
+
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
