@@ -270,7 +270,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
         @Override
         public T fromObject(@Nullable Object o) {
-            return null;
+            return fromObject.apply(o);
         }
     }
 }
