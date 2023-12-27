@@ -176,7 +176,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPiSettings().clone());
         return this;
     }
