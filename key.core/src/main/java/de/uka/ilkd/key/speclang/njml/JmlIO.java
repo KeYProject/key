@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Label;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -222,10 +224,13 @@ public class JmlIO {
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         term = services.getTermBuilder().addLabel(term, origin);
 
-        if (FeatureSettings
-                .isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
-            term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(expr.second));
+        List<TermLabel> labels;
+        if (FeatureSettings.isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
+            labels = expr.second;
+        }else{
+            labels = expr.second.stream().filter(it -> !(it instanceof SpecNameLabel)).toList();
         }
+        term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(labels));
         return term;
     }
 
