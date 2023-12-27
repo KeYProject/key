@@ -37,6 +37,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
@@ -396,7 +397,8 @@ public class ProofTreePopupFactory {
                 if (!context.proof.isOpenGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
-                                || (!GeneralSettings.noPruningClosed && context.proof
+                                || (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()
+                        && context.proof
                                         .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
                     setEnabled(true);
                 }

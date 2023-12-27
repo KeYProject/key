@@ -514,7 +514,7 @@ public class Proof implements Named {
             goal = getOpenGoal(it.next());
             if (goal != null) {
                 b = true;
-                if (!GeneralSettings.noPruningClosed) {
+                if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()) {
                     closedGoals = closedGoals.prepend(goal);
                 }
                 remove(goal);
@@ -677,7 +677,7 @@ public class Proof implements Named {
             return null;
         }
         // abort pruning if the node is closed and pruning in closed branches is disabled
-        if (cuttingPoint.isClosed() && GeneralSettings.noPruningClosed) {
+        if (cuttingPoint.isClosed() && ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()) {
             return null;
         }
 

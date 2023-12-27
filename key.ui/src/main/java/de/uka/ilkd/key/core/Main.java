@@ -369,7 +369,7 @@ public final class Main {
         }
 
         if (cl.isSet(NO_JMLSPECS)) {
-            GeneralSettings.disableSpecs = true;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setDisableSpecs(true);
         }
 
         if (cl.isSet(TIMEOUT)) {
@@ -461,11 +461,11 @@ public final class Main {
         }
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
-            GeneralSettings.noPruningClosed = false;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
         }
 
         if (cl.isSet(KEEP_FILEREPOS)) {
-            GeneralSettings.keepFileRepos = true;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setKeepFileRepos(true);
         }
     }
 
@@ -524,7 +524,7 @@ public final class Main {
              * explicitly enable pruning in closed branches for interactive mode (if not manually
              * disabled)
              */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(cl.isSet(NO_PRUNING_CLOSED));
 
             MainWindow mainWindow = MainWindow.getInstance();
 

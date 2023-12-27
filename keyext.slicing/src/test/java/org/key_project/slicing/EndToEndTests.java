@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicReference;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -14,19 +10,20 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.Pair;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.helper.FindResources;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -266,8 +263,9 @@ class EndToEndTests {
     private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
-        boolean oldValue = GeneralSettings.noPruningClosed;
-        GeneralSettings.noPruningClosed = false;
+        boolean oldValue = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
+
         // load proof
         Assertions.assertTrue(proofFile.exists());
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
@@ -316,7 +314,7 @@ class EndToEndTests {
             return new Pair<>(slicedProof, tempFile);
         } finally {
             environment.dispose();
-            GeneralSettings.noPruningClosed = oldValue;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(oldValue);
         }
     }
 }

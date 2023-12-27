@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
@@ -105,7 +106,7 @@ public final class Main {
 
     private static void processFile(File proofFile, boolean overwrite) throws Exception {
         LOGGER.info("Processing proof: {}", proofFile.getName());
-        GeneralSettings.noPruningClosed = false;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
