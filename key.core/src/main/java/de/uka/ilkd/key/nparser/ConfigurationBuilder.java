@@ -26,7 +26,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCkey(KeYParser.CkeyContext ctx) {
+    public String visitCkey(KeYParser.CkeyContext ctx) {
         if (ctx.STRING_LITERAL() != null)
             return sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
         return ctx.IDENT().getText();
@@ -52,17 +52,17 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCintb(KeYParser.CintbContext ctx) {
+    public Long visitCintb(KeYParser.CintbContext ctx) {
         return Long.parseLong(ctx.getText(), 2);
     }
 
     @Override
-    public Object visitCinth(KeYParser.CinthContext ctx) {
+    public Long visitCinth(KeYParser.CinthContext ctx) {
         return Long.parseLong(ctx.getText(), 16);
     }
 
     @Override
-    public Object visitCintd(KeYParser.CintdContext ctx) {
+    public Long visitCintd(KeYParser.CintdContext ctx) {
         final var text = ctx.getText();
         if (text.endsWith("L") || text.endsWith("l")) {
             return Long.parseLong(text.substring(0, text.length() - 1), 10);
@@ -72,27 +72,27 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCfpf(KeYParser.CfpfContext ctx) {
+    public Double visitCfpf(KeYParser.CfpfContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public Object visitCfpd(KeYParser.CfpdContext ctx) {
+    public Double visitCfpd(KeYParser.CfpdContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public Object visitCfpr(KeYParser.CfprContext ctx) {
+    public Double visitCfpr(KeYParser.CfprContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public Object visitCbool(KeYParser.CboolContext ctx) {
+    public Boolean visitCbool(KeYParser.CboolContext ctx) {
         return Boolean.parseBoolean(ctx.getText());
     }
 
     @Override
-    public Object visitTable(KeYParser.TableContext ctx) {
+    public Configuration visitTable(KeYParser.TableContext ctx) {
         final var data = new LinkedHashMap<String, Object>();
         for (KeYParser.CkvContext context : ctx.ckv()) {
             var name = context.ckey().accept(this).toString();
@@ -103,7 +103,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitList(KeYParser.ListContext ctx) {
+    public List<Object> visitList(KeYParser.ListContext ctx) {
         var seq = new ArrayList<>(ctx.children.size());
         for (KeYParser.CvalueContext context : ctx.cvalue()) {
             seq.add(context.accept(this));

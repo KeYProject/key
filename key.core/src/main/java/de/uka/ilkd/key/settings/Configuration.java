@@ -376,6 +376,10 @@ public class Configuration {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
+    public void overwriteWith(Configuration other) {
+        data.putAll(other.data);
+    }
+
     /**
      * POJO for metadata of configuration entries.
      */

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
@@ -113,25 +114,27 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * Fill in only the necessary info.
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        properties.setProperty(IPersistablePO.PROPERTY_NAME, name());
+    public Configuration createLoaderConfig() throws IOException {
+        var c = new Configuration();
+        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(IPersistablePO.PROPERTY_NAME, name());
 
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
 
         if (tacletFile != null) {
-            properties.setProperty("tacletFile", tacletFile);
+            c.set("tacletFile", tacletFile);
         }
         if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile);
+            c.set("definitionFile", definitionFile);
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
                 String name = AXIOM_FILE + (i == 0 ? "" : (i + 1));
-                properties.setProperty(name, axiomFiles[i]);
+                c.set(name, axiomFiles[i]);
             }
         }
+        return c;
     }
 
     @Override

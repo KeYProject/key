@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
+import de.uka.ilkd.key.settings.Configuration;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -20,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class ProblemFinder extends ExpressionBuilder {
     private @Nullable Sequent problem;
     private @Nullable String chooseContract;
-    private @Nullable String proofObligation;
+    private Configuration proofObligation;
 
     public ProblemFinder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -50,11 +51,9 @@ public class ProblemFinder extends ExpressionBuilder {
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null) {
-                proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
-            }
-            // .replace("\\\\:", ":");
-            else {
-                proofObligation = "";
+                proofObligation = ParsingFacade.getConfiguration((KeYParser.TableContext) ctx.proofObligation);
+            } else {
+                proofObligation = null;
             }
         }
         if (ctx.PROBLEM() != null) {
@@ -78,8 +77,7 @@ public class ProblemFinder extends ExpressionBuilder {
         return chooseContract;
     }
 
-    @Nullable
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return proofObligation;
     }
 

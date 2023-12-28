@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -224,8 +225,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param properties The {@link Properties} to read value from.
      * @return {@code true} is set, {@code false} is not set.
      */
-    protected static boolean isAddUninterpretedPredicate(Properties properties) {
-        String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
+    public static boolean isAddUninterpretedPredicate(Configuration properties) {
+        String value = properties.getString(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
         return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
@@ -235,8 +236,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param properties The {@link Properties} to read value from.
      * @return {@code true} is set, {@code false} is not set.
      */
-    protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
-        String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
+    public static boolean isAddSymbolicExecutionLabel(Configuration properties) {
+        String value = properties.getString(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
         return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
@@ -485,18 +486,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
         if (isAddUninterpretedPredicate()) {
-            properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
+            c.set(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
                 String.valueOf(isAddUninterpretedPredicate()));
         }
         if (isAddSymbolicExecutionLabel()) {
-            properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
+            c.set(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
                 String.valueOf(isAddSymbolicExecutionLabel()));
         }
+        return c;
     }
 
     public ImmutableSet<NoPosTacletApp> getInitialTaclets() {

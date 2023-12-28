@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -349,62 +348,16 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("contract", contract.getName());
+        return c;
     }
 
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        String contractName = properties.getProperty("contract");
-        int proofNum = 0;
-        String baseContractName = null;
-        int ind = -1;
-        for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
-            proofNum++;
-        }
-        if (ind == -1) {
-            baseContractName = contractName;
-            proofNum = 0;
-        } else {
-            baseContractName = contractName.substring(0, ind);
-        }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(baseContractName);
-        if (contract == null) {
-            throw new IOException("Contract not found: " + baseContractName);
-        } else {
-            ProofOblInput po;
-            boolean addUninterpretedPredicate = isAddUninterpretedPredicate(properties);
-            boolean addSymbolicExecutionLabel = isAddSymbolicExecutionLabel(properties);
-            if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
-                if (!(contract instanceof FunctionalOperationContract)) {
-                    throw new IOException(
-                        "Found contract \"" + contract + "\" is no FunctionalOperationContract.");
-                }
-                po = new FunctionalOperationContractPO(initConfig,
-                    (FunctionalOperationContract) contract, addUninterpretedPredicate,
-                    addSymbolicExecutionLabel);
-            } else {
-                po = contract.createProofObl(initConfig);
-            }
-            return new LoadedPOContainer(po, proofNum);
-        }
-    }
 
     /**
      * {@inheritDoc}

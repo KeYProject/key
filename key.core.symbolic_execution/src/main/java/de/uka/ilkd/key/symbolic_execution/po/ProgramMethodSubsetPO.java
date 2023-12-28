@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
+import de.uka.ilkd.key.settings.Configuration;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -82,6 +83,10 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 //spotless:on
 public class ProgramMethodSubsetPO extends ProgramMethodPO {
+    public static final String START_LINE = "startLine";
+    public static final String START_COLUMN = "startColumn";
+    public static final String END_LINE = "endLine";
+    public static final String END_COLUMN = "endColumn";
     /**
      * Contains all undeclared variables used in the method part to execute.
      */
@@ -309,34 +314,21 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
+    public Configuration createLoaderConfig() {
+        var c=super.createLoaderConfig();
         if (getStartPosition() != null) {
-            properties.setProperty("startLine", getStartPosition().line() + "");
-            properties.setProperty("startColumn", getStartPosition().column() + "");
+            c.set(START_LINE, getStartPosition().line() + "");
+            c.set(START_COLUMN, getStartPosition().column() + "");
         }
         if (getEndPosition() != null) {
-            properties.setProperty("endLine", getEndPosition().line() + "");
-            properties.setProperty("endColumn", getEndPosition().column() + "");
+            c.set(END_LINE, getEndPosition().line() + "");
+            c.set(END_COLUMN, getEndPosition().column() + "");
         }
-    }
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig, getName(properties),
-            getProgramMethod(initConfig, properties), getPrecondition(properties),
-            getStartPosition(properties), getEndPosition(properties),
-            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
+        return c;
     }
 
     /**
@@ -346,12 +338,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The defined start {@link Position}.
      * @throws IOException Occurred Exception if it was not possible to read the start position.
      */
-    protected static Position getStartPosition(Properties properties) throws IOException {
-        String line = properties.getProperty("startLine");
+    protected static Position getStartPosition(Configuration properties) throws IOException {
+        String line = properties.getString(START_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("Start line property \"startLine\" is not available or empty.");
         }
-        String column = properties.getProperty("startColumn");
+        String column = properties.getString(START_COLUMN);
         if (column == null || column.isEmpty()) {
             throw new IOException(
                 "Start column property \"startColumn\" is not available or empty.");
@@ -384,12 +376,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The defined end {@link Position}.
      * @throws IOException Occurred Exception if it was not possible to read the end position.
      */
-    protected static Position getEndPosition(Properties properties) throws IOException {
-        String line = properties.getProperty("endLine");
+    protected static Position getEndPosition(Configuration properties) throws IOException {
+        String line = properties.getString(END_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("End line property \"endLine\" is not available or empty.");
         }
-        String column = properties.getProperty("endColumn");
+        String column = properties.getString(END_COLUMN);
         if (column == null || column.isEmpty()) {
             throw new IOException("End column property \"endColumn\" is not available or empty.");
         }
