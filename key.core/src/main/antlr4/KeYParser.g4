@@ -241,7 +241,8 @@ datatype_decls:
 
 datatype_decl:
   doc=DOC_COMMENT?
-  FREE?
+  // weigl: all datatypes are free!
+  // FREE?
   name=simple_ident
   EQUALS
   datatype_constructor (OR datatype_constructor)*

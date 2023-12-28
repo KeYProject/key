@@ -49,6 +49,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
@@ -58,7 +59,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             for (int i = 0; i < args.length; i++) {
                 args[i] = accept(constructorContext.sortId(i));
             }
-            Function function = new Function(name, sort, args);
+            Function function = new Function(name, sort, args, null, true, false);
             namespaces().functions().add(function);
         }
         return null;

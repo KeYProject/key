@@ -56,7 +56,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        boolean freeAdt = ctx.FREE() != null;
+        //boolean freeAdt = ctx.FREE() != null;
         var name = ctx.name.getText();
         var doc = ctx.DOC_COMMENT() != null
                 ? ctx.DOC_COMMENT().getText()
