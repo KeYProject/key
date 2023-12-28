@@ -11,6 +11,8 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
+import java.util.Objects;
+
 public class ProofIrrelevancyProperty implements TermProperty {
     /**
      * The single instance of this property.
@@ -102,29 +104,51 @@ public class ProofIrrelevancyProperty implements TermProperty {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        // int hashcode2 = -1; // this line is just so the code compiles
-        // // part from TermImpl
-        // if (hashcode2 == -1) {
-        // // compute into local variable first to be thread-safe.
-        // hashcode2 = Objects.hash(term.op(),
-        // EqualsModProofIrrelevancyUtil
-        // .hashCodeIterable(term.subs()),
-        // EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
-        // if (hashcode2 == -1) {
-        // hashcode2 = 0;
-        // }
-        // }
-        // // part from LabeledTermImpl
-        // final ImmutableArray<TermLabel> labels = term.getLabels();
-        // final int numOfLabels = labels.size();
-        // for (int i = 0; i < numOfLabels; i++) {
-        // final TermLabel currentLabel = labels.get(i);
-        // if (currentLabel.isProofRelevant()) {
-        // hashcode2 += 7 * currentLabel.hashCode();
-        // }
-        // }
-        // return hashcode2;
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo term proof-irrelevancy not yet implemented!");
+        int hashcode2 = -1; // this line is just so the code compiles
+        // part from TermImpl
+        if (hashcode2 == -1) {
+            // compute into local variable first to be thread-safe.
+            hashcode2 = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+                EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+            if (hashcode2 == -1) {
+                hashcode2 = 0;
+            }
+        }
+        // part from LabeledTermImpl
+        final ImmutableArray<TermLabel> labels = term.getLabels();
+        final int numOfLabels = labels.size();
+        for (int i = 0; i < numOfLabels; i++) {
+            final TermLabel currentLabel = labels.get(i);
+            if (currentLabel.isProofRelevant()) {
+                hashcode2 += 7 * currentLabel.hashCode();
+            }
+        }
+        return hashcode2;
+        // throw new UnsupportedOperationException(
+        // "Hashing of terms modulo term proof-irrelevancy not yet implemented!");
+    }
+
+    // -------------------------- Utility methods --------------------------------- //
+
+    /**
+     * Compute the hashcode of an iterable of terms using the elements' {@link TermEqualsModProperty}
+     * implementation.
+     *
+     * @param iter iterable of terms
+     * @return combined hashcode
+     */
+    public static int hashCodeIterable(Iterable<? extends Term> iter) {
+        // adapted from Arrays.hashCode
+        if (iter == null) {
+            return 0;
+        }
+
+        int result = 1;
+
+        for (Term element : iter) {
+            result = 31 * result + (element == null ? 0 : element.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
+        }
+
+        return result;
     }
 }
