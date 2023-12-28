@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
+
+import java.io.IOException;
 
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
-
-import java.io.IOException;
 
 /**
  * @author Alexander Weigl
@@ -20,11 +23,16 @@ public class ProgramMethodSubsetPOLoader implements ProofObligationLoader {
      * @throws IOException Occurred Exception.
      */
     @Override
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) throws IOException {
-        return new IPersistablePO.LoadedPOContainer(new ProgramMethodSubsetPO(initConfig, AbstractPO.getName(properties),
-                ProgramMethodPO.getProgramMethod(initConfig, properties), ProgramMethodPO.getPrecondition(properties),
-                ProgramMethodSubsetPO.getStartPosition(properties), ProgramMethodSubsetPO.getEndPosition(properties),
-                AbstractOperationPO.isAddUninterpretedPredicate(properties), AbstractOperationPO.isAddSymbolicExecutionLabel(properties)));
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties) throws IOException {
+        return new IPersistablePO.LoadedPOContainer(
+            new ProgramMethodSubsetPO(initConfig, AbstractPO.getName(properties),
+                ProgramMethodPO.getProgramMethod(initConfig, properties),
+                ProgramMethodPO.getPrecondition(properties),
+                ProgramMethodSubsetPO.getStartPosition(properties),
+                ProgramMethodSubsetPO.getEndPosition(properties),
+                AbstractOperationPO.isAddUninterpretedPredicate(properties),
+                AbstractOperationPO.isAddSymbolicExecutionLabel(properties)));
     }
 
     @Override

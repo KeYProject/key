@@ -8,8 +8,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-
 import de.uka.ilkd.key.settings.Configuration;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -51,7 +51,8 @@ public class ProblemFinder extends ExpressionBuilder {
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null) {
-                proofObligation = ParsingFacade.getConfiguration((KeYParser.TableContext) ctx.proofObligation);
+                proofObligation =
+                    ParsingFacade.getConfiguration((KeYParser.TableContext) ctx.proofObligation);
             } else {
                 proofObligation = null;
             }

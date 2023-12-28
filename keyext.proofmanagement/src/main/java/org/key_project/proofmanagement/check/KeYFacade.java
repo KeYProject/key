@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
@@ -28,20 +37,12 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 /**
  * This class provides static methods to access the prover (KeY).
@@ -100,7 +101,7 @@ public final class KeYFacade {
         } catch (Exception e) {
             // TODO: exception handling: better not throw exceptions, but print to log and continue
             throw new ProofManagementException(
-                    "Could not load proof! " + System.lineSeparator() + e);
+                "Could not load proof! " + System.lineSeparator() + e);
         }
     }
 
@@ -142,7 +143,7 @@ public final class KeYFacade {
 
         // parse the actual proof tree to an intermediate representation (without replay!)
         IntermediatePresentationProofFileParser parser =
-                new IntermediatePresentationProofFileParser(proof);
+            new IntermediatePresentationProofFileParser(proof);
         ProblemInitializer pi = line.problemInitializer;
         KeYUserProblemFile keyFile = line.envInput;
         pi.tryReadProof(parser, keyFile);
@@ -167,7 +168,7 @@ public final class KeYFacade {
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-                path.toFile(), fileRepo, control, profile, false);
+            path.toFile(), fileRepo, control, profile, false);
         line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
         /////////////////// createEnvInput
@@ -175,7 +176,7 @@ public final class KeYFacade {
         profile = keyFile.getProfile() == null ? profile : keyFile.getProfile();
 
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-                new DefaultUserInterfaceControl());
+            new DefaultUserInterfaceControl());
         pi.setFileRepo(fileRepo);
         line.problemInitializer = pi;
 
@@ -191,7 +192,7 @@ public final class KeYFacade {
 
         // more generic version (works e.g. for taclet proofs)
         IPersistablePO.LoadedPOContainer poContainer =
-                createProofObligationContainer(keyFile, initConfig, proofObligation);
+            createProofObligationContainer(keyFile, initConfig, proofObligation);
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
@@ -231,7 +232,7 @@ public final class KeYFacade {
      * @throws IOException Occurred Exception.
      */
     private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
-                                                                                   InitConfig initConfig, Configuration properties) throws Exception {
+            InitConfig initConfig, Configuration properties) throws Exception {
         final String chooseContract = keyFile.chooseContract();
         final Configuration proofObligation = keyFile.getProofObligation();
 
@@ -262,21 +263,23 @@ public final class KeYFacade {
                 throw new RuntimeException("Contract not found: " + baseContractName);
             } else {
                 return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig),
-                        proofNum);
+                    proofNum);
             }
         } else if (proofObligation != null) {
             String poClass = properties.getString(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
                 throw new IOException("Proof obligation class property \""
-                        + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
+                    + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
-            ServiceLoader<ProofObligationLoader> loader = ServiceLoader.load(ProofObligationLoader.class);
+            ServiceLoader<ProofObligationLoader> loader =
+                ServiceLoader.load(ProofObligationLoader.class);
             for (ProofObligationLoader poloader : loader) {
                 if (poloader.handles(poClass)) {
                     return poloader.loadFrom(initConfig, proofObligation);
                 }
             }
-            throw new IllegalArgumentException("There is no builder that can build the PO for the id " + poClass);
+            throw new IllegalArgumentException(
+                "There is no builder that can build the PO for the id " + poClass);
         } else {
             return null;
         }
@@ -310,8 +313,8 @@ public final class KeYFacade {
                             line.replayResult = replayProof(line, envInput, data);
                         } catch (ProofInputException e) {
                             throw new ProofManagementException(
-                                    "Could not replay proof from " + envInput
-                                            + System.lineSeparator() + e);
+                                "Could not replay proof from " + envInput
+                                    + System.lineSeparator() + e);
                         }
                     }
                 }
@@ -320,7 +323,7 @@ public final class KeYFacade {
     }
 
     private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-                                            Logger logger) throws ProofInputException {
+            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
@@ -349,7 +352,7 @@ public final class KeYFacade {
                     .getStrategySettings()
                     .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                    StrategyProperties.OSS_ON);
+                StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
@@ -376,8 +379,8 @@ public final class KeYFacade {
                 errors.addAll(parserResult.errors());
             }
             status +=
-                    (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
-                            : "Error while loading proof.");
+                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
+                        : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
@@ -445,7 +448,7 @@ public final class KeYFacade {
         } catch (IOException e) {
             data.setSrcLoadingState(CheckerData.LoadingState.ERROR);
             throw new ProofManagementException("Java sources could not be loaded."
-                    + System.lineSeparator() + e.getMessage());
+                + System.lineSeparator() + e.getMessage());
         }
     }
 }

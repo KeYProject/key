@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init.loader;
 
 import de.uka.ilkd.key.proof.init.*;
@@ -12,7 +15,8 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) {
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties) {
         String contractName = properties.getString("contract");
         int proofNum = 0;
         String baseContractName = null;
@@ -35,7 +39,8 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + baseContractName);
         } else {
-            return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+            return new IPersistablePO.LoadedPOContainer(
+                contract.createProofObl(initConfig, contract), proofNum);
         }
     }
 

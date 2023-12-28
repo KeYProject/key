@@ -22,8 +22,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
-
 import de.uka.ilkd.key.settings.Configuration;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -319,7 +319,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     public Configuration createLoaderConfig() {
-        var c=super.createLoaderConfig();
+        var c = super.createLoaderConfig();
         if (getStartPosition() != null) {
             c.set(START_LINE, getStartPosition().line() + "");
             c.set(START_COLUMN, getStartPosition().column() + "");

@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
+
+import java.io.IOException;
 
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
-
-import java.io.IOException;
 
 import static de.uka.ilkd.key.proof.init.AbstractPO.getName;
 import static de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO.*;
@@ -19,11 +22,13 @@ public class ProgramMethodPOLoader implements ProofObligationLoader {
      * @return The instantiated proof obligation.
      */
     @Override
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties)
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties)
             throws IOException {
-        return new IPersistablePO.LoadedPOContainer(new ProgramMethodPO(initConfig, getName(properties),
-                ProgramMethodPO.getProgramMethod(initConfig, properties), getPrecondition(properties),
-                isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
+        return new IPersistablePO.LoadedPOContainer(new ProgramMethodPO(initConfig,
+            getName(properties),
+            ProgramMethodPO.getProgramMethod(initConfig, properties), getPrecondition(properties),
+            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
     }
 
     @Override

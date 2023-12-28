@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -19,10 +22,11 @@ public class InfFlowContractPOLoader implements ProofObligationLoader {
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) {
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties) {
         final String contractName = properties.getString("contract");
         final Contract contract =
-                initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + contractName);
         } else {

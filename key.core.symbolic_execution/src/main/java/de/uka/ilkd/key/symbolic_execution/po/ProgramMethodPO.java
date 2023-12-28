@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -24,15 +30,10 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 
 /**
  * <p>
@@ -77,13 +78,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Constructor.
      *
-     * @param initConfig   The {@link InitConfig} to use.
-     * @param name         The name to use.
-     * @param pm           The {@link IProgramMethod} to execute code parts from.
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
      * @param precondition An optional precondition to use.
      */
     public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
-                           String precondition) {
+            String precondition) {
         super(initConfig, name);
         assert pm != null;
         this.pm = pm;
@@ -93,18 +94,18 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Constructor.
      *
-     * @param initConfig                The {@link InitConfig} to use.
-     * @param name                      The name to use.
-     * @param pm                        The {@link IProgramMethod} to execute code parts from.
-     * @param precondition              An optional precondition to use.
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
+     * @param precondition An optional precondition to use.
      * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
-     *                                  {@code false} uninterpreted predicate is not contained in postcondition.
+     *        {@code false} uninterpreted predicate is not contained in postcondition.
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
-     *                                  to the modality, {@code false} to not label the modality.
+     *        to the modality, {@code false} to not label the modality.
      */
     public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
-                           String precondition, boolean addUninterpretedPredicate,
-                           boolean addSymbolicExecutionLabel) {
+            String precondition, boolean addUninterpretedPredicate,
+            boolean addSymbolicExecutionLabel) {
         super(initConfig, name, addUninterpretedPredicate, addSymbolicExecutionLabel);
         assert pm != null;
         this.pm = pm;
@@ -146,7 +147,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
         ImmutableArray<Expression> args = new ImmutableArray<>(
-                formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
+            formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
         MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
         StatementBlock result = new StatementBlock(mbs);
         return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
@@ -157,7 +158,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars, Services services) {
+            ImmutableList<ProgramVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -166,8 +167,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-                          ImmutableList<ProgramVariable> paramVars,
-                          Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
             JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
@@ -184,9 +185,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-                           ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-                           Services services) {
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         return tb.tt();
     }
 
@@ -195,7 +196,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-                                    ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -279,7 +280,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Returns a human-readable full qualified method signature.
      *
-     * @param pm          The {@link IProgramMethod} which provides the signature.
+     * @param pm The {@link IProgramMethod} which provides the signature.
      * @param includeType Include the container type?
      * @return The human-readable method signature.
      */
@@ -304,7 +305,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param properties The settings of the proof obligation to instantiate.
      * @return The found {@link IProgramMethod}.
      * @throws IOException Occurred Exception if it was not possible to find the
-     *                     {@link IProgramMethod}.
+     *         {@link IProgramMethod}.
      */
     public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
             throws IOException {
@@ -316,7 +317,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         int classMethodSeparator = value.indexOf("#");
         if (classMethodSeparator < 0) {
             throw new IOException(
-                    "Property \"method\" does not contain the class method separator \"#\".");
+                "Property \"method\" does not contain the class method separator \"#\".");
         }
         String className = value.substring(0, classMethodSeparator);
         String signature = value.substring(classMethodSeparator + 1);
@@ -325,16 +326,16 @@ public class ProgramMethodPO extends AbstractOperationPO {
         int breaketsStart = signature.indexOf("(");
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \"(\".");
+                + "\" does not contain required character \"(\".");
         }
         int breaketsEnd = signature.lastIndexOf(")");
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \")\".");
+                + "\" does not contain required character \")\".");
         }
         if (breaketsEnd < breaketsStart) {
             throw new IOException(
-                    "Method signature has not valid order of chracters \"(\" and \")\".");
+                "Method signature has not valid order of chracters \"(\" and \")\".");
         }
         String name = signature.substring(0, breaketsStart);
         String parameters = signature.substring(breaketsStart + 1, breaketsEnd);
@@ -374,7 +375,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
 
     @Override
     protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                                 ImmutableList<Term> paramTerms, Services services) {
+            ImmutableList<Term> paramTerms, Services services) {
         // TODO Auto-generated method stub
         return null;
     }

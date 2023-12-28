@@ -563,7 +563,8 @@ public abstract class AbstractProblemLoader {
         }
 
         // Instantiate proof obligation
-        if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+        if (envInput instanceof ProofOblInput && chooseContract == null
+                && proofObligation == null) {
             return new LoadedPOContainer((ProofOblInput) envInput);
         } else if (chooseContract != null && !chooseContract.isEmpty()) {
             return loadByChosenContract(chooseContract);
@@ -574,7 +575,8 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private LoadedPOContainer loadByProofObligation(Configuration proofObligation) throws Exception {
+    private LoadedPOContainer loadByProofObligation(Configuration proofObligation)
+            throws Exception {
         // Load proof obligation settings
         proofObligation.set(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
 
@@ -587,13 +589,15 @@ public abstract class AbstractProblemLoader {
             throw new IOException("Proof obligation class property \""
                 + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
         }
-        ServiceLoader<ProofObligationLoader> loader = ServiceLoader.load(ProofObligationLoader.class);
+        ServiceLoader<ProofObligationLoader> loader =
+            ServiceLoader.load(ProofObligationLoader.class);
         for (ProofObligationLoader poloader : loader) {
             if (poloader.handles(poClass)) {
                 return poloader.loadFrom(initConfig, proofObligation);
             }
         }
-        throw new IllegalArgumentException("There is no builder that can build the PO for the id " + poClass);
+        throw new IllegalArgumentException(
+            "There is no builder that can build the PO for the id " + poClass);
     }
 
     private LoadedPOContainer loadByChosenContract(String chooseContract) {
