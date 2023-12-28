@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
@@ -23,7 +25,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
         Term result = applyUpdateOnFormula(term);
         Term expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
-        assertTrue(expected.equalsModRenaming(result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Update without free variables was not properly applied on formula!");
 
         term = TacletForTests.parseTerm("{i:=0}(i = 0)");
@@ -35,7 +37,7 @@ public class TestApplyUpdateOnRigidCondition {
         term = TacletForTests.parseTerm("{i:=0} f(const)");
         result = applyUpdateOnTerm(term);
         expected = TacletForTests.parseTerm("f({i:=0} const)");
-        assertTrue(expected.equalsModRenaming(result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Update without free variables was not properly applied on term!");
     }
 
@@ -49,21 +51,21 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         Term expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
-        assertTrue(expected.equalsModRenaming(result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Update is not simply pulled over quantification!");
 
         term = TacletForTests.parseTerm("\\forall int b; {i:=b} (0 = i)");
         b = term.boundVars().get(0);
         result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         expected = TacletForTests.parseTerm("\\forall int b; {i:=b} 0 = {i:=b} i");
-        assertTrue(expected.equalsModRenaming(result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Update is not simply pulled over equality!");
 
         term = TacletForTests.parseTerm("\\forall int b; {i:=b} f(const) = 0");
         b = term.boundVars().get(0);
         result = tb.all(b, tb.equals(applyUpdateOnTerm(term.sub(0).sub(0)), term.sub(0).sub(1)));
         expected = TacletForTests.parseTerm("\\forall int b; f({i:=b} const) = 0");
-        assertTrue(expected.equalsModRenaming(result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Update is not simply pulled over function symbol!");
     }
 
@@ -77,7 +79,8 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
         Term expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
-        assertTrue(expected.equalsModRenaming(result), "Renaming or applying update afterwards !");
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
+            "Renaming or applying update afterwards !");
 
         term = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; {i:=a}\\forall java.lang.Object a; i = a1");
@@ -86,7 +89,7 @@ public class TestApplyUpdateOnRigidCondition {
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");
-        assertTrue(expected.equalsModProofIrrelevancy(result),
+        assertTrue(expected.equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, result),
             "Counter appended to stem was not increased high enough!");
     }
 

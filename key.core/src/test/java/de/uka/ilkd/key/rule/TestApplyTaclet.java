@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -738,7 +739,7 @@ public class TestApplyTaclet {
         Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
         Term correctFormula = correctSeq.getFormulabyNr(1).formula();
 
-        assertTrue(resultFormula.equalsModRenaming(correctFormula),
+        assertTrue(resultFormula.equalsModProperty(RENAMING_TERM_PROPERTY, correctFormula),
             "Wrong result. Expected:"
                 + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
                 + ProofSaver.printAnything(resultFormula, TacletForTests.services()));

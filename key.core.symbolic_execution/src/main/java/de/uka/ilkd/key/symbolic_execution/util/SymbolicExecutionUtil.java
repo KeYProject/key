@@ -71,6 +71,9 @@ import org.key_project.util.java.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 /**
  * Provides utility methods for symbolic execution with KeY.
  *
@@ -387,7 +390,7 @@ public final class SymbolicExecutionUtil {
      * @return true if the term represents the one
      */
     private static boolean isOne(Term subOne, IntegerLDT integerLDT) {
-        return subOne.equalsModIrrelevantTermLabels(integerLDT.one());
+        return subOne.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, integerLDT.one());
     }
 
     /**
@@ -1976,13 +1979,16 @@ public final class SymbolicExecutionUtil {
             List<Term> exceptinalConditions) throws ProofInputException {
         if (term.op() == Junctor.AND) {
             Term lastChild = term.sub(term.arity() - 1);
-            if (lastChild.equalsModIrrelevantTermLabels(normalExcDefinition)
-                    || lastChild.equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+            if (lastChild.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, normalExcDefinition)
+                    || lastChild.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                        exceptionalExcDefinition)) {
                 // Nothing to do, condition is just true
             } else {
                 Term firstChild = term.sub(0);
-                if (firstChild.equalsModIrrelevantTermLabels(normalExcDefinition)
-                        || firstChild.equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+                if (firstChild
+                        .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, normalExcDefinition)
+                        || firstChild.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                            exceptionalExcDefinition)) {
                     // Nothing to do, condition is just true
                 } else {
                     for (int i = 0; i < term.arity(); i++) {
@@ -1994,27 +2000,32 @@ public final class SymbolicExecutionUtil {
             }
         } else if (term.op() == Junctor.IMP) {
             Term leftTerm = term.sub(0);
-            if (leftTerm.equalsModIrrelevantTermLabels(normalExcDefinition)
-                    || leftTerm.equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+            if (leftTerm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, normalExcDefinition)
+                    || leftTerm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                        exceptionalExcDefinition)) {
                 // Nothing to do, condition is just true
             } else {
                 Term rightTerm = term.sub(1);
                 // Deal with heavy weight specification cases
                 if (rightTerm.op() == Junctor.AND && rightTerm.sub(0).op() == Junctor.IMP
                         && rightTerm.sub(0).sub(0)
-                                .equalsModIrrelevantTermLabels(normalExcDefinition)) {
+                                .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                    normalExcDefinition)) {
                     normalConditions.add(leftTerm);
                 } else if (rightTerm.op() == Junctor.AND && rightTerm.sub(1).op() == Junctor.IMP
                         && rightTerm.sub(1).sub(0)
-                                .equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+                                .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                    exceptionalExcDefinition)) {
                     exceptinalConditions.add(leftTerm);
                 }
                 // Deal with light weight specification cases
                 else if (rightTerm.op() == Junctor.IMP
-                        && rightTerm.sub(0).equalsModIrrelevantTermLabels(normalExcDefinition)) {
+                        && rightTerm.sub(0).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                            normalExcDefinition)) {
                     normalConditions.add(leftTerm);
                 } else if (rightTerm.op() == Junctor.IMP && rightTerm.sub(0)
-                        .equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+                        .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                            exceptionalExcDefinition)) {
                     exceptinalConditions.add(leftTerm);
                 } else {
                     Term excCondition = rightTerm;
@@ -2022,19 +2033,23 @@ public final class SymbolicExecutionUtil {
                     if (excCondition.op() == Junctor.AND) {
                         excCondition = excCondition.sub(excCondition.arity() - 1);
                     }
-                    if (excCondition.equalsModIrrelevantTermLabels(normalExcDefinition)) {
+                    if (excCondition.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                        normalExcDefinition)) {
                         normalConditions.add(leftTerm);
                     } else if (excCondition
-                            .equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+                            .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                exceptionalExcDefinition)) {
                         exceptinalConditions.add(leftTerm);
                     } else {
                         // Check if left child is exception definition
                         if (rightTerm.op() == Junctor.AND) {
                             excCondition = rightTerm.sub(0);
-                            if (excCondition.equalsModIrrelevantTermLabels(normalExcDefinition)) {
+                            if (excCondition.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                normalExcDefinition)) {
                                 normalConditions.add(leftTerm);
                             } else if (excCondition
-                                    .equalsModIrrelevantTermLabels(exceptionalExcDefinition)) {
+                                    .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                                        exceptionalExcDefinition)) {
                                 exceptinalConditions.add(leftTerm);
                             } else {
                                 throw new ProofInputException("Exeptional condition expected, "
@@ -2661,7 +2676,7 @@ public final class SymbolicExecutionUtil {
             Term replaceTerm) {
         Term termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
         if (termAtPio != null) {
-            return termAtPio.equalsModRenaming(replaceTerm);
+            return termAtPio.equalsModProperty(RENAMING_TERM_PROPERTY, replaceTerm);
         } else {
             return false;
         }
@@ -3407,11 +3422,13 @@ public final class SymbolicExecutionUtil {
             if (term != skolemEquality) {
                 int skolemCheck = checkSkolemEquality(term);
                 if (skolemCheck == -1) {
-                    if (term.sub(0).equalsModIrrelevantTermLabels(skolemConstant)) {
+                    if (term.sub(0).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                        skolemConstant)) {
                         result.add(term.sub(1));
                     }
                 } else if (skolemCheck == 1) {
-                    if (term.sub(1).equalsModIrrelevantTermLabels(skolemConstant)) {
+                    if (term.sub(1).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                        skolemConstant)) {
                         result.add(term.sub(0));
                     }
                 }
@@ -3501,7 +3518,8 @@ public final class SymbolicExecutionUtil {
                 }
                 childNode = parent;
             }
-            if (services.getTermBuilder().ff().equalsModIrrelevantTermLabels(pathCondition)) {
+            if (services.getTermBuilder().ff().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
+                pathCondition)) {
                 throw new ProofInputException(
                     "Path condition computation failed because the result is false.");
             }
