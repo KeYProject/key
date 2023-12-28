@@ -3,19 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
+import de.uka.ilkd.key.util.KeYResourceManager;
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import de.uka.ilkd.key.util.KeYResourceManager;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 /**
  * This class is used to load and save settings for proofs such as which data type models are used
@@ -32,19 +31,21 @@ import org.slf4j.LoggerFactory;
  * @see Properties
  * @see Settings
  */
+@NullMarked
 public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
     public static final File PROVER_CONFIG_FILE =
-        new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
+            new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
 
     public static final File PROVER_CONFIG_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "proof-settings.json");
+            new File(PathConfig.getKeyConfigDir(), "proof-settings.json");
 
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
 
     public static final ProofSettings DEFAULT_SETTINGS = loadedSettings();
+    public static final String KEY_ADDITIONAL_DATA = "additionalInformation";
 
 
     private static ProofSettings loadedSettings() {
@@ -66,12 +67,12 @@ public class ProofSettings {
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings =
-        ProofDependentSMTSettings.getDefaultSettingsData();
+            ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
-    private Properties lastLoadedProperties = null;
-    private Configuration lastLoadedConfiguration = null;
+    private @Nullable Properties lastLoadedProperties = null;
+    private @Nullable Configuration lastLoadedConfiguration = null;
 
     /**
      * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
@@ -133,10 +134,26 @@ public class ProofSettings {
     }
 
     /**
-     * Used by saveSettings() and settingsToString()
+     * Write the settings to the given stream w/o additional information.
+     *
+     * @see #settingsToStream(Writer, Map)
      */
     public void settingsToStream(Writer out) {
-        getConfiguration().save(out, "Proof-Settings-Config-File");
+        settingsToStream(out, null);
+    }
+
+    /**
+     * Writes the settings to the given stream storing additional data into {@link #KEY_ADDITIONAL_DATA}.
+     *
+     * @param out                   a output destination
+     * @param additionalInformation a nullable map of additional information
+     */
+    public void settingsToStream(Writer out, @Nullable Map<String, Object> additionalInformation) {
+        var config = getConfiguration();
+        if (additionalInformation != null) {
+            config.set(KEY_ADDITIONAL_DATA, new Configuration(additionalInformation));
+        }
+        config.save(out, "Proof-Settings-Config-File");
     }
 
     /**
@@ -148,7 +165,7 @@ public class ProofSettings {
                 PROVER_CONFIG_FILE.getParentFile().mkdirs();
             }
             try (Writer out = new BufferedWriter(
-                new FileWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8))) {
+                    new FileWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8))) {
                 settingsToStream(out);
             }
         } catch (IOException e) {
@@ -157,8 +174,12 @@ public class ProofSettings {
     }
 
     public String settingsToString() {
+        return settingsToString(new HashMap<>());
+    }
+
+    public String settingsToString(Map<String, Object> additionalInformation) {
         StringWriter out = new StringWriter();
-        settingsToStream(out);
+        settingsToStream(out, additionalInformation);
         return out.getBuffer().toString();
     }
 
@@ -170,7 +191,7 @@ public class ProofSettings {
     public void loadDefaultJSONSettings() {
         if (PROVER_CONFIG_FILE_TEMPLATE == null) {
             LOGGER.warn(
-                "default proof-settings file 'default-proof-settings.json' could not be found.");
+                    "default proof-settings file 'default-proof-settings.json' could not be found.");
         } else {
             try (var in = new InputStreamReader(PROVER_CONFIG_FILE_TEMPLATE.openStream())) {
                 loadSettingsFromJSONStream(in);
