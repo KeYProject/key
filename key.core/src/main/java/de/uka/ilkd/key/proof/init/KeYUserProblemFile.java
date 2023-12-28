@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.nparser.*;
+import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
@@ -34,7 +35,11 @@ import org.jspecify.annotations.Nullable;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
+    @Nullable
     private Sequent problem = null;
+
+    @Nullable
+    private Configuration settings;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -117,6 +122,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.add(getPositionedStrings(readRules()));
 
         return warnings;
+    }
+
+    public Configuration  readSettings() {
+        if(settings==null){
+            settings = getParseContext().findSettings();
+        }
+        return settings;
     }
 
     @Override
