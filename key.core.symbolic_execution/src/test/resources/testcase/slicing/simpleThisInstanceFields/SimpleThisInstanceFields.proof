@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Jan 30 14:53:56 CET 2015
-name=main()
-addSymbolicExecutionLabel=true
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
-method=SimpleThisInstanceFields\\#main()
-";
+\proofObligation {
+	"name": "main()",
+	"addSymbolicExecutionLabel": true,
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO",
+	"method": "SimpleThisInstanceFields#main()",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

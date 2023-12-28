@@ -29,11 +29,14 @@ def rewrite(filename):
         fh.write(text)
 
     new_text = REGEX.sub(replace, text, 1)
-    print(new_text)
 
     with open(filename, 'w') as fh:
         fh.write(new_text)
 
 if __name__=="__main__":
     for a in sys.argv[1:]:
-        rewrite(a)
+        try:
+            print(f"File: {a}")
+            rewrite(a)
+        except Exception as e:
+            print(e)
