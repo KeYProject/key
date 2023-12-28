@@ -289,6 +289,17 @@ public class Configuration {
     }
 
     /**
+     * Returns a list of integer values given by the name.
+     */
+    @Nullable
+    public List<Integer> getIntList(String name) {
+        var seq = get(name, List.class);
+        if (seq == null) return null;
+        if (!seq.stream().allMatch(it -> it instanceof Integer)) throw new ClassCastException();
+        return seq;
+    }
+
+    /**
      * Returns string array for the requested entry. {@code defaultValue} is returned if no such
      * entry exists.
      *
@@ -332,7 +343,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the meta data corresponding to the given entry.
+     * Returns the meta-data corresponding to the given entry.
      */
     @Nullable
     public ConfigurationMeta getMeta(String name) {
@@ -533,6 +544,8 @@ public class Configuration {
                 printValue(value.toString());
             } else if (value == null) {
                 printValue("null");
+            } else if (value instanceof int[] array) {
+                printSeq(array);
             } else {
                 throw new IllegalArgumentException("Unexpected object: " + value);
             }
