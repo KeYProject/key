@@ -3,21 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.overop;
 
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.logic.op.Function;
-
 import org.key_project.util.collection.ImmutableArray;
 
-public class InfixMetaData implements FunctionMetaData {
-    private final ImmutableArray<String> infixOperator;
-    private final int prec;
+import java.util.stream.Collectors;
 
-    public InfixMetaData(ImmutableArray<String> names, int prec) {
-        this.infixOperator = names;
-        this.prec = prec;
-    }
-
+public record InfixMetaData(ImmutableArray<String> infixOperator, int prec) implements FunctionMetaData {
     public InfixMetaData(String text, int prec) {
         this(new ImmutableArray<>(text), prec);
     }
