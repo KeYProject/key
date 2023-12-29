@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author mattias ulbrich
  */
 public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
@@ -200,30 +200,18 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         return this == po;
     }
 
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
-        String tacletName = properties.getProperty(PROPERTY_NAME);
-        // This string is parsed by "proveRules.pl"
-        if (java.awt.GraphicsEnvironment.isHeadless()) {
-            LOGGER.info("Proof obligation for taclet: {}", tacletName);
-        }
-        TacletProofObligationInput proofOblInput =
-            new TacletProofObligationInput(tacletName, initConfig);
-        proofOblInput.setLoadInfo(properties);
-        return new LoadedPOContainer(proofOblInput);
-    }
-
-    private void setLoadInfo(Properties properties) {
-        this.baseDir =
-            new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
-        this.tacletFile = properties.getProperty("tacletFile");
-        this.definitionFile = properties.getProperty("definitionFile");
+    void setLoadInfo(Configuration properties) {
+        final var pathname = Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
+        this.baseDir = new File(pathname).getParent();
+        this.tacletFile = properties.getString("tacletFile");
+        this.definitionFile = properties.getString("definitionFile");
         List<String> axioms = new ArrayList<>();
         String name = AXIOM_FILE;
-        String axFile = properties.getProperty(name);
+        String axFile = properties.getString(name);
         while (axFile != null) {
             axioms.add(axFile);
             name = AXIOM_FILE + (axioms.size() + 1);
-            axFile = properties.getProperty(name);
+            axFile = properties.getString(name);
         }
         this.axiomFiles = axioms.toArray(new String[0]);
     }

@@ -26,8 +26,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl script
@@ -62,10 +61,10 @@ public class ProveRulesTest {
         assertNotNull(taclet, "Proof file " + proofFile
             + " claims that it contains a proof for taclet " + tacletName
             + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
-        assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
-            "Found a taclet proof for taclet " + tacletName
-                + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
-                + "adding annotation \\lemma to the declaration of the taclet.");
+        assertInstanceOf(LemmaJustification.class, taclet.getRuleJustification(),
+                "Found a taclet proof for taclet " + tacletName
+                        + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
+                        + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
