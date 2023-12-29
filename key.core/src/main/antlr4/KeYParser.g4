@@ -27,6 +27,7 @@ decls
     | pred_decls
     | func_decls
     | transform_decls
+    | datatype_decls
     | ruleset_decls
     | contracts             // for problems
     | invariants            // for problems
@@ -229,6 +230,36 @@ func_decl
   argSorts = arg_sorts
   functionMetaData?
   SEMI
+;
+
+/**
+\datatypes {
+ \free List = Nil | Cons(any head, List tail);
+}
+*/
+datatype_decls:
+  DATATYPES LBRACE datatype_decl* RBRACE
+;
+
+datatype_decl:
+  doc=DOC_COMMENT?
+  // weigl: all datatypes are free!
+  // FREE?
+  name=simple_ident
+  EQUALS
+  datatype_constructor (OR datatype_constructor)*
+  SEMI
+;
+
+datatype_constructor:
+  name=simple_ident
+  (
+    LPAREN
+    (argSort+=sortId argName+=simple_ident
+     (COMMA argSort+=sortId argName+=simple_ident)*
+    )?
+    RPAREN
+  )?
 ;
 
 

@@ -195,6 +195,7 @@ PROFILE : '\\profile';
 TRUE : 'true';
 FALSE : 'false';
 
+
 // Keywords related to taclets
 SAMEUPDATELEVEL : '\\sameUpdateLevel';
 INSEQUENTSTATE : '\\inSequentState';
@@ -217,6 +218,7 @@ AVOID : '\\avoid';
 
 PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
+FREE : '\\free';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
 INFIX: '\\infix';
