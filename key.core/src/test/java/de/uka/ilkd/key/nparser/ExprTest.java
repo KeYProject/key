@@ -90,12 +90,15 @@ public class ExprTest {
             LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
     }
 
+    private KeyIO io;
     private KeyIO getIo() throws IOException {
+        if(io!=null)return io;
+
         Services services = new Services(new JavaProfile());
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);
-        KeyIO io = new KeyIO(services);
+        io = new KeyIO(services);
         io.load(url).parseFile().loadDeclarations().loadSndDegreeDeclarations();
 
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
@@ -105,7 +108,6 @@ public class ExprTest {
         // Without this call, the LDTs are not available to the expression
         // builder. Probably a problem of the mocking here. (MU)
         services.getTypeConverter().init();
-
         return io;
     }
 
