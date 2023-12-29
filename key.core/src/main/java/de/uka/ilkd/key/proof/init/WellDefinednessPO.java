@@ -13,6 +13,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
@@ -294,25 +295,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         var c = super.createLoaderConfig();
         c.set("wd check", check.getName());
         return c;
-    }
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
-        String contractName = properties.getProperty("wd check");
-        final Contract contract =
-            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + contractName);
-        } else {
-            final ProofOblInput po = contract.createProofObl(initConfig);
-            return new LoadedPOContainer(po);
-        }
     }
 
     /**
