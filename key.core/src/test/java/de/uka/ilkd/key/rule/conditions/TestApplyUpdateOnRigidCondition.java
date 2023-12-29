@@ -15,7 +15,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -89,7 +88,7 @@ public class TestApplyUpdateOnRigidCondition {
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");
-        assertTrue(expected.equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, result),
+        assertTrue(expected.equalsModProperty(RENAMING_TERM_PROPERTY, result),
             "Counter appended to stem was not increased high enough!");
     }
 
