@@ -79,8 +79,6 @@ SL_COMMENT
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
 ;
 
-DOC_COMMENT: '/*!' -> more, pushMode(docComment);
-ML_COMMENT: '/*' OP_SFX* -> more, pushMode(COMMENT);
 
 
 DATATYPES:'\\datatypes';
