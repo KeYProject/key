@@ -18,12 +18,12 @@ import java.util.Set;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.useractions.FocussedAutoModeUserAction;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
+import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -227,7 +228,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getSolverUnions(Main.isExperimentalMode());
+                .getSMTSettings().getSolverUnions();
         if (!solverUnions.isEmpty()) {
             addSeparator();
         }
@@ -242,7 +243,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void createDelayedCutJoinMenu(MenuControl control) {
-        if (Main.isExperimentalMode()) {
+        if (FeatureSettings.isFeatureActivated(ProofTreePopupFactory.FEATURE_DELAY_CUT)) {
             List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
                     .isApplicable(mediator.getSelectedGoal(), getPos().getPosInOccurrence());
             if (!partner.isEmpty()) {

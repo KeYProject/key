@@ -311,7 +311,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * @return the current sizeIndex
      */
     public int sizeIndex() {
-        return sizeIndex.get();
+        return Math.toIntExact(sizeIndex.get());
     }
 
     /**

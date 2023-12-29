@@ -158,7 +158,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());

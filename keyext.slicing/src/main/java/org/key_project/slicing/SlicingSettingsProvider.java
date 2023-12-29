@@ -96,7 +96,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
         alwaysTrack.setSelected(ss.getAlwaysTrack());
         dotExecutable.setText(ss.getDotExecutable());
