@@ -12,7 +12,8 @@
  * <DT>Source and Program Elements</DT>
  * <DD>
  * A {@link de.uka.ilkd.key.java.SourceElement} is a syntactical entity and not
- * necessary a {@link de.uka.ilkd.key.java.ModelElement}, such as a {@link de.uka.ilkd.key.java.Comment}.
+ * necessary a {@link de.uka.ilkd.key.java.ModelElement}, such as a
+ * {@link de.uka.ilkd.key.java.Comment}.
  * <p>
  * A {@link de.uka.ilkd.key.java.ProgramElement} is a {@link de.uka.ilkd.key.java.SourceElement}
  * and a {@link de.uka.ilkd.key.ModelElement}. It is aware of its parent in the syntax
@@ -21,7 +22,8 @@
  * <p>
  * {@link de.uka.ilkd.key.java.ProgramElement}s are further
  * classified into {@link de.uka.ilkd.key.java.TerminalProgramElement}s and
- * {@link de.uka.ilkd.key.java.NonTerminalProgramElement}s. While {@link de.uka.ilkd.key.java.TerminalProgramElement}
+ * {@link de.uka.ilkd.key.java.NonTerminalProgramElement}s. While
+ * {@link de.uka.ilkd.key.java.TerminalProgramElement}
  * is just a tag class, {@link de.uka.ilkd.key.java.NonTerminalProgramElement}s know
  * their AST children (while it is possible that they do not have any).
  * A complete source file occurs as a {@link de.uka.ilkd.key.java.CompilationUnit}.
@@ -56,7 +58,7 @@
  * {@link de.uka.ilkd.key.java.StatementContainer},
  * {@link de.uka.ilkd.key.java.ParameterContainer},
  * {@link de.uka.ilkd.key.java.NamedProgramElement} and
- * {@link de.uka.ilkd.key.java.reference.TypeReferenceContainer}.  A
+ * {@link de.uka.ilkd.key.java.reference.TypeReferenceContainer}. A
  * An {@link de.uka.ilkd.key.java.ExpressionContainer} contains
  * {@link de.uka.ilkd.key.java.Expression}s, a
  * {@link de.uka.ilkd.key.java.StatementContainer} contains
@@ -92,7 +94,7 @@
  * {@link de.uka.ilkd.key.java.Declaration}s are either
  * declarations of types or other entities such as
  * {@link de.uka.ilkd.key.java.declaration.MemberDeclaration} or
- * {@link de.uka.ilkd.key.java.declaration.VariableDeclaration}.  Concrete
+ * {@link de.uka.ilkd.key.java.declaration.VariableDeclaration}. Concrete
  * {@link de.uka.ilkd.key.java.declaration.Modifier}s and
  * {@link de.uka.ilkd.key.java.Declaration}s are
  * bundled in the {@link de.uka.ilkd.key.java.declaration.modifier} and
