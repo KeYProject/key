@@ -13,7 +13,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
@@ -36,10 +35,15 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
+
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
+    public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
+        createFeature("DELAY_CUT", "Activates the delayed cut rule.");
 
     private ProofTreePopupFactory() {
     }
@@ -99,9 +103,14 @@ public class ProofTreePopupFactory {
         menu.add(new Prune(ctx));
 
         initMacroMenu(menu, ctx);
-        if (Main.isExperimentalMode()) {
-            menu.add(new DelayedCut(ctx));
+
+
+        final var delayedCut = new DelayedCut(ctx);
+        if (FeatureSettings.isFeatureActivated(FEATURE_DELAY_CUT)) {
+            menu.add(delayedCut);
         }
+
+
 
         menu.addSeparator();
 

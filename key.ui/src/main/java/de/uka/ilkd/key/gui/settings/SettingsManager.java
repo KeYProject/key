@@ -41,6 +41,7 @@ public class SettingsManager {
     public static final ShortcutSettings SHORTCUT_SETTINGS = new ShortcutSettings();
     public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
+    public static final FeatureSettingsPanel FEATURE_SETTINGS_PANEL = new FeatureSettingsPanel();
 
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -61,6 +62,7 @@ public class SettingsManager {
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             // INSTANCE.add(COLOR_SETTINGS);
+            INSTANCE.add(FEATURE_SETTINGS_PANEL);
         }
         return INSTANCE;
     }
