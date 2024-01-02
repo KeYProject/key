@@ -13,7 +13,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-
+/**
+ * A property that can be used in
+ * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * Renaming of variables is ignored in this equality check.
+ */
 public class RenamingTermProperty implements TermProperty {
     /**
      * The single instance of this property.

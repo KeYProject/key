@@ -8,6 +8,11 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * A property that can be used in
+ * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * All irrelevant term labels are ignored in this equality check.
+ */
 public class IrrelevantTermLabelsProperty implements TermProperty {
     /**
      * The single instance of this property.
@@ -31,7 +36,7 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      * @param term a term
      * @param o the object compared to {@code term}
      * @return {@code true} iff {@code o} is a term syntactically equal to {@code term}, except for
-     *         their labels.
+     *         their irrelevant labels.
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override

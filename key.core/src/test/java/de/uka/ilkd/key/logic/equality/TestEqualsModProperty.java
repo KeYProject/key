@@ -57,7 +57,7 @@ public class TestEqualsModProperty {
 
     // equalsModProperty(...) with RENAMING_TERM_PROPERTY
     @Test
-    public void equalsModRenaming() {
+    public void renaming() {
         // ------------ differing terms to begin with
         Term term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
@@ -102,7 +102,7 @@ public class TestEqualsModProperty {
 
     // equalsModProperty(...) with IRRELEVANT_TERM_LABELS_PROPERTY
     @Test
-    public void equalsModIrrelevantTermLabels() {
+    public void irrelevantTermLabels() {
         // ------------ different terms to begin with
         Term term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
@@ -163,7 +163,7 @@ public class TestEqualsModProperty {
 
     // equalsModProperty(...) with TERM_LABELS_PROPERTY
     @Test
-    public void equalsModTermLabels() {
+    public void AllTermLabels() {
         // ------------ different terms to begin with
         Term term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
@@ -217,7 +217,7 @@ public class TestEqualsModProperty {
 
     // equalsModProperty(...) with PROOF_IRRELEVANCY_PROPERTY
     @Test
-    public void equalsModProofIrrelevancy() {
+    public void proofIrrelevancy() {
         // ------------ different terms to begin with
         Term term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));

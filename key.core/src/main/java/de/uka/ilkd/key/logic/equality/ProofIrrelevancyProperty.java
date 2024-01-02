@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.logic.equality;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
@@ -11,8 +13,11 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Objects;
-
+/**
+ * A property that can be used in
+ * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * All proof irrelevant attributes are ignored in this equality check.
+ */
 public class ProofIrrelevancyProperty implements TermProperty {
     /**
      * The single instance of this property.
@@ -131,8 +136,8 @@ public class ProofIrrelevancyProperty implements TermProperty {
     // -------------------------- Utility methods --------------------------------- //
 
     /**
-     * Compute the hashcode of an iterable of terms using the elements' {@link TermEqualsModProperty}
-     * implementation.
+     * Compute the hashcode mod proof irrelevancy of an iterable of terms using the elements'
+     * {@link TermEqualsModProperty} implementation.
      *
      * @param iter iterable of terms
      * @return combined hashcode
@@ -146,7 +151,8 @@ public class ProofIrrelevancyProperty implements TermProperty {
         int result = 1;
 
         for (Term element : iter) {
-            result = 31 * result + (element == null ? 0 : element.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
+            result = 31 * result + (element == null ? 0
+                    : element.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
         }
 
         return result;

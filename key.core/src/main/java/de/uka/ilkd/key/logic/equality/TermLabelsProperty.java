@@ -7,6 +7,11 @@ import de.uka.ilkd.key.logic.Term;
 
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * A property that can be used in
+ * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * All term labels are ignored in this equality check.
+ */
 public class TermLabelsProperty implements TermProperty {
     /**
      * The single instance of this property.
