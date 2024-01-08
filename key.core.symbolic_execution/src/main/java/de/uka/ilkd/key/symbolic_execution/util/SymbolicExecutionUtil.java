@@ -4095,7 +4095,8 @@ public final class SymbolicExecutionUtil {
                         final Term toSearch = predicate;
                         SequentFormula topLevelPredicate = CollectionUtil
                                 .search(leaf.sequent().succedent(),
-                                    element -> toSearch.op() == element.formula().op());
+                                    element -> SymbolicExecutionUtil.opEquals(toSearch.op(),
+                                        element.formula().op()));
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4302,5 +4303,11 @@ public final class SymbolicExecutionUtil {
         } else {
             return false;
         }
+    }
+
+    public static boolean opEquals(Operator fst, Operator snd) {
+        return fst == snd ||
+                (fst instanceof Modality mod1 && snd instanceof Modality mod2
+                        && mod1.kind() == mod2.kind());
     }
 }

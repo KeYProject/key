@@ -355,8 +355,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                     basename = DEFAULT_BASENAME;
                 }
                 int cnt =
-                        getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                                + 1;
+                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                            + 1;
 
                 Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
                 while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
