@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 public class MatchModalOperatorSVInstruction implements MatchInstruction {
@@ -20,11 +19,10 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     public MatchConditions match(Term t, MatchConditions mc, Services services) {
-        if (t.op() instanceof Modality mod1
-                && op.getModalities().contains(mod1.kind())) {
-            SVInstantiations inst = mc.getInstantiations();
+        if (t.op() instanceof Modality mod
+                && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
-                inst.add(op, mod1.<Modality.JavaModalityKind>kind(), services));
+                mc.getInstantiations().add(op, mod.<Modality.JavaModalityKind>kind(), services));
         } else {
             return null;
         }
@@ -33,8 +31,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        Term t = termPosition.getCurrentSubterm();
-        return match(t, mc, services);
+        return match(termPosition.getCurrentSubterm(), mc, services);
     }
 
 }
