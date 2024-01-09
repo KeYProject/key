@@ -113,7 +113,9 @@ public class ProofIrrelevancyProperty implements TermProperty {
         // part from TermImpl
         if (hashcode2 == -1) {
             // compute into local variable first to be thread-safe.
-            hashcode2 = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+            hashcode2 = Objects.hash(term.op(),
+                EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY,
+                    term.subs()),
                 EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
             if (hashcode2 == -1) {
                 hashcode2 = 0;
@@ -129,32 +131,5 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
         return hashcode2;
-        // throw new UnsupportedOperationException(
-        // "Hashing of terms modulo term proof-irrelevancy not yet implemented!");
-    }
-
-    // -------------------------- Utility methods --------------------------------- //
-
-    /**
-     * Compute the hashcode mod proof irrelevancy of an iterable of terms using the elements'
-     * {@link TermEqualsModProperty} implementation.
-     *
-     * @param iter iterable of terms
-     * @return combined hashcode
-     */
-    public static int hashCodeIterable(Iterable<? extends Term> iter) {
-        // adapted from Arrays.hashCode
-        if (iter == null) {
-            return 0;
-        }
-
-        int result = 1;
-
-        for (Term element : iter) {
-            result = 31 * result + (element == null ? 0
-                    : element.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
-        }
-
-        return result;
     }
 }
