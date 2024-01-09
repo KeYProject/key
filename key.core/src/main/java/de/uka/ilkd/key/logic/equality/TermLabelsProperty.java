@@ -61,9 +61,27 @@ public class TermLabelsProperty implements TermProperty {
         return true;
     }
 
+    /**
+     * Computes the hash code of {@code term} while ignoring <b>all</b> term labels.
+     * <p>
+     * Currently, the hash code is computed almost the same way as in TermImpl. This is also the
+     * case for labeled terms,
+     * as all term labels are ignored.
+     *
+     * @param term the term to compute the hash code for
+     * @return the hash code
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo term labels not yet implemented!");
+        // change 5 and 17 not to match TermImpl's implementation too much
+        int hashcode = 5;
+        hashcode = hashcode * 17 + term.op().hashCode();
+        hashcode = hashcode * 17
+                + EqualityUtils.hashCodeModPropertyOfIterable(TERM_LABELS_PROPERTY, term.subs());
+        hashcode = hashcode * 17 + term.boundVars().hashCode();
+        hashcode = hashcode * 17 + term.javaBlock().hashCode();
+
+        return hashcode;
     }
+
 }

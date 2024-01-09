@@ -80,9 +80,33 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
         return true;
     }
 
+    /**
+     * Computes the hash code of {@code term} while ignoring irrelevant labels.
+     *
+     * @param term the term to compute the hash code for
+     * @return the hash code
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo irrelevant term labels not yet implemented!");
+        // change 5 and 17 not to match TermImpl's implementation too much?
+        int hashcode = 5;
+        hashcode = hashcode * 17 + term.op().hashCode();
+        hashcode = hashcode * 17 + EqualityUtils
+                .hashCodeModPropertyOfIterable(IRRELEVANT_TERM_LABELS_PROPERTY, term.subs());
+        hashcode = hashcode * 17 + term.boundVars().hashCode();
+        hashcode = hashcode * 17 + term.javaBlock().hashCode();
+
+        for (TermLabel label : term.getLabels()) {
+            hashcode += (label.isProofRelevant() ? 7 * label.hashCode() : 0);
+        }
+
+//        final ImmutableArray<TermLabel> termLabels = term.getLabels();
+//        for (int i = 0, sz = termLabels.size(); i < sz; i++) {
+//            final TermLabel currentLabel = termLabels.get(i);
+//            if (currentLabel.isProofRelevant()) {
+//                hashcode += 7 * currentLabel.hashCode();
+//            }
+//        }
+        return hashcode;
     }
 }

@@ -52,6 +52,12 @@ public class RenamingTermProperty implements TermProperty {
             ImmutableSLList.nil(), null);
     }
 
+    /**
+     * Computes the hash code of {@code term} modulo bound renaming.
+     *
+     * @param term the term to compute the hash code for
+     * @return the hash code
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
         throw new UnsupportedOperationException(
