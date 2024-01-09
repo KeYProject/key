@@ -1,0 +1,58 @@
+
+- Klasse K vorstellen mit "get" und "add"
+
+- Klient hat zwei K Objekte k1, k2.
+
+     requires disjoint(k1.fp, k2.fp)
+     x = k1.get(0)
+     k2.add(...)
+     assert k1.get(0) == x
+
+Problem:
+     - soll intuitiv gültig sein im Bsp.
+     - Java Implementierungen können es verletzen
+     - manchmal will man es, manchmal nicht
+     => wir wollen explizit steuern mit Spezifikation wie Objekete sich überlagern
+
+Syntaktische Möglichkeiten:
+
+- Location Sets: P(Object * Field)
+   - first class citizens
+
+
+- Footprint is a loc set
+   - just a normal ghost field, not special construct
+   - payload usually not part of the footprint
+
+- Pattern
+   - hits 99%
+   - but we can do differently
+   - "Aktionsradius", "Effektradius", "(Lese-Schreib-effekt-radius)"
+   - "disjoint(k1.fp, k2.fp)"
+   - "cnstructive co-evolution" of ghost fields and ghost fp
+
+   s. Folie aus VerifyThis
+
+- List-Beispiel:
+   - enlarge weglasse
+   - ArrayList in der kleinsten Version
+   - LinkedList eher weglassen, vllt. kurz phänomenologisch andeuten
+
+- Backup:
+   - Model vs. Ghost
+   - deklarativ vs. Konstruktiv
+   -> Idee: Wolfgang Reif Jubiläumsband
+
+- Test harness:
+l = new ArrayList()   ~~~> seq = []
+l.add(somthing)                  [something]
+assert l.get(0) == something
+l.add(sthelse)                   [something, sthelse]
+assert l.get(0) == something
+assert l.get(1) == sthelse
+
+l2 = nw AL()
+l2.add(...)
+assert l.get(0) == something    <<<<<<<<< FP reasoning
+assert l.get(1) == sthelse
+
