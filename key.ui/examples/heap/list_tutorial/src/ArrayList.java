@@ -80,4 +80,52 @@ public class ArrayList implements List {
         if(array[r] == v) return r;
         return -1;
     }
+
+    /*@ public normal_behaviour
+      @  ensures \dl_seqPerm(\old(seq), seq);
+      @  ensures  (\forall int x; (\forall int y; 0<=x<y<seq.length; (\bigint)seq[x] <= (\bigint)seq[y]));
+      @  assignable footprint;
+      @*/
+    public void sort() {
+
+        /*@ loop_invariant 0 <= i <= size-1;
+          @ loop_invariant (\forall int k; 0<=k<i; array[k] <= array[k+1]);
+          @ loop_invariant (\forall int l; i<=l<size; array[i] <= array[l]);
+          @ loop_invariant \dl_seqPerm(\old(seq), seq);
+          @ loop_invariant \invariant_for(this);
+          @ assignable array[*];
+          @ decreases size - i;
+          @*/
+        for(int i = 0; i < size-1; i++) {
+            int min = i+1;
+            /*@ loop_invariant i+2 <= j <= size;
+              @ loop_invariant i+2 <= min < j;
+              @ loop_invariant (\forall int x; i+1<=x<j; array[x] <= array[min]);
+              @ assignable \strictly_nothing;
+              @ decreases size - i;
+              @*/
+            for(int j = i+2; j < size; j++) {
+                if(array[j] < array[min]) {
+                    min = j;
+                }
+            }
+            swap(i, min);
+        }
+    }
+
+    /*@ private normal_behaviour
+      @  requires 0 <= a < size;
+      @  requires 0 <= b < size;
+      @  ensures array[a] == \old(array[b]);
+      @  ensures array[b] == \old(array[a]);
+      @  ensures \dl_seqPerm(\old(seq), seq);
+      @  assignable array[a], array[b], seq;
+      @*/
+    private void swap(int a, int b) {
+        int t = array[a];
+        array[a] = array[b];
+        array[b] = t;
+        //@ set seq = \seq_put(seq, a, array[a]);
+        //@ set seq = \seq_put(seq, b, array[b]);
+    }
 }
