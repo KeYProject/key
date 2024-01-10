@@ -49,7 +49,7 @@ public class ArrayList implements List {
       @   requires (\forall int x; (\forall int y; 0<=x<y<size; array[x] <= array[y]));  
       @   ensures -1 <= \result < size;
       @   ensures (\exists int idx; 0<=idx<size; array[idx] == v) ?
-      @      array[\result] == v : \result == -1;
+      @      \result >= 0 && array[\result] == v : \result == -1;
       @   assignable \nothing;
       @*/
     private int binSearch(int v) {

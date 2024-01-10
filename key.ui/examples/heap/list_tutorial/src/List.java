@@ -5,13 +5,13 @@ public interface List {
 
     //@ public instance invariant \subset(\singleton(this.seq), footprint);
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
-    // @ decat public instance invariant (\forall int i; 0<=i && i<seq.length; \typeof(seq[i]) == \type(int));
+    // @ public instance invariant (\forall int i; 0<=i && i<seq.length; \typeof(seq[i]) == \type(int));
     //@ public accessible \inv: footprint;
     
     /*@ public normal_behaviour
       @   requires 0 <= index && index < seq.length; 
       @   accessible footprint;
-      @   ensures \result == seq[index];
+      @   ensures \result == (\bigint)seq[index];
       @*/
     public /*@pure@*/ int get(int index);
 
@@ -32,7 +32,7 @@ public interface List {
       @   requires (\forall int x; (\forall int y; 0<=x<y<seq.length; (\bigint)seq[x] <= (\bigint)seq[y]));
       @   ensures -1 <= \result < seq.length;
       @   ensures (\exists int idx; 0<=idx<seq.length; (\bigint)seq[idx] == value) ?
-      @      (\bigint)seq[\result] == value : \result == -1;
+      @      \result >= 0 && (\bigint)seq[\result] == value : \result == -1;
       @   assignable \nothing;
       @*/
     public int find(int value);
