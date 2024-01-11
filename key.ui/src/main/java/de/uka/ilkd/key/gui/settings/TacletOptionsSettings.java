@@ -290,7 +290,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         warnNoProof = window.getMediator().getSelectedProof() == null;
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;

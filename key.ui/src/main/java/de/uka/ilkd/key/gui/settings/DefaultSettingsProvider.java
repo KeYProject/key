@@ -14,7 +14,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public class DefaultSettingsProvider implements SettingsProvider {
     private String description;
-    private JComponent panel;
+    private JPanel panel;
     private List<SettingsProvider> children;
     private final String keywords = "";
     private int priority;
@@ -23,7 +23,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     public DefaultSettingsProvider() {
     }
 
-    public DefaultSettingsProvider(String desc, JComponent pane) {
+    public DefaultSettingsProvider(String desc, JPanel pane) {
         setDescription(desc);
         setPanel(pane);
     }
@@ -38,7 +38,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         return panel;
     }
 
@@ -74,7 +74,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
         return priority;
     }
 
-    public void setPanel(JComponent panel) {
+    public void setPanel(JPanel panel) {
         this.panel = panel;
     }
 

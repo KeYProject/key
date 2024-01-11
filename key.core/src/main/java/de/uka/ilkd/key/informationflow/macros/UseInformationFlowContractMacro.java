@@ -22,6 +22,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -181,7 +182,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
             // formula, else
@@ -190,14 +192,14 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             if (name.startsWith(INF_FLOW_RULENAME_PREFIX)
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                return InfFlowContractAppFeature.INSTANCE.computeCost(ruleApp, pio, goal);
+                return InfFlowContractAppFeature.INSTANCE.computeCost(ruleApp, pio, goal, mState);
             } else if (name.equals(DOUBLE_IMP_LEFT_RULENAME)) {
                 RuleAppCost impLeftCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
-                        .computeCost(ruleApp, pio, goal);
+                        .computeCost(ruleApp, pio, goal, mState);
                 return impLeftCost.add(NumberRuleAppCost.create(-10010));
             } else if (name.equals(IMP_LEFT_RULENAME)) {
                 RuleAppCost impLeftCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
-                        .computeCost(ruleApp, pio, goal);
+                        .computeCost(ruleApp, pio, goal, mState);
                 return impLeftCost.add(NumberRuleAppCost.create(-10000));
             } else if (admittedRuleNames.contains(name)
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {

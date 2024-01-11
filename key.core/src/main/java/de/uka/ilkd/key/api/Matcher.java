@@ -15,8 +15,9 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -67,7 +68,7 @@ public class Matcher {
         Taclet t = parseTaclet(patternString, copyServices);
 
         // Build Matcher for Matchpattern
-        LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
+        VMTacletMatcher tacletMatcher = new VMTacletMatcher(t);
 
         // patternSequent should not be null, as we have created it
         assert t.ifSequent() != null;
@@ -79,9 +80,9 @@ public class Matcher {
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if (size > 0) {
             // Iteratoren durch die Sequent
-            ImmutableList<IfFormulaInstantiation> antecCand =
+            ImmutableArray<IfFormulaInstantiation> antecCand =
                 IfFormulaInstSeq.createList(currentSeq, true, copyServices);
-            ImmutableList<IfFormulaInstantiation> succCand =
+            ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
@@ -93,7 +94,7 @@ public class Matcher {
 
             Queue<SearchNode> queue = new LinkedList<>();
             // init
-            queue.add(new SearchNode(patternArray, asize, antecCand, succCand));
+            queue.add(new SearchNode(patternArray, asize));
 
 
             while (!queue.isEmpty()) {
@@ -101,8 +102,8 @@ public class Matcher {
                 boolean inAntecedent = node.isAntecedent();
                 LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
-                IfMatchResult ma = ltm.matchIf((inAntecedent ? antecCand : succCand),
-                    node.getPatternTerm(), node.mc, copyServices);
+                IfMatchResult ma = tacletMatcher.matchIf((inAntecedent ? antecCand : succCand),
+                    node.getPatternTerm(), node.getMatchConditions(), copyServices);
 
                 if (!ma.getMatchConditions().isEmpty()) {
                     ImmutableList<MatchConditions> testma = ma.getMatchConditions();
@@ -138,7 +139,7 @@ public class Matcher {
      */
     private VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments) {
         VariableAssignments va = new VariableAssignments();
-        SVInstantiations insts = sn.mc.getInstantiations();
+        SVInstantiations insts = sn.getInstantiations();
         Set<String> varNames = assignments.getTypeMap().keySet();
         for (String varName : varNames) {
             SchemaVariable sv = insts.lookupVar(new Name(varName));

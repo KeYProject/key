@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical
@@ -33,11 +34,11 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Term monoT = monomialLeft.toTerm(app, pos, goal);
-        final Term polyT = polynomialRight.toTerm(app, pos, goal);
+        final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);
+        final Term polyT = polynomialRight.toTerm(app, pos, goal, mState);
 
         final Monomial mono = Monomial.create(monoT, services);
         final Polynomial poly = Polynomial.create(polyT, services);
