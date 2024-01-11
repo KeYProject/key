@@ -295,9 +295,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         abbreviateChains = new JCheckBox("Shorten long chains");
         abbreviateChains.setToolTipText("""
                 Collapse long chains when rendering the graph.
-                When enabled, nodes with both input and output degree equal to one,
-                and input/output hyperedge size equal to one will be collapsed into the output
-                edge.""");
+                 When enabled: dependency graph nodes with both input and output degree equal to one
+                 will be collapsed.
+                 These shortened edges are labeled by: initial step ... last step""");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
