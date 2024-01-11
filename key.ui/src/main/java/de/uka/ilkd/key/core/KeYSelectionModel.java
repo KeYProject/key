@@ -50,30 +50,9 @@ public class KeYSelectionModel {
     }
 
     /**
-     * Does not take care of GUI effects
-     */
-    public synchronized void setProof(Proof p) {
-        proof = Objects.requireNonNull(p);
-        Goal g = proof.openGoals().iterator().next();
-        if (g == null) {
-            selectedNode = proof.root().leavesIterator().next();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-        } else {
-            goalIsValid = true;
-            selectedNode = g.node();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-            selectedGoal = g;
-        }
-    }
-
-    /**
      * Sets the selected proof.
      *
      * @param p the proof to select.
-     *
-     * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
     public synchronized void setSelectedProof(Proof p) {
         final Proof previousProof = proof;
@@ -169,9 +148,7 @@ public class KeYSelectionModel {
         selectedNode = g.node();
         selectedSequent = selectedNode.sequent();
         selectedRuleApp = selectedNode.getAppliedRuleApp();
-        if (previousNode != selectedNode) {
-            fireSelectedNodeChanged(previousNode);
-        }
+        fireSelectedNodeChanged(previousNode);
     }
 
     /**
