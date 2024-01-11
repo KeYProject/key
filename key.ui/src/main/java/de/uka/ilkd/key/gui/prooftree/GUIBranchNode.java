@@ -30,18 +30,18 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
      */
     private final Object label;
 
+    private ArrayList<TreeNode> childrenCache = null;
+
+
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
         super(tree, subTree);
         this.label = label;
     }
 
-    private List<GUIAbstractTreeNode> childrenCache = null;
-
     private void createChildrenCache() {
         childrenCache = new ArrayList<>();
     }
 
-    @Override
     public TreeNode getChildAt(int childIndex) {
         fillChildrenCache(false);
         return childrenCache.get(childIndex);

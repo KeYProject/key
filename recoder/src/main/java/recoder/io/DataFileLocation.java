@@ -54,9 +54,16 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form " <type>:
-     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
-     * zip:recoder.zip:recoder/java/JavaProgramFactory.class
+     * returns a URL-like string representation of the location in the form
+     *
+     * <pre>
+     * {@code
+     * <type>:<location-specific-name>"
+     * },
+     * </pre>
+     *
+     * i.e.
+     * {@code file:/bin/sh url:http://mywww/myfile zip:recoder.zip:recoder/java/JavaProgramFactory.class}
      */
     public String toString() {
         return getType() + ":" + file.getPath();

@@ -22,8 +22,8 @@ import recoder.list.generic.ASTList;
 
 /**
  * Transforms the constructors of the given class to their normalform. The constructor normalform
- * can then be accessed via a methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of the
- * normalform is the same as for the original constructor.
+ * can then be accessed via a methodcall {@code <init>;<cons_args)}. The visibility of the
+ * normal form is the same as for the original constructor.
  */
 public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 

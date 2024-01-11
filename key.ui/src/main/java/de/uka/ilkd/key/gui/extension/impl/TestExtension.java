@@ -147,8 +147,10 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         }
 
         @Override
-        public JComponent getPanel(MainWindow window) {
-            return new JLabel("Test");
+        public JPanel getPanel(MainWindow window) {
+            JPanel p = new JPanel();
+            p.add(new JLabel("Test"));
+            return p;
         }
 
         @Override

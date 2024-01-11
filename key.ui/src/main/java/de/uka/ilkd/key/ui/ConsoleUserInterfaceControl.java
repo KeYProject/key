@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -224,7 +225,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.setProof(pa.getFirstProof());
+        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
@@ -312,7 +313,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             Proof p = proofStack.head();
             proofStack = proofStack.removeAll(p);
             assert p.name().equals(e.getSource().name());
-            mediator.setProof(proofStack.head());
+            mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
             // happen for symbolic execution tests, if proofCreated was not
@@ -382,9 +383,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
         try {
             // a copy with running number to compare different runs
-            proof.saveToFile(new File(f.getAbsolutePath()));
+            ProofSaver.saveToFile(new File(f.getAbsolutePath()), proof);
             // save current proof under common name as well
-            proof.saveToFile(new File(baseName + ".auto.proof"));
+            ProofSaver.saveToFile(new File(baseName + ".auto.proof"), proof);
 
             // save proof statistics
             ShowProofStatistics.getCSVStatisticsMessage(proof);

@@ -4,13 +4,23 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import static de.uka.ilkd.key.settings.ViewSettings.SYNTAX_HIGHLIGHTING;
+
 public class SyntaxHighlightingToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6987252955535709994L;
+
+    /**
+     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+     */
+    private final PropertyChangeListener syntaxHighlightingListener =
+        this::handleViewSettingsChanged;
 
     public SyntaxHighlightingToggleAction(MainWindow window) {
         super(window);
@@ -20,6 +30,11 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
             + "slow down the rendering of longer ones.");
         final boolean useSyntaxHighlighting =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting();
+        // Attention: The listener is never
+        // removed, because there is only one
+        // MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(SYNTAX_HIGHLIGHTING, syntaxHighlightingListener);
         setSelected(useSyntaxHighlighting);
     }
 
@@ -28,7 +43,10 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
         boolean useSyntaxHighlighting = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setUseSyntaxHighlighting(useSyntaxHighlighting);
-        mainWindow.makePrettyView();
+        setSelected(useSyntaxHighlighting);
     }
 
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
+        mainWindow.makePrettyView();
+    }
 }

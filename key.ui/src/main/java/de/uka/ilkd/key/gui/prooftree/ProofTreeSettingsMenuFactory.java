@@ -69,7 +69,7 @@ public final class ProofTreeSettingsMenuFactory {
     private static CCheckBox createFilter(ProofTreeView view, ProofTreeViewFilter filter) {
         CCheckBox check = new ProofTreeSettingsCheckBox();
         check.setText(filter.name());
-        check.setEnabled(view.delegateModel != null);
+        check.setEnabled(view.getDelegateModel() != null);
         check.setSelected(filter.isActive());
         // add the selection listener *after* setting the initial value
         // (to avoid re-applying the filter)

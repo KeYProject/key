@@ -5,6 +5,8 @@ package org.key_project.util.java;
 
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +15,11 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for working with Swing.
@@ -21,7 +27,41 @@ import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
  * @author Arne Keller
  */
 public final class SwingUtil {
+    public static final Logger LOGGER = LoggerFactory.getLogger(SwingUtil.class);
+    private static final String NOTIFICATION_ERROR = "failed to show notification ";
+
+
     private SwingUtil() {
+    }
+
+    /**
+     * Wrapper for {@link java.awt.Desktop#browse(URI)} that also works on Linux.
+     *
+     * @param uri the URI to be displayed in the user's default browser
+     */
+    public static void browse(URI uri) throws IOException {
+        try {
+            Desktop.getDesktop().browse(uri);
+        } catch (UnsupportedOperationException e) {
+            if (System.getProperty("os.name").startsWith("Linux")) {
+                // try fallback: xdg-open
+                Runtime.getRuntime().exec(new String[] { "xdg-open", uri.toString() });
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Wrapper for {@link Desktop#isSupported(Desktop.Action)} BROWSE that always returns true on
+     * Linux.
+     *
+     * @return whether BROWSE is supported
+     * @see #browse(URI)
+     */
+    public static boolean browseIsSupported() {
+        return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+                || System.getProperty("os.name").startsWith("Linux");
     }
 
     /**
@@ -177,6 +217,59 @@ public final class SwingUtil {
         // JMenu hides its entries in the popup menu
         if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
             setFont(((JMenu) component).getPopupMenu(), font);
+        }
+    }
+
+    /**
+     * Show a desktop notification to the user.
+     *
+     * @param title title of the notification
+     * @param text text of the notification
+     */
+    public static void showNotification(String title, String text) {
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            // Linux: try notify-send (looks better than SystemTray)
+            try {
+                new CheckedProcessBuilder("notify-send", new String[] { "-?" })
+                        .start("-a", "KeY", title, text);
+            } catch (IOException | InterruptedException e) {
+                // since we checked for notify-send previously, this error is unlikely
+                LOGGER.warn(NOTIFICATION_ERROR, e);
+            }
+        } else if (System.getProperty("os.name").startsWith("Mac")) {
+            // macOS: show a native notification
+            try {
+                new CheckedProcessBuilder("osascript", new String[] { "-e", "return \"\"" })
+                        .start("-e",
+                            "display notification \"%s\" with title \"%s\"".formatted(text, title));
+            } catch (IOException | InterruptedException e) {
+                // since we checked for osascript previously, this error is unlikely
+                LOGGER.warn(NOTIFICATION_ERROR, e);
+            }
+        } else {
+            // else: use the Java API
+            // this will show a native notification on Windows 10/11 at least
+            SystemTray tray = null;
+            TrayIcon trayIcon = null;
+            try {
+                tray = SystemTray.getSystemTray();
+                if (tray == null) {
+                    LOGGER.warn(NOTIFICATION_ERROR + "(tray null)");
+                    return;
+                }
+
+                trayIcon = new TrayIcon(IconFactory.keyLogo(), "KeY");
+                // Let the system resize the image if needed
+                trayIcon.setImageAutoSize(true);
+                tray.add(trayIcon);
+                trayIcon.displayMessage(title, text, TrayIcon.MessageType.NONE);
+            } catch (AWTException e) {
+                LOGGER.warn(NOTIFICATION_ERROR, e);
+            } finally {
+                if (tray != null && trayIcon != null) {
+                    tray.remove(trayIcon);
+                }
+            }
         }
     }
 }

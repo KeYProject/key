@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
@@ -65,7 +64,7 @@ public interface Constraint {
      *
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, TermServices services);
+    Constraint unify(Term t1, Term t2, Services services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -76,7 +75,7 @@ public interface Constraint {
      * @param unchanged true iff the new constraint equals this one
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, TermServices services, BooleanContainer unchanged);
+    Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged);
 
     /**
      * @return true iff this constraint is as strong as "co", i.e. every instantiation satisfying
@@ -108,7 +107,7 @@ public interface Constraint {
      * @param services the Services providing access to the type model
      * @return the joined constraint
      */
-    Constraint join(Constraint co, TermServices services);
+    Constraint join(Constraint co, Services services);
 
     /**
      * joins constraint co with this constraint and returns the joint new constraint. The
@@ -121,7 +120,7 @@ public interface Constraint {
      * @param unchanged the BooleanContainers value set true, if this constraint is as strong as co
      * @return the joined constraint
      */
-    Constraint join(Constraint co, TermServices services, BooleanContainer unchanged);
+    Constraint join(Constraint co, Services services, BooleanContainer unchanged);
 
     /** @return String representation of the constraint */
     @Override
@@ -166,12 +165,12 @@ public interface Constraint {
          * @return always this
          */
         @Override
-        public Constraint unify(Term t1, Term t2, TermServices services) {
+        public Constraint unify(Term t1, Term t2, Services services) {
             return this;
         }
 
         @Override
-        public Constraint unify(Term t1, Term t2, TermServices services,
+        public Constraint unify(Term t1, Term t2, Services services,
                 BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
@@ -201,7 +200,7 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public Constraint join(Constraint co, TermServices services) {
+        public Constraint join(Constraint co, Services services) {
             return this;
         }
 
@@ -211,7 +210,7 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public Constraint join(Constraint co, TermServices services, BooleanContainer c) {
+        public Constraint join(Constraint co, Services services, BooleanContainer c) {
             c.setVal(true);
             return this;
         }
