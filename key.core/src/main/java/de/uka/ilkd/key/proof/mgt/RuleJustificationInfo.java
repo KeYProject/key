@@ -15,8 +15,7 @@ import de.uka.ilkd.key.rule.RuleKey;
 
 public class RuleJustificationInfo {
 
-    private final Map<RuleKey, RuleJustification> rule2justif =
-        new LinkedHashMap<>();
+    private final Map<RuleKey, RuleJustification> rule2justif = new LinkedHashMap<>();
 
     public void addJustification(Rule r, RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
@@ -26,10 +25,8 @@ public class RuleJustificationInfo {
             // always an exception will be thrown
             for (RuleKey key : rule2justif.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
-                    // FIXME weigl: hack
-                    // throw new IllegalArgumentException("A rule named " + r.name()
-                    // + "has already been registered.");
-
+                    throw new IllegalArgumentException(
+                        "A rule named " + r.name() + "has already been registered.");
                 }
             }
         } else {

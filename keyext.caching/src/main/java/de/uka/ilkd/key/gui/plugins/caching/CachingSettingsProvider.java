@@ -73,7 +73,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofCachingSettings ss = getCachingSettings();
         strategySearch.setSelected(ss.getEnabled());
         disposeOption.setSelectedItem(ss.getDispose());

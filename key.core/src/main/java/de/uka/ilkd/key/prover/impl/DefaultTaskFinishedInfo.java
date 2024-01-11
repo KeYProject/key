@@ -8,6 +8,9 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
+    /**
+     * See {@link TaskFinishedInfo#getSource()} for possible values.
+     */
     private final Object source;
 
     // TODO
@@ -27,7 +30,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * @param result task result
      * @param proof the proof the task worked on
      * @param time time the task took (milliseconds)
-     * @param appliedRules how many rules were applied
+     * @param appliedRules how many nodes were created
      * @param closedGoals how many goals were closed
      */
     public DefaultTaskFinishedInfo(Object source, Object result, Proof proof, long time,

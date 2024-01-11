@@ -15,6 +15,8 @@ import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.ExtensionSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -22,6 +24,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import net.miginfocom.layout.CC;
 
 /**
+ * Settings panel where extensions are disabled / enabled.
+ *
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
@@ -87,6 +91,14 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                         pCenter.add(createInfoArea(it.getDescription()));
                         keywords += it.getDescription();
                     }
+
+                    // add a help button if the relevant annotation is there
+                    var help = it.getType().getAnnotation(HelpInfo.class);
+                    var helpPath = help != null ? help.path() : null;
+                    if (helpPath != null) {
+                        var infoButton = createHelpButton(() -> HelpFacade.openHelp(helpPath));
+                        pCenter.add(infoButton);
+                    }
                 });
     }
 
@@ -105,7 +117,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         refresh();
         return this;
     }

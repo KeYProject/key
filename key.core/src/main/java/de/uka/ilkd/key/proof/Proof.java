@@ -5,11 +5,9 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -20,16 +18,11 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.merge.MergePartner;
-import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -543,7 +536,7 @@ public class Proof implements Named {
      * Opens a previously closed node (the one corresponding to p_goal) and all its closed parents.
      * <p>
      *
-     * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
+     * This is, for instance, needed for the {@code MergeRule}: In a situation where a merge node
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
      * <p>
@@ -631,182 +624,31 @@ public class Proof implements Named {
         }
     }
 
+    void removeOpenGoals(Collection<Node> toBeRemoved) {
+        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        for (Goal openGoal : openGoals()) {
+            if (!toBeRemoved.contains(openGoal.node())) {
+                newGoalList = newGoalList.append(openGoal);
+            }
+        }
+        openGoals = newGoalList;
+    }
 
     /**
-     * This class is responsible for pruning a proof tree at a certain cutting point. It has been
-     * introduced to encapsulate the methods that are needed for pruning. Since the class has
-     * influence on the internal state of the proof it should not be moved to a new file, in order
-     * to restrict the access to it.
+     * Removes the given collection of Nodes from the closedGoals. Nodes in the given collection
+     * which are not member of closedGoals are ignored. This method does not reopen the goals!
+     * This has to be done via the method reOpenGoal() if desired.
+     *
+     * @param toBeRemoved the goals to remove
      */
-    private class ProofPruner {
-        private Node firstLeaf = null;
-
-        public ImmutableList<Node> prune(final Node cuttingPoint) {
-
-            // there is only one leaf containing an open goal that is interesting for pruning the
-            // subtree of <code>node</code>, namely the first leave that is found by a breadth
-            // first search.
-            // The other leaves containing open goals are only important for removing the open goals
-            // from the open goal list.
-            // To that end, those leaves are stored in residualLeaves. For increasing the
-            // performance,
-            // a tree structure has been chosen, because it offers the operation
-            // <code>contains</code> in O(log n).
-            final Set<Node> residualLeaves = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
-
-
-            // First, make a breadth first search, in order to find the leaf
-            // with the shortest distance to the cutting point and to remove
-            // the rule applications from the proof management system.
-            // Furthermore, store the residual leaves.
-            breadthFirstSearch(cuttingPoint, (proof, visitedNode) -> {
-                if (visitedNode.leaf()) {
-                    // pruning in closed branches (can be disabled via "--no-pruning-closed")
-                    if (!visitedNode.isClosed() || !GeneralSettings.noPruningClosed) {
-                        if (firstLeaf == null) {
-                            firstLeaf = visitedNode;
-                        } else {
-                            residualLeaves.add(visitedNode);
-                        }
-                    }
-                }
-
-                if (initConfig != null && visitedNode.parent() != null) {
-                    Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                    for (final NoPosTacletApp app : visitedNode.parent()
-                            .getLocalIntroducedRules()) {
-                        initConfig.getJustifInfo().removeJustificationFor(app.taclet());
-                    }
-                }
-
-                // Merge rule applications: Unlink all merge partners.
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
-
-                    for (MergePartner mergePartner : mergeApp.getMergePartners()) {
-                        final Goal linkedGoal = mergePartner.getGoal();
-
-                        if (linkedGoal.node().isClosed()) {
-                            // The partner node has already been closed; we
-                            // have to add the goal again.
-                            proof.reOpenGoal(linkedGoal);
-                        }
-
-                        linkedGoal.setLinkedGoal(null);
-                        SwingUtilities.invokeLater(() -> pruneProof(linkedGoal));
-                    }
-                }
-            });
-
-            // first leaf is closed -> add as goal and reopen
-            final Goal firstGoal =
-                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getOpenGoal(firstLeaf);
-            assert firstGoal != null;
-            if (firstLeaf.isClosed()) {
-                reOpenGoal(firstGoal);
-            }
-
-            // TODO: WP: test interplay with merge rules
-            // Cutting a linked goal (linked by a "defocusing" merge
-            // operation, see {@link MergeRule}) unlinks this goal again.
-            if (firstGoal.isLinked()) {
-                firstGoal.setLinkedGoal(null);
-            }
-
-            // Go from the first leaf that has been found to the cutting point. For each node on the
-            // path,
-            // remove the local rules from firstGoal that have been added by the considered node.
-            traverseFromChildToParent(firstLeaf, cuttingPoint, (proof, visitedNode) -> {
-                for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
-                    firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
-                    initConfig.getJustifInfo().removeJustificationFor(app.taclet());
-                }
-
-                firstGoal.pruneToParent();
-
-                final List<StrategyInfoUndoMethod> undoMethods =
-                    visitedNode.getStrategyInfoUndoMethods();
-                for (StrategyInfoUndoMethod undoMethod : undoMethods) {
-                    firstGoal.undoStrategyInfoAdd(undoMethod);
-                }
-            });
-
-
-            // do some cleaning and refreshing: Clearing indices, caches....
-            refreshGoal(firstGoal, cuttingPoint);
-
-            // cut the subtree, it is not needed anymore.
-            ImmutableList<Node> subtrees = cut(cuttingPoint);
-
-
-            // remove the goals of the residual leaves.
-            removeOpenGoals(residualLeaves);
-            removeClosedGoals(residualLeaves);
-
-            /*
-             * this ensures that the open goals are in interactive mode and thus all rules are
-             * available in the just pruned goal (see GitLab #1480)
-             */
-            setRuleAppIndexToInteractiveMode();
-
-            return subtrees;
-
-        }
-
-        private void refreshGoal(Goal goal, Node node) {
-            goal.getRuleAppManager().clearCache();
-            goal.ruleAppIndex().clearIndexes();
-            goal.node().setAppliedRuleApp(null);
-            node.clearNameCache();
-
-            // delete NodeInfo, but preserve potentially existing branch label
-            String branchLabel = node.getNodeInfo().getBranchLabel();
-            node.clearNodeInfo();
-            if (branchLabel != null) {
-                node.getNodeInfo().setBranchLabel(branchLabel);
+    void removeClosedGoals(Collection<Node> toBeRemoved) {
+        ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+        for (Goal closedGoal : closedGoals) {
+            if (!toBeRemoved.contains(closedGoal.node())) {
+                newGoalList = newGoalList.prepend(closedGoal);
             }
         }
-
-        private void removeOpenGoals(Collection<Node> toBeRemoved) {
-            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
-            for (Goal openGoal : openGoals) {
-                if (!toBeRemoved.contains(openGoal.node())) {
-                    newGoalList = newGoalList.append(openGoal);
-                }
-            }
-            openGoals = newGoalList;
-        }
-
-        /**
-         * Removes the given collection of Nodes from the closedGoals. Nodes in the given collection
-         * which are not member of closedGoals are ignored. This method does not reopen the goals!
-         * This has to be done via the method reOpenGoal() if desired.
-         *
-         * @param toBeRemoved the goals to remove
-         */
-        private void removeClosedGoals(Collection<Node> toBeRemoved) {
-            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
-            for (Goal closedGoal : closedGoals) {
-                if (!toBeRemoved.contains(closedGoal.node())) {
-                    newGoalList = newGoalList.prepend(closedGoal);
-                }
-            }
-            closedGoals = newGoalList;
-        }
-
-        private ImmutableList<Node> cut(Node node) {
-            ImmutableList<Node> children = ImmutableSLList.nil();
-            Iterator<Node> it = node.childrenIterator();
-
-            while (it.hasNext()) {
-                children = children.append(it.next());
-
-            }
-            for (Node child : children) {
-                node.remove(child);
-            }
-            return children;
-        }
-
+        closedGoals = newGoalList;
     }
 
     /**
@@ -843,7 +685,7 @@ public class Proof implements Named {
             return null;
         }
 
-        ProofPruner pruner = new ProofPruner();
+        ProofPruner pruner = new ProofPruner(this);
         if (fireChanges) {
             fireProofIsBeingPruned(cuttingPoint);
         }
@@ -1341,23 +1183,6 @@ public class Proof implements Named {
      */
     public void setProofFile(File proofFile) {
         this.proofFile = proofFile;
-    }
-
-    public void saveToFile(File file) throws IOException {
-        ProofSaver saver = new ProofSaver(this, file);
-        saver.save();
-    }
-
-    /**
-     * Save this proof to a file whilst omitting all proof steps.
-     * In effect, this only saves the proof obligation.
-     *
-     * @param file file to save proof in
-     * @throws IOException on any I/O error
-     */
-    public void saveProofObligationToFile(File file) throws IOException {
-        ProofSaver saver = new ProofSaver(this, file, false);
-        saver.save();
     }
 
     /**

@@ -100,7 +100,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             }
         } catch (final InterruptedException exception) {
             LOGGER.debug("Proof macro has been interrupted:", exception);
-            info = new ProofMacroFinishedInfo(macro, selectedProof, true);
+            info = new ProofMacroFinishedInfo(macro, selectedProof);
             this.exception = exception;
         } catch (final Exception exception) {
             // This should actually never happen.

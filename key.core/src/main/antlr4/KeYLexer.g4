@@ -185,6 +185,7 @@ PROFILE : '\\profile';
 TRUE : 'true';
 FALSE : 'false';
 
+
 // Keywords related to taclets
 SAMEUPDATELEVEL : '\\sameUpdateLevel';
 INSEQUENTSTATE : '\\inSequentState';
@@ -207,8 +208,10 @@ AVOID : '\\avoid';
 
 PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
+DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+FREE : '\\free';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -408,8 +411,6 @@ SL_COMMENT
 
 DOC_COMMENT: '/*!' -> more, pushMode(docComment);
 ML_COMMENT: '/*' -> more, pushMode(COMMENT);
-
-
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
 
 HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F' | '_')+ ('l'|'L')?;
@@ -450,7 +451,7 @@ DOUBLE_LITERAL:
     ;
 
 REAL_LITERAL:
-    RATIONAL_LITERAL ('r' | 'R')
+    RATIONAL_LITERAL ('r' | 'R')?
     ;
 
 
