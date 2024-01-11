@@ -204,15 +204,22 @@ public final class DotExporter {
         for (var edge : edges) {
             var in = ((GraphNode) edge.getSource());
             var out = ((GraphNode) edge.getTarget());
+            // input node label
             String inString = in.toString(abbreviateFormulas, omitBranch);
+            // output node label
             String outString = out.toString(abbreviateFormulas, omitBranch);
+            // label for edge itself
+            String label = data.label;
+            if (edge instanceof AnnotatedShortenedEdge ase) {
+                label = ase.getEdgeLabel();
+            }
             buf
                     .append('"')
                     .append(inString)
                     .append("\" -> \"")
                     .append(outString)
                     .append("\" [label=\"")
-                    .append(data.label);
+                    .append(label);
             // mark useless steps / formulas in red
             if (analysisResults != null
                     && !analysisResults.usefulSteps.contains(node)) {

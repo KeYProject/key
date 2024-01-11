@@ -34,7 +34,7 @@ public class AnnotatedEdge extends DefaultEdge {
     }
 
     /**
-     * @return tte node that added this edge to the dependency graph
+     * @return the node that added this edge to the dependency graph
      */
     public Node getProofStep() {
         return proofStep;

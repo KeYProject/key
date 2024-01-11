@@ -225,7 +225,7 @@ public class DependencyGraph {
 
     /**
      * Gets all the edges representing the supplied proof step.
-     * May be used to reconstruct the hyperedge corresponding to the proof step.
+     * The combination of these represents the hyperedge corresponding to the proof step.
      *
      * @param proofStep the proof step
      * @return the edges representing this step
@@ -371,25 +371,46 @@ public class DependencyGraph {
      * @return modified copy
      */
     public DependencyGraph removeChains() {
+        // first, create a copy of the graph
         var nGraph = new DependencyGraph(this);
+        // get all nodes in the proof
         var allNodes = proof().root().subtreeIterator();
+        // take the outputs "produced" by the nodes
         var toCheck = StreamSupport.stream(Spliterators.spliteratorUnknownSize(allNodes, 0), false)
                 .flatMap(this::outputsOf).toList();
         int removed = 0;
+        // toCheck now contains dependency graph nodes
+        // (TrackedFormulas etc.)
         for (var node : toCheck) {
             var incoming = nGraph.incomingGraphEdgesOf(node).toList();
             var outgoing = nGraph.outgoingGraphEdgesOf(node).toList();
             if (incoming.size() != 1 || outgoing.size() != 1) {
                 continue;
             }
-            // rewrite edge
-            var node1 = incoming.get(0).first;
-            if (edgesOf(node1).size() != 1) {
+            // we want to remove the incoming edge.
+            // that edge is part of a node startNode,
+            // whose hyperedge should not connect more nodes
+            // (otherwise we cannot remove the edge without
+            // making the graph inconsistent)
+            Node startNode = incoming.get(0).first;
+            if (edgesOf(startNode).size() != 1) {
                 continue;
             }
             GraphNode startGraphNode = incoming.get(0).second;
             AnnotatedEdge edge = incoming.get(0).third;
 
+            // get real initial node
+            // (in case of repeated shortenings)
+            Node initialNode = startNode;
+            if (edge instanceof AnnotatedShortenedEdge ase) {
+                initialNode = ase.getInitial();
+            }
+
+            // we want to remove the outgoing edge.
+            // that edge is part of a node endNode,
+            // whose hyperedge should not connect more nodes
+            // (otherwise we cannot remove the edge without
+            // making the graph inconsistent)
             Node endNode = outgoing.get(0).first;
             GraphNode endGraphNode = outgoing.get(0).second;
             var edge2 = outgoing.get(0).third;
@@ -397,10 +418,16 @@ public class DependencyGraph {
                 continue;
             }
 
+            // situation:
+            // startGraphNode ---> node ---> endGraphNode
+
+            // chain removal:
+            // remove node and connected edges
             nGraph.graph.removeVertex(node);
-            var edge3 = new AnnotatedEdge(endNode, edge.replacesInputNode());
+            // create new edge
+            var edge3 = new AnnotatedShortenedEdge(initialNode, endNode, edge.replacesInputNode());
             nGraph.graph.addEdge(startGraphNode, endGraphNode, edge3);
-            nGraph.edgeDataReversed.remove(node1);
+            nGraph.edgeDataReversed.remove(startNode);
             nGraph.edgeDataReversed.get(endNode).remove(edge2);
             nGraph.edgeDataReversed.get(endNode).add(edge3);
             removed++;
