@@ -130,6 +130,7 @@ public class DeclarationBuilder extends DefaultBuilder {
         return null;
     }
 
+
     @Override
     public List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> visitSortList(KeYParser.SortListContext ctx) {
         List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> seq = new ArrayList<>();
@@ -145,22 +146,23 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
-        List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> sortIds = accept(ctx.sortIds);
+        //List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> sortIds = accept(ctx.sortIds);
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
-        assert sortIds != null;
+        //assert sortIds != null;
 
-        for (Pair<String, List<Pair<ParametricSort.Variance, Sort>>> sortId : sortIds) {
-            Name sortName = new Name(sortId.first);
-            boolean isParametricSort = !sortId.second.isEmpty();
         var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
-        for (var idCtx : ctx.sortIds.simple_ident_dots()) {
-            String sortId = accept(idCtx);
-            Name sortName = new Name(sortId);
+        for(var idCtx : ctx.sortIds.sortId()){
+        //for (Pair<String, List<Pair<ParametricSort.Variance, Sort>>> sortId : sortIds) {
+            var name = idCtx.simple_ident_dots().getText();
+            var brackets = StringUtil.repeat("[]", idCtx.EMPTYBRACKETS().size());
+            List<Pair<ParametricSort.Variance, Sort>> typeParams = accept(idCtx.formal_sort_parameters());
+            Name sortName = new Name(name);
+            boolean isParametricSort = typeParams != null && !typeParams.isEmpty();
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                     : DefaultImmutableSet.fromCollection(sortExt);
@@ -175,25 +177,22 @@ public class DeclarationBuilder extends DefaultBuilder {
                         semanticError(ctx, "Generic sorts are not allowed to have type parameters.");
                     }
 
-                    for (Pair<ParametricSort.Variance, Sort> param : sortId.second) {
+                    for (Pair<ParametricSort.Variance, Sort> param : typeParams) {
                         if (!(param.second instanceof GenericSort)) {
                             semanticError(ctx, "Type parameters must be generic sorts. Given type '%s' is %s",
                                     param.second.name(), param.second.getClass().getName());
                         }
                     }
 
-                    ImmutableList<Pair<GenericSort, ParametricSort.Variance>> typeParams =
-                            sortId.second.stream().map(it ->
+                    ImmutableList<Pair<GenericSort, ParametricSort.Variance>> params =
+                            typeParams.stream().map(it ->
                                     new Pair<>((GenericSort) it.second, it.first))
                                     .collect(ImmutableSLList.toImmutableList());
-                    s = new ParametricSort(sortName, ext, isAbstractSort, typeParams);
+                    s = new ParametricSort(sortName, ext, isAbstractSort, params);
                 }else if (isGenericSort) {
-                    int i;
-
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf, documentation,
-                            BuilderHelpers.getPosition(idCtx));
-                        s = gs;
+                        s = new GenericSort(sortName, ext, oneOf, documentation,
+                            BuilderHelpers.getPosition(ctx));
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
                     }
@@ -201,13 +200,11 @@ public class DeclarationBuilder extends DefaultBuilder {
                     s = Sort.ANY;
                 } else {
                     if (isProxySort) {
-                        var ps = new ProxySort(sortName, ext, documentation,
+                        s = new ProxySort(sortName, ext, documentation,
                             BuilderHelpers.getPosition(idCtx));
-                        s = ps;
                     } else {
-                        var si = new SortImpl(sortName, ext, isAbstractSort,
+                        s = new SortImpl(sortName, ext, isAbstractSort,
                             documentation, BuilderHelpers.getPosition(idCtx));
-                        s = si;
                     }
                 }
                 assert s != null;

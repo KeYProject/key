@@ -165,6 +165,26 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
 
+    // Implemented imperatively to avoid arbitrarily deep recursion
+    @Override
+    public ImmutableList<T> replace(int pos, T s) {
+        if(pos < 0 || pos >= size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        ImmutableList<T> already = nil();
+        ImmutableList<T> rest = this;
+
+        while(pos > 0) {
+            already = already.prepend(rest.head());
+            rest = rest.tail();
+            pos --;
+        }
+
+        return rest.tail().prepend(s).prepend(already.reverse());
+    }
+
+
     private static class Cons<S> extends ImmutableSLList<S> {
 
         /**

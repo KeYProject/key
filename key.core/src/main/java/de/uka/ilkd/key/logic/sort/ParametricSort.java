@@ -62,15 +62,16 @@ public class ParametricSort extends AbstractSort {
     private final ImmutableList<Variance> covariances;
 
     public ParametricSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract,
-                          ImmutableList<GenericSort> parameters, ImmutableList<Variance> covariances) {
-        super(name, ext, isAbstract);
+                          ImmutableList<GenericSort> parameters, ImmutableList<Variance> covariances,
+                          String documentation, String origin) {
+        super(name, ext, isAbstract, documentation, origin);
         this.parameters = parameters;
         this.covariances = covariances;
     }
 
     public ParametricSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract,
                           ImmutableList<Pair<GenericSort, Variance>> sortParams) {
-        this(name, ext, isAbstract, sortParams.map(x->x.first), sortParams.map(x->x.second));
+        this(name, ext, isAbstract, sortParams.map(x -> x.first), sortParams.map(x -> x.second), null, null);
     }
 
     public Function<Sort, Sort> getInstantiation(ImmutableList<Sort> args) {

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -18,8 +19,9 @@ public class ParametricSortInstance extends AbstractSort {
 
     private final ParametricSort base;
 
-    public static ParametricSortInstance get(ParametricSort base, ImmutableList<Sort> parameters) {
-        ParametricSortInstance sort = new ParametricSortInstance(base, parameters);
+    public static ParametricSortInstance get(ParametricSort base, ImmutableList<Sort> parameters,
+                                             @Nullable String documentation, @Nullable String origin) {
+        ParametricSortInstance sort = new ParametricSortInstance(base, parameters, documentation, origin);
         ParametricSortInstance cached = CACHE.get(sort);
         if (cached != null) {
             return cached;
@@ -29,9 +31,10 @@ public class ParametricSortInstance extends AbstractSort {
         }
     }
 
-    private ParametricSortInstance(ParametricSort base, ImmutableList<Sort> parameters) {
-        super(makeName(base, parameters),
-                computeExt(base, parameters), base.isAbstract());
+    private ParametricSortInstance(ParametricSort base, ImmutableList<Sort> parameters,
+                                   String documentation, String origin) {
+        super(makeName(base, parameters), computeExt(base, parameters), base.isAbstract(),
+                documentation, origin);
 
         this.base = base;
         this.parameters = parameters;
@@ -58,7 +61,7 @@ public class ParametricSortInstance extends AbstractSort {
                     // take all bases of that arg and add the modified sort as ext class
                     for (Sort s : parameters.get(i).extendsSorts()) {
                         ImmutableList<Sort> newArgs = parameters.replace(i, s);
-                        result = result.add(ParametricSortInstance.get(base, newArgs));
+                        result = result.add(ParametricSortInstance.get(base, newArgs, null, null));
                     }
                     break;
 
@@ -90,7 +93,7 @@ public class ParametricSortInstance extends AbstractSort {
     public ParametricSortInstance map(Function<Sort, Sort> f) {
         ImmutableList<Sort> newParameters = parameters.map(f);
         // The cache ensures that no unnecessary duplicates are kept.
-        return get(base, newParameters);
+        return get(base, newParameters, null, null);
     }
 
     @Override

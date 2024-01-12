@@ -90,7 +90,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             if (lookup != null && (l = lookup.lookup(n)) != null) {
                 try {
                     return (T) l;
-                } catch (ClassCastException e) {
+                } catch (ClassCastException ignored) {
                 }
             }
         }
@@ -353,10 +353,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
         //parametric sorts should be instantiated
         if (ctx.formal_sort_parameters() != null) {
-            if (s instanceof ParametricSort) {
-                ParametricSort ps = (ParametricSort) s;
+            if (s instanceof ParametricSort ps) {
                 ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
-                s = ParametricSortInstance.get(ps, parameters);
+                s = ParametricSortInstance.get(ps, parameters, null, null);
             } else {
                 semanticError(ctx, "Not a polymorphic sort: %s", s);
             }
