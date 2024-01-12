@@ -1,0 +1,32 @@
+### KeY
+
+\problem {
+   int::seqGet(seqDef{int i;}(1, 10, i*i), 2) = 9
+}
+
+### contains.1
+
+(assert (not (= (cast (k_seqGet seqDef1 (i2u 2)) sort_int) (i2u 9))))
+
+### contains.2
+
+(assert (instanceof seqDef1 sort_Seq))
+
+### contains.3
+
+(assert (forall ((var_i Int))
+    (=> (and (<= 0 var_i) (< var_i (- 10 1)))
+        (= (k_seqGet seqDef1 (i2u var_i))
+          (let ((var_i (+ var_i 1))) (i2u (* var_i var_i)))))))
+
+### contains.4
+
+(assert (= (k_seqLen seqDef1) (ite (>= (- 10 1) 0) (i2u (- 10 1)) (i2u 0))))
+
+### expected
+
+valid
+
+### state
+
+ignore

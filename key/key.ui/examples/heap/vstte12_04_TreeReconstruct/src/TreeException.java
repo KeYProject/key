@@ -1,3 +1,0 @@
-
-class TreeException extends Exception {
-}

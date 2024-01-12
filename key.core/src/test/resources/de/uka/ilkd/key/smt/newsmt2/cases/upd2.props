@@ -1,0 +1,20 @@
+### Comment
+
+Parallel updates
+
+### KeY
+
+\programVariables { int p; int q; }
+
+\problem {
+   { p:=q || q:=p } (p-q) = q-p
+}
+
+### contains.1
+
+(assert (not (= (i2u (let ((u_p u_q) (u_q u_p)) (- (u2i u_p) (u2i u_q))))
+                (i2u (- (u2i u_q) (u2i u_p))))))
+
+### expected
+
+valid

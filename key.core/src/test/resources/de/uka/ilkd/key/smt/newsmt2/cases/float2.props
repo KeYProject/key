@@ -1,0 +1,11 @@
+### KeY
+
+\problem { 0.0f = subFloat(1.0f, 1.0f) }
+
+### contains.1
+
+(assert (not (= (f2u (fp #b0 #b00000000 #b00000000000000000000000)) (f2u (fp.sub RNE (fp #b0 #b01111111 #b00000000000000000000000) (fp #b0 #b01111111 #b00000000000000000000000))))))
+
+### expected
+
+valid

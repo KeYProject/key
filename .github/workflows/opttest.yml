@@ -1,0 +1,39 @@
+name: Optional Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 */10 * *"
+
+jobs:
+  optional-tests:
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        java: [21]
+        tests: [":key.core.proof_references:test", ":key.core.symbolic_execution:test"]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{matrix.java}}
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --continue ${{ matrix.tests }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: |
+            **/build/test-results/*/*.xml
+            **/build/reports/            

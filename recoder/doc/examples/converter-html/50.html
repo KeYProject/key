@@ -1,0 +1,159 @@
+<HTML><HEAD><TITLE>Converter</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+/*
+ * 1.1+Swing version.
+ */
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#3">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#51">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#43">util</A>.*;
+
+public class <U><A NAME="52">Converter</A></U> {
+    <A HREF="XRef.html#53">ConversionPanel</A> <U><A NAME="55">metricPanel</A></U>, <U><A NAME="56">usaPanel</A></U>;
+    <A HREF="XRef.html#57">Unit</A>[] <U><A NAME="58">metricDistances</A></U> = new <A HREF="XRef.html#1i">Unit</A>[3];
+    <A HREF="XRef.html#57">Unit</A>[] <U><A NAME="59">usaDistances</A></U> = new <A HREF="XRef.html#1i">Unit</A>[4];
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="5a">COLORS</A></U> = false;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="5b">DEBUG</A></U> = false;
+    final static <A HREF="XRef.html#1j">String</A> <U><A NAME="5c">LOOKANDFEEL</A></U> = null;
+    <A HREF="XRef.html#5">ConverterRangeModel</A> <U><A NAME="5d">dataModel</A></U> = <A HREF="XRef.html#2z">new</A> <A HREF="XRef.html#5">ConverterRangeModel</A>();
+    <A HREF="XRef.html#5e">JPanel</A> <U><A NAME="5f">mainPane</A></U>;
+
+    /** 
+     * Create the ConversionPanels (one for metric, another for U.S.).
+     * I used "U.S." because although Imperial and U.S. distance
+     * measurements are the same, this program could be extended to
+     * include volume measurements, which aren't the same.
+     *
+     * Put the ConversionPanels into a frame, and bring up the frame.
+     */
+    public <U><A NAME="5g">Converter</A></U>() {
+        //Create Unit objects for metric distances, and then
+        //instantiate a ConversionPanel with these Units.
+        <A HREF="XRef.html#58">metricDistances</A>[0] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Centimeters", 0.01);
+        <A HREF="XRef.html#58">metricDistances</A>[1] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Meters", 1.0);
+        <A HREF="XRef.html#58">metricDistances</A>[2] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Kilometers", 1000.0);
+        <A HREF="XRef.html#55">metricPanel</A> = <A HREF="XRef.html#5h">new</A> <A HREF="XRef.html#53">ConversionPanel</A>(this, "Metric System",
+                                          <A HREF="XRef.html#58">metricDistances</A>,
+                                          <A HREF="XRef.html#5d">dataModel</A>);
+
+        //Create Unit objects for U.S. distances, and then
+        //instantiate a ConversionPanel with these Units.
+        <A HREF="XRef.html#59">usaDistances</A>[0] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Inches", 0.0254);
+        <A HREF="XRef.html#59">usaDistances</A>[1] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Feet", 0.305);
+        <A HREF="XRef.html#59">usaDistances</A>[2] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Yards", 0.914);
+        <A HREF="XRef.html#59">usaDistances</A>[3] = <A HREF="XRef.html#1m">new</A> <A HREF="XRef.html#1i">Unit</A>("Miles", 1613.0);
+        <A HREF="XRef.html#56">usaPanel</A> = <A HREF="XRef.html#5h">new</A> <A HREF="XRef.html#53">ConversionPanel</A>(this, "U.S. System",
+                                       <A HREF="XRef.html#59">usaDistances</A>,
+                                       <A HREF="XRef.html#9">new</A> <A HREF="XRef.html#4">FollowerRangeModel</A>(<A HREF="XRef.html#5d">dataModel</A>));
+
+        //Create a JPanel, and add the ConversionPanels to it.
+        <A HREF="XRef.html#5f">mainPane</A> = <A HREF="XRef.html#5i">new</A> <A HREF="XRef.html#5e">JPanel</A>();
+        if (<A HREF="XRef.html#5a">COLORS</A>) {
+            <A HREF="XRef.html#5f">mainPane</A>.<A HREF="XRef.html#5j">setBackground</A>(<A HREF="XRef.html#5k">Color</A>.<A HREF="XRef.html#5l">red</A>);
+        }
+        <A HREF="XRef.html#5f">mainPane</A>.<A HREF="XRef.html#5m">setLayout</A>(<A HREF="XRef.html#5n">new</A> <A HREF="XRef.html#5o">GridLayout</A>(2, 1, 5, 5));
+        <A HREF="XRef.html#5f">mainPane</A>.<A HREF="XRef.html#5p">setBorder</A>(<A HREF="XRef.html#5q">BorderFactory</A>.<A HREF="XRef.html#5r">createEmptyBorder</A>(5, 5, 5, 5));
+        <A HREF="XRef.html#5f">mainPane</A>.<A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#55">metricPanel</A>);
+        <A HREF="XRef.html#5f">mainPane</A>.<A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#56">usaPanel</A>);
+        <A HREF="XRef.html#5t">resetMaxValues</A>(true);
+    }
+
+    public void <U><A NAME="5t">resetMaxValues</A></U>(<A HREF="XRef.html#1d">boolean</A> <U><A NAME="5u">resetCurrentValues</A></U>) {
+        <A HREF="XRef.html#k">double</A> <U><A NAME="5v">metricMultiplier</A></U> = <A HREF="XRef.html#55">metricPanel</A>.<A HREF="XRef.html#5w">getMultiplier</A>();
+        <A HREF="XRef.html#k">double</A> <U><A NAME="5x">usaMultiplier</A></U> = <A HREF="XRef.html#56">usaPanel</A>.<A HREF="XRef.html#5w">getMultiplier</A>();
+        <A HREF="XRef.html#g">int</A> <U><A NAME="5y">maximum</A></U> = <A HREF="XRef.html#53">ConversionPanel</A>.<A HREF="XRef.html#5z">MAX</A>;
+
+        if (<A HREF="XRef.html#5v">metricMultiplier</A> &gt; <A HREF="XRef.html#5x">usaMultiplier</A>) {
+            <A HREF="XRef.html#5y">maximum</A> = (<A HREF="XRef.html#g">int</A>)(<A HREF="XRef.html#53">ConversionPanel</A>.<A HREF="XRef.html#5z">MAX</A> *
+                      (<A HREF="XRef.html#5x">usaMultiplier</A> / <A HREF="XRef.html#5v">metricMultiplier</A>));
+        }
+
+        if (<A HREF="XRef.html#5b">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("in Converter resetMaxValues");
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("  metricMultiplier = "
+                                + <A HREF="XRef.html#5v">metricMultiplier</A>
+                             + "; usaMultiplier = "
+                                + <A HREF="XRef.html#5x">usaMultiplier</A>
+                             + "; maximum = "
+                                + <A HREF="XRef.html#5y">maximum</A>);
+        }
+
+        <A HREF="XRef.html#5d">dataModel</A>.<A HREF="XRef.html#u">setMaximum</A>(<A HREF="XRef.html#5y">maximum</A>);
+
+        if (<A HREF="XRef.html#5u">resetCurrentValues</A>) {
+            <A HREF="XRef.html#5d">dataModel</A>.<A HREF="XRef.html#12">setDoubleValue</A>(<A HREF="XRef.html#5y">maximum</A>);
+        }
+    }
+
+    private static void <U><A NAME="60">initLookAndFeel</A></U>() {
+        <A HREF="XRef.html#1j">String</A> <U><A NAME="61">lookAndFeel</A></U> = null;
+
+        if (<A HREF="XRef.html#5c">LOOKANDFEEL</A> != null) {
+            if (<A HREF="XRef.html#5c">LOOKANDFEEL</A>.<A HREF="XRef.html#62">equals</A>("Metal")) {
+                <A HREF="XRef.html#61">lookAndFeel</A> = <A HREF="XRef.html#63">UIManager</A>.<A HREF="XRef.html#64">getCrossPlatformLookAndFeelClassName</A>();
+            } else if (<A HREF="XRef.html#5c">LOOKANDFEEL</A>.<A HREF="XRef.html#62">equals</A>("System")) {
+                <A HREF="XRef.html#61">lookAndFeel</A> = <A HREF="XRef.html#63">UIManager</A>.<A HREF="XRef.html#65">getSystemLookAndFeelClassName</A>();
+            } else if (<A HREF="XRef.html#5c">LOOKANDFEEL</A>.<A HREF="XRef.html#62">equals</A>("Mac")) {
+                <A HREF="XRef.html#61">lookAndFeel</A> = "com.sun.java.swing.plaf.mac.MacLookAndFeel";
+                //PENDING: check!
+            } else if (<A HREF="XRef.html#5c">LOOKANDFEEL</A>.<A HREF="XRef.html#62">equals</A>("Windows")) {
+                <A HREF="XRef.html#61">lookAndFeel</A> = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+            } else if (<A HREF="XRef.html#5c">LOOKANDFEEL</A>.<A HREF="XRef.html#62">equals</A>("Motif")) {
+                <A HREF="XRef.html#61">lookAndFeel</A> = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+            }
+
+            if (<A HREF="XRef.html#5b">DEBUG</A>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("About to request look and feel: "
+                                   + <A HREF="XRef.html#61">lookAndFeel</A>);
+            }
+
+            try {
+                <A HREF="XRef.html#63">UIManager</A>.<A HREF="XRef.html#66">setLookAndFeel</A>(<A HREF="XRef.html#61">lookAndFeel</A>);
+            } catch (<A HREF="XRef.html#67">ClassNotFoundException</A> <U><A NAME="68">e</A></U>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Couldn't find class for specified look and feel:"
+                                   + <A HREF="XRef.html#61">lookAndFeel</A>);
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Did you include the L&amp;F library in the class path?");
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Using the default look and feel.");
+            } catch (<A HREF="XRef.html#69">UnsupportedLookAndFeelException</A> <U><A NAME="6a">e</A></U>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Can't use the specified look and feel ("
+                                   + <A HREF="XRef.html#61">lookAndFeel</A>
+                                   + ") on this platform.");
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Using the default look and feel.");
+            } catch (<A HREF="XRef.html#6b">Exception</A> <U><A NAME="6c">e</A></U>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Couldn't get specified look and feel ("
+                                   + <A HREF="XRef.html#61">lookAndFeel</A>
+                                   + "), for some reason.");
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("Using the default look and feel.");
+                <A HREF="XRef.html#6c">e</A>.<A HREF="XRef.html#6d">printStackTrace</A>();
+            }
+        }
+    }
+
+    public static void <U><A NAME="6e">main</A></U>(<A HREF="XRef.html#6f">String</A>[] <U><A NAME="6g">args</A></U>) {
+        <A HREF="XRef.html#60">initLookAndFeel</A>();
+        <A HREF="XRef.html#52">Converter</A> <U><A NAME="6h">converter</A></U> = <A HREF="XRef.html#5g">new</A> <A HREF="XRef.html#52">Converter</A>();
+
+        //Create a new window.
+        <A HREF="XRef.html#6i">JFrame</A> <U><A NAME="6j">f</A></U> = <A HREF="XRef.html#6k">new</A> <A HREF="XRef.html#6i">JFrame</A>("Converter");
+        <A HREF="XRef.html#6j">f</A>.<A HREF="XRef.html#6l">addWindowListener</A>(new <A HREF="XRef.html#6m">WindowAdapter</A>(){
+            public void <U><A NAME="6n">windowClosing</A></U>(<A HREF="XRef.html#6o">WindowEvent</A> <U><A NAME="6p">e</A></U>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#6q">exit</A>(0);
+            }
+        });
+
+        //Add the JPanel to the window and display the window.
+        //We can use a JPanel for the content pane because
+        //JPanel is opaque.
+        <A HREF="XRef.html#6j">f</A>.<A HREF="XRef.html#6r">setContentPane</A>(<A HREF="XRef.html#6h">converter</A>.<A HREF="XRef.html#5f">mainPane</A>);
+        if (<A HREF="XRef.html#5a">COLORS</A>) {
+            //This has no effect, since the JPanel completely
+            //covers the content pane.
+            <A HREF="XRef.html#6j">f</A>.<A HREF="XRef.html#6s">getContentPane</A>().<A HREF="XRef.html#6t">setBackground</A>(<A HREF="XRef.html#5k">Color</A>.<A HREF="XRef.html#6u">green</A>);
+        }
+
+        <A HREF="XRef.html#6j">f</A>.<A HREF="XRef.html#6v">pack</A>();        //Resizes the window to its natural size.
+        <A HREF="XRef.html#6j">f</A>.<A HREF="XRef.html#6w">setVisible</A>(true);
+    }
+}
+</PRE></BODY></HTML>

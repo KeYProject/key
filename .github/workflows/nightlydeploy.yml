@@ -1,0 +1,53 @@
+name: Nightly Deployer of Weekly Builds
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 5 * * 1' # every monday morning
+
+permissions:
+  contents: write
+  id-token: write
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # weigl: Should produce fancier release notes, but needs some configuration
+      # # https://github.com/marketplace/actions/release-changelog-builder
+      # - name: "Build Changelog"
+      #   id: build_changelog
+      #   uses: mikepenz/release-changelog-builder-action@v3.7.0
+      #   with:
+      #     ignorePreReleases: true
+      #     fetchReviewers: true
+
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --parallel assemble
+
+      - name: Delete previous nightly release
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly
+
+
+      - name: Create nightly release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create --generate-notes --title "Nightly Release" \
+             --prerelease \
+             nightly key.ui/build/libs/key-*-exe.jar

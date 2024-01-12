@@ -1,0 +1,18 @@
+### KeY
+
+\predicates { a; b; c; }
+
+\problem { a & b & c}
+
+### script
+
+macro split-prop;
+select formula="b";
+
+### goals
+
+3
+
+### selected
+
+==> b

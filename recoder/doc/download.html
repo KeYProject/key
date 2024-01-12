@@ -1,0 +1,436 @@
+<HTML><HEAD>
+<TITLE>RECODER Downloads</TITLE>
+<LINK REL=stylesheet TYPE="text/css" HREF="recoder.css">
+</HEAD><BODY>
+
+<DIV ALIGN="right"><A HREF="../index.html">Home</A></DIV>
+
+<H1>Download</H1>
+<P>
+RECODER is LGPL'ed software. Check the license if you are not familiar with it.
+</P>
+<P>
+As RECODER is still in its infancy, do not expect industrial strength
+in terms of usability, reliability, or efficiency. RECODER is not yet
+mature and parts of the API might change rather frequently.
+</P>
+
+<A NAME="license"><H2>License</H2></A>
+<P>
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU
+<A HREF="lgpl.html">Lesser General Public License</A>
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+</P>
+<P>
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<A HREF="lgpl.html">Lesser General Public License</A> for more details.
+</P>
+<P>
+For further licensing questions, please contact one of the project gurus.
+</P>
+
+<A NAME="setup"><H2>Setup Instructions</H2></A>
+<P>
+There is no dedicated install program, but setup and installation are
+easily done.
+</P>
+
+<A NAME="requirements"><H3>System Requirements</H3></A>
+<P>
+A complete installation of RECODER requires approximately 25&nbsp;MB HD space.
+To run, RECODER requires a Java Virtual Machine Version 1.1 or higher, and
+a good bunch of memory, depending on your project. As a rule of thumb,
+RECODER requires less memory than one needs to create the JavaDoc pages
+for the target system.
+</P>
+
+<A NAME="installation"><H3>Installation Procedure</H3></A>
+<P>
+Step 1: Download the current RECODER distribution.
+</P>
+<P>
+Step 2: Add <CODE>recoder.jar</CODE> to your CLASSPATH.
+</P>
+<P>
+Step 3: If you are new to RECODER, you may want to check out the
+        <A HREF="examples.html">examples</A>.
+</P>
+
+<A NAME="archive"><H2>Software Archive</H2></A>
+<P>
+Public releases are available at
+<A HREF="https://sourceforge.net/project/showfiles.php?group_id=28173">sourceforge</A>.
+The "core" distribution archive does not contain the API documentation or
+developer files, but it does include all the documentation materials from
+this site.
+To unpack the bzip2'ed versions, you need the corresponding
+<CODE>bunzip2</CODE> tool, which is
+<A HREF="http://sources.redhat.com/bzip2/#bzip2-latest">available</A>
+for most platforms.
+</P>
+<P>
+To access the latest version, you must use the anonymous CVS access; please
+consult the corresponding pages on sourceforge for instructions.
+Releases prior to 0.70 are available from the <A HREF="http://i44w3.info.uni-karlsruhe.de/~compost/archive">COMPOST archive</A>.
+</P>
+
+<H3>Version History</H3>
+
+<a name="latest"></a>
+
+<p>
+Release notes for 0.82 (of September 27, 2007)
+<hr NOSHADE WIDTH="50%" ALIGN="left">
+
+This is a maintenance release. Update is recommended but not required if you do not experience any problems.
+
+<ul>
+ <li>Bug fixes
+   <ul> 
+   	 <li> under MacOS, recoder.util.FileUtils correctly finds the runtime-jar file.
+     <li> recoder.io.DefaultProjectFileIO no longer throws NullPointerException when
+			specifying file in current directory
+     <li> recoder.convenience.Naming.toCanonicalName(CompilationUnit) now allows CUs
+				without any type declaration. Needed for package-info.java.
+	</ul>
+ <li>Changes and Additions
+ 	<ul>
+ 		<li>ClassType.getConstructors now returns List<? extends Constructor> instead of List<Constructor>.
+			  Unlike methods, constructors are not inherited, so this makes the API a little bit more
+			  flexible (subclasses use covariant return types)
+		<li>small enhancement: static accesses to non-static members are now detected and reported
+			  as errors if the reference prefix is a type reference
+ 	</ul>
+</ul>
+ 		
+
+
+<p>
+Release notes for 0.81 (of May 8th, 2006)
+<hr NOSHADE WIDTH="50%" ALIGN="left">
+
+<ul>
+<li>Bug fixes
+	<ul>
+		<li>Lots of bugs concerning java 5 features have been fixed since 0.80beta. AN UPDATE IS HIGHLY RECOMMENDED
+	</ul>
+
+<li>Changes
+	<ul>
+		<li>VariableDeclaration.getVariables() is not modifiable any more due to implementation of ParameterDeclaration.
+
+		<li>The type-specific lists in the recoder.list package have been replaced with a clean java 5 generic
+			collections-based implementation.
+	</ul>
+
+<li>Additions
+	<ul>
+		<li>recoder.kit.transformation.java5to4 contains a set of transformations that convert Java 5 code and make it
+	  complient to Java 1.4. There are still some bugs in the transformations dealing with generics and co-variant
+	  return types.
+		<li>ClassFile now stores its original data location, readable with ClassFile.getLocation()
+	</ul>
+</ul>
+
+<p>
+Release notes for 0.8beta (of February 2nd, 2006)
+<hr NOSHADE WIDTH="50%" ALIGN="left">
+
+<ul>
+<li>
+Additions
+
+<ul>
+<li>Java 5 support, including
+  <ul>
+	<li> support for static imports
+	<li> support for variable number of arguments (vararg)
+	<li> support for autoboxing
+	<li> support for enhanced for loops
+	<li> support for annotations
+	<li> support for enums
+	<li> support for generics
+  </ul>
+<li> Added project settings:
+  <ul>
+	<li> JAVA_5  to enable java 5 support
+	<li> TABSIZE to manually set the tab size when parsing files; defaults to 8.
+	          Note that this must be set before parsing to have any meaning.
+  </ul>
+</ul>
+
+<li>API Changes
+<ul>
+<li> support for static imports required that the parent type of Identifier
+  was changed from NamedProgramElement to NonTerminalProgramElement; see <a href="CodingPorting.html">Coding and Porting</a>
+<li> instead of Modifiers, members now have DeclarationSpecifiers, meaning annotations + modifiers;
+  see <a href="CodingPorting.html">Coding and Porting</a>
+</ul>
+
+<li>Other Changes
+<ul>
+<li> java.lang.Object is now always a direct superclass for interfaces,
+  not only if no other supertypes were present (this is the behaviour as it is in bytecode class files)
+  While this is not compliant with java language spec, it's the desired behaviour for bytecode types,
+  and we think that types provided in sourcecode should behave as closely as possible to those
+  provided in bytecode
+<li> incorporated some improvements from the original Java 1.5 grammar for JavaCC
+  (i.e., improved unicode support)
+<li> types available as source in .jar files will not be loaded any more. This was only done
+  when looking for types after having loaded all other source files.
+  We can't think of any value in loading them delayed, as it usually leads to unresolvable
+  type references
+</ul>
+
+
+<li>
+Changes in Progress
+<ul>
+<li> referencing a non-static member from a static context is now reported as an error; this doesn't
+  work entirely, yet.
+</ul>
+
+<li>
+Bugs Fixed
+<ul>
+<li> Fixed a bug in JavaProgramFactory.initialize()
+<li> Reset caches on changes of model element "extends"
+<li> Fixed parser bug #1218730: "super" not accepted as a PrimarySuffix
+<li> Constructors of static member classes may not have been parsed correctly by bytecode parser
+<li> fixed a bug in JavaProgramFactory.parseLong(String)
+</ul>
+
+<li>Known issues
+<ul>
+<li> "Reflection import" is untested for annotations/enums and may not be complete.
+  For instance, generic field/method information is not read.
+<li> Naming of local/anonymous types is not compliant with JLS of any version (note that
+  1.5 and 1.4 have different naming conventions for them, too). Also note that names of such types may vary from run to run, therefore
+  not producing deterministic results when querying them. This may or may not be changed
+  in later versions, depending on demand and time available on our account.
+<li> semantics of annotations such as @Override are not evaluated.
+</ul>
+
+</ul><!--changes 0.8beta-->
+
+<p>
+Changes in 0.75 (of April 28th, 2005)
+<hr NOSHADE WIDTH="50%" ALIGN="left">
+<ul>
+<li>Renamed Debug.assert()-Methods for Java 1.4 compatibility</li>
+<li>If writing back a compilation unit with no primary type, the original filename is kept</li>
+<li>Comments are attached to better matching model elements</li>
+<li>Deprecated NonTerminalProgramElement.getIndexOfChild(int) - see there for explanation</li>
+<li>JUnit is now used as testing framework</li>
+<li>Fixed bug: DefaultNameInfo was not updated on type renames</li>
+<li>Fixed bug when loading bytecode types with static initializer (Max Gensthaler)</li>
+<li>All constructors now validate parent roles</li>
+<li>Incomplete sources are being handled much better</li>
+<li>Fixed a bug in FileUtils</li>
+<li>Better handling for filenames under Windows</li>
+</ul>
+
+
+<p>
+Changes in 0.73 (of May 10th, 2004)
+<hr NOSHADE WIDTH="50%" ALIGN="left">
+<ul>
+<li>Fixed two bugs in DefaultConstantEvaluator</li>
+<li>Fixed bug in PrettyPrinter</li>
+<li>Fixed bug in getType method in DefaultSourceInfo</li>
+<li>Fixed bug in ClassInitializer</li>
+<li>Fixed bug in AbstractArrayList</li>
+<li>Fixed naming conflict of files "x.html" and "X.html" in converter-html and
+    converter-obfuscated-html examples.</li>
+</ul>
+
+
+<P>
+Changes in 0.72 (of March 19th, 2002)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Added contributors list.
+<LI>Added a lot of bells and whistles to the Sourcerer demo program.
+<LI>Added full subtype reporting.
+<LI>Added source element end coordinate assignment.
+<LI>Added internal data structures needed for incremental updates.
+<LI>Added extension classes localization auxiliary.
+<LI>Added further debug formatting options.
+<LI>Added transformations to remove certain garbage code.
+<LI>Added progress propagation to some relevant services and transformations.
+<LI>Added ant buildfile.
+<LI>Fixed byte code outer class parameter in member class constructors problem.
+<LI>Fixed fake default constructor bug.
+<LI>Fixed constructor full name issue.
+<LI>Fixed a package-related model update bug.
+<LI>Fixed a variable-versus-package resolution bug.
+<LI>Fixed a class cast problem concerning the New-operator prefix.
+<LI>Fixed some erroneous error handling situations.
+<LI>Fixed name concatenation reentrance.
+<LI>Fixed behavior of project initialization auxiliary classes.
+<LI>Fixed transitive inheritance problem when renaming methods.
+</UL>
+</P>
+
+<P>
+Changes in 0.71 (of July 26th, 2001)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Added <CODE>jdk1.4</CODE> property to turn <CODE>assert</CODE>
+    statement handling on and off. For now, default is
+    <CODE>jdk1.4=false</CODE>.
+<LI>Added error handler and resume ability. In certain cases, it can be
+    admissible to accept unknown references (e.g. analysis of incomplete
+    code, analysis and transformation of template code).
+<LI>Added compile-time control flow analysis to the SourceInfo
+    service and the StatementKit (new ControlFlowWalker and reachability
+    test).
+<LI>Added transformation to remove unused imports.
+<LI>Added a new Swing-based example application.
+<LI>Added toArray() functionality to lists.
+<LI>Fixed source element position setting in the pretty printer when
+    <CODE>overwriteParsePositions</CODE> property was set.
+    Correct positions are important for graphical frontends.
+<LI>Fixed parenthesized expression: was not a statement.
+<LI>Fixed semicolon problem after class initializers.
+<LI>Fixed pretty printer to accept multiple statements in a line.
+<LI>Added ProgramElementWalker interface.
+<LI>Added new source for type informations: the reflection mode queries the
+    current class objects of the running Java machine. Added new
+    <CODE>class.search.mode</CODE> property.
+<LI>Added RemoveUnusedImports transformation.
+<LI>Fixed RenamePackage transformation: index problem when full package
+    name was given.
+<LI>Fixed behavior of overriding properties with environment variables.
+<LI>Fixed custom doclet to work with JDK 1.3.1.
+<LI>Some refactorings done in PrettyPrinter and NameInfo.
+<LI>Fixed a model reset issue.
+<LI>Improved HTML generator example.
+<LI>Added a starters tour.
+</UL>
+</P>
+
+<P>
+Changes in 0.70 (of May 31st, 2001)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>The COMPOST and RECODER distributions are disentangled;
+    RECODER is now available separately.
+    Sources, project configurations, and documentation have been
+    adapted.
+<LI>There is a new regression test suite in the developers' version.
+<LI>Minor bug fixes (active debug output, structural equality, cloning, node
+    positions).
+<LI>Example suite has been improved and is now part of the standard distribution.
+<LI>Recoder is now hosted by sourceforge. The developer distribution is
+    available via anonymous CVS:
+<PRE>
+touch ~/.cvspass # if file does not exist already
+cvs -d:pserver:anonymous@cvs.recoder.sourceforge.net:/cvsroot/recoder login
+cvs -z3 -d:pserver:anonymous@cvs.recoder.sourceforge.net:/cvsroot/recoder co RECODER
+</PRE>
+</UL>
+</P>
+
+<P>
+Changes in 0.63 (of May 3rd, 2001)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Added one pass transformation interface, an interface for project
+    data import, and the pretty printer became an instance of a general
+    visitor.
+<LI>Fixed some minor issues: ModelElement.setName removed,
+    more empty lists are returned instead of null.
+<LI>Rearranged services: merged <CODE>TypeSystemInfo</CODE> into
+    <CODE>ProgramModelInfo</CODE> and <CODE>SourceInfo</CODE>,
+    made the <CODE>CrossReferencer</CODE> into a subclass of
+    <CODE>SourceInfo</CODE></LI>.
+<LI>Fixed some minor issues involving expressions as prefixes for
+    <CODE>new</CODE>, manual addition of compilation units,
+    error reporting.</LI>
+<LI>New <CODE>SourceVisitor</CODE> class as parent of the
+    <CODE>PrettyPrinter</CODE>.</LI>
+<LI>Some minor additions to the kit classes.</LI>
+<LI>Fixed, improved and augmented example programs.</LI>
+<LI>Removed a lot of dead code.</LI>
+</UL>
+</P>
+<P>
+Changes in 0.62 (of March 30th, 2001)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Bug fixes (Windows paths in examples were broken, problems
+    with overwritten local type and variable declarations fixed,
+    inner types now have unambiguous names).</LI>
+<LI>Issue list has been updated and numbered.</LI>
+</UL>
+</P>
+<P>
+Changes in 0.61 (of January 5th, 2001)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Small but significant bug fixes (hash table deletion, package object
+    initialization).</LI>
+<LI>Archives define a top level directory.</LI>
+<LI>Examples available for download (shipped with the API documentation).</LI>
+<LI>Size of API Documentation reduced (no "use" index).</LI>
+</UL>
+</P>
+<P>
+Changes in 0.60 (of December 8th, 2000)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>COMPOST got a manual.</LI>
+<LI>Some bug fixes, mostly related to inner classes.</LI>
+<LI>New transformation framework (not yet finished).</LI>
+<LI>Undo support.</LI>
+<LI>Improved source element position interface.</LI>
+<LI>Improved project setting handling.</LI>
+<LI>Some restructuring.</LI>
+<LI>Examples are nearly done.</LI>
+</UL>
+</P>
+<P>
+Changes in 0.52 (of June 27th, 2000)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Minor bug fixes.</LI>
+<LI>Minor improvements and additions.</LI>
+</UL>
+</P>
+<P>
+Changes in 0.51 (of April 26th, 2000)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Minor bug fixes.</LI>
+<LI>Minor improvements and additions in several kit classes.</LI>
+</UL>
+</P>
+<P>
+Changes in 0.5 (of April 7th, 2000)
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>Improved performance (250%) and reduced memory profile (70%).</LI>
+<LI>Much more features, much less bugs.</LI>
+<LI>More consistent, readable and maintainable interfaces and
+    implementations.</LI>
+<LI>New services and configurations <CODE>ChangeHistory</CODE>,
+    <CODE>CrossReferencer</CODE></LI>
+<LI>New transformation base package <CODE>compost.kit</CODE></LI>
+<LI>Redesigned composition model of <CODE>Composable</CODE>s.
+</UL>
+</P>
+<P>
+Changes in 0.4
+<HR NOSHADE WIDTH="50%" ALIGN="left">
+<UL>
+<LI>First public release.
+</UL>
+</P>
+
+
+</BODY></HTML>

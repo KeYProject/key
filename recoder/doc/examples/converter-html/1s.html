@@ -1,0 +1,37 @@
+<HTML><HEAD><TITLE>DecimalField</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#1t">text</A>.*;
+
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#1w">Toolkit</A>;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1x">text</A>.*;
+
+public class <U><A NAME="1y">DecimalField</A></U> extends <A HREF="XRef.html#1z">JTextField</A> {
+    private <A HREF="XRef.html#20">NumberFormat</A> <U><A NAME="21">format</A></U>;
+
+    public <U><A NAME="22">DecimalField</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="23">value</A></U>, <A HREF="XRef.html#g">int</A> <U><A NAME="24">columns</A></U>, <A HREF="XRef.html#20">NumberFormat</A> <U><A NAME="25">f</A></U>) {
+        <A HREF="XRef.html#26">super</A>(<A HREF="XRef.html#24">columns</A>);
+        <A HREF="XRef.html#27">setDocument</A>(<A HREF="XRef.html#28">new</A> <A HREF="XRef.html#2a">FormattedDocument</A>(<A HREF="XRef.html#25">f</A>));
+        <A HREF="XRef.html#21">format</A> = <A HREF="XRef.html#25">f</A>;
+        <A HREF="XRef.html#2b">setValue</A>(<A HREF="XRef.html#23">value</A>);
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="2c">getValue</A></U>() {
+        <A HREF="XRef.html#k">double</A> <U><A NAME="2d">retVal</A></U> = 0.0;
+
+        try {
+            <A HREF="XRef.html#2d">retVal</A> = <A HREF="XRef.html#21">format</A>.<A HREF="XRef.html#2e">parse</A>(<A HREF="XRef.html#2f">getText</A>()).<A HREF="XRef.html#2g">doubleValue</A>();
+        } catch (<A HREF="XRef.html#2h">ParseException</A> <U><A NAME="2i">e</A></U>) {
+            // This should never happen because insertString allows
+            // only properly formatted data to get in the field.
+            <A HREF="XRef.html#1w">Toolkit</A>.<A HREF="XRef.html#2j">getDefaultToolkit</A>().<A HREF="XRef.html#2k">beep</A>();
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2l">err</A>.<A HREF="XRef.html#r">println</A>("getValue: could not parse: " + <A HREF="XRef.html#2f">getText</A>());
+        }
+        return <A HREF="XRef.html#2d">retVal</A>;
+    }
+
+    public void <U><A NAME="2b">setValue</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="2m">value</A></U>) {
+        <A HREF="XRef.html#2n">setText</A>(<A HREF="XRef.html#21">format</A>.<A HREF="XRef.html#2o">format</A>(<A HREF="XRef.html#2m">value</A>));
+    }
+}
+</PRE></BODY></HTML>

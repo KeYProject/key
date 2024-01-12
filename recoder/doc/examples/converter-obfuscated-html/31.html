@@ -1,0 +1,121 @@
+<HTML><HEAD><TITLE>_113</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+/*
+ * 1.1+Swing version.
+ */
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#3">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#32">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1y">util</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1x">text</A>.<A HREF="XRef.html#33">NumberFormat</A>;
+
+public class <U><A NAME="34">_113</A></U> extends <A HREF="XRef.html#35">JPanel</A> {
+
+    <A HREF="XRef.html#36">_22</A> <U><A NAME="38">_114</A></U>;
+    <A HREF="XRef.html#39">JComboBox</A> <U><A NAME="3a">_115</A></U>;
+    <A HREF="XRef.html#3b">JSlider</A> <U><A NAME="3c">_116</A></U>;
+
+    <A HREF="XRef.html#5">_32</A> <U><A NAME="3d">_117</A></U>;
+
+    <A HREF="XRef.html#3e">_89</A> <U><A NAME="3g">_118</A></U>;
+
+    <A HREF="XRef.html#3h">_16</A>[] <U><A NAME="3i">_119</A></U>;
+    <A HREF="XRef.html#1j">String</A> <U><A NAME="3j">_120</A></U>;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3k">_121</A></U> = false;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3l">_122</A></U> = false;
+    final static <A HREF="XRef.html#g">int</A> <U><A NAME="3m">_123</A></U> = 10000;
+
+    <U><A NAME="3n">_113</A></U>(<A HREF="XRef.html#3e">_89</A> <U><A NAME="3o">_124</A></U>, <A HREF="XRef.html#1j">String</A> <U><A NAME="3p">_125</A></U>, <A HREF="XRef.html#3h">_16</A>[] <U><A NAME="3q">_126</A></U>, <A HREF="XRef.html#5">_32</A> <U><A NAME="3r">_127</A></U>) {
+        if (<A HREF="XRef.html#3l">_122</A>) {
+            <A HREF="XRef.html#3s">setBackground</A>(<A HREF="XRef.html#3t">Color</A>.<A HREF="XRef.html#3u">cyan</A>);
+        }
+        <A HREF="XRef.html#3v">setBorder</A>(<A HREF="XRef.html#3w">BorderFactory</A>.<A HREF="XRef.html#3x">createCompoundBorder</A>(
+                        <A HREF="XRef.html#3w">BorderFactory</A>.<A HREF="XRef.html#3y">createTitledBorder</A>(<A HREF="XRef.html#3p">_125</A>),
+                        <A HREF="XRef.html#3w">BorderFactory</A>.<A HREF="XRef.html#3z">createEmptyBorder</A>(5, 5, 5, 5)));
+
+        //Save arguments in instance variables.
+        <A HREF="XRef.html#3g">_118</A> = <A HREF="XRef.html#3o">_124</A>;
+        <A HREF="XRef.html#3i">_119</A> = <A HREF="XRef.html#3q">_126</A>;
+        <A HREF="XRef.html#3j">_120</A> = <A HREF="XRef.html#3p">_125</A>;
+        <A HREF="XRef.html#3d">_117</A> = <A HREF="XRef.html#3r">_127</A>;
+
+        //Add the text field.  It initially displays "0" and needs
+        //to be at least 10 columns wide.
+        <A HREF="XRef.html#33">NumberFormat</A> <U><A NAME="40">_128</A></U> = <A HREF="XRef.html#33">NumberFormat</A>.<A HREF="XRef.html#41">getNumberInstance</A>();
+        <A HREF="XRef.html#40">_128</A>.<A HREF="XRef.html#42">setMaximumFractionDigits</A>(2);
+        <A HREF="XRef.html#38">_114</A> = <A HREF="XRef.html#43">new</A> <A HREF="XRef.html#36">_22</A>(0, 10, <A HREF="XRef.html#40">_128</A>);
+        <A HREF="XRef.html#38">_114</A>.<A HREF="XRef.html#44">_30</A>(<A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#10">_48</A>());
+        <A HREF="XRef.html#38">_114</A>.<A HREF="XRef.html#45">addActionListener</A>(new <A HREF="XRef.html#46">ActionListener</A>(){
+            public void <U><A NAME="47">actionPerformed</A></U>(<A HREF="XRef.html#48">ActionEvent</A> <U><A NAME="49">_129</A></U>) {
+                <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#12">_49</A>(<A HREF="XRef.html#38">_114</A>.<A HREF="XRef.html#4a">_27</A>());
+            }
+        });
+
+        //Add the combo box.
+        <A HREF="XRef.html#3a">_115</A> = <A HREF="XRef.html#4b">new</A> <A HREF="XRef.html#39">JComboBox</A>();
+        for (<A HREF="XRef.html#g">int</A> <U><A NAME="4c">_130</A></U> = 0; <A HREF="XRef.html#4c">_130</A> &lt; <A HREF="XRef.html#3i">_119</A>.length; <A HREF="XRef.html#4c">_130</A>++) { //Populate it.
+            <A HREF="XRef.html#3a">_115</A>.<A HREF="XRef.html#4d">addItem</A>(<A HREF="XRef.html#3i">_119</A>[<A HREF="XRef.html#4c">_130</A>].<A HREF="XRef.html#1k">_17</A>);
+        }
+        <A HREF="XRef.html#3a">_115</A>.<A HREF="XRef.html#4e">setSelectedIndex</A>(0);
+        <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#4f">_43</A>(<A HREF="XRef.html#3i">_119</A>[0].<A HREF="XRef.html#1l">_18</A>);
+        <A HREF="XRef.html#3a">_115</A>.<A HREF="XRef.html#4g">addActionListener</A>(new <A HREF="XRef.html#46">ActionListener</A>(){
+            public void <U><A NAME="4h">actionPerformed</A></U>(<A HREF="XRef.html#48">ActionEvent</A> <U><A NAME="4i">_131</A></U>) {
+                //Set new maximums for the sliders.
+                <A HREF="XRef.html#g">int</A> <U><A NAME="4j">_132</A></U> = <A HREF="XRef.html#3a">_115</A>.<A HREF="XRef.html#4k">getSelectedIndex</A>();
+                <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#4f">_43</A>(<A HREF="XRef.html#3i">_119</A>[<A HREF="XRef.html#4j">_132</A>].<A HREF="XRef.html#1l">_18</A>);
+                <A HREF="XRef.html#3g">_118</A>.<A HREF="XRef.html#4l">_99</A>(false);
+            }
+        });
+
+        //Add the slider.
+        <A HREF="XRef.html#3c">_116</A> = <A HREF="XRef.html#4m">new</A> <A HREF="XRef.html#3b">JSlider</A>(<A HREF="XRef.html#3d">_117</A>);
+        <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#b">addChangeListener</A>(new <A HREF="XRef.html#7">ChangeListener</A>(){
+            public void <U><A NAME="4n">stateChanged</A></U>(<A HREF="XRef.html#d">ChangeEvent</A> <U><A NAME="4o">_133</A></U>) {
+                <A HREF="XRef.html#38">_114</A>.<A HREF="XRef.html#44">_30</A>(<A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#10">_48</A>());
+            }
+        });
+
+        //Make the textfield/slider group a fixed size.
+        <A HREF="XRef.html#35">JPanel</A> <U><A NAME="4p">_134</A></U> = new <A HREF="XRef.html#35">JPanel</A>(){
+            public <A HREF="XRef.html#4q">Dimension</A> <U><A NAME="4r">getMinimumSize</A></U>() {
+                return <A HREF="XRef.html#4s">getPreferredSize</A>();
+            }
+            public <A HREF="XRef.html#4q">Dimension</A> <U><A NAME="4s">getPreferredSize</A></U>() {
+                return <A HREF="XRef.html#4t">new</A> <A HREF="XRef.html#4q">Dimension</A>(150,
+                                     super.<A HREF="XRef.html#4u">getPreferredSize</A>().<A HREF="XRef.html#4v">height</A>);
+            }
+            public <A HREF="XRef.html#4q">Dimension</A> <U><A NAME="4w">getMaximumSize</A></U>() {
+                return <A HREF="XRef.html#4s">getPreferredSize</A>();
+            }
+        };
+        if (<A HREF="XRef.html#3l">_122</A>) {
+            <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#3s">setBackground</A>(<A HREF="XRef.html#3t">Color</A>.<A HREF="XRef.html#4x">blue</A>);
+        }
+        <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#3v">setBorder</A>(<A HREF="XRef.html#3w">BorderFactory</A>.<A HREF="XRef.html#3z">createEmptyBorder</A>(
+                                                0, 0, 0, 5));
+        <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#4y">setLayout</A>(<A HREF="XRef.html#4z">new</A> <A HREF="XRef.html#50">BoxLayout</A>(<A HREF="XRef.html#4p">_134</A>,
+                                          <A HREF="XRef.html#50">BoxLayout</A>.<A HREF="XRef.html#51">Y_AXIS</A>));
+        <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#52">add</A>(<A HREF="XRef.html#38">_114</A>);
+        <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#52">add</A>(<A HREF="XRef.html#3c">_116</A>);
+
+        <A HREF="XRef.html#4y">setLayout</A>(<A HREF="XRef.html#4z">new</A> <A HREF="XRef.html#50">BoxLayout</A>(this, <A HREF="XRef.html#50">BoxLayout</A>.<A HREF="XRef.html#53">X_AXIS</A>));
+        <A HREF="XRef.html#52">add</A>(<A HREF="XRef.html#4p">_134</A>);
+        <A HREF="XRef.html#52">add</A>(<A HREF="XRef.html#3a">_115</A>);
+        <A HREF="XRef.html#4p">_134</A>.<A HREF="XRef.html#54">setAlignmentY</A>(<A HREF="XRef.html#55">TOP_ALIGNMENT</A>);
+        <A HREF="XRef.html#3a">_115</A>.<A HREF="XRef.html#54">setAlignmentY</A>(<A HREF="XRef.html#55">TOP_ALIGNMENT</A>);
+    }
+
+    /** 
+     * Returns the multiplier (units/meter) for the currently
+     * selected unit of measurement.
+     */
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="56">_135</A></U>() {
+        return <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#m">_42</A>();
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="57">_136</A></U>() {
+        return <A HREF="XRef.html#3d">_117</A>.<A HREF="XRef.html#10">_48</A>();
+    }
+}
+</PRE></BODY></HTML>

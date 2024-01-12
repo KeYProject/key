@@ -1,0 +1,5 @@
+#COMPOST Project File
+input.path=../../test/java5/src/generictest/
+output.path=output
+units=all
+java5=true

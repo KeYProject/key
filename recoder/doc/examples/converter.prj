@@ -1,0 +1,4 @@
+#COMPOST Project File
+input.path=converter
+output.path=output
+units=ConversionPanel.java,DecimalField.java,Unit.java,Converter.java,ConverterRangeModel.java,FormattedDocument.java,FollowerRangeModel.java

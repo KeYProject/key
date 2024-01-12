@@ -1,0 +1,37 @@
+<HTML><HEAD><TITLE>_22</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#1t">text</A>.*;
+
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#1w">Toolkit</A>;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1x">text</A>.*;
+
+public class <U><A NAME="36">_22</A></U> extends <A HREF="XRef.html#6l">JTextField</A> {
+    private <A HREF="XRef.html#33">NumberFormat</A> <U><A NAME="6m">_23</A></U>;
+
+    public <U><A NAME="43">_22</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="6n">_24</A></U>, <A HREF="XRef.html#g">int</A> <U><A NAME="6o">_25</A></U>, <A HREF="XRef.html#33">NumberFormat</A> <U><A NAME="6p">_26</A></U>) {
+        <A HREF="XRef.html#6q">super</A>(<A HREF="XRef.html#6o">_25</A>);
+        <A HREF="XRef.html#6r">setDocument</A>(<A HREF="XRef.html#24">new</A> <A HREF="XRef.html#20">_70</A>(<A HREF="XRef.html#6p">_26</A>));
+        <A HREF="XRef.html#6m">_23</A> = <A HREF="XRef.html#6p">_26</A>;
+        <A HREF="XRef.html#44">_30</A>(<A HREF="XRef.html#6n">_24</A>);
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="4a">_27</A></U>() {
+        <A HREF="XRef.html#k">double</A> <U><A NAME="6s">_28</A></U> = 0.0;
+
+        try {
+            <A HREF="XRef.html#6s">_28</A> = <A HREF="XRef.html#6m">_23</A>.<A HREF="XRef.html#6t">parse</A>(<A HREF="XRef.html#6u">getText</A>()).<A HREF="XRef.html#6v">doubleValue</A>();
+        } catch (<A HREF="XRef.html#2n">ParseException</A> <U><A NAME="6w">_29</A></U>) {
+            // This should never happen because insertString allows
+            // only properly formatted data to get in the field.
+            <A HREF="XRef.html#1w">Toolkit</A>.<A HREF="XRef.html#2p">getDefaultToolkit</A>().<A HREF="XRef.html#2q">beep</A>();
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#2r">err</A>.<A HREF="XRef.html#r">println</A>("getValue: could not parse: " + <A HREF="XRef.html#6u">getText</A>());
+        }
+        return <A HREF="XRef.html#6s">_28</A>;
+    }
+
+    public void <U><A NAME="44">_30</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="6x">_31</A></U>) {
+        <A HREF="XRef.html#6y">setText</A>(<A HREF="XRef.html#6m">_23</A>.<A HREF="XRef.html#6z">format</A>(<A HREF="XRef.html#6x">_31</A>));
+    }
+}
+</PRE></BODY></HTML>

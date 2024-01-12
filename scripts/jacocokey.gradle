@@ -1,0 +1,29 @@
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+subprojects {
+    apply plugin: 'jacoco'
+
+    jacocoTestReport {
+        reports {
+            html.required = false
+            xml.required = true
+            csv.required = false
+        }
+    }
+
+    test {
+        finalizedBy jacocoTestReport
+    }
+
+
+    testFast {
+        finalizedBy jacocoTestReport
+        jacoco {
+            destinationFile = file("$buildDir/jacoco/test.exec")
+        }
+    }
+}

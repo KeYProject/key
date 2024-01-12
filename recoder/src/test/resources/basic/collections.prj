@@ -1,0 +1,7 @@
+#COMPOST Project File
+#input.path=../doc/examples/collections;../test/src/
+input.path=../../doc/examples/collections;../../test/basic/testsrc/
+output.path=output
+units=java/util/HashSet.java,java/util/Map.java,java/util/ArrayList.java,java/util/NoSuchElementException.java,java/util/SortedSet.java,java/util/LinkedList.java,java/util/Set.java,java/util/Dictionary.java,java/util/TreeMap.java,java/util/AbstractList.java,java/util/AbstractSequentialList.java,java/util/Arrays.java,java/util/Comparator.java,java/util/Iterator.java,java/util/Hashtable.java,java/util/TreeSet.java,java/util/AbstractMap.java,java/util/Collection.java,java/util/Vector.java,java/util/HashMap.java,java/util/Collections.java,java/util/AbstractCollection.java,java/util/List.java,java/util/AbstractSet.java,java/util/EmptyStackException.java,java/util/ConcurrentModificationException.java,java/util/SortedMap.java,java/util/ListIterator.java,java/util/Enumeration.java,java/util/Stack.java,testdata/MethodTestData
+java5=false
+

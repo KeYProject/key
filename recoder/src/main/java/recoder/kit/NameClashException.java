@@ -1,0 +1,26 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package recoder.kit;
+
+/**
+ * this class implements basic functions for type handling.
+ *
+ * @author Dirk Heuzeroth
+ */
+
+public class NameClashException extends Exception {
+    /**
+     * serialization id
+     */
+    private static final long serialVersionUID = -8660164254613770539L;
+
+    NameClashException() {
+        super();
+    }
+
+    NameClashException(String msg) {
+        super(msg);
+    }
+}

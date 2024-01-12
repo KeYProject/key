@@ -1,0 +1,4577 @@
+options {
+    JAVA_UNICODE_ESCAPE = true; // costs approx. 7%
+    STATIC = true; // if true, the parser may be initialized only once
+    // OPTIMIZE_TOKEN_MANAGER = true; // obsolete
+}
+
+PARSER_BEGIN(JavaCCParser)
+
+package recoder.parser;
+
+import java.io.*;
+import java.util.*;
+
+import recoder.*;
+import recoder.list.generic.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
+import recoder.java.expression.*;
+import recoder.java.expression.literal.*;
+import recoder.java.expression.operator.*;
+import recoder.java.reference.*;
+import recoder.java.statement.*;
+import recoder.io.*;
+
+import recoder.abstraction.TypeArgument.WildcardMode;
+
+
+/**
+   JavaCC AST generation specification based on the original Java1.1   
+   grammar that comes with javacc, and includes the modification of D. Williams
+   to accept the Java 1.2 strictfp modifier.
+   Several patches have been added to allow semicola after member declarations.
+   @author RN
+   @author AL
+   @author Tobias Gutzmann
+ */
+public class JavaCCParser {
+
+    public final static void initialize(Reader r) {
+        current = null;
+        comments.clear();
+        ReInit(r);
+    }
+
+    /** the JavaProgramFactory instance that is used to create
+        parse results
+    */
+    private static JavaProgramFactory factory 
+        = JavaProgramFactory.getInstance();
+
+    static boolean superAllowed = true;
+    private static boolean isSuperAllowed() { return superAllowed; }
+    private static void setAllowSuper(boolean b) { superAllowed = b; }
+
+
+    static boolean jdk1_4 = false;
+    static boolean jdk1_5 = false;
+
+    public static boolean isAwareOfAssert() {
+        return jdk1_4;        
+    }
+
+    public static void setAwareOfAssert(boolean yes) {
+        jdk1_4 = yes;
+        if (yes == false) jdk1_5 = false;
+    }
+    
+    public static boolean isJava5() {
+    	return jdk1_5;
+    }
+    
+    public static void setJava5(boolean yes) {
+	    jdk1_5 = yes;
+    	if (yes)
+	    	jdk1_4 = true;
+    }
+    
+    public static void setTabSize(int tabSize) {
+    	JavaCharStream.setTabSize(tabSize);
+    }
+    
+    public static int getTabSize() {
+    	return JavaCharStream.getTabSize(0); // whatever...
+    }
+    
+    /** temporary valid variable that is used to return an additional
+        argument from parser method VariableDeclaratorId, since such an
+        id may have a dimension
+    */
+    private static int tmpDimension;
+
+    /** current token, follows the next links when necessary */
+    private static Token current;
+
+    /** all comments in a global list. */
+    private static List<Comment> comments = new ArrayList<Comment>();
+
+    /** reuseable position object. */
+    private static SourceElement.Position position = new SourceElement.Position(0, 0);
+
+    private static void copyPrefixInfo(SourceElement oldResult,
+                                       SourceElement newResult) {
+        newResult.setRelativePosition(oldResult.getRelativePosition());
+        newResult.setStartPosition(oldResult.getStartPosition());
+        newResult.setEndPosition(oldResult.getEndPosition());
+    }
+
+    private static void shiftToken() {
+        if (current != token) {
+            if (current != null) {
+                while (current.next != token) {
+                    current = current.next;
+                }
+            }
+            Token prev;
+            if (token.specialToken != null) {
+                prev = token.specialToken;
+            } else {
+                prev = current;
+            }
+            if (prev != null) {
+                int col = token.beginColumn - 1;
+                int lf = token.beginLine - prev.endLine;
+                if (lf <= 0) {
+                    col -= prev.endColumn; // - 1;
+                    if (col < 0) {
+                        col = 0;
+                    }
+                }                
+                position.setPosition(lf, col);
+            }
+            current = token;
+        }
+    }
+
+    /**
+       Sets indentation information.
+     */
+    private static void setPrefixInfo(SourceElement constrResult) {
+        position.setPosition(0, 0);
+        shiftToken();
+        constrResult.setRelativePosition(position);
+        position.setPosition(current.beginLine, current.beginColumn);
+        constrResult.setStartPosition(position);
+    }
+
+    private static void setPostfixInfo(SourceElement constrResult) {
+        shiftToken();
+        position.setPosition(current.endLine, current.endColumn);
+        constrResult.setEndPosition(position);
+    }
+
+    private static void addComment(Comment c, Token tok) {
+        Token prev = tok.specialToken;
+        if (prev == null) {
+            prev = token;
+            // in case we are inside a lookahead we skip to the last known
+            // non-special token
+            while (prev.next != null) {
+                prev = prev.next;
+            }
+        }
+        position.setPosition(0, 0);
+
+        int internalIndentation = 0;
+        int internalLinefeeds = 0;
+        if (prev.image != null) {
+            int col = tok.beginColumn - 1;
+            int lf = tok.beginLine - prev.endLine;
+            if (lf <= 0) {
+                col -= prev.endColumn; // - 1;
+            }                
+            position.setPosition(lf, col);
+        }
+        c.setRelativePosition(position);
+        position.setPosition(tok.endLine, tok.endColumn);
+        c.setEndPosition(position);
+        position.setPosition(tok.beginLine, tok.beginColumn);
+        c.setStartPosition(position);
+        if (!(c instanceof DocComment)) {
+            boolean hasEmptyLine = c.getRelativePosition().getLine() > 1;
+            c.setPrefixed(hasEmptyLine);
+            if (tok.specialToken != null && !hasEmptyLine) {
+                c.setPrefixed(comments.get(comments.size() - 1).isPrefixed());
+            }            
+        }
+        comments.add(c);
+    }
+    
+    static void addSingleLineComment(Token tok) {
+        addComment(factory.createSingleLineComment(tok.image.trim()), tok);
+    }
+
+    static void addMultiLineComment(Token tok) {
+        addComment(factory.createComment(tok.image), tok);
+    }
+
+    static void addDocComment(Token tok) {
+        addComment(factory.createDocComment(tok.image), tok);
+    }
+    
+    public static List<Comment> getComments() {
+        return comments;
+    }
+
+    /** inner class that is only used to return results from
+        primary suffix syntax rule
+        @author RN
+    */
+    static class PrimarySuffixReturnValue {
+        
+        // the following constants represent the various sub rules
+
+        /** indicates that the result is currently undefined */
+        static final int UNDEFINED       = -1;
+        /** production was <pre>"." "this"</pre> */
+        static final int THIS            =  0;        
+        /** production was <pre>"." AllocationExpression</pre> */
+        static final int ALLOCATION_EXPR =  1;        
+        /** production was <pre>"[" Expression "]"</pre> */
+        static final int INDEX_EXPR      =  2;        
+        /** production was <pre>"." <IDENTIFIER></pre> */
+        static final int IDENTIFIER      =  3;        
+        /** production was <pre>Arguments</pre> */
+        static final int ARGUMENTS       =  4; 
+        /** production was <pre>super</pre> */
+        static final int SUPER 			 =  5;
+
+        /** indicates the type of the result */
+        int                   type = UNDEFINED;
+        
+        /** valid iff <tt>type</tt> is <tt>ALLOCATION_EXPR</tt> or 
+            <tt>INDEX_EXPR</tt> */
+        Expression            expr = null;
+        
+        /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> */
+        Identifier            id   = null;
+    
+        /** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
+        ASTList<Expression> args = null;
+        
+        /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> and 
+         *  it is an explicit generic method invocation
+         */
+        ASTList<TypeArgumentDeclaration> typeArgs = null;
+    }
+
+
+    /** inner class that is only used to return results from
+        primary prefix syntax rule
+        @author RN
+    */
+    static class PrimaryPrefixReturnValue {
+    
+        // the following constants represent the various sub rules
+    
+        /** indicates that the result is currently undefined */
+        static final int UNDEFINED        = -1;        
+        /** production was <pre>Literal</pre> */
+        static final int LITERAL          =  0;    
+        /** production was <pre>"this"</pre> */
+        static final int THIS             =  1;        
+        /** production was <pre>"super" "." <IDENTIFIER></pre> */
+        static final int SUPER_MEMBER     =  2;        
+        /** production was <pre>"(" Expression ")"</pre> */
+        static final int PARENTHESIZED_EXPR =  3;    
+        /** production was <pre>AllocationExpression</pre> */
+        static final int ALLOCATION_EXPR  =  4;    
+        /** production was <pre>ResultType "." "class"</pre> */
+        static final int CLASS_REF        =  5;        
+        /** production was <pre>Name</pre> */
+        static final int QUALIFIED_NAME   =  6;
+    
+        /** indicates the type of the result */
+        int           type    = UNDEFINED;
+    
+        /** valid iff <tt>type</tt> is <tt>LITERAL</tt> */
+        Literal       literal = null;
+    
+        /** valid iff <tt>type</tt> is <tt>PARENTHESED_EXPR</tt>
+            or <tt>ALLOCATION_EXPR</tt> */
+        Expression    expr    = null;
+    
+        /** valid iff <tt>type</tt> is <tt>CLASS_REF</tt> */
+        TypeReference typeref = null;
+        
+        /** valid iff <tt>type</tt> is <tt>QUALIFIED_NAME</tt> or
+         <tt>SUPER_MEMBER</tt>*/
+        UncollatedReferenceQualifier name = null;
+    }
+
+    /** return value containers for primary expression.
+        need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+    
+}
+
+PARSER_END(JavaCCParser)
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+/* COMMENTS */
+
+MORE :
+{
+  "//" : IN_SINGLE_LINE_COMMENT
+|
+  <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+|
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+  <SINGLE_LINE_COMMENT: "\n" | "\r" | "\r\n">
+  {
+      JavaCCParser.addSingleLineComment(matchedToken);
+  } 
+  : DEFAULT
+}
+
+<IN_FORMAL_COMMENT>
+SPECIAL_TOKEN :
+{
+  <FORMAL_COMMENT: "*/" >
+  {
+      JavaCCParser.addDocComment(matchedToken);
+  }: DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+  <MULTI_LINE_COMMENT: "*/" >  {
+      JavaCCParser.addMultiLineComment(matchedToken);
+  }: DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT,IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>
+MORE :
+{
+  < ~[] >
+}
+
+/* RESERVED WORDS AND LITERALS */
+
+TOKEN :
+{
+  < ABSTRACT: "abstract" >
+| < ASSERT: "assert" >  {
+      if (!JavaCCParser.jdk1_4) {
+          matchedToken.kind = IDENTIFIER;
+      }
+  }
+| < AT: "@" > {
+	  if (!JavaCCParser.jdk1_5) {
+	  	  // TODO
+	  }
+  }
+| < BOOLEAN: "boolean" >
+| < BREAK: "break" >
+| < BYTE: "byte" >
+| < CASE: "case" >
+| < CATCH: "catch" >
+| < CHAR: "char" >
+| < CLASS: "class" >
+| < CONST: "const" >
+| < CONTINUE: "continue" >
+| < _DEFAULT: "default" >
+| < DO: "do" >
+| < DOUBLE: "double" >
+| < ELSE: "else" >
+| < ENUM: "enum" > {
+	  if (!JavaCCParser.jdk1_5) {
+	  	matchedToken.kind = IDENTIFIER;
+	  }
+}
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < FINAL: "final" >
+| < FINALLY: "finally" >
+| < FLOAT: "float" >
+| < FOR: "for" >
+| < GOTO: "goto" >
+| < IF: "if" >
+| < IMPLEMENTS: "implements" >
+| < IMPORT: "import" >
+| < INSTANCEOF: "instanceof" >
+| < INT: "int" >
+| < INTERFACE: "interface" >
+| < LONG: "long" >
+| < NATIVE: "native" >
+| < NEW: "new" >
+| < NULL: "null" >
+| < PACKAGE: "package">
+| < PRIVATE: "private" >
+| < PROTECTED: "protected" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < SHORT: "short" >
+| < STATIC: "static" >
+| < SUPER: "super" >
+| < SWITCH: "switch" >
+| < SYNCHRONIZED: "synchronized" >
+| < THIS: "this" >
+| < THROW: "throw" >
+| < THROWS: "throws" >
+| < TRANSIENT: "transient" >
+| < TRUE: "true" >
+| < TRY: "try" >
+| < VOID: "void" >
+| < VOLATILE: "volatile" >
+| < WHILE: "while" >
+| < VARARGDENOTER: "..." >
+| < STRICTFP: "strictfp" >
+}
+
+/* LITERALS */
+
+TOKEN :
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+  < CHARACTER_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+           ( ["n","t","b","r","f","\\","'","\""] 
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )
+      "'"
+  >
+|
+  < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+}
+
+/* IDENTIFIERS */
+
+TOKEN :
+{
+  < IDENTIFIER: <LETTER> (<PART_LETTER>)* >
+|
+  < #LETTER:
+      [  // all chars for which Character.isIdentifierStart is true
+         "$",
+         "A"-"Z",
+         "_",
+         "a"-"z",
+         "\u00a2"-"\u00a5",
+         "\u00aa",
+         "\u00b5",
+         "\u00ba",
+         "\u00c0"-"\u00d6",
+         "\u00d8"-"\u00f6",
+         "\u00f8"-"\u021f",
+         "\u0222"-"\u0233",
+         "\u0250"-"\u02ad",
+         "\u02b0"-"\u02b8",
+         "\u02bb"-"\u02c1",
+         "\u02d0"-"\u02d1",
+         "\u02e0"-"\u02e4",
+         "\u02ee",
+         "\u037a",
+         "\u0386",
+         "\u0388"-"\u038a",
+         "\u038c",
+         "\u038e"-"\u03a1",
+         "\u03a3"-"\u03ce",
+         "\u03d0"-"\u03d7",
+         "\u03da"-"\u03f3",
+         "\u0400"-"\u0481",
+         "\u048c"-"\u04c4",
+         "\u04c7"-"\u04c8",
+         "\u04cb"-"\u04cc",
+         "\u04d0"-"\u04f5",
+         "\u04f8"-"\u04f9",
+         "\u0531"-"\u0556",
+         "\u0559",
+         "\u0561"-"\u0587",
+         "\u05d0"-"\u05ea",
+         "\u05f0"-"\u05f2",
+         "\u0621"-"\u063a",
+         "\u0640"-"\u064a",
+         "\u0671"-"\u06d3",
+         "\u06d5",
+         "\u06e5"-"\u06e6",
+         "\u06fa"-"\u06fc",
+         "\u0710",
+         "\u0712"-"\u072c",
+         "\u0780"-"\u07a5",
+         "\u0905"-"\u0939",
+         "\u093d",
+         "\u0950",
+         "\u0958"-"\u0961",
+         "\u0985"-"\u098c",
+         "\u098f"-"\u0990",
+         "\u0993"-"\u09a8",
+         "\u09aa"-"\u09b0",
+         "\u09b2",
+         "\u09b6"-"\u09b9",
+         "\u09dc"-"\u09dd",
+         "\u09df"-"\u09e1",
+         "\u09f0"-"\u09f3",
+         "\u0a05"-"\u0a0a",
+         "\u0a0f"-"\u0a10",
+         "\u0a13"-"\u0a28",
+         "\u0a2a"-"\u0a30",
+         "\u0a32"-"\u0a33",
+         "\u0a35"-"\u0a36",
+         "\u0a38"-"\u0a39",
+         "\u0a59"-"\u0a5c",
+         "\u0a5e",
+         "\u0a72"-"\u0a74",
+         "\u0a85"-"\u0a8b",
+         "\u0a8d",
+         "\u0a8f"-"\u0a91",
+         "\u0a93"-"\u0aa8",
+         "\u0aaa"-"\u0ab0",
+         "\u0ab2"-"\u0ab3",
+         "\u0ab5"-"\u0ab9",
+         "\u0abd",
+         "\u0ad0",
+         "\u0ae0",
+         "\u0b05"-"\u0b0c",
+         "\u0b0f"-"\u0b10",
+         "\u0b13"-"\u0b28",
+         "\u0b2a"-"\u0b30",
+         "\u0b32"-"\u0b33",
+         "\u0b36"-"\u0b39",
+         "\u0b3d",
+         "\u0b5c"-"\u0b5d",
+         "\u0b5f"-"\u0b61",
+         "\u0b85"-"\u0b8a",
+         "\u0b8e"-"\u0b90",
+         "\u0b92"-"\u0b95",
+         "\u0b99"-"\u0b9a",
+         "\u0b9c",
+         "\u0b9e"-"\u0b9f",
+         "\u0ba3"-"\u0ba4",
+         "\u0ba8"-"\u0baa",
+         "\u0bae"-"\u0bb5",
+         "\u0bb7"-"\u0bb9",
+         "\u0c05"-"\u0c0c",
+         "\u0c0e"-"\u0c10",
+         "\u0c12"-"\u0c28",
+         "\u0c2a"-"\u0c33",
+         "\u0c35"-"\u0c39",
+         "\u0c60"-"\u0c61",
+         "\u0c85"-"\u0c8c",
+         "\u0c8e"-"\u0c90",
+         "\u0c92"-"\u0ca8",
+         "\u0caa"-"\u0cb3",
+         "\u0cb5"-"\u0cb9",
+         "\u0cde",
+         "\u0ce0"-"\u0ce1",
+         "\u0d05"-"\u0d0c",
+         "\u0d0e"-"\u0d10",
+         "\u0d12"-"\u0d28",
+         "\u0d2a"-"\u0d39",
+         "\u0d60"-"\u0d61",
+         "\u0d85"-"\u0d96",
+         "\u0d9a"-"\u0db1",
+         "\u0db3"-"\u0dbb",
+         "\u0dbd",
+         "\u0dc0"-"\u0dc6",
+         "\u0e01"-"\u0e30",
+         "\u0e32"-"\u0e33",
+         "\u0e3f"-"\u0e46",
+         "\u0e81"-"\u0e82",
+         "\u0e84",
+         "\u0e87"-"\u0e88",
+         "\u0e8a",
+         "\u0e8d",
+         "\u0e94"-"\u0e97",
+         "\u0e99"-"\u0e9f",
+         "\u0ea1"-"\u0ea3",
+         "\u0ea5",
+         "\u0ea7",
+         "\u0eaa"-"\u0eab",
+         "\u0ead"-"\u0eb0",
+         "\u0eb2"-"\u0eb3",
+         "\u0ebd",
+         "\u0ec0"-"\u0ec4",
+         "\u0ec6",
+         "\u0edc"-"\u0edd",
+         "\u0f00",
+         "\u0f40"-"\u0f47",
+         "\u0f49"-"\u0f6a",
+         "\u0f88"-"\u0f8b",
+         "\u1000"-"\u1021",
+         "\u1023"-"\u1027",
+         "\u1029"-"\u102a",
+         "\u1050"-"\u1055",
+         "\u10a0"-"\u10c5",
+         "\u10d0"-"\u10f6",
+         "\u1100"-"\u1159",
+         "\u115f"-"\u11a2",
+         "\u11a8"-"\u11f9",
+         "\u1200"-"\u1206",
+         "\u1208"-"\u1246",
+         "\u1248",
+         "\u124a"-"\u124d",
+         "\u1250"-"\u1256",
+         "\u1258",
+         "\u125a"-"\u125d",
+         "\u1260"-"\u1286",
+         "\u1288",
+         "\u128a"-"\u128d",
+         "\u1290"-"\u12ae",
+         "\u12b0",
+         "\u12b2"-"\u12b5",
+         "\u12b8"-"\u12be",
+         "\u12c0",
+         "\u12c2"-"\u12c5",
+         "\u12c8"-"\u12ce",
+         "\u12d0"-"\u12d6",
+         "\u12d8"-"\u12ee",
+         "\u12f0"-"\u130e",
+         "\u1310",
+         "\u1312"-"\u1315",
+         "\u1318"-"\u131e",
+         "\u1320"-"\u1346",
+         "\u1348"-"\u135a",
+         "\u13a0"-"\u13f4",
+         "\u1401"-"\u166c",
+         "\u166f"-"\u1676",
+         "\u1681"-"\u169a",
+         "\u16a0"-"\u16ea",
+         "\u1780"-"\u17b3",
+         "\u17db",
+         "\u1820"-"\u1877",
+         "\u1880"-"\u18a8",
+         "\u1e00"-"\u1e9b",
+         "\u1ea0"-"\u1ef9",
+         "\u1f00"-"\u1f15",
+         "\u1f18"-"\u1f1d",
+         "\u1f20"-"\u1f45",
+         "\u1f48"-"\u1f4d",
+         "\u1f50"-"\u1f57",
+         "\u1f59",
+         "\u1f5b",
+         "\u1f5d",
+         "\u1f5f"-"\u1f7d",
+         "\u1f80"-"\u1fb4",
+         "\u1fb6"-"\u1fbc",
+         "\u1fbe",
+         "\u1fc2"-"\u1fc4",
+         "\u1fc6"-"\u1fcc",
+         "\u1fd0"-"\u1fd3",
+         "\u1fd6"-"\u1fdb",
+         "\u1fe0"-"\u1fec",
+         "\u1ff2"-"\u1ff4",
+         "\u1ff6"-"\u1ffc",
+         "\u203f"-"\u2040",
+         "\u207f",
+         "\u20a0"-"\u20af",
+         "\u2102",
+         "\u2107",
+         "\u210a"-"\u2113",
+         "\u2115",
+         "\u2119"-"\u211d",
+         "\u2124",
+         "\u2126",
+         "\u2128",
+         "\u212a"-"\u212d",
+         "\u212f"-"\u2131",
+         "\u2133"-"\u2139",
+         "\u2160"-"\u2183",
+         "\u3005"-"\u3007",
+         "\u3021"-"\u3029",
+         "\u3031"-"\u3035",
+         "\u3038"-"\u303a",
+         "\u3041"-"\u3094",
+         "\u309d"-"\u309e",
+         "\u30a1"-"\u30fe",
+         "\u3105"-"\u312c",
+         "\u3131"-"\u318e",
+         "\u31a0"-"\u31b7",
+         "\u3400"-"\u4db5",
+         "\u4e00"-"\u9fa5",
+         "\ua000"-"\ua48c",
+         "\uac00"-"\ud7a3",
+         "\uf900"-"\ufa2d",
+         "\ufb00"-"\ufb06",
+         "\ufb13"-"\ufb17",
+         "\ufb1d",
+         "\ufb1f"-"\ufb28",
+         "\ufb2a"-"\ufb36",
+         "\ufb38"-"\ufb3c",
+         "\ufb3e",
+         "\ufb40"-"\ufb41",
+         "\ufb43"-"\ufb44",
+         "\ufb46"-"\ufbb1",
+         "\ufbd3"-"\ufd3d",
+         "\ufd50"-"\ufd8f",
+         "\ufd92"-"\ufdc7",
+         "\ufdf0"-"\ufdfb",
+         "\ufe33"-"\ufe34",
+         "\ufe4d"-"\ufe4f",
+         "\ufe69",
+         "\ufe70"-"\ufe72",
+         "\ufe74",
+         "\ufe76"-"\ufefc",
+         "\uff04",
+         "\uff21"-"\uff3a",
+         "\uff3f",
+         "\uff41"-"\uff5a",
+         "\uff65"-"\uffbe",
+         "\uffc2"-"\uffc7",
+         "\uffca"-"\uffcf",
+         "\uffd2"-"\uffd7",
+         "\uffda"-"\uffdc",
+         "\uffe0"-"\uffe1",
+         "\uffe5"-"\uffe6"
+      ]
+  >
+|
+  < #PART_LETTER:
+      [  // all chars for which Character.isIdentifierPart is true
+         "\u0000"-"\u0008",
+         "\u000e"-"\u001b",
+         "$",
+         "0"-"9",
+         "A"-"Z",
+         "_",
+         "a"-"z",
+         "\u007f"-"\u009f",
+         "\u00a2"-"\u00a5",
+         "\u00aa",
+         "\u00b5",
+         "\u00ba",
+         "\u00c0"-"\u00d6",
+         "\u00d8"-"\u00f6",
+         "\u00f8"-"\u021f",
+         "\u0222"-"\u0233",
+         "\u0250"-"\u02ad",
+         "\u02b0"-"\u02b8",
+         "\u02bb"-"\u02c1",
+         "\u02d0"-"\u02d1",
+         "\u02e0"-"\u02e4",
+         "\u02ee",
+         "\u0300"-"\u034e",
+         "\u0360"-"\u0362",
+         "\u037a",
+         "\u0386",
+         "\u0388"-"\u038a",
+         "\u038c",
+         "\u038e"-"\u03a1",
+         "\u03a3"-"\u03ce",
+         "\u03d0"-"\u03d7",
+         "\u03da"-"\u03f3",
+         "\u0400"-"\u0481",
+         "\u0483"-"\u0486",
+         "\u048c"-"\u04c4",
+         "\u04c7"-"\u04c8",
+         "\u04cb"-"\u04cc",
+         "\u04d0"-"\u04f5",
+         "\u04f8"-"\u04f9",
+         "\u0531"-"\u0556",
+         "\u0559",
+         "\u0561"-"\u0587",
+         "\u0591"-"\u05a1",
+         "\u05a3"-"\u05b9",
+         "\u05bb"-"\u05bd",
+         "\u05bf",
+         "\u05c1"-"\u05c2",
+         "\u05c4",
+         "\u05d0"-"\u05ea",
+         "\u05f0"-"\u05f2",
+         "\u0621"-"\u063a",
+         "\u0640"-"\u0655",
+         "\u0660"-"\u0669",
+         "\u0670"-"\u06d3",
+         "\u06d5"-"\u06dc",
+         "\u06df"-"\u06e8",
+         "\u06ea"-"\u06ed",
+         "\u06f0"-"\u06fc",
+         "\u070f"-"\u072c",
+         "\u0730"-"\u074a",
+         "\u0780"-"\u07b0",
+         "\u0901"-"\u0903",
+         "\u0905"-"\u0939",
+         "\u093c"-"\u094d",
+         "\u0950"-"\u0954",
+         "\u0958"-"\u0963",
+         "\u0966"-"\u096f",
+         "\u0981"-"\u0983",
+         "\u0985"-"\u098c",
+         "\u098f"-"\u0990",
+         "\u0993"-"\u09a8",
+         "\u09aa"-"\u09b0",
+         "\u09b2",
+         "\u09b6"-"\u09b9",
+         "\u09bc",
+         "\u09be"-"\u09c4",
+         "\u09c7"-"\u09c8",
+         "\u09cb"-"\u09cd",
+         "\u09d7",
+         "\u09dc"-"\u09dd",
+         "\u09df"-"\u09e3",
+         "\u09e6"-"\u09f3",
+         "\u0a02",
+         "\u0a05"-"\u0a0a",
+         "\u0a0f"-"\u0a10",
+         "\u0a13"-"\u0a28",
+         "\u0a2a"-"\u0a30",
+         "\u0a32"-"\u0a33",
+         "\u0a35"-"\u0a36",
+         "\u0a38"-"\u0a39",
+         "\u0a3c",
+         "\u0a3e"-"\u0a42",
+         "\u0a47"-"\u0a48",
+         "\u0a4b"-"\u0a4d",
+         "\u0a59"-"\u0a5c",
+         "\u0a5e",
+         "\u0a66"-"\u0a74",
+         "\u0a81"-"\u0a83",
+         "\u0a85"-"\u0a8b",
+         "\u0a8d",
+         "\u0a8f"-"\u0a91",
+         "\u0a93"-"\u0aa8",
+         "\u0aaa"-"\u0ab0",
+         "\u0ab2"-"\u0ab3",
+         "\u0ab5"-"\u0ab9",
+         "\u0abc"-"\u0ac5",
+         "\u0ac7"-"\u0ac9",
+         "\u0acb"-"\u0acd",
+         "\u0ad0",
+         "\u0ae0",
+         "\u0ae6"-"\u0aef",
+         "\u0b01"-"\u0b03",
+         "\u0b05"-"\u0b0c",
+         "\u0b0f"-"\u0b10",
+         "\u0b13"-"\u0b28",
+         "\u0b2a"-"\u0b30",
+         "\u0b32"-"\u0b33",
+         "\u0b36"-"\u0b39",
+         "\u0b3c"-"\u0b43",
+         "\u0b47"-"\u0b48",
+         "\u0b4b"-"\u0b4d",
+         "\u0b56"-"\u0b57",
+         "\u0b5c"-"\u0b5d",
+         "\u0b5f"-"\u0b61",
+         "\u0b66"-"\u0b6f",
+         "\u0b82"-"\u0b83",
+         "\u0b85"-"\u0b8a",
+         "\u0b8e"-"\u0b90",
+         "\u0b92"-"\u0b95",
+         "\u0b99"-"\u0b9a",
+         "\u0b9c",
+         "\u0b9e"-"\u0b9f",
+         "\u0ba3"-"\u0ba4",
+         "\u0ba8"-"\u0baa",
+         "\u0bae"-"\u0bb5",
+         "\u0bb7"-"\u0bb9",
+         "\u0bbe"-"\u0bc2",
+         "\u0bc6"-"\u0bc8",
+         "\u0bca"-"\u0bcd",
+         "\u0bd7",
+         "\u0be7"-"\u0bef",
+         "\u0c01"-"\u0c03",
+         "\u0c05"-"\u0c0c",
+         "\u0c0e"-"\u0c10",
+         "\u0c12"-"\u0c28",
+         "\u0c2a"-"\u0c33",
+         "\u0c35"-"\u0c39",
+         "\u0c3e"-"\u0c44",
+         "\u0c46"-"\u0c48",
+         "\u0c4a"-"\u0c4d",
+         "\u0c55"-"\u0c56",
+         "\u0c60"-"\u0c61",
+         "\u0c66"-"\u0c6f",
+         "\u0c82"-"\u0c83",
+         "\u0c85"-"\u0c8c",
+         "\u0c8e"-"\u0c90",
+         "\u0c92"-"\u0ca8",
+         "\u0caa"-"\u0cb3",
+         "\u0cb5"-"\u0cb9",
+         "\u0cbe"-"\u0cc4",
+         "\u0cc6"-"\u0cc8",
+         "\u0cca"-"\u0ccd",
+         "\u0cd5"-"\u0cd6",
+         "\u0cde",
+         "\u0ce0"-"\u0ce1",
+         "\u0ce6"-"\u0cef",
+         "\u0d02"-"\u0d03",
+         "\u0d05"-"\u0d0c",
+         "\u0d0e"-"\u0d10",
+         "\u0d12"-"\u0d28",
+         "\u0d2a"-"\u0d39",
+         "\u0d3e"-"\u0d43",
+         "\u0d46"-"\u0d48",
+         "\u0d4a"-"\u0d4d",
+         "\u0d57",
+         "\u0d60"-"\u0d61",
+         "\u0d66"-"\u0d6f",
+         "\u0d82"-"\u0d83",
+         "\u0d85"-"\u0d96",
+         "\u0d9a"-"\u0db1",
+         "\u0db3"-"\u0dbb",
+         "\u0dbd",
+         "\u0dc0"-"\u0dc6",
+         "\u0dca",
+         "\u0dcf"-"\u0dd4",
+         "\u0dd6",
+         "\u0dd8"-"\u0ddf",
+         "\u0df2"-"\u0df3",
+         "\u0e01"-"\u0e3a",
+         "\u0e3f"-"\u0e4e",
+         "\u0e50"-"\u0e59",
+         "\u0e81"-"\u0e82",
+         "\u0e84",
+         "\u0e87"-"\u0e88",
+         "\u0e8a",
+         "\u0e8d",
+         "\u0e94"-"\u0e97",
+         "\u0e99"-"\u0e9f",
+         "\u0ea1"-"\u0ea3",
+         "\u0ea5",
+         "\u0ea7",
+         "\u0eaa"-"\u0eab",
+         "\u0ead"-"\u0eb9",
+         "\u0ebb"-"\u0ebd",
+         "\u0ec0"-"\u0ec4",
+         "\u0ec6",
+         "\u0ec8"-"\u0ecd",
+         "\u0ed0"-"\u0ed9",
+         "\u0edc"-"\u0edd",
+         "\u0f00",
+         "\u0f18"-"\u0f19",
+         "\u0f20"-"\u0f29",
+         "\u0f35",
+         "\u0f37",
+         "\u0f39",
+         "\u0f3e"-"\u0f47",
+         "\u0f49"-"\u0f6a",
+         "\u0f71"-"\u0f84",
+         "\u0f86"-"\u0f8b",
+         "\u0f90"-"\u0f97",
+         "\u0f99"-"\u0fbc",
+         "\u0fc6",
+         "\u1000"-"\u1021",
+         "\u1023"-"\u1027",
+         "\u1029"-"\u102a",
+         "\u102c"-"\u1032",
+         "\u1036"-"\u1039",
+         "\u1040"-"\u1049",
+         "\u1050"-"\u1059",
+         "\u10a0"-"\u10c5",
+         "\u10d0"-"\u10f6",
+         "\u1100"-"\u1159",
+         "\u115f"-"\u11a2",
+         "\u11a8"-"\u11f9",
+         "\u1200"-"\u1206",
+         "\u1208"-"\u1246",
+         "\u1248",
+         "\u124a"-"\u124d",
+         "\u1250"-"\u1256",
+         "\u1258",
+         "\u125a"-"\u125d",
+         "\u1260"-"\u1286",
+         "\u1288",
+         "\u128a"-"\u128d",
+         "\u1290"-"\u12ae",
+         "\u12b0",
+         "\u12b2"-"\u12b5",
+         "\u12b8"-"\u12be",
+         "\u12c0",
+         "\u12c2"-"\u12c5",
+         "\u12c8"-"\u12ce",
+         "\u12d0"-"\u12d6",
+         "\u12d8"-"\u12ee",
+         "\u12f0"-"\u130e",
+         "\u1310",
+         "\u1312"-"\u1315",
+         "\u1318"-"\u131e",
+         "\u1320"-"\u1346",
+         "\u1348"-"\u135a",
+         "\u1369"-"\u1371",
+         "\u13a0"-"\u13f4",
+         "\u1401"-"\u166c",
+         "\u166f"-"\u1676",
+         "\u1681"-"\u169a",
+         "\u16a0"-"\u16ea",
+         "\u1780"-"\u17d3",
+         "\u17db",
+         "\u17e0"-"\u17e9",
+         "\u180b"-"\u180e",
+         "\u1810"-"\u1819",
+         "\u1820"-"\u1877",
+         "\u1880"-"\u18a9",
+         "\u1e00"-"\u1e9b",
+         "\u1ea0"-"\u1ef9",
+         "\u1f00"-"\u1f15",
+         "\u1f18"-"\u1f1d",
+         "\u1f20"-"\u1f45",
+         "\u1f48"-"\u1f4d",
+         "\u1f50"-"\u1f57",
+         "\u1f59",
+         "\u1f5b",
+         "\u1f5d",
+         "\u1f5f"-"\u1f7d",
+         "\u1f80"-"\u1fb4",
+         "\u1fb6"-"\u1fbc",
+         "\u1fbe",
+         "\u1fc2"-"\u1fc4",
+         "\u1fc6"-"\u1fcc",
+         "\u1fd0"-"\u1fd3",
+         "\u1fd6"-"\u1fdb",
+         "\u1fe0"-"\u1fec",
+         "\u1ff2"-"\u1ff4",
+         "\u1ff6"-"\u1ffc",
+         "\u200c"-"\u200f",
+         "\u202a"-"\u202e",
+         "\u203f"-"\u2040",
+         "\u206a"-"\u206f",
+         "\u207f",
+         "\u20a0"-"\u20af",
+         "\u20d0"-"\u20dc",
+         "\u20e1",
+         "\u2102",
+         "\u2107",
+         "\u210a"-"\u2113",
+         "\u2115",
+         "\u2119"-"\u211d",
+         "\u2124",
+         "\u2126",
+         "\u2128",
+         "\u212a"-"\u212d",
+         "\u212f"-"\u2131",
+         "\u2133"-"\u2139",
+         "\u2160"-"\u2183",
+         "\u3005"-"\u3007",
+         "\u3021"-"\u302f",
+         "\u3031"-"\u3035",
+         "\u3038"-"\u303a",
+         "\u3041"-"\u3094",
+         "\u3099"-"\u309a",
+         "\u309d"-"\u309e",
+         "\u30a1"-"\u30fe",
+         "\u3105"-"\u312c",
+         "\u3131"-"\u318e",
+         "\u31a0"-"\u31b7",
+         "\u3400"-"\u4db5",
+         "\u4e00"-"\u9fa5",
+         "\ua000"-"\ua48c",
+         "\uac00"-"\ud7a3",
+         "\uf900"-"\ufa2d",
+         "\ufb00"-"\ufb06",
+         "\ufb13"-"\ufb17",
+         "\ufb1d"-"\ufb28",
+         "\ufb2a"-"\ufb36",
+         "\ufb38"-"\ufb3c",
+         "\ufb3e",
+         "\ufb40"-"\ufb41",
+         "\ufb43"-"\ufb44",
+         "\ufb46"-"\ufbb1",
+         "\ufbd3"-"\ufd3d",
+         "\ufd50"-"\ufd8f",
+         "\ufd92"-"\ufdc7",
+         "\ufdf0"-"\ufdfb",
+         "\ufe20"-"\ufe23",
+         "\ufe33"-"\ufe34",
+         "\ufe4d"-"\ufe4f",
+         "\ufe69",
+         "\ufe70"-"\ufe72",
+         "\ufe74",
+         "\ufe76"-"\ufefc",
+         "\ufeff",
+         "\uff04",
+         "\uff10"-"\uff19",
+         "\uff21"-"\uff3a",
+         "\uff3f",
+         "\uff41"-"\uff5a",
+         "\uff65"-"\uffbe",
+         "\uffc2"-"\uffc7",
+         "\uffca"-"\uffcf",
+         "\uffd2"-"\uffd7",
+         "\uffda"-"\uffdc",
+         "\uffe0"-"\uffe1",
+         "\uffe5"-"\uffe6",
+         "\ufff9"-"\ufffb"
+      ]
+  >
+}
+
+/* SEPARATORS */
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < LBRACKET: "[" >
+| < RBRACKET: "]" >
+| < SEMICOLON: ";" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+/* OPERATORS */
+
+TOKEN :
+{
+  < ASSIGN: "=" >
+//| < GT: ">" >
+| < LT: "<" >
+| < BANG: "!" >
+| < TILDE: "~" >
+| < HOOK: "?" >
+| < COLON: ":" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < SC_OR: "||" >
+| < SC_AND: "&&" >
+| < INCR: "++" >
+| < DECR: "--" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < SLASH: "/" >
+| < BIT_AND: "&" >
+| < BIT_OR: "|" >
+| < XOR: "^" >
+| < REM: "%" >
+| < LSHIFT: "<<" >
+| < PLUSASSIGN: "+=" >
+| < MINUSASSIGN: "-=" >
+| < STARASSIGN: "*=" >
+| < SLASHASSIGN: "/=" >
+| < ANDASSIGN: "&=" >
+| < ORASSIGN: "|=" >
+| < XORASSIGN: "^=" >
+| < REMASSIGN: "%=" >
+| < LSHIFTASSIGN: "<<=" >
+| < RSIGNEDSHIFTASSIGN: ">>=" >
+| < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+}
+
+/* >'s need special attention due to generics syntax. */
+TOKEN :
+{
+  < RUNSIGNEDSHIFT: ">>>" >
+  {
+     matchedToken.kind = GT;
+     ((Token.GTToken)matchedToken).realKind = RUNSIGNEDSHIFT;
+     input_stream.backup(2);
+     matchedToken.image = ">";
+  }
+| < RSIGNEDSHIFT: ">>" >
+  {
+     matchedToken.kind = GT;
+     ((Token.GTToken)matchedToken).realKind = RSIGNEDSHIFT;
+     input_stream.backup(1);
+     matchedToken.image = ">";
+  }
+| < GT: ">" >
+}
+
+/*****************************************
+ * THE JAVA LANGUAGE GRAMMAR STARTS HERE *
+ *****************************************/
+
+/*
+ * Program structuring syntax follows.
+ */
+
+CompilationUnit CompilationUnit() :
+{
+    CompilationUnit result;
+    PackageSpecification        ps  = null;
+    ASTList<Import>           il  = new ASTArrayList<Import>();
+    Import                      imp;
+    ASTList<TypeDeclaration>  tdl = new ASTArrayList<TypeDeclaration>();
+    TypeDeclaration             td;
+}
+{
+	// This is a quick "fix" - TypeDeclaration and PackageDeclaration unfortunately 
+	// can both start with an unlimited number of annotations. However, usually only one file
+	// per package contains package annotations, so this is not a performance issue.
+    (
+      LOOKAHEAD(PackageDeclaration())
+	  ps = PackageDeclaration()
+	  (
+	    imp = ImportDeclaration()
+	    { il.add(imp); }
+	  )*
+	  (
+	    td = TypeDeclaration()
+	    {
+	      if (td != null) tdl.add(td);
+	    }
+	  )*
+    |
+	  (
+	    imp = ImportDeclaration()
+	    { il.add(imp); }
+	  )*
+	  (
+	    td = TypeDeclaration()
+	    {
+	      if (td != null) tdl.add(td);
+	    }
+	  )*
+	)
+  <EOF>
+  {
+    result = factory.createCompilationUnit(ps, il, tdl); 
+    setPostfixInfo(result);
+    setPrefixInfo(result);
+    return result;
+  }
+}
+
+PackageSpecification PackageDeclaration() :
+{
+    PackageSpecification result;
+    UncollatedReferenceQualifier qn;
+    ASTList<AnnotationUseSpecification> annotations = new ASTArrayList<AnnotationUseSpecification>();
+    AnnotationUseSpecification annot;
+}
+{
+  (annot = AnnotationUse() {
+  	annotations.add(annot);
+  } )*
+  { 
+  	annotations.trimToSize();
+  }
+  "package" 
+      {
+          result = factory.createPackageSpecification();
+          setPrefixInfo(result);
+          result.setAnnotations(annotations);
+      }
+  qn = Name() ";"
+  {
+    result.setPackageReference(qn.toPackageReference());
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Import ImportDeclaration() :
+{
+    Import result;
+    UncollatedReferenceQualifier qn;
+    String hs = null;
+    boolean wildcard = false;
+    boolean isStatic = false;
+}
+{
+  "import"
+  {
+  	  result = factory.createImport();
+      setPrefixInfo(result);
+  }
+  ["static" { isStatic = true; }] 
+  ( qn = Name() ) [ "." "*" { wildcard = true; } ] ";"
+  {
+    // "*" will be thrown away immediately since the package name is sufficient
+      result.setMultiImport(wildcard);
+      if (isStatic) {
+      	result.setStaticImport(true);
+     	if (wildcard) {
+	     	result.setReference(qn.toTypeReference());
+     	} else {
+     		result.setStaticIdentifier(qn.getIdentifier());
+     		UncollatedReferenceQualifier urq = (UncollatedReferenceQualifier)qn.getReferencePrefix();
+     		urq.setReferenceSuffix(null);
+     		result.setReference(urq.toTypeReference());
+     	}
+      }
+      else if (wildcard) {
+          result.setReference(qn);
+      } else {
+          result.setReference(qn.toTypeReference());
+      }
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+TypeDeclaration TypeDeclaration() :
+{
+    TypeDeclaration result = null;
+}
+{
+  (
+      LOOKAHEAD( ( "abstract" | "final" | "public" | "strictfp" | AnnotationUse() )* "class" )
+      result = ClassDeclaration()
+    |
+      LOOKAHEAD( ( "abstract" | "public" | "strictfp" | AnnotationUse() )* "interface" )
+      result = InterfaceDeclaration()
+    |
+      LOOKAHEAD( ("public" | "strictfp" | "protected" | "private" | "static" | AnnotationUse() )* "enum")
+      result = EnumDeclaration()
+    |
+      LOOKAHEAD( ("strictfp" | "public" | "protected" | "private" | "static" | "abstract" | AnnotationUse() )* "@" "interface")
+      result = AnnotationTypeDeclaration()
+    |
+      ";"
+  )
+  {
+    if (result != null) { // may be removed as soon as Recoder fully understands Java5
+        setPostfixInfo(result);
+    }
+    return result;
+  }
+}
+
+
+/*
+ * Declaration syntax follows.
+ */
+ 
+AnnotationDeclaration AnnotationTypeDeclaration() :
+{
+	ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+	MethodDeclaration md;
+	FieldDeclaration fd;
+	TypeDeclaration td;
+	ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>(), methodDs;
+	DeclarationSpecifier ds;
+	Identifier name, methodName;
+	TypeReference methodRes;
+	Expression methodDefExpr;
+	AnnotationDeclaration result = new AnnotationDeclaration();
+}
+{
+	(LOOKAHEAD(2)(
+	    "strictfp" { ds = factory.createStrictFp(); }
+	  | "public" { ds = factory.createPublic(); }
+	  | "protected" { ds = factory.createProtected(); }
+	  | "private" { ds = factory.createPrivate(); }
+	  | "static" { ds = factory.createStatic(); }
+	  | "abstract" { ds = factory.createAbstract(); }
+	  | ds = AnnotationUse() 
+	 ) { declSpecs.add(ds); }
+	)*
+	"@" { setPrefixInfo(result); } 
+	"interface" <IDENTIFIER> { name = factory.createIdentifier(token.image); }
+	// here begins AnnotationTypeBody (JLS)
+	"{"
+		// AnnotationTypeElementDeclarations (JLS)
+		(
+			// this is a restricted method declaration:
+			LOOKAHEAD( (AnnotationUse() | "public" | "abstract")* Type() <IDENTIFIER>)
+			{ methodDs = new ASTArrayList<DeclarationSpecifier>(); }
+			  (( ds = AnnotationUse() 
+			    | "public" { ds = factory.createPublic(); }
+			    | "abstract" { ds = factory.createAbstract(); }
+			   ) { methodDs.add(ds); }
+			  )* 
+			  methodRes = Type() 
+			  <IDENTIFIER> { methodName = factory.createIdentifier(token.image); }
+			  "(" ")" 
+			  { methodDefExpr = null; }
+			  ["default" methodDefExpr = ElementValue()]
+			{ 
+				md = factory.createAnnotationPropertyDeclaration(methodDs, methodRes, methodName, methodDefExpr);
+				members.add(md);
+			}
+		  |
+		    // ConstantDeclaration
+		    /*LOOKAHEAD( (AnnotationUse() | "public" | "static" | "final")* Type() VariableDeclarator(true))
+		    (AnnotationUse() | "public" | "static" | "final")* Type() VariableDeclarator(true) ( "," VariableDeclarator(true))* ";"*/
+		    LOOKAHEAD(FieldDeclaration())
+		    fd = FieldDeclaration() { members.add(fd); }
+		  |
+		    LOOKAHEAD( NestedClassDeclaration() )
+		    td = NestedClassDeclaration() { members.add(td); }
+		  |
+		    LOOKAHEAD( EnumDeclaration())
+		    td = EnumDeclaration() { members.add(td); }
+		  |
+		    LOOKAHEAD( NestedInterfaceDeclaration() )
+		    td = NestedInterfaceDeclaration() { members.add(td); }
+		  | 
+		    LOOKAHEAD( AnnotationTypeDeclaration() )
+		    td = AnnotationTypeDeclaration() { members.add(td); }
+		  |
+		    ";"
+		)*
+	"}"
+	
+	{ 
+		result.setDeclarationSpecifiers(declSpecs);
+		result.setIdentifier(name);
+		result.setMembers(members);
+		setPostfixInfo(result);
+		return result;
+	}
+}
+
+ 
+EnumDeclaration EnumDeclaration() :
+{
+	DeclarationSpecifier ds;
+	ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+	EnumDeclaration result;
+	ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+	MemberDeclaration md;
+	Implements im;
+	ASTList<UncollatedReferenceQualifier> nl;
+	EnumConstantDeclaration constant;
+}
+{
+
+	(LOOKAHEAD(2)(
+	    "strictfp" { ds = factory.createStrictFp(); }
+	  | "public" { ds = factory.createPublic(); }
+	  | "protected" { ds = factory.createProtected(); }
+	  | "private" { ds = factory.createPrivate(); }
+	  | "static" { ds = factory.createStatic(); }
+	  | ds = AnnotationUse() 
+	 )	{ 
+	 		setPrefixInfo(ds);
+	 		setPostfixInfo(ds);
+	 		declSpecs.add(ds); 
+		}
+	)*
+	"enum" 
+	{
+		result = new EnumDeclaration();
+		setPrefixInfo(result);
+		if (declSpecs.size() != 0)
+			result.setDeclarationSpecifiers(declSpecs);
+	}
+	
+	<IDENTIFIER>
+    {
+          Identifier id = factory.createIdentifier(token.image);
+          setPrefixInfo(id);
+          setPostfixInfo(id);
+          result.setIdentifier(id);
+    }
+
+	[ "implements"
+	  {
+          im = factory.createImplements();
+          setPrefixInfo(im);          
+      }
+      nl = TypedNameList()
+      {
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          im.setSupertypes(trl);
+          result.setImplementedTypes(im);
+      }
+	] 
+	"{" // begin of "EnumBody"
+	  [ constant = EnumConstant() { 
+	 		members.add(constant);
+	  	}
+	  	( LOOKAHEAD(2) "," constant = EnumConstant() { members.add(constant); } )* 
+	  ] 
+	  [","] 
+	  [";" 
+	      (md = ClassBodyDeclaration()
+			 {
+		        members.add(md);
+			 }
+		   )*
+	  ] 
+	"}"
+	{ 
+	 	result.setMembers(members);
+	 	setPostfixInfo(result);
+		return result;
+	}
+}
+
+EnumConstantDeclaration EnumConstant() :
+{
+	AnnotationUseSpecification annot;
+	ASTArrayList<DeclarationSpecifier> annotations = null;
+	Identifier id;
+	ASTList<Expression> args = null;
+	ClassDeclaration cd = null;	
+	ASTList<MemberDeclaration> body = null;
+	EnumConstantSpecification spec;
+	EnumConstructorReference ref = null;
+	EnumConstantDeclaration result = new EnumConstantDeclaration();
+}
+{
+	{ setPrefixInfo(result); }
+	( 
+		{ if (annotations == null) annotations = new ASTArrayList<DeclarationSpecifier>(); }
+		annot = AnnotationUse() 
+		{ annotations.add(annot); }
+	)* 
+	
+	<IDENTIFIER> { 
+		id = factory.createIdentifier(token.image); 
+		setPrefixInfo(id);
+		setPostfixInfo(id);
+	}
+	[
+		args = Arguments() 
+	] 
+    [ 
+       {
+           cd = factory.createClassDeclaration();
+           setPrefixInfo(cd);
+       }
+       body = ClassBody()
+       {
+           cd.setMembers(body);
+           setPostfixInfo(cd);
+       }
+    ]	
+	{
+		ref = new EnumConstructorReference(args, cd);
+		setPrefixInfo(ref);  // TODO this maybe too late ?!
+		setPostfixInfo(ref);
+		spec = new EnumConstantSpecification(id, ref);
+		setPrefixInfo(spec); // TODO this maybe too late ?!
+		setPostfixInfo(spec);
+		setPostfixInfo(result);
+		result.setEnumConstantSpecification(spec);
+		result.setDeclarationSpecifiers(annotations);
+		return result;
+	}
+}
+
+
+ClassDeclaration ClassDeclaration() :
+{
+  ClassDeclaration    result = null;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
+}
+{
+  ( (
+      ( "abstract" 		{ m = factory.createAbstract(); } )
+    | ( "final"    		{ m = factory.createFinal();    } )
+    | ( "public"   		{ m = factory.createPublic();   } )
+    | ( "strictfp" 		{ m = factory.createStrictFp(); } )
+    | ( m = AnnotationUse() 							  )
+    )
+    { 
+	    setPrefixInfo(m);
+    	setPostfixInfo(m);
+        ml.add(m); 
+    }
+  )*
+  result = UnmodifiedClassDeclaration()
+    
+  {
+    result.setDeclarationSpecifiers(ml);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+ClassDeclaration UnmodifiedClassDeclaration() :
+{
+  ClassDeclaration                 result;
+  UncollatedReferenceQualifier     qn;
+  ASTList<UncollatedReferenceQualifier> nl;
+  ASTList<MemberDeclaration>     mdl;
+  Extends ex;
+  Implements im;
+  ASTList<TypeParameterDeclaration> typeParams = null;
+}
+{
+  "class"  {
+      result = factory.createClassDeclaration();
+      setPrefixInfo(result);
+  }
+  <IDENTIFIER>
+      {
+          Identifier id = factory.createIdentifier(token.image);
+          setPrefixInfo(id);
+          setPostfixInfo(id);
+          result.setIdentifier(id);
+      }
+  [ typeParams = TypeParameters() 
+  	{
+  		result.setTypeParameters(typeParams);
+  	}
+  ]
+  [ "extends"
+      {
+          ex = factory.createExtends();
+          setPrefixInfo(ex);
+      }
+      qn = TypedName()
+      {
+          ex.setSupertypes(new ASTArrayList<TypeReference>(1));
+          ex.getSupertypes().add(qn.toTypeReference());
+          result.setExtendedTypes(ex);
+      }
+  ]
+  [ "implements"
+      {
+          im = factory.createImplements();
+          setPrefixInfo(im);          
+      }
+      nl = TypedNameList()
+      {
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          im.setSupertypes(trl);
+          result.setImplementedTypes(im);
+      }
+  ]
+  mdl = ClassBody()
+  {
+    result.setMembers(mdl);
+    setPostfixInfo(result); // coordinate of "}" ?!
+    return result;
+  }
+}
+
+ASTList<MemberDeclaration> ClassBody() :
+{
+  ASTList<MemberDeclaration> result = new ASTArrayList<MemberDeclaration>();
+  MemberDeclaration md;
+}
+{
+  "{"
+  (
+    md = ClassBodyDeclaration()
+    {
+        result.add(md);
+    }
+  )*
+  "}"
+  {
+    return result;
+  }
+}
+
+ClassDeclaration NestedClassDeclaration() :
+{
+  ClassDeclaration result;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
+}
+{
+  (
+    (
+      ( "static"    { m = factory.createStatic(); }    )
+    | ( "abstract"  { m = factory.createAbstract(); }  )
+    | ( "final"     { m = factory.createFinal(); }     )
+    | ( "public"    { m = factory.createPublic(); }    )
+    | ( "protected" { m = factory.createProtected(); } )
+    | ( "private"   { m = factory.createPrivate(); }   )
+    | ( "strictfp"  { m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse() 						   )
+    )
+    {
+	    setPrefixInfo(m);
+    	setPostfixInfo(m);
+        ml.add(m);
+    }
+  )*
+  result = UnmodifiedClassDeclaration()
+  {
+    result.setDeclarationSpecifiers(ml);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+MemberDeclaration ClassBodyDeclaration() :
+{
+  MemberDeclaration result;
+}
+{
+(
+  LOOKAHEAD(2)
+  (result = Initializer() (";")*) // patch
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "class" )
+  (result = NestedClassDeclaration() (";")*) // patch
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "interface" )
+  (result = NestedInterfaceDeclaration() (";")*) // patch
+| LOOKAHEAD( (AnnotationUse())* [ ("public" | "protected" | "private")  (AnnotationUse())*] [TypeParameters()] <IDENTIFIER> "(" )
+  (result = ConstructorDeclaration()  (";")*) // patch
+| LOOKAHEAD( MethodDeclarationLookahead() )
+  (result = MethodDeclaration() (";")*) // patch
+| LOOKAHEAD( EnumDeclaration() )
+  (result = EnumDeclaration() (";")*)
+| LOOKAHEAD( AnnotationTypeDeclaration() )
+  (result = AnnotationTypeDeclaration() (";")*)
+| (result = FieldDeclaration() (";")*) // patch
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+InterfaceDeclaration InterfaceDeclaration() :
+{
+  InterfaceDeclaration result;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
+}
+{
+  (
+    (
+      ( "abstract"  	{ m = factory.createAbstract(); }  )
+    | ( "public"    	{ m = factory.createPublic(); 	}  )
+    | ( "strictfp"  	{ m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse()								   )
+    )
+    {
+        setPrefixInfo(m);
+   	    setPostfixInfo(m);
+       	ml.add(m);
+    }
+  )*
+  result = UnmodifiedInterfaceDeclaration()
+  {
+    result.setDeclarationSpecifiers(ml);
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+InterfaceDeclaration NestedInterfaceDeclaration() :
+{
+  InterfaceDeclaration result;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
+}
+{
+  (
+    (
+      ( "static"    { m = factory.createStatic(); }    )
+    | ( "abstract"  { m = factory.createAbstract(); }  )
+    | ( "final"     { m = factory.createFinal(); }     )
+    | ( "public"    { m = factory.createPublic(); }    )
+    | ( "protected" { m = factory.createProtected(); } )
+    | ( "private"   { m = factory.createPrivate(); }   )
+    | ( "strictfp"  { m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse() 						   )
+    )
+    {
+        setPrefixInfo(m);
+   	    setPostfixInfo(m);
+       	ml.add(m);
+    }
+  )*
+  result = UnmodifiedInterfaceDeclaration()
+  {
+    result.setDeclarationSpecifiers(ml);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+InterfaceDeclaration UnmodifiedInterfaceDeclaration() :
+{
+    InterfaceDeclaration             result;
+    ASTList<UncollatedReferenceQualifier> nl;
+    ASTList<MemberDeclaration>     mdl = new ASTArrayList<MemberDeclaration>();
+    MemberDeclaration                md;
+    Extends ex;
+    ASTList<TypeParameterDeclaration> typeParams = null;
+}
+{
+  "interface"
+  {
+      result = factory.createInterfaceDeclaration();
+      setPrefixInfo(result);
+  }      
+  <IDENTIFIER>
+  {
+      Identifier id = factory.createIdentifier(token.image);
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+      result.setIdentifier(id);
+  }
+  [ typeParams = TypeParameters() 
+  	{
+  		result.setTypeParameters(typeParams);
+  	}
+  ]
+  [ "extends"
+      {
+          ex = factory.createExtends();
+          setPrefixInfo(ex);
+      }
+      nl = TypedNameList()
+      {
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          ex.setSupertypes(trl);
+          result.setExtendedTypes(ex);
+      }
+  ]
+  "{"
+  (
+    md = InterfaceMemberDeclaration()
+    {
+        mdl.add(md);
+    }
+  )*
+  "}"
+  {
+    result.setMembers(mdl);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+MemberDeclaration InterfaceMemberDeclaration() :
+{
+    MemberDeclaration result;
+}
+{
+(
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "class" )
+  (result = NestedClassDeclaration() (";")*) // patch
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "interface" )
+  (result = NestedInterfaceDeclaration() (";")*) // patch
+| LOOKAHEAD( MethodDeclarationLookahead() )
+  (result = MethodDeclaration() (";")*) // patch
+| LOOKAHEAD( EnumDeclaration() )
+  (result = EnumDeclaration() (";")*)
+| LOOKAHEAD( AnnotationTypeDeclaration() )
+  (result = AnnotationTypeDeclaration() (";")*)
+| (result = FieldDeclaration() (";")*) // patch
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+FieldDeclaration FieldDeclaration() :
+{
+    FieldDeclaration result;
+    ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+    DeclarationSpecifier m = null;
+    TypeReference tr;
+    ASTArrayList<FieldSpecification> vl = new ASTArrayList<FieldSpecification>();
+    VariableSpecification var;
+    boolean hasPrefixInfo = false;
+}
+{
+   { 
+		result = factory.createFieldDeclaration();
+   }
+
+   (
+    (
+      ( "public"    { m = factory.createPublic(); }    )
+    | ( "protected" { m = factory.createProtected(); } )
+    | ( "private"   { m = factory.createPrivate(); }   )
+    | ( "static"    { m = factory.createStatic(); }    )
+    | ( "final"     { m = factory.createFinal(); }     )
+    | ( "transient" { m = factory.createTransient(); } )
+    | ( "volatile"  { m = factory.createVolatile(); }  )
+    | ( m = AnnotationUse() 						   )
+    )
+    {
+        setPrefixInfo(m);        
+   	    setPostfixInfo(m);
+       	ml.add(m);
+       	if (!hasPrefixInfo) {
+       		copyPrefixInfo(m, result);
+       		hasPrefixInfo = true;	
+      	}
+    }
+  )*
+  tr = Type()
+  {
+  	if (!hasPrefixInfo) {
+  		copyPrefixInfo(tr, result);
+  	}
+    result.setDeclarationSpecifiers(ml);
+    result.setTypeReference(tr);
+  }
+  var = VariableDeclarator(true)
+      {
+          vl.add((FieldSpecification)var);
+      }
+  (
+    ","
+    var = VariableDeclarator(true)
+    {
+          vl.add((FieldSpecification)var);
+    }
+  )*
+  ";"
+  {
+    result.setFieldSpecifications(vl);
+    //    setPrefixInfo(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+VariableSpecification VariableDeclarator(boolean isForField) :
+{
+    Identifier id;
+    int dim = 0;
+    Expression init = null;
+    VariableSpecification result;
+}
+{
+    id = VariableDeclaratorId() { dim = tmpDimension; }
+    [ "=" init = VariableInitializer() ]
+    {
+    if (isForField) {
+        result = factory.createFieldSpecification(id, dim, init);
+    } else {
+        result = factory.createVariableSpecification(id, dim, init);
+    }
+    //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Identifier VariableDeclaratorId() :
+{
+    Identifier result;
+}
+{
+  <IDENTIFIER>
+  { 
+      result = factory.createIdentifier(token.image);
+      setPrefixInfo(result);
+      setPostfixInfo(result);
+      tmpDimension = 0;
+  }
+  ( "[" "]" { tmpDimension++; } )*
+  {
+    setPostfixInfo(result);
+    //setPrefixInfo(result);
+    return result;
+  }
+}
+
+Expression VariableInitializer() :
+{
+  Expression result;
+}
+{
+(
+  result = ArrayInitializer()
+| result = Expression()
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+ArrayInitializer ArrayInitializer() :
+{
+    ArrayInitializer result;
+    ASTList<Expression> el = new ASTArrayList<Expression>();
+    Expression init;
+}
+{
+    "{" {
+        result = factory.createArrayInitializer();
+        setPrefixInfo(result);
+    }
+  [ init = VariableInitializer()
+    { el.add(init); }
+    ( LOOKAHEAD(2) ","
+      init = VariableInitializer()
+    { el.add(init); }
+    )*
+  ] [ "," ] "}"
+  {
+    result.setArguments(el);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+MethodDeclaration MethodDeclaration() :
+{
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m = null;
+  TypeReference tr;
+  ASTList<UncollatedReferenceQualifier> nl = null;
+  Throws th = null;
+  StatementBlock body = null;
+  MethodDeclaration result;
+  ASTList<TypeParameterDeclaration> typeParams = null;
+  SourceElement dummy = null;
+}
+{
+  (
+    (
+      ( "public"       { m = factory.createPublic(); }        )
+    | ( "protected"    { m = factory.createProtected(); }     )
+    | ( "private"      { m = factory.createPrivate(); }       )
+    | ( "static"       { m = factory.createStatic(); }        )
+    | ( "final"        { m = factory.createFinal(); }         )
+    | ( "abstract"     { m = factory.createAbstract(); }      )
+    | ( "native"       { m = factory.createNative(); }        )
+    | ( "synchronized" { m = factory.createSynchronized(); }  )
+    | ( "strictfp"     { m = factory.createStrictFp(); }      )
+    | ( m = AnnotationUse()									  )
+    )
+    {
+        setPrefixInfo(m);
+   	    setPostfixInfo(m);
+        ml.add(m);
+    }
+  )*
+
+  [	 	
+  	"<"
+  	{
+	    if (ml.size() == 0) { // '<' of MethodDeclaration is first element then. Need to store the result somewhere...
+	    	dummy = factory.createPublic();
+	    	setPrefixInfo(dummy); /* HACK */
+	    }
+    }
+  	typeParams = TypeParametersNoLE()
+  ]
+  tr = ResultType()
+  result = MethodDeclarator(tr)
+  {
+	  if (dummy != null) {
+	  	copyPrefixInfo(dummy, result);
+	  	dummy = null;
+	  }
+  }
+  [ "throws" {
+      th = factory.createThrows();
+      setPrefixInfo(th);      
+    }
+    nl = TypedNameList() ]
+  ( body = Block() | ";" )
+  {
+      if (nl != null) {
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              trl.add(nl.get(i).toTypeReference());
+          }
+          th.setExceptions(trl);
+          //  Throws th = factory.createThrows(trl);
+          result.setThrown(th);
+      }
+      result.setTypeParameters(typeParams);
+      result.setDeclarationSpecifiers(ml);
+      result.setBody(body);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+
+// This production is to determine lookahead only.
+void MethodDeclarationLookahead() :
+{}
+{
+  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp" | AnnotationUse() )*
+  [TypeParameters()] ResultType() <IDENTIFIER> "("
+}
+
+MethodDeclaration MethodDeclarator(TypeReference tr) :
+{
+    Identifier                      id;
+    ASTList<ParameterDeclaration> pdl;
+    MethodDeclaration               result;
+}
+{
+  <IDENTIFIER>
+  { 
+      id = factory.createIdentifier(token.image); 
+      setPrefixInfo(id); 
+      setPostfixInfo(id); 
+  }
+  pdl = FormalParameters()
+  
+  ( "[" "]" // array dims are indeed allowed after parameter list (!)
+    { if (tr != null) { tr.setDimensions(tr.getDimensions()+1); } }
+  )*
+
+  {
+      result = factory.createMethodDeclaration();
+      result.setIdentifier(id);
+      result.setTypeReference(tr);
+      result.setParameters(pdl);
+      setPrefixInfo(result); 
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+ASTList<ParameterDeclaration> FormalParameters() :
+{
+    ParameterDeclaration pd;
+    ASTList<ParameterDeclaration> result = new ASTArrayList<ParameterDeclaration>();
+}
+{
+  "("
+      [       pd = FormalParameter() { result.add(pd); }
+        ( "," pd = FormalParameter() { 
+        	// check if more params are admissible (no more after a vararg) occurs in FormalParameter()
+        	result.add(pd); 
+        } )* 
+      ]
+  ")"
+  {
+      return result;
+  }
+}
+
+ParameterDeclaration FormalParameter() :
+{
+    ParameterDeclaration result;
+    TypeReference tr;
+    DeclarationSpecifier mod = null;
+	Identifier id;
+	VariableSpecification vspec;
+	int dim;
+	ASTList<DeclarationSpecifier> ml = null;
+	boolean isVarArg = false;
+}
+{
+  (
+  	mod = AnnotationUse()
+  	{
+       if (ml == null) {
+         ml = new ASTArrayList<DeclarationSpecifier>();
+       }
+       setPrefixInfo(mod);
+       setPostfixInfo(mod);
+       ml.add(mod);
+  	}
+  
+  )*
+  [  "final"  
+  	{  
+      mod = factory.createFinal(); 
+      setPrefixInfo(mod); 
+      setPostfixInfo(mod); 
+      if (ml == null) {
+         ml = new ASTArrayList<DeclarationSpecifier>();
+      }
+      ml.add(mod);
+    } 
+    (mod = AnnotationUse()
+       {
+       setPrefixInfo(mod);
+       setPostfixInfo(mod);
+       ml.add(mod);
+       }
+    )*
+	  
+  ]
+  
+  tr = Type()
+  [ "..." 
+  	{ 
+  		isVarArg = true;
+  	} 
+  ]
+  id = VariableDeclaratorId() { dim = tmpDimension; /*if (varArgSpec != null) dim++;*/ }
+  {
+      result = factory.createParameterDeclaration(tr, id);
+      if (ml != null) {
+          result.setDeclarationSpecifiers(ml);
+      }
+      vspec = result.getVariables().get(0); 
+      vspec.setDimensions(dim);
+      setPostfixInfo(result);
+      setPrefixInfo(result); 
+      result.setVarArg(isVarArg);
+      return result;
+  }
+}
+
+
+ConstructorDeclaration ConstructorDeclaration() :
+{
+    ConstructorDeclaration          result;
+    DeclarationSpecifier            m = null;
+    ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+    Identifier                      id;
+    ASTList<ParameterDeclaration> pdl;
+    ASTList<UncollatedReferenceQualifier> nl = null;
+    SpecialConstructorReference     scr = null;
+    StatementBlock                  body;
+    ASTList<Statement>            stats = new ASTArrayList<Statement>();
+    Statement                       stat;
+}
+{
+  {
+     result = factory.createConstructorDeclaration();
+  }
+  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
+  [
+   (
+      ( "public"       { m = factory.createPublic(); }    )
+    | ( "protected"    { m = factory.createProtected(); } )
+    | ( "private"      { m = factory.createPrivate(); }   )
+   )
+    {
+      setPrefixInfo(m); 
+      setPostfixInfo(m);
+      ml.add(m);
+	}
+  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
+  ]
+  [ TypeParameters() ]
+  <IDENTIFIER> { 
+      id = factory.createIdentifier(token.image);
+      setPrefixInfo(id); 
+      setPostfixInfo(id);
+  }
+  pdl = FormalParameters()
+  {
+      setPrefixInfo(result); 
+  }
+
+  [ "throws" nl = TypedNameList() ]
+  "{"
+  {
+      body = factory.createStatementBlock();
+      setPrefixInfo(body); 
+      body.setBody(stats);
+  }
+  { setAllowSuper(false); }
+    [ LOOKAHEAD(ExplicitConstructorInvocation())
+      scr = ExplicitConstructorInvocation()
+      { stats.add(scr); }
+    ]
+  { setAllowSuper(true); }
+    ( stat = BlockStatement()
+      { stats.add(stat); }
+    )*
+  "}"
+  {
+      setPostfixInfo(body); 
+      result.setIdentifier(id);
+      result.setParameters(pdl);
+      if (!ml.isEmpty())
+          result.setDeclarationSpecifiers(ml);
+      if (nl != null) {
+          int s = nl.size();
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>(s);
+          for (int i = 0; i < s; i++) {
+              trl.add(nl.get(i).toTypeReference());
+          }
+          Throws th = factory.createThrows(trl);
+          setPrefixInfo(th);
+          result.setThrown(th);
+      }
+      result.setBody(body);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+SpecialConstructorReference ExplicitConstructorInvocation() :
+{
+    SpecialConstructorReference result;
+    ASTList<Expression> args;
+    Expression expr = null;
+}
+{
+(
+  LOOKAHEAD("this" Arguments() ";")
+  "this" 
+  {
+     result = factory.createThisConstructorReference(); setPrefixInfo(result);
+  } 
+  args = Arguments() ";"
+  { result.setArguments(args); }
+|
+  [ LOOKAHEAD(2) expr = PrimaryExpression() "." ]
+  "super" 
+  {
+     result = factory.createSuperConstructorReference(); setPrefixInfo(result);
+  } 
+  args = Arguments() ";"
+  { 
+    result.setArguments(args);
+    ((SuperConstructorReference)result).setReferencePrefix((ReferencePrefix)expr);
+   }
+)
+  {
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+ClassInitializer Initializer() :
+{
+  ClassInitializer result;
+  ASTList<DeclarationSpecifier> ml = null;
+  StatementBlock block;
+}
+{
+  [ "static"
+    {
+      ml = new ASTArrayList<DeclarationSpecifier>();
+      Static s = factory.createStatic();
+      setPrefixInfo(s); 
+      setPostfixInfo(s);
+      ml.add(s);
+    }
+  ]
+  block = Block()
+  {
+    result = factory.createClassInitializer(block);
+    setPrefixInfo(result);
+    if (ml != null) {
+      result.setDeclarationSpecifiers(ml);
+    }
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+/*
+ * Type, name and expression syntax follows.
+ */
+TypeReference Type() :
+{
+  TypeReference result;
+  UncollatedReferenceQualifier qn;
+  int dimension = 0;
+}
+{
+	(
+	LOOKAHEAD(TypedName()) // try to match typed name FIRST
+ 	  qn = TypedName() 
+ 	  {
+      	result = qn.toTypeReference();
+      }
+      ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
+      {
+      	result.setDimensions(dimension);
+      	setPostfixInfo(result);
+ 	  }
+ 	|
+ 	  result = RawType() // raw types are also types
+  	)
+  {
+      return result;
+  }
+}
+
+TypeReference RawType() :
+{
+  TypeReference result;
+  UncollatedReferenceQualifier qn;
+  int dimension = 0;
+}
+{
+  ( result = PrimitiveType() // the 1st difference to Type()
+  | (qn = Name()  // the 2nd difference to Type()
+    {
+        result = qn.toTypeReference();
+    }
+    )
+
+  )
+  ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
+  {
+      result.setDimensions(dimension);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+TypeReference PrimitiveType() :
+{
+    TypeReference result;
+}
+{
+  (
+    "boolean"
+  | "char"
+  | "byte"
+  | "short"
+  | "int"
+  | "long"
+  | "float"
+  | "double"
+  )
+  {
+    Identifier id = factory.createIdentifier(token.image);
+    setPrefixInfo(id);
+    setPostfixInfo(id);
+    result = factory.createTypeReference(id);
+    setPostfixInfo(result);
+    //    setPrefixInfo(result);
+    return result;
+  }
+}
+
+TypeReference ResultType() :
+{
+  TypeReference result;
+}
+{
+(
+  ( "void" { 
+    Identifier id = factory.createIdentifier(token.image);
+    setPrefixInfo(id);
+    setPostfixInfo(id);
+    result = factory.createTypeReference(id);
+    setPrefixInfo(result);    
+} )
+  | result = Type()
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+UncollatedReferenceQualifier Name() :
+/*
+ * A lookahead of 2 is required below since "Name" can be followed
+ * by a ".*" when used in the context of an "ImportDeclaration".
+ */
+{
+  UncollatedReferenceQualifier result;
+  Identifier id;
+}
+{
+  <IDENTIFIER>
+  {
+    id = factory.createIdentifier(token.image);    
+    setPrefixInfo(id);
+    setPostfixInfo(id);
+    result = factory.createUncollatedReferenceQualifier(id);
+  }
+  ( LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } <IDENTIFIER>
+    {
+      id = factory.createIdentifier(token.image);
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+      result = factory.createUncollatedReferenceQualifier(result, id);
+    }
+  )*
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+UncollatedReferenceQualifier TypedName() :
+/* this is for generics.
+ */
+{
+  UncollatedReferenceQualifier result;
+  Identifier id;
+  ASTList<TypeArgumentDeclaration> typeArguments = null;
+}
+{
+  <IDENTIFIER>
+  {
+    id = factory.createIdentifier(token.image);    
+    setPrefixInfo(id);
+    setPostfixInfo(id);
+  }
+  [LOOKAHEAD(2) typeArguments = TypeArguments()]
+  {
+    result = factory.createUncollatedReferenceQualifier(id);
+    result.setTypeArguments(typeArguments);
+  }
+  (
+    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } <IDENTIFIER>
+    {
+      id = factory.createIdentifier(token.image);
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+      typeArguments = null; // reset!
+    }
+    [LOOKAHEAD(2) typeArguments = TypeArguments()]
+    {
+      result = factory.createUncollatedReferenceQualifier(result, id);
+      result.setTypeArguments(typeArguments);
+    }
+  )*
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+	
+ASTList<TypeArgumentDeclaration> TypeArguments() :
+{
+	ASTList<TypeArgumentDeclaration> args = new ASTArrayList<TypeArgumentDeclaration>();
+	TypeArgumentDeclaration ta;
+}
+{
+	"<" ta = TypeArgument() { args.add(ta); } ("," ta = TypeArgument() { args.add(ta); })* ">"
+	{ return args; }
+}
+
+TypeArgumentDeclaration TypeArgument() :
+{
+	WildcardMode wm = WildcardMode.None;
+	TypeReference t = null;
+	TypeArgumentDeclaration result = new TypeArgumentDeclaration();
+}
+{
+  (
+	t = Type() 
+   { setPrefixInfo(result); }
+  |
+	"?" { wm = WildcardMode.Any; setPrefixInfo(result); } 
+		[  ("extends" { wm = WildcardMode.Extends; } 
+		    | "super"  { wm = WildcardMode.Super; }
+		   ) 
+		 t = Type()
+		]
+  )
+  { 
+  	setPostfixInfo(result);
+  	result.setWildcardMode(wm);
+  	result.setTypeReference(t);
+  	return result;
+  }
+}
+
+/*
+ASTList<UncollatedReferenceQualifier> NameList() :
+{
+  ASTList<UncollatedReferenceQualifier> result = 
+      new ASTArrayList<UncollatedReferenceQualifier>();
+  UncollatedReferenceQualifier qn;
+}
+{
+  qn = Name()
+  {
+    result.add(qn);
+  }
+  ( "," qn = Name()
+    {
+      result.add(qn);
+    }
+  )*
+  {
+    return result;
+  }
+}
+*/
+
+ASTList<UncollatedReferenceQualifier> TypedNameList() :
+{
+  ASTList<UncollatedReferenceQualifier> result = 
+      new ASTArrayList<UncollatedReferenceQualifier>();
+  UncollatedReferenceQualifier qn;
+}
+{
+  qn = TypedName()
+  {
+    result.add(qn);
+  }
+  ( "," qn = TypedName()
+    {
+      result.add(qn);
+    }
+  )*
+  {
+    return result;
+  }
+}
+
+
+/*
+ * Expression syntax follows.
+ */
+Expression Expression() :
+/*
+ * This expansion has been written this way instead of:
+ *   Assignment() | ConditionalExpression()
+ * for performance reasons.
+ * However, it is a weakening of the grammar for it allows the LHS of
+ * assignments to be any conditional expression whereas it can only be
+ * a primary expression.  Consider adding a semantic predicate to work
+ * around this.
+ */
+{
+    Expression result;
+    Expression expr;
+    Assignment op;
+    ASTList<Expression> leftRight = new ASTArrayList<Expression>();
+}
+{
+  result = ConditionalExpression()
+  [ 
+    op   = AssignmentOperator()
+    expr = Expression()
+    {
+        leftRight.add(result);
+        leftRight.add(expr);
+        op.setArguments(leftRight);
+        result = op;
+    }
+  ]
+  { 
+      setPostfixInfo(result);
+      return result;
+  }
+
+}
+
+Assignment AssignmentOperator() :
+{
+    Assignment result;
+}
+{
+  (   "="    { result = factory.createCopyAssignment(); }
+    | "*="   { result = factory.createTimesAssignment(); }
+    | "/="   { result = factory.createDivideAssignment(); }
+    | "%="   { result = factory.createModuloAssignment(); }
+    | "+="   { result = factory.createPlusAssignment(); }
+    | "-="   { result = factory.createMinusAssignment(); }
+    | "<<="  { result = factory.createShiftLeftAssignment(); }
+    | ">>="  { result = factory.createShiftRightAssignment(); }
+    | ">>>=" { result = factory.createUnsignedShiftRightAssignment(); }
+    | "&="   { result = factory.createBinaryAndAssignment(); }
+    | "^="   { result = factory.createBinaryXOrAssignment(); }
+    | "|="   { result = factory.createBinaryOrAssignment(); }
+  )
+  {
+    setPostfixInfo(result);
+    setPrefixInfo(result);
+    return result;
+  }
+}
+
+Expression ConditionalExpression() :
+{
+    Expression result;
+    Expression expr1;
+    Expression expr2;
+    Operator op;
+}
+{
+  result = ConditionalOrExpression()
+  [ "?" { op = factory.createConditional(); setPrefixInfo(op); }
+    expr1 = Expression()
+    ":" expr2 = ConditionalExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(3);
+        args.add(result);
+        args.add(expr1);
+        args.add(expr2);
+        op.setArguments(args);
+        result = op;
+    }
+  ]
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression ConditionalOrExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator op;
+}
+{
+  result = ConditionalAndExpression()
+  ( "||" { op = factory.createLogicalOr(); setPrefixInfo(op); }
+    expr = ConditionalAndExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression ConditionalAndExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator op;
+}
+{
+  result = InclusiveOrExpression()
+  ( "&&" { op = factory.createLogicalAnd(); setPrefixInfo(op); }
+    expr = InclusiveOrExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression InclusiveOrExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator op;
+}
+{
+  result = ExclusiveOrExpression()
+  ( "|" { op = factory.createBinaryOr(); setPrefixInfo(op); }
+    expr = ExclusiveOrExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression ExclusiveOrExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator op;
+}
+{
+  result = AndExpression()
+  ( "^" { op = factory.createBinaryXOr(); setPrefixInfo(op); }
+      expr = AndExpression()
+      {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
+      }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression AndExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator op;
+}
+{
+  result = EqualityExpression()
+  ( "&" { op = factory.createBinaryAnd(); setPrefixInfo(op); }
+    expr = EqualityExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression EqualityExpression() :
+{
+    Expression result;
+    Expression expr;
+    Operator cmp;
+}
+{
+  result = InstanceOfExpression()
+  ( (   "==" { cmp = factory.createEquals(); setPrefixInfo(cmp); }
+      | "!=" { cmp = factory.createNotEquals(); setPrefixInfo(cmp); }
+    )
+    expr = InstanceOfExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        cmp.setArguments(args);
+        result = cmp;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression InstanceOfExpression() :
+{
+    Expression result;
+    TypeReference tr;
+}
+{
+  result = RelationalExpression()
+  [ "instanceof" tr = Type()
+    {
+        result = factory.createInstanceof(result, tr);
+        setPrefixInfo(result);
+    }
+  ]
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression RelationalExpression() :
+{
+    Expression result;
+    Operator cmp;
+    Expression expr;
+}
+{
+  result = ShiftExpression()
+  ( (   "<"  { cmp = factory.createLessThan(); setPrefixInfo(cmp); }
+      | ">"  { cmp = factory.createGreaterThan(); setPrefixInfo(cmp); }
+      | "<=" { cmp = factory.createLessOrEquals(); setPrefixInfo(cmp); }
+      | ">=" { cmp = factory.createGreaterOrEquals(); setPrefixInfo(cmp); }
+    )
+    expr = ShiftExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        cmp.setArguments(args);
+        result = cmp;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+Expression ShiftExpression() :
+{
+    Expression result;
+    Operator shift;
+    Expression expr;
+}
+{
+  result = AdditiveExpression()
+  ( (   "<<"  { shift = factory.createShiftLeft(); setPrefixInfo(shift); }
+//      | ">>"  { shift = factory.createShiftRight(); setPrefixInfo(shift); }
+      | RSIGNEDSHIFT()  { shift = factory.createShiftRight(); setPrefixInfo(shift); }
+//      | ">>>" { shift = factory.createUnsignedShiftRight(); setPrefixInfo(shift); }
+      | RUNSIGNEDSHIFT() { shift = factory.createUnsignedShiftRight(); setPrefixInfo(shift); }
+    )
+    expr = AdditiveExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        shift.setArguments(args);
+        result = shift;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+Expression AdditiveExpression() :
+{
+    Expression result;
+    Operator add;
+    Expression expr;
+}
+{
+  result = MultiplicativeExpression()
+    ( ( "+" { add = factory.createPlus(); setPrefixInfo(add); }
+      | "-" { add = factory.createMinus(); setPrefixInfo(add); }
+    )
+    expr = MultiplicativeExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        add.setArguments(args);
+        result = add;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression MultiplicativeExpression() :
+{
+    Expression result = null;
+    Operator mult = null;
+    Expression expr;
+}
+{
+  result = UnaryExpression()
+  ( (   "*" { mult = factory.createTimes();  setPrefixInfo(mult); }
+      | "/" { mult = factory.createDivide(); setPrefixInfo(mult); }
+      | "%" { mult = factory.createModulo(); setPrefixInfo(mult); }
+    )
+    expr = UnaryExpression()
+    {
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        mult.setArguments(args);
+        result = mult;
+    }
+  )*
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+Expression UnaryExpression() :
+{
+    Expression result;
+    Expression expr;
+    boolean negative = false;
+}
+{
+(
+  ( "+" { result = factory.createPositive(); setPrefixInfo(result); } 
+  | "-" { result = factory.createNegative(); setPrefixInfo(result); } )
+  expr = UnaryExpression()
+  {
+      ((Operator)result).setArguments(new ASTArrayList<Expression>(expr));
+  }
+|
+  result = PreIncrementExpression()
+|
+  result = PreDecrementExpression()
+|
+  result = UnaryExpressionNotPlusMinus()
+)
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+PreIncrement PreIncrementExpression() :
+{
+    PreIncrement result;
+    Expression expr;
+}
+{
+  "++"
+  {
+      result = factory.createPreIncrement();
+      setPrefixInfo(result);
+  } 
+  expr = PrimaryExpression()
+  {
+      result.setArguments(new ASTArrayList<Expression>(expr));
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+PreDecrement PreDecrementExpression() :
+{
+    PreDecrement result;
+    Expression expr;
+}
+{
+  "--" 
+  {
+      result = factory.createPreDecrement();
+      setPrefixInfo(result);
+  }
+  expr = PrimaryExpression()
+  { 
+      result.setArguments(new ASTArrayList<Expression>(expr));
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+Expression UnaryExpressionNotPlusMinus() :
+{
+    Expression result;
+    Expression expr;
+    boolean    not = false;
+}
+{
+(
+  (   "~" { result = factory.createBinaryNot();  setPrefixInfo(result); }
+    | "!" { result = factory.createLogicalNot(); setPrefixInfo(result); }
+  )
+  expr = UnaryExpression()
+  {
+      ((Operator)result).setArguments(new ASTArrayList<Expression>(expr));
+  }
+  
+|
+  LOOKAHEAD( CastLookahead() )
+  result = CastExpression()
+|
+  result = PostfixExpression()
+)
+    { 
+        setPostfixInfo(result);
+        return result;
+    }
+
+}
+
+// This production is to determine lookahead only. The LOOKAHEAD specifications
+// below are not used, but they are there just to indicate that we know about
+// this.
+void CastLookahead() :
+{}
+{
+  LOOKAHEAD("(" PrimitiveType() ("[" "]")* ")")
+  "(" PrimitiveType() ("[" "]")* ")"
+  //  LOOKAHEAD(2)
+  //  "(" PrimitiveType()
+|
+  LOOKAHEAD("(" TypedName() "[")
+  "(" TypedName() "[" "]"
+|
+  "(" TypedName() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+}
+
+Expression PostfixExpression() :
+{
+    Expression result;
+}
+{
+  result = PrimaryExpression()
+  [   "++" 
+    { 
+        result = factory.createPostIncrement(result); 
+        setPrefixInfo(result);
+    }
+    | "--" 
+    { 
+        result = factory.createPostDecrement(result); 
+        setPrefixInfo(result);
+    }
+  ]
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+TypeCast CastExpression() :
+{
+    TypeCast result = null;
+    TypeReference tr;
+    Expression expr;
+}
+{
+  {
+    result = factory.createTypeCast();
+  }
+(
+  LOOKAHEAD("(" PrimitiveType())
+  "(" { setPrefixInfo(result); } tr = Type() ")"
+  expr = UnaryExpression()
+| "(" { setPrefixInfo(result); } tr = Type() ")"
+  expr = UnaryExpressionNotPlusMinus()
+)
+  {
+      result.setTypeReference(tr);
+      result.setArguments(new ASTArrayList<Expression>(expr));
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+
+Expression PrimaryExpression() :
+{
+    Expression result = null;
+    ReferencePrefix tmpResult = null;
+}
+{
+    prefix = PrimaryPrefix()
+    {
+      // create initial AST construct from prefix only
+      switch (prefix.type) {
+      case PrimaryPrefixReturnValue.LITERAL:
+          if (prefix.literal instanceof StringLiteral) {
+              tmpResult = (StringLiteral)prefix.literal;
+          } else {
+              result = prefix.literal;
+              setPostfixInfo(result);
+              return result;
+              //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          }
+          break;
+      case PrimaryPrefixReturnValue.THIS:
+          tmpResult = factory.createThisReference();
+          setPrefixInfo(tmpResult);
+          setPostfixInfo(tmpResult);
+          break;
+      case PrimaryPrefixReturnValue.SUPER_MEMBER:
+          tmpResult = prefix.name;
+          break;
+      case PrimaryPrefixReturnValue.PARENTHESIZED_EXPR:
+          tmpResult = (ParenthesizedExpression)prefix.expr;
+          break;
+      case PrimaryPrefixReturnValue.ALLOCATION_EXPR:
+          tmpResult = (ReferencePrefix)prefix.expr;
+          break;
+      case PrimaryPrefixReturnValue.CLASS_REF:
+          tmpResult = factory.createMetaClassReference(prefix.typeref);
+          setPrefixInfo(tmpResult);
+          setPostfixInfo(tmpResult);
+          break;
+      case PrimaryPrefixReturnValue.QUALIFIED_NAME:
+          tmpResult = prefix.name;
+          break;
+      default:
+          throw new ParseException("Unknown prefix");
+      }
+    }
+  ( LOOKAHEAD(2) suffix = PrimarySuffix()
+    {      
+      switch (suffix.type) {
+      case PrimarySuffixReturnValue.THIS:
+          // the prefix MUST be a type expression!!!!!
+          // we currently only create UncollatedReferenceQualifiers
+          if (tmpResult instanceof TypeReference) {
+              tmpResult = 
+                 factory.createThisReference((TypeReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+              tmpResult =
+                 factory.createThisReference(((UncollatedReferenceQualifier)tmpResult).toTypeReference());
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("No type as prefix of `this'");
+          }
+          break;
+      case PrimarySuffixReturnValue.SUPER:
+          // the prefix MUST be a type expression!!!!!
+          // we currently only create UncollatedReferenceQualifiers
+          if (tmpResult instanceof TypeReference) {
+              tmpResult = 
+                 factory.createSuperReference((TypeReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+              tmpResult =
+                 factory.createSuperReference(((UncollatedReferenceQualifier)tmpResult).toTypeReference());
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof ThisReference) {
+          	  tmpResult = 
+                 factory.createSuperReference((ThisReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("No type as prefix of `super', was "  + tmpResult.getClass());
+          }
+          break;      
+      case PrimarySuffixReturnValue.ALLOCATION_EXPR:
+          if (suffix.expr instanceof New) {
+              ((New)suffix.expr).setReferencePrefix(tmpResult);
+              tmpResult = (New)suffix.expr;
+          } else {
+              throw new ParseException("Allocation without new?");
+          }
+          break;
+      case PrimarySuffixReturnValue.INDEX_EXPR:
+          if (tmpResult instanceof UncollatedReferenceQualifier ||
+              tmpResult instanceof MethodReference ||
+              tmpResult instanceof ParenthesizedExpression ||
+              tmpResult instanceof VariableReference) {
+                  // Now we know that this is an array reference
+              ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
+              indicees.add(suffix.expr);
+              tmpResult = 
+                  factory.createArrayReference(tmpResult, indicees);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof ArrayReference) {
+              // we need to add another access dimension
+              ((ArrayReference)tmpResult).getDimensionExpressions().add(suffix.expr);
+          } else {
+              throw new ParseException("Bad index context - " +
+                                       tmpResult.getClass().getName() + "?!");
+              /*
+                e.g. StringLiteral, TypeReference, NewArray
+                (would have to be in parentheses), SuperReference, ...
+              */
+          }
+          break;
+      case PrimarySuffixReturnValue.IDENTIFIER:
+          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
+          ((UncollatedReferenceQualifier)tmpResult).setTypeArguments(suffix.typeArgs);
+          suffix.typeArgs = null;
+          setPrefixInfo(tmpResult);
+          setPostfixInfo(tmpResult);
+          break;
+      case PrimarySuffixReturnValue.ARGUMENTS:
+          // method call -determine the kind of method
+          if (tmpResult instanceof UncollatedReferenceQualifier) {
+              // this is a normal method call
+              tmpResult = factory.createMethodReference
+              (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
+               ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+              
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("Arguments without method name?");
+          }
+          break;
+      default:
+          throw new ParseException("Unknown primary suffix type");
+      }
+    }
+  )*
+  {     
+      if (tmpResult instanceof UncollatedReferenceQualifier) {
+          result = (UncollatedReferenceQualifier)tmpResult;
+          // should be a FieldReference?
+      } else {
+          result = (Expression)tmpResult;
+      }
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+
+PrimaryPrefixReturnValue PrimaryPrefix() :
+{
+    // reuses global prefix field
+    Literal                      lit;
+    Expression                   expr;
+    TypeReference                tr;
+    UncollatedReferenceQualifier qn;
+    SuperReference               supRef = null;
+    ParenthesizedExpression      parExpr = null;
+    Identifier                   id = null;
+}
+{
+(
+//  LOOKAHEAD(NonWildcardTypeArguments() "this" Arguments()) 
+//  	NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
+//      { 
+//        prefix.type = prefix.THIS; 
+//        System.err.println("Ignoring NonWildcardTypeArguments!");
+//      }
+//|
+  lit = Literal()
+  {
+      prefix.type    = prefix.LITERAL;
+      prefix.literal = lit;
+  }
+|
+  "this"
+  {
+      prefix.type = prefix.THIS;
+  }
+|
+  //[NonWildcardTypeArguments()]
+  "super" {
+      supRef = factory.createSuperReference();
+      setPrefixInfo(supRef);
+      setPostfixInfo(supRef);
+   }
+  "." <IDENTIFIER>
+  {
+      id   = factory.createIdentifier(token.image);
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+      prefix.name =
+          factory.createUncollatedReferenceQualifier(supRef, id);
+      prefix.type = prefix.SUPER_MEMBER;
+  }
+|
+  "("
+  { parExpr = factory.createParenthesizedExpression();
+    setPrefixInfo(parExpr);
+  }
+  expr = Expression()
+  ")"
+  {
+      setPostfixInfo(parExpr);
+      parExpr.setArguments(new ASTArrayList<Expression>(expr));
+      prefix.expr = parExpr;
+      prefix.type = prefix.PARENTHESIZED_EXPR;
+  }
+|
+  expr = AllocationExpression()
+  {
+      prefix.type = prefix.ALLOCATION_EXPR;
+      prefix.expr = expr;
+  }
+|
+  LOOKAHEAD( ResultType() "." "class" )
+  tr = ResultType() "." "class"
+  {
+      prefix.type    = prefix.CLASS_REF;
+      prefix.typeref = tr;
+  }
+|
+  qn = Name()
+  {
+      prefix.type = prefix.QUALIFIED_NAME;
+      prefix.name = qn;
+  }
+)
+  {
+      return prefix;
+  }
+}
+
+PrimarySuffixReturnValue PrimarySuffix() :
+{
+    // reuses global suffix field
+    Expression               expr;
+    ASTList<Expression>    args;
+    Identifier               id;
+    ASTList<TypeArgumentDeclaration> typeArgs;
+}
+{
+(
+  LOOKAHEAD(2)
+  "." "this"
+  {
+      suffix.type = suffix.THIS;
+  }
+|
+  LOOKAHEAD(2, {isSuperAllowed()})
+  "." "super"
+  {
+  	  suffix.type = suffix.SUPER;
+  }
+|
+  LOOKAHEAD(2)
+  "." expr = AllocationExpression()
+  {
+      suffix.type = suffix.ALLOCATION_EXPR;
+      suffix.expr = expr;
+  }
+|
+  LOOKAHEAD(3) // explicit Generic method invocation
+  "." 
+  	  suffix.typeArgs = NonWildcardTypeArguments() <IDENTIFIER>
+  {
+  	  suffix.type = suffix.IDENTIFIER;
+  	  suffix.id = factory.createIdentifier(token.image);
+  	  setPrefixInfo(suffix.id);
+  	  setPostfixInfo(suffix.id);
+  }
+|  "[" expr = Expression() "]"
+  {
+      suffix.type = suffix.INDEX_EXPR;
+      suffix.expr = expr;
+  }
+|
+  "." <IDENTIFIER>
+  {
+      suffix.type = suffix.IDENTIFIER;
+      suffix.id   = factory.createIdentifier(token.image);
+      setPrefixInfo(suffix.id);
+      setPostfixInfo(suffix.id);
+  }
+|
+  args = Arguments()
+  {
+      suffix.type = suffix.ARGUMENTS;
+      suffix.args = args;
+  }
+)
+  {
+      return suffix;
+  }
+}
+
+Literal Literal() :
+{
+    Literal result;
+}
+{
+(
+  <INTEGER_LITERAL>
+  {
+      if (token.image.endsWith("L") || token.image.endsWith("l")) {
+          result = factory.createLongLiteral(token.image);
+      } else {
+          result = factory.createIntLiteral(token.image);
+      }
+      setPrefixInfo(result);
+  }
+| <FLOATING_POINT_LITERAL>
+  {
+      if (token.image.endsWith("F") || token.image.endsWith("f")) {
+          result = factory.createFloatLiteral(token.image);
+      } else {
+          result = factory.createDoubleLiteral(token.image);
+      }
+      setPrefixInfo(result);
+  }
+| <CHARACTER_LITERAL>
+  {
+      result = factory.createCharLiteral(token.image);
+      setPrefixInfo(result);
+  }
+| <STRING_LITERAL>
+  {
+      result = factory.createStringLiteral(token.image);
+      setPrefixInfo(result);
+  }
+| result = BooleanLiteral()
+| result = NullLiteral()
+)
+  { 
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+BooleanLiteral BooleanLiteral() :
+{
+    BooleanLiteral result;
+}
+{
+(
+  "true" { result = factory.createBooleanLiteral(true); }
+|
+  "false" { result = factory.createBooleanLiteral(false); }
+)
+  { 
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+NullLiteral NullLiteral() :
+{
+    NullLiteral result;
+}
+{
+  "null"
+  {
+      result = factory.createNullLiteral();
+      setPrefixInfo(result);
+      return result;
+  }
+}
+
+ASTList<Expression> Arguments() :
+{
+    ASTList<Expression> result = null;
+}
+{
+  "(" [ result = ArgumentList() ] ")"
+  {
+      // !!! should set end coordinates to parent, possibly
+      return result;
+  }
+}
+
+ASTList<Expression> ArgumentList() :
+{
+    ASTList<Expression> result = new ASTArrayList<Expression>();
+    Expression expr;
+}
+{
+        expr = Expression() { result.add(expr); }
+  ( LOOKAHEAD("," Expression()) "," expr = Expression() { result.add(expr); } )*
+  {
+    return result;
+  }
+}
+
+TypeOperator AllocationExpression() :
+{
+    UncollatedReferenceQualifier qn;
+    TypeOperator  result;
+    TypeReference tr;
+    ASTList<Expression> args;
+    ASTList<MemberDeclaration> body = null;
+    ClassDeclaration cd = null;
+    NewArray na;
+    ASTList<TypeArgumentDeclaration> typeArgs;
+}
+{
+(
+  LOOKAHEAD(2)
+  "new" 
+    {
+        na = factory.createNewArray();
+        setPrefixInfo(na);
+    }
+    tr = PrimitiveType()
+    {
+        na.setTypeReference(tr);
+    }
+    result = ArrayDimsAndInits(na)
+|
+  "new"
+  {
+      result = factory.createNew();
+      setPrefixInfo(result);
+  }
+  qn = TypedName()
+  [typeArgs = NonWildcardTypeArguments() { qn.setTypeArguments(typeArgs); } ]
+  (
+   args = Arguments()
+     [ 
+       {
+           cd = factory.createClassDeclaration();
+           setPrefixInfo(cd);
+       }
+       body = ClassBody()
+       {
+           cd.setMembers(body);
+           setPostfixInfo(cd);
+       }
+     ]
+     {
+         result.setTypeReference(qn.toTypeReference());
+         ((New)result).setArguments(args);
+         if (cd != null) {
+             ((New)result).setClassDeclaration(cd);
+         }
+     }
+   |
+     {        
+        na = factory.createNewArray();
+        copyPrefixInfo(result, na);
+        na.setTypeReference(qn.toTypeReference());
+     }
+     result = ArrayDimsAndInits(na)
+  )
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+/*
+ * The third LOOKAHEAD specification below is to parse to PrimarySuffix
+ * if there is an expression between the "[...]".
+ */
+NewArray ArrayDimsAndInits(NewArray result) :
+{
+    int dimensions = 0;
+    Expression expr;
+    ASTList<Expression> sizes = null;
+    ArrayInitializer init = null;
+}
+{
+(
+  LOOKAHEAD(2)
+  ( LOOKAHEAD(2)
+      "[" expr = Expression() "]"
+      {
+          sizes = (sizes == null) ? new ASTArrayList<Expression>() : sizes;
+          sizes.add(expr);
+          dimensions++;
+      }
+    )+
+    ( LOOKAHEAD(2)
+      "[" "]"
+      { dimensions++; }
+    )*
+|
+  ( "[" "]" 
+      { dimensions++; }
+  )+
+  init = ArrayInitializer()
+)
+  {
+      //      setPrefixInfo(result); 
+      result.setDimensions(dimensions);
+      if (sizes != null) {
+          result.setArguments(sizes);
+      }
+      result.setArrayInitializer(init);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+/*
+ * Statement syntax follows.
+ */
+Statement Statement() :
+{
+  Statement result = null;
+  Expression expr;
+}
+{
+(
+  LOOKAHEAD(2)
+  result = LabeledStatement()
+| result = Block()
+| result = EmptyStatement()
+| expr   = StatementExpression() ";"
+  {
+      try {
+          result = (ExpressionStatement)expr;
+      }
+      catch (ClassCastException cce) {
+          // this is a semantical error!!!
+          throw new ParseException("Class cast error: ExpressionStatement expected - found " + recoder.convenience.Format.toString("%c @%p %s", expr));
+      }
+  }
+| result = SwitchStatement()
+| result = IfStatement()
+| result = WhileStatement()
+| result = DoStatement()
+| result = ForStatement()
+| result = BreakStatement()
+| result = ContinueStatement()
+| result = ReturnStatement()
+| result = ThrowStatement()
+| result = SynchronizedStatement()
+| result = TryStatement()
+| result = AssertStatement()
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+LabeledStatement LabeledStatement() :
+{
+  LabeledStatement result;
+  Identifier id;
+  Statement stat;
+}
+{
+  <IDENTIFIER>
+  {
+      id = factory.createIdentifier(token.image);
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+  }
+  ":"
+  {
+      result = factory.createLabeledStatement();
+      setPrefixInfo(result);
+      result.setIdentifier(id);
+  }
+  stat = Statement()
+  {
+    result.setBody(stat);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+StatementBlock Block() :
+{
+  StatementBlock result;
+  ASTList<Statement> sl = new ASTArrayList<Statement>();
+  Statement stat;
+}
+{
+  "{"
+  {
+    result = factory.createStatementBlock();
+    setPrefixInfo(result);
+  }
+  ( stat = BlockStatement()
+    {
+      sl.add(stat);
+    }
+  )*
+  "}"
+  {
+    result.setBody(sl);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Statement BlockStatement() :
+{
+  Statement result;
+}
+{
+(
+  LOOKAHEAD((AnnotationUse())* [ "final" ] Type() <IDENTIFIER>)
+  result = LocalVariableDeclaration() ";"
+| result = Statement()
+| result = UnmodifiedClassDeclaration()
+// | result = UnmodifiedInterfaceDeclaration()   removed: not valid!
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+LocalVariableDeclaration LocalVariableDeclaration() :
+{
+  LocalVariableDeclaration result;
+  ASTList<VariableSpecification> vl = new ASTArrayList<VariableSpecification>(1);
+  TypeReference tr;
+  VariableSpecification var;
+  ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+  AnnotationUseSpecification annot;
+}
+{
+  {
+    result = factory.createLocalVariableDeclaration();
+    setPrefixInfo(result);
+  }
+  (annot = AnnotationUse() { declSpecs.add(annot); })*
+  [ "final" 
+    { 
+      Final fi = factory.createFinal(); 
+      setPrefixInfo(fi);
+      setPostfixInfo(fi);
+      declSpecs.add(fi);
+    } 
+   (annot = AnnotationUse() { declSpecs.add(annot); })*
+  ]
+  {
+    if (declSpecs.size() != 0)
+    	result.setDeclarationSpecifiers(declSpecs); 
+  }
+  tr = Type()
+  var = VariableDeclarator(false) { vl.add(var); }
+  ( "," 
+    var = VariableDeclarator(false)  { vl.add(var); }
+  )*
+  {
+      result.setTypeReference(tr);
+      result.setVariableSpecifications(vl);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+EmptyStatement EmptyStatement() :
+{
+    EmptyStatement result;
+}
+{
+  ";"
+  {
+    result = factory.createEmptyStatement(); 
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Expression StatementExpression() :
+/*
+ * The last expansion of this production accepts more than the legal
+ * Java expansions for StatementExpression.  This expansion does not
+ * use PostfixExpression for performance reasons.
+ */
+{
+    Expression result;
+    Expression expr;
+    Assignment op;
+    ASTList<Expression> leftRight;
+}
+{
+(
+  result = PreIncrementExpression()
+| result = PreDecrementExpression()
+| (
+    result = PrimaryExpression()
+    [
+      "++" { 
+          result = factory.createPostIncrement(result); 
+          setPrefixInfo(result);
+      }
+    | "--" { 
+        result = factory.createPostDecrement(result); 
+        setPrefixInfo(result);
+      }
+    | ( op = AssignmentOperator()
+        expr = Expression()
+        {
+          leftRight = new ASTArrayList<Expression>(2);
+          leftRight.add(result);
+          leftRight.add(expr);
+          op.setArguments(leftRight);
+          result = op;
+        }
+      )
+    ]
+  )
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Switch SwitchStatement() :
+{
+  Switch result;
+  Expression expr;
+  ASTList<Branch> branches = new ASTArrayList<Branch>(2);
+  Branch branch;
+  ASTList<Statement> stats;
+  Statement stat;
+}
+{
+  "switch" 
+  {
+      result = factory.createSwitch();
+      setPrefixInfo(result);
+   } 
+   "(" expr = Expression() ")" "{"
+    ( branch = SwitchLabel()
+      {
+        stats = new ASTArrayList<Statement>();
+      }
+      ( stat = BlockStatement()
+        {
+          stats.add(stat);
+        }
+      )*
+      {
+        if (branch instanceof Case) {
+          ((Case)branch).setBody(stats);
+        } else {
+          ((Default)branch).setBody(stats);
+        }
+        branches.add(branch);
+      }
+    )*
+  "}"
+  {
+      result.setExpression(expr);
+      result.setBranchList(branches);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+Branch SwitchLabel() :
+/*
+ * The returned branch is not completely initialized - only the label is set
+ */
+{
+  Branch result;
+  Expression expr;
+}
+{
+(
+  ( "case"  
+    { 
+        result = factory.createCase(); 
+        setPrefixInfo(result); 
+    } 
+    expr = Expression() 
+    ":"  
+    { 
+        ((Case)result).setExpression(expr); 
+    } 
+  )
+  | 
+  ( "default"
+    { 
+        result = factory.createDefault(); 
+        setPrefixInfo(result); 
+    } 
+    ":" 
+  )
+)
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Assert AssertStatement() :
+
+{
+  Assert result;
+  Expression cond = null;
+  Expression msg = null;
+}
+{
+   "assert"
+   {
+       result = factory.createAssert();
+       setPrefixInfo(result);
+   }
+   cond = Expression()
+   [
+    ":"
+    msg = Expression()    
+   ]
+  ";"
+  {
+      
+      result.setCondition(cond);
+      result.setMessage(msg);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+
+If IfStatement() :
+/*
+ * The disambiguating algorithm of JavaCC automatically binds dangling
+ * else's to the innermost if statement.  The LOOKAHEAD specification
+ * is to tell JavaCC that we know what we are doing.
+ */
+{
+  If result;
+  Expression cond;
+  Then thenStat;
+  Else elseStat = null;
+  Statement trueStat;
+  Statement falseStat = null;
+}
+{
+  "if" 
+  {
+      result = factory.createIf();
+      setPrefixInfo(result);
+  }
+  "(" cond = Expression() ")" 
+  {
+      thenStat = factory.createThen();
+      setPrefixInfo(thenStat);
+  }
+  trueStat = Statement()
+  {
+     thenStat.setBody(trueStat);
+  }
+  [ LOOKAHEAD(1) "else" 
+    {
+        elseStat = factory.createElse();
+        setPrefixInfo(elseStat);
+    }
+    falseStat = Statement() 
+    {
+       elseStat.setBody(falseStat);
+    }
+  ]
+  {
+      result.setExpression(cond);
+      result.setThen(thenStat);
+      if (elseStat != null) {
+          result.setElse(elseStat);
+      }
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+While WhileStatement() :
+{
+  While result;
+  Expression expr;
+  Statement stat;
+}
+{
+  "while" 
+  {
+    result = factory.createWhile();
+    setPrefixInfo(result);
+  }
+  "(" expr = Expression() ")" stat = Statement()
+  {
+    result.setGuard(expr);
+    result.setBody(stat);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Do DoStatement() :
+{
+  Do result;
+  Expression expr;
+  Statement stat;
+}
+{
+  "do" 
+  {
+      result = factory.createDo();
+      setPrefixInfo(result);
+  }
+  stat = Statement() "while" "(" expr = Expression() ")" ";"
+  {
+    result.setGuard(expr);
+    result.setBody(stat);    
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+LoopStatement ForStatement() :
+{
+    LoopStatement result;
+    ASTList<LoopInitializer> init = null;
+    Expression guard = null;
+    ASTList<Expression> update = null;
+    Statement body;
+}
+{
+  "for" 
+//  {
+//      result = factory.createFor();
+//      setPrefixInfo(result);
+//  }
+	   //"(" 
+	   (
+  	// old for
+  	   LOOKAHEAD( "(" [ForInit()] ";")
+  	      { 
+  	      	result = factory.createFor();
+  	      	setPrefixInfo(result);
+  	      }
+  	      "("
+	   	  [ init = ForInit() ] ";"
+	      [ guard = Expression() ] ";"
+    	  [ update = ForUpdate() ] 
+    
+    | LOOKAHEAD( "(" ForInit() ":")
+    // enhanced for loop / "foreach"
+    	{
+    		result = factory.createEnhancedFor();
+    		setPrefixInfo(result);	
+    	}
+    	"("
+    	init = ForInit()
+    	":"
+    	guard = Expression()
+       )
+       // this is common again
+  	   ")"
+	      body = Statement()
+	  {
+    	  result.setInitializers(init);
+	      result.setGuard(guard);
+    	  result.setUpdates(update);
+	      result.setBody(body);
+	      setPostfixInfo(result);
+	      return result;
+	  }
+}
+
+ASTList<LoopInitializer> ForInit() :
+{
+    ASTList<LoopInitializer> result = new ASTArrayList<LoopInitializer>();
+    LocalVariableDeclaration varDecl = null;
+    ASTList<Expression> exprs = null;
+}
+{
+(
+  LOOKAHEAD( [ "final" ] Type() <IDENTIFIER> )
+  varDecl = LocalVariableDeclaration()
+| exprs   = StatementExpressionList()
+)
+    {
+        if (varDecl != null) {
+            result.add(varDecl);
+        } else {
+            for (int i =  0, s = exprs.size(); i < s; i += 1) {
+                result.add((LoopInitializer)exprs.get(i));
+            }
+        }
+        return result;
+    }
+}
+
+ASTList<Expression> StatementExpressionList() :
+{
+    ASTList<Expression> result = new ASTArrayList<Expression>();
+    Expression expr;
+}
+{
+        expr = StatementExpression() { result.add(expr); }
+  ( "," expr = StatementExpression() { result.add(expr); } )*
+  {
+      return result;
+  }
+}
+
+ASTList<Expression> ForUpdate() :
+{
+    ASTList<Expression> result;
+}
+{
+  result = StatementExpressionList()
+  { 
+    return result;
+  }
+}
+
+Break BreakStatement() :
+{
+    Identifier id = null;
+    Break result;
+}
+{
+  "break" 
+  { 
+      result = factory.createBreak(); 
+      setPrefixInfo(result); 
+   }
+  [ <IDENTIFIER> { 
+      id = factory.createIdentifier(token.image); 
+      setPrefixInfo(id);
+      setPostfixInfo(id);
+      result.setIdentifier(id);
+  } ] ";"
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Continue ContinueStatement() :
+{
+    Identifier id = null;
+    Continue result;
+}
+{
+  "continue" 
+  {
+      result = factory.createContinue();
+      setPrefixInfo(result);     
+  }
+  [ <IDENTIFIER> 
+     {
+         id = factory.createIdentifier(token.image); 
+         setPrefixInfo(id);
+         setPostfixInfo(id);
+         result.setIdentifier(id);
+       }
+  ] ";"
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+Return ReturnStatement() :
+{
+    Expression expr = null;
+    Return result;
+}
+{
+  "return" 
+  {
+      result = factory.createReturn();
+      setPrefixInfo(result);
+  }
+  [ expr = Expression() 
+    { 
+        result.setExpression(expr); 
+    } 
+  ]   
+  ";"
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+Throw ThrowStatement() :
+{
+    Throw result;
+    Expression expr;
+}
+{
+  "throw" 
+  {
+      result = factory.createThrow();      
+      setPrefixInfo(result);
+  }
+      expr = Expression() ";"
+  {
+      result.setExpression(expr);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+SynchronizedBlock SynchronizedStatement() :
+{
+    SynchronizedBlock result;
+    Expression expr;
+    StatementBlock block;
+}
+{
+  "synchronized" 
+  {
+      result = factory.createSynchronizedBlock();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression() ")"
+  block = Block()
+  {
+      result.setExpression(expr);
+      result.setBody(block);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+Try TryStatement() :
+/*
+ * Semantic check required here to make sure that at least one
+ * finally/catch is present.
+ */
+{
+    Try result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Catch cat;
+    Finally fin;
+}
+{
+  "try"
+      {
+        result = factory.createTry();
+        setPrefixInfo(result);
+      }
+  block = Block()
+      {
+          result.setBody(block);
+      }
+  ( "catch" 
+    {
+      cat = factory.createCatch();
+      setPrefixInfo(cat);
+    }
+    "("  param = FormalParameter() ")"  
+    block = Block()
+    {
+        cat.setParameterDeclaration(param);
+        cat.setBody(block);
+        branches.add(cat);
+    }
+  )*
+  [ "finally" 
+     {
+         fin = factory.createFinally();
+         setPrefixInfo(fin);
+     }
+    block = Block()
+      {
+          fin.setBody(block);
+          branches.add(fin);
+      }
+  ]
+  {
+    result.setBranchList(branches);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+/**
+   For partial parsing ONLY. Allows this()/super() calls, as in
+   constructor bodies.
+ */
+ASTList<Statement> GeneralizedStatements() :
+{
+    ASTList<Statement>            result = new ASTArrayList<Statement>();
+    SpecialConstructorReference     scr = null;
+    Statement                       stat = null;
+}
+{
+    [ LOOKAHEAD(ExplicitConstructorInvocation())
+      scr = ExplicitConstructorInvocation()
+      { result.add(scr); }
+    ]
+    ( stat = BlockStatement()
+      { result.add(stat); }
+    )*
+  {
+      return result;
+  }
+}
+
+// Java 5 specific 
+AnnotationUseSpecification AnnotationUse() :
+{
+	TypeReference tr;	
+	AnnotationUseSpecification result = factory.createAnnotationUseSpecification();
+	Expression ev = null;
+	ASTList<AnnotationElementValuePair> list = null;
+	Identifier ident;
+	AnnotationPropertyReference id;
+	AnnotationElementValuePair evp;
+}
+{
+	"@"
+	 { setPrefixInfo(result); }
+	tr = Type()
+	[ "(" { list = new ASTArrayList<AnnotationElementValuePair>(); }
+	    [
+			   LOOKAHEAD(<IDENTIFIER> "=")
+				<IDENTIFIER> { 
+					ident = factory.createIdentifier(token.image); 
+					setPrefixInfo(ident);
+					setPostfixInfo(ident);
+					id = factory.createAnnotationPropertyReference(ident);
+					copyPrefixInfo(ident, id);
+					setPostfixInfo(id);
+				} "=" ev = ElementValue() 
+				{ 
+					 	evp = new AnnotationElementValuePair(id, ev);
+					 	copyPrefixInfo(ident, evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 				
+				} 
+				(
+					"," <IDENTIFIER> { 
+						ident = factory.createIdentifier(token.image); 
+						setPrefixInfo(ident);
+						setPostfixInfo(ident);
+						id = factory.createAnnotationPropertyReference(ident);
+						copyPrefixInfo(ident, id);
+						setPostfixInfo(id);
+					 } "=" ev = ElementValue() 
+					 { 
+					 	evp = new AnnotationElementValuePair(id, ev);
+					 	copyPrefixInfo(ident, evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 
+					} 
+				)*
+			| 
+			   LOOKAHEAD(ElementValue())
+			  	ev = ElementValue() { 
+			  			evp = new AnnotationElementValuePair(null, ev);
+					 	copyPrefixInfo(ev, evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 
+			  	} // Single Element Annotation
+		]
+	 ")"
+	]
+	{
+		result.setTypeReference(tr);
+		if (list != null) {
+			result.setElementValuePairs(list);
+		}
+		setPostfixInfo(result);
+		return result;
+	}
+}
+
+Expression ElementValue() :
+{
+	Expression res = null;
+	Expression tmp;
+	ASTList<Expression> elist = null;
+}
+{
+	(   res = Expression()
+	  | res = AnnotationUse()
+	  | "{" { res = new ElementValueArrayInitializer(); setPrefixInfo(res); }
+	       [tmp = ElementValue() 
+	  		 {
+    		 	elist = new ASTArrayList<Expression>();  
+	  			elist.add(tmp);
+	  		 }
+	  		 (LOOKAHEAD(2) "," tmp = ElementValue()
+	  			{ elist.add(tmp); }
+	  		 )* [","] 
+            ]
+         "}"
+		{
+			setPostfixInfo(res);
+			((ElementValueArrayInitializer)res).setElementValues(elist);
+		}
+	  			
+	)
+	{ 
+		return res; 
+	}
+}
+
+ASTList<TypeArgumentDeclaration> NonWildcardTypeArguments() :
+{
+	ASTList<UncollatedReferenceQualifier> nl;
+	ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>();
+	TypeArgumentDeclaration ta;
+}
+{
+	"<" nl = TypedNameList() ">"	
+	{
+		for (int i = 0; i < nl.size(); i++) {
+			ta = new TypeArgumentDeclaration(nl.get(i).toTypeReference());
+			res.add(ta);
+		}
+		return res;
+	}
+}
+
+// HACK for handling position of methodDeclarations correctly
+ASTList<TypeParameterDeclaration> TypeParametersNoLE() :
+{
+	ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+	TypeParameterDeclaration tp;
+}
+{
+  tp = TypeParameter() { res.add(tp); } ("," tp = TypeParameter() { res.add(tp);})* ">"
+  {
+  	return res;
+  }
+}
+
+ASTList<TypeParameterDeclaration> TypeParameters() :
+{
+	ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+}
+{
+  "<" res = TypeParametersNoLE()
+  { return res; }
+}
+
+TypeParameterDeclaration TypeParameter() :
+{
+	TypeParameterDeclaration res = new TypeParameterDeclaration();
+	Identifier id;
+	ASTList<TypeReference> bound = null;
+}
+{
+	<IDENTIFIER> { 
+		id = factory.createIdentifier(token.image); 
+		setPrefixInfo(id);
+		setPostfixInfo(id);
+	} ["extends" bound = Bound()]	
+	{
+		res.setIdentifier(id);
+		res.setBound(bound);
+		return res;
+	}
+}
+
+ASTList<TypeReference> Bound() :
+{
+	TypeReference tr;
+	ASTList<TypeReference> res = new ASTArrayList<TypeReference>();
+}
+{
+	tr = Type() {res.add(tr);} ("&" tr = Type() {res.add(tr);})*	
+	{ 
+		return res;
+	}
+}
+
+/* We use productions to match >>>, >> and > so that we can keep the
+ * type declaration syntax with generics clean
+ */
+
+void RUNSIGNEDSHIFT():
+{}
+{
+  ( LOOKAHEAD({ getToken(1).kind == GT &&
+                ((Token.GTToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
+   ">" ">" ">"
+  )
+}
+
+void RSIGNEDSHIFT():
+{}
+{
+  ( LOOKAHEAD({ getToken(1).kind == GT &&
+                ((Token.GTToken)getToken(1)).realKind == RSIGNEDSHIFT} )
+  ">" ">"
+  )
+}

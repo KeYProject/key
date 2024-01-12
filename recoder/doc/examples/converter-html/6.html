@@ -1,0 +1,195 @@
+<HTML><HEAD><TITLE>ConverterRangeModel</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+/*
+ * 1.1+Swing version.
+ */
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#3">event</A>.*;
+
+/** 
+ * Based on the source code for DefaultBoundedRangeModel,
+ * this class stores its value as a double, rather than 
+ * an int.  The minimum value and extent are always 0.
+ **/
+public class <U><A NAME="5">ConverterRangeModel</A></U> implements <A HREF="XRef.html#2p">BoundedRangeModel</A> {
+    protected <A HREF="XRef.html#d">ChangeEvent</A> <U><A NAME="2q">changeEvent</A></U> = null;
+    protected <A HREF="XRef.html#2r">EventListenerList</A> <U><A NAME="2s">listenerList</A></U> = <A HREF="XRef.html#2t">new</A> <A HREF="XRef.html#2r">EventListenerList</A>();
+
+    protected <A HREF="XRef.html#g">int</A> <U><A NAME="2u">maximum</A></U> = 10000;
+    protected <A HREF="XRef.html#g">int</A> <U><A NAME="2v">minimum</A></U> = 0;
+    protected <A HREF="XRef.html#g">int</A> <U><A NAME="2w">extent</A></U> = 0;
+    protected <A HREF="XRef.html#k">double</A> <U><A NAME="2x">value</A></U> = 0.0;
+    protected <A HREF="XRef.html#k">double</A> <U><A NAME="n">multiplier</A></U> = 1.0;
+    protected <A HREF="XRef.html#1d">boolean</A> <U><A NAME="2y">isAdjusting</A></U> = false;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="o">DEBUG</A></U> = false;
+
+    public <U><A NAME="2z">ConverterRangeModel</A></U>() {}
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="m">getMultiplier</A></U>() {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel getMultiplier");
+        }
+        return <A HREF="XRef.html#n">multiplier</A>;
+    }
+
+    public void <U><A NAME="30">setMultiplier</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="31">multiplier</A></U>) {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setMultiplier");
+        }
+        this.<A HREF="XRef.html#n">multiplier</A> = <A HREF="XRef.html#31">multiplier</A>;
+        <A HREF="XRef.html#f">fireStateChanged</A>();
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="j">getMaximum</A></U>() {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel getMaximum");
+        }
+        return <A HREF="XRef.html#2u">maximum</A>;
+    }
+
+    public void <U><A NAME="u">setMaximum</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="32">newMaximum</A></U>) {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setMaximum");
+        }
+        <A HREF="XRef.html#1g">setRangeProperties</A>(<A HREF="XRef.html#2x">value</A>, <A HREF="XRef.html#2w">extent</A>, <A HREF="XRef.html#2v">minimum</A>, <A HREF="XRef.html#32">newMaximum</A>, <A HREF="XRef.html#2y">isAdjusting</A>);
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="33">getMinimum</A></U>() {
+        return (<A HREF="XRef.html#g">int</A>)<A HREF="XRef.html#2v">minimum</A>;
+    }
+
+    public void <U><A NAME="34">setMinimum</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="35">newMinimum</A></U>) {
+        <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setMinimum");
+        //Do nothing.
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="36">getValue</A></U>() {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel getValue");
+        }
+        return (<A HREF="XRef.html#g">int</A>)<A HREF="XRef.html#10">getDoubleValue</A>();
+    }
+
+    public void <U><A NAME="37">setValue</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="38">newValue</A></U>) {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setValue");
+        }
+        <A HREF="XRef.html#12">setDoubleValue</A>((<A HREF="XRef.html#k">double</A>)<A HREF="XRef.html#38">newValue</A>);
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="10">getDoubleValue</A></U>() {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel getDoubleValue");
+        }
+        return <A HREF="XRef.html#2x">value</A>;
+    }
+
+    public void <U><A NAME="12">setDoubleValue</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="39">newValue</A></U>) {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setDoubleValue");
+        }
+        <A HREF="XRef.html#1g">setRangeProperties</A>(<A HREF="XRef.html#39">newValue</A>, <A HREF="XRef.html#2w">extent</A>, <A HREF="XRef.html#2v">minimum</A>, <A HREF="XRef.html#2u">maximum</A>, <A HREF="XRef.html#2y">isAdjusting</A>);
+    }
+
+    public <A HREF="XRef.html#g">int</A> <U><A NAME="14">getExtent</A></U>() {
+        return (<A HREF="XRef.html#g">int</A>)<A HREF="XRef.html#2w">extent</A>;
+    }
+
+    public void <U><A NAME="17">setExtent</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="3a">newExtent</A></U>) {}
+        //Do nothing.
+
+    public <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3b">getValueIsAdjusting</A></U>() {
+        return <A HREF="XRef.html#2y">isAdjusting</A>;
+    }
+
+    public void <U><A NAME="3c">setValueIsAdjusting</A></U>(<A HREF="XRef.html#1d">boolean</A> <U><A NAME="3d">b</A></U>) {
+        <A HREF="XRef.html#1g">setRangeProperties</A>(<A HREF="XRef.html#2x">value</A>, <A HREF="XRef.html#2w">extent</A>, <A HREF="XRef.html#2v">minimum</A>, <A HREF="XRef.html#2u">maximum</A>, <A HREF="XRef.html#3d">b</A>);
+    }
+
+    public void <U><A NAME="3e">setRangeProperties</A></U>(<A HREF="XRef.html#g">int</A> <U><A NAME="3f">newValue</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3g">newExtent</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3h">newMin</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3i">newMax</A></U>,
+                                   <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3j">newAdjusting</A></U>) {
+        <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("In ConverterRangeModel setRangeProperties");
+        <A HREF="XRef.html#1g">setRangeProperties</A>((<A HREF="XRef.html#k">double</A>)<A HREF="XRef.html#3f">newValue</A>,
+                           <A HREF="XRef.html#3g">newExtent</A>,
+                           <A HREF="XRef.html#3h">newMin</A>,
+                           <A HREF="XRef.html#3i">newMax</A>,
+                           <A HREF="XRef.html#3j">newAdjusting</A>);
+    }
+
+    public void <U><A NAME="1g">setRangeProperties</A></U>(<A HREF="XRef.html#k">double</A> <U><A NAME="3k">newValue</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3l">unusedExtent</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3m">unusedMin</A></U>,
+                                   <A HREF="XRef.html#g">int</A> <U><A NAME="3n">newMax</A></U>,
+                                   <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3o">newAdjusting</A></U>) {
+        if (<A HREF="XRef.html#o">DEBUG</A>) {
+            <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("setRangeProperties(): "
+                                + "newValue = " + <A HREF="XRef.html#3k">newValue</A>
+                                + "; newMax = " + <A HREF="XRef.html#3n">newMax</A>);
+        }
+        if (<A HREF="XRef.html#3n">newMax</A> &lt;= <A HREF="XRef.html#2v">minimum</A>) {
+            <A HREF="XRef.html#3n">newMax</A> = <A HREF="XRef.html#2v">minimum</A> + 1;
+            if (<A HREF="XRef.html#o">DEBUG</A>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("maximum raised by 1 to " + <A HREF="XRef.html#3n">newMax</A>);
+            }
+        }
+        if (<A HREF="XRef.html#3p">Math</A>.<A HREF="XRef.html#3q">round</A>(<A HREF="XRef.html#3k">newValue</A>) &gt; <A HREF="XRef.html#3n">newMax</A>) { //allow some rounding error
+            <A HREF="XRef.html#3k">newValue</A> = <A HREF="XRef.html#3n">newMax</A>;
+            if (<A HREF="XRef.html#o">DEBUG</A>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("value lowered to " + <A HREF="XRef.html#3n">newMax</A>);
+            }
+        }
+
+        <A HREF="XRef.html#1d">boolean</A> <U><A NAME="3r">changeOccurred</A></U> = false;
+        if (<A HREF="XRef.html#3k">newValue</A> != <A HREF="XRef.html#2x">value</A>) {
+            if (<A HREF="XRef.html#o">DEBUG</A>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("value set to " + <A HREF="XRef.html#3k">newValue</A>);
+            }
+            <A HREF="XRef.html#2x">value</A> = <A HREF="XRef.html#3k">newValue</A>;
+            <A HREF="XRef.html#3r">changeOccurred</A> = true;
+        }
+        if (<A HREF="XRef.html#3n">newMax</A> != <A HREF="XRef.html#2u">maximum</A>) {
+            if (<A HREF="XRef.html#o">DEBUG</A>) {
+                <A HREF="XRef.html#p">System</A>.<A HREF="XRef.html#q">out</A>.<A HREF="XRef.html#r">println</A>("maximum set to " + <A HREF="XRef.html#3n">newMax</A>);
+            }
+            <A HREF="XRef.html#2u">maximum</A> = <A HREF="XRef.html#3n">newMax</A>;
+            <A HREF="XRef.html#3r">changeOccurred</A> = true;
+        }
+        if (<A HREF="XRef.html#3o">newAdjusting</A> != <A HREF="XRef.html#2y">isAdjusting</A>) {
+            <A HREF="XRef.html#2u">maximum</A> = <A HREF="XRef.html#3n">newMax</A>;
+            <A HREF="XRef.html#2y">isAdjusting</A> = <A HREF="XRef.html#3o">newAdjusting</A>;
+            <A HREF="XRef.html#3r">changeOccurred</A> = true;
+        }
+
+        if (<A HREF="XRef.html#3r">changeOccurred</A>) {
+            <A HREF="XRef.html#f">fireStateChanged</A>();
+        }
+    }
+
+    /* 
+     * The rest of this is event handling code copied from 
+     * DefaultBoundedRangeModel. 
+     */
+    public void <U><A NAME="b">addChangeListener</A></U>(<A HREF="XRef.html#7">ChangeListener</A> <U><A NAME="3s">l</A></U>) {
+        <A HREF="XRef.html#2s">listenerList</A>.<A HREF="XRef.html#3t">add</A>(<A HREF="XRef.html#7">ChangeListener</A>.class, <A HREF="XRef.html#3s">l</A>);
+    }
+
+    public void <U><A NAME="3u">removeChangeListener</A></U>(<A HREF="XRef.html#7">ChangeListener</A> <U><A NAME="3v">l</A></U>) {
+        <A HREF="XRef.html#2s">listenerList</A>.<A HREF="XRef.html#3w">remove</A>(<A HREF="XRef.html#7">ChangeListener</A>.class, <A HREF="XRef.html#3v">l</A>);
+    }
+
+    protected void <U><A NAME="f">fireStateChanged</A></U>() {
+        <A HREF="XRef.html#3x">Object</A>[] <U><A NAME="3y">listeners</A></U> = <A HREF="XRef.html#2s">listenerList</A>.<A HREF="XRef.html#3z">getListenerList</A>();
+        for (<A HREF="XRef.html#g">int</A> <U><A NAME="40">i</A></U> = <A HREF="XRef.html#3y">listeners</A>.length - 2; <A HREF="XRef.html#40">i</A> &gt;= 0; <A HREF="XRef.html#40">i</A> -= 2) {
+            if (<A HREF="XRef.html#3y">listeners</A>[<A HREF="XRef.html#40">i</A>] == <A HREF="XRef.html#7">ChangeListener</A>.class) {
+                if (<A HREF="XRef.html#2q">changeEvent</A> == null) {
+                    <A HREF="XRef.html#2q">changeEvent</A> = <A HREF="XRef.html#41">new</A> <A HREF="XRef.html#d">ChangeEvent</A>(this);
+                }
+                ((<A HREF="XRef.html#7">ChangeListener</A>)<A HREF="XRef.html#3y">listeners</A>[<A HREF="XRef.html#40">i</A> + 1]).<A HREF="XRef.html#42">stateChanged</A>(<A HREF="XRef.html#2q">changeEvent</A>);
+            }
+        }
+    }
+}
+</PRE></BODY></HTML>

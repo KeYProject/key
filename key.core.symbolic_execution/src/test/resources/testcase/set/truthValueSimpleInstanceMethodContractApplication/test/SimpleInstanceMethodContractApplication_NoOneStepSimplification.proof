@@ -1,0 +1,205 @@
+\profile "Java Profile for Symbolic Execution";
+
+\settings {
+"#Proof-Settings-Config-File
+#Fri Oct 22 15:04:52 CEST 2021
+[Labels]UseOriginLabels=true
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]invariantForall=false
+[Strategy]ActiveStrategy=Symbolic Execution Strategy
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[Choice]DefaultChoices=JavaCard-JavaCard\\:off , Strings-Strings\\:on , assertions-assertions\\:on , bigint-bigint\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:noRestriction , modelFields-modelFields\\:showSatisfiability , moreSeqRules-moreSeqRules\\:off , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:allow , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[Strategy]MaximumNumberOfAutomaticApplications=1
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[Strategy]Timeout=-1
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[SMTSettings]useUninterpretedMultiplication=true
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[SMTSettings]maxGenericSorts=2
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[SMTSettings]integersMinimum=-2147483645
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]integersMaximum=2147483645
+"
+}
+
+\javaSource ".";
+
+\proofObligation "#Proof Obligation Settings
+#Fri Oct 22 15:04:52 CEST 2021
+addSymbolicExecutionLabel=true
+contract=SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication\\:\\:main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0
+name=SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication\\:\\:main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+addUninterpretedPredicate=true
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "lukas" ) (keyVersion "427de8e7e5"))
+(keyLog "2" (keyUser "lukas" ) (keyVersion "427de8e7e5"))
+
+(autoModeTime "1497")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (newnames "o,result,exc,heapAtPre,SETAccumulate,o_0,f"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "2"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "4"))
+(rule "andLeft" (formula "1"))
+(rule "eqSymm" (formula "6") (term "0,0,1,0,1"))
+(rule "replace_known_right" (formula "2") (term "0") (ifseqformula "5"))
+(rule "concrete_or_2" (formula "2"))
+(rule "assignment" (formula "6") (term "1"))
+(rule "sequentialToParallel2" (formula "6"))
+(rule "simplifyUpdate3" (formula "6") (term "1,0"))
+(rule "methodBodyExpand" (formula "6") (term "1") (newnames "heapBefore_main,savedHeapBefore_main"))
+(rule "simplifyUpdate2" (formula "6") (term "1"))
+(rule "returnUnfold" (formula "6") (term "1") (inst "#v0=x"))
+(rule "variableDeclarationAssign" (formula "6") (term "1"))
+(rule "variableDeclaration" (formula "6") (term "1") (newnames "x"))
+ (builtin "Use Operation Contract" (formula "6") (newnames "heapBefore_doubleValue,result_0,exc_0") (contract "SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication::doubleValue(int)].JML normal_behavior operation contract.0"))
+(branch "Post (doubleValue)"
+   (rule "inInt" (formula "5") (term "1,0,1,1"))
+   (rule "concrete_and_3" (formula "5") (term "0,1,1"))
+   (rule "translateJavaMulInt" (formula "5") (term "1,0,0,1,1,1"))
+   (rule "simplifyUpdate2" (formula "5"))
+   (rule "mul_literals" (formula "5") (term "1,0,0,1,1,1"))
+   (rule "simplifyUpdate2" (formula "5") (term "1"))
+   (rule "andLeft" (formula "5"))
+   (rule "simplifyUpdate2" (formula "5"))
+   (rule "andLeft" (formula "6"))
+   (rule "simplifyUpdate2" (formula "7"))
+   (rule "andLeft" (formula "6"))
+   (rule "simplifyUpdate2" (formula "6"))
+   (rule "applyOnRigidFormula" (formula "7"))
+   (rule "applyOnPV" (formula "7") (term "1"))
+   (rule "simplifyUpdate1" (formula "7") (term "0"))
+   (rule "assignment" (formula "8") (term "1"))
+   (rule "sequentialToParallel2" (formula "8"))
+   (rule "simplifyUpdate3" (formula "8") (term "1,0"))
+   (rule "applyEq" (formula "8") (term "0,1,0") (ifseqformula "6"))
+   (rule "methodCallReturn" (formula "8") (term "1"))
+   (rule "assignment" (formula "8") (term "1"))
+   (rule "sequentialToParallel2" (formula "8"))
+   (rule "simplifyUpdate3" (formula "8") (term "1,0"))
+   (rule "applyOnElementary" (formula "8") (term "1,0"))
+   (rule "applyOnPV" (formula "8") (term "0,1,0"))
+   (rule "simplifyUpdate2" (formula "8"))
+   (rule "methodCallEmpty" (formula "8") (term "1"))
+   (rule "tryEmpty" (formula "8") (term "1"))
+   (rule "emptyModality" (formula "8") (term "1"))
+   (rule "applyOnRigidFormula" (formula "8"))
+   (rule "simplifyUpdate2" (formula "8") (term "1"))
+   (rule "simplifyUpdate2" (formula "8") (term "0"))
+   (rule "applyOnRigidFormula" (formula "8") (term "1"))
+   (rule "applyOnRigidFormula" (formula "8") (term "0"))
+   (rule "simplifyUpdate2" (formula "8") (term "1,0"))
+   (rule "simplifyUpdate2" (formula "8") (term "0,0"))
+   (rule "applyOnRigidFormula" (formula "8") (term "0,1"))
+   (rule "applyOnRigidFormula" (formula "8") (term "1,0"))
+   (rule "simplifyUpdate1" (formula "8") (term "2,1,0"))
+   (rule "simplifyUpdate1" (formula "8") (term "1,1,0"))
+   (rule "simplifyUpdate1" (formula "8") (term "0,1,0"))
+   (rule "applyOnPV" (formula "8") (term "2,1,0"))
+   (rule "applyOnPV" (formula "8") (term "1,1,0"))
+   (rule "applyOnRigidFormula" (formula "8") (term "0,0"))
+   (rule "simplifyUpdate2" (formula "8") (term "1,0,0"))
+   (rule "simplifyUpdate2" (formula "8") (term "0,0,0"))
+   (rule "applyOnRigidFormula" (formula "8") (term "0,0,1"))
+   (rule "simplifyUpdate1" (formula "8") (term "1,0,0,1"))
+   (rule "applyOnRigidFormula" (formula "8") (term "1,0,0"))
+   (rule "simplifyUpdate1" (formula "8") (term "1,1,0,0"))
+   (rule "applyOnPV" (formula "8") (term "0,1,0,0"))
+   (rule "eqClose" (formula "8") (term "1,0,0"))
+   (rule "concrete_and_3" (formula "8") (term "0,0"))
+   (rule "applyOnRigidTerm" (formula "8") (term "0,0,0,1"))
+   (rule "simplifyUpdate1" (formula "8") (term "2,0,0,0,1"))
+   (rule "simplifyUpdate1" (formula "8") (term "1,0,0,0,1"))
+   (rule "applyOnPV" (formula "8") (term "0,0,0,0,1"))
+   (rule "eqClose" (formula "8") (term "0,0,1"))
+   (rule "applyOnRigidFormula" (formula "8") (term "0,0"))
+   (rule "applyOnPV" (formula "8") (term "0,0,0"))
+   (rule "simplifyUpdate1" (formula "8") (term "1,0,0"))
+   (rule "eqClose" (formula "8") (term "0,0"))
+   (rule "concrete_and_1" (formula "8") (term "0"))
+   (rule "all_unused" (formula "8") (term "1"))
+   (rule "all_unused" (formula "8") (term "1"))
+   (rule "concrete_and_3" (formula "8"))
+    (opengoal " ")
+)
+(branch "Exceptional Post (doubleValue)"
+   (rule "translateJavaMulInt" (formula "5") (term "1,0,0,1,1,1"))
+   (rule "simplifyUpdate2" (formula "5"))
+   (rule "mul_literals" (formula "5") (term "1,0,0,1,1,1"))
+   (rule "simplifyUpdate2" (formula "5") (term "1"))
+   (rule "andLeft" (formula "5"))
+   (rule "simplifyUpdate2" (formula "5"))
+   (rule "andLeft" (formula "6"))
+   (rule "simplifyUpdate2" (formula "7"))
+   (rule "andLeft" (formula "5"))
+   (rule "andLeft" (formula "7"))
+   (rule "simplifyUpdate2" (formula "7"))
+   (rule "notLeft" (formula "5"))
+   (rule "close" (formula "9") (ifseqformula "8"))
+)
+(branch "Pre (doubleValue)"
+   (rule "inInt" (formula "6") (term "1,1,1,1"))
+   (rule "concrete_and_3" (formula "6") (term "1,1,1"))
+   (rule "qeq_literals" (formula "6") (term "0,0,0,1,1"))
+   (rule "concrete_and_1" (formula "6") (term "0,0,1,1"))
+   (rule "simplifyUpdate2" (formula "6"))
+   (rule "simplifyUpdate2" (formula "6") (term "1"))
+   (rule "applyOnRigidFormula" (formula "6"))
+   (rule "applyOnRigidFormula" (formula "6") (term "0"))
+   (rule "simplifyUpdate2" (formula "6") (term "0,0"))
+   (rule "applyOnRigidFormula" (formula "6") (term "1"))
+   (rule "simplifyUpdate2" (formula "6") (term "0,1"))
+   (rule "replace_known_left" (formula "6") (term "0,1") (ifseqformula "1"))
+   (rule "concrete_and_1" (formula "6") (term "1"))
+   (rule "applyOnRigidFormula" (formula "6") (term "1,0"))
+   (rule "applyOnPV" (formula "6") (term "1,1,0"))
+   (rule "simplifyUpdate1" (formula "6") (term "0,1,0"))
+   (rule "replace_known_left" (formula "6") (term "1,0") (ifseqformula "4"))
+   (rule "concrete_and_3" (formula "6") (term "0"))
+   (rule "applyOnRigidFormula" (formula "6") (term "1"))
+   (rule "simplifyUpdate1" (formula "6") (term "1,1"))
+   (rule "applyOnRigidTerm" (formula "6") (term "0,1"))
+   (rule "simplifyUpdate1" (formula "6") (term "2,0,1"))
+   (rule "applyOnPV" (formula "6") (term "1,0,1"))
+   (rule "simplifyUpdate1" (formula "6") (term "0,0,1"))
+   (rule "replace_known_left" (formula "6") (term "1") (ifseqformula "2"))
+   (rule "concrete_and_3" (formula "6"))
+   (rule "allRight" (formula "6") (inst "sk=x_0"))
+   (rule "closeTrue" (formula "6"))
+)
+(branch "Null reference (_o = null)"
+   (rule "simplifyUpdate2" (formula "6"))
+   (rule "notRight" (formula "6"))
+   (rule "applyOnRigidFormula" (formula "1"))
+   (rule "applyOnPV" (formula "1") (term "0"))
+   (rule "simplifyUpdate1" (formula "1") (term "1"))
+   (rule "close" (formula "6") (ifseqformula "1"))
+)
+)
+}

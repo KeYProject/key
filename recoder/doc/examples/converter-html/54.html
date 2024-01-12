@@ -1,0 +1,119 @@
+<HTML><HEAD><TITLE>ConversionPanel</TITLE><BASE TARGET="refframe"></HEAD><BODY BGCOLOR="#FFFFFF"><PRE>
+/*
+ * 1.1+Swing version.
+ */
+
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.*;
+import <A HREF="XRef.html#1">javax</A>.<A HREF="XRef.html#2">swing</A>.<A HREF="XRef.html#3">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1v">awt</A>.<A HREF="XRef.html#51">event</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#43">util</A>.*;
+import <A HREF="XRef.html#1u">java</A>.<A HREF="XRef.html#1x">text</A>.<A HREF="XRef.html#20">NumberFormat</A>;
+
+public class <U><A NAME="53">ConversionPanel</A></U> extends <A HREF="XRef.html#5e">JPanel</A> {
+    <A HREF="XRef.html#1y">DecimalField</A> <U><A NAME="6x">textField</A></U>;
+    <A HREF="XRef.html#6y">JComboBox</A> <U><A NAME="6z">unitChooser</A></U>;
+    <A HREF="XRef.html#70">JSlider</A> <U><A NAME="71">slider</A></U>;
+    <A HREF="XRef.html#5">ConverterRangeModel</A> <U><A NAME="72">sliderModel</A></U>;
+    <A HREF="XRef.html#52">Converter</A> <U><A NAME="73">controller</A></U>;
+    <A HREF="XRef.html#57">Unit</A>[] <U><A NAME="74">units</A></U>;
+    <A HREF="XRef.html#1j">String</A> <U><A NAME="75">title</A></U>;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="76">DEBUG</A></U> = false;
+    final static <A HREF="XRef.html#1d">boolean</A> <U><A NAME="77">COLORS</A></U> = false;
+    final static <A HREF="XRef.html#g">int</A> <U><A NAME="5z">MAX</A></U> = 10000;
+
+    <U><A NAME="5h">ConversionPanel</A></U>(<A HREF="XRef.html#52">Converter</A> <U><A NAME="78">myController</A></U>, <A HREF="XRef.html#1j">String</A> <U><A NAME="79">myTitle</A></U>,
+                    <A HREF="XRef.html#57">Unit</A>[] <U><A NAME="7a">myUnits</A></U>,
+                    <A HREF="XRef.html#5">ConverterRangeModel</A> <U><A NAME="7b">myModel</A></U>) {
+        if (<A HREF="XRef.html#77">COLORS</A>) {
+            <A HREF="XRef.html#5j">setBackground</A>(<A HREF="XRef.html#5k">Color</A>.<A HREF="XRef.html#7c">cyan</A>);
+        }
+        <A HREF="XRef.html#5p">setBorder</A>(<A HREF="XRef.html#5q">BorderFactory</A>.<A HREF="XRef.html#7d">createCompoundBorder</A>(
+                        <A HREF="XRef.html#5q">BorderFactory</A>.<A HREF="XRef.html#7e">createTitledBorder</A>(<A HREF="XRef.html#79">myTitle</A>),
+                        <A HREF="XRef.html#5q">BorderFactory</A>.<A HREF="XRef.html#5r">createEmptyBorder</A>(5, 5, 5, 5)));
+
+        //Save arguments in instance variables.
+        <A HREF="XRef.html#73">controller</A> = <A HREF="XRef.html#78">myController</A>;
+        <A HREF="XRef.html#74">units</A> = <A HREF="XRef.html#7a">myUnits</A>;
+        <A HREF="XRef.html#75">title</A> = <A HREF="XRef.html#79">myTitle</A>;
+        <A HREF="XRef.html#72">sliderModel</A> = <A HREF="XRef.html#7b">myModel</A>;
+
+        //Add the text field.  It initially displays "0" and needs
+        //to be at least 10 columns wide.
+        <A HREF="XRef.html#20">NumberFormat</A> <U><A NAME="7f">numberFormat</A></U> = <A HREF="XRef.html#20">NumberFormat</A>.<A HREF="XRef.html#7g">getNumberInstance</A>();
+        <A HREF="XRef.html#7f">numberFormat</A>.<A HREF="XRef.html#7h">setMaximumFractionDigits</A>(2);
+        <A HREF="XRef.html#6x">textField</A> = <A HREF="XRef.html#22">new</A> <A HREF="XRef.html#1y">DecimalField</A>(0, 10, <A HREF="XRef.html#7f">numberFormat</A>);
+        <A HREF="XRef.html#6x">textField</A>.<A HREF="XRef.html#2b">setValue</A>(<A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#10">getDoubleValue</A>());
+        <A HREF="XRef.html#6x">textField</A>.<A HREF="XRef.html#7i">addActionListener</A>(new <A HREF="XRef.html#7j">ActionListener</A>(){
+            public void <U><A NAME="7k">actionPerformed</A></U>(<A HREF="XRef.html#7l">ActionEvent</A> <U><A NAME="7m">e</A></U>) {
+                <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#12">setDoubleValue</A>(<A HREF="XRef.html#6x">textField</A>.<A HREF="XRef.html#2c">getValue</A>());
+            }
+        });
+
+        //Add the combo box.
+        <A HREF="XRef.html#6z">unitChooser</A> = <A HREF="XRef.html#7n">new</A> <A HREF="XRef.html#6y">JComboBox</A>();
+        for (<A HREF="XRef.html#g">int</A> <U><A NAME="7o">i</A></U> = 0; <A HREF="XRef.html#7o">i</A> &lt; <A HREF="XRef.html#74">units</A>.length; <A HREF="XRef.html#7o">i</A>++) { //Populate it.
+            <A HREF="XRef.html#6z">unitChooser</A>.<A HREF="XRef.html#7p">addItem</A>(<A HREF="XRef.html#74">units</A>[<A HREF="XRef.html#7o">i</A>].<A HREF="XRef.html#1k">description</A>);
+        }
+        <A HREF="XRef.html#6z">unitChooser</A>.<A HREF="XRef.html#7q">setSelectedIndex</A>(0);
+        <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#30">setMultiplier</A>(<A HREF="XRef.html#74">units</A>[0].<A HREF="XRef.html#1l">multiplier</A>);
+        <A HREF="XRef.html#6z">unitChooser</A>.<A HREF="XRef.html#7r">addActionListener</A>(new <A HREF="XRef.html#7j">ActionListener</A>(){
+            public void <U><A NAME="7s">actionPerformed</A></U>(<A HREF="XRef.html#7l">ActionEvent</A> <U><A NAME="7t">e</A></U>) {
+                //Set new maximums for the sliders.
+                <A HREF="XRef.html#g">int</A> <U><A NAME="7u">i</A></U> = <A HREF="XRef.html#6z">unitChooser</A>.<A HREF="XRef.html#7v">getSelectedIndex</A>();
+                <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#30">setMultiplier</A>(<A HREF="XRef.html#74">units</A>[<A HREF="XRef.html#7u">i</A>].<A HREF="XRef.html#1l">multiplier</A>);
+                <A HREF="XRef.html#73">controller</A>.<A HREF="XRef.html#5t">resetMaxValues</A>(false);
+            }
+        });
+
+        //Add the slider.
+        <A HREF="XRef.html#71">slider</A> = <A HREF="XRef.html#7w">new</A> <A HREF="XRef.html#70">JSlider</A>(<A HREF="XRef.html#72">sliderModel</A>);
+        <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#b">addChangeListener</A>(new <A HREF="XRef.html#7">ChangeListener</A>(){
+            public void <U><A NAME="7x">stateChanged</A></U>(<A HREF="XRef.html#d">ChangeEvent</A> <U><A NAME="7y">e</A></U>) {
+                <A HREF="XRef.html#6x">textField</A>.<A HREF="XRef.html#2b">setValue</A>(<A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#10">getDoubleValue</A>());
+            }
+        });
+
+        //Make the textfield/slider group a fixed size.
+        <A HREF="XRef.html#5e">JPanel</A> <U><A NAME="7z">unitGroup</A></U> = new <A HREF="XRef.html#5e">JPanel</A>(){
+            public <A HREF="XRef.html#80">Dimension</A> <U><A NAME="81">getMinimumSize</A></U>() {
+                return <A HREF="XRef.html#82">getPreferredSize</A>();
+            }
+            public <A HREF="XRef.html#80">Dimension</A> <U><A NAME="82">getPreferredSize</A></U>() {
+                return <A HREF="XRef.html#83">new</A> <A HREF="XRef.html#80">Dimension</A>(150,
+                                     super.<A HREF="XRef.html#84">getPreferredSize</A>().<A HREF="XRef.html#85">height</A>);
+            }
+            public <A HREF="XRef.html#80">Dimension</A> <U><A NAME="86">getMaximumSize</A></U>() {
+                return <A HREF="XRef.html#82">getPreferredSize</A>();
+            }
+        };
+        if (<A HREF="XRef.html#77">COLORS</A>) {
+            <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#5j">setBackground</A>(<A HREF="XRef.html#5k">Color</A>.<A HREF="XRef.html#87">blue</A>);
+        }
+        <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#5p">setBorder</A>(<A HREF="XRef.html#5q">BorderFactory</A>.<A HREF="XRef.html#5r">createEmptyBorder</A>(
+                                                0, 0, 0, 5));
+        <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#5m">setLayout</A>(<A HREF="XRef.html#88">new</A> <A HREF="XRef.html#89">BoxLayout</A>(<A HREF="XRef.html#7z">unitGroup</A>,
+                                          <A HREF="XRef.html#89">BoxLayout</A>.<A HREF="XRef.html#8a">Y_AXIS</A>));
+        <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#6x">textField</A>);
+        <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#71">slider</A>);
+
+        <A HREF="XRef.html#5m">setLayout</A>(<A HREF="XRef.html#88">new</A> <A HREF="XRef.html#89">BoxLayout</A>(this, <A HREF="XRef.html#89">BoxLayout</A>.<A HREF="XRef.html#8b">X_AXIS</A>));
+        <A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#7z">unitGroup</A>);
+        <A HREF="XRef.html#5s">add</A>(<A HREF="XRef.html#6z">unitChooser</A>);
+        <A HREF="XRef.html#7z">unitGroup</A>.<A HREF="XRef.html#8c">setAlignmentY</A>(<A HREF="XRef.html#8d">TOP_ALIGNMENT</A>);
+        <A HREF="XRef.html#6z">unitChooser</A>.<A HREF="XRef.html#8c">setAlignmentY</A>(<A HREF="XRef.html#8d">TOP_ALIGNMENT</A>);
+    }
+
+    /** 
+     * Returns the multiplier (units/meter) for the currently
+     * selected unit of measurement.
+     */
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="5w">getMultiplier</A></U>() {
+        return <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#m">getMultiplier</A>();
+    }
+
+    public <A HREF="XRef.html#k">double</A> <U><A NAME="8e">getValue</A></U>() {
+        return <A HREF="XRef.html#72">sliderModel</A>.<A HREF="XRef.html#10">getDoubleValue</A>();
+    }
+}
+</PRE></BODY></HTML>

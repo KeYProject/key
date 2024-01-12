@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed by class HeapHandler in this package</comment>
+
+    <entry key="fieldIdentifier.decls">(declare-fun fieldIdentifier (U) Int)</entry>
+    <entry key="arr.decls">(declare-fun arr (U) U)</entry>
+
+    <entry key="arr.axioms">
+        (assert (forall ((u U)) (!
+            (=&gt; (&gt;= (u2i u) 0) (= (fieldIdentifier (arr u)) (u2i u)))
+            :pattern ((arr u)))))
+        (assert (forall ((u U)) (! (exactinstanceof (arr u) sort_Field) :pattern ((arr u)))) )
+    </entry>
+
+    <entry key="arr.deps">fieldIdentifier</entry>
+
+</properties>

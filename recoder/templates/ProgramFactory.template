@@ -1,0 +1,17 @@
+package compost;
+
+import compost.*;
+import compost.list.*;
+import compost.java.*;
+import compost.java.declaration.*;
+import compost.java.declaration.modifier.*;
+import compost.java.reference.*;
+import compost.java.expression.*;
+import compost.java.expression.literal.*;
+import compost.java.expression.operator.*;
+import compost.java.statement.*;
+import compost.convenience.TreeWalker;
+
+import java.io.*;
+
+public interface ProgramFactory extends Service {}

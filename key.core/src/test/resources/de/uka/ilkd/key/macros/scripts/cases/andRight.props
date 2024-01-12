@@ -1,0 +1,20 @@
+### KeY
+
+\predicates { a; b; }
+\problem { a & b }
+
+### script
+
+rule andRight;
+
+### goals
+
+2
+
+### goal 1
+
+==> b
+
+### goal 2
+
+==> a

@@ -1,0 +1,120 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches:
+      - "main"
+      - "KeY-*"
+  merge_group:
+  
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+  checks: write
+
+jobs:
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        java: [21]
+    continue-on-error: true
+    runs-on: ${{ matrix.os }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Save PR number
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const util = require('util');
+            fs.mkdirSync("./pr", { recursive: true });
+            const payload = context.payload;
+            const number = (payload.issue || payload.pull_request || payload).number;
+            const text = number === undefined ? "" : String(number);
+            core.info("Pr number is " + number + ", writing \"" + text + "\"");
+            fs.writeFileSync("./pr/pr_number", text);
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pr-number
+          path: pr/
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: |
+            **/build/test-results/*/*.xml
+            **/build/reports/
+            !**/jacocoTestReport.xml
+            
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
+  integration-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
+        os: [ubuntu-latest]
+        java: [21]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Cache SMT-Solvers
+        id: smt-solvers
+        uses: actions/cache@v3
+        with:
+          path: smt-solvers
+          key: ${{ runner.os }}-smt-solvers
+
+      - name: Install SMT-Solvers
+        run: .github/dlsmt.sh
+        shell: bash
+
+
+      - name: "Running tests: ${{ matrix.test }}"
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: --continue ${{ matrix.test }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: |
+            **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
+            **/build/reports/

@@ -1,0 +1,18 @@
+<!-- The function symbols required for Java arithmetics -->
+<entry key="prec.taclets">
+    precOfInt
+</entry>
+
+<entry key="jdiv.dl">
+\forall int divNum; \forall int divDenom;
+  jdiv(divNum,divDenom) =
+         \if (divNum &gt;= 0)
+         \then (div(divNum,divDenom))
+         \else (div(divNum*(-1),divDenom)*(-1))
+</entry>
+
+<entry key="jmod.dl">
+\forall int divNum; \forall int divDenom;
+  jmod(divNum,divDenom) =
+    divNum + jdiv(divNum,divDenom)*(-1)*divDenom
+</entry>
