@@ -2012,8 +2012,8 @@ public class TermLabelManager {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
             SequentFormula existingSF = CollectionUtil.search(s,
-                element -> element.formula().equalsModProperty(RENAMING_TERM_PROPERTY,
-                    rejectedTerm));
+                element -> element.formula().equalsModProperty(rejectedTerm, RENAMING_TERM_PROPERTY
+                ));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();

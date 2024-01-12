@@ -223,8 +223,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final Term freeTerm = spec.getInternalFreeModifies().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
-                        || !tb.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                            term)) {
+                        || !tb.strictlyNothing().equalsModProperty(term, IRRELEVANT_TERM_LABELS_PROPERTY
+                )) {
                     final Term m = spec.getModifies(heap, self, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
@@ -239,8 +239,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(
-                            IRRELEVANT_TERM_LABELS_PROPERTY,
-                            freeTerm)) {
+                        freeTerm, IRRELEVANT_TERM_LABELS_PROPERTY
+                )) {
                     final Term m = spec.getFreeModifies(heap, selfTerm, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);

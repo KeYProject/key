@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * All proof irrelevant attributes are ignored in this equality check.
  */
 public class ProofIrrelevancyProperty implements TermProperty {
@@ -82,7 +82,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(otherSubs.get(i), PROOF_IRRELEVANCY_PROPERTY)) {
                 return false;
             }
         }

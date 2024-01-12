@@ -92,7 +92,7 @@ public class ProveSMTLemmasTest {
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     Term parsedLemma = io.parseExpression(lemmaString);
                     Term actual = loadedProof.root().sequent().succedent().get(0).formula();
-                    if (!actual.equalsModProperty(RENAMING_TERM_PROPERTY, parsedLemma)) {
+                    if (!actual.equalsModProperty(parsedLemma, RENAMING_TERM_PROPERTY)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);
                         Assertions.fail("The proven lemma is different from the stored one.");

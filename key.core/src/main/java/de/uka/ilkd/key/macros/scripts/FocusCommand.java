@@ -78,7 +78,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         for (SequentFormula seqFormula : ante) {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
-                it -> it.equalsModProperty(RENAMING_TERM_PROPERTY, seqFormula.formula()))) {
+                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
@@ -88,7 +88,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         ImmutableList<SequentFormula> succ = goal.sequent().succedent().asList();
         for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
-                it -> it.equalsModProperty(RENAMING_TERM_PROPERTY, seqFormula.formula()))) {
+                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }

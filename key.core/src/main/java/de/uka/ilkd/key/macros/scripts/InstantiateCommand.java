@@ -110,7 +110,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, p.formula)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -119,7 +119,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, p.formula)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -135,8 +135,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                if (pta.posInOccurrence().subTerm().equalsModProperty(RENAMING_TERM_PROPERTY,
-                    p.formula)) {
+                if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY
+                )) {
                     return pta;
                 }
             }

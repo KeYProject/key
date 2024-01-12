@@ -357,7 +357,7 @@ public class MergeRule implements BuiltInRule {
             // Check if location v is set to different value in both states.
 
             // Easy check: Term equality
-            boolean proofClosed = rightSide1.equalsModProperty(RENAMING_TERM_PROPERTY, rightSide2);
+            boolean proofClosed = rightSide1.equalsModProperty(rightSide2, RENAMING_TERM_PROPERTY);
 
             // We skip the check for equal valuation of this variable if
             // the depth threshold is exceeded by one of the right sides.

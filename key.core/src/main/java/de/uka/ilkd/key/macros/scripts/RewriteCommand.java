@@ -114,7 +114,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, p.formula)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -124,7 +124,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, p.formula)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,

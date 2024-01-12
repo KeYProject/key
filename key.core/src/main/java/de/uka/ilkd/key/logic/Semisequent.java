@@ -159,8 +159,8 @@ public class Semisequent implements Iterable<SequentFormula> {
             searchList = searchList.tail();
 
             if (sequentFormula != null
-                    && cf.formula().equalsModProperty(RENAMING_TERM_PROPERTY,
-                        sequentFormula.formula())) {
+                    && cf.formula().equalsModProperty(sequentFormula.formula(), RENAMING_TERM_PROPERTY
+            )) {
                 semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 

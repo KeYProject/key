@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * All irrelevant term labels are ignored in this equality check.
  */
 public class IrrelevantTermLabelsProperty implements TermProperty {
@@ -71,8 +71,8 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(otherSubs.get(i), IRRELEVANT_TERM_LABELS_PROPERTY
+            )) {
                 return false;
             }
         }

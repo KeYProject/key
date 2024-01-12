@@ -739,7 +739,7 @@ public class TestApplyTaclet {
         Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
         Term correctFormula = correctSeq.getFormulabyNr(1).formula();
 
-        assertTrue(resultFormula.equalsModProperty(RENAMING_TERM_PROPERTY, correctFormula),
+        assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_TERM_PROPERTY),
             "Wrong result. Expected:"
                 + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
                 + ProofSaver.printAnything(resultFormula, TacletForTests.services()));

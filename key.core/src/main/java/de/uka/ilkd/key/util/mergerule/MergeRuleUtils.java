@@ -1691,7 +1691,7 @@ public class MergeRuleUtils {
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
+                if (existingTerm.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
@@ -1722,7 +1722,7 @@ public class MergeRuleUtils {
         @Override
             public boolean equals(Object obj) {
                 return obj instanceof TermWrapper
-                        && term.equalsModProperty(RENAMING_TERM_PROPERTY, ((TermWrapper) obj).term());
+                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
             }
 
             @Override

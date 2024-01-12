@@ -31,8 +31,8 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
         for (TacletGoalTemplate temp : ((Taclet) app.rule()).goalTemplates()) {
             RewriteTacletGoalTemplate rwtemp = (RewriteTacletGoalTemplate) temp;
-            if (rwtemp.replaceWith().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                pos.subTerm())) {
+            if (rwtemp.replaceWith().equalsModProperty(pos.subTerm(), IRRELEVANT_TERM_LABELS_PROPERTY
+            )) {
                 return false;
             }
         }

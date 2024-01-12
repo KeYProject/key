@@ -91,13 +91,13 @@ public class JoinIsApplicable {
             Term formula = sf.formula();
             Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
-                    && !formula.equalsModProperty(RENAMING_TERM_PROPERTY, referenceFormula)) {
+                    && !formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
                 update2 = formula.sub(0);// don't change the order of this and
                                          // the following line.
                 formula = formula.sub(1);
 
             }
-            if (formula.equalsModProperty(RENAMING_TERM_PROPERTY, referenceFormula)) {
+            if (formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
                 return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
                     update1, g2.node(), sf, update2);
             }

@@ -132,8 +132,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
                         changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
                     return beforeChangeOp == afterChangeTerm.op() && beforeChangeTerm.sub(0)
-                            .equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                                afterChangeTerm.sub(0));
+                            .equalsModProperty(afterChangeTerm.sub(0), IRRELEVANT_TERM_LABELS_PROPERTY
+                            );
                 }
 
                 return false;

@@ -105,7 +105,7 @@ public class PredictCostProver {
             op = pro.op();
         }
         if ((op == Equality.EQUALS || op == Equality.EQV)
-                && pro.sub(0).equalsModProperty(RENAMING_TERM_PROPERTY, pro.sub(1))) {
+                && pro.sub(0).equalsModProperty(pro.sub(1), RENAMING_TERM_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         Term arithRes = HandleArith.provedByArith(pro, services);
@@ -133,7 +133,7 @@ public class PredictCostProver {
             ax = ax.sub(0);
             negated = !negated;
         }
-        if (pro.equalsModProperty(RENAMING_TERM_PROPERTY, ax)) {
+        if (pro.equalsModProperty(ax, RENAMING_TERM_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         return problem;
@@ -347,7 +347,7 @@ public class PredictCostProver {
                     return true;
                 }
                 if (op == Junctor.FALSE
-                        && terms[0].equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, terms[j])) {
+                        && terms[0].equalsModProperty(terms[j], IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     next = next.remove(terms[j]);
                     literals = literals.remove(terms[j]);
                 }

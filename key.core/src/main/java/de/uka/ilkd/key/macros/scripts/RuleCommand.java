@@ -317,7 +317,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-            p.formula != null && sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, p.formula);
+            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
@@ -348,7 +348,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
                     p.on == null || pta.posInOccurrence().subTerm()
-                            .equalsModProperty(RENAMING_TERM_PROPERTY, p.on);
+                            .equalsModProperty(p.on, RENAMING_TERM_PROPERTY);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
@@ -358,7 +358,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
                     add &= userInst == null
-                            || userInst.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, ptaInst);
+                            || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
                 if (add) {

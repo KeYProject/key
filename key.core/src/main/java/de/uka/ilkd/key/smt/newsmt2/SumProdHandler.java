@@ -43,7 +43,7 @@ public class SumProdHandler implements SMTHandler {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
-                if (t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return usedBsumTerms.get(t);
                 }
             }
@@ -57,7 +57,7 @@ public class SumProdHandler implements SMTHandler {
             return ret;
         } else if (op == bprodOp) {
             for (Term t : usedBprodTerms.keySet()) {
-                if (t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return usedBprodTerms.get(t);
                 }
             }

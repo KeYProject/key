@@ -1366,14 +1366,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ((Services) services).getTypeConverter().getHeapLDT().getHeap();
         return (globalDefs == null ? "" : "defs: " + globalDefs + "; ") + "pre: " + originalPres
             + (originalFreePres.get(heap) != null
-                    && !originalFreePres.get(heap).equalsModProperty(RENAMING_TERM_PROPERTY,
-                        tb.tt())
+                    && !originalFreePres.get(heap).equalsModProperty(tb.tt(), RENAMING_TERM_PROPERTY
+        )
                                 ? "free pre: " + originalFreePres
                                 : "")
             + "; mby: " + originalMby + "; post: " + originalPosts
             + (originalFreePosts.get(heap) != null
-                    && !originalFreePosts.get(heap).equalsModProperty(RENAMING_TERM_PROPERTY,
-                        tb.tt())
+                    && !originalFreePosts.get(heap).equalsModProperty(tb.tt(), RENAMING_TERM_PROPERTY
+        )
                                 ? "free post: " + originalFreePosts
                                 : "")
             + "; mods: " + originalMods + "; hasMod: " + hasRealModifiesClause

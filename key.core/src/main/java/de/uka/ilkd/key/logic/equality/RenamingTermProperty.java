@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * Renaming of variables is ignored in this equality check.
  */
 public class RenamingTermProperty implements TermProperty {

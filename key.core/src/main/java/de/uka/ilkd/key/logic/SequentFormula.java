@@ -77,7 +77,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
             return true;
         }
         if (obj instanceof SequentFormula cmp) {
-            return term.equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, cmp.formula());
+            return term.equalsModProperty(cmp.formula(), PROOF_IRRELEVANCY_PROPERTY);
         }
         return false;
     }

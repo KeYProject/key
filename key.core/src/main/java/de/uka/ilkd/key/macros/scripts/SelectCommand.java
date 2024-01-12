@@ -135,7 +135,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModProperty(RENAMING_TERM_PROPERTY, formula)) {
+            if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
                 return true;
             }
         }

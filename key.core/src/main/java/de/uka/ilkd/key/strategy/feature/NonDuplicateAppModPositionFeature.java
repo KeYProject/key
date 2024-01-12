@@ -24,7 +24,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();
         final Term oldFocus = oldPio.subTerm();
-        if (!newFocus.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, oldFocus)) {
+        if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return false;
         }
 

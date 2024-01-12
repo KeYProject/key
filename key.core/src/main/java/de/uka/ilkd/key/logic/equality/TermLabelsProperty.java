@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * All term labels are ignored in this equality check.
  */
 public class TermLabelsProperty implements TermProperty {
@@ -54,7 +54,7 @@ public class TermLabelsProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(TERM_LABELS_PROPERTY, otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(otherSubs.get(i), TERM_LABELS_PROPERTY)) {
                 return false;
             }
         }

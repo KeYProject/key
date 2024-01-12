@@ -125,7 +125,7 @@ public abstract class ElementMatcher<T extends Operator> {
 
             final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
             if (t != null) {
-                if (!t.equalsModProperty(RENAMING_TERM_PROPERTY, term)) {
+                if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     LOGGER.debug(
                         "FAILED. Adding instantiations leads to unsatisfiable constraint. {} {}",
                         op, term);

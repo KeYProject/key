@@ -31,6 +31,6 @@ public class EqTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, Services services) {
-        return term.equalsModProperty(RENAMING_TERM_PROPERTY, pattern.getContent(mState));
+        return term.equalsModProperty(pattern.getContent(mState), RENAMING_TERM_PROPERTY);
     }
 }

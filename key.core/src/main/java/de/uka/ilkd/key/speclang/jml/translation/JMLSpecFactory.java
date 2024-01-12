@@ -627,8 +627,8 @@ public class JMLSpecFactory {
                     .atPres(atPres).atBefore(atBefores).translateTerm(expr, specType);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(), IRRELEVANT_TERM_LABELS_PROPERTY
+            )) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                         "\"assignable \\less_than_nothing\" does not go with other "
@@ -771,8 +771,8 @@ public class JMLSpecFactory {
                 new JmlIO(services).context(context).parameters(paramVars).translateTerm(expr);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(), IRRELEVANT_TERM_LABELS_PROPERTY
+            )) {
                 return true;
             }
         }
@@ -972,14 +972,14 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModProperty(RENAMING_TERM_PROPERTY,
-                tb.allLocs())) {
+            if (clauses.accessibles.get(heap).equalsModProperty(tb.allLocs(), RENAMING_TERM_PROPERTY
+            )) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
                 if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModProperty(RENAMING_TERM_PROPERTY, tb.allLocs())) {
+                        .equalsModProperty(tb.allLocs(), RENAMING_TERM_PROPERTY)) {
                     createContract = false;
                     break;
                 }

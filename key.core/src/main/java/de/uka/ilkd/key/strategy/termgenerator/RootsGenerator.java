@@ -92,8 +92,8 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-            tb.ff())) {
+        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY
+        )) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
