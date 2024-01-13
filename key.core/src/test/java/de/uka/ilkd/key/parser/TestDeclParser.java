@@ -103,6 +103,11 @@ public class TestDeclParser {
     }
 
     @Test
+    public void testParametricDatatype() {
+        evaluateDeclarations("\\sorts{\\generic E;} \\datatypes { List<[E]> = Nil | Cons(E obj, List<[E]> tail); }");
+    }
+
+    @Test
     public void testParametericSortDeclFails() {
         Assertions.assertThrows(Exception.class, () -> evaluateDeclarations("\\sorts { parametric<[E]>; }"));
         //assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared) generic sorts"));

@@ -328,7 +328,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var argSort =
             context.argSort.stream()
-                    .map(it -> sorts().lookup(it.getText()))
+                    .map(it -> (Sort) accept(it))
                     .toList();
         var argNames =
             context.argName.stream()

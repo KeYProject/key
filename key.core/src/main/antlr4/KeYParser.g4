@@ -248,7 +248,7 @@ datatype_decl:
   doc=DOC_COMMENT?
   // weigl: all datatypes are free!
   // FREE?
-  name=simple_ident
+  name=simple_ident formal_sort_parameters?
   EQUALS
   datatype_constructor (OR datatype_constructor)*
   SEMI
