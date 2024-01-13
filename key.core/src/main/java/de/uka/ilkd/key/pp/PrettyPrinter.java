@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -1922,12 +1921,7 @@ public class PrettyPrinter implements Visitor {
 
         l.beginRelativeC();
         l.brk();
-        createLogicPrinter().printTerm(jmlAssert.getCond());
+        l.print(jmlAssert.getConditionText().trim());
         l.end();
-    }
-
-    private SequentViewLogicPrinter createLogicPrinter() {
-        return new SequentViewLogicPrinter(new NotationInfo(), null, l,
-            new TermLabelVisibilityManager());
     }
 }

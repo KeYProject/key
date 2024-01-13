@@ -95,8 +95,7 @@ public class LogicPrinter {
      * @param services services.
      * @param layouter the layouter to use
      */
-    public LogicPrinter(NotationInfo notationInfo, @Nullable Services services,
-            PosTableLayouter layouter) {
+    public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
         this.services = services;
         if (services != null) {

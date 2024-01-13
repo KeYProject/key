@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -76,6 +77,18 @@ public class JmlAssert extends JavaStatement {
 
     public TextualJMLAssertStatement.Kind getKind() {
         return kind;
+    }
+
+    /**
+     * @return the condition in String form
+     */
+    public String getConditionText() {
+        if (cond != null) {
+            return LogicPrinter.quickPrintTerm(cond, services);
+        }
+        // this will lose whitespace, so e.g. \forall will not be printed correctly
+        // but normally the term form should get printed.
+        return condition.first.getText().substring(kind.name().length());
     }
 
     /**

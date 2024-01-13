@@ -28,7 +28,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    protected SequentViewLogicPrinter(NotationInfo notationInfo, @Nullable Services services,
+    protected SequentViewLogicPrinter(NotationInfo notationInfo, Services services,
             PosTableLayouter layouter, VisibleTermLabels visibleTermLabels) {
         super(notationInfo, services, layouter);
         this.visibleTermLabels = visibleTermLabels;
