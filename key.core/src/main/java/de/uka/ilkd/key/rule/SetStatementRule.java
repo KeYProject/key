@@ -35,10 +35,10 @@ public final class SetStatementRule implements BuiltInRule {
     /**
      * The name of this rule
      */
-    private final Name name;
+    private static final Name name = new Name("Set Statement");
 
     private SetStatementRule() {
-        this.name = new Name("Set Statement");
+        // no statements
     }
 
     @Override
@@ -76,34 +76,28 @@ public final class SetStatementRule implements BuiltInRule {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");
         }
+
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
-
         final Term formula = occurrence.subTerm();
-        final Term update = UpdateApplication.getUpdate(formula);
+        assert formula.op() instanceof UpdateApplication :
+                "Currently, this can only be applied if there is an update application in front of the modality";
 
-        Term target;
-        if (formula.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(formula);
-        } else {
-            target = formula;
-        }
+        Term update = UpdateApplication.getUpdate(formula);
+        Term target = UpdateApplication.getTarget(formula);
 
-        final var setStatement =
+        SetStatement setStatement =
             Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
                     .filter(SetStatement.class::isInstance).map(SetStatement.class::cast)
                     .orElseThrow(() -> new RuleAbortException("not a Set Statement"));
-        final CopyAssignment copy = KeYJavaASTFactory.assign(setStatement.getExpressionAt(0),
-            setStatement.getExpressionAt(1), setStatement.getPositionInfo());
 
-        final ImmutableList<Goal> result = goal.split(1);
+        Term newUpdate = tb.elementary(setStatement.getTarget(), setStatement.getValue());
+        JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
-        final var javaBlock =
-            JavaTools.replaceStatement(target.javaBlock(), services, setStatement, copy);
-        final var blockTerm = tb.prog((Modality) target.op(), javaBlock, target.sub(0), null);
-        final var newTerm = tb.apply(update, blockTerm);
+        Term newTerm = tb.apply(update, tb.apply(newUpdate, services.getTermFactory().createTerm(target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
+
+        ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(newTerm), occurrence);
-
         return result;
     }
 

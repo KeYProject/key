@@ -11,6 +11,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -430,17 +431,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
-        var statement = stat.getAssignment();
+        JmlParser.Set_statementContext statement = stat.getAssignment();
 
         // parse statement, attach to AST
         de.uka.ilkd.key.java.Position pos =
             de.uka.ilkd.key.java.Position.fromToken(stat.getAssignment().start);
         try {
-            String assignment = getFullText(statement).substring(3);
-            List<Statement> stmtList = services.getProgramFactory().parseStatements(assignment);
-            assert stmtList.size() == 1;
-            var setStatement = (CopyAssignment) stmtList.get(0);
-            var set = new SetStatement(setStatement, statement);
+            var set = new SetStatement(statement);
             updatePositionInformation(set, pos);
             doAttach(set, astParent, childIndex);
         } catch (Throwable e) {

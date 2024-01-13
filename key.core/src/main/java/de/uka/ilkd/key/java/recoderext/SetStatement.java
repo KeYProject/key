@@ -4,15 +4,16 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-
-import recoder.java.expression.operator.CopyAssignment;
+import recoder.java.ProgramElement;
+import recoder.java.SourceVisitor;
+import recoder.java.statement.JavaStatement;
 
 /**
  * Wrapper for JML set statements which lifts the contained parse tree to the Translator.
  *
  * @author Julian Wiesler
  */
-public class SetStatement extends CopyAssignment {
+public class SetStatement extends JavaStatement {
     /**
      * Parser context of the assignment
      */
@@ -21,20 +22,27 @@ public class SetStatement extends CopyAssignment {
     /**
      * Primary constructor
      *
-     * @param proto the copy assignment
      * @param context the context of the assignment
      */
-    public SetStatement(CopyAssignment proto, JmlParser.Set_statementContext context) {
-        super(proto);
+    public SetStatement(JmlParser.Set_statementContext context) {
         this.context = context;
     }
 
+    /**
+     * copy constructor
+     *
+     * @param proto the orginal JML set statement to copy
+     */
+    public SetStatement(SetStatement proto) {
+        super(proto);
+        this.context = proto.context;
+    }
     /**
      * {@inheritDoc}
      */
     @Override
     public SetStatement deepClone() {
-        return new SetStatement(this, this.context);
+        return new SetStatement(this);
     }
 
     /**
@@ -44,5 +52,41 @@ public class SetStatement extends CopyAssignment {
      */
     public JmlParser.Set_statementContext getParserContext() {
         return context;
+    }
+
+    /**
+     * A set statement has no recorder AST children
+     * @return
+     */
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * There are no recorder AST children.
+     *
+     * @throws IndexOutOfBoundsException always
+     */
+    @Override
+    public ProgramElement getChildAt(int index) {
+        throw new IndexOutOfBoundsException("JmlAssert has no program children");
+    }
+
+    @Override
+    public int getChildPositionCode(ProgramElement child) {
+        return -1;
+    }
+
+    @Override
+    public boolean replaceChild(ProgramElement p, ProgramElement q) {
+        return false;
+    }
+
+    @Override
+    public void accept(SourceVisitor v) {
+        // should be fine to leave blank
     }
 }

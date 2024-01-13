@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -1284,17 +1286,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSetStatement(SetStatement x) {
-        l.print("//@ ");
-        l.keyWord("set");
-
-        l.beginRelativeC();
-        l.brk();
-        performActionOnCopyAssignment(x);
-        l.end();
-    }
-
-    @Override
     public void performActionOnDivideAssignment(DivideAssignment x) {
         printOperator(x, "/=");
     }
@@ -1924,4 +1915,34 @@ public class PrettyPrinter implements Visitor {
         l.print(jmlAssert.getConditionText().trim());
         l.end();
     }
+
+    /**
+     * Prints a JML set statement
+     *
+     * @param x the set statement
+     */
+    public void performActionOnSetStatement(SetStatement x) {
+        l.print("//@ ");
+        l.keyWord("set");
+
+        l.beginRelativeC();
+        l.brk();
+        JmlParser.Set_statementContext context = x.getParserContext();
+
+        Term target = x.getTarget();
+        Term value = x.getValue();
+        if(target != null && value != null) {
+            l.print(LogicPrinter.quickPrintTerm(target, null));
+            l.print(" = ");
+            l.print(LogicPrinter.quickPrintTerm(value, null));
+            l.print(" // ");
+        } else {
+            // This is really only emergency fallback as it will most probably be garbage.
+            if(context != null) {
+                l.print(context.getText());
+            }
+        }
+        l.end();
+    }
+
 }
