@@ -162,7 +162,7 @@ public class SettingsUi extends JPanel {
             }
             return all.stream();
         }).map(x -> {
-            JPanel panel = (JPanel) x.getPanel(mainWindow);
+            JPanel panel = x.getPanel(mainWindow);
             setSettingsPanel(panel);
             frame.pack();
             return panel.getWidth();

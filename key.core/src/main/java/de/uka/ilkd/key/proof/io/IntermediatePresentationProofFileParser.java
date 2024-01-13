@@ -327,8 +327,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @param preferences The preferences to load.
      */
     private void loadPreferences(String preferences) {
-        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
-        proofSettings.loadSettingsFromString(preferences);
+        final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+        proofSettings.loadSettingsFromPropertyString(preferences);
     }
 
     /**

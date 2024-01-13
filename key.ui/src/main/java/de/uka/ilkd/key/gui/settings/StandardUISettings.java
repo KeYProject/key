@@ -141,7 +141,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings generalSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
