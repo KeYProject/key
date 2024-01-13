@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqPut;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
@@ -136,7 +137,7 @@ public final class SeqLDT extends LDT {
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
-                || op instanceof SeqLength;
+                || op instanceof SeqLength || op instanceof SeqPut;
     }
 
 
@@ -158,6 +159,8 @@ public final class SeqLDT extends LDT {
             return seqSub;
         } else if (op instanceof SeqReverse) {
             return seqReverse;
+        } else if (op instanceof SeqPut) {
+            return seqUpd;
         } else if (op instanceof SeqIndexOf) {
             return seqIndexOf;
         } else if (op instanceof SeqGet) {

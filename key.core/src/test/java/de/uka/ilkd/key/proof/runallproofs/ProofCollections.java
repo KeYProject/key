@@ -313,9 +313,11 @@ public class ProofCollections {
         g.provable("heap/list_seq/ArrayList.contains.key");
         g.provable("heap/list_seq/ArrayList.enlarge.key");
         g.provable("heap/list_seq/ArrayList.get.key");
+        g.provable("heap/list_seq/ArrayList.set.key");
         g.provable("heap/list_seq/ArrayList.newArray.key");
         g.provable("heap/list_seq/ArrayList.remove.0.key");
         g.provable("heap/list_seq/ArrayList.remove.1.key");
+        g.provable("heap/list_seq/LinkedList.set.key");
 
 
         g = c.group("observer");
