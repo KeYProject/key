@@ -15,7 +15,7 @@ public interface TermEqualsModProperty {
      * Checks whether this object is equal to {@code o} modulo the property described by
      * {@code property}.
      *
-     * @param o        the object that is checked for equality
+     * @param o the object that is checked for equality
      * @param property the property to be ignored in the equality check
      * @return whether this object is equal to <code>o</code>
      */

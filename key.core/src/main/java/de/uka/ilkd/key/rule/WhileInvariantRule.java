@@ -831,16 +831,16 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
             if (strictlyNothing.equalsModProperty(
-                    mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 if (strictlyNothing.equalsModProperty(
-                        freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
                 }
             } else {
                 if (strictlyNothing.equalsModProperty(
-                        freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
                 } else {
                     currentFrame = tb.frame(

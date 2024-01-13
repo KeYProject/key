@@ -71,8 +71,8 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
         final ImmutableArray<Term> otherSubs = other.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(otherSubs.get(i), IRRELEVANT_TERM_LABELS_PROPERTY
-            )) {
+            if (!termSubs.get(i).equalsModProperty(otherSubs.get(i),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return false;
             }
         }

@@ -651,8 +651,8 @@ public final class AuxiliaryContractBuilders {
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equalsModProperty(strictlyNothing(), IRRELEVANT_TERM_LABELS_PROPERTY
-                )) {
+                if (!modifiesClause.equalsModProperty(strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
                         services.getTermBuilder().label(
                             services.getTermBuilder().func(anonymisationHeap.getValue()),

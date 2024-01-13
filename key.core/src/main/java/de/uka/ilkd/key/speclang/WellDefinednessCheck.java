@@ -399,8 +399,8 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods = LogicPrinter.quickPrintTerm(
-                getAssignable(null).equalsModProperty(TB.strictlyNothing(), IRRELEVANT_TERM_LABELS_PROPERTY
-                ) ? TB.empty()
+                getAssignable(null).equalsModProperty(TB.strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.empty()
                             : this.getAssignable(null),
                 services);
             mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
@@ -734,24 +734,24 @@ public abstract class WellDefinednessCheck implements Contract {
         this.assignable = ass;
         if (ass == null
                 || TB.strictlyNothing().equalsModProperty(
-                ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.FALSE().equalsModProperty(
-                ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.strictlyNothing();
         } else if (TB.tt().equalsModProperty(
-                ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+            ass, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.TRUE().equalsModProperty(
-                ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
         if (ass1 == null || TB.strictlyNothing().equalsModProperty(
-                ass1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            ass1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass2, services);
         } else if (ass2 == null || TB.strictlyNothing().equalsModProperty(
-                ass2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            ass2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);

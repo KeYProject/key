@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -18,19 +20,19 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * Renaming of variables is ignored in this equality check.
  */
-public class RenamingTermProperty implements TermProperty {
+public class RenamingProperty implements TermProperty {
     /**
      * The single instance of this property.
      */
-    public static final RenamingTermProperty RENAMING_TERM_PROPERTY = new RenamingTermProperty();
+    public static final RenamingProperty RENAMING_TERM_PROPERTY = new RenamingProperty();
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
-     * through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
+     * through {@link RenamingProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
      * {@link TermProperty#equalsModThisProperty(Term, Object)}.
      */
-    private RenamingTermProperty() {}
+    private RenamingProperty() {}
 
     /**
      * Checks if {@code o} is a term syntactically equal to {@code term} modulo bound renaming.
@@ -160,7 +162,7 @@ public class RenamingTermProperty implements TermProperty {
 
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
             nat = checkNat(nat);
-            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+            if (javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(), nat)) {
                 return FAILED;
             }
         }
@@ -176,6 +178,22 @@ public class RenamingTermProperty implements TermProperty {
         }
 
         return nat;
+    }
+
+    /**
+     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
+     * (see comment in SourceElement)
+     */
+    public static boolean javaBlocksNotEqualModRenaming(JavaBlock jb1, JavaBlock jb2,
+            NameAbstractionTable nat) {
+        JavaProgramElement pe1 = jb1.program();
+        JavaProgramElement pe2 = jb2.program();
+        if (pe1 == null && pe2 == null) {
+            return false;
+        } else if (pe1 != null && pe2 != null) {
+            return !pe1.equalsModRenaming(pe2, nat);
+        }
+        return true;
     }
 
     private boolean descendRecursively(Term t0, Term t1,

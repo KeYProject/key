@@ -25,7 +25,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_TERM_PROPERTY;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {

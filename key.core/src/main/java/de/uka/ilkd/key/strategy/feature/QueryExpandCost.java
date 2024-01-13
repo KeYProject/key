@@ -181,8 +181,8 @@ public class QueryExpandCost implements Feature {
                     final Term oldterm = pio.subTerm();
                     final Term curterm = pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
-                            && oldterm.equalsModProperty(curterm, IRRELEVANT_TERM_LABELS_PROPERTY
-                    )) {
+                            && oldterm.equalsModProperty(curterm,
+                                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                         count++;
                         if (count > maxRepetitionsOnSameTerm) {
                             break;
