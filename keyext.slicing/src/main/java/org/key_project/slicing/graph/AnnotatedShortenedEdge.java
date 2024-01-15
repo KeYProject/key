@@ -15,11 +15,11 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
     /**
      * The initial node in this shortened chain.
      */
-    private Node initial;
+    private final Node initial;
     /**
      * The last node in this shortened chain.
      */
-    private Node last;
+    private final Node last;
 
     /**
      * Create a new shortened edge.
