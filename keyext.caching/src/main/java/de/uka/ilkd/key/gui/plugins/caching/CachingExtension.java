@@ -18,6 +18,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
+import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
+import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
 import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -193,6 +195,7 @@ public class CachingExtension
             actions.add(new CloseByReference(this, mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
+            actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
         }
         return new ArrayList<>();
