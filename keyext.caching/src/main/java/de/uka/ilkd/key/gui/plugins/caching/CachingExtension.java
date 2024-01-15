@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
+import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
+import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
@@ -83,6 +84,15 @@ public class CachingExtension
         if (toggleAction == null) {
             toggleAction = new CachingToggleAction(mainWindow);
         }
+    }
+
+    /**
+     * Update the GUI state of the status line button.
+     *
+     * @param proof the currently open proof
+     */
+    public void updateGUIState(Proof proof) {
+        referenceSearchButton.updateState(proof);
     }
 
     @Override
@@ -186,7 +196,7 @@ public class CachingExtension
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
             List<Action> actions = new ArrayList<>();
-            actions.add(new CloseByReference(mediator, node));
+            actions.add(new CloseByReference(this, mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
@@ -299,72 +309,6 @@ public class CachingExtension
         @Override
         public void proofDisposed(ProofDisposedEvent e) {
 
-        }
-    }
-
-    /**
-     * Action to search for suitable references on a single node.
-     *
-     * @author Arne Keller
-     */
-    private final class CloseByReference extends KeyAction {
-        /**
-         * The mediator.
-         */
-        private final KeYMediator mediator;
-        /**
-         * The node to try to close by reference.
-         */
-        private final Node node;
-
-        /**
-         * Construct new action.
-         *
-         * @param mediator the mediator
-         * @param node the node
-         */
-        public CloseByReference(KeYMediator mediator, Node node) {
-            this.mediator = mediator;
-            this.node = node;
-            setName("Close by reference to other proof");
-            setEnabled(!node.isClosed() && node.lookup(ClosedBy.class) == null);
-            setMenuPath("Proof Caching");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            List<Node> nodes = new ArrayList<>();
-            if (node.leaf()) {
-                nodes.add(node);
-            } else {
-                node.subtreeIterator().forEachRemaining(n -> {
-                    if (n.leaf() && !n.isClosed()) {
-                        nodes.add(n);
-                    }
-                });
-            }
-            List<Integer> mismatches = new ArrayList<>();
-            for (Node n : nodes) {
-                // search other proofs for matching nodes
-                ClosedBy c = ReferenceSearcher.findPreviousProof(
-                    mediator.getCurrentlyOpenedProofs(), n);
-                if (c != null) {
-                    n.proof().closeGoal(n.proof().getOpenGoal(n));
-                    n.register(c, ClosedBy.class);
-                } else {
-                    mismatches.add(n.serialNr());
-                }
-            }
-            if (!nodes.isEmpty()) {
-                referenceSearchButton.updateState(nodes.get(0).proof());
-            }
-            if (!mismatches.isEmpty()) {
-                // since e.getSource() is the popup menu, it is better to use the MainWindow
-                // instance here as a parent
-                JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
-                    "Proof Caching error", JOptionPane.WARNING_MESSAGE);
-            }
         }
     }
 
