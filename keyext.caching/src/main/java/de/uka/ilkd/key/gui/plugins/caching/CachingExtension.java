@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,13 +12,12 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
+import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -44,8 +42,6 @@ import de.uka.ilkd.key.settings.ProofCachingSettings;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Extension for proof caching.
@@ -61,8 +57,6 @@ public class CachingExtension
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, KeYGuiExtension.Toolbar,
         KeYGuiExtension.MainMenu,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
-
     /**
      * The mediator.
      */
@@ -309,52 +303,6 @@ public class CachingExtension
         @Override
         public void proofDisposed(ProofDisposedEvent e) {
 
-        }
-    }
-
-    /**
-     * Action to copy referenced proof steps to the new proof.
-     *
-     * @author Arne Keller
-     */
-    private static class CopyReferencedProof extends KeyAction {
-        /**
-         * The mediator.
-         */
-        private final KeYMediator mediator;
-        /**
-         * The node to copy the steps to.
-         */
-        private final Node node;
-
-        /**
-         * Construct a new action.
-         *
-         * @param mediator the mediator
-         * @param node the node
-         */
-        public CopyReferencedProof(KeYMediator mediator, Node node) {
-            this.mediator = mediator;
-            this.node = node;
-            setName("Copy referenced proof steps here");
-            setEnabled(node.leaf() && node.isClosed()
-                    && node.lookup(ClosedBy.class) != null);
-            setMenuPath("Proof Caching");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ClosedBy c = node.lookup(ClosedBy.class);
-            Goal current = node.proof().getClosedGoal(node);
-            try {
-                mediator.stopInterface(true);
-                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current,
-                    c.nodesToSkip());
-                mediator.startInterface(true);
-            } catch (Exception ex) {
-                LOGGER.error("failed to copy proof ", ex);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
-            }
         }
     }
 
