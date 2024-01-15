@@ -57,7 +57,8 @@ import org.slf4j.LoggerFactory;
 @HelpInfo(path = "/user/ProofCaching/")
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
+        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, KeYGuiExtension.Toolbar,
+        KeYGuiExtension.MainMenu,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
@@ -66,8 +67,8 @@ public class CachingExtension
      */
     private KeYMediator mediator;
     /**
-     * Whether to try to close the current proof after a rule application.
-     * Will be false when running certain macros.
+     * Whether to try to close the current proof (by caching) after a rule application.
+     * Will be false when running certain macros, like the "close provable goals" macro.
      */
     private boolean tryToClose = false;
 
@@ -76,6 +77,32 @@ public class CachingExtension
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
     private ReferenceSearchButton referenceSearchButton;
+    private CachingToggleAction toggleAction = null;
+
+    private void initActions(MainWindow mainWindow) {
+        if (toggleAction == null) {
+            toggleAction = new CachingToggleAction(mainWindow);
+        }
+    }
+
+    @Override
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
+        initActions(mainWindow);
+        JToolBar tb = new JToolBar("Proof Caching");
+        JToggleButton comp = new JToggleButton(toggleAction);
+        tb.add(comp);
+        return tb;
+    }
+
+    @Override
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+        initActions(mainWindow);
+        return List.of(toggleAction);
+    }
+
+    public boolean getProofCachingEnabled() {
+        return toggleAction.isSelected();
+    }
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
@@ -90,6 +117,8 @@ public class CachingExtension
 
     @Override
     public void ruleApplied(ProofEvent e) {
+        // main entry point for proof caching logic:
+        // this is called after every rule application in the proof
         if (!tryToClose) {
             return;
         }
@@ -100,6 +129,10 @@ public class CachingExtension
             return;
         }
         if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
+            return;
+        }
+        // new global off switch
+        if (!getProofCachingEnabled()) {
             return;
         }
         Proof p = e.getSource();
