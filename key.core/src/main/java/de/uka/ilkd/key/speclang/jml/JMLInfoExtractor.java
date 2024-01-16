@@ -110,7 +110,7 @@ public final class JMLInfoExtractor {
             coms = coms.prepend(method.getTypeReference().getComments());
         }
 
-        // ... or to 'void' ...
+        // ... or to 'void' (special case) ...
         if (method.getVoidComments() != null) {
             coms = coms.prepend(method.getVoidComments());
         }
@@ -135,11 +135,6 @@ public final class JMLInfoExtractor {
         var specMathMode = checkForSpecMathMode(comments);
 
         return new MethodDeclaration.JMLModifiers(pure, strictlyPure, helper, specMathMode);
-    }
-
-    private static boolean hasJMLModifier(MethodDeclaration pm, String mod) {
-        var coms = getJMLComments(pm);
-        return checkFor(mod, coms);
     }
 
 

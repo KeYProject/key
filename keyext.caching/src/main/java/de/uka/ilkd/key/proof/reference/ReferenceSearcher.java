@@ -167,9 +167,13 @@ public final class ReferenceSearcher {
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
             Term term = seq.getFormulabyNr(i).formula();
+            // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
+                // not suitable for caching
                 return false;
             }
+            // then, check for program methods
+            // (may expand differently depending on Java code associated with proofs)
             term.execPreOrder(f);
             if (f.getFoundProgramMethod()) {
                 return false;
