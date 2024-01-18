@@ -2,4 +2,5 @@ description "Test Case Generation based on proof attempts."
 
 dependencies {
     implementation project(":key.core")
+    implementation("com.squareup:javapoet:1.13.0")
 }

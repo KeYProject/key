@@ -6,34 +6,17 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.HashSet;
 import java.util.Set;
 
-public class OracleLocationSet {
+sealed interface OracleLocationSet {
+    EmptyOracleLocationSet EMPTY = new EmptyOracleLocationSet();
+    AllLocsLocationSet ALL_LOCS = new AllLocsLocationSet();
 
-    private final Set<OracleLocation> locs;
-
-    public static final EmptyOracleLocationSet EMPTY = new EmptyOracleLocationSet();
-
-    public static final AllLocsLocationSet ALL_LOCS = new AllLocsLocationSet();
-
-
-    public OracleLocationSet() {
-        locs = new HashSet<>();
-    }
-
-    private void add(OracleLocation loc) {
-        locs.add(loc);
-    }
-
-    private void add(OracleLocationSet loc) {
-        locs.addAll(loc.locs);
-    }
-
-    public static OracleLocationSet singleton(OracleLocation loc) {
-        OracleLocationSet result = new OracleLocationSet();
+    static OracleLocationSet singleton(OracleLocation loc) {
+        var result = new OracleDefaultLocationSet();
         result.add(loc);
         return result;
     }
 
-    public static OracleLocationSet union(OracleLocationSet l1, OracleLocationSet l2) {
+    static OracleLocationSet union(OracleLocationSet l1, OracleLocationSet l2) {
 
         if (l1 == ALL_LOCS || l2 == ALL_LOCS) {
             return ALL_LOCS;
@@ -47,14 +30,13 @@ public class OracleLocationSet {
             return l1;
         }
 
-        OracleLocationSet result = new OracleLocationSet();
+        var result = new OracleDefaultLocationSet();
         result.add(l1);
         result.add(l2);
         return result;
     }
 
-    public static OracleLocationSet intersect(OracleLocationSet l1, OracleLocationSet l2) {
-
+    static OracleLocationSet intersect(OracleLocationSet l1, OracleLocationSet l2) {
         if (l1 == EMPTY || l2 == EMPTY) {
             return EMPTY;
         }
@@ -67,15 +49,18 @@ public class OracleLocationSet {
             return l1;
         }
 
-        OracleLocationSet result = new OracleLocationSet();
-        for (OracleLocation l : l1.locs) {
+
+        var s1 = (OracleDefaultLocationSet) l1;
+        var s2 = (OracleDefaultLocationSet) l2;
+
+        var result = new OracleDefaultLocationSet();
+        for (OracleLocation l : s1.locs) {
             if (l2.contains(l)) {
                 result.add(l);
             }
         }
 
-
-        for (OracleLocation l : l2.locs) {
+        for (OracleLocation l : s2.locs) {
             if (l1.contains(l)) {
                 result.add(l);
             }
@@ -84,33 +69,36 @@ public class OracleLocationSet {
         return result;
     }
 
+    boolean contains(OracleLocation l);
+}
+
+final class OracleDefaultLocationSet implements OracleLocationSet {
+    final Set<OracleLocation> locs = new HashSet<>();
+
+    void add(OracleLocation loc) {
+        locs.add(loc);
+    }
+
+    void add(OracleLocationSet loc) {
+        if (loc instanceof OracleDefaultLocationSet o)
+            locs.addAll(o.locs);
+    }
+
+    @Override
     public boolean contains(OracleLocation l) {
         for (OracleLocation loc : locs) {
-
             if (loc.equals(l)) {
                 return true;
             }
 
-            if (loc.isAllFields() && loc.getObject().equals(l.getObject())) {
+            if (loc.isAllFields() && loc.object().equals(l.object())) {
                 return true;
             }
-
         }
-
         return false;
     }
 
     public String toString() {
-
-        if (this == EMPTY) {
-            return "Empty";
-        }
-
-        if (this == ALL_LOCS) {
-            return "All";
-        }
-
-
         StringBuilder result = new StringBuilder();
 
         result.append("{");
@@ -130,15 +118,28 @@ public class OracleLocationSet {
 }
 
 
-class EmptyOracleLocationSet extends OracleLocationSet {
+final class EmptyOracleLocationSet implements OracleLocationSet {
+    @Override
     public boolean contains(OracleLocation l) {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Empty";
+
     }
 }
 
 
-class AllLocsLocationSet extends OracleLocationSet {
+final class AllLocsLocationSet implements OracleLocationSet {
+    @Override
     public boolean contains(OracleLocation l) {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "All";
     }
 }
