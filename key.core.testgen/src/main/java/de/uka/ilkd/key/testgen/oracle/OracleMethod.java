@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
+import de.uka.ilkd.key.logic.sort.Sort;
+
 import java.util.List;
 
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
-
-import org.key_project.logic.sort.Sort;
+import static de.uka.ilkd.key.testgen.template.Constants.TAB;
 
 public class OracleMethod {
 
@@ -46,9 +50,27 @@ public class OracleMethod {
         return body;
     }
 
+    public MethodSpec build() {
+        TypeName retType = TypeName.BOOLEAN;
+        if (returnType != null) {
+            retType = ClassName.get("", returnType.name().toString());
+        }
+
+        Iterable<ParameterSpec> params = args.stream().map(
+                it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
+                        it.name().toString()).build()
+        ).toList();
+
+        var m = MethodSpec.methodBuilder(methodName)
+                .returns(retType)
+                .addParameters(params)
+                .addStatement(body);
+        return m.build();
+    }
+
     @Override
     public String toString() {
-        String tab = TestCaseGenerator.TAB;
+        String tab = TAB;
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
@@ -63,7 +85,7 @@ public class OracleMethod {
             retType = returnType.name().toString();
         }
         return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-            + body + "\n" + tab + "}";
+                + body + "\n" + tab + "}";
 
     }
 }

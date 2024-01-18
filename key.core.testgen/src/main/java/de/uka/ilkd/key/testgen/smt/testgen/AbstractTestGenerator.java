@@ -1,16 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.smt.testgen;
-
-import java.io.IOException;
-import java.util.*;
+package de.uka.ilkd.key.testgen.smt.testgen;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
-import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -19,17 +16,17 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
-import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.testgen.TestgenUtils;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.testgen.macros.TestGenMacro;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.template.Templates;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
@@ -43,9 +40,11 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Implementations of this class are used generate test cases or a given {@link Proof}.
@@ -114,7 +113,7 @@ public abstract class AbstractTestGenerator {
             log.writeln("No test data constraints were extracted.");
         }
         final Collection<SMTProblem> problems = new LinkedList<>();
-        log.writeln("Test data generation: appling semantic blasting macro on proofs");
+        log.writeln("Test data generation: applying semantic blasting macro on proofs");
         try {
             for (final Proof proof : proofs) {
                 if (stopRequest != null && stopRequest.shouldStop()) {
@@ -333,7 +332,7 @@ public abstract class AbstractTestGenerator {
         }
         boolean res = false;
         for (int i = 0; i < t.arity() && !res; i++) {
-            res |= hasModalities(t.sub(i), checkUpdates);
+            res = hasModalities(t.sub(i), checkUpdates);
         }
         return res;
     }
@@ -364,7 +363,7 @@ public abstract class AbstractTestGenerator {
 
     protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLog log,
             Proof originalProof) throws IOException {
-        final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
+        final TestCaseGenerator tg = new TestCaseGenerator(originalProof, Templates.TEMPLATE_JUNIT4);
         tg.setLogger(log);
 
         tg.generateJUnitTestSuite(problemSolvers);
@@ -401,7 +400,7 @@ public abstract class AbstractTestGenerator {
                     solvedPaths++;
                     if (solver.getSocket().getQuery() != null) {
                         final Model m = solver.getSocket().getQuery().getModel();
-                        if (TestCaseGenerator.modelIsOK(m)) {
+                        if (TestgenUtils.modelIsOK(m)) {
                             output.add(solver);
                         } else {
                             problem++;
