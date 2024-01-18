@@ -26,6 +26,6 @@ public record OracleUnaryTerm(OracleTerm sub,
 
 
     public String toString() {
-        return op2String.get(op) + sub.toString();
+        return op2String.get(op) + sub;
     }
 }

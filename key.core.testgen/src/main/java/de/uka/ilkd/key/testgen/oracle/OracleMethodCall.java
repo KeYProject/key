@@ -3,27 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 
-public class OracleMethodCall implements OracleTerm {
-
-    private final OracleMethod method;
-    private final List<? extends OracleTerm> args;
-    private final OracleTerm caller;
-
+public record OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args,
+                               @Nullable OracleTerm caller)
+        implements OracleTerm {
     public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args) {
-        super();
-        this.method = method;
-        this.args = args;
-        caller = null;
-    }
-
-    public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args,
-            OracleTerm caller) {
-        super();
-        this.method = method;
-        this.args = args;
-        this.caller = caller;
+        this(method, args, null);
     }
 
     public String toString() {
@@ -41,5 +30,4 @@ public class OracleMethodCall implements OracleTerm {
             return methodName + "(" + aString + ")";
         }
     }
-
 }

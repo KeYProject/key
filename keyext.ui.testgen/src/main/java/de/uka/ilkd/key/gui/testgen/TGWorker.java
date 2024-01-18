@@ -18,8 +18,8 @@ import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
-import de.uka.ilkd.key.smt.testgen.StopRequest;
+import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
+import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
 
 /**
  * <strong>The worker must be started using method {@link TGWorker#start()} and not
