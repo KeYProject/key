@@ -6,8 +6,9 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
@@ -24,6 +25,8 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.testgen.template.Constants.*;
 
 public class OracleGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleGenerator.class);
@@ -185,10 +188,10 @@ public class OracleGenerator {
         Sort allObjSort = createSetSort("java.lang.Object");
         Sort oldMapSort = new SortImpl(new Name("Map<Object,Object>"));
 
-        OracleVariable allInts = new OracleVariable(TestCaseGenerator.ALL_INTS, allIntSort);
-        OracleVariable allBools = new OracleVariable(TestCaseGenerator.ALL_BOOLS, allBoolSort);
-        OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
-        OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
+        OracleVariable allInts = new OracleVariable(ALL_INTS, allIntSort);
+        OracleVariable allBools = new OracleVariable(ALL_BOOLS, allBoolSort);
+        OracleVariable allObj = new OracleVariable(ALL_OBJECTS, allObjSort);
+        OracleVariable oldMap = new OracleVariable(OLDMap, oldMapSort);
 
         for (Term c : constants) {
             result.add(new OracleVariable(c.toString(), c.sort()));
@@ -663,7 +666,7 @@ public class OracleGenerator {
     }
 
     private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
-        String tab = TestCaseGenerator.TAB;
+        String tab = TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
             + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
             + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
@@ -671,21 +674,24 @@ public class OracleGenerator {
     }
 
     private String createExistsBody(QuantifiableVariable qv, String setName, OracleTerm cond) {
-        String tab = TestCaseGenerator.TAB;
-        return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
-            + "\n" + tab + tab + "if(" + cond.toString() + "){" + "\n" + tab + tab + tab
-            + "return true;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
-            + "return false;";
+        String tab = TAB;
+        return ("""
+                %sfor(%s %s : %s){
+                %s%sif(%s){
+                %s%s%sreturn true;
+                %s%s}
+                %s}
+                %sreturn false;""").formatted(
+                        tab, qv.sort().name(), qv.name(), setName, tab, tab, cond.toString(),
+                tab, tab, tab, tab, tab, tab, tab);
     }
 
     private static OracleTerm neg(OracleTerm t) {
-
         if (t instanceof OracleUnaryTerm) {
             return ((OracleUnaryTerm) t).sub();
         } else {
             return new OracleUnaryTerm(t, Op.Neg);
         }
-
     }
 
     private static OracleTerm eq(OracleTerm left, OracleTerm right) {

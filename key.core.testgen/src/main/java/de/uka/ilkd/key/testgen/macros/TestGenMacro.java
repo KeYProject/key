@@ -1,15 +1,19 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.macros;
+package de.uka.ilkd.key.testgen.macros;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.FilterStrategy;
+import de.uka.ilkd.key.macros.ModalityCache;
+import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
