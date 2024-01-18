@@ -7,12 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 
-public class ModifiesSetTranslator {
-
-    private final Services services;
-    private final OracleGenerator gen;
-
-
+public record ModifiesSetTranslator(Services services, OracleGenerator gen) {
     public boolean isSingleTon(Term t) {
         return t.op().equals(getLocSetLDT().getSingleton());
     }
@@ -41,14 +36,7 @@ public class ModifiesSetTranslator {
         return services.getTypeConverter().getLocSetLDT();
     }
 
-    public ModifiesSetTranslator(Services services, OracleGenerator gen) {
-        this.services = services;
-        this.gen = gen;
-    }
-
-
     public OracleLocationSet translate(Term t) {
-
         if (isSingleTon(t)) {
             Term obj = t.sub(0);
             Term field = t.sub(1);
@@ -56,39 +44,24 @@ public class ModifiesSetTranslator {
             String fieldString = gen.generateOracle(field, false).toString();
             OracleLocation loc = new OracleLocation(objString, fieldString);
             return OracleLocationSet.singleton(loc);
-        }
-
-        else if (isUnion(t)) {
+        } else if (isUnion(t)) {
             OracleLocationSet left = translate(t.sub(0));
             OracleLocationSet right = translate(t.sub(1));
             return OracleLocationSet.union(left, right);
-        }
-
-        else if (isIntersection(t)) {
+        } else if (isIntersection(t)) {
             OracleLocationSet left = translate(t.sub(0));
             OracleLocationSet right = translate(t.sub(1));
             return OracleLocationSet.intersect(left, right);
-        }
-
-        else if (isAllFields(t)) {
+        } else if (isAllFields(t)) {
             Term obj = t.sub(0);
             String objString = gen.generateOracle(obj, false).toString();
             OracleLocation loc = new OracleLocation(objString);
             return OracleLocationSet.singleton(loc);
-        }
-
-        else if (isEmpty(t)) {
+        } else if (isEmpty(t)) {
             return OracleLocationSet.EMPTY;
-        }
-
-        else if (isAllLocs(t)) {
+        } else if (isAllLocs(t)) {
             return OracleLocationSet.ALL_LOCS;
         }
-
-
         throw new RuntimeException("Unsupported locset operation: " + t.op());
     }
-
-
-
 }
