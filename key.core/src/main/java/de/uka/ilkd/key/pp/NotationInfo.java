@@ -106,8 +106,8 @@ public final class NotationInfo {
 
     public static boolean DEFAULT_PRETTY_SYNTAX = true;
     /**
-     * Whether the very fancy notation is enabled in which Unicode characters for logical operators
-     * are printed.
+     * Whether the very fancy notation is enabled by default in which Unicode characters for logical
+     * operators are printed.
      */
     public static boolean DEFAULT_UNICODE_ENABLED = false;
 

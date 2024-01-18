@@ -31,11 +31,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -96,76 +100,43 @@ public final class CachingDatabase {
             return;
         }
 
+        // read JSON
         try {
-            var factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            var builder = factory.newDocumentBuilder();
-            var document = builder.parse(cacheIndex);
+            var document = ParsingFacade.readConfigurationFile(cacheIndex);
 
-            var otherFiles = document.getElementsByTagName("otherFile");
-            for (int i = 0; i < otherFiles.getLength(); i++) {
-                var entry = otherFiles.item(i);
-                var name = entry.getAttributes().getNamedItem("name").getNodeValue();
-                var hash = entry.getAttributes().getNamedItem("hash").getNodeValue();
+            var otherFiles = document.getSection("files");
+            for (int i = 0; i < otherFiles.getEntries().size(); i++) {
+                var entry = otherFiles.getSection(Integer.toString(i));
+                var name = entry.getString("file");
+                var hash = entry.getString("hash");
                 files.put(Integer.parseInt(hash),
                     new CachedFile(name, Integer.parseInt(hash)));
             }
 
-            var entries = document.getElementsByTagName("entry");
-            for (int i = 0; i < entries.getLength(); i++) {
-                var entry = entries.item(i);
-                var parsed = extractEntry(entry);
-                var file = new File(parsed.first);
-                var choiceSettings = parsed.second;
-                var references = XMLUtil.findElementsByTagName(entry, "referencedFile").stream()
+            var cachedProofsJson = document.getSection("proofs");
+            for (int i = 0; i < cachedProofsJson.getEntries().size(); i++) {
+                var entry = cachedProofsJson.getSection(Integer.toString(i));
+                var file = new File(entry.getString("file"));
+                var choiceSettings = entry.getString("choiceSettings");
+                var keyVersion = entry.getString("keyVersion");
+                var references = entry.getSection("referencedFiles").getEntries().stream()
                         .map(x -> {
-                            String id = XMLUtil.getAttribute(x, "id");
+                            String id = (String) x.getValue();
                             return Objects.requireNonNull(files.get(Integer.parseInt(id)));
-                        }).collect(Collectors.toList());
-                for (var branch : parsed.third) {
+                        }).toList();
+                var branches = entry.getSection("cachedSequents");
+                for (int j = 0; j < branches.getEntries().size(); j++) {
+                    var branch = branches.getSection(Integer.toString(i));
                     cacheProofs.add(file);
                     cache.add(
-                        new CachedProofBranch(file, references, choiceSettings, branch.first,
-                            branch.second));
+                            new CachedProofBranch(file, references, choiceSettings, keyVersion, branch.getInt("stepIndex"),
+                                    branch.getString("sequent")));
                 }
             }
             doNotSave = false;
         } catch (Exception e) {
             LOGGER.error("failed to load proof caching database ", e);
         }
-    }
-
-    private static Triple<String, String, List<Pair<Integer, String>>> extractEntry(Node entry) {
-        String file = null;
-        String choiceSettings = null;
-        List<Pair<Integer, String>> branches = new ArrayList<>();
-        var childNodes = entry.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            var childNode = childNodes.item(i);
-            if (childNode.getNodeName().equals("file")) {
-                file = childNode.getTextContent();
-            } else if (childNode.getNodeName().equals("choiceSettings")) {
-                choiceSettings = childNode.getTextContent();
-            } else if (childNode.getNodeName().equals("branches")) {
-                var branchNodes = childNode.getChildNodes();
-                for (int j = 0; j < branchNodes.getLength(); j++) {
-                    String sequent = "";
-                    int stepIndex = -1;
-                    var branchData = branchNodes.item(j).getChildNodes();
-                    for (int k = 0; k < branchData.getLength(); k++) {
-                        var data = branchData.item(k);
-                        if (data.getNodeName().equals("sequent")) {
-                            sequent = data.getTextContent();
-                        } else if (data.getNodeName().equals("stepIndex")) {
-                            stepIndex = Integer.parseInt(data.getTextContent());
-                        }
-                    }
-                    branches.add(new Pair<>(stepIndex, sequent));
-                }
-            }
-        }
-        return new Triple<>(file, choiceSettings, branches);
     }
 
     /**
@@ -183,76 +154,68 @@ public final class CachingDatabase {
     public static void save() {
         init();
         if (!dirty || doNotSave) {
-            LOGGER.info("not saving database"); // debug
+            LOGGER.info("not saving database");
             return;
         }
-        // store cache in ~/.key/cachedProofs.xml
+        // store cache in ~/.key/cachedProofs.json
         try {
             var factory = DocumentBuilderFactory.newInstance();
             factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
             factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             var builder = factory.newDocumentBuilder();
             var doc = builder.newDocument();
+
+            var docJson = new Configuration();
+
             var cacheEl = doc.createElement("cacheDatabase");
             doc.appendChild(cacheEl);
             var cachedProofs = doc.createElement("cachedProofs");
             cacheEl.appendChild(cachedProofs);
+            var cachedProofsJson = docJson.getOrCreateSection("proofs");
+            int i = 0;
             var entries = cache.stream().collect(Collectors.groupingBy(w -> w.proofFile));
             for (var entry : entries.values()) {
-                var entryEl = doc.createElement("entry");
-                cachedProofs.appendChild(entryEl);
-                var fileEl = doc.createElement("file");
-                fileEl.setTextContent(entry.get(0).proofFile.getAbsolutePath());
-                var choiceSettingsEl = doc.createElement("choiceSettings");
-                choiceSettingsEl.setTextContent(entry.get(0).choiceSettings);
-                entryEl.appendChild(fileEl);
-                entryEl.appendChild(choiceSettingsEl);
-                var branchesEl = doc.createElement("branches");
-                entryEl.appendChild(branchesEl);
+                var entryElJson = cachedProofsJson.getOrCreateSection(Integer.toString(i));
+                i++;
+                entryElJson.set("name", entry.get(0).proofFile.getName());
+                entryElJson.set("file", entry.get(0).proofFile.getAbsolutePath());
+                entryElJson.set("keyVersion", entry.get(0).proofFile.getAbsolutePath());
+                entryElJson.set("choiceSettings", entry.get(0).choiceSettings);
+                var referencedFilesJson = entryElJson.getOrCreateSection("referencedFiles");
+                int j = 0;
                 for (var ref : entry.get(0).referencedFiles) {
-                    var referencesEl = doc.createElement("referencedFile");
-                    referencesEl.setAttribute("id", String.valueOf(ref.hash));
+                    referencedFilesJson.set(Integer.toString(j), ref.hash);
+                    j++;
                 }
-
+                var branchesJson = entryElJson.getOrCreateSection("cachedSequents");
+                j = 0;
                 for (var branch : entry) {
-                    var branchEl = doc.createElement("branch");
-                    branchesEl.appendChild(branchEl);
-                    var sequentEl = doc.createElement("sequent");
-                    sequentEl.setTextContent(branch.sequent);
-                    branchEl.appendChild(sequentEl);
-                    var stepIndexEl = doc.createElement("stepIndex");
-                    stepIndexEl.setTextContent(String.valueOf(branch.stepIndex));
-                    branchEl.appendChild(stepIndexEl);
+                    var branchEl = branchesJson.getOrCreateSection(Integer.toString(j));
+                    branchEl.set("stepIndex", branch.stepIndex);
+                    branchEl.set("sequent", branch.sequent);
+                    j++;
                 }
             }
-            var cachedFiles = doc.createElement("cachedFiles");
-            cacheEl.appendChild(cachedFiles);
+            var cachedFilesJson = docJson.getOrCreateSection("files");
+            i = 0;
             for (var entry : files.values()) {
-                var entryEl = doc.createElement("otherFile");
-                entryEl.setAttribute("name", entry.filename);
-                entryEl.setAttribute("hash", Integer.toString(entry.hash));
-                cachedFiles.appendChild(entryEl);
+                var entryElJson = cachedFilesJson.getOrCreateSection(Integer.toString(i));
+                i++;
+                entryElJson.set("file", entry.filename);
+                entryElJson.set("hash", Integer.toString(entry.hash));
             }
             // save to file
+            /*
             var transformerFactory = TransformerFactory.newInstance();
             var transformer = transformerFactory.newTransformer();
             var source = new DOMSource(doc);
             var writer = new FileWriter(PathConfig.getCacheIndex());
             var result = new StreamResult(writer);
             transformer.transform(source, result);
-
-            // new JSON-based store
-            JsonBuilder jsonBuilder = null;
-            var proofs = jsonBuilder.newArray("proofs");
-            int i = 0;
-            for (var entry : entries.values()) {
-                var proof = proofs.newObject(String.valueOf(i));
-                i++;
-                proof.putString("file", entry.get(0).proofFile.getAbsolutePath());
-                // TODO: ...
-            }
-            // compilation error to skip tests
-            // jsonBuilder
+             */
+            var writer = new FileWriter(PathConfig.getCacheIndex());
+            docJson.save(writer, "Proof Caching Metadata");
+            writer.close();
         } catch (Exception e) {
             LOGGER.error("failed to save proof cache database ", e);
         }
@@ -385,8 +348,8 @@ public final class CachingDatabase {
         finalReferences.addAll(sourceNew);
         for (var node : nodesToCheck) {
             cache.add(
-                new CachedProofBranch(file, finalReferences, choiceSettings, node.getStepIndex(),
-                    node.sequent().toString()));
+                new CachedProofBranch(file, finalReferences, choiceSettings, KeYConstants.VERSION, node.getStepIndex(),
+                    node.sequent(), proof.getServices()));
         }
     }
 

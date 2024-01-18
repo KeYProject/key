@@ -303,6 +303,13 @@ public class Configuration {
         return getSection(name, true);
     }
 
+    /**
+     * Get or create the given subsection of this Configuration.
+     *
+     * @param name name of subsection
+     * @param createIfNotExists true if it should be created if it does not exist
+     * @return the subsection
+     */
     public Configuration getSection(String name, boolean createIfNotExists) {
         if (!exists(name) && createIfNotExists) {
             set(name, new Configuration());

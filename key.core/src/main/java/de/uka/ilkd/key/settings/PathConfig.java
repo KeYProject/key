@@ -43,6 +43,7 @@ public final class PathConfig {
     private static String proofIndependentSettings;
     /**
      * In which file to store the proof cache index.
+     * Usually: ~/.key/cachedProofs.json
      */
     private static File cacheIndex;
 
