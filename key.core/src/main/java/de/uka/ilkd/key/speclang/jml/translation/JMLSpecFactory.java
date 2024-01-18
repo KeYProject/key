@@ -1472,7 +1472,7 @@ public class JMLSpecFactory {
                 "Invalid assignment target for set statement: " + error,
                 Location.fromToken(setStatementContext.start));
         }
-        statement.setTranslated(assignee, value);
+        statement.setTranslated(assignee, value, pv);
     }
 
     /**

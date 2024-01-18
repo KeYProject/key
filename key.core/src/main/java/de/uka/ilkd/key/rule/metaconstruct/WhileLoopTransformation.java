@@ -760,17 +760,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnSetStatement(SetStatement x) {
-        DefaultAction def = new DefaultAction() {
-            @Override
-            ProgramElement createNewElement(ExtList changeList) {
-                return KeYJavaASTFactory.setStatement(changeList);
-            }
-        };
-        def.doAction(x);
-    }
-
-    @Override
     public void performActionOnThen(Then x) {
         DefaultAction def = new DefaultAction() {
             @Override
