@@ -33,7 +33,7 @@ public class RemoveCachingInformationAction extends KeyAction {
         setMenuPath("Proof Caching");
         setEnabled(node.lookup(ClosedBy.class) != null);
 
-        setName("Remove cached proof info on this node");
+        setName("Re-open cached goal");
         putValue(SHORT_DESCRIPTION, "Make this an open goal again.");
     }
 
