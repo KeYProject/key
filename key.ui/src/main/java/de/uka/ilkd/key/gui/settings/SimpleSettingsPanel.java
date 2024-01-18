@@ -190,6 +190,14 @@ public class SimpleSettingsPanel extends JPanel {
         return infoButton;
     }
 
+    public static JButton createHelpButton(Runnable callback) {
+        var infoButton =
+            new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        infoButton.setToolTipText("Open online help...");
+        infoButton.addActionListener(e -> callback.run());
+        return infoButton;
+    }
+
     @SuppressWarnings("unchecked")
     private class ValidatorSpinnerAdapter<T> implements ChangeListener {
         private final Validator<T> validator;

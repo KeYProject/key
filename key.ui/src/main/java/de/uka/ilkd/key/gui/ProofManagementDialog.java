@@ -482,12 +482,13 @@ public final class ProofManagementDialog extends JDialog {
                 } else {
                     env.registerProof(po, pl);
                 }
+                mediator.getSelectionModel().setSelectedProof(pl.getFirstProof());
             } catch (ProofInputException exc) {
                 LOGGER.error("", exc);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
-            mediator.setProof(proof);
+            mediator.getSelectionModel().setSelectedProof(proof);
         }
         startedProof = true;
         // starting another proof will not execute the ProblemLoader again,

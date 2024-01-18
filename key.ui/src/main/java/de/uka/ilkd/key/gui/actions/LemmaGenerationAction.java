@@ -152,7 +152,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
                     }
 
@@ -233,7 +232,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
-
                         mainWindow.getUserInterface().registerProofAggregate(p);
                     }
                 }
