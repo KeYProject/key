@@ -26,16 +26,11 @@ import org.key_project.logic.sort.Sort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofInfo {
+public record ProofInfo(Proof proof, Services services) {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
 
-    private final Proof proof;
-
-    private final Services services;
-
     public ProofInfo(Proof proof) {
-        this.proof = proof;
-        this.services = proof.getServices();
+        this(proof, proof.getServices());
     }
 
     public IProgramMethod getMUT() {
@@ -81,7 +76,7 @@ public class ProofInfo {
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
             JTerm post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
-                orig.params, orig.atPres, services);
+                    orig.params, orig.atPres, services);
             return post;
         }
         // no pre <==> false
@@ -172,7 +167,7 @@ public class ProofInfo {
                 return "";
             }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
-                + ";";
+                    + ";";
         }
         StringBuilder result = new StringBuilder();
         for (JTerm sub : update.subs()) {

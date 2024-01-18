@@ -1,11 +1,16 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.settings;
+package de.uka.ilkd.key.testgen.settings;
 
 import java.io.File;
 import java.util.Properties;
 
+import de.uka.ilkd.key.settings.AbstractSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.testgen.Format;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -18,7 +23,7 @@ public class TestGenerationSettings extends AbstractSettings {
         System.getProperty("user.home") + File.separator + "testFiles";
     private static final boolean DEFAULT_REMOVEDUPLICATES = true;
     private static final boolean DEFAULT_USERFL = false;
-    private static final boolean DEFAULT_USEJUNIT = false;
+    private static final Format DEFAULT_USEJUNIT = Format.Plain;
     private static final boolean DEFAULT_INVARIANTFORALL = true;
     private static final String DEFAULT_OPENJMLPATH = ".";
     private static final String DEFAULT_OBJENESISPATH = ".";
@@ -49,7 +54,7 @@ public class TestGenerationSettings extends AbstractSettings {
     private String objenesisPath;
     private boolean removeDuplicates;
     private boolean useRFL;
-    private boolean useJunit;
+    private Format format;
     private int concurrentProcesses;
     private boolean invariantForAll;
     private boolean includePostCondition;
@@ -61,7 +66,7 @@ public class TestGenerationSettings extends AbstractSettings {
         outputPath = DEFAULT_OUTPUTPATH;
         removeDuplicates = DEFAULT_REMOVEDUPLICATES;
         useRFL = DEFAULT_USERFL;
-        useJunit = DEFAULT_USEJUNIT;
+        format = Format.Plain;
         concurrentProcesses = DEFAULT_CONCURRENTPROCESSES;
         invariantForAll = DEFAULT_INVARIANTFORALL;
         openjmlPath = DEFAULT_OPENJMLPATH;
@@ -74,7 +79,7 @@ public class TestGenerationSettings extends AbstractSettings {
         maxUnwinds = data.maxUnwinds;
         outputPath = data.outputPath;
         removeDuplicates = data.removeDuplicates;
-        useJunit = data.useJunit;
+        format = data.format;
         useRFL = data.useRFL;
         concurrentProcesses = data.concurrentProcesses;
         invariantForAll = data.invariantForAll;
@@ -136,7 +141,7 @@ public class TestGenerationSettings extends AbstractSettings {
         setRemoveDuplicates(SettingsConverter.read(props,
             prefix + PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
         setRFL(SettingsConverter.read(props, prefix + PROP_USE_RFL, DEFAULT_USERFL));
-        setUseJunit(SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT));
+        setFormat(Format.valueOf(SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT.name())));
         setConcurrentProcesses(SettingsConverter.read(props,
             prefix + PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(SettingsConverter.read(props,
@@ -198,10 +203,10 @@ public class TestGenerationSettings extends AbstractSettings {
 
     }
 
-    public void setUseJunit(boolean useJunit) {
-        var old = this.useJunit;
-        this.useJunit = useJunit;
-        firePropertyChange(PROP_USE_JUNIT, old, this.useJunit);
+    public void setFormat(Format format) {
+        var old = this.format;
+        this.format = format;
+        firePropertyChange(PROP_USE_JUNIT, old, this.format);
 
     }
 
@@ -230,8 +235,8 @@ public class TestGenerationSettings extends AbstractSettings {
         return useRFL;
     }
 
-    public boolean useJunit() {
-        return useJunit;
+    public Format useJunit() {
+        return format;
     }
 
 
@@ -246,7 +251,7 @@ public class TestGenerationSettings extends AbstractSettings {
         SettingsConverter.store(props, prefix + PROP_OUTPUT_PATH, outputPath);
         SettingsConverter.store(props, prefix + PROP_REMOVE_DUPLICATES, removeDuplicates);
         SettingsConverter.store(props, prefix + PROP_USE_RFL, useRFL);
-        SettingsConverter.store(props, prefix + PROP_USE_JUNIT, useJunit);
+        SettingsConverter.store(props, prefix + PROP_USE_JUNIT, format);
         SettingsConverter.store(props, prefix + PROP_OPENJML_PATH, openjmlPath);
         SettingsConverter.store(props, prefix + PROP_OBJENESIS_PATH, objenesisPath);
         SettingsConverter.store(props, prefix + PROP_INCLUDE_POST_CONDITION, includePostCondition);
@@ -263,7 +268,7 @@ public class TestGenerationSettings extends AbstractSettings {
         setOutputPath(cat.getString(PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(cat.getBool(PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
         setRFL(cat.getBool(PROP_USE_RFL, DEFAULT_USERFL));
-        setUseJunit(cat.getBool(PROP_USE_JUNIT, DEFAULT_USEJUNIT));
+        setFormat(cat.getEnum(PROP_USE_JUNIT, Format.Plain));
         setConcurrentProcesses(cat.getInt(PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(cat.getBool(PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setOpenjmlPath(cat.getString(PROP_OPENJML_PATH, DEFAULT_OPENJMLPATH));
@@ -283,7 +288,7 @@ public class TestGenerationSettings extends AbstractSettings {
         cat.set(PROP_OUTPUT_PATH, outputPath);
         cat.set(PROP_REMOVE_DUPLICATES, removeDuplicates);
         cat.set(PROP_USE_RFL, useRFL);
-        cat.set(PROP_USE_JUNIT, useJunit);
+        cat.set(PROP_USE_JUNIT, format);
         cat.set(PROP_OPENJML_PATH, openjmlPath);
         cat.set(PROP_OBJENESIS_PATH, objenesisPath);
         cat.set(PROP_INCLUDE_POST_CONDITION, includePostCondition);
