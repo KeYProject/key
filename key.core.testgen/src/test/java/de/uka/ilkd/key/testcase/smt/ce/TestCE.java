@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -139,7 +139,7 @@ public class TestCE extends TestCommons {
             TryCloseMacro close = new TryCloseMacro();
             close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             // should not be provable
-            assertFalse(proof.openGoals().isEmpty());
+            assertFalse(!proof.openGoals().isEmpty());
             // there should be a counterexample for each goal...
             for (Goal g : proof.openGoals()) {
                 SemanticsBlastingMacro sb = new SemanticsBlastingMacro();

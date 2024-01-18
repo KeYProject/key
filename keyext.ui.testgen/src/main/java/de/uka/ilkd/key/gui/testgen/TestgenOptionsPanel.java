@@ -8,7 +8,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.Format;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = -2170118134719823425L;
@@ -59,7 +60,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner maxUnwinds;
     private final JCheckBox symbolicEx;
-    private final JCheckBox useJUnit;
+    private final JComboBox<Format> useJUnit;
     private final JCheckBox invariantForAll;
     private final JCheckBox includePostCondition;
     private final JCheckBox removeDuplicates;
@@ -115,10 +116,10 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         });
     }
 
-    private JCheckBox getJUnitPanel() {
-        return addCheckBox("Generate JUnit and test oracle", INFO_USE_JUNIT, false, val -> {
-            settings.setUseJunit(val);
-        });
+    private JComboBox<Format> getJUnitPanel() {
+        return addComboBox("Set the format", INFO_USE_JUNIT, 0, val -> {
+            settings.setFormat(val);
+        }, Format.values());
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {
@@ -162,7 +163,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());
-        useJUnit.setSelected(settings.useJunit());
+        useJUnit.setSelectedItem(settings.useJunit());
         symbolicEx.setSelected(settings.getApplySymbolicExecution());
         removeDuplicates.setSelected(settings.removeDuplicates());
         checkboxRFL.setSelected(settings.useRFL());

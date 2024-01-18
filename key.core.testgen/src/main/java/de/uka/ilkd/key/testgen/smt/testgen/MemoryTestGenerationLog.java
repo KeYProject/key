@@ -1,9 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.smt.testgen;
+package de.uka.ilkd.key.testgen.smt.testgen;
 
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import static de.uka.ilkd.key.testgen.template.Constants.NEW_LINE;
 
 /**
  * Implementation of {@link TestGenerationLog} which stores the log in memory.
@@ -22,7 +22,7 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
     @Override
     public void writeln(String string) {
         sb.append(string);
-        sb.append(TestCaseGenerator.NEW_LINE);
+        sb.append(NEW_LINE);
     }
 
     /**
@@ -31,7 +31,7 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
     @Override
     public void write(String string) {
         sb.append(string);
-        sb.append(TestCaseGenerator.NEW_LINE);
+        sb.append(NEW_LINE);
     }
 
     /**
@@ -40,7 +40,7 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
     @Override
     public void writeException(Throwable t) {
         sb.append(t.getMessage());
-        sb.append(TestCaseGenerator.NEW_LINE);
+        sb.append(NEW_LINE);
     }
 
     /**

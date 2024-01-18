@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.macros.TestGenMacro;
+import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
