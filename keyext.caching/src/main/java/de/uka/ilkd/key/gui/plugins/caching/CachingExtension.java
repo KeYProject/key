@@ -96,6 +96,7 @@ public class CachingExtension
         initActions(mainWindow);
         JToolBar tb = new JToolBar("Proof Caching");
         JToggleButton comp = new JToggleButton(toggleAction);
+        comp.setToolTipText((String) toggleAction.getValue(Action.LONG_DESCRIPTION));
         tb.add(comp);
         return tb;
     }

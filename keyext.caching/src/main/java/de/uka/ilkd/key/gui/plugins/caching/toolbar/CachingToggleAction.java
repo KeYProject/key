@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 public class CachingToggleAction extends MainWindowAction {
     public static final Icon ICON =
         IconFactory.keyCachedClosed((int) IconFactory.DEFAULT_SIZE, (int) IconFactory.DEFAULT_SIZE);
+    private static final String DESCRIPTION =
+        "Enable or disable proof caching for currently open proofs.";
 
     public CachingToggleAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -27,10 +29,10 @@ public class CachingToggleAction extends MainWindowAction {
         setMenuPath("Options");
         setEnabled(true);
         setSelected(true);
-        putValue(Action.LONG_DESCRIPTION,
-            "Enable or disable proof caching for currently open proofs.");
+        putValue(Action.LONG_DESCRIPTION, DESCRIPTION);
         // for main menu variant of action
         putValue(KeyAction.CHECKBOX, true);
+        setTooltip(DESCRIPTION);
 
         setIcon(ICON);
     }
