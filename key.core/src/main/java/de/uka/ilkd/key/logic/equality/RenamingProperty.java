@@ -30,27 +30,24 @@ public class RenamingProperty implements TermProperty {
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
      * through {@link RenamingProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Object)}.
+     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
      */
     private RenamingProperty() {}
 
     /**
-     * Checks if {@code o} is a term syntactically equal to {@code term} modulo bound renaming.
+     * Checks if {@code term2} is a term syntactically equal to {@code term1} modulo bound renaming.
      *
-     * @param term a term
-     * @param o the object compared to {@code term}
-     * @return true iff {@code o} has the same values in operator, sort, arity, varsBoundHere
-     *         and javaBlock as {@code term} modulo bound renaming
+     * @param term1 a term
+     * @param term2 the term compared to {@code term1}
+     * @return true iff {@code term2} has the same values in operator, sort, arity, varsBoundHere
+     *         and javaBlock as {@code term1} modulo bound renaming
      */
     @Override
-    public Boolean equalsModThisProperty(Term term, Object o) {
-        if (o == term) {
+    public Boolean equalsModThisProperty(Term term1, Term term2) {
+        if (term2 == term1) {
             return true;
         }
-        if (!(o instanceof Term t)) {
-            return false;
-        }
-        return unifyHelp(term, t, ImmutableSLList.nil(),
+        return unifyHelp(term1, term2, ImmutableSLList.nil(),
             ImmutableSLList.nil(), null);
     }
 
@@ -181,6 +178,7 @@ public class RenamingProperty implements TermProperty {
     }
 
     /**
+     * TODO better doc
      * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
      * (see comment in SourceElement)
      */

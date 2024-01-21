@@ -17,17 +17,17 @@ import de.uka.ilkd.key.logic.Term;
  */
 public interface TermProperty {
     /**
-     * Checks {@code term} and {@code o} for equality ignoring a certain property.
+     * Checks {@code term1} and {@code term2} for equality ignoring a certain property.
      *
-     * @param term the term to check for equality with {@code o}
-     * @param o the object to check for equality with {@code term}
-     * @return whether {@code term} and {@code o} are equal ignoring a certain property
+     * @param term1 the first term to check for equality with {@code term2}
+     * @param term2 the second term to check for equality with {@code term1}
+     * @return whether {@code term1} and {@code term2} are equal ignoring a certain property
      */
-    Boolean equalsModThisProperty(Term term, Object o);
+    Boolean equalsModThisProperty(Term term1, Term term2);
 
     /**
      * Computes the hash code of the {@code term} in a context where
-     * {@link this#equalsModThisProperty(Term, Object)} is used as an equality check, so that it can
+     * {@link this#equalsModThisProperty(Term, Term)} is used as an equality check, so that it can
      * be used in, e.g., a HashMap.
      *
      * @param term the term to compute the hash code for

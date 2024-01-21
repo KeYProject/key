@@ -340,7 +340,10 @@ class TermImpl implements Term {
 
     @Override
     public boolean equalsModProperty(Object o, TermProperty property) {
-        return property.equalsModThisProperty(this, o);
+        if (!(o instanceof Term other)) {
+            return false;
+        }
+        return property.equalsModThisProperty(this, other);
     }
 
     @Override
