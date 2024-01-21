@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * All proof irrelevant attributes are ignored in this equality check.
  */
 public class ProofIrrelevancyProperty implements TermProperty {
@@ -30,66 +30,63 @@ public class ProofIrrelevancyProperty implements TermProperty {
      * can be accessed
      * through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is used as a
      * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Object)}.
+     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
      */
     private ProofIrrelevancyProperty() {}
 
     /**
-     * Checks if {@code o} is a term syntactically equal to {@code term}, except for attributes that
+     * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
+     * that
      * are not relevant for the purpose of these terms in the proof.
      * <p>
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      * </p>
      *
-     * @param term a term
-     * @param o the object compared to {@code term}
-     * @return true iff {@code o} is a term syntactically equal to {@code term}, except for
+     * @param term1 a term
+     * @param term2 the term compared to {@code term1}
+     * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
      */
     @Override
-    public Boolean equalsModThisProperty(Term term, Object o) {
-        if (o == term) {
+    public Boolean equalsModThisProperty(Term term1, Term term2) {
+        if (term2 == term1) {
             return true;
         }
 
-        if (!(o instanceof Term other)) {
-            return false;
-        }
-
-        final boolean opResult = term.op().equalsModProofIrrelevancy(other.op());
+        final boolean opResult = term1.op().equalsModProofIrrelevancy(term2.op());
         if (!(opResult
-                && EqualsModProofIrrelevancyUtil.compareImmutableArrays(term.boundVars(),
-                    other.boundVars())
-                && term.javaBlock().equalsModProofIrrelevancy(other.javaBlock()))) {
+                && EqualsModProofIrrelevancyUtil.compareImmutableArrays(term1.boundVars(),
+                    term2.boundVars())
+                && term1.javaBlock().equalsModProofIrrelevancy(term2.javaBlock()))) {
             return false;
         }
 
-        final ImmutableArray<TermLabel> termLabels = term.getLabels();
-        final ImmutableArray<TermLabel> otherLabels = other.getLabels();
+        final ImmutableArray<TermLabel> termLabels = term1.getLabels();
+        final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : termLabels) {
-            if (label.isProofRelevant() && !otherLabels.contains(label)) {
+            if (label.isProofRelevant() && !term2Labels.contains(label)) {
                 return false;
             }
         }
-        for (TermLabel label : otherLabels) {
+        for (TermLabel label : term2Labels) {
             if (label.isProofRelevant() && !termLabels.contains(label)) {
                 return false;
             }
         }
 
-        final ImmutableArray<Term> termSubs = term.subs();
-        final ImmutableArray<Term> otherSubs = other.subs();
-        final int numOfSubs = termSubs.size();
+        final ImmutableArray<Term> term1Subs = term1.subs();
+        final ImmutableArray<Term> term2Subs = term2.subs();
+        final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(PROOF_IRRELEVANCY_PROPERTY, otherSubs.get(i))) {
+            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), PROOF_IRRELEVANCY_PROPERTY)) {
                 return false;
             }
         }
 
         // This would be the only new thing from LabeledTermImpl, but this doesn't seem right
-        if (term.hasLabels() && other.hasLabels()) {
-            if (other.getLabels().size() != term.getLabels().size()) {
+        if (term1.hasLabels() && term2.hasLabels()) {
+            if (term2.getLabels().size() != term1.getLabels().size()) {
                 return false;
             }
         }

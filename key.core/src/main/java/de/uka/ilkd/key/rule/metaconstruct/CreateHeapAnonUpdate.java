@@ -126,7 +126,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        return tb.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod)
+        return tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)
                 ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }

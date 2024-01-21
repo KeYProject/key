@@ -399,8 +399,8 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods = LogicPrinter.quickPrintTerm(
-                getAssignable(null).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                    TB.strictlyNothing()) ? TB.empty()
+                getAssignable(null).equalsModProperty(TB.strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.empty()
                             : this.getAssignable(null),
                 services);
             mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
@@ -734,24 +734,24 @@ public abstract class WellDefinednessCheck implements Contract {
         this.assignable = ass;
         if (ass == null
                 || TB.strictlyNothing().equalsModProperty(
-                    IRRELEVANT_TERM_LABELS_PROPERTY, ass)
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.FALSE().equalsModProperty(
-                    IRRELEVANT_TERM_LABELS_PROPERTY, ass)) {
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.strictlyNothing();
         } else if (TB.tt().equalsModProperty(
-            IRRELEVANT_TERM_LABELS_PROPERTY, ass)
+            ass, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.TRUE().equalsModProperty(
-                    IRRELEVANT_TERM_LABELS_PROPERTY, ass)) {
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
         if (ass1 == null || TB.strictlyNothing().equalsModProperty(
-            IRRELEVANT_TERM_LABELS_PROPERTY, ass1)) {
+            ass1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass2, services);
         } else if (ass2 == null || TB.strictlyNothing().equalsModProperty(
-            IRRELEVANT_TERM_LABELS_PROPERTY, ass2)) {
+            ass2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);
@@ -1013,9 +1013,9 @@ public abstract class WellDefinednessCheck implements Contract {
             Term anonHeap, TermServices services) {
         assert mod != null;
         assert anonHeap != null
-                || TB.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod);
+                || TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY);
         final Term havocUpd =
-            TB.strictlyNothing().equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, mod) ? TB.skip()
+            TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.skip()
                     : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();

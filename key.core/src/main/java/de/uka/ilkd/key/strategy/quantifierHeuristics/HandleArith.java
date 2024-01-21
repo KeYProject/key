@@ -54,7 +54,7 @@ public class HandleArith {
         final Term falseT = tb.ff();
 
         final Term arithTerm = formatArithTerm(problem, tb, integerLDT, services.getCaches());
-        if (arithTerm.equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY, falseT)) {
+        if (arithTerm.equalsModProperty(falseT, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             result = provedArithEqual(problem, tb, services);
             putInTermCache(provedByArithCache, problem, result);
             return result;

@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(TermProperty, Object)}.
+ * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
  * All irrelevant term labels are ignored in this equality check.
  */
 public class IrrelevantTermLabelsProperty implements TermProperty {
@@ -25,54 +25,52 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      * can be accessed
      * through {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY} and is used as a
      * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Object)}.
+     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
      */
     private IrrelevantTermLabelsProperty() {}
 
     /**
-     * Checks if {@code o} is a term syntactically equal to {@code term}, except for some irrelevant
+     * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for some
+     * irrelevant
      * labels.
      *
-     * @param term a term
-     * @param o the object compared to {@code term}
-     * @return {@code true} iff {@code o} is a term syntactically equal to {@code term}, except for
+     * @param term1 a term
+     * @param term2 the term compared to {@code term1}
+     * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
+     *         for
      *         their irrelevant labels.
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
-    public Boolean equalsModThisProperty(Term term, Object o) {
-        if (o == term) {
+    public Boolean equalsModThisProperty(Term term1, Term term2) {
+        if (term2 == term1) {
             return true;
         }
 
-        if (!(o instanceof Term other)) {
+        if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
+                && term1.javaBlock().equals(term2.javaBlock()))) {
             return false;
         }
 
-        if (!(term.op().equals(other.op()) && term.boundVars().equals(other.boundVars())
-                && term.javaBlock().equals(other.javaBlock()))) {
-            return false;
-        }
-
-        final ImmutableArray<TermLabel> termLabels = term.getLabels();
-        final ImmutableArray<TermLabel> otherLabels = other.getLabels();
-        for (TermLabel label : termLabels) {
-            if (label.isProofRelevant() && !otherLabels.contains(label)) {
+        final ImmutableArray<TermLabel> term1Labels = term1.getLabels();
+        final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
+        for (TermLabel label : term1Labels) {
+            if (label.isProofRelevant() && !term2Labels.contains(label)) {
                 return false;
             }
         }
-        for (TermLabel label : otherLabels) {
-            if (label.isProofRelevant() && !termLabels.contains(label)) {
+        for (TermLabel label : term2Labels) {
+            if (label.isProofRelevant() && !term1Labels.contains(label)) {
                 return false;
             }
         }
 
-        final ImmutableArray<Term> termSubs = term.subs();
-        final ImmutableArray<Term> otherSubs = other.subs();
+        final ImmutableArray<Term> termSubs = term1.subs();
+        final ImmutableArray<Term> term2Subs = term2.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!termSubs.get(i).equalsModProperty(IRRELEVANT_TERM_LABELS_PROPERTY,
-                otherSubs.get(i))) {
+            if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return false;
             }
         }
