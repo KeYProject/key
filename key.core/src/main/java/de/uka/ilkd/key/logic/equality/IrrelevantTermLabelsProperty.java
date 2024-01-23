@@ -86,7 +86,6 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        // change 5 and 17 not to match TermImpl's implementation too much?
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
         hashcode = hashcode * 17 + EqualityUtils
@@ -98,13 +97,6 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
             hashcode += (label.isProofRelevant() ? 7 * label.hashCode() : 0);
         }
 
-//        final ImmutableArray<TermLabel> termLabels = term.getLabels();
-//        for (int i = 0, sz = termLabels.size(); i < sz; i++) {
-//            final TermLabel currentLabel = termLabels.get(i);
-//            if (currentLabel.isProofRelevant()) {
-//                hashcode += 7 * currentLabel.hashCode();
-//            }
-//        }
         return hashcode;
     }
 }

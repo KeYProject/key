@@ -71,7 +71,6 @@ public class TermLabelsProperty implements TermProperty {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        // change 5 and 17 not to match TermImpl's implementation too much
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
         hashcode = hashcode * 17
