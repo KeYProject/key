@@ -6,10 +6,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;

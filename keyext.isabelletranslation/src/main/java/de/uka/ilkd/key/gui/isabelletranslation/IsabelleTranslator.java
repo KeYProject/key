@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -173,7 +172,7 @@ public class IsabelleTranslator {
         return result.append("typedecl ").append(usedSorts.get(sort)).append(System.lineSeparator());
     }
 
-    private StringBuilder translateTerm(Term term, List<QuantifiableVariable> quantifiedVariables, Services services) {
+    private StringBuilder translateTerm(Term term, List<QuantifiableVariable> quantifiedVariables, Services services) throws IllegalFormulaException {
         Operator op = term.op();
 
         if (op == Junctor.IMP) {
@@ -243,7 +242,7 @@ public class IsabelleTranslator {
             return this.translateLogicalExists(qv, arg1);
         }
         //TODO translation of other types
-        return new StringBuilder();
+        throw new IllegalFormulaException("");
     }
 
     private StringBuilder translateLogicalFalse() {
