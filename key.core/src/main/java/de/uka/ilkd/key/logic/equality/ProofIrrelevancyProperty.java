@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
