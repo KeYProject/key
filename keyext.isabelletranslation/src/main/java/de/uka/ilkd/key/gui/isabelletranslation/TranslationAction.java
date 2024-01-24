@@ -3,11 +3,7 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.macros.SMTPreparationMacro;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
-import org.key_project.util.collection.ImmutableList;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -23,18 +19,6 @@ public class TranslationAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Translation Action");
-        KeYMediator mediator = getMediator();
-        Proof currentProof = mediator.getSelectedProof();
-        ImmutableList<Goal> goals = ImmutableList.of(mediator.getSelectedGoal());
-
-        SMTPreparationMacro smtMacro = new SMTPreparationMacro();
-        if (smtMacro.canApplyTo(currentProof, goals, null)) {
-            try {
-                smtMacro.applyTo(mediator.getUI(), currentProof, goals, null, null);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
 
         generateTranslation();
     }
