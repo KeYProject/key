@@ -32,6 +32,7 @@ dependencies {
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")
+    runtimeOnly project(":keyext.isabelletranslation")
 }
 
 task createExamplesZip(type: Zip) {
