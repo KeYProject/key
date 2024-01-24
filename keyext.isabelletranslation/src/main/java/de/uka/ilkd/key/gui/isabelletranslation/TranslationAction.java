@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.smt.IllegalFormulaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +38,11 @@ public class TranslationAction extends MainWindowAction {
                 Files.write(Paths.get(path), translation.toString().getBytes());
                 LOGGER.info("Saved to: " + path);
             } catch (IOException e) {
+                //TODO handle exception
                 throw new RuntimeException(e);
             }
         } catch (IllegalFormulaException e) {
+            //TODO output alert to user
             throw new RuntimeException(e);
         }
     }
