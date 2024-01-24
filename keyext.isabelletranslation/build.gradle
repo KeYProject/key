@@ -1,0 +1,6 @@
+description "Translate"
+
+dependencies {
+    implementation project(':key.core')
+    implementation project(':key.ui')
+}
