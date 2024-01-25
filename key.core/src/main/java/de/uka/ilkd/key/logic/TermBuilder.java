@@ -63,6 +63,9 @@ public class TermBuilder {
         this.ff = tf.createTerm(Junctor.FALSE);
     }
 
+    /**
+     * @return the term factory of this builder
+     */
     public TermFactory tf() {
         return tf;
     }

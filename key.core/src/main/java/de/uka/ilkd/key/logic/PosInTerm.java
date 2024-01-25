@@ -23,7 +23,7 @@ public final class PosInTerm {
 
     private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
-    // to save memory, we use 16bit integers (unsigned) instead of 32bit
+    // to save memory, we use 16bit integers (char) instead of 32bit
     private final char[] positions;
     private final char size;
     private volatile char hash = (char) -1;
@@ -40,6 +40,7 @@ public final class PosInTerm {
 
     /**
      * Remove the first index from this position.
+     * In effect, this gives a position relative to the first sub-term.
      *
      * @return position of the first subterm
      */

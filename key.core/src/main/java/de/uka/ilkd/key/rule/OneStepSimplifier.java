@@ -64,13 +64,13 @@ public final class OneStepSimplifier implements BuiltInRule {
      * If true, the simplification process will stop on cycles.
      * Note that cycles should never happen by careful selection of the rulesets.
      */
-    private static boolean ENABLE_CYCLE_CHECK = true;
+    private static final boolean ENABLE_CYCLE_CHECK = true;
     /**
      * If true, the simplifier will keep a log of rule applications.
      * This may lead to excessive memory consumption, so it can be disabled here.
      * TODO: add a real (user-facing) option?
      */
-    private static boolean ENABLE_PROTOCOL = true;
+    private static final boolean ENABLE_PROTOCOL = true;
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
@@ -284,13 +284,21 @@ public final class OneStepSimplifier implements BuiltInRule {
                 }
             }
 
+            // applicable check: only consider normal rule apps
+            // (not replace-knowns)
+            if (applicableCheck) {
+                return result;
+            }
             // do replace-known until done
-            while (!applicableCheck) {
+            while (true) {
+                // may need to move position up in term due to changes in result
                 while (!pos.posInTerm().existsSubTerm(result.formula()) && pos.isTopLevel()) {
                     pos = pos.up();
                 }
-                Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
+                Term replacedKnown =
+                    replaceKnownHelper(context, result.formula(), result.formula(), pos.isInAntec(),
+                        ifInsts, protocol, services, goal, ruleApp, pos.posInTerm(),
+                        PosInTerm.getTopLevel());
                 if (replacedKnown != null && replacedKnown != result.formula()) {
                     result = new SequentFormula(replacedKnown);
                 } else {
@@ -370,21 +378,36 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Helper for replaceKnown (handles recursion).
      *
-     * @param protocol
-     * @param services TODO
+     * @param map the context (sequent formulas mapped to their position)
+     * @param topIn the formula to simplify (not modified by recursive calls)
+     * @param in the term to simplify
+     * @param inAntecedent whether the term is in the antecedent
+     * @param ifInsts filled by this method with positions used as replace-known targets
+     * @param protocol filled by this method with replaceKnown taclet apps
+     * @param services services
+     * @param goal the goal we work on
+     * @param ruleApp the current OSS rule app
+     * @param pio indicates which sub-term inside term in is going to be recursed into
+     * @param inPio the position of term in inside its sequent formula (always pass top-level
+     *        unless you are recursing inside this method)
+     * @return the simplified term
      */
-    private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
+    private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term topIn,
+            Term in,
             boolean inAntecedent, /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol,
-            Services services, Goal goal, RuleApp ruleApp, PosInTerm pio) {
+            Services services, Goal goal, RuleApp ruleApp, PosInTerm pio, PosInTerm inPio) {
         if (pio == PosInTerm.getTopLevel()) {
             pio = null;
         }
+        // search context for our term
         final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if (pos != null) {
+            // match found => replace-known can be applied
             ifInsts.add(pos);
             if (protocol != null) {
                 if (ENABLE_PROTOCOL) {
-                    protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                    protocol.add(
+                        makeReplaceKnownTacletApp(topIn, inAntecedent, pos, inPio, goal.sequent()));
                 } else {
                     protocol.add(null); // to keep size correct
                 }
@@ -413,13 +436,14 @@ public final class OneStepSimplifier implements BuiltInRule {
                     subs[i] = in.sub(i);
                     continue;
                 }
-                subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
-                    services, goal, ruleApp, pio != null ? pio.sub() : null);
+                subs[i] = replaceKnownHelper(map, topIn, in.sub(i), inAntecedent, ifInsts, protocol,
+                    services, goal, ruleApp, pio != null ? pio.sub() : null, inPio.down(i));
                 if (subs[i] != in.sub(i)) {
                     changed = true;
                 }
             }
             if (changed) {
+                // re-construct term with modified subs array
                 return services.getTermBuilder().tf().createTerm(in.op(), subs, in.boundVars(),
                     in.javaBlock(), in.getLabels());
             } else {
@@ -431,8 +455,18 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     /**
      * Simplifies the given constrained formula as far as possible using the replace-known rules
-     * (hardcoded here). The context formulas available for replace-known are passed in as
-     * "context". The positions of the actually used context formulas are passed out as "ifInsts".
+     * (hardcoded here).
+     *
+     * @param services the services of the current proof
+     * @param cf the sequent formula to simplify
+     * @param inAntecedent whether the formula is in the antecedent
+     * @param context sequent formulas available for replace-known (one entry for each formula on
+     *        the sequent)
+     * @param ifInsts will contain the positions of used context formulas
+     * @param protocol will be filled with replace-known taclet apps
+     * @param goal the goal the OSS is currently working on
+     * @param ruleApp the current (incomplete) OSS rule app
+     * @return the simplified formula (null if no simplification possible)
      */
     private SequentFormula replaceKnown(Services services, SequentFormula cf, boolean inAntecedent,
             Map<TermReplacementKey, PosInOccurrence> context,
@@ -442,8 +476,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             return null;
         }
         final Term formula = cf.formula();
-        final Term simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
-            protocol, services, goal, ruleApp, PosInTerm.getTopLevel());
+        final Term simplifiedFormula = replaceKnownHelper(context, formula, formula, inAntecedent,
+            ifInsts,
+            protocol, services, goal, ruleApp, PosInTerm.getTopLevel(), PosInTerm.getTopLevel());
         if (simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -451,8 +486,21 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent,
-            PosInOccurrence pio) {
+    /**
+     * Make a new replace-known taclet app with the given parameters:
+     * topLevelFormula, inAntecedent and posInFormula specify the application target,
+     * pio specifies what formula is referenced in the replace-known's find.
+     *
+     * @param topLevelFormula term where we apply the replace-known
+     * @param inAntecedent whether the top level formula is in the antecedent
+     * @param pio the position of the referenced sequent formula
+     * @param posInFormula position in topLevelFormula where we apply the replace-known
+     * @param sequent sequent of current node
+     * @return the replace-known taclet app
+     */
+    private RuleApp makeReplaceKnownTacletApp(Term topLevelFormula, boolean inAntecedent,
+            PosInOccurrence pio, PosInTerm posInFormula,
+            Sequent sequent) {
         FindTaclet taclet;
         if (pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()
@@ -466,19 +514,18 @@ public final class OneStepSimplifier implements BuiltInRule {
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
         svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
-        PosInOccurrence applicatinPIO =
-            new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
-                                                                                      // should be
-                                                                                      // the precise
-                                                                                      // sub term
+        // where the replace-known is applied
+        PosInOccurrence applicationPIO =
+            new PosInOccurrence(new SequentFormula(topLevelFormula), posInFormula,
                 inAntecedent); // It is required to create a new PosInOccurrence because formula and
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
-        ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
+        // create if insts based on pio
+        ifInst =
+            ifInst.append(new IfFormulaInstSeq(sequent, pio.isInAntec(), pio.sequentFormula()));
+        return PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicationPIO,
             lastProof.getServices());
-        return ta;
     }
 
     /**
@@ -529,14 +576,18 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         final Set<PosInOccurrence> ifInsts = new HashSet<>();
 
-        // first, do replace-known applications
+        // first, do replace-known applications.
+        // If we could only do replace-knowns, OSS should not be applicable
+        // => check for that
         if (!applicableCheck) {
+            // repeat replace-known until ...
             while (true) {
                 SequentFormula result = replaceKnown(services, cf, ossPIO.isInAntec(), context,
                     ifInsts, protocol, goal, ruleApp);
                 if (result != null) {
                     cf = result;
                 } else {
+                    // no more result = no more replace-known possible
                     break;
                 }
             }
@@ -659,6 +710,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";
+        OneStepSimplifierRuleApp ossRuleApp = (OneStepSimplifierRuleApp) ruleApp;
 
         final PosInOccurrence pos = ruleApp.posInOccurrence();
         assert pos != null && pos.isTopLevel();
@@ -668,9 +720,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         Sequent seq = goal.sequent();
         // restrict sequent view to the formulas specified in the rule application
         // this avoids different simplification results if a proof is reloaded
-        if (((OneStepSimplifierRuleApp) ruleApp).shouldRestrictAssumeInsts()
-                && !disableOSSRestriction) {
-            ImmutableList<PosInOccurrence> ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
+        if (ossRuleApp.shouldRestrictAssumeInsts() && !disableOSSRestriction) {
+            ImmutableList<PosInOccurrence> ifInsts = ossRuleApp.ifInsts();
             ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
             ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();
             if (ifInsts != null) {
