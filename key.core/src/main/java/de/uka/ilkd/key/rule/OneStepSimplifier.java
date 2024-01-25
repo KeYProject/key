@@ -430,8 +430,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
-                if (pio != null && pio.getIndexAt(0) != i) {
-                    // this indicates the subformula has not changed
+                if (changed || (pio != null && pio.getIndexAt(0) != i)) {
+                    // only do one change per replaceKnownHelper call.
+                    // second part of condition indicates the subformula has not changed
                     // (meaning we can skip recursing)
                     subs[i] = in.sub(i);
                     continue;
