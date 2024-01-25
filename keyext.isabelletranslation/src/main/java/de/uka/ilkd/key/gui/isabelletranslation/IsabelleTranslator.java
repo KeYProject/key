@@ -104,10 +104,9 @@ public class IsabelleTranslator {
     }
 
     private StringBuilder getNullLocale() {
-        //TODO handle null correctly. Probably null != undefined (Isabelle)
+        //TODO handle null correctly
         StringBuilder result = new StringBuilder();
         result.append("fixes null::'a").append(System.lineSeparator());
-        result.append("assumes null_undef: \"null = undefined\"").append(System.lineSeparator());
         return result;
     }
 
