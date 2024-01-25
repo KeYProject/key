@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Indicates that a branch has been closed by "reference" to another closed proof.
+ * This is always looked up using {@link Node#lookup(Class)} on the node of that branch.
  *
  * @param proof The proof referenced.
  * @param node  The node referenced.

@@ -75,6 +75,7 @@ public class CachingExtension
     private final Set<Proof> trackedProofs = new HashSet<>();
     private ReferenceSearchButton referenceSearchButton;
     private CachingToggleAction toggleAction = null;
+    private CachingPruneHandler cachingPruneHandler = null;
 
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {
@@ -120,6 +121,7 @@ public class CachingExtension
         trackedProofs.add(p);
         p.addRuleAppListener(this);
         p.addProofDisposedListener(this);
+        p.addProofTreeListener(cachingPruneHandler);
     }
 
     @Override
@@ -173,7 +175,7 @@ public class CachingExtension
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-
+        cachingPruneHandler = new CachingPruneHandler(mediator);
     }
 
     @Override
