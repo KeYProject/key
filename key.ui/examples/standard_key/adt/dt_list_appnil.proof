@@ -1,0 +1,118 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Sat Sep 23 18:02:36 CEST 2023
+[Choice]DefaultChoices=JavaCard-JavaCard\\:off, Strings-Strings\\:on, assertions-assertions\\:safe, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:treatAsAxiom, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
+[Labels]UseOriginLabels=true
+[SMTSettings]SelectedTaclets=
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[SMTSettings]instantiateHierarchyAssumptions=true
+[SMTSettings]integersMaximum=2147483645
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[SMTSettings]useUninterpretedMultiplication=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[Strategy]MaximumNumberOfAutomaticApplications=500
+[Strategy]Timeout=-1
+"
+}
+
+\heuristicsDecl {
+	LIST;
+}
+
+\datatypes {
+	List = Nil | Cons(any head, List tail);
+}
+
+\predicates {
+   contains(any, List);
+}
+
+\functions{
+	// append to lists
+	List app(List, List);
+	// revert a list
+	List rev(List);
+}
+
+\schemaVariables {
+    \term List list, list1;
+    \term any e;
+    \variables List nv;
+    \variables any el;
+    \formula b;
+}
+
+\rules {
+	// axioms
+	concat_base{
+        \find (app(Nil, list))
+        \replacewith (list) 
+        \heuristics (LIST)
+    };
+	concat_step{
+            \find( app(Cons(e, list1), list) )
+	        \replacewith (Cons(e, app(list1,list) ))
+		    \heuristics (LIST)};
+
+	// definition of revert
+	revert_base {\find (rev(Nil)) \replacewith(Nil) };
+	revert_step {\find (rev(Cons(e,list))) \replacewith (app(rev(list),Cons(e,Nil)))};
+}
+\problem {
+\forall List l; app(l, Nil) = l
+}
+
+\proof {
+(keyLog "0" (keyUser "weigl" ) (keyVersion "a2d4fe7cbe94d8423abafb4759831fd75cadc21f"))
+
+(autoModeTime "105")
+
+(branch "dummy ID"
+(rule "List_Ind" (inst "phi=(app(l, Nil) = l)<<origin(\"User_Interaction @ node 0 (Induction_for_List)\",\"[]\")>>") (inst "x=l") (userinteraction))
+(branch "Nil"
+   (rule "concat_base" (formula "1") (term "0") (userinteraction))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "closeTrue" (formula "1"))
+)
+(branch "Cons(anyhead,Listtail)"
+   (rule "allRight" (formula "2") (inst "sk=l_0"))
+   (rule "allRight" (formula "1") (inst "sk=tail_0"))
+   (rule "allRight" (formula "1") (inst "sk=head_0"))
+   (rule "impRight" (formula "1"))
+   (rule "concat_step" (formula "2") (term "0"))
+   (rule "applyEq" (formula "2") (term "1,0") (ifseqformula "1"))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "closeTrue" (formula "2"))
+)
+(branch "Use case of List"
+   (rule "close" (formula "2") (ifseqformula "1"))
+)
+)
+}

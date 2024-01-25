@@ -8,6 +8,7 @@ import java.io.File;
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -40,6 +41,17 @@ public class ContractLoadingTests {
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);
+    }
+
+    @Test
+    void issues1717() throws ProblemLoaderException, ProofInputException {
+        File javaFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1717/UnderscoreZero.java");
+        Assumptions.assumeTrue(javaFile.exists());
+        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        var proof = file.startProof(file.getProofContracts().get(0));
+        Assertions.assertNotNull(proof);
     }
 
     @Test

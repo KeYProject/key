@@ -96,10 +96,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
-
-        final BuiltInRuleAppContainer container = new BuiltInRuleAppContainer(bir, pio, cost, goal);
-
-        return container;
+        return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
 
     /**

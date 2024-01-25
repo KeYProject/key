@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
 import de.uka.ilkd.key.gui.prooftree.Style;
 import de.uka.ilkd.key.gui.prooftree.Styler;
@@ -44,6 +45,7 @@ import org.jspecify.annotations.NonNull;
 @KeYGuiExtension.Info(name = "Exploration",
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
     experimental = true, optional = true, priority = 10000)
+@HelpInfo(path = "/user/Exploration/")
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {

@@ -5,31 +5,23 @@ package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import org.key_project.util.collection.ImmutableList;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * Created by sarah on 5/2/17.
  */
-public class SearchNode {
-    final SequentFormula[] pattern;
-    int pos = 0;
-    int succAntPos = 0;
-    public final MatchConditions mc;
-    final ImmutableList<IfFormulaInstantiation> antec;
-    final ImmutableList<IfFormulaInstantiation> succ;
+public final class SearchNode {
+    private final SequentFormula[] pattern;
+    private final int pos;
+    private final int succAntPos;
+    private final MatchConditions mc;
 
 
-
-    public SearchNode(SequentFormula[] pattern, int succAntPos,
-            ImmutableList<IfFormulaInstantiation> antec,
-            ImmutableList<IfFormulaInstantiation> succ) {
+    public SearchNode(SequentFormula[] pattern, int succAntPos) {
         this.pattern = pattern;
+        this.pos = 0;
         this.succAntPos = succAntPos;
-        this.antec = antec;
-        this.succ = succ;
         this.mc = MatchConditions.EMPTY_MATCHCONDITIONS;
     }
 
@@ -38,8 +30,6 @@ public class SearchNode {
         this.succAntPos = parent.succAntPos;
         int parentPos = parent.pos;
         this.pos = parentPos + 1;
-        antec = parent.antec;
-        succ = parent.succ;
         mc = cond;
     }
 
@@ -55,4 +45,11 @@ public class SearchNode {
         return pos >= pattern.length;
     }
 
+    public SVInstantiations getInstantiations() {
+        return mc == null ? null : mc.getInstantiations();
+    }
+
+    public MatchConditions getMatchConditions() {
+        return mc;
+    }
 }

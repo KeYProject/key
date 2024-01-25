@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Term generator that enumerates the formulas of the current sequent/antecedent/succedent.
@@ -44,7 +45,8 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return new SFIterator(generateForIt(goal));
     }
 

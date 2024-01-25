@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
@@ -34,10 +35,10 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection(op, subTerms);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
-            subs[i] = subTerms[i].toTerm(app, pos, goal);
+            subs[i] = subTerms[i].toTerm(app, pos, goal, mState);
         }
         return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
     }

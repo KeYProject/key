@@ -162,7 +162,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // inform the listener
         ProofMacroFinishedInfo info =
-            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
+            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0);
 
         //
         // start actual autoprove

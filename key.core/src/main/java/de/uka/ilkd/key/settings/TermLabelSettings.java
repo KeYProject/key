@@ -19,19 +19,15 @@ import org.slf4j.LoggerFactory;
 public class TermLabelSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
-    /**
-     * Property key for {@link #getUseOriginLabels()}
-     */
-    public static final String USE_ORIGIN_LABELS = "[Labels]UseOriginLabels";
+    public static final String USE_ORIGIN_LABELS = "UseOriginLabels";
 
-    /**
-     * @see {@link #getUseOriginLabels()}
-     */
+    public static final String CATEGORY = "Labels";
+
     private boolean useOriginLabels = true;
 
     @Override
     public void readSettings(Properties props) {
-        String str = props.getProperty(USE_ORIGIN_LABELS);
+        String str = props.getProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS);
 
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
@@ -42,11 +38,32 @@ public class TermLabelSettings extends AbstractSettings {
 
     @Override
     public void writeSettings(Properties props) {
-        props.setProperty(USE_ORIGIN_LABELS, Boolean.toString(useOriginLabels));
+        props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,
+            Boolean.toString(useOriginLabels));
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        var category = props.getSection(CATEGORY);
+        if (category == null)
+            return;
+        try {
+            setUseOriginLabels(category.getBool(USE_ORIGIN_LABELS));
+        } catch (Exception e) {
+            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
+                + "Using the default value: true." + "The string read was: {}",
+                category.get(USE_ORIGIN_LABELS), e);
+            setUseOriginLabels(true);
+        }
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var category = props.getOrCreateSection(CATEGORY);
+        category.set(USE_ORIGIN_LABELS, useOriginLabels);
     }
 
     /**
-     *
      * @return {@code true} iff {@link OriginTermLabel}s should be used.
      */
     public boolean getUseOriginLabels() {
