@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -21,6 +24,10 @@ public class IsabelleTranslator {
     private final HashMap<Function, StringBuilder> usedFunctions = new HashMap<>();
 
     private final HashMap<Function, StringBuilder> usedPredicates = new HashMap<>();
+
+    private final HashMap<Sort, StringBuilder> intrinsicSorts = new HashMap<>();
+
+    private final HashMap<Function, StringBuilder> intrinsicFunctions = new HashMap<>();
 
     private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
@@ -72,6 +79,21 @@ public class IsabelleTranslator {
 
     private static final StringBuilder DISTINCT = new StringBuilder("distinct");
 
+    private static final Sort BOOL_SORT = new SortImpl(new Name("boolean"));
+
+    public IsabelleTranslator(Services services) {
+        //TODO add intrinsic sorts and functions that shouldnt be overridden
+        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+
+        intrinsicSorts.put(integerLDT.targetSort(), new StringBuilder("int"));
+        intrinsicSorts.put(BOOL_SORT, new StringBuilder("bool"));
+
+        intrinsicFunctions.put(integerLDT.getAdd(), PLUSSTRING);
+        intrinsicFunctions.put(integerLDT.getSub(), MINUSSTRING);
+        intrinsicFunctions.put(integerLDT.getMul(), MULTSTRING);
+        intrinsicFunctions.put(integerLDT.getDiv(), DIVSTRING);
+    }
+
     public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
         Term problem = sequentToTerm(sequent, services);
         // TODO find correct values
@@ -113,7 +135,8 @@ public class IsabelleTranslator {
     private StringBuilder getFunctionDeclarations() {
         StringBuilder declarations = new StringBuilder();
         for (Function fun : usedFunctions.keySet()) {
-            declarations.append(getFunctionDeclaration(fun)).append(System.lineSeparator());
+            if (!intrinsicFunctions.containsKey(fun))
+                declarations.append(getFunctionDeclaration(fun)).append(System.lineSeparator());
         }
         return declarations;
     }
@@ -161,7 +184,8 @@ public class IsabelleTranslator {
     private StringBuilder getSortDeclarations() {
         StringBuilder declaration = new StringBuilder();
         for (Sort sort : usedSorts.keySet()) {
-            declaration.append(getSortDeclaration(sort));
+            if (!intrinsicSorts.containsKey(sort))
+                declaration.append(getSortDeclaration(sort));
         }
         return declaration;
     }
@@ -303,8 +327,8 @@ public class IsabelleTranslator {
         if (args.isEmpty()) {
             toReturn.append(name);
         } else {
-            toReturn.append("(");
-            toReturn.append(name).append(" ");
+            toReturn.append("((");
+            toReturn.append(name).append(") ");
 
             for (StringBuilder arg : args) {
                 toReturn.append(arg).append(" ");

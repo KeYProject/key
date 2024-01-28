@@ -28,8 +28,8 @@ public class TranslationAction extends MainWindowAction {
     }
 
     private void generateTranslation() {
-        IsabelleTranslator translator = new IsabelleTranslator();
         KeYMediator mediator = getMediator();
+        IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
         try {
             //TODO let user choose where to save file?
             String path = System.getProperty("user.home") + "\\Translation.thy";
