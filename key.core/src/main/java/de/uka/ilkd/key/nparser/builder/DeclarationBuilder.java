@@ -53,7 +53,21 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
+            ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
+        return null;
+    }
+
+    @Override
+    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        // boolean freeAdt = ctx.FREE() != null;
+        var name = ctx.name.getText();
+        var doc = ctx.DOC_COMMENT() != null
+                ? ctx.DOC_COMMENT().getText()
+                : null;
+        var origin = BuilderHelpers.getPosition(ctx);
+        var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+        sorts().add(s);
         return null;
     }
 

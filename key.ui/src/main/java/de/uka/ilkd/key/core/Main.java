@@ -475,8 +475,10 @@ public final class Main {
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
         LOGGER.debug("Experimental Features: {}", state);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().setActivateAll(state);
     }
 
+    @Deprecated
     public static boolean isExperimentalMode() {
         return experimentalMode;
     }

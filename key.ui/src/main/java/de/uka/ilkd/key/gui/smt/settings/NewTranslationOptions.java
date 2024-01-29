@@ -69,7 +69,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {

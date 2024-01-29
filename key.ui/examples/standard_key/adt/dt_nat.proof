@@ -1,0 +1,191 @@
+\profile "Java Profile";
+
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:off",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:safe",
+        "bigint" : "bigint:on",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:off",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     },
+    "Labels" : { 
+        "UseOriginLabels" : true
+     },
+    "NewSMT" : { 
+        
+     },
+    "SMTSettings" : { 
+        "SelectedTaclets" : [ 
+            
+         ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+     },
+    "Strategy" : { 
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : { 
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+         }
+     }
+ } 
+
+\datatypes {
+        \free Nat = zero | succ(Nat pred);
+}
+
+\predicates {
+        greaterThan(Nat, Nat);
+}
+
+\functions{
+        Nat plusNat(Nat, Nat);
+}
+
+\rules {
+    plusDef {
+        \schemaVar \variable Nat n;
+        \schemaVar \variable Nat m;
+        \add( \forall n; \forall m; (plusNat(n, zero) = n & plusNat(n, succ(m)) = succ(plusNat(n, m))) ==> )
+    };
+    
+    greaterThanDef {
+        \schemaVar \variable Nat n;
+        \add( \forall n; greaterThan(succ(n), n) ==> )
+    };
+
+    greaterThanTrans {
+        \schemaVar \variable Nat n;
+        \schemaVar \variable Nat m;
+        \schemaVar \variable Nat l;
+        \add( \forall Nat n; \forall Nat m; \forall Nat l; (greaterThan(n,m) & greaterThan(m,l) -> greaterThan(n,l)) ==> )
+    };
+}
+
+\programVariables { Nat x; Nat y; }
+\problem {
+greaterThan(plusNat(x, y), x) | y = zero
+}
+
+\proof {
+(keyLog "0" (keyUser "mattias" ) (keyVersion "e0995588635b2e5e38c1791e254de76ab4391d36"))
+
+(autoModeTime "115")
+
+(branch "dummy ID"
+(rule "orRight" (formula "4") (userinteraction))
+(rule "Nat_Ind" (inst "phi=(\\forall Nat x;
+   ((  greaterThan(plusNat(x, y), x)<<origin(\"User_Interaction @ node 1 (Induction_for_Nat)\",\"[]\")>>
+     | (zero = y)<<origin(\"User_Interaction @ node 1 (Induction_for_Nat)\",\"[]\")>>)<<origin(\"User_Interaction @ node 1 (Induction_for_Nat)\",\"[]\")>>))<<origin(\"User_Interaction @ node 1 (Induction_for_Nat)\",\"[]\")>>") (inst "x=y") (userinteraction))
+(branch "zero"
+    (builtin "One Step Simplification" (formula "4") (userinteraction))
+   (rule "closeTrue" (formula "4") (userinteraction))
+)
+(branch "succ(Natpred)"
+   (rule "allRight" (formula "4") (inst "sk=pred_0") (userinteraction))
+   (rule "impRight" (formula "4") (userinteraction))
+   (rule "allRight" (formula "5") (inst "sk=x_0") (userinteraction))
+   (rule "instAll" (formula "5") (term "0,0,0") (ifseqformula "1") (userinteraction))
+   (rule "instAll" (formula "6") (term "0,0,0") (ifseqformula "3") (userinteraction))
+   (rule "instAll" (formula "7") (term "0,1,0,0") (ifseqformula "1") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "applyEqRigid" (formula "9") (term "0,0") (ifseqformula "2") (userinteraction))
+   (rule "instAll" (formula "9") (term "0,0,0") (ifseqformula "8") (userinteraction))
+   (rule "instAll" (formula "1") (term "0") (ifseqformula "8") (userinteraction))
+   (rule "instAll" (formula "1") (term "0,0,0,0,0,0") (ifseqformula "1") (userinteraction))
+   (rule "instAll" (formula "7") (term "1,0") (ifseqformula "1") (userinteraction))
+   (rule "orRight" (formula "13"))
+   (rule "eqSymm" (formula "16"))
+   (rule "eqSymm" (formula "14"))
+   (rule "replace_known_left" (formula "1") (term "0,0,0") (ifseqformula "3"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "replace_known_left" (formula "6") (term "0,0") (ifseqformula "4"))
+    (builtin "One Step Simplification" (formula "6"))
+   (rule "replace_known_left" (formula "7") (term "0,0") (ifseqformula "3"))
+    (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "13")))
+   (rule "notLeft" (formula "7"))
+   (rule "replace_known_right" (formula "7") (term "0") (ifseqformula "12"))
+    (builtin "One Step Simplification" (formula "7"))
+   (rule "replace_known_left" (formula "8") (term "1,0") (ifseqformula "7"))
+    (builtin "One Step Simplification" (formula "8"))
+   (rule "true_left" (formula "8"))
+   (rule "applyEq" (formula "4") (term "1,0") (ifseqformula "7"))
+   (rule "applyEq" (formula "15") (term "0") (ifseqformula "7"))
+   (rule "eqSymm" (formula "15"))
+   (rule "applyEq" (formula "13") (term "1") (ifseqformula "7"))
+   (rule "applyEqRigid" (formula "8") (term "1,0,0,0,0") (ifseqformula "7"))
+   (rule "applyEq" (formula "5") (term "0,1") (ifseqformula "4"))
+   (rule "applyEqRigid" (formula "11") (term "0") (ifseqformula "4"))
+   (rule "applyEq" (formula "12") (term "0,0") (ifseqformula "4"))
+   (rule "applyEqRigid" (formula "3") (term "0,0") (ifseqformula "4"))
+   (rule "applyEqRigid" (formula "2") (term "0,0,1,0,0") (ifseqformula "4"))
+   (rule "applyEq" (formula "1") (term "0,0,0") (ifseqformula "4"))
+   (rule "applyEq" (formula "3") (term "1") (ifseqformula "4"))
+   (rule "close" (formula "12") (ifseqformula "3"))
+)
+(branch "Use case of Nat"
+   (rule "eqSymm" (formula "6"))
+   (rule "eqSymm" (formula "1") (term "1,0,0"))
+   (rule "nnf_imp2or" (formula "3") (term "0,0,0"))
+   (rule "nnf_notAnd" (formula "3") (term "0,0,0,0"))
+   (rule "distr_forallAnd" (formula "2") (term "0"))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "distr_forallAnd" (formula "2"))
+   (rule "andLeft" (formula "2"))
+   (rule "commute_or" (formula "1") (term "0,0"))
+   (rule "commute_or" (formula "4") (term "0,0,0,0"))
+   (rule "commute_or_2" (formula "4") (term "0,0,0"))
+   (rule "allLeft" (formula "3") (inst "t=x"))
+   (rule "allLeft" (formula "1") (inst "t=y"))
+   (rule "eqSymm" (formula "1") (term "0,0"))
+   (rule "replace_known_right" (formula "1") (term "0,0") (ifseqformula "9"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "allLeft" (formula "1") (inst "t=x"))
+   (rule "close" (formula "9") (ifseqformula "1"))
+)
+)
+}
