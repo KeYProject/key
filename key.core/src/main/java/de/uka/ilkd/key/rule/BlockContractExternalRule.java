@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;

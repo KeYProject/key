@@ -18,7 +18,7 @@ public abstract class OperatorSV extends AbstractSortedOperator implements Schem
 
 
     protected OperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
-                         boolean isStrict) {
+            boolean isStrict) {
         super(name, argSorts, sort, isRigid);
         this.isStrict = isStrict;
     }

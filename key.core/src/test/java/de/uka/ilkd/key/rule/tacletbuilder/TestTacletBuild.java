@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;

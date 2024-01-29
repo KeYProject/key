@@ -142,7 +142,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the term array of arguments used to construct the method term
      */
     private Term[] getArgs(OperatorSV sv, OperatorSV heap, OperatorSV heapAtPre,
-                           boolean isStatic, boolean twoState, ImmutableList<OperatorSV> params) {
+            boolean isStatic, boolean twoState, ImmutableList<OperatorSV> params) {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);

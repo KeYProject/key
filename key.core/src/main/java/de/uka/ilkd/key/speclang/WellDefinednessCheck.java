@@ -181,9 +181,9 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private Term replaceSV(Term t, OperatorSV selfVar, OperatorSV resultVar,
-                           OperatorSV excVar, Map<LocationVariable, OperatorSV> atPreVars,
-                           ImmutableList<OperatorSV> paramVars, OriginalVariables origVars,
-                           ImmutableList<LocationVariable> heaps) {
+            OperatorSV excVar, Map<LocationVariable, OperatorSV> atPreVars,
+            ImmutableList<OperatorSV> paramVars, OriginalVariables origVars,
+            ImmutableList<LocationVariable> heaps) {
         var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
@@ -200,10 +200,10 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private static Map<LocationVariable, OperatorSV> getSchemaMap(OperatorSV selfVar,
-                                                                  OperatorSV resultVar, OperatorSV excVar,
-                                                                  Map<LocationVariable, OperatorSV> atPreVars,
-                                                                  ImmutableList<OperatorSV> paramVars, OriginalVariables vars,
-                                                                  ImmutableList<LocationVariable> heaps) {
+            OperatorSV resultVar, OperatorSV excVar,
+            Map<LocationVariable, OperatorSV> atPreVars,
+            ImmutableList<OperatorSV> paramVars, OriginalVariables vars,
+            ImmutableList<LocationVariable> heaps) {
         final Map<LocationVariable, OperatorSV> result =
             new LinkedHashMap<>();
         // self

@@ -35,7 +35,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     public JavaTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort,
-                                   final boolean elemSort) {
+            final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         this.elemSort = elemSort;
