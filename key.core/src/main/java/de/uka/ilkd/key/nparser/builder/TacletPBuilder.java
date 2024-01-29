@@ -936,7 +936,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return this.<SchemaVariable>mapOf(ctx.one_schema_var_decl());
     }
 
-    protected SchemaVariable declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
+    protected OperatorSV declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
             boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
             SchemaVariableModifierSet mods) {
         OperatorSV v;

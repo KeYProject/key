@@ -634,7 +634,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final JavaDLFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
 
         final Term wellFormed = TB.wellFormed(TB.var(heap));
 
