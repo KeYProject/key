@@ -15,15 +15,17 @@ import net.miginfocom.layout.CC;
 
 import static de.uka.ilkd.key.settings.ProofCachingSettings.DISPOSE_COPY;
 import static de.uka.ilkd.key.settings.ProofCachingSettings.DISPOSE_REOPEN;
+import static de.uka.ilkd.key.settings.ProofCachingSettings.PRUNE_COPY;
+import static de.uka.ilkd.key.settings.ProofCachingSettings.PRUNE_REOPEN;
 
 /**
- * Settings for the proof slicing extension.
+ * Settings for the proof caching extension.
  *
  * @author Arne Keller
  */
 public class CachingSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
-     * Singleton instance of the slicing settings.
+     * Singleton instance of the caching settings.
      */
     private static final ProofCachingSettings CACHING_SETTINGS = new ProofCachingSettings();
 
@@ -36,14 +38,26 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
      */
     private static final String STRATEGY_SEARCH =
         "Automatically search for references in auto mode";
+    /**
+     * Label for second option.
+     */
     private static final String DISPOSE_TITLE =
         "Behaviour when disposing referenced proof";
+    private static final String PRUNE_TITLE =
+        "Behaviour when pruning into referenced proof";
 
     /**
      * Checkbox for first option.
      */
     private final JCheckBox strategySearch;
+    /**
+     * Combobox for second option (dispose behaviour).
+     */
     private final JComboBox<String> disposeOption;
+    /**
+     * Combobox for third option (prune behaviour).
+     */
+    private final JComboBox<String> pruneOption;
 
     /**
      * Construct a new settings provider.
@@ -57,6 +71,11 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
             addCheckBox(STRATEGY_SEARCH, "", true, emptyValidator());
         disposeOption = addComboBox(DISPOSE_TITLE, null, 0, x -> {
         }, DISPOSE_COPY, DISPOSE_REOPEN);
+        pruneOption = addComboBox(PRUNE_TITLE, """
+                When a referenced proof is pruned, this is what happens to
+                 all cached branches that reference it.""",
+            0, x -> {
+            }, PRUNE_REOPEN, PRUNE_COPY);
     }
 
     @Override
@@ -77,6 +96,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         ProofCachingSettings ss = getCachingSettings();
         strategySearch.setSelected(ss.getEnabled());
         disposeOption.setSelectedItem(ss.getDispose());
+        pruneOption.setSelectedItem(ss.getPrune());
         return this;
     }
 
@@ -85,6 +105,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         ProofCachingSettings ss = getCachingSettings();
         ss.setEnabled(strategySearch.isEnabled());
         ss.setDispose(disposeOption.getSelectedItem().toString());
+        ss.setPrune(pruneOption.getSelectedItem().toString());
     }
 
 
