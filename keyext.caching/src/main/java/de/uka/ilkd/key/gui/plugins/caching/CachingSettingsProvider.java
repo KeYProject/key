@@ -43,6 +43,9 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
      */
     private static final String DISPOSE_TITLE =
         "Behaviour when disposing referenced proof";
+    /**
+     * Label for third option.
+     */
     private static final String PRUNE_TITLE =
         "Behaviour when pruning into referenced proof";
 
@@ -69,8 +72,11 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
 
         strategySearch =
             addCheckBox(STRATEGY_SEARCH, "", true, emptyValidator());
-        disposeOption = addComboBox(DISPOSE_TITLE, null, 0, x -> {
-        }, DISPOSE_COPY, DISPOSE_REOPEN);
+        disposeOption = addComboBox(DISPOSE_TITLE, """
+                When a referenced proof is disposed, this is what happens to
+                 all cached branches that reference it.""",
+            0, x -> {
+            }, DISPOSE_COPY, DISPOSE_REOPEN);
         pruneOption = addComboBox(PRUNE_TITLE, """
                 When a referenced proof is pruned, this is what happens to
                  all cached branches that reference it.""",
