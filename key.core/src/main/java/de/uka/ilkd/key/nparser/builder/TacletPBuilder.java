@@ -254,7 +254,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var tacletBuilder = new NoFindTacletBuilder();
         tacletBuilder.setName(new Name(String.format("%s_Ind", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
-        var phi = declareSchemaVariable(ctx, "phi", Sort.FORMULA, true,
+        var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
         var tb = services.getTermBuilder();
         var qvar = (VariableSV) declareSchemaVariable(ctx, "x", sort,
@@ -294,7 +294,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(new Name(String.format("%s_Axiom", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
-        var phi = declareSchemaVariable(ctx, "phi", Sort.FORMULA, true,
+        var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
         var tb = services.getTermBuilder();
         var qvar = (VariableSV) declareSchemaVariable(ctx, "x", sort,

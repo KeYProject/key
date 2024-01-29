@@ -60,7 +60,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             for (int i = 0; i < args.length; i++) {
                 args[i] = accept(constructorContext.sortId(i));
             }
-            Function function = new Function(name, sort, args, null, true, false);
+            JFunction function = new JFunction(name, sort, args, null, true, false);
             namespaces().functions().add(function);
         }
         return null;
