@@ -80,7 +80,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                 updatedSubs[i] = tb.apply(u, phi.sub(i));
             }
 
-            return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(), null);
+            return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
+                null);
         }
 
         // Here we have to check for name collisions as there are free variables in u
