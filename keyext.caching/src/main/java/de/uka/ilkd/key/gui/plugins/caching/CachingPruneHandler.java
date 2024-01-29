@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.plugins.caching;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
+import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -13,7 +15,6 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
-import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

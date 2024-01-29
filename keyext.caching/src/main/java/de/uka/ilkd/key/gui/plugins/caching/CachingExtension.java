@@ -20,6 +20,8 @@ import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
 import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
+import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
+import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -39,7 +41,6 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
