@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 
 public interface SVWrapper {
     /**
      * returns a String name of this meta construct.
      */
-    AbstractSV getSV();
+    OperatorSV getSV();
 }

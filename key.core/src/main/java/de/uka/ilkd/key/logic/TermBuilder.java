@@ -390,7 +390,7 @@ public class TermBuilder {
         return result;
     }
 
-    public Term var(AbstractSV v) {
+    public Term var(OperatorSV v) {
         return tf.createTerm(v);
     }
 

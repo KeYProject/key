@@ -176,14 +176,14 @@ public abstract class WellDefinednessCheck implements Contract {
         return new Pair<>(implicit, explicit);
     }
 
-    private Term replaceSV(Term t, AbstractSV self, ImmutableList<AbstractSV> params) {
+    private Term replaceSV(Term t, OperatorSV self, ImmutableList<OperatorSV> params) {
         return replaceSV(t, self, null, null, null, params, getOrigVars(), getHeaps());
     }
 
-    private Term replaceSV(Term t, AbstractSV selfVar, AbstractSV resultVar,
-            AbstractSV excVar, Map<LocationVariable, AbstractSV> atPreVars,
-            ImmutableList<AbstractSV> paramVars, OriginalVariables origVars,
-            ImmutableList<LocationVariable> heaps) {
+    private Term replaceSV(Term t, OperatorSV selfVar, OperatorSV resultVar,
+                           OperatorSV excVar, Map<LocationVariable, OperatorSV> atPreVars,
+                           ImmutableList<OperatorSV> paramVars, OriginalVariables origVars,
+                           ImmutableList<LocationVariable> heaps) {
         var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
@@ -199,12 +199,12 @@ public abstract class WellDefinednessCheck implements Contract {
         return or.replace(t);
     }
 
-    private static Map<LocationVariable, AbstractSV> getSchemaMap(AbstractSV selfVar,
-            AbstractSV resultVar, AbstractSV excVar,
-            Map<LocationVariable, AbstractSV> atPreVars,
-            ImmutableList<AbstractSV> paramVars, OriginalVariables vars,
-            ImmutableList<LocationVariable> heaps) {
-        final Map<LocationVariable, AbstractSV> result =
+    private static Map<LocationVariable, OperatorSV> getSchemaMap(OperatorSV selfVar,
+                                                                  OperatorSV resultVar, OperatorSV excVar,
+                                                                  Map<LocationVariable, OperatorSV> atPreVars,
+                                                                  ImmutableList<OperatorSV> paramVars, OriginalVariables vars,
+                                                                  ImmutableList<LocationVariable> heaps) {
+        final Map<LocationVariable, OperatorSV> result =
             new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
@@ -216,7 +216,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 && !vars.params.isEmpty()) {
             assert vars.params.size() == paramVars.size();
             final Iterator<LocationVariable> it1 = vars.params.iterator();
-            final Iterator<AbstractSV> it2 = paramVars.iterator();
+            final Iterator<OperatorSV> it2 = paramVars.iterator();
             while (it1.hasNext()) {
                 var originalParamVar = it1.next();
                 var paramVar = it2.next();
@@ -615,7 +615,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The {@link Term} containing the general assumptions.
      */
     private TermListAndFunc buildFreePreForTaclet(Term implicitPre, TermSV self,
-            TermSV heap, ImmutableList<AbstractSV> params,
+            TermSV heap, ImmutableList<OperatorSV> params,
             Services services) {
         ImmutableList<Term> resList = ImmutableSLList.nil();
 
@@ -733,8 +733,8 @@ public abstract class WellDefinednessCheck implements Contract {
             newVars.params, getOrigVars(), getHeaps());
     }
 
-    final Condition replaceSV(Condition pre, AbstractSV self,
-            ImmutableList<AbstractSV> params) {
+    final Condition replaceSV(Condition pre, OperatorSV self,
+            ImmutableList<OperatorSV> params) {
         final Term implicit = replaceSV(pre.implicit, self, params);
         final Term explicit = replaceSV(pre.explicit, self, params);
         return new Condition(implicit, explicit);
@@ -1008,7 +1008,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *         function
      */
     public final TermAndFunc getPreForTaclet(final Condition pre, TermSV self,
-            TermSV heap, ImmutableList<AbstractSV> parameters,
+            TermSV heap, ImmutableList<OperatorSV> parameters,
             Services services) {
         final TermListAndFunc freePre =
             buildFreePreForTaclet(pre.implicit, self, heap, parameters, services);

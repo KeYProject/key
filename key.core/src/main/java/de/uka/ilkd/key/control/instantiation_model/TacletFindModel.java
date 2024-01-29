@@ -353,7 +353,7 @@ public class TacletFindModel extends AbstractTableModel {
                     sort = idd.sort();
                     if (sort == null) {
                         try {
-                            sort = result.getRealSort((AbstractSV) sv, services);
+                            sort = result.getRealSort((OperatorSV) sv, services);
                         } catch (SortException e) {
                             throw new MissingSortException(String.valueOf(sv),
                                 createPosition(irow));

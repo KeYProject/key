@@ -141,8 +141,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param params schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
-    private Term[] getArgs(AbstractSV sv, AbstractSV heap, AbstractSV heapAtPre,
-            boolean isStatic, boolean twoState, ImmutableList<AbstractSV> params) {
+    private Term[] getArgs(OperatorSV sv, OperatorSV heap, OperatorSV heapAtPre,
+                           boolean isStatic, boolean twoState, ImmutableList<OperatorSV> params) {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
@@ -182,8 +182,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      *
      * @return a list of schema variables
      */
-    private ImmutableList<AbstractSV> paramsSV() {
-        ImmutableList<AbstractSV> paramsSV = ImmutableSLList.nil();
+    private ImmutableList<OperatorSV> paramsSV() {
+        ImmutableList<OperatorSV> paramsSV = ImmutableSLList.nil();
         for (var pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
                 SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
@@ -284,7 +284,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
         final var selfSV =
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
-        final ImmutableList<AbstractSV> paramsSV = paramsSV();
+        final ImmutableList<OperatorSV> paramsSV = paramsSV();
         StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
             ps.append(" ").append(pv.getKeYJavaType().getFullName());

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -44,7 +44,7 @@ public class TestSyntacticalReplaceVisitor {
         RewriteTaclet taclet =
             (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
         rw = ((RewriteTacletGoalTemplate) taclet.goalTemplates().head()).replaceWith();
-        var u = (AbstractSV) rw.varsBoundHere(0).get(0);
+        var u = (OperatorSV) rw.varsBoundHere(0).get(0);
 
         SchemaVariable b = (SchemaVariable) rw.sub(0).sub(0).op();
 

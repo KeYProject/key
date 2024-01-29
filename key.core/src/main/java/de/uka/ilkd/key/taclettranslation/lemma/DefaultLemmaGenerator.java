@@ -212,7 +212,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * for JavaCard Dynamic Logic.) This method is used for both Formula schema variables and Term
      * schema variables.
      */
-    private Term createSimpleInstantiation(Taclet owner, AbstractSV sv, TermServices services) {
+    private Term createSimpleInstantiation(Taclet owner, OperatorSV sv, TermServices services) {
         ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
@@ -232,7 +232,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Sort[] argSorts = new Sort[svSet.size()];
         int i = 0;
         for (var sv : svSet) {
-            if (sv instanceof AbstractSV asv)
+            if (sv instanceof OperatorSV asv)
                 argSorts[i] = replaceSort(asv.sort(), services);
             i++;
         }

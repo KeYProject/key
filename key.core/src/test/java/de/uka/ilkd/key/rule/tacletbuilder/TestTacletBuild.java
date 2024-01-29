@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -50,7 +50,7 @@ public class TestTacletBuild {
     public void test0() {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
-        Term b = tf.createTerm((AbstractSV) TacletForTests.getSchemaVariables().lookup("b"),
+        Term b = tf.createTerm((OperatorSV) TacletForTests.getSchemaVariables().lookup("b"),
             NO_SUBTERMS);
         Term t1 = tb.ex((QuantifiableVariable) u, b);
         Term t2 = tb.ex((QuantifiableVariable) v, b);

@@ -24,7 +24,7 @@ class TacletDescriber {
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
         boolean started = false;
-        if (psv instanceof AbstractSV sv) {
+        if (psv instanceof OperatorSV sv) {
             if (sv.isRigid() && !(sv instanceof VariableSV)) {
                 if (!started) {
                     out.append("[");
@@ -81,7 +81,7 @@ class TacletDescriber {
          */
         if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV
                 || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
-            out.append(" ").append(((AbstractSV) schemaVar).sort().declarationString());
+            out.append(" ").append(((OperatorSV) schemaVar).sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -29,13 +29,13 @@ import org.key_project.logic.sort.Sort;
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
-    private final AbstractSV exprOrTypeSV;
+    private final OperatorSV exprOrTypeSV;
     private final GenericSort sort;
     private final boolean elemSort;
 
 
-    public JavaTypeToSortCondition(final AbstractSV exprOrTypeSV, final GenericSort sort,
-            final boolean elemSort) {
+    public JavaTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort,
+                                   final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         this.elemSort = elemSort;
@@ -46,7 +46,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     }
 
 
-    public static boolean checkSortedSV(final AbstractSV exprOrTypeSV) {
+    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE

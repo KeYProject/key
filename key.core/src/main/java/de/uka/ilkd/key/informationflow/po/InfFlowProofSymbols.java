@@ -613,7 +613,7 @@ public class InfFlowProofSymbols {
 
         result.append("\\schemaVariables{\n");
         for (final SchemaVariable sv : getSchemaVariables()) {
-            if (!(sv instanceof AbstractSV asv))
+            if (!(sv instanceof OperatorSV asv))
                 continue;
             final String prefix = asv instanceof FormulaSV ? "\\formula "
                     : asv instanceof TermSV ? "\\term " : "\\variables ";

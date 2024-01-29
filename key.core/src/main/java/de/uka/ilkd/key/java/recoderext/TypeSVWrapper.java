@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 
 import recoder.java.SourceElement;
 import recoder.java.reference.TypeReference;
@@ -14,9 +14,9 @@ public class TypeSVWrapper extends TypeReference implements KeYRecoderExtension,
      *
      */
     private static final long serialVersionUID = 2694567717981292433L;
-    private final AbstractSV sv;
+    private final OperatorSV sv;
 
-    public TypeSVWrapper(AbstractSV sv) {
+    public TypeSVWrapper(OperatorSV sv) {
         this.sv = sv;
     }
 
@@ -28,7 +28,7 @@ public class TypeSVWrapper extends TypeReference implements KeYRecoderExtension,
     /**
      * returns the schema variable of this type sv wrapper
      */
-    public AbstractSV getSV() {
+    public OperatorSV getSV() {
         return sv;
     }
 

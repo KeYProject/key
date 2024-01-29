@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -129,7 +129,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new PassiveExpression();
     }
 
-    public static void throwSortInvalid(AbstractSV sv, String s) throws ParseException {
+    public static void throwSortInvalid(OperatorSV sv, String s) throws ParseException {
         throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
             + sv.sort().name().toString() + " does not comply with expected type " + s
             + " in Java program.");
@@ -141,17 +141,17 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             return false;
         }
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof AbstractSV asv) {
+        if (n instanceof OperatorSV asv) {
             return asv.sort() == sort;
         }
         return false;
     }
 
 
-    public AbstractSV lookupSchemaVariable(String s) throws ParseException {
-        AbstractSV sv;
+    public OperatorSV lookupSchemaVariable(String s) throws ParseException {
+        OperatorSV sv;
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof AbstractSV asv) {
+        if (n instanceof OperatorSV asv) {
             sv = asv;
         } else {
             throw new ParseException("Schema variable not declared: " + s);

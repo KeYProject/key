@@ -654,7 +654,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
 
-        if (attribute instanceof AbstractSV sv) {
+        if (attribute instanceof OperatorSV sv) {
             /*
              * if (!inSchemaMode()) { semanticError(null,
              * "Schemavariables may only occur inside taclets."); }
@@ -693,7 +693,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
-        Operator result = (AbstractSV) schemaVariables().lookup(new Name(attributeName));
+        Operator result = (OperatorSV) schemaVariables().lookup(new Name(attributeName));
         // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
@@ -1622,7 +1622,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else if (v instanceof LocationVariable lv) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
         }else {
-            if (v instanceof AbstractSV sv) {
+            if (v instanceof OperatorSV sv) {
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(sv));
             } else {
                 String errorMessage = "";

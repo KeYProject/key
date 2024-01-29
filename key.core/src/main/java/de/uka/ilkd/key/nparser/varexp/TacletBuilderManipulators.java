@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -305,7 +305,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            var v = (AbstractSV) arguments[0];
+            var v = (OperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);

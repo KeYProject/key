@@ -531,7 +531,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable variable : uninstantiatedVars()) {
-            if (!(variable instanceof AbstractSV operatorSv)) {
+            if (!(variable instanceof OperatorSV operatorSv)) {
                 continue;
             }
             if (operatorSv.arity() != 0) {
@@ -661,7 +661,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return the new taclet app, or <code>null</code> if the sort of <code>sv</code> is generic
      *         and cannot be instantiated (at least at the time)
      */
-    private static TacletApp forceGenericSortInstantiation(TacletApp app, AbstractSV sv,
+    private static TacletApp forceGenericSortInstantiation(TacletApp app, OperatorSV sv,
             Services services) {
         final GenericSortCondition c = GenericSortCondition.forceInstantiation(sv.sort(), false);
         if (c != null) {
@@ -680,7 +680,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(AbstractSV p_sv, TermServices services) {
+    public Sort getRealSort(OperatorSV p_sv, TermServices services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
     }
 
@@ -691,7 +691,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *
      * @param services the Services class allowing access to the type model
      */
-    public TacletApp createSkolemConstant(String instantiation, AbstractSV sv,
+    public TacletApp createSkolemConstant(String instantiation, OperatorSV sv,
             boolean interesting, Services services) {
         return createSkolemConstant(instantiation, sv, getRealSort(sv, services), interesting,
             services);
