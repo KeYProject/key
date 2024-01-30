@@ -10,10 +10,10 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
  * All irrelevant term labels are ignored in this equality check.
  */
-public class IrrelevantTermLabelsProperty implements TermProperty {
+public class IrrelevantTermLabelsProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -25,7 +25,7 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      * can be accessed
      * through {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY} and is used as a
      * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
      */
     private IrrelevantTermLabelsProperty() {}
 

@@ -9,10 +9,10 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
  * All term labels are ignored in this equality check.
  */
-public class TermLabelsProperty implements TermProperty {
+public class TermLabelsProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -22,7 +22,7 @@ public class TermLabelsProperty implements TermProperty {
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
      * through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
      */
     private TermLabelsProperty() {}
 

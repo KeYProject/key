@@ -6,10 +6,10 @@ package de.uka.ilkd.key.logic;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
+import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.equality.RenamingProperty;
-import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
-import de.uka.ilkd.key.logic.equality.TermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -24,7 +24,7 @@ import org.key_project.util.java.CollectionUtil;
  * </p>
  *
  * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
- * the method {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)} can be used to
+ * the method {@link EqualsModProperty#equalsModProperty(Object, Property)} can be used to
  * compare terms
  * while ignoring certain
  * given properties. E.g. by using {@link RenamingProperty#RENAMING_TERM_PROPERTY}, just the

@@ -7,9 +7,10 @@ package de.uka.ilkd.key.logic.equality;
  * Interface to check for equality ignoring given properties and to compute according hash codes on
  * terms.
  *
+ * @param <T> the type of the objects that are checked for equality or hashed
  * @author Tobias Reinhold
  */
-public interface TermEqualsModProperty {
+public interface EqualsModProperty<T> {
 
     /**
      * Checks whether this object is equal to {@code o} modulo the property described by
@@ -19,7 +20,8 @@ public interface TermEqualsModProperty {
      * @param property the property to be ignored in the equality check
      * @return whether this object is equal to <code>o</code>
      */
-    boolean equalsModProperty(Object o, TermProperty property);
+
+    boolean equalsModProperty(Object o, Property<T> property);
 
     /**
      * Computes the hash code according to the given ignored {@code property}.
@@ -27,5 +29,5 @@ public interface TermEqualsModProperty {
      * @param property the ignored property according to which the hash code is computed
      * @return the hash code of this object
      */
-    int hashCodeModProperty(TermProperty property);
+    int hashCodeModProperty(Property<T> property);
 }

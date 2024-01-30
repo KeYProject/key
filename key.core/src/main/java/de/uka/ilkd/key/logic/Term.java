@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -40,7 +40,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, TermEqualsModProperty {
+        extends SVSubstitute, Sorted, EqualsModProperty<Term> {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").

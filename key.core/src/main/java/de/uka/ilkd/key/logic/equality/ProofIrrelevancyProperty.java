@@ -15,10 +15,10 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
  * All proof irrelevant attributes are ignored in this equality check.
  */
-public class ProofIrrelevancyProperty implements TermProperty {
+public class ProofIrrelevancyProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -30,7 +30,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
      * can be accessed
      * through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is used as a
      * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
      */
     private ProofIrrelevancyProperty() {}
 
@@ -134,7 +134,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
 
     /**
      * Compute the hashcode mod proof irrelevancy of an iterable of terms using the elements'
-     * {@link TermEqualsModProperty} implementation.
+     * {@link EqualsModProperty} implementation.
      *
      * @param iter iterable of terms
      * @return combined hashcode
