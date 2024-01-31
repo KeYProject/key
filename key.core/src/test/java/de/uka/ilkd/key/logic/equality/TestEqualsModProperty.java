@@ -269,10 +269,10 @@ public class TestEqualsModProperty {
         labels2 = new ImmutableArray<>(relevantLabel1, relevantLabel2);
         term1 = tb.label(term1, labels1);
         term2 = tb.label(term2, labels2);
-        assertFalse(term1.equalsModProperty(term2, PROOF_IRRELEVANCY_PROPERTY),
-            "Should be false as both terms have a different number of labels");
-        assertFalse(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
-            "Should be false as both terms have a different number of labels");
+        assertTrue(term1.equalsModProperty(term2, PROOF_IRRELEVANCY_PROPERTY),
+            "Should be true as both terms have the same relevant term labels and irrelevant labels do not matter");
+        assertTrue(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
+            "Should be true as both terms have the same relevant term labels and irrelevant labels do not matter");
 
         // ------------ not the same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1);

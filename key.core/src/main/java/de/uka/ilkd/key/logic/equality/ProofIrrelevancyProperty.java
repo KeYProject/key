@@ -84,13 +84,6 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
 
-        // This would be the only new thing from LabeledTermImpl, but this doesn't seem right
-        if (term1.hasLabels() && term2.hasLabels()) {
-            if (term2.getLabels().size() != term1.getLabels().size()) {
-                return false;
-            }
-        }
-
         return true;
     }
 
