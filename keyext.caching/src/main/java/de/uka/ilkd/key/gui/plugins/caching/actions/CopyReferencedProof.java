@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
-public class CopyReferencedProof extends KeyAction {
+public final class CopyReferencedProof extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyReferencedProof.class);
 
     /**

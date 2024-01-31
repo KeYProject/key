@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  *
  * @author Arne Keller
  */
-public class GotoReferenceAction extends KeyAction {
+public final class GotoReferenceAction extends KeyAction {
 
     private final KeYMediator mediator;
     private final Node node;

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
+import de.uka.ilkd.key.gui.plugins.caching.actions.CloseAllByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
@@ -200,6 +201,11 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new RemoveCachingInformationAction(mediator, node));
+            return actions;
+        } else if (kind.getType() == Proof.class) {
+            Proof proof = (Proof) underlyingObject;
+            List<Action> actions = new ArrayList<>();
+            actions.add(new CloseAllByReference(this, mediator, proof));
             return actions;
         }
         return new ArrayList<>();

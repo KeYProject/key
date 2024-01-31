@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  *
  * @author Arne Keller
  */
-public class RemoveCachingInformationAction extends KeyAction {
+public final class RemoveCachingInformationAction extends KeyAction {
 
     /**
      * The KeY mediator.

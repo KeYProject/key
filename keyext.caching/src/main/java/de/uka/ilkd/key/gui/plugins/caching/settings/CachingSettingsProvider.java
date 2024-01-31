@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.plugins.caching.settings;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

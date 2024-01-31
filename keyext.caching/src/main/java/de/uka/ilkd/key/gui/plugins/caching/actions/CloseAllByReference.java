@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
@@ -14,15 +13,16 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
 /**
- * Action to search for suitable references on a single node.
+ * Proof context menu action to perform proof caching for all open goals on that proof.
  *
  * @author Arne Keller
  */
-public final class CloseByReference extends KeyAction {
+public class CloseAllByReference extends KeyAction {
     /**
      * The caching extension.
      */
@@ -32,22 +32,23 @@ public final class CloseByReference extends KeyAction {
      */
     private final KeYMediator mediator;
     /**
-     * The node to try to close by reference.
+     * The proof whose open goals we try to close by reference.
      */
-    private final Node node;
+    private final Proof proof;
 
     /**
      * Construct new action.
      *
      * @param mediator the mediator
-     * @param node the node
+     * @param proof the proof
      */
-    public CloseByReference(CachingExtension cachingExtension, KeYMediator mediator, Node node) {
+    public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
+            Proof proof) {
         this.cachingExtension = cachingExtension;
         this.mediator = mediator;
-        this.node = node;
-        setName("Close by reference to other proof");
-        setEnabled(!node.isClosed() && node.lookup(ClosedBy.class) == null);
+        this.proof = proof;
+        setName("Run proof caching search for open goals");
+        setEnabled(!proof.closed());
         setMenuPath("Proof Caching");
     }
 
@@ -56,16 +57,8 @@ public final class CloseByReference extends KeyAction {
         // nodes will be the open goals for which to
         // perform proof caching
         List<Node> nodes = new ArrayList<>();
-        if (node.leaf()) {
-            nodes.add(node);
-        } else {
-            node.subtreeIterator().forEachRemaining(n -> {
-                if (n.leaf() && !n.isClosed()) {
-                    nodes.add(n);
-                }
-            });
-        }
-        List<Integer> mismatches = new ArrayList<>();
+        proof.openGoals().forEach(x -> nodes.add(x.node()));
+        int matches = 0;
         for (Node n : nodes) {
             // search other proofs for matching nodes
             ClosedBy c = ReferenceSearcher.findPreviousProof(
@@ -73,19 +66,16 @@ public final class CloseByReference extends KeyAction {
             if (c != null) {
                 n.proof().closeGoal(n.proof().getOpenGoal(n));
                 n.register(c, ClosedBy.class);
-            } else {
-                mismatches.add(n.serialNr());
+                matches++;
             }
         }
-        if (!nodes.isEmpty()) {
-            cachingExtension.updateGUIState(nodes.get(0).proof());
-        }
-        if (!mismatches.isEmpty()) {
+        if (matches > 0) {
+            cachingExtension.updateGUIState(proof);
             // since e.getSource() is the popup menu, it is better to use the MainWindow
             // instance here as a parent
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
-                "Proof Caching error", JOptionPane.WARNING_MESSAGE);
+                "Successfully closed " + matches + " open goal(s) by cache",
+                "Proof Caching info", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
