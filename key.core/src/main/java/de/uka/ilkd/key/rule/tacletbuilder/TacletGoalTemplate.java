@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -19,7 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public class TacletGoalTemplate {
+public class TacletGoalTemplate implements EqualsModProofIrrelevancy {
 
     /** stores sequent that is one of the new goals */
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
@@ -174,5 +175,19 @@ public class TacletGoalTemplate {
             result += "\\addprogvars " + addedProgVars() + " ";
         }
         return result;
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof TacletGoalTemplate)) {
+            return false;
+        }
+        TacletGoalTemplate other = (TacletGoalTemplate) obj;
+        return addedSeq.equals(other.addedSeq) && addedRules.equals(other.addedRules);
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return 0;
     }
 }
