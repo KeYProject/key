@@ -69,10 +69,6 @@ class TermImpl implements Term {
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
-    /**
-     * Cached hash value.
-     */
-    private int hashcode2 = -1;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
