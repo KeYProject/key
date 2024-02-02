@@ -25,14 +25,21 @@ public class JmlEnabledKeysIndicator implements KeYGuiExtension, KeYGuiExtension
 
     public JmlEnabledKeysIndicator() {
         lblIndicator.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        lblIndicator.setToolTipText("Currently enabled keys for the JML condition evaluation");
+        lblIndicator.setToolTipText("Currently enabled keys for tool-specific JML annotations");
         settings.addPropertyChangeListener(GeneralSettings.KEY_JML_ENABLED_KEYS, it -> update());
         update();
     }
 
     private void update() {
-        var lbl = String.join(", ", settings.getJmlEnabledKeys());
-        lblIndicator.setText(lbl);
+        final var current = settings.getJmlEnabledKeys();
+        if (!GeneralSettings.JML_ENABLED_KEYS_DEFAULT.equals(current)) {
+            var lbl = String.join(", ", current);
+            lblIndicator.setText(lbl);
+            lblIndicator.setVisible(true);
+        } else {
+            lblIndicator.setText("");
+            lblIndicator.setVisible(false);
+        }
     }
 
     @Override

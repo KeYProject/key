@@ -48,7 +48,10 @@ public class GeneralSettings extends AbstractSettings {
      */
     private static final String ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
 
-    private Set<String> jmlEnabledKeys = new TreeSet<>(Set.of("key"));
+    /** Default value for {@link #getJmlEnabledKeys()} */
+    public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
+
+    private Set<String> jmlEnabledKeys = new TreeSet<>(JML_ENABLED_KEYS_DEFAULT);
 
     /**
      * minimize interaction is on by default
