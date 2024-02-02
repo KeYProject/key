@@ -6,11 +6,13 @@ package de.uka.ilkd.key.proof.init.loader;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (28.12.23)
  */
+@NullMarked
 public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.

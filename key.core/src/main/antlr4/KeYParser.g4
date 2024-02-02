@@ -39,7 +39,7 @@ problem
 :
   ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-  | PROOFOBLIGATION  (proofObligation=cvalue SEMI?)?
+  | PROOFOBLIGATION  (proofObligation=cvalue | oldProofObligation=string_value)? SEMI?
   )
   proofScript?
 ;

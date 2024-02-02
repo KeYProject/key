@@ -6,7 +6,9 @@ package de.uka.ilkd.key.proof.init.loader;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class DependencyContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
@@ -19,7 +21,7 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
             Configuration properties) {
         String contractName = properties.getString("contract");
         int proofNum = 0;
-        String baseContractName = null;
+        String baseContractName;
         int ind = -1;
         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);

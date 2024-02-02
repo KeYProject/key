@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,7 +60,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
-    public static final Map<Boolean, String> TRANSACTION_TAGS =
+    public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;

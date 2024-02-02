@@ -32,6 +32,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 

@@ -8,11 +8,13 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (28.12.23)
  */
+@NullMarked
 public class InfFlowContractPOLoader implements ProofObligationLoader {
 
     /**

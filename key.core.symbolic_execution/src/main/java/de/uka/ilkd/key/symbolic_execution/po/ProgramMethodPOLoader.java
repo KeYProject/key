@@ -9,10 +9,12 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.proof.init.AbstractPO.getName;
 import static de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO.*;
 
+@NullMarked
 public class ProgramMethodPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.

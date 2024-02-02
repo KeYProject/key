@@ -201,7 +201,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     }
 
     void setLoadInfo(Configuration properties) {
-        final var pathname = Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
+        final var pathname =
+            Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();
         this.tacletFile = properties.getString("tacletFile");
         this.definitionFile = properties.getString("definitionFile");

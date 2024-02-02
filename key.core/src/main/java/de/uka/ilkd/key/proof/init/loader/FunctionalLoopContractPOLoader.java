@@ -6,11 +6,13 @@ package de.uka.ilkd.key.proof.init.loader;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (28.12.23)
  */
+@NullMarked
 public class FunctionalLoopContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
@@ -24,7 +26,7 @@ public class FunctionalLoopContractPOLoader implements ProofObligationLoader {
             Configuration properties) {
         String contractName = properties.getString("contract");
         int proofNum = 0;
-        String baseContractName = null;
+        String baseContractName;
         int ind = -1;
         for (String tag : FunctionalLoopContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);
@@ -51,8 +53,8 @@ public class FunctionalLoopContractPOLoader implements ProofObligationLoader {
 
     @Override
     public boolean handles(String identifier) {
-        return FunctionalLoopContractPOLoader.class.getName().equals(identifier)
-                || FunctionalLoopContractPOLoader.class.getSimpleName().equals(identifier)
+        return FunctionalLoopContractPO.class.getName().equals(identifier)
+                || FunctionalLoopContractPO.class.getSimpleName().equals(identifier)
                 || getClass().getName().equals(identifier)
                 || getClass().getSimpleName().equals(identifier);
     }
