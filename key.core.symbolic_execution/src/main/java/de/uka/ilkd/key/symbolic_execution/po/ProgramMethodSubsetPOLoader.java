@@ -8,6 +8,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
+
 import org.jspecify.annotations.NullMarked;
 
 /**

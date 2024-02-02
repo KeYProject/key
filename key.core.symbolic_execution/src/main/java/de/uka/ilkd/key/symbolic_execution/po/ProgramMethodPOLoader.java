@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
+
 import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.proof.init.AbstractPO.getName;

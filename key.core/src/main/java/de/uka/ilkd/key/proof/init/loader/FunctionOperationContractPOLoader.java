@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init.loader;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import org.jspecify.annotations.NullMarked;
 
-import java.io.IOException;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
@@ -25,7 +26,8 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) throws IOException {
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties) throws IOException {
         String contractName = properties.getString("contract");
         int proofNum = 0;
         String baseContractName;
@@ -50,17 +52,17 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
         } else {
             ProofOblInput po;
             boolean addUninterpretedPredicate =
-                    AbstractOperationPO.isAddUninterpretedPredicate(properties);
+                AbstractOperationPO.isAddUninterpretedPredicate(properties);
             boolean addSymbolicExecutionLabel =
-                    AbstractOperationPO.isAddSymbolicExecutionLabel(properties);
+                AbstractOperationPO.isAddSymbolicExecutionLabel(properties);
             if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
                 if (!(contract instanceof FunctionalOperationContract)) {
                     throw new IOException(
-                            "Found contract \"" + contract + "\" is no FunctionalOperationContract.");
+                        "Found contract \"" + contract + "\" is no FunctionalOperationContract.");
                 }
                 po = new FunctionalOperationContractPO(initConfig,
-                        (FunctionalOperationContract) contract, addUninterpretedPredicate,
-                        addSymbolicExecutionLabel);
+                    (FunctionalOperationContract) contract, addUninterpretedPredicate,
+                    addSymbolicExecutionLabel);
             } else {
                 po = contract.createProofObl(initConfig);
             }
