@@ -292,10 +292,12 @@ public class Configuration {
      * Returns a list of integer values given by the name.
      */
     @Nullable
-    public List<Integer> getIntList(String name) {
+    public List<Long> getIntList(String name) {
         var seq = get(name, List.class);
-        if (seq == null) return null;
-        if (!seq.stream().allMatch(it -> it instanceof Integer)) throw new ClassCastException();
+        if (seq == null)
+            return null;
+        if (!seq.stream().allMatch(it -> it instanceof Long))
+            throw new ClassCastException();
         return seq;
     }
 
