@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -33,10 +34,12 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
      * @param poContainer The loaded {@link LoadedPOContainer}.
      * @param proofList The created {@link ProofAggregate}.
      * @param result The occurred {@link ReplayResult}.
+     * @param settings
      * @throws ProblemLoaderException Occurred Exception.
      */
     void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
+            ProofAggregate proofList, ReplayResult result,
+            Configuration settings) throws ProblemLoaderException;
 
     /**
      * This method is called if no {@link LoadedPOContainer} was created via

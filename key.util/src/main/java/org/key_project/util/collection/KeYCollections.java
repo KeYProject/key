@@ -78,7 +78,7 @@ public class KeYCollections {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null collection
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param delimiter a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -93,7 +93,7 @@ public class KeYCollections {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null array of objects
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param delimiter a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -124,7 +124,8 @@ public class KeYCollections {
     }
 
     /**
-     * Creates a run-length encoding from the given positive integer array. The return array has the following form:
+     * Creates a run-length encoding from the given positive integer array. The return array has the
+     * following form:
      * every positive entry stands for its own. Every negative integer describes the repetition
      * of the following positive integer.
      * <p>
@@ -157,7 +158,8 @@ public class KeYCollections {
     public static int[] runLengthEncoding(Collection<Integer> array) {
         var iter = array.iterator();
         class PushbackIterator implements Iterator<Integer> {
-            private int pushedBack=-1;
+            private int pushedBack = -1;
+
             @Override
             public boolean hasNext() {
                 return pushedBack >= 0 || iter.hasNext();
@@ -165,9 +167,9 @@ public class KeYCollections {
 
             @Override
             public Integer next() {
-                if(pushedBack>=0){
+                if (pushedBack >= 0) {
                     var v = pushedBack;
-                    pushedBack=-1;
+                    pushedBack = -1;
                     return v;
                 }
                 return iter.next();
@@ -190,7 +192,7 @@ public class KeYCollections {
             while (iter.hasNext() && (symbol == (last = piter.next()))) {
                 count++;
             }
-            if(last!=symbol) {
+            if (last != symbol) {
                 piter.pushBack(last);
             }
             if (count != 1) {

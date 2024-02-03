@@ -279,7 +279,9 @@ public abstract class AbstractProblemLoader {
                 loadSelectedProof(poContainer, proofList, callbackProofLoaded);
             }
         } finally {
-            control.loadingFinished(this, poContainer, proofList, result);
+            var settings = (envInput instanceof KeYUserProblemFile kupf) ? kupf.readSettings()
+                    : new Configuration();
+            control.loadingFinished(this, poContainer, proofList, result, settings);
         }
     }
 
@@ -645,9 +647,6 @@ public abstract class AbstractProblemLoader {
                 new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
             parserResult = parser.getResult();
-
-            // Parser is no longer needed, set it to null to free memory.
-            parser = null;
 
             // For loading, we generally turn on one step simplification to be
             // able to load proofs that used it even if the user has currently

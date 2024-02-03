@@ -9,7 +9,6 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.nparser.*;
-import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
@@ -124,8 +123,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return warnings;
     }
 
-    public Configuration  readSettings() {
-        if(settings==null){
+    public Configuration readSettings() {
+        if (settings == null) {
             settings = getParseContext().findSettings();
         }
         return settings;
@@ -282,4 +281,5 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYJavaType getContainerType() {
         return null;
     }
+
 }

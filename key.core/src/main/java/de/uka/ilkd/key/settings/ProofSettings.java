@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
+import de.uka.ilkd.key.util.KeYResourceManager;
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
@@ -10,14 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
-import de.uka.ilkd.key.util.KeYResourceManager;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to load and save settings for proofs such as which data type models are used
@@ -147,9 +146,10 @@ public class ProofSettings {
     }
 
     /**
-     * Writes the settings to the given stream storing additional data into {@link #KEY_ADDITIONAL_DATA}.
+     * Writes the settings to the given stream storing additional data into
+     * {@link #KEY_ADDITIONAL_DATA}.
      *
-     * @param out                   a output destination
+     * @param out a output destination
      * @param additionalInformation a nullable map of additional information
      */
     public void settingsToStream(Writer out, @Nullable Map<String, Object> additionalInformation) {

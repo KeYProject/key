@@ -394,7 +394,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
             }
 
-            if(getMediator().getSelectedProof() == proof) {
+            if (getMediator().getSelectedProof() == proof) {
                 saver.setPathToLastSelectedNode(getMediator().getSelectedNode().getPosInProof());
             }
 
@@ -529,12 +529,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();
-        if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile file) {
-            //TODO weigl not triggered
+        if (poContainer != null
+                && poContainer.getProofOblInput() instanceof KeYUserProblemFile file) {
+            // TODO weigl not triggered
             var settings = file.readSettings();
             var addInfo = settings.getSection(ProofSettings.KEY_ADDITIONAL_DATA);
-            if(addInfo!=null){
-                var lastSelectedNodePath = settings.getIntList(OutputStreamProofSaver.KEY_LAST_SELECTED_NODE);
+            if (addInfo != null) {
+                var lastSelectedNodePath =
+                    settings.getIntList(OutputStreamProofSaver.KEY_LAST_SELECTED_NODE);
                 if (lastSelectedNodePath != null && proofList != null) {
                     var proof = proofList.getFirstProof();
                     proof.root().traversePath(lastSelectedNodePath.iterator());
