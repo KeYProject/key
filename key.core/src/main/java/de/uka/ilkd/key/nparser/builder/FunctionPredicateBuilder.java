@@ -109,6 +109,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (lookup(p.name()) == null) {
             functions().add(p);
+        } else {
+            // weigl: agreement on KaKeY meeting: this should be an error.
+            semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");
         }
         return null;
     }
@@ -162,7 +165,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     public Object visitFunc_decl(KeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
-        String func_name = accept(ctx.funcpred_name());
+        String funcName = accept(ctx.funcpred_name());
         List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         assert argSorts != null;
@@ -179,11 +182,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
 
         Function f = null;
-        assert func_name != null;
-        int separatorIndex = func_name.indexOf("::");
+        assert funcName != null;
+        int separatorIndex = funcName.indexOf("::");
         if (separatorIndex > 0) {
-            String sortName = func_name.substring(0, separatorIndex);
-            String baseName = func_name.substring(separatorIndex + 2);
+            String sortName = funcName.substring(0, separatorIndex);
+            String baseName = funcName.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
@@ -196,7 +199,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         if (f == null) {
-            f = new Function(new Name(func_name),
+            f = new Function(new Name(funcName),
                 retSort, argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
                 unique,
@@ -206,7 +209,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         if (lookup(f.name()) == null) {
             functions().add(f);
         } else {
-            addWarning("Function '" + func_name + "' is already defined!");
+            // weigl: agreement on KaKeY meeting: this should be an error.
+            semanticError(ctx, "Function '" + funcName + "' is already defined!");
         }
         return f;
     }
