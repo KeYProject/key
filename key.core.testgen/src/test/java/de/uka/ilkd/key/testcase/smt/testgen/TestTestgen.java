@@ -7,12 +7,12 @@ import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
+import de.uka.ilkd.key.testcase.HelperClassForTestgenTests;
 import de.uka.ilkd.key.testcase.smt.ce.TestCommons;
+import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

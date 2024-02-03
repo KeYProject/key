@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.List;
+
+import de.uka.ilkd.key.logic.sort.Sort;
+
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
-import de.uka.ilkd.key.logic.sort.Sort;
-
-import java.util.List;
 
 import static de.uka.ilkd.key.testgen.template.Constants.TAB;
 
@@ -57,9 +58,8 @@ public class OracleMethod {
         }
 
         Iterable<ParameterSpec> params = args.stream().map(
-                it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
-                        it.name().toString()).build()
-        ).toList();
+            it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
+                it.name().toString()).build()).toList();
 
         var m = MethodSpec.methodBuilder(methodName)
                 .returns(retType)
@@ -85,7 +85,7 @@ public class OracleMethod {
             retType = returnType.name().toString();
         }
         return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-                + body + "\n" + tab + "}";
+            + body + "\n" + tab + "}";
 
     }
 }
