@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.23.3"
+    id "com.diffplug.spotless" version "6.25.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -70,7 +70,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.9")
+        implementation("org.slf4j:slf4j-api:2.0.11")
 
         testImplementation("ch.qos.logback:logback-classic:1.4.14")
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
