@@ -106,13 +106,13 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
 
     private JTextField getOpenJMLPanel() {
         return addFileChooserPanel("Location of openjml:", "", INFO_OPEN_JML_PATH, false, e -> {
-            settings.setOpenjmlPath(openJMLPanel.getText());
+            //settings.setOpenjmlPath(openJMLPanel.getText());
         });
     }
 
     private JTextField getObjenesisPanel() {
         return addFileChooserPanel("Location of objenesis:", "", INFO_OBJENESIS_PATH, false, e -> {
-            settings.setObjenesisPath(objenesisPanel.getText());
+            //settings.setObjenesisPath(objenesisPanel.getText());
         });
     }
 
@@ -167,8 +167,8 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         symbolicEx.setSelected(settings.getApplySymbolicExecution());
         removeDuplicates.setSelected(settings.removeDuplicates());
         checkboxRFL.setSelected(settings.useRFL());
-        objenesisPanel.setText(settings.getObjenesisPath());
-        openJMLPanel.setText(settings.getOpenjmlPath());
+        //objenesisPanel.setText(settings.getObjenesisPath());
+        //openJMLPanel.setText(settings.getOpenjmlPath());
         saveToFilePanel.setText(settings.getOutputFolderPath());
         return this;
     }
