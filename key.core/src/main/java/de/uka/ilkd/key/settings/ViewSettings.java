@@ -78,22 +78,22 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Pretty Syntax is true by default, use Unicode symbols not
      */
-    private static final String PRETTY_SYNTAX = "PrettySyntax";
+    public static final String PRETTY_SYNTAX = "PrettySyntax";
 
     /**
      *
      */
-    private static final String USE_UNICODE = "UseUnicodeSymbols";
+    public static final String USE_UNICODE = "UseUnicodeSymbols";
 
     /**
      *
      */
-    private static final String SYNTAX_HIGHLIGHTING = "SyntaxHighlighting";
+    public static final String SYNTAX_HIGHLIGHTING = "SyntaxHighlighting";
 
     /**
      *
      */
-    private static final String HIDE_PACKAGE_PREFIX = "HidePackagePrefix";
+    public static final String HIDE_PACKAGE_PREFIX = "HidePackagePrefix";
 
     /**
      * confirm exiting by default
@@ -311,7 +311,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * @return the current sizeIndex
      */
     public int sizeIndex() {
-        return sizeIndex.get();
+        return Math.toIntExact(sizeIndex.get());
     }
 
     /**

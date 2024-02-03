@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -60,6 +60,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -76,6 +77,8 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -97,6 +100,10 @@ public final class MainWindow extends JFrame {
         "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
+    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST = createFeature(
+        "BULK_UI_TEST",
+        "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
+        false);
 
     private static MainWindow instance = null;
     /**
@@ -829,8 +836,8 @@ public final class MainWindow extends JFrame {
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
+        SwingUtilities.invokeLater(this::updateSequentView);
     }
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -887,10 +894,20 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if (Main.isExperimentalMode()) {
+
+        {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
-            submenu.add(runAllProofsAction);
+            var rapItem = new JMenuItem(runAllProofsAction);
+            final Consumer<Boolean> showRAPAction = active -> {
+                if (active) {
+                    submenu.add(rapItem);
+                } else {
+                    submenu.remove(rapItem);
+                }
+            };
+            FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST, showRAPAction);
         }
+
         fileMenu.addSeparator();
         fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
@@ -1038,9 +1055,9 @@ public final class MainWindow extends JFrame {
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
+                .getSMTSettings().getUsableSolverUnions();
 
-        if (solverUnions == null || solverUnions.isEmpty()) {
+        if (solverUnions.isEmpty()) {
             updateDPSelectionMenu();
         } else {
             updateDPSelectionMenu(solverUnions);
@@ -1725,7 +1742,6 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
@@ -1791,5 +1807,4 @@ public final class MainWindow extends JFrame {
     public void setSequentView(SequentView sequentView) {
         sequentViewSearchBar.setSequentView(sequentView);
     }
-
 }
