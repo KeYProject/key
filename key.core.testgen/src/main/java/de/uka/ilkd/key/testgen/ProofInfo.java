@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
@@ -23,8 +23,13 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
+import java.util.Set;
 
 public record ProofInfo(Proof proof, Services services) {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
@@ -33,6 +38,8 @@ public record ProofInfo(Proof proof, Services services) {
         this(proof, proof.getServices());
     }
 
+
+    @Nullable
     public IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
@@ -43,6 +50,41 @@ public record ProofInfo(Proof proof, Services services) {
         }
     }
 
+    @Nullable
+    public String getMUTCall() {
+        var m = getMUT();
+        if (m == null) return null;
+
+        var name = m.getFullName();
+        if (name == null) return null;
+
+        StringBuilder params = new StringBuilder();
+        for (ParameterDeclaration p : m.getParameters()) {
+            for (VariableSpecification v : p.getVariables()) {
+                IProgramVariable var = v.getProgramVariable();
+                params.append(",").append(var.name());
+            }
+        }
+        if (!params.isEmpty()) {
+            params = new StringBuilder(params.substring(1));
+        }
+
+        String caller;
+        if (m.isStatic()) {
+            caller = getTypeOfClassUnderTest().getName();
+        } else {
+            caller = "self";
+        }
+
+        if (m.getReturnType().equals(KeYJavaType.VOID_TYPE)) {
+            return caller + "." + name + "(" + params + ");";
+        } else {
+            String returnType = m.getReturnType().getFullName();
+            return returnType + " result = " + caller + "." + name + "(" + params + ");";
+        }
+    }
+
+    @Nullable
     public KeYJavaType getTypeOfClassUnderTest() {
         if (getMUT() == null) {
             return null;
@@ -50,13 +92,14 @@ public record ProofInfo(Proof proof, Services services) {
         return getMUT().getContainerType();
     }
 
+    @Nullable
     public KeYJavaType getReturnType() {
         return getMUT().getType();
     }
 
     public Contract getContract() {
         ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
-        return po.getContract();
+        return Objects.requireNonNull(po).getContract();
     }
 
     public JTerm getPostCondition() {
