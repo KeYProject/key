@@ -9,7 +9,6 @@ import java.util.List;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

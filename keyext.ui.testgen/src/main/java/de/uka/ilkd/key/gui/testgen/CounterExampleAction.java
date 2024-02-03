@@ -18,14 +18,14 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampleGenerator;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

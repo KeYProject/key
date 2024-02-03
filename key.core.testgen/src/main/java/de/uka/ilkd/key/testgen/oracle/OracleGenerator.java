@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -677,8 +676,8 @@ public class OracleGenerator {
                 %s%s}
                 %s}
                 %sreturn false;""").formatted(
-                        tab, qv.sort().name(), qv.name(), setName, tab, tab, cond.toString(),
-                tab, tab, tab, tab, tab, tab, tab);
+            tab, qv.sort().name(), qv.name(), setName, tab, tab, cond.toString(),
+            tab, tab, tab, tab, tab, tab, tab);
     }
 
     private static OracleTerm neg(OracleTerm t) {

@@ -28,7 +28,6 @@ import de.uka.ilkd.key.testgen.TestgenUtils;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.template.Templates;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.util.collection.ImmutableList;
@@ -54,7 +53,7 @@ public abstract class AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} to use.
+     * @param ui            The {@link UserInterfaceControl} to use.
      * @param originalProof The {@link Proof} to generate test cases for.
      */
     protected AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
@@ -74,11 +73,11 @@ public abstract class AbstractTestGenerator {
         }
         if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
             log.writeln("Warning: z3 supported minimum supported version is: "
-                + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
+                    + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
         }
         if (originalProof.closed() && settings.includePostCondition()) {
             log.writeln("Cannot generate test cases from closed proof with "
-                + "\nInclude Postcondition option activated. Aborting.");
+                    + "\nInclude Postcondition option activated. Aborting.");
             return;
         }
 
@@ -95,7 +94,7 @@ public abstract class AbstractTestGenerator {
 
         log.writeln("Extracting test data constraints (path conditions).");
         proofs =
-            createProofsForTesting(settings.removeDuplicates(), !settings.includePostCondition());
+                createProofsForTesting(settings.removeDuplicates(), !settings.includePostCondition());
         if (stopRequest != null && stopRequest.shouldStop()) {
             return;
         }
@@ -111,7 +110,6 @@ public abstract class AbstractTestGenerator {
                 if (stopRequest != null && stopRequest.shouldStop()) {
                     return;
                 }
-                log.write(".");
                 final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
                 TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
                 final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
@@ -128,7 +126,7 @@ public abstract class AbstractTestGenerator {
                 } catch (final InterruptedException e) {
                     LOGGER.debug("Semantics blasting interrupted");
                     log.writeln("\n Warning: semantics blasting was interrupted. "
-                        + "A test case will not be generated.");
+                            + "A test case will not be generated.");
                 } catch (final Exception e) {
                     log.writeln(e.getLocalizedMessage());
                     LOGGER.warn("", e);
@@ -145,26 +143,26 @@ public abstract class AbstractTestGenerator {
 
         // create special smt settings for test case generation
         final ProofIndependentSMTSettings piSettings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
         piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
         final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
         final NewSMTTranslationSettings newSettings =
-            new NewSMTTranslationSettings(proof.getSettings().getNewSMTSettings());
+                new NewSMTTranslationSettings(proof.getSettings().getNewSMTSettings());
         pdSettings.setInvariantForall(settings.invariantForAll());
         // invoke z3 for counterexamples
         final DefaultSMTSettings smtsettings =
-            new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);
+                new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);
         launcher = new SolverLauncher(smtsettings);
         launcher.addListener(new SolverLauncherListener() {
             @Override
             public void launcherStopped(SolverLauncher launcher,
-                    Collection<SMTSolver> finishedSolvers) {
+                                        Collection<SMTSolver> finishedSolvers) {
                 handleLauncherStopped(launcher, finishedSolvers, log);
             }
 
             @Override
             public void launcherStarted(Collection<SMTProblem> problems,
-                    Collection<SolverType> solverTypes, SolverLauncher launcher) {
+                                        Collection<SolverType> solverTypes, SolverLauncher launcher) {
                 handleLauncherStarted(problems, solverTypes, launcher, log);
             }
         });
@@ -204,11 +202,11 @@ public abstract class AbstractTestGenerator {
      * which the emptyModality rules was applied if the selected proof is closed.
      *
      * @param removeDuplicatePathConditions - if true no identical proofs will be created
-     * @param removePostCondition - if true, remove post condition
+     * @param removePostCondition           - if true, remove post condition
      * @return a list of proofs
      */
     private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions,
-            boolean removePostCondition) {
+                                               boolean removePostCondition) {
         final List<Proof> res = new LinkedList<>();
         final List<Node> nodes = new LinkedList<>();
         final ImmutableList<Goal> oldGoals = originalProof.openGoals();
@@ -225,10 +223,10 @@ public abstract class AbstractTestGenerator {
                 Proof p;
                 if (removeDuplicatePathConditions) {
                     p = createProofForTestingNoDuplicate(oldGoalIter.next(), res,
-                        removePostCondition);
+                            removePostCondition);
                 } else {
                     p = createProofForTestingNoDuplicate(oldGoalIter.next(), null,
-                        removePostCondition);
+                            removePostCondition);
                 }
                 if (p != null) {
                     res.add(p);
@@ -243,7 +241,7 @@ public abstract class AbstractTestGenerator {
     /**
      * Adds all nodes on which the emptyModality rule was applied to the list.
      *
-     * @param root the root node
+     * @param root  the root node
      * @param nodes the nodes to be added
      */
     private void getNodesWithEmptyModalities(Node root, List<Node> nodes) {
@@ -262,18 +260,18 @@ public abstract class AbstractTestGenerator {
      * Creates a proof with the specified node as its root. If an identical proof is found in
      * otherProofs than null will be returned instead.
      *
-     * @param node the new root node
-     * @param otherProofs a list of proofs as described above
+     * @param node                the new root node
+     * @param otherProofs         a list of proofs as described above
      * @param removePostCondition if true, then remove post condition
      * @return the new proof with the specified root node
      * @throws ProofInputException exception for proof input
      */
     private Proof createProofForTestingNoDuplicate(Node node, List<Proof> otherProofs,
-            boolean removePostCondition) throws ProofInputException {
+                                                   boolean removePostCondition) throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
         Sequent newSequent =
-            Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
+                Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
         Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
         while (it.hasNext()) {
             final SequentFormula sf = it.next();
@@ -304,13 +302,13 @@ public abstract class AbstractTestGenerator {
     }
 
     protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
-            Sequent newSequent) throws ProofInputException {
+                                Sequent newSequent) throws ProofInputException {
         ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
-            new Choice("ban", "runtimeExceptions"));
+                new Choice("ban", "runtimeExceptions"));
         ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
         Proof proof = starter.getProof();
         proof.getServices().getSpecificationRepository().registerProof(
-            proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }
@@ -332,13 +330,13 @@ public abstract class AbstractTestGenerator {
 
 
     protected void handleLauncherStarted(Collection<SMTProblem> problems,
-            Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
+                                         Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
         log.writeln("Test data generation: solving " + problems.size()
-            + " SMT problems... \n please wait...");
+                + " SMT problems... \n please wait...");
     }
 
     protected void handleLauncherStopped(SolverLauncher launcher,
-            Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
+                                         Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
         try {
             log.writeln("Finished solving SMT problems: " + problemSolvers.size());
             problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
@@ -354,11 +352,8 @@ public abstract class AbstractTestGenerator {
         }
     }
 
-    protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLog log,
-            Proof originalProof) throws IOException {
-        final TestCaseGenerator tg = new TestCaseGenerator(originalProof, Templates.TEMPLATE_JUNIT4);
-        tg.setLogger(log);
-
+    protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws IOException {
+        final TestCaseGenerator tg = new TestCaseGenerator(originalProof, new TestGenerationSettings(), log);
         tg.generateJUnitTestSuite(problemSolvers);
         if (tg.isJunit()) {
             log.writeln("Compile the generated files using a Java compiler.");
@@ -371,7 +366,7 @@ public abstract class AbstractTestGenerator {
      * This method is used in the Eclipse world to show a dialog with the log.
      */
     protected void informAboutNoTestResults(SolverLauncher launcher,
-            Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
+                                            Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
     }
 
     public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(
@@ -409,13 +404,13 @@ public abstract class AbstractTestGenerator {
             }
         }
         log.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + solvedPaths + "\n"
-            + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
+                + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
         if (problem > 0) {
             log.writeln(" problems             :" + problem);
         }
         if (unknown > 0) {
             log.writeln(
-                " Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers and restart key.\n Make sure you use Z3 version 4.3.1.");
+                    " Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers and restart key.\n Make sure you use Z3 version 4.3.1.");
         }
         log.writeln("----------------------");
         return output;
