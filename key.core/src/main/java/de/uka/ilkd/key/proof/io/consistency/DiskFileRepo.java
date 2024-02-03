@@ -13,9 +13,8 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import de.uka.ilkd.key.settings.GeneralSettings;
-
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -339,7 +338,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * @throws IOException if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
-        if (!isDisposed() && !ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()) {
+        if (!isDisposed() && !ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .isNoPruningClosed()) {
             try (var s = Files.walk(tmpDir)) {
                 s.sorted(Comparator.reverseOrder())
                         // .map(Path::toFile)

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -461,7 +460,8 @@ public final class Main {
         }
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setNoPruningClosed(false);
         }
 
         if (cl.isSet(KEEP_FILEREPOS)) {
@@ -524,7 +524,8 @@ public final class Main {
              * explicitly enable pruning in closed branches for interactive mode (if not manually
              * disabled)
              */
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(cl.isSet(NO_PRUNING_CLOSED));
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setNoPruningClosed(cl.isSet(NO_PRUNING_CLOSED));
 
             MainWindow mainWindow = MainWindow.getInstance();
 

@@ -8,9 +8,8 @@ import java.io.File;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.GeneralSettings;
-
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Assertions;

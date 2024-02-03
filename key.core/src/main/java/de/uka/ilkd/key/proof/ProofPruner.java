@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import java.util.*;
+import javax.swing.*;
+
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class is responsible for pruning a proof tree at a certain cutting point. It has been
@@ -56,7 +57,8 @@ class ProofPruner {
         proof.breadthFirstSearch(cuttingPoint, (proof, visitedNode) -> {
             if (visitedNode.leaf()) {
                 // pruning in closed branches (can be disabled via "--no-pruning-closed")
-                if (!visitedNode.isClosed() || !ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()) {
+                if (!visitedNode.isClosed() || !ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getGeneralSettings().isNoPruningClosed()) {
                     if (firstLeaf == null) {
                         firstLeaf = visitedNode;
                     } else {

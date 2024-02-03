@@ -15,9 +15,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
-
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -75,8 +74,9 @@ public final class GoalBackAction extends MainWindowAction {
                     final Node selNode = getMediator().getSelectedNode();
                     // enable/disable the action (see JavaDoc of class)
                     setEnabled(selNode != null && !proof.root().leaf()
-                            && !(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()
-                            && selNode.isClosed()));
+                            && !(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                                    .isNoPruningClosed()
+                                    && selNode.isClosed()));
                 }
             }
 

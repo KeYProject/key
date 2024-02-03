@@ -225,9 +225,10 @@ public class JmlIO {
         term = services.getTermBuilder().addLabel(term, origin);
 
         List<TermLabel> labels;
-        if (FeatureSettings.isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
+        if (FeatureSettings
+                .isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
             labels = expr.second;
-        }else{
+        } else {
             labels = expr.second.stream().filter(it -> !(it instanceof SpecNameLabel)).toList();
         }
         term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(labels));
