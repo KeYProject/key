@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
 import de.uka.ilkd.key.smt.model.Model;
 import org.jspecify.annotations.Nullable;
-
-import static org.antlr.tool.LeftRecursiveRuleAnalyzer.ASSOC.left;
 
 public class TestgenUtils {
     interface AssignmentCreator {
@@ -20,18 +21,18 @@ public class TestgenUtils {
 
     public static String createAssignmentWithRfl(String type, Object left, String right) {
         if (left instanceof RefEx leftEx) {
-            return ReflectionClassCreator.NAME_OF_CLASS + "."
-                    + ReflectionClassCreator.SET_PREFIX
-                    + ReflectionClassCreator.cleanTypeName(leftEx.fieldType()) + "("
-                    + leftEx.rcObjType() + ".class, " + leftEx.rcObj() + ", \"" + leftEx.field() + "\", "
-                    + right + ");";
+            return "%s.%s%s(%s.class, %s, \"%s\", %s)".formatted(
+                    ReflectionClassCreator.NAME_OF_CLASS,
+                    ReflectionClassCreator.SET_PREFIX,
+                    ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
+                    leftEx.rcObjType(), leftEx.rcObj(), leftEx.field(), right);
         } else {
             return createAssignmentWithoutRfl(type, left, right);
         }
     }
 
     public static String createAssignmentWithoutRfl(String type, Object left, String right) {
-        return type + " " + left + " = " + right + ";";
+        return "%s %s = %s".formatted(type, left, right);
     }
 
     public static boolean isNumericType(String type) {
