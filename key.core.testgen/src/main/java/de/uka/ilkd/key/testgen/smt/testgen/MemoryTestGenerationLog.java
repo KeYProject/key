@@ -29,15 +29,6 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
      * {@inheritDoc}
      */
     @Override
-    public void write(String string) {
-        sb.append(string);
-        sb.append(NEW_LINE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void writeException(Throwable t) {
         sb.append(t.getMessage());
         sb.append(NEW_LINE);
