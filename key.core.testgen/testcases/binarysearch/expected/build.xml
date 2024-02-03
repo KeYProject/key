@@ -1,0 +1,49 @@
+<project name="MyProject" default="run" basedir=".">
+	<description>
+		simple example build file
+	</description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src"/>
+	<property name="test" location="test"/>
+	<property name="build" location="build"/>
+	<property name="lib" location="lib"/>
+	<property name="dist" location="dist"/>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}"/>
+
+		<get dest="${lib}" retries="5">
+			<url url="https://repo1.maven.org/maven2/org/objenesis/objenesis/3.3/objenesis-3.3.jar"/>
+			<url url="https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"/>
+		</get>
+	</target>
+
+	<target name="compile" depends="init"
+	        description="compile the source">
+		<!-- Compile the Java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" >
+			<src path="${src}"/>
+			<src path="${test}"/>
+
+			<classpath>
+				<pathelement path="${lib}"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="run" depends="compile">
+		<java>
+
+		</java>
+	</target>
+
+	<target name="clean"
+	        description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+</project>
