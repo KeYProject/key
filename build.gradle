@@ -79,7 +79,7 @@ subprojects {
 
         testCompileOnly 'junit:junit:4.13.2'
         testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.1'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 
         implementation("org.jspecify:jspecify:0.3.0")
     }
