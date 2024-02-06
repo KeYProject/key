@@ -7,6 +7,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * Abstract sorted operator class offering some common functionality.
+ */
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator {
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();

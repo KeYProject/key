@@ -3,5 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-public class Program {
+/**
+ * The program in a {@link org.key_project.logic.op.Modality}.
+ *
+ */
+public interface Program extends SyntaxElement {
 }

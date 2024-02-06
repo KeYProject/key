@@ -17,7 +17,8 @@ import org.key_project.util.collection.ImmutableArray;
 
 
 /**
- * Objects of this class represent function and predicate symbols. Note that program variables are a
+ * Objects of this class represent function and predicate symbols in JavaDL. Note that program
+ * variables are a
  * separate syntactic category, and not a type of function.
  * <br>
  * <strong>As soon as there is a solution for

@@ -14,7 +14,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock extends Program implements EqualsModProofIrrelevancy {
+public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**

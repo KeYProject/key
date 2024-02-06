@@ -4,7 +4,7 @@
 package org.key_project.logic;
 
 /**
- * This interface is used for AST elements of target languages, e.g., Java or Rust.
+ * This interface is used for AST elements of target languages, e.g., Java, Rust, ...
  */
 public interface LanguageElement {
 }

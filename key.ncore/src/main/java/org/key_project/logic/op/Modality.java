@@ -22,12 +22,26 @@ public abstract class Modality extends AbstractSortedOperator {
         this.kind = kind;
     }
 
+    /**
+     * The kind of this modality, e.g., box, diamond.
+     *
+     * @return The kind of the modality.
+     * @param <K> Restricts the expected type of the kind.
+     */
     public final <K extends Kind> K kind() {
         return (K) kind;
     }
 
+    /**
+     * The program contained in this modality.
+     *
+     * @return the program.
+     */
     public abstract Program program();
 
+    /**
+     * Modality kinds like box and diamond.
+     */
     public abstract static class Kind implements Named {
         private final Name name;
 
