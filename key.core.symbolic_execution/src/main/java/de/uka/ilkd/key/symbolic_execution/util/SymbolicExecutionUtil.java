@@ -72,7 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 
 /**
  * Provides utility methods for symbolic execution with KeY.
@@ -2676,7 +2676,7 @@ public final class SymbolicExecutionUtil {
             Term replaceTerm) {
         Term termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
         if (termAtPio != null) {
-            return termAtPio.equalsModProperty(replaceTerm, RENAMING_TERM_PROPERTY);
+            return termAtPio.equalsModProperty(replaceTerm, RENAMING_PROPERTY);
         } else {
             return false;
         }

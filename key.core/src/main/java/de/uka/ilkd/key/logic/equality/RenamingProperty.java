@@ -24,12 +24,12 @@ public class RenamingProperty implements TermProperty {
     /**
      * The single instance of this property.
      */
-    public static final RenamingProperty RENAMING_TERM_PROPERTY = new RenamingProperty();
+    public static final RenamingProperty RENAMING_PROPERTY = new RenamingProperty();
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
-     * through {@link RenamingProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
+     * through {@link RenamingProperty#RENAMING_PROPERTY} and is used as a parameter for
      * {@link TermProperty#equalsModThisProperty(Term, Term)}.
      */
     private RenamingProperty() {}

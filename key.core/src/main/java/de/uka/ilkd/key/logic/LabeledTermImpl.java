@@ -27,7 +27,7 @@ import org.key_project.util.java.CollectionUtil;
  * the method {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)} can be used to
  * compare terms
  * while ignoring certain
- * given properties. E.g. by using {@link RenamingProperty#RENAMING_TERM_PROPERTY}, just the
+ * given properties. E.g. by using {@link RenamingProperty#RENAMING_PROPERTY}, just the
  * term structures modulo
  * renaming are compared whilst ignoring annotations.
  * <p>

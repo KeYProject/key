@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,14 +63,14 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         Term term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
-        assertFalse(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertFalse(term1.equalsModProperty(term2, RENAMING_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
-        assertFalse(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertFalse(term2.equalsModProperty(term1, RENAMING_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
         // other tests for equality already in TestTerm.java
 
         // ------------ comparison with something that is not a term
-        assertFalse(term1.equalsModProperty(1, RENAMING_TERM_PROPERTY),
+        assertFalse(term1.equalsModProperty(1, RENAMING_PROPERTY),
             "Should be false as other object is not a term");
 
         // ------------ differing labels
@@ -80,23 +80,23 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         ImmutableArray<TermLabel> labels1 = new ImmutableArray<>(irrelevantLabel);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
 
         labels1 = new ImmutableArray<>(relevantLabel1);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
 
         ImmutableArray<TermLabel> labels2 = new ImmutableArray<>(relevantLabel2);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
             "Should be true as labels do not matter");
     }
 
