@@ -6,9 +6,9 @@ package de.uka.ilkd.key.gui.extension.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,8 @@ public class Extension<T> implements Comparable<Extension<T>> {
     }
 
     public boolean isOptional() {
-        return info != null && info.optional() && (!isExperimental() || Main.isExperimentalMode());
+        return info != null && info.optional()
+                && (!isExperimental() || FeatureSettings.isFeatureActivated(getName()));
     }
 
     public int getPriority() {
@@ -54,9 +55,10 @@ public class Extension<T> implements Comparable<Extension<T>> {
 
     public boolean isDisabled() {
         return isDisabledByMaintainer() // disabled by options
-                || (!Main.isExperimentalMode() && isExperimental()) // disabled because of wrong
-                                                                    // mode
-                || ExtensionManager.getExtensionSettings() // disabled by command line
+                // disabled because of wrong // mode
+                || (!FeatureSettings.isFeatureActivated(getName()) && isExperimental())
+                // disabled by command line
+                || ExtensionManager.getExtensionSettings()
                         .getForbiddenClasses().contains(getType().getName());
     }
 

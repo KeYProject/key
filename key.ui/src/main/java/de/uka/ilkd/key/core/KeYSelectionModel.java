@@ -149,7 +149,7 @@ public class KeYSelectionModel {
         selectedNode = node;
         selectedSequent = sequent;
         selectedRuleApp = ruleApp;
-        fireSelectedNodeChanged(node);
+        fireSelectedNodeChanged(previousNode);
     }
 
     /**
