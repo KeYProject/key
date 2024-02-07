@@ -18,7 +18,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 
 	@Override
 	public LoopInvariantGenerationResult generate() {
-		System.out.println("Relaxed LIG:  ");
+//		System.out.println("Relaxed LIG:  ");
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
@@ -35,28 +35,28 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 		}
 
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-		System.out.println("SHIFTED");
+//		System.out.println("SHIFTED");
 //		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
-//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
-		allCompPreds.add(tb.geq(index, low));//
-		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
-		for (Term arr : arrays) {
-			allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-			allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-		}
+//		// Initial Predicate Sets for stencil:
+//		allCompPreds.add(tb.geq(index, low));//
+//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+//		for (Term arr : arrays) {
+//			allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
+//			allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
+//		}
 
 		//Initial Predicate Sets for :
-//		allCompPreds.add(tb.geq(index, low));
-//		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
-//		for (Term arr : arrays) {
-//			allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, low, high)));
-//			allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, low, high)));
-//		}
+		allCompPreds.add(tb.geq(index, low));
+		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
+		for (Term arr : arrays) {
+			allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, low, high)));
+		}
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 
@@ -74,7 +74,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 
 		do {
 			itrNumber++;
-			System.out.println("Iteration Number: " + itrNumber);
+//			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.clear();
 			oldCompPreds.clear();

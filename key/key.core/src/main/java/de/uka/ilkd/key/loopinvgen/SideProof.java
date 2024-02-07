@@ -11,8 +11,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -21,12 +19,10 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Provides means to perform side proofs required by the loop invariant generator.
@@ -143,7 +139,7 @@ public class SideProof {
 		static long COUNTER=0; // only used for saving - unique filenames
 	private static void printDebugAndSaveProof(ApplyStrategyInfo info, long time) {
 		if (DEBUG_VERBOSITY == 0) return;
-		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+//		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
 		if (DEBUG_VERBOSITY > 1) {
 //			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
@@ -245,9 +241,9 @@ public class SideProof {
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
 //			System.out.println("Proving fml "+ fml + " is "+ closed);
-			if(left.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange() && right.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange()){
-				System.out.println("SUBSET IS " + closed + " for " + left + " and " + right);
-			}
+//			if(left.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange() && right.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange()){
+//				System.out.println("SUBSET IS " + closed + " for " + left + " and " + right);
+//			}
 			return closed;
 		}
 		return false;
@@ -298,7 +294,7 @@ public class SideProof {
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
-			System.out.println("Proving fml "+ fml + " is "+ closed);
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
 			return closed;
 		}
 		return false;
@@ -438,12 +434,12 @@ public class SideProof {
 	}
  */
 	protected boolean isProvable(Sequent seq2prove, Services services) {
-		System.out.println(seq2prove.succedent());
+//		System.out.println(seq2prove.succedent());
 		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
 
 	protected boolean isProvable(Sequent seq2prove, int timeout, Services services) {
-		System.out.println(seq2prove.succedent());
+//		System.out.println(seq2prove.succedent());
 		return isProvable(seq2prove, maxRuleApp, timeout, true, services);
 	}
 

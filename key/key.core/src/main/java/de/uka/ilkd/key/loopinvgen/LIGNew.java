@@ -38,8 +38,8 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		}
 
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-//		System.out.println("SHIFTED");
-//		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
+		System.out.println("SHIFTED");
+		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 
@@ -122,9 +122,9 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
 		allDepPreds.addAll(allCompPreds);
 
-//		final PredicateSetCompressor compressor =
-//				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
-//		allDepPreds = compressor.compress();
+		final PredicateSetCompressor compressor =
+				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
+		allDepPreds = compressor.compress();
 		LoopInvariantGenerationResult result = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
 		System.out.println("Loop Invariant is: " + result);
 		return result;

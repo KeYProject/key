@@ -11,15 +11,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class PredicateRefiner {
     protected final Services services;
@@ -163,7 +159,7 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-//        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
+        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
 

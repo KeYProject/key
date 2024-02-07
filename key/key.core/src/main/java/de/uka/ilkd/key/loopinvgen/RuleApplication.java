@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,10 +20,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class RuleApplication {
 
@@ -243,6 +240,12 @@ public class RuleApplication {
 //			ApplyStrategyInfo info =
 					ps.start(goals);
 //			System.out.println("info after unwind: "+info);
+
+//			try {
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopUnwind.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 
 			return currentGoal.proof().openGoals();
 		}

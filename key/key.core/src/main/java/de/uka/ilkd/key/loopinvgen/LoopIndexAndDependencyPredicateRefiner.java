@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Refinement of the predicates describing the loop index and the dependency predicates
@@ -41,9 +43,9 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
 			if(depLDT.isDependencePredicate(pred.op())){
-				System.out.println("Proving Dep Pred: " + pred);
+//				System.out.println("abel + 1 " + pred);
 				if(locSetToPredicate.hasVertex(pred.sub(0)) && locSetToPredicate.hasEdge(pred.sub(0),pred)){
-					System.out.println("In lattice " + pred);
+//					System.out.println("In lattice " + pred);
 					inlattice++;
 				}
 				else if(sequentImpliesPredicate(pred)){
@@ -81,10 +83,10 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 		for (Term w : weakenedDepPreds) {
 			if(w.arity()>0){
-				System.out.println("Checking lattice for: " + w);
+//				System.out.println("Checking lattice for: " + w);
 				if (locSetToPredicate.hasVertex(w.sub(0)) && locSetToPredicate.hasEdge(w.sub(0), w)) {
 					depPredicates.add(w);
-					System.out.println("In lattice: " + w);
+//					System.out.println("In lattice: " + w);
 					inlattice++;
 				} else {
 					if (sequentImpliesPredicate(w)) {
@@ -109,12 +111,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				}
 			}
 		}
-		System.out.println("Lattice was useful " + inlattice + " times");
+//		System.out.println("Lattice was useful " + inlattice + " times");
 //		System.out.println("DEP PREDS: " + depPredicates);
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
-			System.out.println("Proving Comp Pred: " + pred);
+//			System.out.println("Proving Comp Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 //				System.out.println("not proved Inner: "+pred);
 				unProvenCompPreds.add(pred);
@@ -127,7 +129,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 
 		for (Term w : weakenedCompPreds) {
-			System.out.println("Proving Weakened Comp Pred: " + w);
+//			System.out.println("Proving Weakened Comp Pred: " + w);
 			if (sequentImpliesPredicate(w)) {
 				compPredicates.add(w);
 			}

@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 	public Pair<Set<Term>, Set<Term>> refine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-			System.out.println("Proving Dep Pred: " + pred);
+//			System.out.println("abel + 1 " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 //				System.out.println("not implied by the seq: " + pred);
 				unProvenDepPreds.add(pred);

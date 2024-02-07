@@ -141,7 +141,7 @@ public class PredicateSetCompressor {
 //			}
 //		}
 
-		System.out.println("DepPreds 2 Deleted by Compressor " + fDepPredList);
+//		System.out.println("DepPreds 2 Deleted by Compressor " + fDepPredList);
 		return fDepPredList;
 	}
 
@@ -198,7 +198,7 @@ public class PredicateSetCompressor {
 		}
 
 		fDepPredList.removeAll(toDelete);
-		System.out.println("DepPreds Deleted by Compressor: "+toDelete);
+//		System.out.println("DepPreds Deleted by Compressor: "+toDelete);
 		return fDepPredList;
 	}
 
@@ -220,23 +220,23 @@ public class PredicateSetCompressor {
 					// Y b
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
-							System.out.println("Compression deleted: " + compPred2 + " because of " + compPred1);
+//							System.out.println("Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
-							System.out.println("1- Compression deleted: " + compPred2 + " because of " + compPred1);
+//							System.out.println("1- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("2- Compression deleted: " + compPred1 + " because of " + compPred2);
+//							System.out.println("2- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("3- Compression deleted: " + compPred2 + " because of " + compPred1);
+//							System.out.println("3- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred1);
 						}
 					}
@@ -260,32 +260,32 @@ public class PredicateSetCompressor {
 					// a
 					if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("4- Compression deleted: " + compPred1 + " because of " + compPred2);
+//							System.out.println("4- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
-							System.out.println("5- Compression deleted: " + compPred2 + " because of " + compPred1);
+//							System.out.println("5- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
-							System.out.println("6- Compression deleted: " + compPred2 + " because of " + compPred1);
+//							System.out.println("6- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("7- Compression deleted: " + compPred1 + " because of " + compPred2);
+//							System.out.println("7- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("8- Compression deleted: " + compPred1 + " because of " + compPred2);
+//							System.out.println("8- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
-							System.out.println("9- Compression deleted: " + compPred1 + " because of " + compPred2);
+//							System.out.println("9- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					}
@@ -400,7 +400,7 @@ public class PredicateSetCompressor {
 			}
 		}
 		fCompPredList.removeAll(toDelete);
-		System.out.println("CompPreds Deleted by Compressor: " + toDelete);
+//		System.out.println("CompPreds Deleted by Compressor: " + toDelete);
 		return fCompPredList;
 	}
 
