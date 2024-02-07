@@ -11,10 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -36,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -80,6 +78,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitDecls(KeYParser.DeclsContext ctx) {
         mapOf(ctx.schema_var_decls());
         mapOf(ctx.rulesOrAxioms());
+        mapOf(ctx.datatype_decls());
         return null;
     }
 
@@ -113,8 +112,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (String s : Objects.requireNonNull(ids)) {
             modalities = opSVHelper(s, modalities);
         }
-        SchemaVariable osv = schemaVariables().lookup(new Name(id));
-        osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
+        SchemaVariable osv =
+            SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
         schemaVariables().add(osv);
         return osv;
     }
@@ -165,7 +164,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             b.setAnnotations(tacletAnnotations);
             b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
-            announceTaclet(ctx, r);
+            registerTaclet(ctx, r);
             currentTBuilder.pop();
             return r;
         }
@@ -205,7 +204,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setOrigin(BuilderHelpers.getPosition(ctx));
         try {
             Taclet r = peekTBuilder().getTaclet();
-            announceTaclet(ctx, r);
+            registerTaclet(ctx, r);
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
             return r;
@@ -214,7 +213,15 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
-    private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
+    private void registerTaclet(KeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
+        var taclet = tb.getTaclet();
+        taclet2Builder.put(taclet, peekTBuilder());
+        topLevelTaclets.add(taclet);
+        LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
+            ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
+    }
+
+    private void registerTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
@@ -224,6 +231,172 @@ public class TacletPBuilder extends ExpressionBuilder {
         return currentTBuilder.peek();
     }
 
+
+    @Override
+    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        var tbAx = createAxiomTaclet(ctx);
+        registerTaclet(ctx, tbAx);
+
+        var tbInd = createInductionTaclet(ctx);
+        registerTaclet(ctx, tbInd);
+
+        var tbSplit = createConstructorSplit(ctx);
+        registerTaclet(ctx, tbSplit);
+
+        return null;
+    }
+
+
+    private TacletBuilder<? extends Taclet> createInductionTaclet(
+            KeYParser.Datatype_declContext ctx) {
+        var tacletBuilder = new NoFindTacletBuilder();
+        tacletBuilder.setName(new Name(String.format("%s_Ind", ctx.name.getText())));
+        final var sort = sorts().lookup(ctx.name.getText());
+        var phi = declareSchemaVariable(ctx, "phi", Sort.FORMULA, true,
+            false, false, new SchemaVariableModifierSet.FormulaSV());
+        var tb = services.getTermBuilder();
+        var qvar = (VariableSV) declareSchemaVariable(ctx, "x", sort,
+            true, false, false,
+            new SchemaVariableModifierSet.VariableSV());
+        // tacletBuilder.addVarsNotFreeIn(qvar, phi);
+
+        var cases = ctx.datatype_constructor().stream()
+                .map(it -> createGoalDtConstructor(it, qvar, tb.var(phi), sort))
+                .collect(Collectors.toList());
+
+        var use = tb.all(qvar, tb.var(phi));
+        var useCase = new TacletGoalTemplate(
+            Sequent.createAnteSequent(new Semisequent(new SequentFormula(use))),
+            ImmutableSLList.nil());
+        useCase.setName("Use case of " + ctx.name.getText());
+        cases.add(useCase);
+
+        cases.forEach(tacletBuilder::addTacletGoalTemplate);
+        tacletBuilder.setDisplayName("Induction_for_" + sort.name());
+        return tacletBuilder;
+    }
+
+    private TacletGoalTemplate createGoalDtConstructor(KeYParser.Datatype_constructorContext it,
+            VariableSV qvar, Term var, Sort sort) {
+        var constr = createQuantifiedFormula(it, qvar, var, sort);
+        var goal = new TacletGoalTemplate(
+            Sequent.createSuccSequent(new Semisequent(new SequentFormula(constr))),
+            ImmutableSLList.nil());
+        goal.setName(it.getText());
+        return goal;
+    }
+
+
+    private RewriteTacletBuilder<RewriteTaclet> createAxiomTaclet(
+            KeYParser.Datatype_declContext ctx) {
+        var tacletBuilder = new RewriteTacletBuilder<>();
+        tacletBuilder.setName(new Name(String.format("%s_Axiom", ctx.name.getText())));
+        final var sort = sorts().lookup(ctx.name.getText());
+        var phi = declareSchemaVariable(ctx, "phi", Sort.FORMULA, true,
+            false, false, new SchemaVariableModifierSet.FormulaSV());
+        var tb = services.getTermBuilder();
+        var qvar = (VariableSV) declareSchemaVariable(ctx, "x", sort,
+            true, false, false,
+            new SchemaVariableModifierSet.VariableSV());
+        var find = tb.all(qvar, tb.var(phi)); // \forall #x #phi
+        tacletBuilder.setFind(find);
+        tacletBuilder.addVarsNotFreeIn(qvar, phi);
+
+        var cases = ctx.datatype_constructor().stream()
+                .map(it -> createQuantifiedFormula(it, qvar, tb.var(phi), sort))
+                .collect(Collectors.toList());
+
+        var axiom = tb.equals(find, tb.and(cases));
+
+        var goal = new TacletGoalTemplate(
+            Sequent.createAnteSequent(new Semisequent(new SequentFormula(axiom))),
+            ImmutableSLList.nil());
+        tacletBuilder.addTacletGoalTemplate(goal);
+
+        tacletBuilder.setDisplayName("Axiom_for_" + sort.name());
+        return tacletBuilder;
+    }
+
+    private Term createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
+            QuantifiableVariable qvX, Term phi, Sort dt) {
+        var tb = services.getTermBuilder();
+        var fn = functions().lookup(context.name.getText());
+        if (context.argName.isEmpty())
+            return tb.subst(qvX, tb.func(fn), phi);
+
+        var args = new Term[context.argName.size()];
+
+        var argSort =
+            context.argSort.stream()
+                    .map(it -> sorts().lookup(it.getText()))
+                    .toList();
+        var argNames =
+            context.argName.stream()
+                    .map(RuleContext::getText)
+                    .toList();
+        var qvs = new ArrayList<QuantifiableVariable>(args.length);
+        var ind = new ArrayList<Term>(args.length);
+
+        for (int i = 0; i < argSort.size(); i++) {
+            final var qv = new LogicVariable(new Name(argNames.get(i)), argSort.get(i));
+            qvs.add(qv);
+            args[i] = services.getTermFactory().createTerm(qvs.get(i));
+
+            if (argSort.get(i).equals(dt)) {
+                ind.add(tb.subst(qvX, args[i], phi));
+            }
+        }
+
+        if (ind.isEmpty()) {
+            return tb.all(qvs, tb.func(fn, args));
+        } else {
+            var base = tb.and(ind);
+            return tb.all(qvs, tb.imp(base, tb.subst(qvX, tb.func(fn, args), phi)));
+        }
+    }
+
+    private RewriteTacletBuilder<RewriteTaclet> createConstructorSplit(
+            KeYParser.Datatype_declContext ctx) {
+        final var tb = services.getTermBuilder();
+
+        Map<String, Term> variables = new HashMap<>();
+        for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
+            for (int i = 0; i < context.argName.size(); i++) {
+                var name = context.argName.get(i).getText();
+                var sort = sorts().lookup(context.argSort.get(i).getText());
+                var sv = declareSchemaVariable(ctx, name, sort,
+                    false, true, false,
+                    new SchemaVariableModifierSet.TermSV());
+                variables.put(name, tb.var(sv));
+            }
+        }
+
+        final var b = new RewriteTacletBuilder<>();
+        b.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        final var sort = sorts().lookup(ctx.name.getText());
+
+        b.setName(new Name(sort.name() + "_ctor_split"));
+        b.setDisplayName("case distinction of " + sort.name());
+
+        var phi = declareSchemaVariable(ctx, "var", sort,
+            false, false, false,
+            new SchemaVariableModifierSet.TermSV());
+        b.setFind(tb.var(phi));
+        for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
+            var func = functions().lookup(context.name.getText());
+            Term[] args = new Term[context.argName.size()];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = variables.get(context.argName.get(i).getText());
+            }
+            Semisequent antec =
+                new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
+            Sequent addedSeq = Sequent.createAnteSequent(antec);
+            TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableSLList.nil());
+            goal.setName("#var = " + context.name.getText());
+            b.addTacletGoalTemplate(goal);
+        }
+        return b;
+    }
 
     @Override
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
@@ -676,7 +849,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return this.<SchemaVariable>mapOf(ctx.one_schema_var_decl());
     }
 
-    protected void declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
+    protected SchemaVariable declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
             boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
             SchemaVariableModifierSet mods) {
         SchemaVariable v;
@@ -715,6 +888,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             LOGGER.error("Override: {} {}", old, v);
         }
         schemaVariables().add(v);
+        return v;
     }
 
     public List<Taclet> getTopLevelTaclets() {
