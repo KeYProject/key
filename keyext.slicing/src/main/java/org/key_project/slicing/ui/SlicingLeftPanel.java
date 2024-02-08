@@ -139,6 +139,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private JCheckBox abbreviateFormulas = null;
     /**
+     * Checkbox to shorten chains in DOT output.
+     */
+    private JCheckBox abbreviateChains = null;
+    /**
      * Checkbox to enable the dependency analysis algorithm.
      */
     private JCheckBox doDependencyAnalysis = null;
@@ -286,7 +290,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
 
-        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
+        abbreviateFormulas = new JCheckBox("Abbreviate node labels");
+        abbreviateFormulas.setToolTipText("Replace node labels with their hash value.");
+        abbreviateChains = new JCheckBox("Shorten long chains");
+        abbreviateChains.setToolTipText("""
+                Collapse long chains when rendering the graph.
+                 When enabled: dependency graph nodes with both input and output degree equal to one
+                 will be collapsed.
+                 These shortened edges are labeled by: initial step ... last step""");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
@@ -303,12 +314,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         resetGraphLabels();
 
         abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
+        abbreviateChains.setAlignmentX(Component.LEFT_ALIGNMENT);
         dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
         showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel1.add(graphNodes);
         panel1.add(graphEdges);
         panel1.add(abbreviateFormulas);
+        panel1.add(abbreviateChains);
         panel1.add(dotExport);
         panel1.add(showGraphRendering);
 
@@ -348,7 +361,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 String text = extension.trackers.get(currentProof)
-                        .exportDot(abbreviateFormulas.isSelected());
+                        .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
                 writer.write(text);
             } catch (IOException e) {
                 LOGGER.error("failed to export DOT file", e);
@@ -374,7 +387,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             return;
         }
         String text = extension.trackers.get(currentProof)
-                .exportDot(abbreviateFormulas.isSelected());
+                .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 

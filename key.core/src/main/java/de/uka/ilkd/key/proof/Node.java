@@ -465,7 +465,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for all nodes in the subtree.
+     * @return an iterator for all nodes in the subtree (including this node).
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);

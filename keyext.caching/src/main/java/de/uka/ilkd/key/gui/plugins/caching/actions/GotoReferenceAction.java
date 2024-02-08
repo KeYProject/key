@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
 
@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  *
  * @author Arne Keller
  */
-public class GotoReferenceAction extends KeyAction {
+public final class GotoReferenceAction extends KeyAction {
 
     private final KeYMediator mediator;
     private final Node node;
