@@ -46,6 +46,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension for proof caching.
@@ -61,6 +63,8 @@ public class CachingExtension
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, KeYGuiExtension.Toolbar,
         KeYGuiExtension.MainMenu,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
+
     /**
      * The mediator.
      */
@@ -155,9 +159,15 @@ public class CachingExtension
             return;
         }
         for (Goal goal : newGoals) {
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
-                goal.node());
+            ClosedBy c = null;
+            try {
+                c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
+                    goal.node());
+            } catch (Exception exception) {
+                LOGGER.warn("error during reference search ", exception);
+            }
             if (c != null) {
+                // stop automode from working on this goal
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
