@@ -26,29 +26,21 @@ import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
-
-import org.key_project.util.helper.JsonBuilder;
-import org.key_project.util.java.XMLUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
 /**
  * Database of externally saved proofs to use in caching.
@@ -126,11 +118,12 @@ public final class CachingDatabase {
                         }).toList();
                 var branches = entry.getSection("cachedSequents");
                 for (int j = 0; j < branches.getEntries().size(); j++) {
-                    var branch = branches.getSection(Integer.toString(i));
+                    var branch = branches.getSection(Integer.toString(j));
                     cacheProofs.add(file);
                     cache.add(
-                            new CachedProofBranch(file, references, choiceSettings, keyVersion, branch.getInt("stepIndex"),
-                                    branch.getString("sequent")));
+                        new CachedProofBranch(file, references, choiceSettings, keyVersion,
+                            branch.getInt("stepIndex"),
+                            branch.getString("sequent")));
                 }
             }
             doNotSave = false;
@@ -159,18 +152,8 @@ public final class CachingDatabase {
         }
         // store cache in ~/.key/cachedProofs.json
         try {
-            var factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            var builder = factory.newDocumentBuilder();
-            var doc = builder.newDocument();
-
             var docJson = new Configuration();
 
-            var cacheEl = doc.createElement("cacheDatabase");
-            doc.appendChild(cacheEl);
-            var cachedProofs = doc.createElement("cachedProofs");
-            cacheEl.appendChild(cachedProofs);
             var cachedProofsJson = docJson.getOrCreateSection("proofs");
             int i = 0;
             var entries = cache.stream().collect(Collectors.groupingBy(w -> w.proofFile));
@@ -179,7 +162,7 @@ public final class CachingDatabase {
                 i++;
                 entryElJson.set("name", entry.get(0).proofFile.getName());
                 entryElJson.set("file", entry.get(0).proofFile.getAbsolutePath());
-                entryElJson.set("keyVersion", entry.get(0).proofFile.getAbsolutePath());
+                entryElJson.set("keyVersion", entry.get(0).keyVersion);
                 entryElJson.set("choiceSettings", entry.get(0).choiceSettings);
                 var referencedFilesJson = entryElJson.getOrCreateSection("referencedFiles");
                 int j = 0;
@@ -192,7 +175,7 @@ public final class CachingDatabase {
                 for (var branch : entry) {
                     var branchEl = branchesJson.getOrCreateSection(Integer.toString(j));
                     branchEl.set("stepIndex", branch.stepIndex);
-                    branchEl.set("sequent", branch.sequent);
+                    branchEl.set("sequent", branch.encodeSequent());
                     j++;
                 }
             }
@@ -205,14 +188,6 @@ public final class CachingDatabase {
                 entryElJson.set("hash", Integer.toString(entry.hash));
             }
             // save to file
-            /*
-            var transformerFactory = TransformerFactory.newInstance();
-            var transformer = transformerFactory.newTransformer();
-            var source = new DOMSource(doc);
-            var writer = new FileWriter(PathConfig.getCacheIndex());
-            var result = new StreamResult(writer);
-            transformer.transform(source, result);
-             */
             var writer = new FileWriter(PathConfig.getCacheIndex());
             docJson.save(writer, "Proof Caching Metadata");
             writer.close();
@@ -327,11 +302,10 @@ public final class CachingDatabase {
 
         // save sequents of candidate nodes in cache
         proof.setStepIndices();
-        // only search in compatible proofs
         String choiceSettings = proof.getSettings().getChoiceSettings().toString();
-        Queue<de.uka.ilkd.key.proof.Node> nodesToCheck = proof.closedGoals().stream().map(goal -> {
+        Queue<Node> nodesToCheck = proof.closedGoals().stream().map(goal -> {
             // first, find the initial node in this branch
-            de.uka.ilkd.key.proof.Node n = goal.node();
+            Node n = goal.node();
             if (n.parent() != null
                     && n.parent().getAppliedRuleApp().rule() == CloseAfterMerge.INSTANCE) {
                 // cannot reference this kind of branch
@@ -348,18 +322,46 @@ public final class CachingDatabase {
         finalReferences.addAll(sourceNew);
         for (var node : nodesToCheck) {
             cache.add(
-                new CachedProofBranch(file, finalReferences, choiceSettings, KeYConstants.VERSION, node.getStepIndex(),
+                new CachedProofBranch(file, finalReferences, choiceSettings, KeYConstants.VERSION,
+                    node.getStepIndex(),
                     node.sequent(), proof.getServices()));
         }
+
+        // always immediately save database
+        save();
     }
 
+    /**
+     * Find cache hits for the given sequent.
+     *
+     * @param choiceSettings choice settings of the current proof
+     * @param sequent sequent in current proof
+     * @param services services of current proof
+     * @return cached proof branches that match the provided sequent
+     */
     public static Collection<CachedProofBranch> findMatching(ChoiceSettings choiceSettings,
-            Sequent sequent) {
+            Sequent sequent, Services services) {
         init();
 
-        // TODO
+        String choiceSettingsString = choiceSettings.toString();
 
-        return List.of();
+        Set<String> anteFormulas = new HashSet<>();
+        sequent.antecedent().forEach(x -> anteFormulas
+                .add(LogicPrinter.quickPrintTerm(x.formula(), services, true, false, false)));
+        Set<String> succFormulas = new HashSet<>();
+        sequent.succedent().forEach(x -> succFormulas
+                .add(LogicPrinter.quickPrintTerm(x.formula(), services, true, false, false)));
+        List<CachedProofBranch> matching = new ArrayList<>();
+        cache.forEach(x -> {
+            if (!x.choiceSettings.equals(choiceSettingsString)) {
+                return;
+            }
+            if (x.isCacheHitFor(anteFormulas, succFormulas)) {
+                matching.add(x);
+            }
+        });
+
+        return matching;
     }
 
     /**

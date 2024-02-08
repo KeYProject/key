@@ -95,7 +95,8 @@ public class ReferenceSearchDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
 
-        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null
+                || g.node().lookup(CachedProofBranch.class) != null)) {
             getApplyButton().setEnabled(true);
         }
 

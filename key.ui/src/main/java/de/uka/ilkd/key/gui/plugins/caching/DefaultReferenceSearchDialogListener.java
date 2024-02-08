@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.*;
 
@@ -28,6 +30,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
     private static final Logger LOGGER =
         LoggerFactory.getLogger(DefaultReferenceSearchDialogListener.class);
     private final KeYMediator mediator;
+    private final List<Proof> auxiliaryProofsToClose = new ArrayList<>();
 
     public DefaultReferenceSearchDialogListener(KeYMediator mediator) {
         this.mediator = mediator;
@@ -44,12 +47,29 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
         Proof p = mediator.getSelectedProof();
         new Thread(() -> {
             try {
-                mediator.initiateAutoMode(p, true, false);
+                // first, load externally referenced goals
+                for (var closedGoal : p.closedGoals()) {
+                    var branch = closedGoal.node().lookup(CachedProofBranch.class);
+                    if (branch != null) {
+                        new RealizeFromDatabaseAction(mediator, closedGoal.node(),
+                            () -> SwingUtilities.invokeLater(() -> {
+                                auxiliaryProofsToClose.add(mediator.getSelectedProof());
+                                mediator.getSelectionModel().setSelectedProof(p);
+                                System.out.println(mediator.getSelectedProof());
+                                copyButtonClicked(dialog);
+                            })).actionPerformed(null);
+                        // now return and wait for the callback
+                        return;
+                    }
+                }
+                SwingUtilities.invokeAndWait(() -> mediator.initiateAutoMode(p, true, false));
                 CopyReferenceResolver.copyCachedGoals(p, null,
                     total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
                     () -> SwingUtilities.invokeLater(() -> {
                         if (dialog.incrementProgress()) {
                             dialog.dispose();
+                            // close auxiliary proofs
+                            auxiliaryProofsToClose.forEach(Proof::dispose);
                             new ShowProofStatistics.Window(MainWindow.getInstance(), p)
                                     .setVisible(true);
                         }

@@ -133,7 +133,7 @@ public class CachingExtension
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-
+        Runtime.getRuntime().addShutdownHook(new Thread(CachingDatabase::save));
     }
 
     @Override
@@ -156,6 +156,8 @@ public class CachingExtension
             actions.add(new CloseByReference(mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
+            actions.add(new SearchInDatabaseAction(this, node));
+            actions.add(new RealizeFromDatabaseAction(mediator, node, null));
             return actions;
         } else if (kind.getType() == Proof.class) {
             Proof proof = (Proof) underlyingObject;
@@ -343,6 +345,10 @@ public class CachingExtension
         }
     }
 
+    public void updateGUIState() {
+        referenceSearchButton.updateState(mediator.getSelectedProof());
+    }
+
     /**
      * Action to copy referenced proof steps to the new proof.
      *
@@ -384,6 +390,8 @@ public class CachingExtension
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
+            } finally {
+                node.deregister(c, ClosedBy.class);
             }
         }
     }

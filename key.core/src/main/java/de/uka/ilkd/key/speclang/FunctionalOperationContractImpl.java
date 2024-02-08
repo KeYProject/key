@@ -761,7 +761,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,
-                    useUnicodeSymbols)).append(", ");
+                    useUnicodeSymbols, true)).append(", ");
             } else {
                 sig.append(subst).append(", ");
             }
@@ -786,7 +786,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final LocationVariable baseHeap = heapLDT.getHeap();
 
         String printClause =
-            LogicPrinter.quickPrintTerm(clauseTerm, services, usePrettyPrinting, useUnicodeSymbols);
+            LogicPrinter.quickPrintTerm(clauseTerm, services, usePrettyPrinting, useUnicodeSymbols,
+                true);
         clause = clause + (includeHtmlMarkup ? "<br><b>" : "\n") + text
                 + (h == baseHeap ? "" : "[" + h + "]") + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printClause, false)
@@ -819,7 +820,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (globalDefs != null) {
             globalDefs = includeHtmlMarkup ? tb.unlabelRecursive(globalDefs) : globalDefs;
             final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services,
-                usePrettyPrinting, useUnicodeSymbols);
+                usePrettyPrinting, useUnicodeSymbols, true);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
@@ -876,7 +877,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         final String mby = hasMby
                 ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting,
-                    useUnicodeSymbols)
+                    useUnicodeSymbols, true)
                 : null;
 
         final String mods = getModifiesText(originalMods, hasRealModifiesClause, includeHtmlMarkup,
