@@ -45,22 +45,19 @@ public final class ReferenceSearcher {
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
-                continue; // doesn't make sense
+                continue; // doesn't make sense to cache in the same proof
             }
             // conservative check: all user-defined rules in a previous proof
             // have to also be available in the new proof
             var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
             var tacletIndex = p.allGoals().head().ruleAppIndex().tacletIndex();
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
-            Set<NoPosTacletApp> newTaclets = null;
+            Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
             var tacletsOk = true;
             for (var taclet : tacletIndex.allNoPosTacletApps().stream()
                     .filter(x -> x.taclet().getOrigin() != null
                             && x.taclet().getOrigin().contains(proofFile))
                     .toList()) {
-                if (newTaclets == null) {
-                    newTaclets = newTacletIndex.allNoPosTacletApps();
-                }
                 if (newTaclets.stream().noneMatch(newTaclet -> Objects
                         .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
                     tacletsOk = false;
@@ -88,7 +85,16 @@ public final class ReferenceSearcher {
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
             var depTracker = p.lookup(DependencyTracker.class);
-            AnalysisResults results = depTracker != null ? depTracker.analyze(true, false) : null;
+            AnalysisResults results = null;
+            // only try to get analysis results if it is a pure proof
+            if (depTracker != null && p.closedGoals().stream()
+                    .noneMatch(x -> x.node().lookup(ClosedBy.class) != null)) {
+                try {
+                    results = depTracker.analyze(true, false);
+                } catch (Exception ignored) {
+                    // if the analysis for some reason fails, we simply proceed as usual
+                }
+            }
             while (!nodesToCheck.isEmpty()) {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
@@ -119,8 +125,9 @@ public final class ReferenceSearcher {
                 Set<Node> toSkip = new HashSet<>();
                 if (results != null) {
                     // computed skipped nodes by iterating through all nodes
+                    AnalysisResults finalResults = results;
                     n.subtreeIterator().forEachRemaining(x -> {
-                        if (!results.usefulSteps.contains(x)) {
+                        if (!finalResults.usefulSteps.contains(x)) {
                             toSkip.add(x);
                         }
                     });
