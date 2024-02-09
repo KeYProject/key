@@ -99,7 +99,7 @@ public class OverloadedOperatorHandler {
         this.integerHandler = new IntegerHandler(services, specMathMode);
 
         handlers.add(new BinaryBooleanHandler(services));
-        // handlers.add(new SequenceHandler(services));
+        handlers.add(new SequenceHandler(services));
         // handlers.add(new LocSetHandler(services));
         handlers.add(this.integerHandler);
         handlers.add(new FloatHandler(services));
