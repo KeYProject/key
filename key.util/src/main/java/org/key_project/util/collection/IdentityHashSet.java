@@ -58,17 +58,17 @@ public final class IdentityHashSet<T extends @Nullable Object> implements Set<T>
         return innerMap.keySet().iterator();
     }
 
-    @SuppressWarnings("nullness") // see
-                                  // https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    @SuppressWarnings({"nullness","override.return.invalid"})
     @Override
     public @Nullable Object[] toArray() {
         return innerMap.keySet().toArray();
     }
 
-    @SuppressWarnings("nullness") // see
-                                  // https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    @SuppressWarnings({"nullness","override.return.invalid"})
     @Override
-    public <T1> T1[] toArray(T1[] a) {
+    public <T> T[] toArray(T[] a) {
         return innerMap.keySet().toArray(a);
     }
 
