@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -62,6 +60,10 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
      */
     private DefaultImmutableSet(ImmutableList<T> elementList) {
         this.elementList = elementList;
+    }
+
+    public static <T> ImmutableSet<T> fromCollection(Collection<T> seq) {
+        return new DefaultImmutableSet<>(ImmutableList.fromList(seq));
     }
 
     // private static HashSet<String> previousComplains = new HashSet<>();

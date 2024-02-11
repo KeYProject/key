@@ -81,10 +81,11 @@ subprojects {
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
         compileOnly 'org.jspecify:jspecify:0.3.0'
-        compileOnly 'io.github.eisop:checker-qual:3.34.0-eisop1'
-        compileOnly 'io.github.eisop:checker-util:3.34.0-eisop1'
-        testCompileOnly 'io.github.eisop:checker-qual:3.34.0-eisop1'
-        checkerFramework 'io.github.eisop:checker:3.34.0-eisop1'
+        def eisop_version = "3.42.0-eisop2"
+        compileOnly "io.github.eisop:checker-qual:$eisop_version"
+        compileOnly "io.github.eisop:checker-util:$eisop_version"
+        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
+        checkerFramework "io.github.eisop:checker:$eisop_version"
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
         testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.3'
