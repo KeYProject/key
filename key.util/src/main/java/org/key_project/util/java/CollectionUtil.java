@@ -6,6 +6,8 @@ package org.key_project.util.java;
 import java.util.*;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides static methods to work with {@link Collection}s.
  *
@@ -173,7 +175,7 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T search(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T> @Nullable T search(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
         if (iterable != null && filter != null) {
             Iterator<T> iter = iterable.iterator();
@@ -195,7 +197,7 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T> @Nullable T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
         if (iterable != null && filter != null) {
             Iterator<T> iter = iterable.iterator();
@@ -218,7 +220,8 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T, E extends Throwable> T searchAndRemoveWithException(Iterable<T> iterable,
+    public static <T, E extends Throwable> @Nullable T searchAndRemoveWithException(
+            Iterable<T> iterable,
             IFilterWithException<T, E> filter) throws E {
         T result = null;
         if (iterable != null && filter != null) {
@@ -314,7 +317,7 @@ public class CollectionUtil {
      * @param iterable The {@link Iterable} to remove first element from.
      * @return The removed first element or {@code null} if no element was removed.
      */
-    public static <T> T removeFirst(Iterable<T> iterable) {
+    public static <T> @Nullable T removeFirst(Iterable<T> iterable) {
         try {
             if (iterable != null) {
                 Iterator<T> iter = iterable.iterator();

@@ -9,6 +9,22 @@ on:
       - 'KeY-*'
 
 jobs:
+  checkerFramework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'corretto'
+          cache: 'gradle'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: -DENABLE_NULLNESS=true compileTest
+
+
   qodana:
     runs-on: ubuntu-latest
     steps:

@@ -46,7 +46,6 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
-
 public final class OneStepSimplifier implements BuiltInRule {
 
     /**

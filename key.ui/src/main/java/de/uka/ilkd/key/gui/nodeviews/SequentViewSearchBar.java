@@ -21,8 +21,6 @@ import de.uka.ilkd.key.util.Pair;
 
 import org.jspecify.annotations.NonNull;
 
-
-
 /*
  * Search bar implementing search function for SequentView.
  */

@@ -31,7 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-
 public final class UseDependencyContractRule implements BuiltInRule {
 
     public static final UseDependencyContractRule INSTANCE = new UseDependencyContractRule();

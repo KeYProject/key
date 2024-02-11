@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Provides a basic implementation of {@link IRunnableWithResult}.
@@ -20,13 +22,13 @@ public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWith
     /**
      * The result.
      */
-    private T result;
+    private @Nullable T result;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T getResult() {
+    public @Nullable T getResult() {
         return result;
     }
 
@@ -35,7 +37,7 @@ public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWith
      *
      * @param result The result to set.
      */
-    protected void setResult(T result) {
+    protected void setResult(@Nullable T result) {
         this.result = result;
     }
 }

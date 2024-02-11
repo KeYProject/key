@@ -10,9 +10,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Utilities for Collections.
- *
  *
  * @author Alexander Weigl
  * @version 1 (29.03.19)
@@ -27,9 +29,11 @@ public class KeYCollections {
      * first one.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+        @Nullable
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
-        return res;
+        // After arraycopy, all elements of res are NonNull.
+        return NullnessUtil.castNonNullDeep(res);
     }
 
     // =======================================================
@@ -58,9 +62,12 @@ public class KeYCollections {
         }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
-            final U value = m1.get(e.getValue());
-            if (value != null) {
-                res.put(e.getKey(), value);
+            final T v1 = e.getValue();
+            if (v1 != null) {
+                final U value = m1.get(v1);
+                if (value != null) {
+                    res.put(e.getKey(), value);
+                }
             }
         }
         return res;

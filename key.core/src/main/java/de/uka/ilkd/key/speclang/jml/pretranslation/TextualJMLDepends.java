@@ -15,7 +15,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
  * *methods* are part of TextualJMLSpecCase.

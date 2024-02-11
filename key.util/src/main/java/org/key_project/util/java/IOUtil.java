@@ -16,6 +16,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
+import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides static methods to work with java IO.
  *
@@ -43,7 +47,7 @@ public final class IOUtil {
      *
      * @return The home directory.
      */
-    public static File getHomeDirectory() {
+    public static @Nullable File getHomeDirectory() {
         String path = System.getProperty("user.home");
         if (path != null) {
             return new File(path);
@@ -58,7 +62,7 @@ public final class IOUtil {
      * @param file The file to extract it extension.
      * @return The file extension or {@code null} if not available.
      */
-    public static String getFileExtension(File file) {
+    public static @Nullable String getFileExtension(@Nullable File file) {
         if (file != null) {
             String name = file.getName();
             int dotIndex = name.lastIndexOf('.');
@@ -79,7 +83,7 @@ public final class IOUtil {
      *        needed.
      * @return The file name without extension or {@code null} if it was not possible to compute it.
      */
-    public static String getFileNameWithoutExtension(String fileName) {
+    public static @PolyNull String getFileNameWithoutExtension(@PolyNull String fileName) {
         if (fileName != null) {
             int dotIndex = fileName.lastIndexOf('.');
             if (dotIndex >= 0) {
@@ -149,7 +153,7 @@ public final class IOUtil {
      *         existing file.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(File file) throws IOException {
+    public static @Nullable String readFrom(@Nullable File file) throws IOException {
         if (file != null && file.isFile()) {
             return readFrom(new FileInputStream(file));
         } else {
@@ -164,7 +168,7 @@ public final class IOUtil {
      * @return The read content or {@code null} if the {@link InputStream} is {@code null}.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(InputStream in) throws IOException {
+    public static @PolyNull String readFrom(@PolyNull InputStream in) throws IOException {
         if (in == null) {
             return null;
         }
@@ -214,7 +218,8 @@ public final class IOUtil {
      * @param encoding The encoding to use.
      * @throws IOException Occurred Exception.
      */
-    public static void writeTo(OutputStream out, String content, String encoding)
+    public static void writeTo(@Nullable OutputStream out, @Nullable String content,
+            @Nullable String encoding)
             throws IOException {
         if (out == null || content == null) {
             return;
@@ -299,7 +304,8 @@ public final class IOUtil {
      * @return The computed start indices.
      * @throws IOException Occurred Exception.
      */
-    public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
+    public static LineInformation[] computeLineInformation(@Nullable InputStream in)
+            throws IOException {
         if (in == null) {
             return new LineInformation[0];
         }
@@ -592,7 +598,8 @@ public final class IOUtil {
      * @return A new {@link InputStream} with with the replaced line breaks.
      * @throws IOException Occurred Exception.
      */
-    public static InputStream unifyLineBreaks(InputStream in) throws IOException {
+    public static @PolyNull InputStream unifyLineBreaks(@PolyNull InputStream in)
+            throws IOException {
         if (in != null) {
             String text = IOUtil.readFrom(in);
             text = text.replace("\r\n", "\n");
@@ -630,7 +637,7 @@ public final class IOUtil {
      * @return {@code true} child is contained (recursive) in parent, {@code false} child is not
      *         contained in parent.
      */
-    public static boolean contains(File parent, File child) {
+    public static boolean contains(@Nullable File parent, @Nullable File child) {
         boolean contains = false;
         if (parent != null && child != null) {
             while (!contains && child != null) {
@@ -715,35 +722,35 @@ public final class IOUtil {
         return file != null && file.exists();
     }
 
-    public static URL getClassLocationURL(Class<?> classInstance) {
+    public static @Nullable URL getClassLocationURL(Class<?> classInstance) {
         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
         return cs != null ? cs.getLocation() : null;
     }
 
-    public static File getClassLocation(Class<?> classInstance) {
-        if (classInstance != null) {
-            return toFile(getClassLocationURL(classInstance));
-        } else {
+    public static @Nullable File getClassLocation(@Nullable Class<?> classInstance) {
+        if (classInstance == null) {
             return null;
+        } else {
+            return toFile(getClassLocationURL(classInstance));
         }
     }
 
-    public static File getProjectRoot(Class<?> classInstance) {
+    public static @Nullable File getProjectRoot(Class<?> classInstance) {
         File file = getClassLocation(classInstance);
         return file != null ? file.getParentFile() : null;
     }
 
-    public static File toFile(URL url) {
+    public static @Nullable File toFile(@Nullable URL url) {
         URI uri = toURI(url);
         return uri != null ? new File(uri) : null;
     }
 
-    public static String toFileString(URL url) {
+    public static @Nullable String toFileString(@Nullable URL url) {
         File file = toFile(url);
         return file != null ? file.toString() : null;
     }
 
-    public static URI toURI(URL url) {
+    public static @Nullable URI toURI(@Nullable URL url) {
         try {
             if (url != null) {
                 String protocol = url.getProtocol();
@@ -774,7 +781,10 @@ public final class IOUtil {
      * @return The current directory.
      */
     public static File getCurrentDirectory() {
-        return new File(".").getAbsoluteFile().getParentFile();
+        File result = new File(".").getAbsoluteFile().getParentFile();
+        assert result != null
+                : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
+        return result;
     }
 
     /**
@@ -793,7 +803,7 @@ public final class IOUtil {
      * @param name The segment to validate.
      * @return The validated OS independent path segment in which each invalid sign is replaced.
      */
-    public static String validateOSIndependentFileName(String name) {
+    public static @PolyNull String validateOSIndependentFileName(@PolyNull String name) {
         if (name != null) {
             char[] latinBig = StringUtil.LATIN_ALPHABET_BIG.toCharArray();
             char[] latinSmall = StringUtil.LATIN_ALPHABET_SMALL.toCharArray();
@@ -839,7 +849,12 @@ public final class IOUtil {
                     Files.createDirectories(path);
                 } else {
                     // create nonexistent parent directories and then extract the file
-                    Files.createDirectories(path.getParent());
+                    // Since path is the result of resolving a zip entry name in the
+                    // target directory, it does have a parent.
+                    @SuppressWarnings("nullness")
+                    @NonNull
+                    Path parent = path.getParent();
+                    Files.createDirectories(parent);
                     Files.copy(zin, path);
                 }
             }

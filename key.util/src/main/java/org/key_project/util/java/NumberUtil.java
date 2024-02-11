@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
+
 /**
  * Provides utility methods to work with numbers.
  *

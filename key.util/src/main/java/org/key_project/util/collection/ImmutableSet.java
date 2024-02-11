@@ -9,58 +9,38 @@ import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
  * offer a public static final variable .<called>nil()
  */
-
-public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
+public interface ImmutableSet<T extends @Nullable Object>
+        extends Iterable<T>, java.io.Serializable {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableSet.
      *
      * @return a Collector that accumulates the input elements into a new ImmutableSet.
      */
-    static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
+    @SuppressWarnings("nullness") // it seems some annotations are missing on Collector.of ...
+    static <T extends @Nullable Object> Collector<T, Set<T>, ImmutableSet<T>> collector() {
         return Collector.of(HashSet::new, Set::add, (set1, set2) -> {
             set1.addAll(set2);
             return set1;
-        }, ImmutableSet::fromSet, Characteristics.UNORDERED);
-    }
-
-    /**
-     * Creates an ImmutableSet from a Set.
-     *
-     * @param set a Set.
-     * @return an ImmutableSet containing the same elements as the specified set.
-     */
-    static <T> ImmutableSet<T> fromSet(Set<T> set) {
-        ImmutableSet<T> result = DefaultImmutableSet.nil();
-
-        for (T el : set) {
-            result = result.add(el);
-        }
-
-        return result;
+        }, Immutables::createSetFrom, Characteristics.UNORDERED);
     }
 
     /**
      * Builds a single set with the given obj.
      */
-    static <T> ImmutableSet<T> singleton(T obj) {
+    static <T extends @Nullable Object> ImmutableSet<T> singleton(T obj) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
         return result.add(obj);
     }
 
-    static <T> ImmutableSet<T> empty() {
+    static <T extends @Nullable Object> ImmutableSet<T> empty() {
         return DefaultImmutableSet.nil();
-    }
-
-
-    static <T> ImmutableSet<T> fromCollection(@NonNull Collection<? extends T> seq) {
-        return fromSet(new HashSet<>(seq));
     }
 
     /**
@@ -115,7 +95,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @return true iff the this set is subset of o and vice versa.
      */
     @Override
-    boolean equals(Object o);
+    boolean equals(@Nullable Object o);
 
     @Override
     int hashCode();
