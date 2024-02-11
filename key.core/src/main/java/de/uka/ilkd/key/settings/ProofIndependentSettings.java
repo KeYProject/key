@@ -77,6 +77,9 @@ public class ProofIndependentSettings {
             if (lastReadedProperties != null) {
                 settings.readSettings(lastReadedProperties);
             }
+            if (lastReadedConfiguration != null) {
+                settings.readSettings(lastReadedConfiguration);
+            }
         }
     }
 
