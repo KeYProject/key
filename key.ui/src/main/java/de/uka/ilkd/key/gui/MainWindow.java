@@ -833,6 +833,9 @@ public final class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Update the sequent view.
+     */
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());

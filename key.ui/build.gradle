@@ -29,6 +29,7 @@ dependencies {
     api 'org.key-project:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
+    runtimeOnly project(":keyext.caching")
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")

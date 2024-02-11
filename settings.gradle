@@ -13,6 +13,7 @@ include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
+include 'keyext.caching'
 
 // ENABLE NULLNESS here or on the CLI
-System.setProperty("ENABLE_NULLNESS", "true")
+// System.setProperty("ENABLE_NULLNESS", "true")
