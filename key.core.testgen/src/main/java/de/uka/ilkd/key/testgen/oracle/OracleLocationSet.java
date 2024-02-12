@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
-import java.util.HashSet;
-import java.util.Set;
+import static de.uka.ilkd.key.testgen.oracle.OracleLocationSets.ALL_LOCS;
+import static de.uka.ilkd.key.testgen.oracle.OracleLocationSets.EMPTY;
 
-sealed interface OracleLocationSet {
-    EmptyOracleLocationSet EMPTY = new EmptyOracleLocationSet();
-    AllLocsLocationSet ALL_LOCS = new AllLocsLocationSet();
+public sealed
+interface OracleLocationSet permits AllLocsLocationSet, EmptyOracleLocationSet, OracleDefaultLocationSet {
 
     static OracleLocationSet singleton(OracleLocation loc) {
         var result = new OracleDefaultLocationSet();
@@ -17,7 +16,6 @@ sealed interface OracleLocationSet {
     }
 
     static OracleLocationSet union(OracleLocationSet l1, OracleLocationSet l2) {
-
         if (l1 == ALL_LOCS || l2 == ALL_LOCS) {
             return ALL_LOCS;
         }
@@ -70,76 +68,4 @@ sealed interface OracleLocationSet {
     }
 
     boolean contains(OracleLocation l);
-}
-
-final class OracleDefaultLocationSet implements OracleLocationSet {
-    final Set<OracleLocation> locs = new HashSet<>();
-
-    void add(OracleLocation loc) {
-        locs.add(loc);
-    }
-
-    void add(OracleLocationSet loc) {
-        if (loc instanceof OracleDefaultLocationSet o)
-            locs.addAll(o.locs);
-    }
-
-    @Override
-    public boolean contains(OracleLocation l) {
-        for (OracleLocation loc : locs) {
-            if (loc.equals(l)) {
-                return true;
-            }
-
-            if (loc.isAllFields() && loc.object().equals(l.object())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-
-        result.append("{");
-
-        for (OracleLocation loc : locs) {
-            result.append(loc).append(" ");
-        }
-
-        result.append("}");
-
-
-        return result.toString();
-
-
-    }
-
-}
-
-
-final class EmptyOracleLocationSet implements OracleLocationSet {
-    @Override
-    public boolean contains(OracleLocation l) {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Empty";
-
-    }
-}
-
-
-final class AllLocsLocationSet implements OracleLocationSet {
-    @Override
-    public boolean contains(OracleLocation l) {
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "All";
-    }
 }

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
@@ -16,13 +17,7 @@ public record OracleMethodCall(OracleMethod method, List<? extends OracleTerm> a
 
     public String toString() {
         String methodName = method.getMethodName();
-        StringBuilder aString = new StringBuilder();
-        for (OracleTerm arg : args) {
-            aString.append(" ").append(arg.toString()).append(",");
-        }
-        if (!args.isEmpty()) {
-            aString = new StringBuilder(aString.substring(0, aString.length() - 1));
-        }
+        String aString = args.stream().map(Object::toString).collect(Collectors.joining(", "));
         if (caller != null) {
             return caller + "." + methodName + "(" + aString + ")";
         } else {
