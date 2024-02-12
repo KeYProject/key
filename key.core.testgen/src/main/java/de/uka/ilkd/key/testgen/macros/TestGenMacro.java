@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.macros;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.Nullable;
+
 public class TestGenMacro extends StrategyProofMacro {
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
@@ -40,11 +41,10 @@ public class TestGenMacro extends StrategyProofMacro {
     }
 
     @Override
+    @Nullable
     public String getCategory() {
         return null;
     }
-
-
 }
 
 
@@ -54,22 +54,18 @@ public class TestGenMacro extends StrategyProofMacro {
  */
 class TestGenStrategy extends FilterStrategy {
     private static final Name NAME = new Name(TestGenStrategy.class.getSimpleName());
-    private static final Set<String> unwindRules;
+    private static final Set<String> unwindRules = Set.of(
+        "loopUnwind", "doWhileUnwind", "methodCall", "methodCallWithAssignment",
+        "staticMethodCall", "staticMethodCallWithAssignment");
     private static final int UNWIND_COST = 1000;
     private final int limit;
-    /** the modality cache used by this strategy */
-    private final ModalityCache modalityCache = new ModalityCache();
-    static {
-        unwindRules = new HashSet<>();
-        TestGenStrategy.unwindRules.add("loopUnwind");
-        TestGenStrategy.unwindRules.add("doWhileUnwind");
-        TestGenStrategy.unwindRules.add("methodCall");
-        TestGenStrategy.unwindRules.add("methodCallWithAssignment");
-        TestGenStrategy.unwindRules.add("staticMethodCall");
-        TestGenStrategy.unwindRules.add("staticMethodCallWithAssignment");
-    }
 
-    private static boolean isUnwindRule(Rule rule) {
+    /**
+     * the modality cache used by this strategy
+     */
+    private final ModalityCache modalityCache = new ModalityCache();
+
+    private static boolean isUnwindRule(@Nullable Rule rule) {
         if (rule == null) {
             return false;
         }

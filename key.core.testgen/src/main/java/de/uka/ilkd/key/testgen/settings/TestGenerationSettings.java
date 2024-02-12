@@ -23,10 +23,8 @@ public class TestGenerationSettings extends AbstractSettings {
             System.getProperty("user.home") + File.separator + "testFiles";
     private static final boolean DEFAULT_REMOVEDUPLICATES = true;
     private static final boolean DEFAULT_USERFL = false;
-    private static final Format DEFAULT_USEJUNIT = Format.Plain;
+    private static final Format DEFAULT_USEJUNIT = Format.JUnit4;
     private static final boolean DEFAULT_INVARIANTFORALL = true;
-    private static final String DEFAULT_OPENJMLPATH = ".";
-    private static final String DEFAULT_OBJENESISPATH = ".";
     private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
     // endregion
 
@@ -39,8 +37,6 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final String PROP_USE_JUNIT = "UseJUnit";
     private static final String PROP_CONCURRENT_PROCESSES = "ConcurrentProcesses";
     private static final String PROP_INVARIANT_FOR_ALL = "InvariantForAll";
-    private static final String PROP_OPENJML_PATH = "OpenJMLPath";
-    private static final String PROP_OBJENESIS_PATH = "ObjenesisPath";
     private static final String PROP_INCLUDE_POST_CONDITION =
             "IncludePostCondition";
     private static final String CATEGORY = "TestGenSettings";
@@ -65,7 +61,7 @@ public class TestGenerationSettings extends AbstractSettings {
         outputPath = DEFAULT_OUTPUTPATH;
         removeDuplicates = DEFAULT_REMOVEDUPLICATES;
         useRFL = DEFAULT_USERFL;
-        format = Format.Plain;
+        format = Format.JUnit4;
         concurrentProcesses = DEFAULT_CONCURRENTPROCESSES;
         invariantForAll = DEFAULT_INVARIANTFORALL;
         includePostCondition = DEFAULT_INCLUDEPOSTCONDITION;
@@ -238,7 +234,7 @@ public class TestGenerationSettings extends AbstractSettings {
         setOutputPath(cat.getString(PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(cat.getBool(PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
         setRFL(cat.getBool(PROP_USE_RFL, DEFAULT_USERFL));
-        setFormat(cat.getEnum(PROP_USE_JUNIT, Format.Plain));
+        setFormat(cat.getEnum(PROP_USE_JUNIT, Format.JUnit4));
         setConcurrentProcesses(cat.getInt(PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(cat.getBool(PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setIncludePostCondition(

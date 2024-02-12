@@ -30,7 +30,10 @@ import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +50,9 @@ public abstract class AbstractTestGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestGenerator.class);
     private final UserInterfaceControl ui;
     private final Proof originalProof;
+    @Nullable
     private SolverLauncher launcher;
-    private List<Proof> proofs;
+    private List<Proof> proofs = new ArrayList<>();
 
     /**
      * Constructor.
@@ -61,11 +65,8 @@ public abstract class AbstractTestGenerator {
         this.originalProof = originalProof;
     }
 
-    public void generateTestCases(final StopRequest stopRequest, final TestGenerationLog log) {
-
-
+    public void generateTestCases(final StopRequest stopRequest, final TestGenerationLogger log) {
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
-
 
         if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
             log.writeln("Could not find the z3 SMT solver. Aborting.");
@@ -330,13 +331,13 @@ public abstract class AbstractTestGenerator {
 
 
     protected void handleLauncherStarted(Collection<SMTProblem> problems,
-                                         Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
+            Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLogger log) {
         log.writeln("Test data generation: solving " + problems.size()
                 + " SMT problems... \n please wait...");
     }
 
     protected void handleLauncherStopped(SolverLauncher launcher,
-                                         Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
+            Collection<SMTSolver> problemSolvers, TestGenerationLogger log) {
         try {
             log.writeln("Finished solving SMT problems: " + problemSolvers.size());
             problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
@@ -346,13 +347,13 @@ public abstract class AbstractTestGenerator {
                 log.writeln("No test data was generated.");
                 informAboutNoTestResults(launcher, problemSolvers, log, originalProof);
             }
-            log.testGenerationCompleted();
+            log.close();
         } catch (Exception e) {
             log.writeException(e);
         }
     }
 
-    protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws IOException {
+    protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLogger log, Proof originalProof) throws IOException {
         final TestCaseGenerator tg = new TestCaseGenerator(originalProof, new TestGenerationSettings(), log);
         tg.generateJUnitTestSuite(problemSolvers);
         if (tg.isJunit()) {
@@ -366,11 +367,11 @@ public abstract class AbstractTestGenerator {
      * This method is used in the Eclipse world to show a dialog with the log.
      */
     protected void informAboutNoTestResults(SolverLauncher launcher,
-                                            Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
+            Collection<SMTSolver> problemSolvers, TestGenerationLogger log, Proof originalProof) {
     }
 
     public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(
-            Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
+            Collection<SMTSolver> problemSolvers, TestGenerationLogger log) {
         int unknown = 0;
         int infeasiblePaths = 0;
         int solvedPaths = 0;

@@ -120,9 +120,6 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     public void dispose() {
         if (showInMainWindow) {
             List<Proof> proofs = getProofs();
-            if (proofs == null) {
-                return;
-            }
             for (final Proof p : proofs) {
                 if (MainWindow.getInstance().getProofList().containsProof(p)) {
                     p.dispose();
