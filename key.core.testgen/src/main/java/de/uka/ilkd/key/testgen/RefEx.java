@@ -17,8 +17,8 @@ public record RefEx(@Nullable String rcObjType, String rcObj, String fieldType, 
     @Override
     public String toString() {
         if (rcObjType != null && !rcObjType.isEmpty()) {
-            return "((" + rcObjType + ")" + rcObj + ")." + field;
+            return "((%s)%s).%s".formatted(rcObjType, rcObj, field);
         }
-        return rcObj + "." + field;
+        return "%s.%s".formatted(rcObj, field);
     }
 }
