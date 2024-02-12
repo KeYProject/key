@@ -5,6 +5,6 @@ package de.uka.ilkd.key.testgen.oracle;
 
 public record OracleBinTerm(String op, OracleTerm left, OracleTerm right) implements OracleTerm {
     public String toString() {
-        return "(" + left.toString() + " " + op + " " + right.toString() + ")";
+        return "(%s %s %s)".formatted(left, op, right);
     }
 }

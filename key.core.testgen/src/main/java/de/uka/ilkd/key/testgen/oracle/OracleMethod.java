@@ -5,12 +5,13 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.testgen.template.Constants.TAB;
 
@@ -70,7 +71,6 @@ public class OracleMethod {
 
     @Override
     public String toString() {
-        String tab = TAB;
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
@@ -84,8 +84,8 @@ public class OracleMethod {
         if (returnType != null) {
             retType = returnType.name().toString();
         }
-        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-            + body + "\n" + tab + "}";
+        return "%spublic %s %s(%s){\n%s%s%s\n%s}".formatted(TAB, retType, methodName, argString,
+            TAB, TAB, body, TAB);
 
     }
 }

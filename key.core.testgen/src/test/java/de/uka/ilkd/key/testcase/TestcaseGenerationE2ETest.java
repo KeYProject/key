@@ -12,7 +12,16 @@ public class TestcaseGenerationE2ETest {
     @Test
     public void binarySearch() throws ProblemLoaderException, InterruptedException {
         TGMain.main(new String[]{
-            "--output", "testcases/binarysearch/actual", "testcases/binarysearch/attempt.proof"
+                "--output", "testcases/binarysearch/actual", "testcases/binarysearch/attempt.proof"
+        });
+    }
+
+    @Test
+    public void arrayUtil() throws ProblemLoaderException, InterruptedException {
+        TGMain.main(new String[]{
+                "--all-contracts",
+                "--output", "testcases/arrayutil/actual",
+                "testcases/arrayutil/src/"
         });
     }
 }

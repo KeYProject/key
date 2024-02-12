@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.smt.testgen;
 
-public interface TestGenerationLog {
-    void writeln(String string);
+public interface TestGenerationLogger {
+    void writeln(String message);
 
-    void writeException(Throwable t);
+    void writeException(Throwable throwable);
 
-    void testGenerationCompleted();
+    void close();
 }

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
      */
     public static void generateTestcases(KeYEnvironment<?> env, Proof proof,
                                          TestGenerationSettings settings,
-                                         @Nullable TestGenerationLog log) throws InterruptedException {
+                                         @Nullable TestGenerationLogger log) throws InterruptedException {
         final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, log);
 
         NewSMTTranslationSettings newSettings = new NewSMTTranslationSettings();

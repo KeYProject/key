@@ -6,11 +6,11 @@ package de.uka.ilkd.key.testgen.smt.testgen;
 import static de.uka.ilkd.key.testgen.template.Constants.NEW_LINE;
 
 /**
- * Implementation of {@link TestGenerationLog} which stores the log in memory.
+ * Implementation of {@link TestGenerationLogger} which stores the log in memory.
  *
  * @author Martin Hentschel
  */
-public class MemoryTestGenerationLog implements TestGenerationLog {
+public class MemoryTestGenerationLogger implements TestGenerationLogger {
     /**
      * The {@link StringBuffer} which stores all the content.
      */
@@ -20,8 +20,8 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
      * {@inheritDoc}
      */
     @Override
-    public void writeln(String string) {
-        sb.append(string);
+    public void writeln(String message) {
+        sb.append(message);
         sb.append(NEW_LINE);
     }
 
@@ -29,8 +29,8 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
      * {@inheritDoc}
      */
     @Override
-    public void writeException(Throwable t) {
-        sb.append(t.getMessage());
+    public void writeException(Throwable throwable) {
+        sb.append(throwable.getMessage());
         sb.append(NEW_LINE);
     }
 
@@ -38,7 +38,7 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
      * {@inheritDoc}
      */
     @Override
-    public void testGenerationCompleted() {
+    public void close() {
     }
 
     /**

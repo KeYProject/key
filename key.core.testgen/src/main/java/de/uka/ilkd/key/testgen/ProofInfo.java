@@ -94,7 +94,8 @@ public record ProofInfo(Proof proof, Services services) {
 
     @Nullable
     public KeYJavaType getReturnType() {
-        return getMUT().getType();
+        var mut =  getMUT();
+        return mut != null ? mut.getType() : null;
     }
 
     public Contract getContract() {
