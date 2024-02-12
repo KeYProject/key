@@ -31,11 +31,13 @@ import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.MemoryTestGenerationLog;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.testgen.smt.testgen.MemoryTestGenerationLogger;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.logic.Term;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
@@ -92,7 +94,7 @@ public class TestCaseGenerator {
     private final Path dontCopy;
     protected final Path modDir;
     protected final String directory;
-    private final TestGenerationLog logger;
+    private final TestGenerationLogger logger;
     private final String fileName;
     private final String packageName;
     private final String mutName;
@@ -106,8 +108,8 @@ public class TestCaseGenerator {
 
     private final TestGenerationSettings settings;
 
-    public TestCaseGenerator(Proof proof, TestGenerationSettings settings, @Nullable TestGenerationLog log) {
-        logger = Objects.requireNonNullElse(log, new MemoryTestGenerationLog());
+    public TestCaseGenerator(Proof proof, TestGenerationSettings settings, @Nullable TestGenerationLogger log) {
+        logger = Objects.requireNonNullElse(log, new MemoryTestGenerationLogger());
         this.settings = settings;
 
         fileName = "TestGeneric" + TestCaseGenerator.FILE_COUNTER;
@@ -360,9 +362,6 @@ public class TestCaseGenerator {
                         switch (settings.useJunit()) {
                             case JUnit4 -> ms.addAnnotation(JUNIT4_TEST_ANNOTATION);
                             case JUnit5 -> ms.addAnnotation(JUNIT5_TEST_ANNOTATION);
-                            case TestNG -> ms.addAnnotation(TESTNG_TEST_ANNOTATION);
-                            case Plain -> {
-                            }
                         }
                         ms.addComment("Test preamble: creating objects and intializing test data");
                         generateTestCase(ms, m, typeInfMap);

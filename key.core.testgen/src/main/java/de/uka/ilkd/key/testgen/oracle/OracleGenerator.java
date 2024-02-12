@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -40,23 +41,23 @@ public class OracleGenerator {
 
     private static int varNum;
 
-    private HashMap<Operator, String> ops;
+    private Map<Operator, String> ops = new HashMap<>();
 
-    private final Set<OracleMethod> oracleMethods;
+    private final Set<OracleMethod> oracleMethods = new HashSet<>();
 
-    private final List<OracleVariable> quantifiedVariables;
+    private final List<OracleVariable> quantifiedVariables = new ArrayList<>();
 
-    private Set<String> truePredicates;
+    private Set<String> truePredicates = new TreeSet<>();
 
-    private Set<String> falsePredicates;
+    private Set<String> falsePredicates = new TreeSet<>();
 
-    private final Set<String> prestateTerms;
+    private final Set<String> prestateTerms = new TreeSet<>();
 
-    private final Map<Sort, OracleMethod> invariants;
+    private final Map<Sort, OracleMethod> invariants = new HashMap<>();
 
-    private List<OracleVariable> methodArgs;
+    private List<OracleVariable> methodArgs = new ArrayList<>();
 
-    private Set<Term> constants;
+    private Set<Term> constants = new HashSet<>();
 
     private final ReflectionClassCreator rflCreator;
 
@@ -67,15 +68,10 @@ public class OracleGenerator {
     public OracleGenerator(Services services, ReflectionClassCreator rflCreator, boolean useRFL) {
         this.services = services;
         initOps();
-        oracleMethods = new HashSet<>();
-        quantifiedVariables = new LinkedList<>();
-        prestateTerms = new HashSet<>();
-        invariants = new HashMap<>();
         this.rflCreator = rflCreator;
         this.useRFL = useRFL;
         initTrue();
         initFalse();
-        methodArgs = null;
     }
 
     private void initTrue() {
@@ -119,20 +115,12 @@ public class OracleGenerator {
         constants = getConstants(term);
         methodArgs = getMethodArgs(term);
         OracleTerm body = generateOracle(term, false);
-        return new OracleMethod("testOracle", methodArgs, "return " + body.toString() + ";");
+        return new OracleMethod("testOracle", methodArgs, "return " + body + ";");
     }
 
     public OracleLocationSet getOracleLocationSet(Term modifierset) {
-
         ModifiesSetTranslator mst = new ModifiesSetTranslator(services, this);
         return mst.translate(modifierset);
-
-
-    }
-
-
-    public List<OracleVariable> getMethodArgs() {
-        return methodArgs;
     }
 
     public Set<OracleMethod> getOracleMethods() {
@@ -580,7 +568,7 @@ public class OracleGenerator {
 
         OracleTerm invTerm = generateOracle(t, initialSelect);
 
-        String body = "return " + invTerm.toString() + ";";
+        String body = "return " + invTerm + ";";
 
         return new OracleMethod(methodName, args, body);
 
@@ -599,14 +587,7 @@ public class OracleGenerator {
             + "\n   return " + falseCase + ";" + "\n}";
 
         return new OracleMethod(methodName, args, body, term.sort());
-
     }
-
-
-    public Set<String> getPrestateTerms() {
-        return prestateTerms;
-    }
-
 
     private String getSetName(Sort s) {
 
@@ -667,7 +648,7 @@ public class OracleGenerator {
     private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
         String tab = TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
-            + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
+            + "\n" + tab + tab + "if(" + neg + "){" + "\n" + tab + tab + tab
             + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
             + "return true;";
     }
@@ -738,6 +719,4 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, left, right);
         }
     }
-
-
 }
