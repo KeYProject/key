@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
-public record OracleUnaryTerm(OracleTerm sub,Op op)implements OracleTerm{public enum Op {
-    Neg("!"), Minus("-");
-
-    public final String symbol;
-
-    Op(String symbol) {
-        this.symbol = symbol;
+/**
+ * @author Alexander Weigl
+ * @version 1 (17.03.24)
+ */
+final class AllLocsLocationSet implements OracleLocationSet {
+    @Override
+    public boolean contains(OracleLocation l) {
+        return true;
     }
 
-    }
-
+    @Override
     public String toString() {
-        return op.symbol + sub;
+        return "All";
     }
 }
