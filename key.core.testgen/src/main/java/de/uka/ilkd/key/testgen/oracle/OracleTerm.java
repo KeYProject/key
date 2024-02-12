@@ -7,5 +7,4 @@ public sealed
 interface OracleTerm
 permits OracleBinTerm, OracleConstant, OracleMethodCall, OracleType, OracleUnaryTerm, OracleVariable
 {
-
 }

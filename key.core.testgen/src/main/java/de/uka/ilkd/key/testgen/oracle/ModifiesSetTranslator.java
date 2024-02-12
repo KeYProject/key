@@ -58,9 +58,9 @@ public record ModifiesSetTranslator(Services services, OracleGenerator gen) {
             OracleLocation loc = new OracleLocation(objString);
             return OracleLocationSet.singleton(loc);
         } else if (isEmpty(t)) {
-            return OracleLocationSet.EMPTY;
+            return OracleLocationSets.EMPTY;
         } else if (isAllLocs(t)) {
-            return OracleLocationSet.ALL_LOCS;
+            return OracleLocationSets.ALL_LOCS;
         }
         throw new RuntimeException("Unsupported locset operation: " + t.op());
     }
