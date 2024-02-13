@@ -3,6 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,20 +27,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
-
-import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.util.parsing.BuildingException;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
@@ -94,6 +94,7 @@ public final class ParsingFacade {
         KeYParser p = new KeYParser(new CommonTokenStream(createLexer(stream)));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
+        p.setErrorHandler(p.getErrorReporter());
         return p;
     }
 
@@ -108,9 +109,9 @@ public final class ParsingFacade {
     public static KeyAst.File parseFile(URL url) throws IOException {
         long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
-                ReadableByteChannel channel = Channels.newChannel(is)) {
+             ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(channel, Charset.defaultCharset(),
-                4096, CodingErrorAction.REPLACE, url.toString(), -1);
+                    4096, CodingErrorAction.REPLACE, url.toString(), -1);
             return parseFile(stream);
         } finally {
             long stop = System.currentTimeMillis();
@@ -128,21 +129,22 @@ public final class ParsingFacade {
 
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
-
+        var ep = p.getErrorReporter();
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
         // we don't want error messages or recovery during first try
-        p.removeErrorListeners();
-        p.setErrorHandler(new BailErrorStrategy());
-        KeYParser.FileContext ctx;
+        KeYParser.FileContext ctx = null;
         try {
             ctx = p.file();
-        } catch (ParseCancellationException ex) {
+        } catch (ParseCancellationException ex1) {
             LOGGER.warn("SLL was not enough");
-            p = createParser(stream);
-            ctx = p.file();
+            try {
+                p = createParser(stream);
+                ctx = p.file();
+            } catch (ParseCancellationException ex2) {
+                var t = p.getErrorReporter().join(ep);
+                throw new SyntaxErrorReporter.ParserException("", t.getErrors());
+            }
         }
-
-        p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }
 
@@ -207,13 +209,14 @@ public final class ParsingFacade {
     }
 
     // region configuration
+
     /**
      * Parses a the configuration determined by the given {@code file}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
      * @param file non-null {@link Path} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable.
+     * @throws IOException       if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(Path file) throws IOException {
@@ -233,7 +236,7 @@ public final class ParsingFacade {
      *
      * @param file non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable.
+     * @throws IOException       if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
@@ -249,7 +252,7 @@ public final class ParsingFacade {
      *
      * @param file non-null {@link CharStream} object
      * @return a configration object with the data deserialize from the given file
-     * @throws IOException if the file is not found or not readable.
+     * @throws IOException       if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static Configuration readConfigurationFile(CharStream input) throws IOException {
