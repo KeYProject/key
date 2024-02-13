@@ -21,7 +21,6 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -133,15 +132,7 @@ public final class ParsingFacade {
         // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
-        KeYParser.FileContext ctx;
-        try {
-            ctx = p.file();
-        } catch (ParseCancellationException ex) {
-            LOGGER.warn("SLL was not enough");
-            p = createParser(stream);
-            ctx = p.file();
-        }
-
+        KeYParser.FileContext ctx = p.file();
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }
