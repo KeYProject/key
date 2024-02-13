@@ -1,18 +1,14 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.DependenciesLDT;
-import de.uka.ilkd.key.proof.Goal;
+import java.util.HashSet;
 
 public class ShiftUpdateImplNew {
 	private final Goal goal;
@@ -108,7 +104,7 @@ public class ShiftUpdateImplNew {
 	 */
 	private Term generateRenameUpdate(Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
-
+//		System.out.println(updateList);
 		// collect updated locations
 		// collect inverseUpdate of each event
 		HashSet<UpdateableOperator> updatedLocations = new HashSet<>();
@@ -148,10 +144,12 @@ public class ShiftUpdateImplNew {
 		keepParallelUpdateRenames = tb.parallel(renameUpdates);
 		final Term parallelInversesEvents = tb.parallel(inverseEventUpdates);
 		final Term parallelInvAnonEvents = tb.parallel(inverseAnonEventUpdates);
-		final Term updateRenameAndInverseEvents = tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
-		final Term updateAnonInvEvents = tb.sequential(keepParallelUpdateRenames, parallelInvAnonEvents);
-		allParallelUpdateRenames = tb.sequential(updateRenameAndInverseEvents, updateAnonInvEvents);
-//		System.out.println("Anon Update: "+ ret);
+		Term renamesAndInverseEvents = parallelInversesEvents.op() == UpdateJunctor.SKIP ?
+				keepParallelUpdateRenames : tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
+		allParallelUpdateRenames = parallelInvAnonEvents.op() == UpdateJunctor.SKIP ?
+				renamesAndInverseEvents :
+				tb.sequential(renamesAndInverseEvents, parallelInvAnonEvents);
+//		System.out.println(" inversed: "+ allParallelUpdateRenames);
 		return allParallelUpdateRenames;
 	}
 

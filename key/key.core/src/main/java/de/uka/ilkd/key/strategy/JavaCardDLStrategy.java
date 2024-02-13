@@ -5,7 +5,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.loopinvgen.NestedLoopUsecaseRule;
@@ -20,24 +19,9 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
-import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
-import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
-import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
-import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
-import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
+import de.uka.ilkd.key.strategy.termgenerator.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -1215,6 +1199,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "locset_expand_setMinus", longConst(100));
 
+        bindRuleSet(d, "locset_expand_setMinus_known", longConst(-500));
+
+
+
         bindRuleSet(d, "locset_expand_setMinus_low_priority", 5000);
 
         /*final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
@@ -1353,6 +1341,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "pull_out_matrixRange",
             add(not(isBelow(tf.eqF)), longConst(-3500)));
 
+
+        final LocSetLDT locLDT = getServices().getTypeConverter().getLocSetLDT();
+        TermFeature setMinus = op(locLDT.getSetMinus());
+
+        bindRuleSet(d, "pullOutLocSet",
+                add(not(isBelow(tf.eqF)),
+                        not(isBelow(setMinus)),
+                        applyTF(FocusProjection.INSTANCE, sub(setMinus,any())),
+                        longConst(-800)));
+
         bindRuleSet(d, "simplifyMatrixAnonHeap", add(not(isBelow(ff.ifThenElse)),
             longConst(-2000) /* slightly faster than simplify_ENLARGING */, EqNonDuplicateAppFeature.INSTANCE));
 
@@ -1423,7 +1421,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     new Feature[] {
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
-                        ifZero(NotBelowQuantifierFeature.INSTANCE,
+                            ScaleFeature.createAffine(countOccurrences(FocusProjection.INSTANCE), -10, 10),
+                            ifZero(NotBelowQuantifierFeature.INSTANCE,
                                add(applyTF(cutFormula,
                                        add(ff.cutAllowed,
                                            // do not cut over formulas containing

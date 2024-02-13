@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashMap;
@@ -159,7 +158,7 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
+//        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
 

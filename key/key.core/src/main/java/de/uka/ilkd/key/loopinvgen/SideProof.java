@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -151,16 +149,16 @@ public class SideProof {
 		}
 
 
-		try {
-
-			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
-
-			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		COUNTER++;
+//		try {
+//
+//			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
+//
+//			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		COUNTER++;
 	}
 
 	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,

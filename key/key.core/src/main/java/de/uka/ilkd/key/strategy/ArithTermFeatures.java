@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 
+
     public ArithTermFeatures(IntegerLDT numbers) {
         Z = numbers.getNumberSymbol();
         C = numbers.getCharSymbol();

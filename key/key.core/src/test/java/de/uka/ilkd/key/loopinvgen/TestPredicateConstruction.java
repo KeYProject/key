@@ -108,7 +108,7 @@ public class TestPredicateConstruction {
 
 		try {
 			succFormula = parse("{i:=0}\\<{"
-					+ "		while (i<=a.length-2) {"
+					+ "		while (i<a.length-1) {"
 					+"			a[i] = a[i+1];"
 					+"			sum = sum + a[i];"
 					+ "			i++;}"
@@ -123,8 +123,8 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
-		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
 		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -152,8 +152,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -176,8 +176,8 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
-		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
 		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -205,8 +205,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -388,8 +388,8 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
-		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length > 10" };
 		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -417,8 +417,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 //
@@ -546,8 +546,8 @@ public class TestPredicateConstruction {
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-//		String[] arrLeft = {"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))", "a.length>10" };
-		String[] arrLeft = {"relaxedNoR(arrayRange(a,0,a.length))", "relaxedNoW(arrayRange(a,0,a.length))", "a.length>10" };
+		String[] arrLeft = {"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))", "a.length>10" };
+//		String[] arrLeft = {"relaxedNoR(arrayRange(a,0,a.length))", "relaxedNoW(arrayRange(a,0,a.length))", "a.length>10" };
 		String[] arrRight = {"a=null"};
 		try {
 			for (String fml : arrLeft) {
@@ -575,8 +575,8 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return null;
 		}
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -588,8 +588,8 @@ public class TestPredicateConstruction {
 		
 		try {
 			
-			formula = parse("{i:=0}\\<{while (i<=a.length-2) {"
-							+ "				if(i> (a.length-1)/2){"
+			formula = parse("{i:=0}\\<{while (i<a.length-1) {"
+							+ "				if(cond){"
 							+ "					a[i] = a[i+1];"
 							+ "				}\n"
 							+ "				else {"
@@ -626,8 +626,8 @@ public class TestPredicateConstruction {
 
 		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))", "a.length>10" };
-		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length))","relaxedNoR(arrayRange(a,0,a.length))", "a.length>10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))", "a.length>10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length))","relaxedNoR(arrayRange(a,0,a.length))", "a.length>10" };
 		String[] arrRight = {"a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -656,8 +656,8 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -669,7 +669,7 @@ public class TestPredicateConstruction {
 		
 		try {
 			
-			formula = parse("{i:=1}\\<{while (i <= a.length-2) {"
+			formula = parse("{i:=1}\\<{while (i < a.length-1) {"
 							+ "				if(i> (a.length-1)/2){"
 							+ "					a[i] = a[i+1];"
 							+ "				}\n"
@@ -706,8 +706,8 @@ public class TestPredicateConstruction {
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length>10" };
-		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length>10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length>10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length>10" };
 		String[] arrRight = {"a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -736,10 +736,91 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
-		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
+
+	public LoopInvariantGenerationResult conditionWithDifferentEvents0() {
+
+		Term formula;
+
+		Recoder2KeY r2k = new Recoder2KeY(services, nss);
+
+		try {
+
+			formula = parse("{i:=0}\\<{while (i < a.length-1) {"
+					+ "				if(i> (a.length-1)/2){"
+					+ "					a[i] = a[i+1];"
+					+ "				}\n"
+					+ "				else {"
+					+ " 				a[i] = a[i]+1;"
+					+ "				}"
+					+ "				; // this is just a comment, the semicolon is replaced by a merge_point(i);\n"
+					+ "        //@ merge_proc \"MergeByIfThenElseAntecedent\";\n"
+					+ "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		MergePointInline inlineMergePoints = new MergePointInline(formula.sub(1).javaBlock().program(), false, services);
+		ProgramElement s = inlineMergePoints.inline();
+
+		for (MergeContract mc : inlineMergePoints.getContracts()) {
+			services.getSpecificationRepository().addMergeContract(mc);
+		}
+
+		if (!(s instanceof StatementBlock)) {
+			s = new StatementBlock((Statement)s);
+		}
+
+		// recreate formula
+		formula = tb.apply(formula.sub(0), tb.dia(JavaBlock.createJavaBlock((StatementBlock)s), tb.tt()));
+
+//		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
+
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length>10" };
+//		String[] arrLeft = { "relaxedNoW(arrayRange(a,0,a.length-1))","relaxedNoR(arrayRange(a,0,a.length-1))", "a.length>10" };
+		String[] arrRight = {"a=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+		return loopInvGenerator.generate();
+	}
+
 
 //
 //	public void testCaseFor_mbps() {
@@ -1375,16 +1456,17 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		LoopInvariantGenerationResult result;
 		long start = System.currentTimeMillis();
-		result = tpc.shiftArrayToLeft();//Precise Result. Relaxed works.
-//		result = tpc.interAndIntra();//New. Relaxed works. But noR(a[0]) is missing.
-//		result = tpc.shiftArrayToLeftWithBreak();//Precise Result. Relaxed works.
-//		result = tpc.condition();//Precise Result. Relaxed works.
-//		result = tpc.conditionDifferentNumberOfEvents();//Precise Result. Relaxed works.
-//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
-//		result = tpc.withFunc(); //Normal works. Relaxed works.
+//		result = tpc.shiftArrayToLeft();//Normal works. Relaxed works.
+//		result = tpc.interAndIntra();//New. Normal works. Relaxed works. But noR(a[0]) is missing.
+//		result = tpc.shiftArrayToLeftWithBreak();//Normal works. Relaxed works.
+//		result = tpc.condition();//Normal works. Relaxed works.
+//		result = tpc.conditionDifferentNumberOfEvents();//Normal works. Relaxed works.
+//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew.Normal works. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
+//		result = tpc.conditionWithDifferentEvents0();//Normal works. Relaxed not checked yet.
+		result = tpc.withFunc(); //Normal works. Relaxed works.
 //		result = tpc.withoutFunc(); //Normal works. Relaxed works.
 //		result = tpc.interDep(); //New. Normal works. Relaxed works.
-//		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
+//		result = tpc.stencil(); //Change the s0 in LIGNew. Normal works. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
 //		result = tpc.basicMltpArrDiffIndex();

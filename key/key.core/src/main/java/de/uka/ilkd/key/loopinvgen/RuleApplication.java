@@ -101,7 +101,7 @@ public class RuleApplication {
 			ApplyStrategyInfo info = ps.start(goals);
 //			System.out.println("Info" + info);
 			for(Goal g: ps.getProof().getSubtreeGoals(subtreeRoot)) {
-				System.out.println("After Start:"+g.sequent());
+//				System.out.println("After Start:"+g.sequent());
 			}
 //			try {
 //////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));

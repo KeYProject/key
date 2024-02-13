@@ -38,14 +38,14 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		}
 
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-		System.out.println("SHIFTED");
-		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
+//		System.out.println("SHIFTED");
+//		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
-//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
+//		// Initial Predicate Sets for stencil, conditionalWithDifferentEvents, conditionWithDifferentEvents0:
 //		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
 //		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 //		for (Term arr : arrays) {
@@ -79,7 +79,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
 		do {
 			itrNumber++;
-			System.out.println("Iteration Number: " + itrNumber);
+//			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.clear();
 			oldCompPreds.clear();

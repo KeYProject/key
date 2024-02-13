@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.WeakHashMap;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -17,6 +8,10 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  *
@@ -269,7 +264,7 @@ public class LexPathOrdering implements TermOrdering {
         public int compareWeights(Operator p_a, Operator p_b) {
             final Integer aWeight = getWeight ( p_a );
             final Integer bWeight = getWeight ( p_b );
-            
+
             if ( aWeight == null ) {
                 if ( bWeight == null )
                     return 0;
@@ -359,11 +354,15 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("union")) return Integer.valueOf ( 7 );
             if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
-            if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
+//            if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
 
             
             if ( opStr.equals ("seqSingleton")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("seqConcat")) return Integer.valueOf ( 7 );
+
+//            if (p_op.arity() == 0 && p_op instanceof Function && ((Function)p_op).isSkolemConstant()) {
+//                return Integer.MAX_VALUE;
+//            }
 
             return null;
         }
