@@ -158,7 +158,7 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-//        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
+//        System.out.println("sequentImpliesPredicate is called for: "+ ProofSaver.printAnything(pred, null));
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
 

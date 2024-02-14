@@ -1315,7 +1315,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(-1910))
                     ))));
 
-
+        bindRuleSet(d, "arrayRange_known_empty",
+                ifZero(lt("high", "low"),
+                        add(ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
+                                inftyConst(), longConst(-5000))),
+                        inftyConst()));
 
 /*        bindRuleSet(d, "simplify_matrix_range_literal_2",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),

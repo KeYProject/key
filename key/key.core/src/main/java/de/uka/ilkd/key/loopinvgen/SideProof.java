@@ -35,6 +35,7 @@ public class SideProof {
 	private static final boolean AGGRESSIVE_FILTER = true;
 
 	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
+	private static int timeout = 5000;// 5000
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
@@ -74,7 +75,7 @@ public class SideProof {
 													 int maxRuleApp, boolean simplifyOnly,
 													 boolean stopAtFirstUncloseableGoal,
 													 Services services) throws ProofInputException {
-		return isProvableHelper(seq2prove,maxRuleApp,5000, simplifyOnly,stopAtFirstUncloseableGoal,services);
+		return isProvableHelper(seq2prove,maxRuleApp,timeout, simplifyOnly,stopAtFirstUncloseableGoal,services);
 	}
 		public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
 													 int maxRuleApp, int timeout, boolean simplifyOnly,
@@ -108,11 +109,13 @@ public class SideProof {
 
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 
-		if (false && stopAtFirstUncloseableGoal) {
+		if ( stopAtFirstUncloseableGoal) {//false &&
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
 		} else {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
 		}
+
+		sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
 
 		if (simplifyOnly) {
 			sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
@@ -154,6 +157,7 @@ public class SideProof {
 //			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
 //
 //			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
+//			System.out.println(info);
 //
 //		} catch (IOException e) {
 //			e.printStackTrace();

@@ -314,7 +314,7 @@ public class TestPredicateConstruction {
 	}
 
 
-	public LoopInvariantGenerationResult interDep() {
+	public LoopInvariantGenerationResult intaDepOnly() {
 		Term succFormula;
 
 		try {
@@ -589,7 +589,7 @@ public class TestPredicateConstruction {
 		try {
 			
 			formula = parse("{i:=0}\\<{while (i<a.length-1) {"
-							+ "				if(cond){"
+							+ "				if(i > (a.length-1)/2){"
 							+ "					a[i] = a[i+1];"
 							+ "				}\n"
 							+ "				else {"
@@ -1456,16 +1456,16 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		LoopInvariantGenerationResult result;
 		long start = System.currentTimeMillis();
-//		result = tpc.shiftArrayToLeft();//Normal works. Relaxed works.
-//		result = tpc.interAndIntra();//New. Normal works. Relaxed works. But noR(a[0]) is missing.
+//		result = tpc.shiftArrayToLeft();//Normal not precise. Relaxed works.
+//		result = tpc.interAndIntra();//New. Normal misses noR(a[0]). Relaxed works. But noR(a[0]) is missing.
 //		result = tpc.shiftArrayToLeftWithBreak();//Normal works. Relaxed works.
 //		result = tpc.condition();//Normal works. Relaxed works.
 //		result = tpc.conditionDifferentNumberOfEvents();//Normal works. Relaxed works.
-//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew.Normal works. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
+		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew.Normal misses noW(a[0]). Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 //		result = tpc.conditionWithDifferentEvents0();//Normal works. Relaxed not checked yet.
-		result = tpc.withFunc(); //Normal works. Relaxed works.
+//		result = tpc.withFunc(); //Normal works. Relaxed works.
 //		result = tpc.withoutFunc(); //Normal works. Relaxed works.
-//		result = tpc.interDep(); //New. Normal works. Relaxed works.
+//		result = tpc.intaDepOnly(); //New. Normal works. Relaxed works.
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Normal works. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
