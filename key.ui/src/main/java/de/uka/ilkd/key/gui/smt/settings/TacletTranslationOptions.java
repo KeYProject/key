@@ -63,7 +63,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         ProofDependentSMTSettings pdSettings = SettingsManager.getSmtPdSettings(window).clone();
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
         maxNumberOfGenerics.setValue(pdSettings.getMaxGenericSorts());

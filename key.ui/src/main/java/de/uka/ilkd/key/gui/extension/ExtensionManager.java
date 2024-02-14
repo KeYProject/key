@@ -117,7 +117,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         refresh();
         return this;
     }

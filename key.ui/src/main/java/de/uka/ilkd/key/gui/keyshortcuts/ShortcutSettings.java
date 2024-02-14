@@ -44,7 +44,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         KeyStrokeSettings settings = KeyStrokeManager.getSettings();
         Properties p = new Properties();
         settings.writeSettings(p);
