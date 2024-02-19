@@ -1,8 +1,29 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.speclang.njml;
+package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.util.ExceptionTools;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,54 +36,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.util.ExceptionTools;
-
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.opentest4j.AssertionFailedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * This test case is used to ensure that errors in JML (and perhaps also in Java)
- * are reported with a reasonable error message and the right position pointing
+ * This test case is used to ensure that errors in KeY files are reported
+ * with a reasonable error message and the right position pointing
  * into the file.
  *
  * To add a test case, locate the "exceptional" directory in the resources
- * (below the directory for this package here) and add your single Java file
+ * (below the directory for this package here) and add a .key file
  * that contains an error that should be presented to the user (like syntax
  * error, unresolved names, ...)
  *
  * See README.md in said directory for information on the meta-data inside
- * the Java files.
+ * the files.
  *
  * @author Mattias Ulbrich
  */
-public class JMLParserExceptionTest {
+public class ParserExceptionTest {
 
     // The following can be changed temporarily to control run tests
     private static final boolean IGNORE_BROKEN = false;
 
     // File name local to the res directoy with the test cases
-    private static final String FIX_FILE = null; // "SetInClass.java";
+    // Can be used for temporary debugging
+    private static final String FIX_FILE = null; // "conflict.key";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JMLParserExceptionTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParserExceptionTest.class);
 
     private final static Pattern PROP_LINE =
         Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
-        URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
+        URL fileURL = ParserExceptionTest.class.getResource("exceptional");
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
@@ -70,7 +76,7 @@ public class JMLParserExceptionTest {
             List<Arguments> list = List.of(Arguments.of(dir.resolve(FIX_FILE), FIX_FILE));
             return list.stream();
         }
-        return Files.walk(dir).filter(it -> it.getFileName().toString().endsWith(".java"))
+        return Files.walk(dir).filter(it -> it.getFileName().toString().endsWith(".key"))
                 .map(it -> Arguments.of(it, it.getFileName()));
     }
 
@@ -100,15 +106,16 @@ public class JMLParserExceptionTest {
         }
 
         try {
-            ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-            AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
-                null, AbstractProfile.getDefaultProfile(), false,
-                control, false, new Properties());
-            pl.setLoadSingleJavaFile(true);
-            pl.load();
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toFile());
+
             // No exception encountered
             assertEquals("true", props.getProperty("noException"),
                 "Unless 'noException: true' has been set, an exception is expected");
+
+            String checkScript = props.getProperty("checkScript");
+            if(checkScript != null) {
+                check(checkScript, env);                
+            }
 
         } catch (AssertionFailedError ae) {
             throw ae;
@@ -163,5 +170,15 @@ public class JMLParserExceptionTest {
                 throw assertionFailedError;
             }
         }
+    }
+
+    /*
+     * We can also provide some Java code to be checked on the resultung env object
+     */
+    private static void check(String checkScript, KeYEnvironment<DefaultUserInterfaceControl> env) throws ScriptException {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("java");
+        engine.put("env", env);
+        Object result = engine.eval(checkScript);
+        assertEquals(Boolean.TRUE, result, "The checkscript failed and did not return true");
     }
 }
