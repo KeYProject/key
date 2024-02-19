@@ -31,7 +31,7 @@ public abstract class AbstractLoopInvariantGenerator {
     protected Term indexOuter;
     protected Term indexInner;
     protected Term guard;
-    protected Term[] arrays = new Term[1];//2 when two arrays and 1 when one array.
+    protected Term[] arrays = new Term[2];//2 when two arrays and 1 when one array.
     protected int arraysIndex = 0;
     protected Set<Term> oldDepPreds = new HashSet<>();
     protected Set<Term> oldInnerDepPreds = new HashSet<>();

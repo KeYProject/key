@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -15,10 +18,6 @@ import de.uka.ilkd.key.rule.metaconstruct.ReplaceWhileLoop;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class NestedLoopUsecaseRuleImp{
 
@@ -63,7 +62,7 @@ public class NestedLoopUsecaseRuleImp{
         return mod;
     }
     private Term creatUpdates(Term innerLI, PosInOccurrence pos) {
-        Term mod = findWPRed(innerLI, tb.allLocs());//findNoW
+        Term mod = findNoW(innerLI, tb.allLocs());//findNoW
 
         //anonymizes the heap
         final Name heapPrimeName = new Name(tb.newName(tb.getBaseHeap()+"_Prime"));

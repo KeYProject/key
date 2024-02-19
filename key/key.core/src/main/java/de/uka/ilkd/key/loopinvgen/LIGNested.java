@@ -90,7 +90,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 
 
 			boolean nested = false;
-			boolean firstApproach = true; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
+			boolean firstApproach = false; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
