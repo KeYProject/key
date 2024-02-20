@@ -179,7 +179,7 @@ public class OverloadedOperatorHandler {
                 return switch (op) {
                 case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
                 case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
-                case BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
                 case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
                 case LTE -> new SLExpression(tb.subset(l, r));
                 case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
