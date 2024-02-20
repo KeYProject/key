@@ -150,6 +150,9 @@ public class OverloadedOperatorHandler {
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             if (left.getTerm().sort() == ldtSequence.targetSort()
                     && right.getTerm().sort() == ldtSequence.targetSort()) {
                 if (op == JMLOperator.ADD) {
@@ -173,6 +176,9 @@ public class OverloadedOperatorHandler {
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
