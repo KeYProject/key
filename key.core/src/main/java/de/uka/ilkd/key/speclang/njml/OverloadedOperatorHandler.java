@@ -100,7 +100,7 @@ public class OverloadedOperatorHandler {
 
         handlers.add(new BinaryBooleanHandler(services));
         handlers.add(new SequenceHandler(services));
-        // handlers.add(new LocSetHandler(services));
+        handlers.add(new LocSetHandler(services));
         handlers.add(this.integerHandler);
         handlers.add(new FloatHandler(services));
         handlers.add(new DoubleHandler(services));
@@ -180,10 +180,10 @@ public class OverloadedOperatorHandler {
                 case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
                 case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
                 case BITWISE_AND -> new SLExpression(tb.intersect(l, r));
-                case LT -> new SLExpression(tb.subset(l, r));
-                case LTE -> new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                case GT -> new SLExpression(tb.subset(r, l));
-                case GTE -> new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
+                case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
+                case LTE -> new SLExpression(tb.subset(l, r));
+                case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
+                case GTE -> new SLExpression(tb.subset(r, l));
                 default -> null;
                 };
             }
