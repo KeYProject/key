@@ -7,7 +7,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -126,7 +125,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         }
 
         if (target.getType() == KeYJavaType.VOID_TYPE) {
-            throw new ProofInputException("Dependency contracts are currently not supported for void methods");
+            throw new ProofInputException(
+                "Dependency contracts are currently not supported for void methods");
         }
 
         final Services proofServices = postInit();
