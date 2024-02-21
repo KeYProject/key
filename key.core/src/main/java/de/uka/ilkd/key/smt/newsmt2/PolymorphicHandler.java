@@ -22,8 +22,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 public class PolymorphicHandler implements SMTHandler {
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
         // there are also no snippets.
     }

@@ -24,8 +24,7 @@ public class NumberConstantsHandler implements SMTHandler {
     private Function negNumberSign;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();

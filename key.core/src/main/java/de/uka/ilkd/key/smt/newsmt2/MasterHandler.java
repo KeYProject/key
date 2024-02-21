@@ -74,6 +74,11 @@ public class MasterHandler {
     private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
     /**
+     * Handler Options to be used by all the other SMT handlers.
+     */
+    private final String[] handlerOptions;
+
+    /**
      * Create a new handler with the default set of smt handlers.
      *
      * @param services non-null services
@@ -86,8 +91,13 @@ public class MasterHandler {
     public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
             String[] handlerOptions) throws IOException {
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
-            handlerOptions, this);
+        this.handlerOptions = handlerOptions;
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
+    }
+
+    public String[] getHandlerOptions() {
+        // TODO clone array instead?
+        return handlerOptions;
     }
 
     /**

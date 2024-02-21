@@ -68,8 +68,7 @@ public interface SMTHandler {
      * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
-    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException;
+    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException;
 
     /**
      * Query if this handler can translate a term.

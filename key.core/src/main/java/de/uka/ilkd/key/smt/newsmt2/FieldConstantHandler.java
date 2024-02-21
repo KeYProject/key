@@ -48,8 +48,7 @@ public class FieldConstantHandler implements SMTHandler {
     private Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }

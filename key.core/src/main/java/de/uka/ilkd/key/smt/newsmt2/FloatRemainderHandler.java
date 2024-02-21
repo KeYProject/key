@@ -33,8 +33,7 @@ public class FloatRemainderHandler implements SMTHandler {
     private Sort doubleSort;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
 

@@ -38,8 +38,7 @@ public class IntegerOpHandler implements SMTHandler {
     private IntegerLDT integerLDT;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         supportedOperators.clear();
         this.integerLDT = services.getTypeConverter().getIntegerLDT();
 

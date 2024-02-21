@@ -177,7 +177,7 @@ public class SMTHandlerServices {
      */
 
     public List<SMTHandler> getFreshHandlers(Services services, @NonNull String[] handlerNames,
-            String[] handlerOptions, MasterHandler mh) throws IOException {
+                                             MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
@@ -194,7 +194,7 @@ public class SMTHandlerServices {
                  * modification of the snippetMap while accessing it. snippet =
                  * snippetMap.get(handler); }
                  */
-                copy.init(mh, services, snippetMap.get(handler), handlerOptions);
+                copy.init(mh, services, snippetMap.get(handler));
                 result.add(copy);
             } catch (Exception e) {
                 throw new IOException(e);

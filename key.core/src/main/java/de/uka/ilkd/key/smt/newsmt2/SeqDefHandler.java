@@ -54,8 +54,7 @@ public class SeqDefHandler implements SMTHandler {
     private TermFactory termFactory;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
         seqLDT = services.getTypeConverter().getSeqLDT();
         termFactory = services.getTermFactory();

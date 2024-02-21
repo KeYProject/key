@@ -34,8 +34,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     private boolean enableQuantifiers;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
     }
 
