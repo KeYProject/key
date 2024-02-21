@@ -122,6 +122,17 @@ public class Function extends AbstractSortedOperator {
         return s.toString();
     }
 
+    /**
+     * @return a string representation of the argument sorts to this function
+     */
+    public final String argsToString() {
+        StringBuilder s = new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+        if (arity() > 0) {
+            s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));
+        }
+        return s.toString();
+    }
+
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
     }

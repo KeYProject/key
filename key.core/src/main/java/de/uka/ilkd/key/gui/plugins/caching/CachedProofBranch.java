@@ -4,11 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -51,6 +47,8 @@ public class CachedProofBranch {
      * Succedent part of the sequent of the cached branch.
      */
     public final List<String> sequentSucc;
+    private final Map<String, String> typesFunctions;
+    private final Map<String, String> typesLocVars;
 
     /**
      * Create a new data object about a cached proof branch.
@@ -81,6 +79,14 @@ public class CachedProofBranch {
             sequentSucc.add(
                 LogicPrinter.quickPrintTerm(succ.get(i).formula(), services, true, false, false));
         }
+        var typeCollector = new TypeCollectingVisitor();
+        for (int i = 1; i <= sequent.size(); i++) {
+            var f = sequent.getFormulabyNr(i);
+            f.formula().execPreOrder(typeCollector);
+        }
+
+        this.typesFunctions = typeCollector.getTypes();
+        this.typesLocVars = typeCollector.getTypesLocVars();
     }
 
     /**
@@ -107,6 +113,8 @@ public class CachedProofBranch {
         this.sequentAnte = Arrays.asList(ante);
         var succ = anteSucc[1].split(SEQUENT_TERM_SEPARATOR);
         this.sequentSucc = Arrays.asList(succ);
+        this.typesFunctions = new HashMap<>();
+        this.typesLocVars = new HashMap<>();
     }
 
     public String encodeSequent() {
