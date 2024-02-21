@@ -133,14 +133,7 @@ public final class ParsingFacade {
         // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
-        KeYParser.FileContext ctx;
-        try {
-            ctx = p.file();
-        } catch (ParseCancellationException ex) {
-            LOGGER.warn("SLL was not enough");
-            p = createParser(stream);
-            ctx = p.file();
-        }
+        KeYParser.FileContext ctx = p.file();
 
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);

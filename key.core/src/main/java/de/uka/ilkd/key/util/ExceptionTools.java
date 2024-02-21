@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.antlr.v4.runtime.InputMismatchException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -56,6 +59,8 @@ public final class ExceptionTools {
             return Optional.ofNullable(getLocation((ParseException) exc));
         } else if (exc instanceof TokenMgrError) {
             return Optional.ofNullable(getLocation((TokenMgrError) exc));
+        } else if (exc instanceof InputMismatchException ime) {
+            return Optional.ofNullable(getLocation(ime));
         }
 
         if (exc.getCause() != null) {
@@ -71,6 +76,12 @@ public final class ExceptionTools {
         Token token = exc.currentToken;
         return token == null ? null
                 : new Location(null, Position.fromToken(token.next));
+    }
+
+    private static Location getLocation(InputMismatchException exc) {
+        var token = exc.getOffendingToken();
+
+        return token == null ? null : new Location(Paths.get("/", exc.getInputStream().getSourceName()).normalize().toUri(), Position.fromToken(token));
     }
 
     private static Location getLocation(TokenMgrError exc) {
