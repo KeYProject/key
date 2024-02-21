@@ -5,6 +5,8 @@ package de.uka.ilkd.key.smt.solvertypes;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -270,46 +272,64 @@ public final class SolverTypeImplementation implements SolverType {
         if (checkEnvVariable(cmd)) {
             return true;
         } else {
-            File file = new File(cmd);
-            return file.exists() && !file.isDirectory();
+            Path file = Paths.get(cmd);
+            return Files.exists(file) && !Files.isDirectory(file);
         }
     }
 
-    private static boolean checkFile(String parent, String child) {
-        File file = Paths.get(parent, child).toFile();
-        return file.exists() && file.canExecute();
+    private static boolean checkPath(Path path) {
+        return Files.exists(path) && Files.isExecutable(path);
     }
 
     private static boolean checkEnvVariable(String cmd) {
-        String pathExt = System.getenv("PATHEXT");
-
-        // Build all possible children exes (add extensions)
-        String[] exes;
-        if (pathExt == null) {
-            // No PATHEXT, just use cmd
-            exes = new String[] { cmd };
-        } else {
-            String[] pathExtensions = pathExt.split(File.pathSeparator);
-            exes = new String[pathExtensions.length + 1];
-
-            // Append all extensions to cmd
-            for (int i = 0; i < pathExtensions.length; i++) {
-                exes[i] = cmd + pathExtensions[i];
-            }
-            // Add unchanged cmd to be sure (e.g. cmd = bla.exe)
-            exes[pathExtensions.length] = cmd;
+        Path cmdPath = Paths.get(cmd);
+        if(cmdPath.isAbsolute()){
+            return checkPath(cmdPath);
         }
 
+       return checkPathVariable(cmd + getOSDefaultExtension());
+    }
+
+    private static boolean checkPathVariable(String cmd) {
         String path = System.getenv("PATH");
         String[] paths = path.split(File.pathSeparator);
         for (String parent : paths) {
-            for (String children : exes) {
-                if (checkFile(parent, children)) {
+            Path parentPath = Paths.get(parent);
+                Path childPath = Paths.get(cmd);
+                Path completePath = parentPath.resolve(childPath);
+                if (checkPath(completePath)) {
                     return true;
                 }
             }
-        }
+
         return false;
+    }
+
+    private static String getOSDefaultExtension() {
+        final String windowsDefaultExt= ".exe";
+        final String linuxDefaultExt = "";
+        final String maxDefaultExt = "";
+
+        if(osIsWindows()){
+            return windowsDefaultExt;
+        }
+
+        if(osIsLinux()) {
+            return linuxDefaultExt;
+        }
+        return maxDefaultExt;
+    }
+
+    private static String getOperatingSystem() {
+        return System.getProperty("os.name");
+    }
+
+    private static boolean osIsWindows() {
+        return getOperatingSystem().startsWith("Windows");
+    }
+
+    private static boolean osIsLinux() {
+        return getOperatingSystem().startsWith("Linux");
     }
 
     @Override
