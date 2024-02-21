@@ -227,7 +227,14 @@ func_decl
   func_name = funcpred_name
 	whereToBind=where_to_bind?
   argSorts = arg_sorts
+  func_decl_syntax?
   SEMI
+;
+
+func_decl_syntax
+:
+SYNTAX
+    ( MIXFIX_HOLE | OPERATOR | simple_ident | LPAREN | RPAREN )+
 ;
 
 /**
@@ -418,6 +425,12 @@ primitive_term:
   | abbreviation
   | accessterm
   | literals
+  | mixfix
+  ;
+
+mixfix:
+  TILDE (literals | simple_ident | OPERATOR | PLUS | MINUS |
+         LESS | LPAREN | RPAREN /* | ... */ )+ TILDE
   ;
 
 /*

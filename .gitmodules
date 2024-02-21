@@ -1,0 +1,3 @@
+[submodule "java-mixfix"]
+	path = java-mixfix
+	url = https://github.com/mattulbrich/java-mixfix.git

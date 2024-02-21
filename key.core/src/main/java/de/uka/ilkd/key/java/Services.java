@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.nparser.builder.MixFixResolver;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -87,6 +88,8 @@ public class Services implements TermServices {
     private final TermBuilder termBuilder;
 
     private final TermBuilder termBuilderWithoutCache;
+
+    public final MixFixResolver mixFixResolver = new MixFixResolver(this);
 
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no

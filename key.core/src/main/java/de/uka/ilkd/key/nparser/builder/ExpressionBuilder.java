@@ -29,9 +29,11 @@ import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import edu.kit.kastel.formal.mixfix.MixFixException;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -181,6 +183,20 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitTermEOF(KeYParser.TermEOFContext ctx) {
         return accept(ctx.term());
+    }
+
+    @Override
+    public Term visitMixfix(KeYParser.MixfixContext ctx) {
+        try {
+            return services.mixFixResolver.resolve(ctx);
+        } catch (MixFixException e) {
+            Object val = e.getToken();
+            if(val instanceof Token token) {
+                throw new BuildingException(token, "Mixfix parser error", e);
+            } else {
+                throw new BuildingException(e);
+            }
+        }
     }
 
     @Override

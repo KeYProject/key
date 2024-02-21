@@ -212,6 +212,7 @@ DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
 FREE : '\\free';
+SYNTAX : '\\syntax';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -427,6 +428,10 @@ fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 
 
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
+
+OPERATOR: [#_$%&!~?<+>-]+ ;
+
+MIXFIX_HOLE: '_' '/' DIGIT+ ;
 
 INT_LITERAL:
     (DIGIT | '_')+ ('l'|'L')?
