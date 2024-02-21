@@ -106,6 +106,10 @@ public final class TypeConverter {
         return (SeqLDT) getLDT(SeqLDT.NAME);
     }
 
+    public SortLDT getSortLDT() {
+        return (SortLDT) getLDT(SortLDT.NAME);
+    }
+
     public MapLDT getMapLDT() {
         return (MapLDT) getLDT(MapLDT.NAME);
     }

@@ -72,6 +72,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
+    private final SortLDT sortLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory termFactory;
     private final ProgramVariable selfVar;
@@ -98,6 +99,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
+        this.sortLDT = services.getTypeConverter().getSortLDT();
         this.exc = new SLExceptionFactory(null, 1, 0);
 
         this.selfVar = self;
@@ -623,33 +625,38 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-        SLExpression result = accept(ctx.shiftexpr(0));
+        SLExpression left = accept(ctx.shiftexpr(0));
         SLExpression right = accept(ctx.shiftexpr(1));
-        assert result != null && right != null;
+        assert left != null && right != null;
 
-        if (result.isTerm() || right.isTerm()) {
-            raiseError("Cannot build subtype expression from terms.", ctx);
-        }
-        assert result.isType();
-        assert right.isType();
-        if (result.getTerm() == null) {
-            exc.addIgnoreWarning("subtype expression <: only supported for"
-                + " \\typeof() arguments on the left side.", ctx.ST().getSymbol());
-            final Namespace<Function> fns = services.getNamespaces().functions();
-            int x = -1;
-            Name name;
-            do {
-                name = new Name("subtype_" + ++x);
-            } while (fns.lookup(name) != null);
-            final Function z = new Function(name, Sort.FORMULA);
-            fns.add(z);
-            result = new SLExpression(tb.func(z));
-        } else {
+        if (left.isType() && left.getTerm() != null && right.isType()) {
             Sort os = right.getType().getSort();
             Function ioFunc = os.getInstanceofSymbol(services);
-            result = new SLExpression(tb.equals(tb.func(ioFunc, result.getTerm()), tb.TRUE()));
+            left = new SLExpression(tb.equals(tb.func(ioFunc, left.getTerm()), tb.TRUE()));
+        } else {
+            Term leftSort;
+            if (left.isTerm()) {
+                leftSort = left.getTerm();
+            } else {
+                Function ssortFunc = sortLDT.getSsort(left.getType().getSort(),services);
+                leftSort = tb.func(ssortFunc);
+            }
+
+            Term rightSort;
+            if (right.isTerm()) {
+                rightSort = right.getTerm();
+            } else {
+                Function ssortFunc = sortLDT.getSsort(right.getType().getSort(),services);
+                rightSort = tb.func(ssortFunc);
+            }
+
+            left = new SLExpression(tb.func(sortLDT.getSsubsort(), leftSort, rightSort));
         }
-        return result;
+
+//        } else {
+//            raiseError("Unsupported use of <: operator",ctx);
+//        }
+        return left;
     }
 
 

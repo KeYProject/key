@@ -576,6 +576,11 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnSubtype(Subtype x) {
+        printOperator(x, "<:");
+    }
+
+    @Override
     public void performActionOnArrayDeclaration(ArrayDeclaration type) {
         Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
         assert baseType != null;

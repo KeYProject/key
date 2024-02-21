@@ -413,4 +413,6 @@ public interface Visitor {
      *        wasn't finished)
      */
     void performActionOnJmlAssertCondition(final Term cond);
+
+    void performActionOnSubtype(Subtype subtype);
 }
