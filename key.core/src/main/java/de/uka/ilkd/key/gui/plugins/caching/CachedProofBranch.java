@@ -80,10 +80,7 @@ public class CachedProofBranch {
                 LogicPrinter.quickPrintTerm(succ.get(i).formula(), services, true, false, false));
         }
         var typeCollector = new TypeCollectingVisitor();
-        for (int i = 1; i <= sequent.size(); i++) {
-            var f = sequent.getFormulabyNr(i);
-            f.formula().execPreOrder(typeCollector);
-        }
+        typeCollector.visit(sequent);
 
         this.typesFunctions = typeCollector.getTypes();
         this.typesLocVars = typeCollector.getTypesLocVars();
@@ -99,7 +96,7 @@ public class CachedProofBranch {
      */
     CachedProofBranch(File proofFile, Collection<CachedFile> referencedFiles, String choiceSettings,
             String keyVersion,
-            int stepIndex, String sequent) {
+            int stepIndex, String sequent, Map<String, String> typesFunctions, Map<String, String> typesLocVars) {
         this.proofFile = proofFile;
         this.referencedFiles = referencedFiles;
         this.keyVersion = keyVersion;
@@ -113,8 +110,8 @@ public class CachedProofBranch {
         this.sequentAnte = Arrays.asList(ante);
         var succ = anteSucc[1].split(SEQUENT_TERM_SEPARATOR);
         this.sequentSucc = Arrays.asList(succ);
-        this.typesFunctions = new HashMap<>();
-        this.typesLocVars = new HashMap<>();
+        this.typesFunctions = typesFunctions;
+        this.typesLocVars = typesLocVars;
     }
 
     public String encodeSequent() {
@@ -143,9 +140,30 @@ public class CachedProofBranch {
      *
      * @param anteFormulas antecedent
      * @param succFormulas succedent
+     * @param sequent the sequent
      * @return whether this cached proof branch can close the new proof branch
      */
-    public boolean isCacheHitFor(Set<String> anteFormulas, Set<String> succFormulas) {
+    public boolean isCacheHitFor(Set<String> anteFormulas, Set<String> succFormulas, Sequent sequent) {
+        var typeCollector = new TypeCollectingVisitor();
+        typeCollector.visit(sequent);
+        for (var entry : typeCollector.getTypes().entrySet()) {
+            var ourType = typesFunctions.get(entry.getKey());
+            if (ourType == null) {
+                continue;
+            }
+            if (!ourType.equals(entry.getValue())) {
+                return false;
+            }
+        }
+        for (var entry : typeCollector.getTypesLocVars().entrySet()) {
+            var ourType = typesLocVars.get(entry.getKey());
+            if (ourType == null) {
+                continue;
+            }
+            if (!ourType.equals(entry.getValue())) {
+                return false;
+            }
+        }
         for (var ante : sequentAnte) {
             if (!anteFormulas.contains(ante)) {
                 return false;
@@ -157,5 +175,13 @@ public class CachedProofBranch {
             }
         }
         return true;
+    }
+
+    public Map<String, String> getTypesFunctions() {
+        return Collections.unmodifiableMap(typesFunctions);
+    }
+
+    public Map<String, String> getTypesLocVars() {
+        return Collections.unmodifiableMap(typesLocVars);
     }
 }

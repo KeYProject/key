@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
@@ -11,6 +12,13 @@ import java.util.Map;
 public class TypeCollectingVisitor implements Visitor {
     private final Map<String, String> types = new HashMap<>();
     private final Map<String, String> typesLocVars = new HashMap<>();
+
+    public void visit(Sequent sequent) {
+        for (int i = 1; i <= sequent.size(); i++) {
+            var f = sequent.getFormulabyNr(i);
+            f.formula().execPreOrder(this);
+        }
+    }
 
     @Override
     public boolean visitSubtree(Term visited) {

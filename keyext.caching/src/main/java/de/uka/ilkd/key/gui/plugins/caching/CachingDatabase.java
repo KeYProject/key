@@ -119,11 +119,23 @@ public final class CachingDatabase {
                 var branches = entry.getSection("cachedSequents");
                 for (int j = 0; j < branches.getEntries().size(); j++) {
                     var branch = branches.getSection(Integer.toString(j));
+                    var typesFunctions = branch.getSection("typesFunctions");
+                    Map<String, String> typesFunctionsMap = new HashMap<>();
+                    for (var typeEntry : typesFunctions.getEntries()) {
+                        typesFunctionsMap.put(typeEntry.getKey(), (String) typeEntry.getValue());
+                    }
+                    var typesLocVars = branch.getSection("typesLocVars");
+                    Map<String, String> typesLocVarsMap = new HashMap<>();
+                    for (var typeEntry : typesLocVars.getEntries()) {
+                        typesLocVarsMap.put(typeEntry.getKey(), (String) typeEntry.getValue());
+                    }
                     cacheProofs.add(file);
                     cache.add(
                         new CachedProofBranch(file, references, choiceSettings, keyVersion,
                             branch.getInt("stepIndex"),
-                            branch.getString("sequent")));
+                            branch.getString("sequent"),
+                                typesFunctionsMap,
+                                typesLocVarsMap));
                 }
             }
             doNotSave = false;
@@ -176,6 +188,10 @@ public final class CachingDatabase {
                     var branchEl = branchesJson.getOrCreateSection(Integer.toString(j));
                     branchEl.set("stepIndex", branch.stepIndex);
                     branchEl.set("sequent", branch.encodeSequent());
+                    var functionTypes = branchEl.getOrCreateSection("typesFunctions");
+                    branch.getTypesFunctions().forEach(functionTypes::set);
+                    var locVarTypes = branchEl.getOrCreateSection("typesLocVars");
+                    branch.getTypesLocVars().forEach(locVarTypes::set);
                     j++;
                 }
             }
@@ -356,7 +372,7 @@ public final class CachingDatabase {
             if (!x.choiceSettings.equals(choiceSettingsString)) {
                 return;
             }
-            if (x.isCacheHitFor(anteFormulas, succFormulas)) {
+            if (x.isCacheHitFor(anteFormulas, succFormulas, sequent)) {
                 matching.add(x);
             }
         });

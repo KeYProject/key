@@ -55,7 +55,6 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                             () -> SwingUtilities.invokeLater(() -> {
                                 auxiliaryProofsToClose.add(mediator.getSelectedProof());
                                 mediator.getSelectionModel().setSelectedProof(p);
-                                System.out.println(mediator.getSelectedProof());
                                 copyButtonClicked(dialog);
                             })).actionPerformed(null);
                         // now return and wait for the callback
