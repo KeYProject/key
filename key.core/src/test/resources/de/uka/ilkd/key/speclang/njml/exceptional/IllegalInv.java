@@ -1,4 +1,4 @@
-// exceptionClass: ConvertException
+// exceptionClass: PosConvertException
 // msgContains: mismatched input ';'
 // position: 17/19
 // verbose: true
