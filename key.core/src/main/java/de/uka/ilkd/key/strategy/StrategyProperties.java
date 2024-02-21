@@ -106,6 +106,11 @@ public final class StrategyProperties extends Properties {
     public static final String USER_TACLETS_LOW = "USER_TACLETS_LOW";
     public static final String USER_TACLETS_HIGH = "USER_TACLETS_HIGH";
 
+    public static final String ABSTRACT_PROOF_FORBIDDEN_RULE_SETS = "ABSTRACT_PROOF_FORBIDDEN_RULE_SETS";
+    public static final String ABSTRACT_PROOF_FORBIDDEN_RULES = "ABSTRACT_PROOF_FORBIDDEN_RULES";
+    public static final String ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN = "ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN";
+
+
     /**
      * Key used in {@link StrategyProperties} to configure alias checks in a
      * {@code} SymbolicExecutionStrategy}.
@@ -183,7 +188,10 @@ public final class StrategyProperties extends Properties {
         SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
-        SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
+        SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF,
+        ABSTRACT_PROOF_FORBIDDEN_RULE_SETS,
+        ABSTRACT_PROOF_FORBIDDEN_RULES,
+        ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN};
 
     private static final Properties DEFAULT_MAP = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategyProperties.class);
@@ -212,6 +220,9 @@ public final class StrategyProperties extends Properties {
             SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         DEFAULT_MAP.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
             SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+        DEFAULT_MAP.setProperty(ABSTRACT_PROOF_FORBIDDEN_RULE_SETS, "");
+        DEFAULT_MAP.setProperty(ABSTRACT_PROOF_FORBIDDEN_RULES, "");
+        DEFAULT_MAP.setProperty(ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN, "false");
     }
 
     public StrategyProperties() {
@@ -234,6 +245,9 @@ public final class StrategyProperties extends Properties {
         put(VBT_PHASE, DEFAULT_MAP.getProperty(VBT_PHASE));
         put(CLASS_AXIOM_OPTIONS_KEY, DEFAULT_MAP.getProperty(CLASS_AXIOM_OPTIONS_KEY));
         put(AUTO_INDUCTION_OPTIONS_KEY, DEFAULT_MAP.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
+        put(ABSTRACT_PROOF_FORBIDDEN_RULE_SETS, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FORBIDDEN_RULE_SETS));
+        put(ABSTRACT_PROOF_FORBIDDEN_RULES, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FORBIDDEN_RULES));
+        put(ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN));
     }
 
     public static String userTacletsOptionsKey(int i) {
@@ -329,6 +343,9 @@ public final class StrategyProperties extends Properties {
             nonExecutionBranchHidingSideProofs
                     ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
                     : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+        sp.setProperty(StrategyProperties.ABSTRACT_PROOF_FORBIDDEN_RULE_SETS, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FORBIDDEN_RULE_SETS));
+        sp.setProperty(StrategyProperties.ABSTRACT_PROOF_FORBIDDEN_RULES, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FORBIDDEN_RULES));
+        sp.setProperty(StrategyProperties.ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN, DEFAULT_MAP.getProperty(ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN));
     }
 
 
