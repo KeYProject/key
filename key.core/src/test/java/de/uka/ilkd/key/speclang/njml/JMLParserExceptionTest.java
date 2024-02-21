@@ -132,19 +132,20 @@ public class JMLParserExceptionTest {
                 }
 
                 String msg = props.getProperty("msgContains");
+                String errMsg = e.getMessage();
                 if (msg != null) {
-                    assertTrue(e.getMessage().contains(msg), "Message must contain " + msg);
+                    assertTrue(errMsg.contains(msg), "Message must contain " + msg + ", but is " + errMsg);
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
-                    assertTrue(e.getMessage().matches(msg),
-                        "Message must match regular exp " + msg);
+                    assertTrue(errMsg.matches(msg),
+                        "Message must match regular exp " + msg + ", but is " + errMsg);
                 }
 
                 msg = props.getProperty("msgIs");
                 if (msg != null) {
-                    assertEquals(msg, e.getMessage(), "Message must be " + msg);
+                    assertEquals(msg, errMsg, "Message must be " + msg + ", but is " + errMsg);
                 }
 
                 String loc = props.getProperty("position");

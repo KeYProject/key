@@ -1,7 +1,6 @@
 // verbose: true
-// broken: true
-// xxxexceptionClass: PosConvertException
-// xxxmsgContains: XXXX
+// msgContains: missing '{'
+// position: 8/7
 
 class MissingClosingBrace {    
     /*@ model int modelMethodWithoutClose() {
