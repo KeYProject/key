@@ -703,13 +703,9 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
                 result = ThreeValuedTruth.TRUE;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
-                    try {
-                        if (subs.get(i).containsJavaBlockRecursive()) {
-                            result = ThreeValuedTruth.TRUE;
-                            break;
-                        }
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
+                    if (subs.get(i).containsJavaBlockRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
                     }
                 }
             }
