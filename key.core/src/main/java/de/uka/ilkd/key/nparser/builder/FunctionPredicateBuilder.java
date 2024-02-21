@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -52,16 +53,28 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
+        var dtNamespace = new Namespace<Function>();
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
             Sort[] args = new Sort[constructorContext.sortId().size()];
+            var argNames = constructorContext.argName;
             for (int i = 0; i < args.length; i++) {
-                args[i] = accept(constructorContext.sortId(i));
+                Sort argSort = accept(constructorContext.sortId(i));
+                args[i] = argSort;
+                var argName = argNames.get(i).getText();
+                var alreadyDefinedFn = dtNamespace.lookup(argName);
+                if (alreadyDefinedFn != null
+                        && (!alreadyDefinedFn.sort().equals(argSort) || !alreadyDefinedFn.argSort(0).equals(sort))) {
+                    throw new RuntimeException("Name already in namespace: " + argName);
+                }
+                Function fn = new Function(new Name(argName), argSort, new Sort[]{ sort }, null, false, false);
+                dtNamespace.add(fn);
             }
             Function function = new Function(name, sort, args, null, true, false);
-            namespaces().functions().add(function);
+            namespaces().functions().addSafely(function);
         }
+        namespaces().functions().addSafely(dtNamespace.allElements());
         return null;
     }
 

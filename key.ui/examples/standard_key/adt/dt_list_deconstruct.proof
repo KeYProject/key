@@ -1,0 +1,116 @@
+\profile "Java Profile";
+
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:on",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:on",
+        "bigint" : "bigint:on",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:off",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     },
+    "Labels" : { 
+        "UseOriginLabels" : true
+     },
+    "NewSMT" : { 
+        
+     },
+    "SMTSettings" : { 
+        "SelectedTaclets" : [ 
+            
+         ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+     },
+    "Strategy" : { 
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 500,
+        "Timeout" : -1,
+        "options" : { 
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_OFF",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+         }
+     }
+ } 
+
+\datatypes {
+	List = Nil | Cons(any head, List tail) | Cons2(any head2, List tail);
+}
+
+\functions {
+	List x;
+}
+\problem {
+  Nil = tail(Cons(Z(0(#)), Nil))
+& Nil = tail(Cons2(Z(0(#)), Nil))
+& (   x = Cons(Z(0(#)), Cons(Z(1(#)), Nil))
+   -> head(x) = Z(0(#)))
+}
+
+\proof {
+(keyLog "0" (keyUser "daniel" ) (keyVersion "1fb0c10630b493ce138850ae0f9803d3f2fffc51"))
+
+(autoModeTime "0")
+
+(branch "dummy ID"
+(rule "andRight" (formula "1") (userinteraction))
+(branch "Case 1"
+   (rule "andRight" (formula "1") (userinteraction))
+   (branch "Case 1"
+      (rule "tail_Dec_Cons" (formula "1") (term "1") (userinteraction))
+      (rule "equalUnique" (formula "1") (userinteraction))
+      (rule "closeTrue" (formula "1") (userinteraction))
+   )
+   (branch "Case 2"
+      (rule "tail_Dec_Cons2" (formula "1") (term "1") (userinteraction))
+      (rule "equalUnique" (formula "1") (userinteraction))
+      (rule "closeTrue" (formula "1") (userinteraction))
+   )
+)
+(branch "Case 2"
+   (rule "impRight" (formula "1") (userinteraction))
+   (rule "head_DecEQ_Cons" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
+   (rule "equal_literals" (formula "2") (userinteraction))
+   (rule "closeTrue" (formula "2") (userinteraction))
+)
+)
+}
