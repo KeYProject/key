@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.antlr.v4.runtime.InputMismatchException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -38,6 +41,34 @@ public final class ExceptionTools {
     private ExceptionTools() {
     }
 
+    public static String getNiceMessage(InputMismatchException ime) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Syntax error in input file ");
+        var inFile = new File(ime.getInputStream().getSourceName());
+        sb.append(inFile.getName());
+        sb.append("\n");
+        sb.append("Line: ");
+        sb.append(ime.getOffendingToken().getLine());
+        sb.append(" Character: ");
+        sb.append(ime.getOffendingToken().getCharPositionInLine() + 1);
+
+        var offendingToken = ime.getOffendingToken();
+        sb.append("\n");
+        sb.append("Found token: ");
+        sb.append(ime.getRecognizer().getVocabulary().getDisplayName(offendingToken.getType()));
+        sb.append("\n");
+        sb.append("Expected token type(s): ");
+        for (var interval : ime.getExpectedTokens().getIntervals()) {
+            for (int i = interval.a; i <= interval.b; i++) {
+                sb.append(ime.getRecognizer().getVocabulary().getDisplayName(i));
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
     /**
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
      * Result may be null.
@@ -56,6 +87,8 @@ public final class ExceptionTools {
             return Optional.ofNullable(getLocation((ParseException) exc));
         } else if (exc instanceof TokenMgrError) {
             return Optional.ofNullable(getLocation((TokenMgrError) exc));
+        } else if (exc instanceof InputMismatchException ime) {
+            return Optional.ofNullable(getLocation(ime));
         }
 
         if (exc.getCause() != null) {
@@ -71,6 +104,15 @@ public final class ExceptionTools {
         Token token = exc.currentToken;
         return token == null ? null
                 : new Location(null, Position.fromToken(token.next));
+    }
+
+    private static Location getLocation(InputMismatchException exc) {
+        var token = exc.getOffendingToken();
+
+        return token == null ? null
+                : new Location(
+                    Paths.get("/", exc.getInputStream().getSourceName()).normalize().toUri(),
+                    Position.fromToken(token));
     }
 
     private static Location getLocation(TokenMgrError exc) {
