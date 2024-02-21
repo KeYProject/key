@@ -197,6 +197,49 @@ public class JMLSpecFactory {
         return symbDatas;
     }
 
+    public Contract createDefaultContract(IProgramMethod method) {
+        ProgramVariableCollection progVarCollection = createProgramVariables(method);
+        LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        Term excNull = tb.equals(tb.var(progVarCollection.excVar), tb.NULL());
+
+        if (method.getContainerType().getFullName().startsWith("java.")
+                || method.getContainerType().getFullName().startsWith("org.apache.")) {
+            return cf.func(
+                    generateName(method, Behavior.NORMAL_BEHAVIOR, null),
+                    method,
+                    true,
+                    Map.of(heap, tb.tt()),
+                    Map.of(heap, tb.tt()),
+                    null,
+                    Map.of(heap, excNull),
+                    Map.of(heap, tb.tt()),
+                    Map.of(),
+                    Map.of(heap, tb.empty()),
+                    Map.of(heap, tb.empty()),
+                    Map.of(heap, tb.empty()),
+                    Map.of(heap, false),
+                    Map.of(heap, false),
+                    progVarCollection);
+        } else {
+            return cf.func(
+                    generateName(method, Behavior.BEHAVIOR, null),
+                    method,
+                    false,
+                    Map.of(heap, tb.tt()),
+                    Map.of(heap, tb.tt()),
+                    null,
+                    Map.of(heap, tb.tt()),
+                    Map.of(heap, tb.tt()),
+                    Map.of(),
+                    Map.of(heap, tb.allLocs()),
+                    Map.of(heap, tb.empty()),
+                    Map.of(heap, tb.allLocs()),
+                    Map.of(heap, true),
+                    Map.of(heap, true),
+                    progVarCollection);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // internal classes
     // -------------------------------------------------------------------------
