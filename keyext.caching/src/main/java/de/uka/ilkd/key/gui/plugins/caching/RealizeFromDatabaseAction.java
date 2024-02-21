@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -51,7 +52,7 @@ public class RealizeFromDatabaseAction extends KeyAction {
         while (allNodes.hasNext()) {
             var x = allNodes.next();
             if (x.getStepIndex() == cachedProofBranch.stepIndex) {
-                node.register(new ClosedBy(proof, x), ClosedBy.class);
+                node.register(new ClosedBy(proof, x, new HashSet<>()), ClosedBy.class);
                 if (callback != null) {
                     callback.run();
                 }

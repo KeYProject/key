@@ -37,6 +37,7 @@ public class AddToDatabaseAction extends KeyAction {
         this.proof = proof;
 
         setName("Add to proof caching database");
+        setMenuPath("Proof Caching");
     }
 
     @Override

@@ -67,4 +67,15 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
             return List.of(v);
         }
     }
+
+    public EquivalenceDirectedGraph copy() {
+        var g = new EquivalenceDirectedGraph();
+        for (var vertex : vertexSet()) {
+            g.addVertex(vertex);
+        }
+        for (var edge : edgeSet()) {
+            g.addEdge((GraphNode) edge.getSource(), (GraphNode) edge.getTarget(), edge);
+        }
+        return g;
+    }
 }

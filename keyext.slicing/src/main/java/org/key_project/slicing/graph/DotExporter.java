@@ -4,6 +4,7 @@
 package org.key_project.slicing.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -64,11 +65,12 @@ public final class DotExporter {
         while (!queue.isEmpty()) {
             Node node = queue.remove(queue.size() - 1);
             node.childrenIterator().forEachRemaining(queue::add);
-            DependencyNodeData data = node.lookup(DependencyNodeData.class);
-            if (data == null) {
+            var edges = graph.edgesOf(node);
+            var data = node.lookup(DependencyNodeData.class);
+            if (edges == null || edges.isEmpty() || data == null) {
                 continue;
             }
-            outputEdge(buf, analysisResults, abbreviateFormulas, false, node, data);
+            outputEdge(buf, analysisResults, abbreviateFormulas, false, node, data, edges);
         }
         // colorize useless nodes
         if (analysisResults != null) {
@@ -192,6 +194,59 @@ public final class DotExporter {
                     buf.append('"').append(outString).append("\" [shape=\"").append(shape)
                             .append("\"]\n");
                 }
+            }
+        }
+    }
+
+    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
+            boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data,
+            Collection<AnnotatedEdge> edges) {
+        for (var edge : edges) {
+            var in = ((GraphNode) edge.getSource());
+            var out = ((GraphNode) edge.getTarget());
+            // input node label
+            String inString = in.toString(abbreviateFormulas, omitBranch);
+            // output node label
+            String outString = out.toString(abbreviateFormulas, omitBranch);
+            // label for edge itself
+            String label = data.label;
+            if (edge instanceof AnnotatedShortenedEdge ase) {
+                label = ase.getEdgeLabel();
+            }
+            buf
+                    .append('"')
+                    .append(inString)
+                    .append("\" -> \"")
+                    .append(outString)
+                    .append("\" [label=\"")
+                    .append(label);
+            // mark useless steps / formulas in red
+            if (analysisResults != null
+                    && !analysisResults.usefulSteps.contains(node)) {
+                buf.append("\" color=\"red");
+            }
+            buf
+                    .append("\"]\n");
+            if (analysisResults != null) {
+                if (!analysisResults.usefulNodes.contains(in)) {
+                    buf.append('"').append(inString).append('"')
+                            .append(" [color=\"red\"]\n");
+                }
+                if (!analysisResults.usefulNodes.contains(out)) {
+                    buf.append('"').append(outString).append('"')
+                            .append(" [color=\"red\"]\n");
+                }
+            }
+            // make sure the formulas are drawn with the correct shape
+            String shape = SHAPES.get(in.getClass());
+            if (shape != null) {
+                buf.append('"').append(inString).append("\" [shape=\"").append(shape)
+                        .append("\"]\n");
+            }
+            shape = SHAPES.get(out.getClass());
+            if (shape != null) {
+                buf.append('"').append(outString).append("\" [shape=\"").append(shape)
+                        .append("\"]\n");
             }
         }
     }

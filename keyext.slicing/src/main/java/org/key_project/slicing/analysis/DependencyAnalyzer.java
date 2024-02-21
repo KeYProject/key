@@ -242,7 +242,7 @@ public final class DependencyAnalyzer {
         executionTime.stop(TOTAL_WORK);
 
         return new AnalysisResults(
-            proof, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
+            proof, graph, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
             branchStacks, doDependencyAnalysis, doDeduplicateRuleApps, executionTime);
     }
 

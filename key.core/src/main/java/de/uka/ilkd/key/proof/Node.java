@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -465,7 +466,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for all nodes in the subtree.
+     * @return an iterator for all nodes in the subtree (including this node).
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
@@ -606,8 +607,8 @@ public class Node implements Iterable<Node> {
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
                 final Goal goal = proof().getOpenGoal(this);
-                if (this.isClosed() && lookup(ClosedBy.class) != null) {
-                    cachedName = CACHED_GOAL;
+                if (this.isClosed() && (lookup(ClosedBy.class) != null || lookup(CachedProofBranch.class) != null)) {
+                    return CACHED_GOAL;
                 } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {

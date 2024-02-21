@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -304,6 +306,13 @@ public class TestSemisequent {
         assertEquals(ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(sci), "Both semisequents should be equal.");
+    }
+
+    @Test
+    void constructorTest() {
+        var a = Semisequent.EMPTY_SEMISEQUENT;
+        var b = Semisequent.create(new ArrayList<>());
+        assertSame(a, b);
     }
 
 }

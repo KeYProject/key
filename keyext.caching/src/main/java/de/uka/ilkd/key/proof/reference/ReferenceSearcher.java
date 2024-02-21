@@ -16,6 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.slicing.DependencyTracker;
+import org.key_project.slicing.analysis.AnalysisResults;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,22 +51,19 @@ public final class ReferenceSearcher {
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
-                continue; // doesn't make sense
+                continue; // doesn't make sense to cache in the same proof
             }
             // conservative check: all user-defined rules in a previous proof
             // have to also be available in the new proof
             var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
             var tacletIndex = p.allGoals().head().ruleAppIndex().tacletIndex();
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
-            Set<NoPosTacletApp> newTaclets = null;
+            Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
             var tacletsOk = true;
             for (var taclet : tacletIndex.allNoPosTacletApps().stream()
                     .filter(x -> x.taclet().getOrigin() != null
                             && x.taclet().getOrigin().contains(proofFile))
                     .toList()) {
-                if (newTaclets == null) {
-                    newTaclets = newTacletIndex.allNoPosTacletApps();
-                }
                 if (newTaclets.stream().noneMatch(newTaclet -> Objects
                         .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
                     tacletsOk = false;
@@ -90,6 +90,18 @@ public final class ReferenceSearcher {
                 }
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+            var depTracker = p.lookup(DependencyTracker.class);
+            AnalysisResults results = null;
+            // only try to get analysis results if it is a pure proof
+            if (depTracker != null && p.closedGoals().stream()
+                    .noneMatch(x -> x.node().lookup(ClosedBy.class) != null)) {
+                try {
+                    results = depTracker.analyze(true, false);
+                } catch (Exception ignored) {
+                    // if the analysis for some reason fails, we simply proceed as usual
+                    LOGGER.debug("failed to analyze proof ", ignored);
+                }
+            }
             while (!nodesToCheck.isEmpty()) {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
@@ -106,15 +118,29 @@ public final class ReferenceSearcher {
                 if (n.parent() != null) {
                     nodesToCheck.add(n.parent());
                 }
-                Semisequent ante = n.sequent().antecedent();
-                Semisequent succ = n.sequent().succedent();
+                Sequent seq = n.sequent();
+                if (results != null) {
+                    seq = results.reduceSequent(n);
+                }
+                Semisequent ante = seq.antecedent();
+                Semisequent succ = seq.succedent();
                 Semisequent anteNew = newNode.sequent().antecedent();
                 Semisequent succNew = newNode.sequent().succedent();
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
                     continue;
                 }
                 LOGGER.debug("found caching candidate in proof {} node {}", p.name(), n.serialNr());
-                return new ClosedBy(p, n);
+                Set<Node> toSkip = new HashSet<>();
+                if (results != null) {
+                    // computed skipped nodes by iterating through all nodes
+                    AnalysisResults finalResults = results;
+                    n.subtreeIterator().forEachRemaining(x -> {
+                        if (!finalResults.usefulSteps.contains(x)) {
+                            toSkip.add(x);
+                        }
+                    });
+                }
+                return new ClosedBy(p, n, toSkip);
             }
             // dependency graph caching search
         }
@@ -158,9 +184,13 @@ public final class ReferenceSearcher {
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
             Term term = seq.getFormulabyNr(i).formula();
+            // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
+                // not suitable for caching
                 return false;
             }
+            // then, check for program methods
+            // (may expand differently depending on Java code associated with proofs)
             term.execPreOrder(f);
             if (f.getFoundProgramMethod()) {
                 return false;
