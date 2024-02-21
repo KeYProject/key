@@ -6,6 +6,8 @@ package de.uka.ilkd.key.smt.communication;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.key_project.util.java.IOUtil;
 
@@ -39,7 +41,7 @@ class BufferedMessageReader {
     private final Reader reader;
 
     /** the delimiters supported in this instance */
-    private final String[] delimiters;
+    private final Collection<String> delimiters;
 
     /**
      * Creates a new BufferedMessageReader wrapping the given Reader.
@@ -47,9 +49,9 @@ class BufferedMessageReader {
      * @param reader the Reader to wrap
      * @param delimiters the delimiters, where incoming messages should be split
      */
-    public BufferedMessageReader(Reader reader, String[] delimiters) {
+    public BufferedMessageReader(Reader reader, Collection<String> delimiters) {
         this.reader = reader;
-        this.delimiters = delimiters;
+        this.delimiters = new HashSet<>(delimiters);
     }
 
     /**

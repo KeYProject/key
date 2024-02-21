@@ -45,7 +45,7 @@ public class MasterHandler {
     private final List<Writable> axioms = new ArrayList<>();
 
     /** A list of known symbols */
-    private final Set<String> knownSymbols = new HashSet<>();
+    private final Collection<String> knownSymbols = new HashSet<>();
 
     /** A list of untranslatable values */
     private final Map<Term, SExpr> unknownValues = new HashMap<>();
@@ -68,7 +68,7 @@ public class MasterHandler {
     /**
      * Handler Options to be used by all the other SMT handlers.
      */
-    private final String[] handlerOptions;
+    private final Collection<String> handlerOptions;
 
     /**
      * Create a new handler with the default set of smt handlers.
@@ -80,16 +80,17 @@ public class MasterHandler {
      * @param handlerOptions arbitrary String options for the handlers to process
      * @throws IOException if the handlers cannot be loaded
      */
-    public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
-            String[] handlerOptions) throws IOException {
+    public MasterHandler(Services services, SMTSettings settings,
+                         Collection<String> handlerNames, Collection<String> handlerOptions)
+            throws IOException {
         getTranslationState().putAll(settings.getNewSettings().getMap());
         this.handlerOptions = handlerOptions;
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
     }
 
-    public String[] getHandlerOptions() {
+    public Set<String> getHandlerOptions() {
         // TODO clone array instead?
-        return handlerOptions;
+        return new HashSet<>(handlerOptions);
     }
 
     public boolean noTypeEmbedding () {

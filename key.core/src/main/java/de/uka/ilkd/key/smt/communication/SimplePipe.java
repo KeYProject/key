@@ -5,6 +5,7 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -72,7 +73,7 @@ public class SimplePipe implements Pipe {
      * @param session the message list where to log the messages to
      * @param process the external process this pipe is connected to
      */
-    public SimplePipe(@NonNull InputStream input, @NonNull String[] messageDelimiters,
+    public SimplePipe(@NonNull InputStream input, @NonNull Collection<String> messageDelimiters,
             @NonNull OutputStream output, @NonNull SolverCommunication session,
             @NonNull Process process) {
         processWriter =

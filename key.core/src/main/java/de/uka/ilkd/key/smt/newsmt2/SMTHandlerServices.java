@@ -103,13 +103,14 @@ public class SMTHandlerServices {
      *         names as well.
      * @throws IOException if loading the snippet Properties for a handler class fails
      */
-    public Collection<SMTHandler> getTemplateHandlers(String[] handlerNames) throws IOException {
+    public Collection<SMTHandler> getTemplateHandlers(Collection<String> handlerNames) throws IOException {
         // If handlerNames is empty, use default handlerNames list.
-        if (handlerNames.length == 0) {
+        if (handlerNames.size() == 0) {
             InputStream stream = SolverPropertiesLoader.class.getResourceAsStream(DEFAULT_HANDLERS);
             BufferedReader reader =
                 new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-            handlerNames = reader.lines().toArray(String[]::new);
+            handlerNames = new HashSet<>();
+            Collections.addAll(handlerNames, reader.lines().toArray(String[]::new));
         }
         Collection<SMTHandler> result = new LinkedList<>();
         for (String name : handlerNames) {
@@ -170,13 +171,12 @@ public class SMTHandlerServices {
      * @param services passed on to the handlers for initialisation
      * @param handlerNames the fully classified class names of the SMTHandlers to be used If this is
      *        empty or null, all existing handlers will be used.
-     * @param handlerOptions arbitrary String options for the SMTHandlers
      * @param mh passed on to the handlers for initialisation
      * @return a freshly created list of freshly created handlers
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, @NonNull String[] handlerNames,
+    public List<SMTHandler> getFreshHandlers(Services services, @NonNull Collection<String> handlerNames,
                                              MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();

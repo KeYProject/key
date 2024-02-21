@@ -243,9 +243,9 @@ public class SolverPropertiesLoader {
         long timeout;
         Class<?> solverSocketClass;
         Class<?> translatorClass;
-        String[] handlerNames;
-        String[] handlerOptions;
-        String[] delimiters;
+        Set<String> handlerNames = new HashSet<>();
+        Set<String> handlerOptions = new HashSet<>();
+        Set<String> delimiters = new HashSet<>();
 
         // Read props file to create a SolverTypeImplementation object:
 
@@ -279,8 +279,9 @@ public class SolverPropertiesLoader {
 
 
         // the message DELIMITERS used by the created solver in its stdout
-        delimiters = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.DELIMITERS,
-            SPLIT, DEFAULT_DELIMITERS);
+        Collections.addAll(delimiters,
+                SettingsConverter.readRawStringList(props,
+                        SolverPropertiesLoader.DELIMITERS, SPLIT, DEFAULT_DELIMITERS));
 
         // the smt translator (class SMTTranslator) used by the created solver
         try {
@@ -293,10 +294,10 @@ public class SolverPropertiesLoader {
 
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
-        handlerNames = SettingsConverter.readRawStringList(props,
-            SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]);
-        handlerOptions = SettingsConverter.readRawStringList(props,
-            SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
+        Collections.addAll(handlerNames, SettingsConverter.readRawStringList(props,
+            SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]));
+        Collections.addAll(handlerOptions, SettingsConverter.readRawStringList(props,
+            SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]));
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null,

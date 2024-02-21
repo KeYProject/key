@@ -7,9 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -63,11 +61,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     /**
      * The fully classified class names of the SMTHandlers used by this translator.
      */
-    private final String[] handlerNames;
+    private final Collection<String> handlerNames;
     /**
      * Arbitrary String options for the SMTHandlers used by this translator.
      */
-    private final String[] handlerOptions;
+    private final Collection<String> handlerOptions;
 
     /**
      * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the
@@ -78,15 +76,15 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * @param handlerNames fully classified class names of the SMTHandlers to be used by this
      *        translator
      */
-    public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
-            @Nullable String preamble) {
+    public ModularSMTLib2Translator(Collection<String> handlerNames, Collection<String> handlerOptions,
+                                    @Nullable String preamble) {
         if (preamble == null) {
             this.preamble = SMTHandlerServices.getInstance().getPreamble();
         } else {
             this.preamble = preamble;
         }
-        this.handlerNames = handlerNames;
-        this.handlerOptions = handlerOptions;
+        this.handlerNames = new HashSet<>(handlerNames);
+        this.handlerOptions = new HashSet<>(handlerOptions);
         /*
          * Make sure to load the needed handlers once so that their smt properties are loaded as
          * well. This is needed so that the properties already exist before first translating
@@ -106,7 +104,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
      */
     public ModularSMTLib2Translator() {
-        this(new String[0], new String[0], null);
+        this(new HashSet<>(), new HashSet<>(), null);
     }
 
     @Override
