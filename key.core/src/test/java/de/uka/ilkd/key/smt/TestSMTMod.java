@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
+
+import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -8,18 +13,18 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.junit.Test;
+
 import org.key_project.util.helper.FindResources;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
 
 /**
  * This class is for testing the translation of modulo from KeY to SMT
+ *
  * @author Nils Buchholz, 2024
  */
 public class TestSMTMod {
@@ -41,12 +46,13 @@ public class TestSMTMod {
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
      * thus satisfying the definition of euclidean modulo
+     *
      * @throws ProblemLoaderException Occured Exception during load of problem file
      */
     @Test
     public void testModSpec() throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(new File(testCaseDirectory, "smt/modSpec.key"));
+            KeYEnvironment.load(new File(testCaseDirectory, "smt/modSpec.key"));
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
