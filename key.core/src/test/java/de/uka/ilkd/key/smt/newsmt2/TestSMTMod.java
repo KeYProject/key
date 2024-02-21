@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.File;
 
@@ -10,6 +10,10 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SMTTestSettings;
+import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -46,6 +50,7 @@ public class TestSMTMod {
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
      * thus satisfying the definition of euclidean modulo
+     * Tests for Z3 and CVC4
      *
      * @throws ProblemLoaderException Occured Exception during load of problem file
      */
