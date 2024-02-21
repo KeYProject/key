@@ -65,10 +65,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 var argName = argNames.get(i).getText();
                 var alreadyDefinedFn = dtNamespace.lookup(argName);
                 if (alreadyDefinedFn != null
-                        && (!alreadyDefinedFn.sort().equals(argSort) || !alreadyDefinedFn.argSort(0).equals(sort))) {
+                        && (!alreadyDefinedFn.sort().equals(argSort)
+                                || !alreadyDefinedFn.argSort(0).equals(sort))) {
                     throw new RuntimeException("Name already in namespace: " + argName);
                 }
-                Function fn = new Function(new Name(argName), argSort, new Sort[]{ sort }, null, false, false);
+                Function fn = new Function(new Name(argName), argSort, new Sort[] { sort }, null,
+                    false, false);
                 dtNamespace.add(fn);
             }
             Function function = new Function(name, sort, args, null, true, false);
