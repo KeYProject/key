@@ -2007,6 +2007,22 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return new SLExpression(t);
     }
 
+    @Override
+    public SLExpression visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Term t;
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        if (ctx.STRICTLY_NOTHING() != null) {
+            t = tb.strictlyNothing();
+        } else {
+            final Term storeRef = accept(ctx.storeRefUnion());
+            assert storeRef != null;
+            t = termFactory.assignable(storeRef);
+        }
+        for (LocationVariable heap : heaps) {
+            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+        }
+        return new SLExpression(t);
+    }
 
     @Override
     public SLExpression visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {

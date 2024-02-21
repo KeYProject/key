@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
@@ -254,9 +255,10 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final TerminalNode assign = ctx.ASSIGNABLE() != null ? ctx.ASSIGNABLE()
+                : ctx.MODIFIES() != null ? ctx.MODIFIES() : ctx.MODIFIABLE();
         final boolean isFree =
-            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free")
-                    || ctx.MODIFIES() != null && ctx.MODIFIES().getText().endsWith("_free");
+            assign != null && assign.getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
@@ -266,6 +268,29 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             if (methodContract != null) {
                 methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
+            if (loopContract != null) {
+                loopContract.addClause(
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
+                    heap, ctx2);
+            }
+        }
+        return null;
+    }
+
+    @Override public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final TerminalNode assign = ctx.ASSIGNABLE() != null ? ctx.ASSIGNABLE()
+                : ctx.MODIFIES() != null ? ctx.MODIFIES() : ctx.MODIFIABLE() != null ?
+                        ctx.MODIFIABLE() : ctx.LOOP_ASSIGNABLE();
+        final boolean isFree =
+            assign != null && assign.getText().endsWith("_free");
+        final LabeledParserRuleContext ctx2 =
+            LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
+                attachOriginLabel);
+        for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(
                     isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
