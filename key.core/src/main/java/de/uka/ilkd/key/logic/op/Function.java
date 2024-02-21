@@ -126,7 +126,8 @@ public class Function extends AbstractSortedOperator {
      * @return a string representation of the argument sorts to this function
      */
     public final String argsToString() {
-        StringBuilder s = new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+        StringBuilder s =
+            new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
         if (arity() > 0) {
             s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));
         }

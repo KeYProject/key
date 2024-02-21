@@ -96,7 +96,8 @@ public class CachedProofBranch {
      */
     CachedProofBranch(File proofFile, Collection<CachedFile> referencedFiles, String choiceSettings,
             String keyVersion,
-            int stepIndex, String sequent, Map<String, String> typesFunctions, Map<String, String> typesLocVars) {
+            int stepIndex, String sequent, Map<String, String> typesFunctions,
+            Map<String, String> typesLocVars) {
         this.proofFile = proofFile;
         this.referencedFiles = referencedFiles;
         this.keyVersion = keyVersion;
@@ -143,7 +144,8 @@ public class CachedProofBranch {
      * @param sequent the sequent
      * @return whether this cached proof branch can close the new proof branch
      */
-    public boolean isCacheHitFor(Set<String> anteFormulas, Set<String> succFormulas, Sequent sequent) {
+    public boolean isCacheHitFor(Set<String> anteFormulas, Set<String> succFormulas,
+            Sequent sequent) {
         var typeCollector = new TypeCollectingVisitor();
         typeCollector.visit(sequent);
         for (var entry : typeCollector.getTypes().entrySet()) {

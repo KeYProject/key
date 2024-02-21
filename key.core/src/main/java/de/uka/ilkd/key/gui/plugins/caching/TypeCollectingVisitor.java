@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class TypeCollectingVisitor implements Visitor {
     private final Map<String, String> types = new HashMap<>();
@@ -32,7 +35,8 @@ public class TypeCollectingVisitor implements Visitor {
             types.put(function.name().toString(), function.argsToString());
         }
         if (op instanceof LocationVariable locationVariable) {
-            typesLocVars.put(locationVariable.name().toString(), locationVariable.getKeYJavaType().toString());
+            typesLocVars.put(locationVariable.name().toString(),
+                locationVariable.getKeYJavaType().toString());
         }
     }
 

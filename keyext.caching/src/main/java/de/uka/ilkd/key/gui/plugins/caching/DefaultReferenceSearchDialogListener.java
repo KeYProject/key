@@ -52,9 +52,8 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                     var branch = closedGoal.node().lookup(CachedProofBranch.class);
                     if (branch != null) {
                         new RealizeFromDatabaseAction(mediator, closedGoal.node(),
-                            () -> SwingUtilities.invokeLater(() -> {
-                                auxiliaryProofsToClose.add(mediator.getSelectedProof());
-                                mediator.getSelectionModel().setSelectedProof(p);
+                            proof -> SwingUtilities.invokeLater(() -> {
+                                auxiliaryProofsToClose.add(proof);
                                 copyButtonClicked(dialog);
                             })).actionPerformed(null);
                         // now return and wait for the callback

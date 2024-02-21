@@ -607,7 +607,8 @@ public class Node implements Iterable<Node> {
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
                 final Goal goal = proof().getOpenGoal(this);
-                if (this.isClosed() && (lookup(ClosedBy.class) != null || lookup(CachedProofBranch.class) != null)) {
+                if (this.isClosed() && (lookup(ClosedBy.class) != null
+                        || lookup(CachedProofBranch.class) != null)) {
                     return CACHED_GOAL;
                 } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this

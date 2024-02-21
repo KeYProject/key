@@ -134,8 +134,8 @@ public final class CachingDatabase {
                         new CachedProofBranch(file, references, choiceSettings, keyVersion,
                             branch.getInt("stepIndex"),
                             branch.getString("sequent"),
-                                typesFunctionsMap,
-                                typesLocVarsMap));
+                            typesFunctionsMap,
+                            typesLocVarsMap));
                 }
             }
             doNotSave = false;
