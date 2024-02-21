@@ -54,6 +54,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     private static final String GET_UNSAT_CORE = "getUnsatCore";
 
+    public static final String NO_TYPE_EMBEDDING = "noTypeEmbedding";
+
     /**
      * The smt preamble prepended to smt problems that are created with this translator.
      */

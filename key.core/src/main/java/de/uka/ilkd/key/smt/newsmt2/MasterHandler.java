@@ -4,16 +4,8 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -98,6 +90,10 @@ public class MasterHandler {
     public String[] getHandlerOptions() {
         // TODO clone array instead?
         return handlerOptions;
+    }
+
+    public boolean noTypeEmbedding () {
+        return Arrays.asList(handlerOptions).contains(ModularSMTLib2Translator.NO_TYPE_EMBEDDING);
     }
 
     /**
