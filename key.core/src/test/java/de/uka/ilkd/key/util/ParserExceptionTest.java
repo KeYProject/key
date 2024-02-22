@@ -163,18 +163,18 @@ public abstract class ParserExceptionTest {
                 String errMsg = e.getMessage();
                 if (msg != null) {
                     assertTrue(actualMessage.contains(msg),
-                        "Message must contain " + msg + ", but message is: " + actualMessage);
+                        "Message must contain '" + msg + "', but message is: '" + actualMessage + "'");
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
                     assertTrue(actualMessage.matches(msg),
-                        "Message must match regular exp " + msg + ", but is " + errMsg);
+                        "Message must match regular expression '" + msg + "', but is '" + actualMessage + "'");
                 }
 
                 msg = props.getProperty("msgIs");
                 if (msg != null) {
-                    assertEquals(msg, actualMessage, "Message must be " + msg + ", but is " + errMsg);
+                    assertEquals(msg, actualMessage, "Message must be " + msg + ", but is " + actualMessage + "'");
                 }
 
                 String loc = props.getProperty("position");
