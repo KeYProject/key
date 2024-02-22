@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -29,12 +30,14 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "u_";
+    private IntegerLDT integerLDT;
 
     // TODO This flag does not seem to be 100% what it is supposed to. Refactor. MU
     private boolean enableQuantifiers;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
         enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
     }
 
@@ -68,7 +71,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         }
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
+        SExpr.Type exprType = (term.sort() == JavaDLTheory.FORMULA) ? BOOL : (term.sort() == integerLDT.targetSort() ? IntegerOpHandler.INT : UNIVERSE);
         return new SExpr(name, exprType, children);
     }
 

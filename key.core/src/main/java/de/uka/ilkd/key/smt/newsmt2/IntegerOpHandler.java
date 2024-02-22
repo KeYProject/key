@@ -24,7 +24,8 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 public class IntegerOpHandler implements SMTHandler {
 
     /** to indicate that an expression holds a value of type Int. */
-    public static final Type INT = new Type("Int", "i2u", "u2i");
+    //public static final Type INT = new Type("Int", "i2u", "u2i");
+    public static final Type INT = new Type("Int", null, null);
 
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
         new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
@@ -61,11 +62,11 @@ public class IntegerOpHandler implements SMTHandler {
 
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
 
-        //if (!masterHandler.isHandlerOptionSet(ModularSMTLib2Translator.NO_TYPE_EMBEDDING)) {
+        if (!masterHandler.isHandlerOptionSet(ModularSMTLib2Translator.NO_TYPE_EMBEDDING)) {
             // sort_int is defined here, declare it as already defined
             masterHandler.addKnownSymbol("sort_int");
             masterHandler.addSort(integerLDT.targetSort());
-        //}
+        }
 
         this.limitedToPresbuger = PROPERTY_PRESBURGER.get(masterHandler.getTranslationState());
     }
