@@ -5,9 +5,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -317,7 +315,10 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
-                if (methodSpecs.isEmpty()) {
+                // Create default contracts for all methods except KeY default methods (like <init>) and Object methods.
+                if (methodSpecs.isEmpty()
+                        && !pm.getContainerType().getFullName().equals("java.lang.Object")
+                        && !pm.getFullName().startsWith("<")) {
                     specRepos.addContract(specExtractor.createDefaultContract(pm));
                 }
 
