@@ -130,7 +130,6 @@ public final class ParsingFacade {
         KeYParser p = createParser(stream);
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
-        // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
         KeYParser.FileContext ctx = p.file();

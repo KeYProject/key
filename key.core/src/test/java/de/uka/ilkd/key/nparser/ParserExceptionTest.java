@@ -60,7 +60,7 @@ public class ParserExceptionTest {
 
     // File name local to the res directoy with the test cases
     // Can be used for temporary debugging
-    private static final String FIX_FILE = null; // "conflict.key";
+    private static final String FIX_FILE = "missing_semicolon.key";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserExceptionTest.class);
 
@@ -138,20 +138,21 @@ public class ParserExceptionTest {
                     }
                 }
 
+                String actualMessage = ExceptionTools.getMessage(e);
                 String msg = props.getProperty("msgContains");
                 if (msg != null) {
-                    assertTrue(e.getMessage().contains(msg), "Message must contain " + msg);
+                    assertTrue(actualMessage.contains(msg), "Message must contain " + msg + ", but message is: " + actualMessage);
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
-                    assertTrue(e.getMessage().matches(msg),
+                    assertTrue(actualMessage.matches(msg),
                         "Message must match regular exp " + msg);
                 }
 
                 msg = props.getProperty("msgIs");
                 if (msg != null) {
-                    assertEquals(msg, e.getMessage(), "Message must be " + msg);
+                    assertEquals(msg, actualMessage, "Message must be " + msg);
                 }
 
                 String loc = props.getProperty("position");
