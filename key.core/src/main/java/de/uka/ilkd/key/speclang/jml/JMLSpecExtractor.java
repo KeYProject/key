@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.*;
@@ -717,7 +716,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public Contract createDefaultContract(IProgramMethod method) {
-        return jsf.createDefaultContract(method);
+    public Contract createDefaultContract(IProgramMethod method, boolean useSoundDefault) {
+        return jsf.createDefaultContract(method, useSoundDefault);
     }
 }

@@ -110,5 +110,5 @@ public interface SpecExtractor {
      */
     ImmutableList<PositionedString> getWarnings();
 
-    Contract createDefaultContract(IProgramMethod pm);
+    Contract createDefaultContract(IProgramMethod pm, boolean useSoundDefault);
 }
