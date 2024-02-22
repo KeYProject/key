@@ -1,5 +1,6 @@
 // verbose: true
-// msgContains: missing '{'
+// broken: true
+// msgContains: missing '}'
 // position: 8/7
 
 class MissingClosingBrace {    
@@ -7,3 +8,5 @@ class MissingClosingBrace {
       @  return 0;
       @*/
 }
+
+// Since RBRACE is defined twice in the grammar, this can be reported only like this?!

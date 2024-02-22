@@ -167,8 +167,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
             SortDependingFunction firstInstance =
                 SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
-            if(sort == null)
-                semanticError(ctx,"Could not find sort: %s", sortName);
+            if (sort == null)
+                semanticError(ctx, "Could not find sort: %s", sortName);
             if (firstInstance != null) {
                 SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {

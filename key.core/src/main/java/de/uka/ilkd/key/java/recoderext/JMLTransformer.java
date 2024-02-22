@@ -100,8 +100,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             int previousEndLine = previousStart.getLine() +
                     (int) previousText.chars().filter(x -> x == '\n').count();
 
-            // /*ab*/  => length: 6, lastIndex: -1, so we get 6
-            // /*\nb*/ => length: 6, lastIndex:  2, so we get 3
+            // /*ab*/ => length: 6, lastIndex: -1, so we get 6
+            // /*\nb*/ => length: 6, lastIndex: 2, so we get 3
             int previousEndColumn = previousStart.getColumn() - 1 +
                     previousText.length() - (previousText.lastIndexOf('\n') + 1);
 
@@ -111,8 +111,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
             // the columns are starting at 1 and not at 0
             int insertColumns = insertRows > 0 ? // line break between the comments
-                    currentStart.getColumn() - 1 :
-                    (currentStart.getColumn() - 1) - previousEndColumn;
+                    currentStart.getColumn() - 1
+                    : (currentStart.getColumn() - 1) - previousEndColumn;
 
             assert insertRows >= 0 && insertColumns >= 0;
 

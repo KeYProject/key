@@ -98,19 +98,27 @@ public final class JMLSpecExtractor implements SpecExtractor {
             int previousEndLine = previousStart.line() +
                     (int) previousText.chars().filter(x -> x == '\n').count();
 
-            // /*ab*/  => length: 6, lastIndex: -1, so we get 6
-            // /*\nb*/ => length: 6, lastIndex:  2, so we get 3
+            // /*ab*/ => length: 6, lastIndex: -1, so we get 6
+            // /*\nb*/ => length: 6, lastIndex: 2, so we get 3
             int previousEndColumn = previousStart.column() - 1 +
                     previousText.length() - (previousText.lastIndexOf('\n') + 1);
 
             Position currentStart = comments[i].getStartPosition();
+            if (currentStart.isNegative()) {
+                // The comment is an artificial one; we cannot reproduce positions anyway, so just
+                // paste them. ...
+                while (i < comments.length) {
+                    sb.append(comments[i].getText());
+                    i++;
+                }
+                break;
+            }
 
             int insertRows = currentStart.line() - previousEndLine;
 
             // the columns are starting at 1 and not at 0
             int insertColumns = insertRows > 0 ? // line break between the comments
-                    currentStart.column() - 1 :
-                    (currentStart.column() - 1) - previousEndColumn;
+                    currentStart.column() - 1 : (currentStart.column() - 1) - previousEndColumn;
 
             assert insertRows >= 0 && insertColumns >= 0;
 

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -54,7 +55,11 @@ public class JMLParserExceptionTest {
     private static final boolean IGNORE_BROKEN = false;
 
     // File name local to the res directoy with the test cases
-    private static final String FIX_FILE = null; // "SetInClass.java";
+    private static final String FIX_FILE = null; // "SomeSpecificFile.java";
+
+    private static final Set<String> SUPPORTED_KEYS =
+        Set.of("noException", "exceptionClass", "msgContains",
+            "msgMatches", "msgIs", "position", "ignore", "broken", "verbose");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLParserExceptionTest.class);
 
@@ -99,6 +104,9 @@ public class JMLParserExceptionTest {
             Assumptions.abort("This test case has been marked to be ignored");
         }
 
+        props.keySet().stream().filter(k -> !SUPPORTED_KEYS.contains(k)).forEach(
+            k -> fail("Unsupported test spec key: " + k));
+
         try {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
             AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
@@ -110,7 +118,7 @@ public class JMLParserExceptionTest {
             assertEquals("true", props.getProperty("noException"),
                 "Unless 'noException: true' has been set, an exception is expected");
 
-        } catch (AssertionFailedError ae) {
+        } catch (Error ae) {
             throw ae;
         } catch (Throwable e) {
             if ("true".equals(props.getProperty("verbose"))) {
@@ -134,7 +142,8 @@ public class JMLParserExceptionTest {
                 String msg = props.getProperty("msgContains");
                 String errMsg = e.getMessage();
                 if (msg != null) {
-                    assertTrue(errMsg.contains(msg), "Message must contain " + msg + ", but is " + errMsg);
+                    assertTrue(errMsg.contains(msg),
+                        "Message must contain " + msg + ", but is " + errMsg);
                 }
 
                 msg = props.getProperty("msgMatches");
