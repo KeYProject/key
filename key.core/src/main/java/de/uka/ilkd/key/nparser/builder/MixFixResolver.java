@@ -33,7 +33,7 @@ public class MixFixResolver {
         // ... others as well
     }
 
-    public Term resolve(KeYParser.MixfixContext ctx) throws MixFixException {
+    public Term resolve(KeYParser.TermContext ctx) throws MixFixException {
         List<Token> tokens = extractTokens(ctx);
         // Currently there is ~ at the beginning and end of mixfix parts
         tokens.remove(0);
