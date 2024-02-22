@@ -21,6 +21,7 @@ import javax.script.ScriptException;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.junit.jupiter.api.Assumptions;
@@ -115,8 +116,12 @@ public class ParserExceptionTest {
         } catch (AssertionFailedError ae) {
             throw ae;
         } catch (Throwable e) {
+            Throwable error = e;
+            if (error instanceof ProblemLoaderException) {
+                error = error.getCause();
+            }
             if ("true".equals(props.getProperty("verbose"))) {
-                LOGGER.info("Exception raised while parsing {}", file.getFileName(), e);
+                LOGGER.info("Exception raised while parsing {}", file.getFileName(), error);
             }
 
             try {
@@ -127,13 +132,14 @@ public class ParserExceptionTest {
                 String exc = props.getProperty("exceptionClass");
                 if (exc != null) {
                     if (exc.contains(".")) {
-                        assertEquals(exc, e.getClass().getName(), "Exception type expected");
+                        assertEquals(exc, error.getClass().getName(), "Exception type expected");
                     } else {
-                        assertEquals(exc, e.getClass().getSimpleName(), "Exception type expected");
+                        assertEquals(exc, error.getClass().getSimpleName(),
+                            "Exception type expected");
                     }
                 }
 
-                String actualMessage = ExceptionTools.getMessage(e);
+                String actualMessage = ExceptionTools.getMessage(error);
                 String msg = props.getProperty("msgContains");
                 if (msg != null) {
                     assertTrue(actualMessage.contains(msg),
@@ -153,7 +159,7 @@ public class ParserExceptionTest {
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
-                    Location actLoc = ExceptionTools.getLocation(e).orElseThrow(
+                    Location actLoc = ExceptionTools.getLocation(error).orElseThrow(
                         () -> new Exception("there is no location in the exception"));
                     assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
                         "Exception location must point to file under test");
@@ -162,7 +168,7 @@ public class ParserExceptionTest {
             } catch (AssertionFailedError assertionFailedError) {
                 // in case of a failed assertion log the stacktrace
                 LOGGER.info("Original stacktrace leading to failed junit assertion in {}",
-                    file.getFileName(), e);
+                    file.getFileName(), error);
                 // e.printStackTrace();
                 throw assertionFailedError;
             }
