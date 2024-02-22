@@ -60,7 +60,7 @@ public class ParserExceptionTest {
 
     // File name local to the res directoy with the test cases
     // Can be used for temporary debugging
-    private static final String FIX_FILE = "missing_semicolon.key";
+    private static final String FIX_FILE = null; // "delayed_error.key";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserExceptionTest.class);
 
