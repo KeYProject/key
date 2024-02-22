@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -232,14 +229,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (signature == null || signature.isEmpty()) {
             return "";
         }
-        StringBuilder sigString = new StringBuilder();
-
-        for (SLExpression expr : signature) {
-            final KeYJavaType t = expr.getType();
-            sigString.append(t == null ? "<unknown type>" : t.getFullName()).append(", ");
-        }
-
-        return sigString.substring(0, sigString.length() - 2);
+        return String.join(", ", signature
+                .map(SLExpression::getType)
+                .filter(Objects::nonNull)
+                .map(KeYJavaType::getFullName));
     }
 
     // region expression
