@@ -129,7 +129,8 @@ public final class ExceptionTools {
 
         return token == null ? null
                 : new Location(
-                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName()).normalize().toUri(),
+                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
+                            .normalize().toUri(),
                     Position.fromToken(token));
     }
 
@@ -138,7 +139,8 @@ public final class ExceptionTools {
 
         return token == null ? null
                 : new Location(
-                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName()).normalize().toUri(),
+                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
+                            .normalize().toUri(),
                     Position.fromToken(token));
     }
 

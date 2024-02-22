@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
-
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.FindResources;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
+
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
+import org.key_project.util.helper.FindResources;
+
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
