@@ -6,8 +6,10 @@ package de.uka.ilkd.key.smt.solvertypes;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidAlgorithmParameterException;
 import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Services;
@@ -257,23 +259,29 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     /**
-     * Returns false whenever cmd is null or empty, otherwise the environment variables are checked
-     * for the command and if no file with the command's name is found in any of those paths, the
-     * cmd itself is used as the pathname. If all of these fail, the cmd is also not installed.
+     * Returns false whenever cmd is null or empty, otherwise if the command is an absolute path
+     * it is checked, if not the environment variables are checked
+     * for the command whether there is a file with the command's name in any of those paths.
+     * If all of these fail, the cmd is also not installed.
      *
      * @param cmd the command whose existence will be checked
      * @return true iff the command is a non-empty String and a file with the command's name or with
      *         the command as pathname can be found in the file system.
      */
     public static boolean isInstalled(@Nullable String cmd) {
+
         if (cmd == null || cmd.isEmpty()) {
             return false;
         }
-        if (checkEnvVariable(cmd)) {
-            return true;
-        } else {
-            Path file = Paths.get(cmd);
-            return Files.exists(file) && !Files.isDirectory(file);
+        try {
+            Path cmdPath = Paths.get(cmd);
+            if (cmdPath.isAbsolute()) {
+                return checkPath(cmdPath);
+            }
+            return checkEnvVariable(cmd + getOSDefaultExtension());
+
+        } catch (InvalidPathException e) {
+            return false;
         }
     }
 
@@ -282,15 +290,6 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     private static boolean checkEnvVariable(String cmd) {
-        Path cmdPath = Paths.get(cmd);
-        if(cmdPath.isAbsolute()){
-            return checkPath(cmdPath);
-        }
-
-       return checkPathVariable(cmd + getOSDefaultExtension());
-    }
-
-    private static boolean checkPathVariable(String cmd) {
         String path = System.getenv("PATH");
         String[] paths = path.split(File.pathSeparator);
         for (String parent : paths) {
@@ -304,6 +303,8 @@ public final class SolverTypeImplementation implements SolverType {
 
         return false;
     }
+
+
 
     private static String getOSDefaultExtension() {
         final String windowsDefaultExt= ".exe";

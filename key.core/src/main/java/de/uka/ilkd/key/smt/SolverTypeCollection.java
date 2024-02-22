@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
+import java.nio.file.InvalidPathException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -86,7 +87,6 @@ public class SolverTypeCollection implements Iterable<SolverType> {
                 usableCount++;
             }
         }
-
         return usableCount >= minUsableSolver;
     }
 
