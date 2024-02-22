@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

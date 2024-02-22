@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.proof.replay;
 
 import java.io.File;
-import java.util.HashSet;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;

@@ -180,18 +180,18 @@ public class JavaService {
         return Collections.unmodifiableCollection(libraryPath);
     }
 
-    private static BuildingIssue buildingIssueFromProblem(Problem problem) {
+    private static BuildingIssue buildingIssueFromProblem(String source, Problem problem) {
         var loc = problem.getLocation()
                 .flatMap(TokenRange::toRange)
                 .map(b -> b.begin)
                 .orElse(new Position(-1, -1));
         return new BuildingIssue(problem.getVerboseMessage(),
             problem.getCause().orElse(null), false,
-            de.uka.ilkd.key.java.Position.fromJPPosition(loc));
+            de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
     }
 
     // region parsing of compilation units
-    private <T> T unwrapParseResult(ParseResult<T> result) {
+    private <T> T unwrapParseResult(String source, ParseResult<T> result) {
         if (result.isSuccessful()) {
             assert result.getResult().isPresent();
             return result.getResult().get();
@@ -202,7 +202,7 @@ public class JavaService {
 
         var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
         for (Problem problem : result.getProblems()) {
-            errors.add(buildingIssueFromProblem(problem));
+            errors.add(buildingIssueFromProblem(source, problem));
         }
 
         throw new BuildingExceptions(errors);
@@ -241,7 +241,7 @@ public class JavaService {
         var cus = new ArrayList<CompilationUnit>(files.size());
         for (Path file : files) {
             try {
-                var cu = unwrapParseResult(parseCompilationUnit(file, repo));
+                var cu = unwrapParseResult(file.toString(), parseCompilationUnit(file, repo));
                 if (cu.getPackageDeclaration().isEmpty()) {
                     fixupPackageDeclaration(cu, parent.relativize(file).toString());
                 }
@@ -269,7 +269,7 @@ public class JavaService {
         parseSpecialClasses();
         LOGGER.debug("Reading {}", trim(text));
         var reader = new StringReader(text);
-        var cu = unwrapParseResult(programFactory.parseCompilationUnit(reader));
+        var cu = unwrapParseResult("<string>", programFactory.parseCompilationUnit(reader));
         programFactory.addUserClasses(Collections.singletonList(cu));
         // transform program
         transformModel(Collections.singletonList(cu));
@@ -350,12 +350,10 @@ public class JavaService {
 
         var errors = compilationUnits.stream()
                 .filter(c -> c.second.isSuccessful())
-                .map(c -> new LibraryFileParsingIssue(
-                    c.first,
-                    c.second.getProblems().stream().map(JavaService::buildingIssueFromProblem)
-                            .toList()))
+                .flatMap(c -> c.second.getProblems().stream()
+                        .map(problem -> buildingIssueFromProblem(c.first.toString(), problem)))
                 .collect(Collectors.toList());
-        throw new LibraryParsingException(errors);
+        throw new BuildingExceptions(errors);
     }
 
     /**
@@ -395,10 +393,11 @@ public class JavaService {
             FileCollection.Walker walker = fc.createWalker(new String[] { ".jml", ".java" });
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
+                var name = walker.getCurrentLocation().toString();
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
-                    var cu = unwrapParseResult(programFactory.parseCompilationUnit(f));
+                    var cu = unwrapParseResult(name, programFactory.parseCompilationUnit(f));
                     fixupPackageDeclaration(cu, walker.getRelativeLocation());
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, false);
@@ -757,11 +756,11 @@ public class JavaService {
         BlockStmt block;
         if (input.contains("..") || input.contains("...")) {
             // TODO weigl further eloborate the situation, how to work with contexts provided?
-            var b = unwrapParseResult(programFactory.parseContextBlock(input));
+            var b = unwrapParseResult("memory:/", programFactory.parseContextBlock(input));
             original = b;
             block = new BlockStmt(b.getStatements());
         } else { // Simple Java-block
-            block = unwrapParseResult(programFactory.parseStatementBlock(input));
+            block = unwrapParseResult("memory:/", programFactory.parseStatementBlock(input));
             original = block;
         }
         // TODO javaparser result unused
@@ -894,19 +893,21 @@ public class JavaService {
         return programFactory.getSymbolSolver();
     }
 
-    public record LibraryFileParsingIssue(Path path, List<BuildingIssue> issues) {
-    }
-
-    public static final class LibraryParsingException extends RuntimeException {
-        private final List<LibraryFileParsingIssue> issues;
-
-        public LibraryParsingException(List<LibraryFileParsingIssue> issues) {
-            super("Parsing library classes failed");
-            this.issues = issues;
-        }
-
-        public List<LibraryFileParsingIssue> getIssues() {
-            return issues;
-        }
-    }
+    /*
+     * public record LibraryFileParsingIssue(Path path, List<BuildingIssue> issues) {
+     * }
+     *
+     * public static final class LibraryParsingException extends RuntimeException {
+     * private final List<LibraryFileParsingIssue> issues;
+     *
+     * public LibraryParsingException(List<LibraryFileParsingIssue> issues) {
+     * super("Parsing library classes failed");
+     * this.issues = issues;
+     * }
+     *
+     * public List<LibraryFileParsingIssue> getIssues() {
+     * return issues;
+     * }
+     * }
+     */
 }
