@@ -3,34 +3,41 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.util.Pair;
 
+/**
+ * This class realizes a 1:1 map for term abbreviations.
+ * A term abbreviation is a label for a (complex) term structure that should be used for pretty
+ * printing instead.
+ * Abbreviations are also supported during parsing.
+ * Use {@code @label} to access to a previous defined abbreviation
+ * with label {@code label}.
+ */
 public class AbbrevMap {
 
     /**
-     * HashMaps used to store the mappings from Term to String, String to Term and Term to Enabled.
+     * HashMaps used to store the mappings from Term to String, String to Term and Term to enable.
      */
-    private final HashMap<AbbrevWrapper, String> termstring;
-    private final HashMap<String, AbbrevWrapper> stringterm;
+    private final Map<AbbrevWrapper, String> term2String = new LinkedHashMap<>();
+    private final Map<String, AbbrevWrapper> string2Term = new LinkedHashMap<>();
 
     /**
-     * Enabled is set true if a abbreviation should be used when printing the term.
+     * Enabled is set true if an abbreviation should be used when printing the term.
      */
-    private final HashMap<AbbrevWrapper, Boolean> termenabled;
+    private final Set<AbbrevWrapper> isTermEnabled = new HashSet<>();
+
+    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * Creates a AbbrevMap.
      */
     public AbbrevMap() {
-        termstring = new LinkedHashMap<>();
-        stringterm = new LinkedHashMap<>();
-        termenabled = new LinkedHashMap<>();
     }
 
     /**
@@ -38,27 +45,26 @@ public class AbbrevMap {
      *
      * @param t a term
      * @param abbreviation the abbreviation for of this term
-     * @param enabled true if the abbreviation should be used (e.g. when printing the term), false
+     * @param enabled true if the abbreviation should be used (e.g., when printing the term), false
      *        otherwise.
      */
     public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
+
         if (containsTerm(t)) {
             throw new AbbrevException("A abbreviation for " + t + " already exists", true);
         }
+
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
                 + " in use for: " + getTerm(abbreviation), false);
         }
-        scw = new AbbrevWrapper(t);
-        termstring.put(scw, abbreviation);
-        stringterm.put(abbreviation, scw);
-        termenabled.put(scw, enabled ? Boolean.TRUE : Boolean.FALSE);
+        forcePut(abbreviation, t);
     }
 
     /**
-     * Changes the abbreviation of t to abbreviation. If the AbbrevMap doesn't contain t nothing
-     * happens.
+     * Changes the abbreviation of t to abbreviation.
+     * If the AbbrevMap doesn't contain t, nothing happens.
      *
      * @throws AbbrevException if the abbreviation is already in use.
      */
@@ -70,9 +76,12 @@ public class AbbrevMap {
                     + " in use for: " + getTerm(abbreviation), false);
             }
             scw = new AbbrevWrapper(t);
-            stringterm.remove(termstring.get(scw));
-            termstring.put(scw, abbreviation);
-            stringterm.put(abbreviation, scw);
+            final var old = term2String.get(scw);
+            string2Term.remove(old);
+            term2String.put(scw, abbreviation);
+            string2Term.put(abbreviation, scw);
+
+            changeSupport.firePropertyChange(abbreviation, old, t);
         }
     }
 
@@ -84,15 +93,18 @@ public class AbbrevMap {
      */
     public void changeAbbrev(String abbreviation, Term t, boolean enabled) throws AbbrevException {
         if (containsAbbreviation(abbreviation)) {
-            AbbrevWrapper scw;
             if (containsTerm(t)) {
                 throw new AbbrevException("A abbreviation for " + t + " already exists", true);
             }
-            scw = new AbbrevWrapper(t);
-            stringterm.remove(termstring.get(scw));
-            termstring.put(scw, abbreviation);
-            stringterm.put(abbreviation, scw);
-            termenabled.put(scw, enabled ? Boolean.TRUE : Boolean.FALSE);
+            var scw = new AbbrevWrapper(t);
+            final var old = term2String.get(scw);
+            string2Term.remove(old);
+            term2String.put(scw, abbreviation);
+            string2Term.put(abbreviation, scw);
+
+            setEnabled(t, enabled);
+
+            changeSupport.firePropertyChange(abbreviation, old, t);
         }
     }
 
@@ -100,14 +112,14 @@ public class AbbrevMap {
      * Returns true if the map contains the abbreviation s.
      */
     public boolean containsAbbreviation(String s) {
-        return stringterm.containsKey(s);
+        return string2Term.containsKey(s);
     }
 
     /**
      * Returns true if the map contains the term t.
      */
     public boolean containsTerm(Term t) {
-        return termstring.containsKey(new AbbrevWrapper(t));
+        return term2String.containsKey(new AbbrevWrapper(t));
     }
 
     /**
@@ -115,8 +127,8 @@ public class AbbrevMap {
      * abbreviation.
      */
     public Term getTerm(String s) {
-        var term = stringterm.get(s);
-        return term == null ? null : term.getTerm();
+        var term = string2Term.get(s);
+        return term == null ? null : term.term();
     }
 
     /**
@@ -124,18 +136,14 @@ public class AbbrevMap {
      * t.
      */
     public String getAbbrev(Term t) {
-        return "@" + termstring.get(new AbbrevWrapper(t));
+        return "@" + term2String.get(new AbbrevWrapper(t));
     }
 
     /**
      * Returns true if the mapping is enabled, which means that the abbreviation may be used.
      */
     public boolean isEnabled(Term t) {
-        Boolean b = termenabled.get(new AbbrevWrapper(t));
-        if (b != null) {
-            return b;
-        }
-        return false;
+        return isTermEnabled.contains(new AbbrevWrapper(t));
     }
 
     /**
@@ -145,34 +153,57 @@ public class AbbrevMap {
      * @param enabled true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
-        termenabled.put(new AbbrevWrapper(t), enabled ? Boolean.TRUE : Boolean.FALSE);
+        var oldEnabled = isEnabled(t);
+        var scw = new AbbrevWrapper(t);
+        if (enabled)
+            isTermEnabled.add(scw);
+        else
+            isTermEnabled.remove(scw);
+        changeSupport.firePropertyChange("enabled", oldEnabled, enabled);
     }
 
     /**
-     * Exports the current abbreviation map as a sequence of pairs of the term and its abbreviation.
+     * Exports the current abbreviation map as a sequence of pairs of the terms and its
+     * abbreviation.
      * Note, this will allocate a new data structure each time.
      */
     public Collection<Pair<Term, String>> export() {
-        return termstring.entrySet().stream().map(e -> new Pair<>(e.getKey().t, e.getValue()))
+        return term2String.entrySet().stream().map(e -> new Pair<>(e.getKey().term, e.getValue()))
                 .collect(Collectors.toList());
 
     }
 
-    public record AbbrevWrapper(Term t) {
+    public void remove(Term term) {
+        var scw = new AbbrevWrapper(term);
+        var s = term2String.get(scw);
+        string2Term.remove(s);
+        term2String.remove(scw);
+        isTermEnabled.remove(scw);
+        changeSupport.firePropertyChange(s, term, null);
+    }
 
-        @Override
-            public boolean equals(Object o) {
-                if (!(o instanceof AbbrevWrapper scw)) {
-                    return false;
-                }
-                if (scw.getTerm() == t) {
-                    return true;
-                }
-                return t.equals(scw.getTerm());
-            }
+    /**
+     * Sets the given abbreviation to term without checking of previous assignment.
+     *
+     * @param abbreviation the label of the abbreviation
+     * @param t a term
+     */
+    public void forcePut(String abbreviation, Term t) {
+        var scw = new AbbrevWrapper(t);
+        term2String.put(scw, abbreviation);
+        string2Term.put(abbreviation, scw);
 
-            public Term getTerm() {
-                return t;
-            }
-        }
+        changeSupport.firePropertyChange(abbreviation, null, t);
+        setEnabled(t, true);
+    }
+
+    public record AbbrevWrapper(Term term) {}
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
 }

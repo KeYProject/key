@@ -4,13 +4,10 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -20,30 +17,33 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The menu shown by a {@link SequentViewListener} when the user clicks on a {@link SequentView}.
  *
  * @param <T> a type of {@link SequentView} on which this menu is shown.
  */
-public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
-    private static final long serialVersionUID = -366978815217974621L;
-
-    /** @see #addClipboardItem(MenuControl) */
-    private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
-
-    /** @see #createNameCreationInfoSection(MenuControl) */
-    private static final String NAME_CREATION_INFO = "View name creation info";
-
-    /** The position of the selected term. */
+@NullMarked
+public class SequentViewMenu<T extends SequentView> extends JMenu {
+    /**
+     * The position of the selected term.
+     */
     private PosInSequent pos;
 
-    /** The sequent view associated with this menu. */
+    /**
+     * The sequent view associated with this menu.
+     */
     private T sequentView;
+
+    private final KeyAction actionCopyToClipboard = new CopyToClipboardAction();
+    private final KeyAction actionNameCreationInfo = new NameCreationInfoAction();
 
     /**
      * Creates an empty menu.
      */
-    public SequentViewMenu() {}
+    public SequentViewMenu() {
+    }
 
     /**
      * Creates a new menu that displays all applicable actions at the given position.
@@ -55,13 +55,9 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
         super();
         this.sequentView = sequentView;
         this.pos = pos;
-
-        assert sequentView != null;
-        assert pos != null;
     }
 
     /**
-     *
      * @return the position at which to show this menu.
      */
     protected PosInSequent getPos() {
@@ -69,7 +65,6 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     }
 
     /**
-     *
      * @return the sequent view on which to show this menu.
      */
     protected T getSequentView() {
@@ -82,6 +77,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      * (see KeYSequentViewMenuExtension)
      * </p>
      *
+     * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.ContextMenu
      * @see KeYGuiExtensionFacade#getContextMenuItems
      */
     protected void addExtensionMenu() {
@@ -96,51 +92,49 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
 
     /**
      * Adds an action to copy the selected term to the clipboard.
-     *
-     * @param control the action listener for the action.
      */
-    protected void addClipboardItem(MenuControl control) {
-        JMenuItem item = new JMenuItem(COPY_TO_CLIPBOARD);
-        item.addActionListener(control);
-        add(item);
+    protected void addClipboardItem() {
+        add(new JMenuItem(actionCopyToClipboard));
     }
 
     /**
      * Adds an action to show the name creation info to the clipboard.
-     *
-     * @param control the action listener for the action.
      */
-    protected void createNameCreationInfoSection(MenuControl control) {
-        JMenuItem item = new JMenuItem(NAME_CREATION_INFO);
-        item.addActionListener(control);
-        add(item);
+    protected void createNameCreationInfoSection() {
+        add(new JMenuItem(actionNameCreationInfo));
     }
 
-    /**
-     * The action listener for the actions in this menu.
-     */
-    protected class MenuControl implements ActionListener {
+
+    class CopyToClipboardAction extends KeyAction {
+        public CopyToClipboardAction() {
+            setName("Copy to clipboard");
+        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (((JMenuItem) e.getSource()).getText().startsWith(COPY_TO_CLIPBOARD)) {
-                GuiUtilities.copyHighlightToClipboard(sequentView, pos);
-            } else if (((JMenuItem) e.getSource()).getText()
-                    .startsWith("View name creation info")) {
-                Term t = pos.getPosInOccurrence().subTerm();
-                ProgramVariable var = (ProgramVariable) t.op();
-                ProgramElementName name = var.getProgramElementName();
-                NameCreationInfo info = name.getCreationInfo();
-                String message;
-                if (info != null) {
-                    message = info.infoAsString();
-                } else {
-                    message = "No information available.";
-                }
-                JOptionPane.showMessageDialog(null, message, "Name creation info",
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
+            GuiUtilities.copyHighlightToClipboard(sequentView, pos);
+        }
+    }
+
+    class NameCreationInfoAction extends KeyAction {
+        public NameCreationInfoAction() {
+            setName("View name creation info");
         }
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Term t = pos.getPosInOccurrence().subTerm();
+            ProgramVariable var = (ProgramVariable) t.op();
+            ProgramElementName name = var.getProgramElementName();
+            NameCreationInfo info = name.getCreationInfo();
+            String message;
+            if (info != null) {
+                message = info.infoAsString();
+            } else {
+                message = "No information available.";
+            }
+            JOptionPane.showMessageDialog(null, message, "Name creation info",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 }
