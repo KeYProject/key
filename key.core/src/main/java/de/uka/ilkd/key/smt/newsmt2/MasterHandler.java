@@ -88,13 +88,8 @@ public class MasterHandler {
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
     }
 
-    public Set<String> getHandlerOptions() {
-        // TODO clone array instead?
-        return new HashSet<>(handlerOptions);
-    }
-
-    public boolean noTypeEmbedding () {
-        return Arrays.asList(handlerOptions).contains(ModularSMTLib2Translator.NO_TYPE_EMBEDDING);
+    public boolean isHandlerOptionSet(String optionName) {
+        return handlerOptions.contains(optionName);
     }
 
     /**

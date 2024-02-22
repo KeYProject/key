@@ -61,8 +61,8 @@ public class IntegerOpHandler implements SMTHandler {
 
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
 
-        // sort_int is defined here, declare it as already defined
-        if(!masterHandler.noTypeEmbedding()) {
+        if (!masterHandler.isHandlerOptionSet(ModularSMTLib2Translator.NO_TYPE_EMBEDDING)) {
+            // sort_int is defined here, declare it as already defined
             masterHandler.addKnownSymbol("sort_int");
             masterHandler.addSort(integerLDT.targetSort());
         }
