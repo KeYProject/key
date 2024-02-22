@@ -1,7 +1,15 @@
 package java.lang;
 
-public class Object {  
+public class Object {
 
+    //@ public ghost \TYPE packed;
+
+    //TODO Workaround for KeY not supporting set statement for \TYPE variable because Recoder is terrible
+
+    /*@ public normal_behavior
+      @   assignable packed;
+      @*/
+    public void havocPacked();
     
     /*@ public normal_behavior
       @   assignable \nothing;
