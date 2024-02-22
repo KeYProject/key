@@ -926,20 +926,22 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else {
             // create two contracts for each diamond and box modality
+            Map<LocationVariable, Term> boxPres = new LinkedHashMap<>(pres);
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.requires.get(heap) != null) {
+                    var div = tb.convertToFormula(clauses.diverges);
                     pres.put(heap,
-                        tb.andSC(pres.get(heap), tb.not(tb.convertToFormula(clauses.diverges))));
+                        tb.andSC(pres.get(heap), tb.not(div)));
+                    boxPres.put(heap, tb.andSC(boxPres.get(heap), div));
                     break;
                 }
             }
-            // TODO: Fix #29
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
                 clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
                 clauses.hasFreeMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
-            FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
+            FunctionalOperationContract contract2 = cf.func(name, pm, false, boxPres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
                 clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
                 clauses.hasFreeMod, progVars);
