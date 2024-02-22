@@ -3,27 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.util.ExceptionTools;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.opentest4j.AssertionFailedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -35,6 +14,22 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -113,8 +108,8 @@ public class ParserExceptionTest {
                 "Unless 'noException: true' has been set, an exception is expected");
 
             String checkScript = props.getProperty("checkScript");
-            if(checkScript != null) {
-                check(checkScript, env);                
+            if (checkScript != null) {
+                check(checkScript, env);
             }
 
         } catch (AssertionFailedError ae) {
@@ -141,7 +136,8 @@ public class ParserExceptionTest {
                 String actualMessage = ExceptionTools.getMessage(e);
                 String msg = props.getProperty("msgContains");
                 if (msg != null) {
-                    assertTrue(actualMessage.contains(msg), "Message must contain " + msg + ", but message is: " + actualMessage);
+                    assertTrue(actualMessage.contains(msg),
+                        "Message must contain " + msg + ", but message is: " + actualMessage);
                 }
 
                 msg = props.getProperty("msgMatches");
@@ -176,7 +172,8 @@ public class ParserExceptionTest {
     /*
      * We can also provide some Java code to be checked on the resultung env object
      */
-    private static void check(String checkScript, KeYEnvironment<DefaultUserInterfaceControl> env) throws ScriptException {
+    private static void check(String checkScript, KeYEnvironment<DefaultUserInterfaceControl> env)
+            throws ScriptException {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("java");
         engine.put("env", env);
         Object result = engine.eval(checkScript);

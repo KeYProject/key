@@ -57,7 +57,8 @@ public final class ExceptionTools {
     public static String getMessage(Throwable throwable) {
         if (throwable == null) {
             return "";
-        } else if (throwable instanceof ParseCancellationException || throwable instanceof ProblemLoaderException) {
+        } else if (throwable instanceof ParseCancellationException
+                || throwable instanceof ProblemLoaderException) {
             return getMessage(throwable.getCause());
         } else if (throwable instanceof InputMismatchException ime) {
             return getNiceMessage(ime);

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

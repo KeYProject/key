@@ -49,10 +49,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
