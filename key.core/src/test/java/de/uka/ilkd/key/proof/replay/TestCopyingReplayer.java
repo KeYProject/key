@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.replay;
 
 import java.io.File;
+import java.util.HashSet;
 import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -47,7 +48,7 @@ class TestCopyingReplayer {
         proof2.pruneProof(proof2.root());
         proof2.getServices().resetCounters();
         new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
-            proof2.getOpenGoal(proof2.root()));
+            proof2.getOpenGoal(proof2.root()), new HashSet<>());
 
         Assertions.assertTrue(proof2.closed());
         Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());

@@ -231,13 +231,19 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             // proofs)
             filename = MiscTools.toValidFileName(filename);
         }
-        int prevSlice = filename.indexOf("_slice");
+        String sliceSuffix = "_slice";
+        int prevSlice = filename.indexOf(sliceSuffix);
         if (prevSlice != -1) {
-            int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
-            sliceNr++;
-            filename = filename.substring(0, prevSlice) + "_slice" + sliceNr;
+            var slicingIteration = filename.substring(prevSlice + sliceSuffix.length());
+            if (slicingIteration.matches("\\d+")) {
+                int sliceNr = Integer.parseInt(slicingIteration);
+                sliceNr++;
+                filename = filename.substring(0, prevSlice) + sliceSuffix + sliceNr;
+            } else {
+                filename = filename + sliceSuffix + "1";
+            }
         } else {
-            filename = filename + "_slice1";
+            filename = filename + sliceSuffix + "1";
         }
         filename = filename + ".proof";
         File tempFile = tempDir.resolve(filename).toFile();

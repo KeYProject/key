@@ -6,6 +6,9 @@ package de.uka.ilkd.key.java.ast;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+/**
+ * Comment element of Java source code.
+ */
 public class Comment extends JavaSourceElement {
 
     private final String text;

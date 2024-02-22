@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,24 @@ class TestReferenceSearcher {
         Proof proof = foundReference.proof();
         CopyReferenceResolver.copyCachedGoals(proof, p2, null, null);
         assertTrue(p.closed());
+
+        assertNotEquals(55, foundReference.serialNr());
+        // test that copying with slicing information works
+        new DependencyTracker(p2);
+        Node n55 = p.findAny(x -> x.serialNr() == 55);
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(n55));
+        ClosedBy n55Close = ReferenceSearcher.findPreviousProof(previousProofs, n55);
+        assertEquals(n55.serialNr(), n55Close.node().serialNr());
+        assertSame(p2, n55Close.proof());
+        int previousTotal = p.countNodes();
+        n55.register(n55Close, ClosedBy.class);
+        p.pruneProof(n55);
+        p.closeGoal(p.getOpenGoal(n55));
+        assertTrue(p.closed());
+        n55.proof().copyCachedGoals(p2, null, null);
+        assertTrue(p.closed());
+        assertEquals(previousTotal - 4, p.countNodes());
+
         GeneralSettings.noPruningClosed = true;
         p.dispose();
         p2.dispose();
