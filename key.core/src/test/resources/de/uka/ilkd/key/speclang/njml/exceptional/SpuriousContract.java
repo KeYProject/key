@@ -5,10 +5,10 @@
 
 // currently does not report an exception
 
-class NamedAccessInContract {
+class SpuriousContract {
 
     /*@ public normal_behaviour
-      @  accessible \inv : \everything;
+      @  requires true;
+      @  ensures true;
       @*/
-    /*@ pure */int m() { return 0; }
 }
