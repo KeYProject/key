@@ -49,10 +49,10 @@ public class SumProdHandler implements SMTHandler {
             }
             List<SExpr> exprs = new LinkedList<>();
             exprs.add(trans.translate(term.sub(0)));
-            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), IntegerOpHandler.INT));
+            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), SExpr.Type.INT));
             String s = String.valueOf(usedBsumTerms.size());
             trans.addDeclaration(bsumOrProdDecl("bsum", s));
-            SExpr ret = new SExpr("bsum" + s, IntegerOpHandler.INT, exprs);
+            SExpr ret = new SExpr("bsum" + s, SExpr.Type.INT, exprs);
             usedBsumTerms.put(term, ret);
             return ret;
         } else if (op == bprodOp) {
@@ -63,10 +63,10 @@ public class SumProdHandler implements SMTHandler {
             }
             List<SExpr> exprs = new LinkedList<>();
             exprs.add(trans.translate(term.sub(0)));
-            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), IntegerOpHandler.INT));
+            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), SExpr.Type.INT));
             String s = String.valueOf(usedBprodTerms.size());
             trans.addDeclaration(bsumOrProdDecl("bprod", s));
-            SExpr ret = new SExpr("bprod" + s, IntegerOpHandler.INT, exprs);
+            SExpr ret = new SExpr("bprod" + s, SExpr.Type.INT, exprs);
             usedBprodTerms.put(term, ret);
             return ret;
         } else { // unreachable
@@ -75,7 +75,7 @@ public class SumProdHandler implements SMTHandler {
     }
 
     private SExpr bsumOrProdDecl(String fun, String number) {
-        return new SExpr("declare-fun", IntegerOpHandler.INT, new SExpr(fun + number),
+        return new SExpr("declare-fun", SExpr.Type.INT, new SExpr(fun + number),
             new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));
     }
 }

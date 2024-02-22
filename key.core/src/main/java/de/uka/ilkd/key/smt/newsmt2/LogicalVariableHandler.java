@@ -56,7 +56,7 @@ public class LogicalVariableHandler implements SMTHandler {
         if (sort.name().equals(IntegerLDT.NAME)) {
             // Special casing integer quantification: Avoid conversion to "U".
             // Caution: Must be in sync with quantifier treatment.
-            return new SExpr(VAR_PREFIX + name, IntegerOpHandler.INT);
+            return new SExpr(VAR_PREFIX + name, Type.INT);
         } else {
             return new SExpr(VAR_PREFIX + name, Type.UNIVERSE);
         }

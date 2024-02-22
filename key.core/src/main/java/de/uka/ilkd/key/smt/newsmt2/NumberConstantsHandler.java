@@ -39,10 +39,10 @@ public class NumberConstantsHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) {
         if (term.sub(0).op() == negNumberSign) {
             String s = AbstractTermTransformer.convertToDecimalString(term, services);
-            return new SExpr("-", IntegerOpHandler.INT, s.substring(1));
+            return new SExpr("-", SExpr.Type.INT, s.substring(1));
         } else {
             String string = AbstractTermTransformer.convertToDecimalString(term, services);
-            return new SExpr(string, IntegerOpHandler.INT);
+            return new SExpr(string, SExpr.Type.INT);
         }
     }
 

@@ -143,8 +143,8 @@ public class SeqDefHandler implements SMTHandler {
         // \forall freevars; seqLen(function(params)) = \if(up-lo>=0) \then(up-lo) \else 0
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr(SEQLEN, app);
-        SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT),
-            trans.translate(term.sub(0), IntegerOpHandler.INT));
+        SExpr len = SExprs.minus(trans.translate(term.sub(1), Type.INT),
+            trans.translate(term.sub(0), Type.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -180,13 +180,13 @@ public class SeqDefHandler implements SMTHandler {
         SExpr i = LogicalVariableHandler.makeVarRef(name, sort);
         qvars.add(LogicalVariableHandler.makeVarDecl(name, sort));
         guards.add(SExprs.lessEqual(SExprs.ZERO, i));
-        SExpr upper = trans.translate(term.sub(1), IntegerOpHandler.INT);
-        SExpr lower = trans.translate(term.sub(0), IntegerOpHandler.INT);
+        SExpr upper = trans.translate(term.sub(1), Type.INT);
+        SExpr lower = trans.translate(term.sub(0), Type.INT);
         SExpr len = SExprs.minus(upper, lower);
         guards.add(SExprs.lessThan(i, len));
         SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);
         SExpr replacedSMTTerm = SExprs.let(LogicalVariableHandler.VAR_PREFIX + name,
-            SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT), smtTerm);
+            SExprs.coerce(SExprs.plus(i, lower), Type.INT), smtTerm);
         SExpr seqGet = new SExpr(SEQGET, Type.UNIVERSE, app, new SExpr("i2u", i));
         SExpr imp = SExprs.imp(SExprs.and(guards), SExprs.eq(seqGet, replacedSMTTerm));
         SExpr forall = SExprs.forall(qvars, imp);
