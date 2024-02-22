@@ -2,6 +2,7 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,10 @@ class ExceptionToolsTest {
             assertEquals(6, loc.getPosition().line());
             assertEquals(1, loc.getPosition().column());
             assertEquals(fileToRead.toUri(), loc.fileUri());
+        } catch (SyntaxErrorReporter.ParserException exception) {
+            Location loc = ExceptionTools.getLocation(exception).get();
+            assertEquals(6, loc.getPosition().line());
+            assertEquals(1, loc.getPosition().column());
         }
     }
 }
