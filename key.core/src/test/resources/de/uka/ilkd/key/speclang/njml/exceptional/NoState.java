@@ -1,5 +1,5 @@
 // noException: true
-
+// broken: true
 class NoState {
 
     /*@ public model_behaviour

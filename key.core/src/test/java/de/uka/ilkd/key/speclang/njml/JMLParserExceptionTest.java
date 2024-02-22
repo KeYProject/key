@@ -15,8 +15,8 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-
 import de.uka.ilkd.key.util.ParserExceptionTest;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -61,8 +61,8 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
     protected void tryLoadFile(Path file) throws Exception {
         ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
         AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
-                null, AbstractProfile.getDefaultProfile(), false,
-                control, false, new Properties());
+            null, AbstractProfile.getDefaultProfile(), false,
+            control, false, new Properties());
         pl.setLoadSingleJavaFile(true);
         pl.load();
     }

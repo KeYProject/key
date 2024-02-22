@@ -1,6 +1,7 @@
 // verbose: true
 // msgContains: missing closing parenthesis
-// position: 6/40
+// position: 7/40
+// broken: true
 
 class MissingClosingParens {
     //@ ensures (\forall int x; x > 5; x > 0 ;

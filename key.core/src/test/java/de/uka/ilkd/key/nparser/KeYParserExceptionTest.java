@@ -10,8 +10,8 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-
 import de.uka.ilkd.key.util.ParserExceptionTest;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,6 +54,6 @@ public class KeYParserExceptionTest extends ParserExceptionTest {
 
     @Override
     protected void tryLoadFile(Path file) throws Exception {
-         KeYEnvironment.load(file.toFile());
+        KeYEnvironment.load(file.toFile());
     }
 }

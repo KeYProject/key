@@ -3,6 +3,7 @@
 // position: 12/19
 // verbose: true
 
+
 // It's not the best of error messages ...
 // and there is no file location information
 class TypeError {

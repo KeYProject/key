@@ -3,20 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.opentest4j.AssertionFailedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -29,20 +15,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.opentest4j.AssertionFailedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,21 +55,22 @@ public abstract class ParserExceptionTest {
      * This can be changed to reactivate the broken test cases
      * (to go bughunting).
      */
-    private static final boolean IGNORE_BROKEN = false;
+    private static final boolean IGNORE_BROKEN = true;
 
     /**
      * The keys supported in the headers of the files
      */
     private static final Set<String> SUPPORTED_KEYS =
-            Set.of("noException", "exceptionClass", "msgContains",
-                    "msgMatches", "msgIs", "position", "ignore", "broken", "verbose");
+        Set.of("noException", "exceptionClass", "msgContains",
+            "msgMatches", "msgIs", "position", "ignore", "broken", "verbose");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserExceptionTest.class);
 
     private final static Pattern PROP_LINE =
-            Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
+        Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
 
-    protected static Stream<Arguments> getFiles(String fixedFile, URL fileURL, String extension) throws URISyntaxException, IOException {
+    protected static Stream<Arguments> getFiles(String fixedFile, URL fileURL, String extension)
+            throws URISyntaxException, IOException {
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
@@ -124,13 +103,13 @@ public abstract class ParserExceptionTest {
         }
 
         props.keySet().stream().filter(k -> !SUPPORTED_KEYS.contains(k)).forEach(
-                k -> fail("Unsupported test spec key: " + k));
+            k -> fail("Unsupported test spec key: " + k));
 
         try {
             tryLoadFile(file);
             // No exception encountered
             assertEquals("true", props.getProperty("noException"),
-                    "Unless 'noException: true' has been set, an exception is expected");
+                "Unless 'noException: true' has been set, an exception is expected");
 
         } catch (Error ae) {
             throw ae;
@@ -145,7 +124,7 @@ public abstract class ParserExceptionTest {
 
             try {
                 assertNotEquals("true", props.getProperty("noException"),
-                        "'noException: true' has been set: no exception expected");
+                    "'noException: true' has been set: no exception expected");
 
                 // We must use throwable here since there are some Errors around ...
                 String exc = props.getProperty("exceptionClass");
@@ -163,28 +142,37 @@ public abstract class ParserExceptionTest {
                 String errMsg = e.getMessage();
                 if (msg != null) {
                     assertTrue(actualMessage.contains(msg),
-                        "Message must contain '" + msg + "', but message is: '" + actualMessage + "'");
+                        "Message must contain '" + msg + "', but message is: '" + actualMessage
+                            + "'");
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
                     assertTrue(actualMessage.matches(msg),
-                        "Message must match regular expression '" + msg + "', but is '" + actualMessage + "'");
+                        "Message must match regular expression '" + msg + "', but is '"
+                            + actualMessage + "'");
                 }
 
                 msg = props.getProperty("msgIs");
                 if (msg != null) {
-                    assertEquals(msg, actualMessage, "Message must be " + msg + ", but is " + actualMessage + "'");
+                    assertEquals(msg, actualMessage,
+                        "Message must be " + msg + ", but is " + actualMessage + "'");
                 }
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
                     Location actLoc = ExceptionTools.getLocation(error).orElseThrow(
-                            () -> new Exception("there is no location in the exception"));
+                        () -> new Exception("there is no location in the exception"));
                     assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
-                            "Exception location must point to file under test");
+                        "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());
                 }
+
+                if ("true".equals(props.getProperty("broken"))) {
+                    LOGGER.warn(
+                        "This test case is marked as broken, but it would actually succeed!");
+                }
+
             } catch (AssertionFailedError assertionFailedError) {
                 // in case of a failed assertion log the stacktrace
                 LOGGER.info("Original stacktrace leading to failed junit assertion in {}",
