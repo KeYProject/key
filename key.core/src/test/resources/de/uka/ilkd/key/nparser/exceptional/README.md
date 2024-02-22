@@ -1,6 +1,6 @@
 
 This directory contains test cases for the class 
-`de.uka.ilkd.key.nparser.ParserExceptionTest`.
+`de.uka.ilkd.key.nparser.KeYParserExceptionTest`.
 
 To add a test case add your single .key file that contains an error
 that should be presented to the user (like syntax error, unresolved
