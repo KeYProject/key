@@ -933,6 +933,7 @@ public class JMLSpecFactory {
                     break;
                 }
             }
+            // TODO: Fix #29
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
                 clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
