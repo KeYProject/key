@@ -43,7 +43,7 @@ public class MixFixResolver {
     }
 
     public static List<Token> extractTokens(ParserRuleContext ctx) {
-        List<Token> result = new ArrayList<Token>();
+        List<Token> result = new ArrayList<>(1024);
         extractTokens(result, ctx);
         return result;
     }

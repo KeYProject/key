@@ -41,12 +41,16 @@ public class ExprTest {
         }
     }
 
+    public static KeyIO io;
+
     private KeyIO getIo() throws IOException {
+        if(io!=null) return io;
+
         Services services = new Services(new JavaProfile());
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);
-        KeyIO io = new KeyIO(services);
+        io = new KeyIO(services);
         io.load(url).parseFile().loadDeclarations().loadSndDegreeDeclarations();
 
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
