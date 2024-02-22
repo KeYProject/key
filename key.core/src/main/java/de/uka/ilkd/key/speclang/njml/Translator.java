@@ -575,10 +575,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (floatResult != null) {
                 return floatResult;
             }
+
+            SLExpression other = expr.get(i);
+            if (other.isType() && !result.isType()) {
+                Function ssortFunc = sortLDT.getSsort(other.getType().getSort(), services);
+                other = new SLExpression(tb.func(ssortFunc));
+            }
+
             if (tok.getText().equals("==")) {
-                result = termFactory.eq(result, expr.get(i));
+                result = termFactory.eq(result, other);
             } else {
-                result = termFactory.neq(result, expr.get(i));
+                result = termFactory.neq(result, other);
             }
         }
         return result;
@@ -653,9 +660,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
             left = new SLExpression(tb.func(sortLDT.getSsubsort(), leftSort, rightSort));
         }
 
-//        } else {
-//            raiseError("Unsupported use of <: operator",ctx);
-//        }
         return left;
     }
 
