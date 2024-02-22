@@ -9,10 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -144,9 +141,10 @@ public final class SolverTypeImplementation implements SolverType {
 
     /**
      * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the
-     * {@link SMTTranslator} that is created with {@link #createTranslator()}.
+     * {@link SMTTranslator} that is created with {@link #createTranslator()}. Careful here:
+     * The order of entries is very important!
      */
-    private final Collection<String> handlerNames;
+    private final List<String> handlerNames;
 
     /**
      * Arbitrary options for the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by this solver
@@ -224,7 +222,7 @@ public final class SolverTypeImplementation implements SolverType {
         this.versionParameter = versionParameter;
         this.translatorClass = translatorClass;
         // copy the array so that it cannot accidentally be manipulated from the outside
-        this.handlerNames = new HashSet<>(handlerNames);
+        this.handlerNames = new ArrayList<>(handlerNames);
         this.handlerOptions = new HashSet<>(handlerOptions);
         this.solverSocketClass = solverSocketClass;
         this.preamble = preamble;
@@ -249,7 +247,7 @@ public final class SolverTypeImplementation implements SolverType {
     private SMTTranslator makeTranslator() {
         try {
             return (SMTTranslator) translatorClass
-                    .getDeclaredConstructor(String[].class, String[].class, String.class)
+                    .getDeclaredConstructor(List.class, Collection.class, String.class)
                     .newInstance(handlerNames, handlerOptions, preamble);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {

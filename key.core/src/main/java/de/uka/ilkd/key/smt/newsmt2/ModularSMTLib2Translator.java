@@ -59,9 +59,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     private final String preamble;
     /**
-     * The fully classified class names of the SMTHandlers used by this translator.
+     * The fully classified class names of the SMTHandlers used by this translator. Careful here:
+     * The order is very important!
      */
-    private final Collection<String> handlerNames;
+    private final List<String> handlerNames;
     /**
      * Arbitrary String options for the SMTHandlers used by this translator.
      */
@@ -76,14 +77,14 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * @param handlerNames fully classified class names of the SMTHandlers to be used by this
      *        translator
      */
-    public ModularSMTLib2Translator(Collection<String> handlerNames, Collection<String> handlerOptions,
+    public ModularSMTLib2Translator(List<String> handlerNames, Collection<String> handlerOptions,
                                     @Nullable String preamble) {
         if (preamble == null) {
             this.preamble = SMTHandlerServices.getInstance().getPreamble();
         } else {
             this.preamble = preamble;
         }
-        this.handlerNames = new HashSet<>(handlerNames);
+        this.handlerNames = new ArrayList<>(handlerNames);
         this.handlerOptions = new HashSet<>(handlerOptions);
         /*
          * Make sure to load the needed handlers once so that their smt properties are loaded as
@@ -104,7 +105,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * preamble may be the one from {@link SMTHandlerServices#getPreamble()}.
      */
     public ModularSMTLib2Translator() {
-        this(new HashSet<>(), new HashSet<>(), null);
+        this(new ArrayList<>(), new HashSet<>(), null);
     }
 
     @Override

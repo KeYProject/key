@@ -243,7 +243,7 @@ public class SolverPropertiesLoader {
         long timeout;
         Class<?> solverSocketClass;
         Class<?> translatorClass;
-        Set<String> handlerNames = new HashSet<>();
+        List<String> handlerNames = new ArrayList<>();
         Set<String> handlerOptions = new HashSet<>();
         Set<String> delimiters = new HashSet<>();
 
