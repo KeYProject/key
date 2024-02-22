@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.api.ScriptResults;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -69,6 +70,7 @@ public class MasterHandler {
      * Handler Options to be used by all the other SMT handlers.
      */
     private final Collection<String> handlerOptions;
+    private HashMap<Sort, Type> coerceType = new HashMap<>();
 
     /**
      * Create a new handler with the default set of smt handlers.
@@ -86,6 +88,7 @@ public class MasterHandler {
         getTranslationState().putAll(settings.getNewSettings().getMap());
         this.handlerOptions = handlerOptions;
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
+        coerceType.put(services.getTypeConverter().getIntegerLDT().targetSort(), Type.INT);
     }
 
     public boolean isHandlerOptionSet(String optionName) {
@@ -188,7 +191,11 @@ public class MasterHandler {
      */
     public SExpr translate(Term problem, Type type) {
         try {
-            return SExprs.coerce(translate(problem), type);
+            if (coerceType.containsKey(problem.sort())) {
+                return SExprs.coerce(translate(problem), coerceType.get(problem.sort()));
+            } else {
+                return SExprs.coerce(translate(problem), type);
+            }
         } catch (Exception ex) {
             // Fall back to an unknown value despite the exception.
             // The result will still be valid SMT code then.
@@ -312,7 +319,12 @@ public class MasterHandler {
      * @throws SMTTranslationException if the type conversion is impossible
      */
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
-        return SExprs.coerce(translate(terms), type);
+        List<SExpr> result = new ArrayList<>();
+        for (Term t : terms) {
+            result.add(translate(t, type));
+        }
+        return result;
+        //return SExprs.coerce(translate(terms), type);
     }
 
     /**

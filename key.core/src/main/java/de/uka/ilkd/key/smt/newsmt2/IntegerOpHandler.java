@@ -96,7 +96,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs());
+        List<SExpr> children = trans.translate(term.subs(), Type.INT);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;

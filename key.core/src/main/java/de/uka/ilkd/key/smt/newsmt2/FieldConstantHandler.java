@@ -90,7 +90,7 @@ public class FieldConstantHandler implements SMTHandler {
 
                 trans.addAxiom(
                     new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
-                        new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+                        new SExpr("-", Type.INT, curVal.toString()))));
 
                 state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
                 trans.addKnownSymbol(smtName);

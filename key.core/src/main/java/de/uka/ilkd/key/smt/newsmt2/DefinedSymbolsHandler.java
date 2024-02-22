@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
@@ -97,11 +98,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     private Properties snippets;
     private boolean enabled;
+    private IntegerLDT integerLDT;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
         this.services = services;
         this.snippets = handlerSnippets;
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
 
         // extract the list of supported suffixes from the keys in the
         // properties.
@@ -192,7 +195,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String prefixedname = PREFIX + name;
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
+        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : (term.sort() == integerLDT.targetSort() ? Type.INT : UNIVERSE);
         SExpr result = new SExpr(prefixedname, exprType, children);
 
         if (!introduceSymbol(trans, name, op)) {

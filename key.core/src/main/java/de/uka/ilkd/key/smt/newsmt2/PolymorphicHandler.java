@@ -40,13 +40,7 @@ public class PolymorphicHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
         if (op == Equality.EQUALS) {
-            List<SExpr> children = trans.translate(term.subs());
-                if (term.subs().get(0).sort() == integerLDT.targetSort() && term.subs().get(1).sort() == integerLDT.targetSort()) {
-                    children = trans.translate(term.subs(), Type.INT);
-                } else {
-                    children = trans.translate(term.subs(), Type.UNIVERSE);
-                }
-                return new SExpr("=", Type.BOOL, children);
+            return new SExpr("=", Type.BOOL, trans.translate(term.subs(), Type.UNIVERSE));
         }
 
         if (op == IfThenElse.IF_THEN_ELSE) {
