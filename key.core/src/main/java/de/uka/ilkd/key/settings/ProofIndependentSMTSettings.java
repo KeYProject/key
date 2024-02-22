@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
+import java.nio.file.InvalidPathException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
