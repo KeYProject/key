@@ -4,10 +4,7 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,9 +17,9 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
@@ -217,6 +214,95 @@ public class ExpressionBuilder extends DefaultBuilder {
             () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx, services));
     }
 
+    private Term binaryTerm(ParserRuleContext ctx, Token opToken, Term left, Term right) {
+        var op = lookupOperator(ctx, left.sort(), right.sort(), opToken.getText());
+        if (op == null) {
+            semanticError(ctx, "Could not find an operator with name '%s' and sorts [%s,%s]",
+                opToken.getText(), left.sort(), right.sort());
+        }
+        return binaryTerm(ctx, op, left, right);
+    }
+
+    private Term binaryTermWithNegationFallback(ParserRuleContext ctx, Token opToken, Term left,
+            Term right) {
+        var op = lookupOperator(ctx, left.sort(), right.sort(), opToken.getText());
+        if (op == null) {
+            // we look up on UTFOperator if we find information about the operator, e.g., if there
+            // is a know
+            // positive entry for example NOT_EQUALS is modelted by NEGATION of EQUALS
+            var opTableEntry = OperatorInfo.find(opToken);
+            if (opTableEntry != null && opTableEntry.getPositiveForm() != null) {
+                var opInfo = opTableEntry.getPositiveForm();
+                op = lookupOperator(ctx, left.sort(), right.sort(), opInfo.getNames());
+                var eq = binaryTerm(ctx, op, left, right);
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+            }
+        }
+        return binaryTerm(ctx, op, left, right);
+    }
+
+    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right,
+            String... opTexts) {
+        return lookupOperator(ctx, left, right, new ImmutableArray<>(opTexts));
+    }
+
+    private Operator lookupOperator(ParserRuleContext ctx, Sort left, Sort right,
+            ImmutableArray<String> opTexts) {
+        if (left == null || right == null) {
+            semanticError(ctx, "Expected sort available on both sides");
+        }
+
+        if (isMetaSort(left)) {
+            left = right;
+        }
+
+        if (isMetaSort(right)) {
+            right = left;
+        }
+
+        var cache = getFunctionCache();
+        var args = "(" + left.name() + "," + right.name() + ")";
+        for (String opText : opTexts) {
+            var signature = opText + args;
+            var op = cache.get(signature);
+            if (op != null) {
+                return op;
+            }
+        }
+        return null;
+    }
+
+    private boolean isMetaSort(Sort sort) {
+        return "Meta".equals(sort.name().toString());
+    }
+
+    private final Map<String, Operator> functionLookupCache = new TreeMap<>();
+
+    private Map<String, Operator> getFunctionCache() {
+        if (functionLookupCache.isEmpty()) {
+            for (Function fun : functions().allElements()) {
+                var oldOp = functionLookupCache.put(fun.toSignatureString(), fun);
+                if (oldOp != null) {
+                    throw new IllegalStateException("Operator collision detected!");
+                }
+
+                if (fun.getMetaData() != null) {
+                    var mds = fun.getMetaData();
+                    for (var md : mds) {
+                        for (var alt : md.getAlternativeSignatures(fun)) {
+                            oldOp = functionLookupCache.put(alt, fun);
+                            if (oldOp != null) {
+                                throw new IllegalStateException("Operator collision detected!");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return functionLookupCache;
+    }
+
+
     @Override
     public Term visitImplication_term(KeYParser.Implication_termContext ctx) {
         Term termL = accept(ctx.a);
@@ -248,7 +334,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
         Term result = accept(ctx.sub);
         assert result != null;
-        if (ctx.MINUS() != null) {
+        if (ctx.opUnaryTerm().MINUS() != null) {
             Operator Z = functions().lookup("Z");
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
@@ -291,64 +377,43 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitEquality_term(KeYParser.Equality_termContext ctx) {
-        Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-        Term eq = binaryTerm(ctx, Equality.EQUALS, termL, termR);
-        if (ctx.NOT_EQUALS() != null) {
-            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+        Term termL = accept(ctx.left);
+        if (ctx.op == null) {
+            return termL;
         }
-        return eq;
+
+        if (ctx.op.EQUALS() != null || ctx.op.NOT_EQUALS() != null) { // overloaded and built-in
+            Term eq = binaryTerm(ctx, Equality.EQUALS, termL, accept(ctx.right));
+            if (ctx.op.NOT_EQUALS() != null) {
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+            }
+            return eq;
+        }
+
+        Term termR = accept(ctx.right);
+        return binaryTermWithNegationFallback(ctx, ctx.op.start, termL, termR);
     }
+
 
     @Override
     public Object visitComparison_term(KeYParser.Comparison_termContext ctx) {
-        Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-
-        if (termR == null) {
-            return updateOrigin(termL, ctx, services);
+        Term termL = accept(ctx.left);
+        if (ctx.op == null) {
+            return termL;
         }
 
-        String op_name = "";
-        if (ctx.LESS() != null) {
-            op_name = "lt";
-        }
-        if (ctx.LESSEQUAL() != null) {
-            op_name = "leq";
-        }
-        if (ctx.GREATER() != null) {
-            op_name = "gt";
-        }
-        if (ctx.GREATEREQUAL() != null) {
-            op_name = "geq";
-        }
-        return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
-
+        Term termR = accept(ctx.right);
+        return binaryTerm(ctx, ctx.op.start, termL, termR);
     }
+
 
     @Override
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
-        Term termL = Objects.requireNonNull(accept(ctx.a));
+        Term termL = Objects.requireNonNull(accept(ctx.left));
         if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx, services);
         }
-
-        List<Term> terms = mapOf(ctx.b);
-        Term last = termL;
-        for (int i = 0; i < terms.size(); i++) {
-            String opname = "";
-            switch (ctx.op.get(i).getType()) {
-                case KeYLexer.UTF_INTERSECT -> opname = "intersect";
-                case KeYLexer.UTF_SETMINUS -> opname = "setMinus";
-                case KeYLexer.UTF_UNION -> opname = "union";
-                case KeYLexer.PLUS -> opname = "add";
-                case KeYLexer.MINUS -> opname = "sub";
-                default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
-            }
-            Term cur = terms.get(i);
-            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
-        }
-        return last;
+        return getBinaryOperatorChain(ctx, termL, ctx.op, mapOf(ctx.others));
     }
 
     private Term binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, Term last, Term cur) {
@@ -371,16 +436,32 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
-        Term termL = accept(ctx.a);
-        if (ctx.b.isEmpty()) {
+        Term termL = accept(ctx.left);
+        if (ctx.others.isEmpty()) {
             return updateOrigin(termL, ctx, services);
         }
-        List<Term> terms = mapOf(ctx.b);
-        Term last = termL;
-        for (Term cur : terms) {
-            last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
+        return getBinaryOperatorChain(ctx, termL, ctx.op, mapOf(ctx.others));
+    }
+
+    private Term getBinaryOperatorChain(ParserRuleContext ctx, Term left,
+            List<? extends ParserRuleContext> operators, List<Term> right) {
+        if (operators.size() != right.size()) {
+            throw new IllegalArgumentException();
         }
-        return last;
+
+        for (int i = 0; i < right.size(); i++) {
+            var cur = right.get(i);
+            var opText = operators.get(i).getText();
+            var op = lookupOperator(operators.get(i), left.sort(), cur.sort(), opText);
+            if (op == null) {
+                var help = "";
+                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]\n%s",
+                    operators.get(i).getText(),
+                    left.sort(), cur.sort(), help);
+            }
+            left = binaryTerm(ctx, op, left, cur);
+        }
+        return left;
     }
 
     @Override
@@ -391,39 +472,11 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
-        if (ctx.b.isEmpty()) { // fast path
-            return accept(ctx.a);
+        Term term = accept(ctx.left);
+        if (ctx.others.isEmpty()) { // fast path
+            return term;
         }
-
-        List<Term> termL = mapOf(ctx.b);
-        // List<String> opName = ctx.op.stream().map(it -> it.getType()== KeYLexer.PERCENT ? "mod" :
-        // "div").collect(Collectors.toList());
-
-        Term term = accept(ctx.a);
-        var sort = term.sort();
-        if (sort == null) {
-            semanticError(ctx, "No sort for term '%s'", term);
-        }
-
-        var ldt = services.getTypeConverter().getLDTFor(sort);
-
-        if (ldt == null) {
-            // falling back to integer ldt (for instance for untyped schema variables)
-            ldt = services.getTypeConverter().getIntegerLDT();
-        }
-
-        assert ctx.op.size() == ctx.b.size();
-
-        for (int i = 0; i < termL.size(); i++) {
-            var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
-            Function op = ldt.getFunctionFor(opName, services);
-            if (op == null) {
-                semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
-                    sort);
-            }
-            term = binaryTerm(ctx, op, term, termL.get(i));
-        }
-        return term;
+        return getBinaryOperatorChain(ctx, term, ctx.op, mapOf(ctx.others));
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
@@ -749,15 +802,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                    case 'n' -> sb.append("\n");
-                    case 'f' -> sb.append("\f");
-                    case 'r' -> sb.append("\r");
-                    case 't' -> sb.append("\t");
-                    case 'b' -> sb.append("\b");
-                    case ':' -> sb.append("\\:");
-                    // this is so in KeY ...
-                    default -> sb.append(chars[i]);
-                    // this more relaxed than before, \a becomes a ...
+                case 'n' -> sb.append("\n");
+                case 'f' -> sb.append("\f");
+                case 'r' -> sb.append("\r");
+                case 't' -> sb.append("\t");
+                case 'b' -> sb.append("\b");
+                case ':' -> sb.append("\\:");
+                // this is so in KeY ...
+                default -> sb.append(chars[i]);
+                // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);
@@ -870,8 +923,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             assert indexTerm != null;
             if (!isIntTerm(indexTerm)) {
                 semanticError(ctx,
-                    "Expecting term of sort %s as index of sequence %s, but found: %s",
-                    IntegerLDT.NAME, term, indexTerm);
+                        "Expecting term of sort %s as index of sequence %s, but found: %s",
+                        IntegerLDT.NAME, term, indexTerm);
             }
             return getServices().getTermBuilder().seqGet(Sort.ANY, term, indexTerm);
         }
@@ -882,19 +935,19 @@ public class ExpressionBuilder extends DefaultBuilder {
             if (rangeTo != null) {
                 if (quantifiedArrayGuard == null) {
                     semanticError(ctx,
-                        "Quantified array expressions are only allowed in locations.");
+                            "Quantified array expressions are only allowed in locations.");
                 }
                 LogicVariable indexVar =
-                    new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
+                        new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
                 Term indexTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(indexVar));
 
                 Function leq = functions().lookup(new Name("leq"));
                 Term fromTerm =
-                    capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
+                        capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
                 Term toTerm =
-                    capsulateTf(ctx, () -> getTermFactory().createTerm(leq, indexTerm, rangeTo));
+                        capsulateTf(ctx, () -> getTermFactory().createTerm(leq, indexTerm, rangeTo));
                 Term guardTerm = capsulateTf(ctx,
-                    () -> getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm));
+                        () -> getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm));
                 quantifiedArrayGuard = capsulateTf(ctx, () -> getTermFactory()
                         .createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm));
                 // TODO check quantifiedArrayGuard!
@@ -953,7 +1006,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
             if (label == null) {
                 label = getServices().getProfile().getTermLabelManager().parseLabel(labelName,
-                    parameters, getServices());
+                        parameters, getServices());
             }
         } catch (Exception ex) {
             throw new BuildingException(ctx, ex);
@@ -980,7 +1033,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term thenT = (Term) ctx.thenT.accept(this);
         Term elseT = (Term) ctx.elseT.accept(this);
         return capsulateTf(ctx,
-            () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
+                () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
     }
 
 
@@ -997,7 +1050,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term elseT = accept(ctx.elseT);
         ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
         Term result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
-            new Term[] { condF, thenT, elseT }, exVarsArray, null);
+                new Term[]{condF, thenT, elseT}, exVarsArray, null);
         unbindVars(orig);
         return result;
     }
@@ -1015,7 +1068,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.sub);
         Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
-            new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])), null);
+                new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])), null);
         unbindVars(orig);
         return a;
     }
@@ -1049,7 +1102,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
         try {
             Term result =
-                getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
+                    getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
             return result;
         } catch (Exception e) {
             throw new BuildingException(ctx, e);
@@ -1081,10 +1134,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ts != null) {
             if (!(ts instanceof VariableSV)) {
                 semanticError(ctx,
-                    ts + " is not allowed in a quantifier. Note, that you can't "
-                        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
-                        + " in taclets. You have to define the variable as a schema variable"
-                        + " and use the syntax \"\\exists i;\" instead.");
+                        ts + " is not allowed in a quantifier. Note, that you can't "
+                                + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+                                + " in taclets. You have to define the variable as a schema variable"
+                                + " and use the syntax \"\\exists i;\" instead.");
             }
             bindVar();
             return (QuantifiableVariable) ts;
@@ -1095,7 +1148,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         QuantifiableVariable result =
-            doLookup(new Name(ctx.id.getText()), variables());
+                doLookup(new Name(ctx.id.getText()), variables());
 
         if (result == null) {
             semanticError(ctx, "There is no schema variable or variable named " + id);
@@ -1128,7 +1181,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         return capsulateTf(ctx,
-            () -> getTermFactory().createTerm(op, new Term[] { a1 }, null, sjb.javaBlock));
+                () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock));
     }
 
     @Override
@@ -1150,7 +1203,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return getTermFactory().createTerm(functions().lookup(new Name("C")),
-            toZNotation(String.valueOf(intVal), functions()).sub(0));
+                toZNotation(String.valueOf(intVal), functions()).sub(0));
     }
 
     public boolean isClass(String p) {
@@ -1176,7 +1229,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         assert parts != null && varfuncid != null;
 
         boolean javaReference =
-            parts.size() > 1 && (isPackage(parts.get(0)) || isClass(parts.get(0)));
+                parts.size() > 1 && (isPackage(parts.get(0)) || isClass(parts.get(0)));
 
         if (javaReference) {
             return splitJava(parts);
@@ -1190,7 +1243,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                    ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1199,13 +1252,13 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         } else {
             String firstName =
-                ctx.name == null ? ctx.INT_LITERAL().getText()
-                        : ctx.name.simple_ident(0).getText();
+                    ctx.name == null ? ctx.INT_LITERAL().getText()
+                            : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                    ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
-                    ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+                        ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
                 Term tv = getServices().getTermFactory().createTerm(v);
                 String memberName = otherParts.get(0).getText();
                 if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
@@ -1213,7 +1266,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         return getServices().getTermBuilder().seqLen(tv);
                     } else {
                         semanticError(ctx, "There is no attribute '%s'for sequences (Seq), only "
-                            + "'length' is supported.", memberName);
+                                + "'length' is supported.", memberName);
                     }
                 }
                 memberName = StringUtil.trim(memberName, "()");
@@ -1221,6 +1274,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 return createAttributeTerm(tv, attr, ctx);
             }
         }
+
         return op;
     }
 
@@ -1266,7 +1320,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             // endregion
 
             KeYJavaType kjt =
-                getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
+                    getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
             if (ctx.call() != null) {
                 addWarning("Call of package or class");
@@ -1290,7 +1344,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         if (pm != null) {
                             Term[] args = visitArguments(simpleContext.call().argument_list());
                             current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args,
-                                kjt.getFullName());
+                                    kjt.getFullName());
                         } else {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
                         }
@@ -1303,7 +1357,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     String attributeName = attrid.id.getText();
                     Term[] args = visitArguments(attrid.call().argument_list());
                     current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName,
-                        args, className);
+                            args, className);
                     if (current == null) {
                         final Sort sort = lookupSort(className);
                         if (sort == null) {
@@ -1312,7 +1366,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                         if (kjt == null) {
                             semanticError(ctx, "Found logic sort for " + className
-                                + " but no corresponding java type!");
+                                    + " but no corresponding java type!");
                         }
                     }
                     return current;
@@ -1347,7 +1401,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 return current;
             } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
                 KeYParser.Attribute_simpleContext attrid =
-                    (KeYParser.Attribute_simpleContext) ctxSuffix;
+                        (KeYParser.Attribute_simpleContext) ctxSuffix;
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
@@ -1355,7 +1409,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         return getServices().getTermBuilder().seqLen(current);
                     } else {
                         semanticError(ctxSuffix, "There is no attribute '%s'for sequences (Seq), "
-                            + "only 'length' is supported.", memberName);
+                                + "only 'length' is supported.", memberName);
                     }
                 } else {
                     boolean isCall = attrid.call() != null;
@@ -1371,7 +1425,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         assert kjt != null;
                         classRef = kjt.getFullName();
                         current = getServices().getJavaInfo().getProgramMethodTerm(current,
-                            memberName, sfxargs, classRef, true);
+                                memberName, sfxargs, classRef, true);
                     } else {
                         Operator attr = getAttributeInPrefixSort(current.sort(), memberName);
                         current = createAttributeTerm(current, attr, ctxSuffix);
@@ -1383,7 +1437,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
                 KeYParser.Attribute_complexContext attrid =
-                    (KeYParser.Attribute_complexContext) ctxSuffix;
+                        (KeYParser.Attribute_complexContext) ctxSuffix;
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
@@ -1397,10 +1451,10 @@ public class ExpressionBuilder extends DefaultBuilder {
                     assert kjt != null;
                     classRef = kjt.getFullName();
                     current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName,
-                        sfxargs, classRef, false);
+                            sfxargs, classRef, false);
                 } else {
                     Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
-                        classRef + "::" + memberName);
+                            classRef + "::" + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
 
@@ -1412,7 +1466,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                     if (kjt == null) {
                         semanticError(ctxSuffix,
-                            "Found logic sort for %s but no corresponding java type!", classRef);
+                                "Found logic sort for %s but no corresponding java type!", classRef);
                     }
                 }
                 if (heap != null) {
@@ -1449,7 +1503,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             orig = variables();
             List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
             boundVars =
-                bv != null ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0])) : null;
+                    bv != null ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0])) : null;
             args = visitArguments(ctx.call().argument_list());
             if (boundVars != null) {
                 unbindVars(orig);
@@ -1464,7 +1518,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                    ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1473,7 +1527,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         } else {
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                    ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
         }
 
         Term current;
@@ -1498,9 +1552,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         for (QuantifiableVariable qv : args[i].freeVars()) {
                             if (boundVars.contains(qv)) {
                                 semanticError(ctx,
-                                    "Building function term " + op
-                                        + " with bound variables failed: " + "Variable " + qv
-                                        + " must not occur free in subterm " + args[i]);
+                                        "Building function term " + op
+                                                + " with bound variables failed: " + "Variable " + qv
+                                                + " must not occur free in subterm " + args[i]);
                             }
                         }
                     }
@@ -1509,7 +1563,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // create term
                 Term[] finalArgs1 = args;
                 current = capsulateTf(ctx,
-                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
+                        () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
             }
         }
         current = handleAttributes(current, ctx.attribute());
@@ -1558,16 +1612,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private Term toFPNotation(String number) {
         String decBitString =
-            Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
+                Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
         // toNum("0")); // soon to disappear
         return getTermFactory().createTerm(functions().lookup(new Name("FP")), toNum(decBitString));
     }
 
     private Term toDFPNotation(String number) {
         String decBitString =
-            Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
+                Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
         return getTermFactory().createTerm(functions().lookup(new Name("DFP")),
-            toNum(decBitString)); // toNum("0")); // soon to disappear
+                toNum(decBitString)); // toNum("0")); // soon to disappear
     }
 
     private Term toNum(String number) {
@@ -1693,7 +1747,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private ImmutableSet<Modality> lookupOperatorSV(String opName,
-            ImmutableSet<Modality> modalities) {
+                                                    ImmutableSet<Modality> modalities) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
         if (!(sv instanceof ModalOperatorSV)) {
             semanticError(null, "Schema variable " + opName + " not defined.");
@@ -1727,13 +1781,13 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // term);
                 return term;
             }
-            Term[] params = new Term[] { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2)};
             return capsulateTf(ctx,
-                () -> getServices().getTermFactory().createTerm(term.op(), params));
+                    () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {
             if (!isImplicitHeap(term.sub(0))) {
                 semanticError(null, "Expecting program variable heap as first argument of: %s",
-                    term);
+                        term);
             }
 
             Term[] params = new Term[term.arity()];
@@ -1744,7 +1798,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             return capsulateTf(ctx,
-                () -> getServices().getTermFactory().createTerm(term.op(), params));
+                    () -> getServices().getTermFactory().createTerm(term.op(), params));
 
         }
         return term;
@@ -1756,7 +1810,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     protected Term heapSelectionSuffix(Term term, Term heap, ParserRuleContext ctx) {
         if (!isHeapTerm(heap)) {
             semanticError(null, "Expecting term of type Heap but sort is %s for term %s",
-                heap.sort(), term);
+                    heap.sort(), term);
         }
         Term result = replaceHeap(term, heap, ctx);
         return result;

@@ -4,21 +4,28 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.overop.FunctionMetaData;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Objects of this class represent function and predicate symbols. Note that program variables are a
  * separate syntactic category, and not a type of function.
  */
+@NullMarked
 public class Function extends AbstractSortedOperator {
 
     private final boolean unique;
     private final boolean skolemConstant;
+    @Nullable
+    private final ImmutableArray<FunctionMetaData> metaData;
 
 
     // -------------------------------------------------------------------------
@@ -27,25 +34,26 @@ public class Function extends AbstractSortedOperator {
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-            boolean isSkolemConstant) {
+            boolean isSkolemConstant, @Nullable ImmutableArray<FunctionMetaData> metaData) {
         super(name, argSorts, sort, whereToBind, isRigid);
-
         this.unique = unique;
-        skolemConstant = isSkolemConstant;
+        this.skolemConstant = isSkolemConstant;
+        this.metaData = metaData;
         assert sort != Sort.UPDATE;
         assert !(unique && sort == Sort.FORMULA);
         assert !(sort instanceof NullSort) || name.toString().equals("null")
                 : "Functions with sort \"null\" are not allowed: " + this;
+
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique) {
-        this(name, sort, argSorts, whereToBind, unique, true, false);
+        this(name, sort, argSorts, whereToBind, unique, true, false, null);
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
-        this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
+        this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant, null);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
@@ -61,7 +69,7 @@ public class Function extends AbstractSortedOperator {
     }
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
-        this(name, sort, argSorts, null, false, isRigid, false);
+        this(name, sort, argSorts, null, false, isRigid, false, null);
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
@@ -81,7 +89,15 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant);
+        this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant, null);
+    }
+
+    public Function(Name name, Sort retSort, Sort[] argSort,
+            @Nullable Boolean[] whereToBind, boolean unique,
+            @Nullable ImmutableArray<FunctionMetaData> metaData) {
+        this(name, retSort, new ImmutableArray<>(argSort),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind),
+            unique, false, false, metaData);
     }
 
 
@@ -124,5 +140,10 @@ public class Function extends AbstractSortedOperator {
 
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
+    }
+
+    @Nullable
+    public ImmutableArray<FunctionMetaData> getMetaData() {
+        return metaData;
     }
 }

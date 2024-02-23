@@ -80,28 +80,26 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  */
 public final class NotationInfo {
 
-
-
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
-    static final int PRIORITY_TOP = 0;
-    static final int PRIORITY_EQUIVALENCE = 20;
-    static final int PRIORITY_IMP = 30;
-    static final int PRIORITY_OR = 40;
-    static final int PRIORITY_AND = 50;
-    static final int PRIORITY_NEGATION = 60;
-    static final int PRIORITY_QUANTIFIER = 60;
-    static final int PRIORITY_MODALITY = 60;
-    static final int PRIORITY_POST_MODALITY = 60;
-    static final int PRIORITY_EQUAL = 70;
-    static final int PRIORITY_COMPARISON = 80;
-    static final int PRIORITY_ARITH_WEAK = 90;
-    static final int PRIORITY_BELOW_ARITH_WEAK = 91;
-    static final int PRIORITY_ARITH_STRONG = 100;
-    static final int PRIORITY_BELOW_ARITH_STRONG = 101;
-    static final int PRIORITY_CAST = 120;
-    static final int PRIORITY_ATOM = 130;
-    static final int PRIORITY_BOTTOM = 140;
-    static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
+    public static final int PRIORITY_TOP = 0;
+    public static final int PRIORITY_EQUIVALENCE = 20;
+    public static final int PRIORITY_IMP = 30;
+    public static final int PRIORITY_OR = 40;
+    public static final int PRIORITY_AND = 50;
+    public static final int PRIORITY_NEGATION = 60;
+    public static final int PRIORITY_QUANTIFIER = 60;
+    public static final int PRIORITY_MODALITY = 60;
+    public static final int PRIORITY_POST_MODALITY = 60;
+    public static final int PRIORITY_EQUAL = 70;
+    public static final int PRIORITY_COMPARISON = 80;
+    public static final int PRIORITY_ARITH_WEAK = 90;
+    public static final int PRIORITY_BELOW_ARITH_WEAK = 91;
+    public static final int PRIORITY_ARITH_STRONG = 100;
+    public static final int PRIORITY_BELOW_ARITH_STRONG = 101;
+    public static final int PRIORITY_CAST = 120;
+    public static final int PRIORITY_ATOM = 130;
+    public static final int PRIORITY_BOTTOM = 140;
+    public static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
 
 
     public static boolean DEFAULT_PRETTY_SYNTAX = true;
@@ -466,6 +464,10 @@ public final class NotationInfo {
             if (result != null) {
                 return result;
             }
+        }
+
+        if (op instanceof Function) {
+            return new Notation.FunctionNotation();
         }
 
         return new Notation.FunctionNotation();

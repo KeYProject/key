@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -12,9 +13,13 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.overop.FunctionMetaData;
+import de.uka.ilkd.key.logic.overop.InfixMetaData;
+import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.pp.NotationInfo;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -91,6 +96,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
+        ImmutableArray<FunctionMetaData> metaData = null;
+        if (ctx.functionMetaData() != null) {
+            metaData = accept(ctx.functionMetaData());
+        }
+
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = pred_name.substring(0, separatorIndex);
@@ -99,15 +109,18 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
+                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false,
+                    metaData);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
             p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
-                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false,
+                metaData);
         }
+
 
         if (lookup(p.name()) == null) {
             functions().add(p);
@@ -116,6 +129,51 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");
         }
         return null;
+    }
+
+    @Override
+    public ImmutableArray<FunctionMetaData> visitInfixMetaData(KeYParser.InfixMetaDataContext ctx) {
+        return ctx.infixOperator().stream()
+                .filter(Objects::nonNull)
+                .map(it -> {
+                    var opInfo = OperatorInfo.find(it.start);
+                    if (opInfo != null) {
+                        return new InfixMetaData(opInfo.getNames(), opInfo.getPrecedence());
+                    } else {
+                        int prec = 0;
+                        if (it.opEqualities() != null)
+                            prec = NotationInfo.PRIORITY_EQUAL;
+                        if (it.opComparison() != null)
+                            prec = NotationInfo.PRIORITY_COMPARISON;
+                        if (it.opStrong1() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_STRONG;
+                        if (it.opStrong2() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_STRONG;
+                        if (it.opWeak() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_WEAK;
+                        if (it.opConjunction() != null)
+                            prec = NotationInfo.PRIORITY_AND;
+                        if (it.opDisjunction() != null)
+                            prec = NotationInfo.PRIORITY_OR;
+                        return new InfixMetaData(it.getText(), prec);
+                    }
+                }).collect(ImmutableArray.collector());
+    }
+
+
+    @Override
+    public Object visitPrefixMetaData(KeYParser.PrefixMetaDataContext ctx) {
+        return super.visitPrefixMetaData(ctx);
+    }
+
+    @Override
+    public Object visitPostfixMetaData(KeYParser.PostfixMetaDataContext ctx) {
+        return super.visitPostfixMetaData(ctx);
+    }
+
+    @Override
+    public Object visitShortcutMetaData(KeYParser.ShortcutMetaDataContext ctx) {
+        return super.visitShortcutMetaData(ctx);
     }
 
     @Override
@@ -131,6 +189,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
+
+        ImmutableArray<FunctionMetaData> metaData = null;
+        if (ctx.functionMetaData() != null) {
+            metaData = accept(ctx.functionMetaData());
+        }
+
+
         Function f = null;
         assert funcName != null;
         int separatorIndex = funcName.indexOf("::");
@@ -140,13 +205,20 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
+                    new Name(baseName),
+                    retSort,
+                    argSorts.toArray(new Sort[0]),
+                    unique,
+                    metaData);
             }
         }
 
         if (f == null) {
-            f = new Function(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
-                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
+            f = new Function(new Name(funcName),
+                retSort, argSorts.toArray(new Sort[0]),
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
+                unique,
+                metaData);
         }
 
         if (lookup(f.name()) == null) {

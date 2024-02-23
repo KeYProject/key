@@ -33,4 +33,3 @@ seqEmpty + seqEmpty
 \emptyset ∪ ∅ \cap ∅ = (∅ \cup ∅) ∩ ∅
 ∅ ⊆ \emptyset
 \emptyset ∖ \emptyset
-(∅ ∊ ∅) & true
