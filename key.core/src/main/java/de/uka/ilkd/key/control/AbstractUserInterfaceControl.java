@@ -26,6 +26,7 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.settings.Configuration;
 
 import org.slf4j.LoggerFactory;
 
@@ -255,7 +256,8 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+            ProofAggregate proofList, ReplayResult result, Configuration settings)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof

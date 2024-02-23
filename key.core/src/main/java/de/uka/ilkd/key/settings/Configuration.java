@@ -54,7 +54,7 @@ public class Configuration {
     /**
      * Loads a configuration using the given char stream.
      *
-     * @param file existsing file path
+     * @param input existing file path
      * @return a configuration based on the file contents
      * @throws IOException i/o error on the steram
      */
@@ -129,8 +129,8 @@ public class Configuration {
      * Returns an integer or {@code null} if not such entry exists.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name) {
         return (int) getLong(name);
@@ -141,8 +141,8 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name, int defaultValue) {
         return (int) getLong(name, defaultValue);
@@ -152,8 +152,8 @@ public class Configuration {
      * Returns a long value for the given name. {@code null} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
         return get(name, Long.class);
@@ -163,8 +163,8 @@ public class Configuration {
      * Returns a long value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
         var value = get(name, Long.class);
@@ -175,8 +175,8 @@ public class Configuration {
      * Returns a boolean value for the given name.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
         return get(name, Boolean.class);
@@ -186,8 +186,8 @@ public class Configuration {
      * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name, boolean defaultValue) {
         return get(name, defaultValue);
@@ -198,15 +198,15 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
-     * @throw NullPointerException if no such value entry exists
+     * @throws ClassCastException if the entry is not an {@link #Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
         return get(name, Double.class);
     }
 
     /**
-     * Returns an string value for the given name. {@code null} if no such value is present.
+     * Returns a string value for the given name. {@code null} if no such value is present.
      *
      * @param name property name
      */
@@ -216,7 +216,7 @@ public class Configuration {
     }
 
     /**
-     * Returns an string value for the given name. {@code defaultValue} if no such value is present.
+     * Returns a string value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
      */
@@ -225,7 +225,7 @@ public class Configuration {
     }
 
     /**
-     * Returns an sub configuration for the given name. {@code null} if no such value is present.
+     * Returns a sub configuration for the given name. {@code null} if no such value is present.
      *
      * @param name property name
      */
@@ -261,6 +261,19 @@ public class Configuration {
     }
 
     /**
+     * Returns a list of integer values given by the name.
+     */
+    @Nullable
+    public List<Long> getIntList(String name) {
+        var seq = get(name, List.class);
+        if (seq == null)
+            return null;
+        if (!seq.stream().allMatch(it -> it instanceof Long))
+            throw new ClassCastException();
+        return seq;
+    }
+
+    /**
      * Returns string array for the requested entry. {@code defaultValue} is returned if no such
      * entry exists.
      *
@@ -277,7 +290,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the meta data corresponding to the given entry.
+     * Returns the meta-data corresponding to the given entry.
      */
     @Nullable
     public ConfigurationMeta getMeta(String name) {
@@ -376,6 +389,7 @@ public class Configuration {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
+
     /**
      * POJO for metadata of configuration entries.
      */
@@ -457,11 +471,14 @@ public class Configuration {
                 printValue(value.toString());
             } else if (value == null) {
                 printValue("null");
+            } else if (value instanceof int[] array) {
+                printSeq(array);
             } else {
                 throw new IllegalArgumentException("Unexpected object: " + value);
             }
             return this;
         }
+
 
         private ConfigurationWriter printMap(Map<String, Object> value) {
             out.format("{ ");
@@ -490,12 +507,16 @@ public class Configuration {
             return this;
         }
 
-        private ConfigurationWriter printSeq(Collection<Object> value) {
+        private void printSeq(int[] array) {
+            printSeq(Arrays.stream(array).boxed().toList());
+        }
+
+        private ConfigurationWriter printSeq(Collection<? extends Object> value) {
             out.format("[ ");
             indent += 4;
             newline();
             printIndent();
-            for (Iterator<Object> iterator = value.iterator(); iterator.hasNext();) {
+            for (var iterator = value.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
                 printValue(o);
                 if (iterator.hasNext()) {

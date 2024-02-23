@@ -39,7 +39,7 @@ public class ProofBundleSaver extends ProofSaver {
     @Override
     protected void save(File file) throws IOException {
         // get the FileRepo from the InitConfig of the Proof
-        FileRepo repo = proof.getInitConfig().getFileRepo();
+        FileRepo repo = getProof().getInitConfig().getFileRepo();
 
         // this ProofSaver can not be used with TrivialFileRepo
         if (!(repo instanceof AbstractFileRepo)) {
@@ -51,7 +51,7 @@ public class ProofBundleSaver extends ProofSaver {
          * create a filename for the actual proof file in the FileRepo: We always use the contract
          * name here (preparation for proof bundle -> saving multiple proofs).
          */
-        String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
+        String proofFileName = MiscTools.toValidFileName(getProof().name().toString() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
         save(repo.createOutputStream(Paths.get(proofFileName)));

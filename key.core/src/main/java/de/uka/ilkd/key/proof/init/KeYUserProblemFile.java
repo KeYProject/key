@@ -18,18 +18,18 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -37,7 +37,11 @@ import org.jspecify.annotations.NonNull;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
+    @Nullable
     private Sequent problem = null;
+
+    @Nullable
+    private Configuration settings;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -122,6 +126,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return warnings;
     }
 
+    public Configuration readSettings() {
+        if (settings == null) {
+            settings = getParseContext().findSettings();
+        }
+        return settings;
+    }
+
     @Override
     public void readProblem() throws ProofInputException {
         if (initConfig == null) {
@@ -177,7 +188,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() {
+    public KeyAst.ProofScriptEntry readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -238,7 +249,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      */
     private Profile readProfileFromFile() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
@@ -264,4 +274,5 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYJavaType getContainerType() {
         return null;
     }
+
 }

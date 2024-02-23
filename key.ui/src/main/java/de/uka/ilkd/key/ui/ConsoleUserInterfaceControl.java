@@ -20,7 +20,6 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -40,7 +39,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -67,13 +65,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     int progressMax = 0;
 
 
-    // flag to indicate that a file should merely be loaded not proved. (for
-    // "reload" testing)
+    // flag to indicate that a file should merely be loaded isn't proved.
+    // (for "reload" testing)
     private final boolean loadOnly;
 
 
     /**
-     * Current key problem file that is attempted to be proven.
+     * The current key problem file that is attempted to be proven.
      */
     private File keyProblemFile = null;
 
@@ -114,7 +112,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * It is assumed that this part of the code is never reached, unless a value has been
          * assigned to keyProblemFile in method loadProblem(File).
          */
-        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
+        assert keyProblemFile != null : "Unexpected null pointer. Trying to"
             + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
@@ -159,12 +157,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
         if (problemLoader.hasProofScript()) {
             try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                var script = problemLoader.readProofScript();
+                ProofScriptEngine pse = new ProofScriptEngine(script.code(), script.getLocation());
                 this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                 pse.execute(this, proof);
                 // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
+                // All this here should be refactored anyway ...
                 this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
             } catch (Exception e) {
                 LOGGER.debug("", e);
@@ -192,8 +190,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void loadProblem(File file) {
         /*
-         * Current file is stored in a private field. It will be used in method printResults() to
-         * determine file names, in which proofs will be written.
+         * The current file is stored in a private field.
+         * It will be used in method printResults() to determine file names, in which proofs will be
+         * written.
          */
         keyProblemFile = file;
         getProblemLoader(file, null, null, null, mediator).runSynchronously();
@@ -249,7 +248,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public final void reportException(Object sender, ProofOblInput input, Exception e) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
+        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{})", sender, input, e);
     }
 
     @Override
@@ -295,7 +294,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public final void openExamples() {
-        LOGGER.info("Open Examples not suported by console UI.");
+        LOGGER.info("Open Examples not supported by console UI.");
     }
 
     @Override
@@ -306,6 +305,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
         super.proofDisposing(e);
@@ -316,7 +316,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
-            // happen for symbolic execution tests, if proofCreated was not
+            // happen for symbolic execution tests if proofCreated was not
             // called by the test setup.
         }
     }
@@ -363,7 +363,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      */
     public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
         if (result instanceof Throwable) {
-            throw new RuntimeException("Error in batchmode.", (Throwable) result);
+            throw new RuntimeException("Error in batch mode.", (Throwable) result);
         }
 
         // Save the proof before exit.
@@ -400,7 +400,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof
-        return proof.openGoals().size() == 0;
+        return proof.openGoals().isEmpty();
     }
 
     @Override

@@ -9,19 +9,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -32,6 +29,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.prover.impl.PerfScope;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -39,7 +37,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -288,13 +285,10 @@ public abstract class AbstractProblemLoader {
                 proofList = createProof(poContainer);
                 loadSelectedProof(poContainer, proofList, callbackProofLoaded);
             }
-        } catch (Throwable t) {
-            // Throw this exception; otherwise, it can for instance occur
-            // that "result" will be null (if replayProof(...) fails) and
-            // we get a NullPointerException that is hard to analyze.
-            throw t;
         } finally {
-            control.loadingFinished(this, poContainer, proofList, result);
+            var settings = (envInput instanceof KeYUserProblemFile kupf) ? kupf.readSettings()
+                    : new Configuration();
+            control.loadingFinished(this, poContainer, proofList, result, settings);
         }
     }
 
@@ -342,13 +336,10 @@ public abstract class AbstractProblemLoader {
      * @param poContainer the container created by {@link #createProofObligationContainer()}.
      * @param proofList the proof list containing the proof to load.
      * @param callbackProofLoaded optional callback, called before the proof is replayed
-     * @throws ProofInputException Occurred Exception.
-     * @throws ProblemLoaderException Occurred Exception.
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            Consumer<Proof> callbackProofLoaded)
-            throws ProofInputException, ProblemLoaderException {
+            Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -470,7 +461,7 @@ public abstract class AbstractProblemLoader {
                 try (ZipFile bundle = new ZipFile(file)) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
-                            .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                            .map(e -> Paths.get(e.getName())).toList();
                 }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
@@ -680,18 +671,13 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public Pair<String, Location> readProofScript() throws ProofInputException {
+    public KeyAst.ProofScriptEntry readProofScript() throws ProofInputException {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-
-        Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URI url = kupf.getInitialFile().toURI();
-        Location location = new Location(url, Position.newOneBased(script.second, script.third));
-
-        return new Pair<>(script.first, location);
+        return kupf.readProofScript();
     }
 
-    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
+    public KeyAst.ProofScriptEntry getProofScript() throws ProblemLoaderException {
         if (hasProofScript()) {
             try {
                 return readProofScript();
@@ -723,9 +709,6 @@ public abstract class AbstractProblemLoader {
                 new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
             parserResult = parser.getResult();
-
-            // Parser is no longer needed, set it to null to free memory.
-            parser = null;
 
             // For loading, we generally turn on one step simplification to be
             // able to load proofs that used it even if the user has currently

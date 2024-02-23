@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -38,7 +38,9 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -50,6 +52,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
@@ -233,11 +236,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 if (problemLoader.hasProofScript()) {
-                    Pair<String, Location> scriptAndLoc;
+                    KeyAst.ProofScriptEntry scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
                         ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.first, scriptAndLoc.second);
+                            scriptAndLoc.code(), scriptAndLoc.getLocation());
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {
@@ -404,6 +407,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
             }
+
+            if (getMediator().getSelectedProof() == proof) {
+                saver.setPathToLastSelectedNode(getMediator().getSelectedNode().getPosInProof());
+            }
+
             String errorMsg;
             try {
                 getMediator().stopInterface(true);
@@ -515,28 +523,47 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
-        super.loadingFinished(loader, poContainer, proofList, result);
-        if (proofList != null) {
-            if (result != null) {
-                if ("".equals(result.getStatus())) {
-                    this.resetStatus(this);
-                } else {
-                    this.reportStatus(this, result.getStatus());
-                }
-                if (result.hasErrors()) {
-                    throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().get(0).getMessage(),
-                        result.getErrorList().get(0));
-                }
+            ProofAggregate proofList, ReplayResult result, Configuration settings)
+            throws ProblemLoaderException {
+        super.loadingFinished(loader, poContainer, proofList, result, settings);
+        if (proofList != null && result != null) {
+            if ("".equals(result.getStatus())) {
+                this.resetStatus(this);
+            } else {
+                this.reportStatus(this, result.getStatus());
+            }
+            if (result.hasErrors()) {
+                throw new ProblemLoaderException(loader,
+                    "Proof could only be loaded partially.\n" + "In summary "
+                        + result.getErrorList().size()
+                        + " not loadable rule application(s) have been detected.\n"
+                        + "The first one:\n" + result.getErrorList().get(0).getMessage(),
+                    result.getErrorList().get(0));
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();
-        if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
+        if (settings != null) {
+            // TODO weigl not triggered
+            var addInfo = settings.getSection(ProofSettings.KEY_ADDITIONAL_DATA);
+            if (addInfo != null) {
+                var lastSelectedNodePath =
+                    addInfo.getIntList(OutputStreamProofSaver.KEY_LAST_SELECTED_NODE);
+                if (lastSelectedNodePath != null && proofList != null) {
+                    var proof = proofList.getFirstProof();
+                    var compressed =
+                        lastSelectedNodePath.stream().mapToInt(Long::intValue).toArray();
+                    var path = KeYCollections.runLengthDecoding(compressed);
+                    try {
+                        var node = proof.root().traversePath(path);
+                        getMediator().nonGoalNodeChosen(node);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        LOGGER.warn(
+                            "Invalid proof tree path detected in KeYUserProblemFile. Not able to select last"
+                                +
+                                " selected proof node.");
+                    }
+                }
+            }
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -65,6 +66,10 @@ public class ProofScriptEngine {
         this.script = script;
         this.initialLocation = initLocation;
         this.initiallySelectedGoal = initiallySelectedGoal;
+    }
+
+    public ProofScriptEngine(KeyAst.ProofScriptEntry script) {
+        this(script.code(), script.getLocation());
     }
 
     private static Map<String, ProofScriptCommand<?>> loadCommands() {

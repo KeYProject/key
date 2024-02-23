@@ -50,7 +50,10 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.KeYCollections;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,21 +62,30 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kai Wallisch
  */
+@NullMarked
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
+    public static final String KEY_LAST_SELECTED_NODE = "lastSelectedNode";
 
     /**
      * The proof to save.
      */
-    protected final Proof proof;
+    private Proof proof;
+
     /**
      * Currently running KeY version (usually a git commit hash).
      */
-    protected final String internalVersion;
+    private String internalVersion;
+
     /**
      * Whether the proof steps should be output (usually true).
      */
-    protected final boolean saveProofSteps;
+    private boolean saveProofSteps;
+
+    /**
+     * Last selected node in this proof
+     */
+    private int @Nullable [] pathToLastSelectedNode = null;
 
 
     /**
@@ -82,6 +94,7 @@ public class OutputStreamProofSaver {
      * @param proof the Proof
      * @return the location of the java source code or null if no such exists
      */
+    @Nullable
     public static File getJavaSourceLocation(Proof proof) {
         final String header = proof.header();
         final int i = header.indexOf("\\javaSource");
@@ -89,7 +102,7 @@ public class OutputStreamProofSaver {
             final int begin = header.indexOf('\"', i);
             final int end = header.indexOf('\"', begin + 1);
             final String sourceLocation = header.substring(begin + 1, end);
-            if (sourceLocation.length() > 0) {
+            if (!sourceLocation.isEmpty()) {
                 return new File(sourceLocation);
             }
         }
@@ -149,7 +162,13 @@ public class OutputStreamProofSaver {
     }
 
     public String writeSettings(ProofSettings ps) {
-        return String.format("\\settings %s \n", ps.settingsToString());
+        // inject the last selected node
+        var additionalInformation = new TreeMap<String, Object>();
+        if (pathToLastSelectedNode != null) {
+            var lastSelectedNode = KeYCollections.runLengthEncoding(pathToLastSelectedNode);
+            additionalInformation.put(KEY_LAST_SELECTED_NODE, lastSelectedNode);
+        }
+        return String.format("\\settings %s \n", ps.settingsToString(additionalInformation));
     }
 
     public void save(OutputStream out) throws IOException {
@@ -229,6 +248,7 @@ public class OutputStreamProofSaver {
         }
     }
 
+    @Nullable
     protected String getBasePath() throws IOException {
         File javaSourceLocation = getJavaSourceLocation(proof);
         if (javaSourceLocation != null) {
@@ -245,7 +265,7 @@ public class OutputStreamProofSaver {
     private String makePathsRelative(String header) {
         final String[] search =
             new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
-        final String basePath;
+        String basePath;
         String tmp = header;
         try {
             basePath = getBasePath();
@@ -270,7 +290,7 @@ public class OutputStreamProofSaver {
 
                 // there may be more than one path
                 while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
-                    if (relPathString.length() > 0) {
+                    if (!relPathString.isEmpty()) {
                         relPathString.append(", ");
                     }
 
@@ -694,7 +714,7 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq, @Nullable PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
@@ -717,9 +737,9 @@ public class OutputStreamProofSaver {
     /**
      * Get the "interesting" instantiations of the provided object.
      *
-     * @see SVInstantiations#interesting()
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
+     * @see SVInstantiations#interesting()
      */
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
@@ -826,7 +846,8 @@ public class OutputStreamProofSaver {
         return printAnything(val, services, true);
     }
 
-    public static String printAnything(Object val, Services services,
+    @Nullable
+    public static String printAnything(@Nullable Object val, Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -847,17 +868,47 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, @Nullable Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
-
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
+            boolean shortAttrNotation) {
         final NotationInfo ni = new NotationInfo();
-
         return LogicPrinter.purePrinter(ni, (shortAttrNotation ? serv : null));
     }
 
+    public String getInternalVersion() {
+        return internalVersion;
+    }
+
+    public void setInternalVersion(String internalVersion) {
+        this.internalVersion = internalVersion;
+    }
+
+    public boolean isSaveProofSteps() {
+        return saveProofSteps;
+    }
+
+    public void setSaveProofSteps(boolean saveProofSteps) {
+        this.saveProofSteps = saveProofSteps;
+    }
+
+    public Proof getProof() {
+        return proof;
+    }
+
+    public void setProof(Proof proof) {
+        this.proof = proof;
+    }
+
+    public int @Nullable [] getPathToLastSelectedNode() {
+        return pathToLastSelectedNode;
+    }
+
+    public void setPathToLastSelectedNode(int[] pathToLastSelectedNode) {
+        this.pathToLastSelectedNode = pathToLastSelectedNode;
+    }
 }
