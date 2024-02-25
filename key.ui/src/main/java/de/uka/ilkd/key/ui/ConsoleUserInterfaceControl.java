@@ -173,7 +173,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         } else if (macroChosen()) {
             applyMacro();
         } else {
-            finish(proof);
+            try {
+                finish(proof);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -229,7 +233,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
-    void finish(Proof proof) {
+    void finish(Proof proof) throws InterruptedException {
         // setInteractive(false) has to be called because the ruleAppIndex
         // has to be notified that we work in auto mode (CS)
         mediator.setInteractive(false);

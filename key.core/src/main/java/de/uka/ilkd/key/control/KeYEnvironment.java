@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -20,7 +21,12 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Instances of this class are used to collect and access all relevant information for verification
@@ -319,4 +325,43 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     public Pair<String, Location> getProofScript() {
         return proofScript;
     }
+
+    /**
+     * Retrieve a list of all available contracts for all known Java types.
+     *
+     * @return a non-null list, possible empty
+     */
+    public List<Contract> getAvailableContracts() {
+        List<Contract> proofContracts = new ArrayList<>(512);
+        Set<KeYJavaType> kjts = getJavaInfo().getAllKeYJavaTypes();
+        for (KeYJavaType type : kjts) {
+            if (!KeYTypeUtil.isLibraryClass(type)) {
+                ImmutableSet<IObserverFunction> targets =
+                    getSpecificationRepository().getContractTargets(type);
+                for (IObserverFunction target : targets) {
+                    ImmutableSet<Contract> contracts =
+                        getSpecificationRepository().getContracts(type, target);
+                    for (Contract contract : contracts) {
+                        proofContracts.add(contract);
+                    }
+                }
+            }
+        }
+        return proofContracts;
+    }
+
+
+    /**
+     * Constructs a list containing all known rules that are registered in the current
+     * environment.
+     *
+     * @return always returns a non-null list
+     */
+    public List<Rule> getRules() {
+        var rules = new ArrayList<Rule>(4096);
+        rules.addAll(getInitConfig().activatedTaclets());
+        getInitConfig().builtInRules().forEach(rules::add);
+        return rules;
+    }
+
 }
