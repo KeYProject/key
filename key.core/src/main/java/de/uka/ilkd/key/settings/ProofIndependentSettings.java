@@ -45,6 +45,8 @@ public class ProofIndependentSettings {
     private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
+    private final FeatureSettings featureSettings = new FeatureSettings();
+
     private File filename;
 
 
@@ -59,6 +61,7 @@ public class ProofIndependentSettings {
         addSettings(lemmaGeneratorSettings);
         addSettings(generalSettings);
         addSettings(viewSettings);
+        addSettings(featureSettings);
     }
 
     private ProofIndependentSettings(File filename) {
@@ -74,6 +77,9 @@ public class ProofIndependentSettings {
             if (lastReadedProperties != null) {
                 settings.readSettings(lastReadedProperties);
             }
+            if (lastReadedConfiguration != null) {
+                settings.readSettings(lastReadedConfiguration);
+            }
         }
     }
 
@@ -88,12 +94,12 @@ public class ProofIndependentSettings {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not load settings from {}", filename, e);
         }
     }
 
     private void load(File file) throws IOException {
-        if (!file.getName().endsWith(".toml")) {
+        if (!file.getName().endsWith(".json")) {
             try (FileInputStream in = new FileInputStream(file)) {
                 Properties properties = new Properties();
                 properties.load(in);
@@ -104,11 +110,14 @@ public class ProofIndependentSettings {
             }
         } else {
             this.lastReadedConfiguration = Configuration.load(file);
+            for (Settings settings : settings) {
+                settings.readSettings(lastReadedConfiguration);
+            }
         }
     }
 
     public void saveSettings() {
-        if (!filename.getName().endsWith(".toml")) {
+        if (!filename.getName().endsWith(".json")) {
             Properties result = new Properties();
             for (Settings settings : settings) {
                 settings.writeSettings(result);
@@ -121,7 +130,7 @@ public class ProofIndependentSettings {
             try (var out = new FileOutputStream(filename)) {
                 result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error("Could not store settings to {}", filename, e);
             }
         }
 
@@ -136,7 +145,7 @@ public class ProofIndependentSettings {
             new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not store settings to {}", filename, e);
         }
     }
 
@@ -158,6 +167,10 @@ public class ProofIndependentSettings {
 
     public ProofIndependentSMTSettings getSMTSettings() {
         return smtSettings;
+    }
+
+    public FeatureSettings getFeatureSettings() {
+        return featureSettings;
     }
 
     /**

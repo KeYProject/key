@@ -3,10 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.util.Properties;
+import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class GeneralSettings extends AbstractSettings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralSettings.class);
+
     /**
      * This parameter disables the possibility to prune in closed branches. It is meant as a
      * fallback solution if storing all closed goals needs too much memory or is not needed. Pruning
@@ -29,16 +34,24 @@ public class GeneralSettings extends AbstractSettings {
 
     private static final String CATEGORY = "General";
 
-    private static final String TACLET_FILTER = "StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY = "DnDDirectionSensitive";
-    private static final String USE_JML_KEY = "UseJML";
-    private static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
-    private static final String AUTO_SAVE = "AutoSavePeriod";
+    public static final String TACLET_FILTER = "StupidMode";
+    public static final String DND_DIRECTION_SENSITIVE_KEY = "DnDDirectionSensitive";
+    public static final String USE_JML_KEY = "UseJML";
+
+    public static final String KEY_JML_ENABLED_KEYS = "JML_ENABLED_KEYS";
+
+    public static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
+    public static final String AUTO_SAVE = "AutoSavePeriod";
 
     /**
      * The key for storing the ensureSourceConsistency flag in settings
      */
     private static final String ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
+
+    /** Default value for {@link #getJmlEnabledKeys()} */
+    public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
+
+    private Set<String> jmlEnabledKeys = new TreeSet<>(JML_ENABLED_KEYS_DEFAULT);
 
     /**
      * minimize interaction is on by default
@@ -75,7 +88,16 @@ public class GeneralSettings extends AbstractSettings {
         // addSettingsListener(AutoSaver.settingsListener);
     }
 
-    // getter
+    public Set<String> getJmlEnabledKeys() {
+        return jmlEnabledKeys;
+    }
+
+    public void setJmlEnabledKeys(Set<String> jmlEnabledKeys) {
+        var oldValue = this.jmlEnabledKeys;
+        this.jmlEnabledKeys = Objects.requireNonNull(jmlEnabledKeys);
+        firePropertyChange(KEY_JML_ENABLED_KEYS, oldValue, jmlEnabledKeys);
+    }
+
     public boolean getTacletFilter() {
         return tacletFilter;
     }
@@ -185,6 +207,20 @@ public class GeneralSettings extends AbstractSettings {
         if (val != null) {
             setEnsureSourceConsistency(Boolean.parseBoolean(val));
         }
+
+        {
+            String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
+            if (sysProp != null) {
+                val = sysProp;
+                LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
+            } else {
+                val = props.getProperty(prefix + KEY_JML_ENABLED_KEYS);
+            }
+
+            if (val != null) {
+                setJmlEnabledKeys(new TreeSet<>(Arrays.stream(val.split(",")).toList()));
+            }
+        }
     }
 
     /**
@@ -205,6 +241,7 @@ public class GeneralSettings extends AbstractSettings {
         props.setProperty(prefix + AUTO_SAVE, String.valueOf(autoSave));
         props.setProperty(prefix + ENSURE_SOURCE_CONSISTENCY,
             String.valueOf(ensureSourceConsistency));
+        props.setProperty(KEY_JML_ENABLED_KEYS, String.join(",", jmlEnabledKeys));
     }
 
     @Override
@@ -222,6 +259,14 @@ public class GeneralSettings extends AbstractSettings {
             setAutoSave(0);
         }
         setEnsureSourceConsistency(props.getBool(ENSURE_SOURCE_CONSISTENCY));
+
+        var sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
+        if (sysProp != null) {
+            LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
+            setJmlEnabledKeys(new TreeSet<>(Arrays.stream(sysProp.split(",")).toList()));
+        } else {
+            setJmlEnabledKeys(new TreeSet<>(props.getStringList(KEY_JML_ENABLED_KEYS)));
+        }
     }
 
     @Override
@@ -232,5 +277,6 @@ public class GeneralSettings extends AbstractSettings {
         props.set(USE_JML_KEY, useJML);
         props.set(AUTO_SAVE, autoSave);
         props.set(ENSURE_SOURCE_CONSISTENCY, ensureSourceConsistency);
+        props.set(KEY_JML_ENABLED_KEYS, jmlEnabledKeys.stream().toList());
     }
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
@@ -27,17 +28,43 @@ public class Semisequent implements Iterable<SequentFormula> {
         seqList = ImmutableSLList.nil();
     }
 
-
     /**
-     * creates a new Semisequent with the Semisequent elements in seqList; the provided list must be
-     * redundancy free, i.e., the created sequent must be exactly the same as when creating the
-     * sequent by subsequently inserting all formulas
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided list must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
      *
      * @param seqList list of sequent formulas
      */
     public Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
+     */
+    public Semisequent(Collection<SequentFormula> seqList) {
+        assert !seqList.isEmpty();
+        this.seqList = ImmutableList.fromList(seqList);
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas (possibly empty).
+     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the
+     * sequent by subsequently inserting all formulas.
+     *
+     * @param seqList list of sequent formulas
+     */
+    public static Semisequent create(Collection<SequentFormula> seqList) {
+        if (seqList.isEmpty()) {
+            return EMPTY_SEMISEQUENT;
+        }
+        return new Semisequent(seqList);
     }
 
 
