@@ -75,7 +75,10 @@ ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
 ASSIGNABLE: ('assignable' | 'assigns' | 'assigning') Pfree -> pushMode(expr);
-LOOP_ASSIGNABLE: ('loop_modifies' | 'loop_writes') Pfree -> pushMode(expr);
+LOOP_ASSIGNABLE
+    : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
+       'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
+       'loop_writable' | 'loop_writes' | 'loop_writing') Pfree -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);
 CAPTURES: 'captures' Pred -> pushMode(expr);
@@ -105,8 +108,8 @@ MEASURED_BY: 'measured_by' Pred -> pushMode(expr);
 MERGE_POINT: 'merge_point';
 MERGE_PROC: 'merge_proc';
 MERGE_PARAMS: 'merge_params' -> pushMode(expr);
-MODIFIABLE: 'modifiable' Pred -> pushMode(expr);
-MODIFIES: 'modifies' Pred -> pushMode(expr);
+MODIFIABLE: ('modifiable' | 'writable') Pred -> pushMode(expr);
+MODIFIES: ('modifies' | 'modifying' | 'writes' | 'writing') Pred -> pushMode(expr);
 MONITORED: 'monitored' -> pushMode(expr);
 MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //OLD: 'old' -> pushMode(expr);
