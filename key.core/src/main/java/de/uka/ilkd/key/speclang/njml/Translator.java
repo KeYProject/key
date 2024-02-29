@@ -2552,7 +2552,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         exc.addWarning(description, node.start);
     }
 
-    private void warnPotentiallyUnintendedFramingSemantics(JmlParser.ParserRuleContext ctx,
+    private void warnPotentiallyUnintendedFramingSemantics(ParserRuleContext ctx,
                                                            String clauseName) {
         clauseName =
                 clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
