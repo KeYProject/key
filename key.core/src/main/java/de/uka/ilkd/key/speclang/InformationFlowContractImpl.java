@@ -643,7 +643,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public Term getModifiable(LocationVariable heap) {
         return null;
     }
 

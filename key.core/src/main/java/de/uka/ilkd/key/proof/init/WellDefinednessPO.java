@@ -39,7 +39,7 @@ import org.key_project.util.collection.ImmutableSet;
  * WD(<generalAssumptions> && <preconditions>) &
  * (<generalAssumptions> & <preconditions>
  *    -> WD(<otherClauses>) &
- *       {anon^assignable}WD(<postconditions>)
+ *       {anon^modifiable}WD(<postconditions>)
  * }
  * </pre>
  * </p>

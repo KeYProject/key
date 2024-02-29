@@ -43,9 +43,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term rep, TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
     }
 
@@ -189,7 +189,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * A data structure to pass the needed terms for the well-definedness sequent of a jml
      * statement, including the context update, pre-condition for the statement, well-formedness
      * condition for the anonymous heap, well-definedness term for the statement's
-     * assignable-clause, well-definedness term for other clauses in the statement and the
+     * modifiable-clause, well-definedness term for other clauses in the statement and the
      * well-definedness term for the statement's post-condition with the according updates (heap of
      * pre-state becomes current heap and the current heap gets anonymised) applied to it.
      *

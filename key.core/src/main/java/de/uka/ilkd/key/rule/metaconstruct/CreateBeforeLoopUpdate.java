@@ -15,7 +15,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * Initializes the "before loop" update needed for the assignable clause.
+ * Initializes the "before loop" update needed for the modifiable clause.
  *
  * Only remembers the heaps of the context, not the changed local variables, although this is done
  * for the built-in loop invariant rules, where they however are never used.

@@ -1991,7 +1991,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public SLExpression visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
+    public SLExpression visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         if (ctx.STRICTLY_NOTHING() != null) {
@@ -1999,16 +1999,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             final Term storeRef = accept(ctx.storeRefUnion());
             assert storeRef != null;
-            t = termFactory.assignable(storeRef);
+            t = termFactory.modifiable(storeRef);
         }
         for (LocationVariable heap : heaps) {
-            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+            contractClauses.add(ContractClauses.MODIFIABLE, heap, t);
         }
         return new SLExpression(t);
     }
 
     @Override
-    public SLExpression visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+    public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         if (ctx.STRICTLY_NOTHING() != null) {
@@ -2016,10 +2016,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             final Term storeRef = accept(ctx.storeRefUnion());
             assert storeRef != null;
-            t = termFactory.assignable(storeRef);
+            t = termFactory.modifiable(storeRef);
         }
         for (LocationVariable heap : heaps) {
-            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+            contractClauses.add(ContractClauses.MODIFIABLE, heap, t);
         }
         return new SLExpression(t);
     }

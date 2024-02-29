@@ -69,11 +69,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      */
     final Map<LocationVariable, Term> originalAxioms;
     /**
-     * The original assignable clause terms.
+     * The original modifiable clause terms.
      */
     final Map<LocationVariable, Term> originalMods;
     /**
-     * The original assignable_free clause terms.
+     * The original modifiable_free clause terms.
      */
     final Map<LocationVariable, Term> originalFreeMods;
     final Map<ProgramVariable, Term> originalDeps;
@@ -593,7 +593,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public Term getModifiable(LocationVariable heap) {
         return originalMods.get(heap);
     }
 

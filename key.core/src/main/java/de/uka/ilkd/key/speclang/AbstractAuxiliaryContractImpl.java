@@ -571,7 +571,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public Term getModifiable(LocationVariable heap) {
         return modifiesClauses.get(heap);
     }
 
@@ -1020,14 +1020,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private final Term diverges;
 
         /**
-         * A map from every heap to an assignable term.
+         * A map from every heap to an modifiable term.
          */
-        private final Map<LocationVariable, Term> assignables;
+        private final Map<LocationVariable, Term> modifiables;
 
         /**
-         * A map from every heap to a free assignable term.
+         * A map from every heap to a free modifiable term.
          */
-        private final Map<LocationVariable, Term> assignablesFree;
+        private final Map<LocationVariable, Term> modifiablesFree;
 
         /**
          * A list of heaps used in this contract.
@@ -1066,8 +1066,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param assignablesFree map from every heap to a free assignable term.
+         * @param modifiables map from every heap to an modifiable term.
+         * @param modifiablesFree map from every heap to a free modifiable term.
          * @param hasMod map specifying on which heaps this contract has a modifies clause.
          * @param hasFreeMod map specifying on which heaps this contract has a free modifies clause.
          * @param services services.
@@ -1081,8 +1081,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final ImmutableList<InfFlowSpec> infFlowSpecs,
                 final Map<Label, Term> breaks, final Map<Label, Term> continues, final Term returns,
                 final Term signals, final Term signalsOnly, final Term diverges,
-                final Map<LocationVariable, Term> assignables,
-                final Map<LocationVariable, Term> assignablesFree,
+                final Map<LocationVariable, Term> modifiables,
+                final Map<LocationVariable, Term> modifiablesFree,
                 final Map<LocationVariable, Boolean> hasMod,
                 final Map<LocationVariable, Boolean> hasFreeMod,
                 final Services services) {
@@ -1105,8 +1105,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.signals = signals;
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
-            this.assignables = assignables;
-            this.assignablesFree = assignablesFree;
+            this.modifiables = modifiables;
+            this.modifiablesFree = modifiablesFree;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
             this.hasMod = hasMod;
             this.hasFreeMod = hasFreeMod;
@@ -1428,7 +1428,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's modifies clauses.
          */
         private Map<LocationVariable, Term> buildModifiesClauses() {
-            return assignables;
+            return modifiables;
         }
 
         /**
@@ -1436,7 +1436,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's free modifies clauses.
          */
         private Map<LocationVariable, Term> buildFreeModifiesClauses() {
-            return assignablesFree;
+            return modifiablesFree;
         }
 
         /**

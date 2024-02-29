@@ -28,10 +28,10 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     private final LoopSpecification inv;
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term rep, LoopSpecification inv,
             TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
@@ -45,7 +45,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         this.inv = inv;
         setMby(inv.getInternalVariant());
         setRequires(inv.getInternalInvariants().get(h));
-        setAssignable(inv.getInternalModifies().get(h), services);
+        setModifiable(inv.getInternalModifies().get(h), services);
         setEnsures(inv.getInternalInvariants().get(h));
     }
 
@@ -66,7 +66,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     @Override
     public LoopWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new LoopWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
             op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
             op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
     }
@@ -79,14 +79,14 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     @Override
     public Contract setID(int newId) {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getOrigVars(), getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getStatement(), TB);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
     }
 

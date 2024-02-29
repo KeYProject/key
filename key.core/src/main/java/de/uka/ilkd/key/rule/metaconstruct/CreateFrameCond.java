@@ -23,7 +23,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * Creates the frame condition (aka "assignable clause") for the given loop. Also accepts the
+ * Creates the frame condition (aka "modifiable clause") for the given loop. Also accepts the
  * pre-state update and extracts the symbols from there. New symbols in the pre-state update (like
  * "heap_BeforeLOOP") are added to the namespaces. This is because the update is, for the loop scope
  * invariant taclet, created by a variable condition; new symbols created there are not

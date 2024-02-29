@@ -73,7 +73,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if the test succeeds
      */
     @Test
-    public void testCombineEqualAssignable() throws SLTranslationException {
+    public void testCombineEqualModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;
@@ -99,7 +99,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
-    public void testCombineEmptyAssignable() throws SLTranslationException {
+    public void testCombineEmptyModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;
@@ -125,7 +125,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
-    public void testCombineDifferentAssignable() throws SLTranslationException {
+    public void testCombineDifferentModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;

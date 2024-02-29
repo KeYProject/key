@@ -36,8 +36,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
-        return getList(ASSIGNABLE_FREE, toString);
+    public ImmutableList<LabeledParserRuleContext> getModifiableFree(Name toString) {
+        return getList(MODIFIABLE_FREE, toString);
     }
 
     private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
@@ -65,8 +65,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(REQUIRES, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
-        return getList(ASSIGNABLE, heap);
+    public ImmutableList<LabeledParserRuleContext> getModifiable(Name heap) {
+        return getList(MODIFIABLE, heap);
     }
 
     public ImmutableList<LabeledParserRuleContext> getDecreases() {
@@ -85,7 +85,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        ACCESSIBLE, ASSIGNABLE, ASSIGNABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
+        ACCESSIBLE, MODIFIABLE, MODIFIABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
         AXIOMS,
     }
 
@@ -239,8 +239,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignable() {
-        return getList(ASSIGNABLE);
+    public ImmutableList<LabeledParserRuleContext> getModifiable() {
+        return getList(MODIFIABLE);
     }
 
     public ImmutableList<LabeledParserRuleContext> getEnsures() {

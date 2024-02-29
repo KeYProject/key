@@ -163,8 +163,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized", "transient",
         "two_state", "uninitialized", "volatile",
 
-        "no_state", "modifies", "modifying", "erases", "modifiable", "returns", "break_behavior",
-        "continue_behavior", "return_behavior",
+        "no_state", "erases", "returns", "break_behavior", "continue_behavior", "return_behavior",
         // special JML expressions:
         "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything", "\\exception",
         "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for", "\\is_initialized",
@@ -179,6 +178,8 @@ public class JavaDocument extends DefaultStyledDocument {
         "accessible", "accessible_redundantly", "assert", "assert_redundantly",
         "assignable", "assignable_free", "assignable_redundantly", "assigns", "assigns_free",
         "assigns_redundantly", "assigning", "assigning_free", "assigning_redundantly",
+        "modifiable", "modifiable_free", "modifiable_redundantly", "modifies", "modifies_free",
+        "modifies_redundantly", "modifying", "modifying_free", "modifying_redundantly",
         "loop_assignable", "loop_assignable_free", "loop_assignable_redundantly", "loop_assigns",
         "loop_assigns_free", "loop_assigns_redundantly", "loop_assigning", "loop_assigning_free",
         "loop_assigning_redundantly", "loop_modifiable", "loop_modifiable_free",

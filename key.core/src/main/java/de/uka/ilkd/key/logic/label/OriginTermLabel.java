@@ -782,14 +782,14 @@ public class OriginTermLabel implements TermLabel {
         ASSERT("assert"),
 
         /**
-         * assignable
+         * modifiable
          */
-        ASSIGNABLE("assignable"),
+        MODIFIABLE("modifiable"),
 
         /**
-         * assignable_free
+         * modifiable_free
          */
-        ASSIGNABLE_FREE("assignable_free"),
+        MODIFIABLE_FREE("modifiable_free"),
 
         /**
          * assume

@@ -242,7 +242,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
+         * @param modifiables map from every heap to an modifiable term.
          * @param hasMod map specifying on which heaps this contract has a modifies clause.
          * @param services services.
          */
@@ -252,14 +252,14 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Term measuredBy, Map<LocationVariable, Term> ensures,
                 Map<LocationVariable, Term> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Term> assignablesFree,
+                Term signalsOnly, Term diverges, Map<LocationVariable, Term> modifiables,
+                Map<LocationVariable, Term> modifiablesFree,
                 Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
                 Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
+                diverges, modifiables, modifiablesFree, hasMod, hasFreeMod, services);
         }
 
         @Override

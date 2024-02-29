@@ -77,10 +77,10 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final List<LocationVariable> heapContext = //
             HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        // The call to MiscTools.removeSingletonPVs removes from the assignable clause
+        // The call to MiscTools.removeSingletonPVs removes from the modifiable clause
         // the program variables which of course should not be part of an anonymizing
         // heap expression. The reason why they're there at all is that for Abstract
-        // Execution, it actually makes sense to have program variables in assignable
+        // Execution, it actually makes sense to have program variables in modifiable
         // clauses, since for an abstract statement they cannot be extracted like for
         // concrete statements (such as loop bodies). (DS, 2019-07-05)
         heapContext.forEach(heap -> mods.put(heap,

@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
+ * A JML loop specification (invariant, modifiable clause, decreases clause, ...) in textual form.
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
@@ -26,7 +26,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
+        INFORMATION_FLOW, MODIFIABLE, MODIFIABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
     public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
@@ -67,28 +67,28 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignable() {
-        return getList(ClauseHd.ASSIGNABLE);
+    public ImmutableList<LabeledParserRuleContext> getModifiable() {
+        return getList(ClauseHd.MODIFIABLE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
-        return getMap(ClauseHd.ASSIGNABLE);
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiables() {
+        return getMap(ClauseHd.MODIFIABLE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
-        return getMapInit(ClauseHd.ASSIGNABLE);
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesInit() {
+        return getMapInit(ClauseHd.MODIFIABLE);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
-        return getList(ClauseHd.ASSIGNABLE_FREE);
+    public ImmutableList<LabeledParserRuleContext> getModifiableFree() {
+        return getList(ClauseHd.MODIFIABLE_FREE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
-        return getMap(ClauseHd.ASSIGNABLE_FREE);
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesFree() {
+        return getMap(ClauseHd.MODIFIABLE_FREE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
-        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesFreeInit() {
+        return getMapInit(ClauseHd.MODIFIABLE_FREE);
     }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
@@ -156,7 +156,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * (Name heap : HeapLDT.VALID_HEAP_NAMES) { it = freeInvariants.get(heap.toString()).iterator();
      * while (it.hasNext()) { sb.append("free invariant<" + heap + ">: " + it.next() + "\n"); } }
      * for (Name heap : HeapLDT.VALID_HEAP_NAMES) { it =
-     * assignables.get(heap.toString()).iterator(); while (it.hasNext()) { sb.append("assignable<" +
+     * modifiables.get(heap.toString()).iterator(); while (it.hasNext()) { sb.append("modifiable<" +
      * heap + ">: " + it.next() + "\n"); } } for (Name heap : HeapLDT.VALID_HEAP_NAMES) { it =
      * infFlowSpecs.iterator(); while (it.hasNext()) { sb.append("determines<" + heap + ">: " +
      * it.next() + "\n"); } } if (variant != null) { sb.append("decreases: " + variant); }

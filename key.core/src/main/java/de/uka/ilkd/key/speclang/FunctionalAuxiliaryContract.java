@@ -246,8 +246,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
-        return contract.getAssignable(heap);
+    public Term getModifiable(LocationVariable heap) {
+        return contract.getModifiable(heap);
     }
 
     @Override

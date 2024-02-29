@@ -436,9 +436,9 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heap the heap to use.
-     * @return this contract's assignable term on the specified heap.
+     * @return this contract's modifiable term on the specified heap.
      */
-    Term getAssignable(LocationVariable heap);
+    Term getModifiable(LocationVariable heap);
 
     /**
      * Accepts a visitor.
@@ -656,7 +656,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         public final Map<LocationVariable, LocationVariable> remembranceHeaps;
 
         /**
-         * A map from every variable {@code var} that is assignable inside the block to
+         * A map from every variable {@code var} that is modifiable inside the block to
          * {@code var_Before_BLOCK}.
          */
         public final Map<LocationVariable, LocationVariable> remembranceLocalVariables;
@@ -693,7 +693,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param exception exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
          * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceLocalVariables a map from every variable {@code var} that is modifiable
          *        inside the block to {@code var_Before_BLOCK}.
          * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.
@@ -1302,7 +1302,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param exception exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
          * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceLocalVariables a map from every variable {@code var} that is modifiable
          *        inside the block to {@code var_Before_BLOCK}.
          * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.

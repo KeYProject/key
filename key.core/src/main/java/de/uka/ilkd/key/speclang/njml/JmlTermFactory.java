@@ -920,14 +920,14 @@ public final class JmlTermFactory {
                         singletons = singletons.append(t);
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
-                        exc.addIgnoreWarning("local variable in assignable clause");
+                        exc.addIgnoreWarning("local variable in modifiable clause");
                         LOGGER.debug("Can't create a locset from local variable " + t + ".\n"
-                            + "In this version of KeY, you do not need to put them in assignable clauses.");
+                            + "In this version of KeY, you do not need to put them in modifiable clauses.");
                     } else {
-                        throw exc.createException0("Can't create a locset from " + t + ".");
+                        throw exc.createException0("Cannot create a locset from " + t + ".");
                     }
                 } else {
-                    throw exc.createException0("Can't create a locset of a singleton: " + expr);
+                    throw exc.createException0("Cannot create a locset of a singleton: " + expr);
                 }
             } else {
                 throw exc.createException0("Not a term: " + expr);
@@ -1053,7 +1053,7 @@ public final class JmlTermFactory {
     }
 
 
-    public Term assignable(@NonNull Term term) {
+    public Term modifiable(@NonNull Term term) {
         return accessible(term);
     }
 

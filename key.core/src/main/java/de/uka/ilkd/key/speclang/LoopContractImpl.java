@@ -942,8 +942,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
          *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param assignablesFree map from every heap to an assignable_free term.
+         * @param modifiables map from every heap to an modifiable term.
+         * @param modifiablesFree map from every heap to an modifiable_free term.
          * @param hasMod map specifying on which heaps this contract has a modifies clause.
          * @param hasFreeMod map specifying on which heaps this contract has a free modifies clause.
          * @param decreases the decreases term.
@@ -955,14 +955,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Term measuredBy, Map<LocationVariable, Term> ensures,
                 Map<LocationVariable, Term> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Term> assignablesFree,
+                Term signalsOnly, Term diverges, Map<LocationVariable, Term> modifiables,
+                Map<LocationVariable, Term> modifiablesFree,
                 Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
                 Term decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
+                diverges, modifiables, modifiablesFree, hasMod, hasFreeMod, services);
             this.decreases = decreases;
         }
 
@@ -989,8 +989,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
          *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param assignablesFree map from every heap to an assignable_free term.
+         * @param modifiables map from every heap to a modifiable term.
+         * @param modifiablesFree map from every heap to a modifiable_free term.
          * @param hasMod map specifying on which heaps this contract has a modifies clause.
          * @param hasFreeMod map specifying on which heaps this contract has a free modifies clause.
          * @param decreases the decreases term.
@@ -1002,14 +1002,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Term measuredBy, Map<LocationVariable, Term> ensures,
                 Map<LocationVariable, Term> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Term> assignablesFree,
+                Term signalsOnly, Term diverges, Map<LocationVariable, Term> modifiables,
+                Map<LocationVariable, Term> modifiablesFree,
                 Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
                 Term decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
+                diverges, modifiables, modifiablesFree, hasMod, hasFreeMod, services);
             this.loop = loop;
             this.decreases = decreases;
         }

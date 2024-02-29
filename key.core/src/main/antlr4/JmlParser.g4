@@ -65,7 +65,7 @@ clause
   :
   ( ensures_clause   | requires_clause     | measured_by_clause
   | captures_clause  | diverges_clause     | working_space_clause
-  | duration_clause  | when_clause         | assignable_clause | accessible_clause
+  | duration_clause  | when_clause         | modifiable_clause | accessible_clause
   | signals_clause   | signals_only_clause | variant_function  | name_clause
   | breaks_clause    | continues_clause    | returns_clause    | separates_clause
   | determines_clause
@@ -87,7 +87,7 @@ accessible_clause
                     (lhs=expression COLON)? rhs=storeRefUnion
                     (MEASURED_BY mby=expression)?
     SEMI_TOPLEVEL;
-assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+modifiable_clause: MODIFIABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
@@ -174,11 +174,11 @@ loop_specification
     | determines_clause
     | loop_separates_clause
     | loop_determines_clause
-    | loop_assignable_clause
+    | loop_modifiable_clause
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
-loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+loop_modifiable_clause: (LOOP_MODIFIABLE | MODIFIABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;

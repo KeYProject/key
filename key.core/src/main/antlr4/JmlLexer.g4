@@ -74,11 +74,11 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-ASSIGNABLE
+MODIFIABLE
     : ('assignable' | 'assigns'  | 'assigning' |
        'modifiable' | 'modifies' | 'modifying' |
        'writable'   | 'writes'   | 'writing') (Pfree|Pred) -> pushMode(expr);
-LOOP_ASSIGNABLE
+LOOP_MODIFIABLE
     : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
        'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
        'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred) -> pushMode(expr);
@@ -181,7 +181,7 @@ DEPENDS: 'depends';  // internal translation for 'accessible' on model fields
 
 /* JML and JML* keywords */
 /*ACCESSIBLE: 'accessible';
-ASSIGNABLE: 'assignable';
+MODIFIABLE: 'modifiable';
 BREAKS: 'breaks';
 CONTINUES: 'continues';
 DECREASES: 'decreases'; // internal translation for 'measured_by'

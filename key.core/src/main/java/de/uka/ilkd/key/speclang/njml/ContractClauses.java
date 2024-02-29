@@ -27,7 +27,7 @@ class ContractClauses {
     static final Clauses<Label, Term> BREAKS = new Clauses<>();
     static final Clauses<Label, Term> CONTINUES = new Clauses<>();
 
-    static final Clauses<LocationVariable, Term> ASSIGNABLE = new Clauses<>();
+    static final Clauses<LocationVariable, Term> MODIFIABLE = new Clauses<>();
     static final Clauses<LocationVariable, Term> ACCESSIBLE = new Clauses<>();
     static final Clauses<LocationVariable, Term> ENSURES = new Clauses<>();
     static final Clauses<LocationVariable, Term> ENSURES_FREE = new Clauses<>();
