@@ -74,11 +74,14 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-ASSIGNABLE: ('assignable' | 'assigns' | 'assigning') Pfree -> pushMode(expr);
+ASSIGNABLE
+    : ('assignable' | 'assigns'  | 'assigning' |
+       'modifiable' | 'modifies' | 'modifying' |
+       'writable'   | 'writes'   | 'writing') (Pfree|Pred) -> pushMode(expr);
 LOOP_ASSIGNABLE
     : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
        'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
-       'loop_writable' | 'loop_writes' | 'loop_writing') Pfree -> pushMode(expr);
+       'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred) -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);
 CAPTURES: 'captures' Pred -> pushMode(expr);
@@ -90,7 +93,7 @@ DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred -> pushMode(expr)
 DETERMINES: 'determines' -> pushMode(expr);
 DIVERGES: 'diverges' Pred -> pushMode(expr);
 //DURATION: 'duration' Pred -> pushMode(expr);
-ENSURES: ('ensures' (Pfree|Pred) | 'post' Pred )-> pushMode(expr);
+ENSURES: ('ensures' | 'post') (Pfree|Pred) -> pushMode(expr);
 FOR_EXAMPLE: 'for_example' -> pushMode(expr);
 //FORALL: 'forall' -> pushMode(expr); //?
 HELPER: 'helper';
@@ -100,7 +103,7 @@ INITIALLY: 'initially' -> pushMode(expr);
 INSTANCE: 'instance';
 INVARIANT: 'invariant' (Pfree|Pred) -> pushMode(expr);
 LOOP_CONTRACT: 'loop_contract';
-LOOP_INVARIANT: ('loop_invariant' (Pfree|Pred) | 'maintaining' Pred) -> pushMode(expr);
+LOOP_INVARIANT: ('loop_invariant' | 'maintaining') (Pfree|Pred) -> pushMode(expr);
 LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in loop invariants
 LOOP_SEPARATES: 'loop_separates';  //KeY extension, deprecated
 MAPS: 'maps' Pred -> pushMode(expr);
@@ -108,8 +111,6 @@ MEASURED_BY: 'measured_by' Pred -> pushMode(expr);
 MERGE_POINT: 'merge_point';
 MERGE_PROC: 'merge_proc';
 MERGE_PARAMS: 'merge_params' -> pushMode(expr);
-MODIFIABLE: ('modifiable' | 'writable') Pred -> pushMode(expr);
-MODIFIES: ('modifies' | 'modifying' | 'writes' | 'writing') Pred -> pushMode(expr);
 MONITORED: 'monitored' -> pushMode(expr);
 MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //OLD: 'old' -> pushMode(expr);
@@ -117,7 +118,7 @@ MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //PRE: 'pre' Pred -> pushMode(expr);
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred -> pushMode(expr);
-REQUIRES: ('requires' (Pfree|Pred) | 'pre' Pred) -> pushMode(expr);
+REQUIRES: ('requires'| 'pre') (Pfree|Pred) -> pushMode(expr);
 RETURN: 'return' -> pushMode(expr);
 RETURNS: 'returns' -> pushMode(expr);
 RESPECTS: 'respects' -> pushMode(expr);

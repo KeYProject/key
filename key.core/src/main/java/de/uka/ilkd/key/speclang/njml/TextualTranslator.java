@@ -255,10 +255,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
-        final TerminalNode assign = ctx.ASSIGNABLE() != null ? ctx.ASSIGNABLE()
-                : ctx.MODIFIES() != null ? ctx.MODIFIES() : ctx.MODIFIABLE();
         final boolean isFree =
-            assign != null && assign.getText().endsWith("_free");
+                ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
@@ -281,11 +279,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
-        final TerminalNode assign = ctx.ASSIGNABLE() != null ? ctx.ASSIGNABLE()
-                : ctx.MODIFIES() != null ? ctx.MODIFIES()
-                        : ctx.MODIFIABLE() != null ? ctx.MODIFIABLE() : ctx.LOOP_ASSIGNABLE();
         final boolean isFree =
-            assign != null && assign.getText().endsWith("_free");
+                ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
