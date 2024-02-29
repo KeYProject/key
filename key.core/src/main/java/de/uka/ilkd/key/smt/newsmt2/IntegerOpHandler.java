@@ -48,6 +48,7 @@ public class IntegerOpHandler implements SMTHandler {
         supportedOperators.put(mul, "*");
         supportedOperators.put(integerLDT.getSub(), "-");
         supportedOperators.put(integerLDT.getDiv(), "div");
+        supportedOperators.put(integerLDT.getMod(), "mod");
         supportedOperators.put(integerLDT.getNeg(), "-");
 
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");

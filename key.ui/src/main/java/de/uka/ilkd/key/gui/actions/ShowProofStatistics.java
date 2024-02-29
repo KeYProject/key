@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ShowProofStatistics extends MainWindowAction {
+    private static final String CSV_SEPERATOR = ";";
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
     private static final long serialVersionUID = -8814798230037775905L;
@@ -82,7 +83,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public static String getCSVStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
         StringBuilder stats = new StringBuilder();
-        stats.append("open goals,").append(openGoals).append("\n");
+        stats.append("open goals" + CSV_SEPERATOR).append(openGoals).append("\n");
 
         final Statistics s = proof.getStatistics();
 
@@ -90,7 +91,7 @@ public class ShowProofStatistics extends MainWindowAction {
             if ("".equals(x.second)) {
                 stats.append(x.first).append("\n");
             } else {
-                stats.append(x.first).append(",").append(x.second).append("\n");
+                stats.append(x.first).append(CSV_SEPERATOR).append(x.second).append("\n");
             }
         }
 
@@ -107,7 +108,8 @@ public class ShowProofStatistics extends MainWindowAction {
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
-                stats.append("interactive,").append(entry.getKey()).append(",")
+                stats.append("interactive" + CSV_SEPERATOR).append(entry.getKey())
+                        .append(CSV_SEPERATOR)
                         .append(entry.getValue()).append("\n");
             }
         }
