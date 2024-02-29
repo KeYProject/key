@@ -13,7 +13,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
@@ -256,7 +255,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-                ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free");
+            ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.MODIFIABLE_FREE
@@ -280,7 +279,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-                ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free");
+            ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.MODIFIABLE_FREE

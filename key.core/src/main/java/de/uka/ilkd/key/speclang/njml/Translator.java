@@ -66,7 +66,7 @@ import static java.util.Objects.requireNonNull;
 class Translator extends JmlParserBaseVisitor<Object> {
 
     private static String[] DISCOURAGED_CLAUSE_NAMES =
-        { "assigning", "assigns", "modifying", "modifies", "writing", "writes",};
+        { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
 
     private final Services services;
     private final TermBuilder tb;
@@ -2552,18 +2552,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
         exc.addWarning(description, node.start);
     }
 
-    private void warnPotentiallyUnintendedFramingSemantics(ParserRuleContext ctx,
-                                                           String clauseName) {
+    private void warnPotentiallyUnintendedFramingSemantics(
+            ParserRuleContext ctx, String clauseName) {
         clauseName =
-                clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
-        for (final String s: DISCOURAGED_CLAUSE_NAMES) { // FIXME
+            clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
+        for (final String s : DISCOURAGED_CLAUSE_NAMES) {
             if (clauseName != null && clauseName.startsWith(s)) {
                 addWarning(ctx, clauseName + " does not conform to KeY's supported JML language, "
-                        + "but is interpreted by KeY as modifiable-clause in order to deal with "
-                        + "other JML-like languages. "
-                        + "However, this interpretation may not correspond to the semantics "
-                        + "actually intended by you. Please consult KeY's official documentation "
-                        + "of the modifiable-clause.");
+                    + "but is interpreted by KeY as modifiable-clause in order to deal with "
+                    + "other JML-like languages. "
+                    + "However, this interpretation may not correspond to the semantics "
+                    + "actually intended by you. Please consult KeY's official documentation "
+                    + "of the modifiable-clause.");
             }
         }
     }
