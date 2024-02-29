@@ -65,6 +65,9 @@ import static java.util.Objects.requireNonNull;
  */
 class Translator extends JmlParserBaseVisitor<Object> {
 
+    private static String[] DISCOURAGED_CLAUSE_NAMES =
+        { "assigning", "assigns", "modifying", "modifies", "writing", "writes",};
+
     private final Services services;
     private final TermBuilder tb;
     private final JavaInfo javaInfo;
@@ -1994,6 +1997,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE().getText());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
@@ -2011,6 +2015,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE().getText());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
@@ -2544,6 +2549,22 @@ class Translator extends JmlParserBaseVisitor<Object> {
     // region exception helper
     protected void addWarning(ParserRuleContext node, String description) {
         exc.addWarning(description, node.start);
+    }
+
+    private void warnPotentiallyUnintendedFramingSemantics(JmlParser.ParserRuleContext ctx,
+                                                           String clauseName) {
+        clauseName =
+                clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
+        for (final String s: DISCOURAGED_CLAUSE_NAMES) { // FIXME
+            if (clauseName != null && clauseName.startsWith(s)) {
+                addWarning(ctx, clauseName + " does not conform to KeY's supported JML language, "
+                        + "but is interpreted by KeY as modifiable-clause in order to deal with "
+                        + "other JML-like languages. "
+                        + "However, this interpretation may not correspond to the semantics "
+                        + "actually intended by you. Please consult KeY's official documentation "
+                        + "of the modifiable-clause.");
+            }
+        }
     }
 
     public List<PositionedString> getWarnings() {
