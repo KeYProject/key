@@ -628,8 +628,8 @@ public class JMLSpecFactory {
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
-                        "\"modifiable \\less_than_nothing\" cannot be joined with other "
-                            + "modifiable clauses (even if they declare the same).",
+                        "\"modifiable \\strictly_nothing\" cannot be joined with other "
+                            + "\"modifiable\" clauses (even if they declare the same).",
                         Location.fromToken(expr.first.start));
                 }
                 return tb.empty();

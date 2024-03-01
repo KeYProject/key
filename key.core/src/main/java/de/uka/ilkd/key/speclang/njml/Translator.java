@@ -65,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  */
 class Translator extends JmlParserBaseVisitor<Object> {
 
-    private static String[] DISCOURAGED_CLAUSE_NAMES =
+    private final static String[] DISCOURAGED_CLAUSE_NAMES =
         { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
 
     private final Services services;
@@ -2558,12 +2558,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
             clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
         for (final String s : DISCOURAGED_CLAUSE_NAMES) {
             if (clauseName != null && clauseName.startsWith(s)) {
-                addWarning(ctx, clauseName + " does not conform to KeY's supported JML language, "
-                    + "but is interpreted by KeY as modifiable-clause in order to deal with "
-                    + "other JML-like languages. "
+                addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
+                    + "but is interpreted by KeY as \"modifiable\" clause in order to deal with "
+                    + "other JML dialects. "
                     + "However, this interpretation may not correspond to the semantics "
-                    + "actually intended by you. Please consult KeY's official documentation "
-                    + "of the modifiable-clause.");
+                    + "which you actually intended. Please consult KeY's official documentation "
+                    + "of the \"modifiable\" clause.");
             }
         }
     }

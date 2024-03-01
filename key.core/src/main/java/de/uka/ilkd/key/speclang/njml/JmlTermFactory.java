@@ -921,8 +921,9 @@ public final class JmlTermFactory {
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in modifiable clause");
-                        LOGGER.debug("Can't create a locset from local variable " + t + ".\n"
-                            + "In this version of KeY, you do not need to put them in modifiable clauses.");
+                        LOGGER.debug("Cannot create a locset from local variable " + t + ".\n"
+                            + "In this version of KeY, you do not need to put them in "
+                            + "modifiable clauses.");
                     } else {
                         throw exc.createException0("Cannot create a locset from " + t + ".");
                     }
