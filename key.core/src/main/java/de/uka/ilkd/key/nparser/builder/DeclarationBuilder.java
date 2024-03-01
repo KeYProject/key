@@ -66,7 +66,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 : null;
         var origin = BuilderHelpers.getPosition(ctx);
         var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
-        sorts().add(s);
+        sorts().addSafely(s);
         return null;
     }
 
