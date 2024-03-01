@@ -1864,14 +1864,38 @@ public final class SpecificationRepository {
         return statementMap.put(statement, spec);
     }
 
+    /**
+     * This record represents mutable information for JML statements.
+     * JML statements need to maintain the current variable set as well as the updated information for the KeY terms
+     * they describe.
+     * <p>
+     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
+     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value terms.
+     *
+     * @param vars
+     * @param terms
+     */
     public record JmlStatementSpec(
             ProgramVariableCollection vars,
             ImmutableList<Term> terms
     ){
+        /**
+         * Retrieve a term
+         * @param index a index to the list of {@code terms}.
+         * @return the term at {@code index} in the {@code terms} list
+         * @throws IndexOutOfBoundsException if the given {@code index} is negative or {@code >= terms().size()}
+         */
         public Term term(int index) {
             return terms.get(index);
         }
 
+        /**
+         * Retrieve a term with a update to the given {@code self} term.
+         * @param services the corresponding services instance
+         * @param self a term which describes the {@code self} object aka. this on the current sequence
+         * @param index the index of the term in {@code terms()}
+         * @return a term updated with {@code self} and the {@code vars()}.
+         */
         public Term getTerm(Services services, Term self, int index) {
             var term = term(index);
 
@@ -1886,6 +1910,16 @@ public final class SpecificationRepository {
             return replacer.replace(term);
         }
 
+        /**
+         * Updates the variables given the new {@code atPres} (variable in pre state) map and the services.
+         * The update is applied directly and an updated specification is returned. You need to add
+         * the updated spec to the statement in the {@link SpecificationRepository} by yourself.
+         *
+         * @param atPres a non-null map of a map of program variable to a term which describes the value of this variable in the pre-state.
+         * @param services the corresponding services object
+         * @return a fresh {@link JmlStatementSpec} instance, non-registered.
+         */
+
         public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
             var termFactory = services.getTermFactory();
             var replacementMap = new TermReplacementMap(termFactory);
@@ -1897,20 +1931,6 @@ public final class SpecificationRepository {
                             vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
                     newTerms);
         }
-    }
-
-    /**
-     * updates this statement with prestate renaming
-     *
-     * @param atPres prestate renaming
-     * @param services services
-     */
-    public void updateStatementVars(
-            Statement statement,
-            final Map<LocationVariable, Term> atPres, final Services services) {
-        var spec = Objects.requireNonNull(getStatementSpec(statement));
-        var newSpec = spec.updateVariables(atPres, services);
-        statementMap.put(statement, newSpec);
     }
     // endregion
 }
