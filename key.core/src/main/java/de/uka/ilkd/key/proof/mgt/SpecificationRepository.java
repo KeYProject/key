@@ -10,6 +10,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -30,11 +32,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -777,7 +781,7 @@ public final class SpecificationRepository {
      * null.
      */
     public Contract getContractByName(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return null;
         }
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
@@ -876,7 +880,7 @@ public final class SpecificationRepository {
      */
     public FunctionalOperationContract combineOperationContracts(
             ImmutableSet<FunctionalOperationContract> toCombine) {
-        assert toCombine != null && toCombine.size() > 0;
+        assert toCombine != null && !toCombine.isEmpty();
         for (Contract contract : toCombine) {
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
                     : "Please combine only atomic contracts!";
@@ -1422,7 +1426,7 @@ public final class SpecificationRepository {
             ImmutableSet<Proof> sop = entry.getValue();
             if (sop.contains(proof)) {
                 sop = sop.remove(proof);
-                if (sop.size() == 0) {
+                if (sop.isEmpty()) {
                     proofs.remove(entry.getKey());
                 } else {
                     proofs.put(entry.getKey(), sop);
@@ -1541,7 +1545,6 @@ public final class SpecificationRepository {
      *
      * @param block the given block.
      * @param modality the given modality.
-     * @return
      */
     public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
             final Modality modality) {
@@ -1847,4 +1850,67 @@ public final class SpecificationRepository {
         }
         return result;
     }
+
+
+    //region Support SetStatement and JmlAssert
+    private final Map<Statement, JmlStatementSpec> statementMap = new IdentityHashMap<>();
+
+    @Nullable
+    public JmlStatementSpec getStatementSpec(Statement statement) {
+        return statementMap.get(statement);
+    }
+
+    public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
+        return statementMap.put(statement,spec);
+    }
+
+    public record JmlStatementSpec(
+            ProgramVariableCollection vars,
+            ImmutableList<Term> terms
+    ){
+        public Term term(int index) {
+            return terms.get(index);
+        }
+
+        public Term getTerm(Services services, Term self, int index) {
+            var term = term(index);
+
+            final TermFactory termFactory = services.getTermFactory();
+            final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+            if (self != null) {
+                replacementMap.replaceSelf(vars().selfVar, self, services);
+            }
+            replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres, services);
+            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores, services);
+            final OpReplacer replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
+            return replacer.replace(term);
+        }
+
+        public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
+            var termFactory = services.getTermFactory();
+            var replacementMap = new TermReplacementMap(termFactory);
+            replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
+            var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
+            var newTerms = terms().map(replacer::replace);
+            return new JmlStatementSpec(
+                    new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
+                            vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
+                    newTerms);
+        }
+    }
+
+    /**
+     * updates this statement with prestate renaming
+     *
+     * @param atPres prestate renaming
+     * @param services services
+     */
+    public void updateStatementVars(
+            Statement statement,
+            final Map<LocationVariable, Term> atPres, final Services services) {
+        var spec = Objects.requireNonNull(getStatementSpec(statement));
+        var newSpec = spec.updateVariables(atPres, services);
+        statementMap.put(statement, newSpec);
+    }
+    //endregion
 }

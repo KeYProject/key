@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -424,7 +425,7 @@ public class JMLSpecFactory {
 
     private void translateAxioms(Context context, ProgramVariableCollection progVars,
             LocationVariable heap, ImmutableList<LabeledParserRuleContext> axioms,
-            ContractClauses clauses, Behavior originalBehavior) throws SLTranslationException {
+            ContractClauses clauses, Behavior originalBehavior) {
         boolean empty = axioms.isEmpty() // either the list is empty
                 || (axioms.size() == 1 // or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
@@ -443,7 +444,7 @@ public class JMLSpecFactory {
             LocationVariable heap, final LocationVariable savedHeap,
             ImmutableList<LabeledParserRuleContext> ensures,
             ImmutableList<LabeledParserRuleContext> ensuresFree, ContractClauses clauses,
-            Behavior originalBehavior) throws SLTranslationException {
+            Behavior originalBehavior) {
         if (heap == savedHeap && ensures.isEmpty()) {
             clauses.ensures.put(heap, null);
         } else {
@@ -708,8 +709,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateSignalsOnly(Context context, ProgramVariable excVar,
-            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses)
-            throws SLTranslationException {
+            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses) {
         return translateSignals(context, null, null, excVar, null, null, originalBehavior,
             originalClauses);
     }
@@ -1472,7 +1472,11 @@ public class JMLSpecFactory {
                 "Invalid assignment target for set statement: " + error,
                 Location.fromToken(setStatementContext.start));
         }
-        statement.setTranslated(assignee, value, pv);
+
+        services.getSpecificationRepository().addStatementSpec(
+                statement,
+                new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value))
+        );
     }
 
     /**
@@ -1483,7 +1487,6 @@ public class JMLSpecFactory {
      * @param method the method containing the block.
      * @param block the block.
      * @param variables an instance of {@link AuxiliaryContract.Variables} for the block.
-     * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
             final JavaStatement block, final AuxiliaryContract.Variables variables) {

@@ -3,23 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.Optional;
-
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A rule for set statements. This unwraps the contained CopyAssignment
@@ -87,17 +86,28 @@ public final class SetStatementRule implements BuiltInRule {
         Term target = UpdateApplication.getTarget(formula);
 
         SetStatement setStatement =
-            Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
-                    .filter(SetStatement.class::isInstance).map(SetStatement.class::cast)
-                    .orElseThrow(() -> new RuleAbortException("not a Set Statement"));
+                Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
+                        .filter(SetStatement.class::isInstance).map(SetStatement.class::cast)
+                        .orElseThrow(() -> new RuleAbortException("not a JML set statement."));
         ExecutionContext exCtx = JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
-        ReferencePrefix prefix = exCtx.getRuntimeInstance();
-        Term self = tb.var((-ProgramVariable) prefix);
-        Term newUpdate = tb.elementary(setStatement.getTarget(self), setStatement.getValue(self));
+        ReferencePrefix prefix = Objects.requireNonNull(exCtx).getRuntimeInstance();
+        Term self = tb.var((ProgramVariable) prefix);
+
+        var spec = services.getSpecificationRepository().getStatementSpec(setStatement);
+
+        if (spec == null) {
+            throw new RuleAbortException("No specification for the set statement found in the specification repository.");
+        }
+
+        var targetTerm = spec.getTerm(services, self, SetStatement.INDEX_TARGET);
+        var valueTerm = spec.getTerm(services, self, SetStatement.INDEX_VALUE);
+
+        Term newUpdate = tb.elementary(targetTerm, valueTerm);
 
         JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
-        Term newTerm = tb.apply(update, tb.apply(newUpdate, services.getTermFactory().createTerm(target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
+        Term newTerm = tb.apply(update, tb.apply(newUpdate, services.getTermFactory().createTerm(
+                target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
 
         ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(newTerm), occurrence);

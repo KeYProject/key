@@ -3,12 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -194,8 +189,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         @Override
         public void performActionOnSetStatement(SetStatement x) {
-            addNeededVariables(x.getVars().atPres.keySet());
-            x.updateVars(atPres, services);
+            var spec = Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+            addNeededVariables(spec.vars().atPres.keySet());
+            var newSpec = spec.updateVariables(atPres, services);
+            services.getSpecificationRepository().addStatementSpec(x, newSpec);
         }
 
         @Override

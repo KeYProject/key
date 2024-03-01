@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -29,6 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -654,11 +652,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnSetStatement(final SetStatement x) {
-        final ProgramVariableCollection vars = x.getVars();
-        final Map<LocationVariable, Term> atPres = vars.atPres;
-        final Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
-        final Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
-        final Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+        var spec = Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        ProgramVariableCollection vars = spec.vars();
+        Map<LocationVariable, Term> atPres = vars.atPres;
+        Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
+        Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
+        Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+
         for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
             LocationVariable pv = e.getKey();
             final Term t = e.getValue();
@@ -675,10 +675,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ProgramVariableCollection newVars =
                 new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
                         newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
-        stack.peek().add(newVars);
-        if (!newAtPres.equals(vars.atPres)) {
+
+
+        var newTerms = spec.terms().map(this::replaceVariablesInTerm);
+        var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
+
+        services.getSpecificationRepository().addStatementSpec(x, newSpec);
+
+        /*if (!newAtPres.equals(vars.atPres)) {
             changed();
-        }
+        }*/
         doDefaultAction(x);
     }
 

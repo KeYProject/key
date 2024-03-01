@@ -1780,7 +1780,7 @@ public class Recoder2KeYConverter {
 
     public SetStatement convert(
             de.uka.ilkd.key.java.recoderext.SetStatement arg) {
-        return new SetStatement(arg.getParserContext(), positionInfo(arg), services);
+        return new SetStatement(arg.getParserContext(), positionInfo(arg));
     }
 
     public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr) {

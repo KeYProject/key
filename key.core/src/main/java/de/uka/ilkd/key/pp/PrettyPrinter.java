@@ -30,10 +30,13 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+import org.antlr.v4.runtime.misc.Interval;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * A configurable pretty printer for Java source elements originally from COMPOST.
@@ -1927,20 +1930,29 @@ public class PrettyPrinter implements Visitor {
 
         l.beginRelativeC();
         l.brk();
-        JmlParser.Set_statementContext context = x.getParserContext();
 
-        Term target = x.getTarget();
-        Term value = x.getValue();
+        /*
+        var spec = Objects.requireNonNull(services.getStatementSpec(x));
+        Term target = spec.term();
+        Term value = spec.term();
+
         if(target != null && value != null) {
             l.print(LogicPrinter.quickPrintTerm(target, null));
             l.print(" = ");
             l.print(LogicPrinter.quickPrintTerm(value, null));
             l.print(" // ");
         } else {
-            // This is really only emergency fallback as it will most probably be garbage.
-            if(context != null) {
-                l.print(context.getText());
-            }
+
+         */
+
+        // FIXME weigl: we should rather access the specification repository here.
+        // but services is currently not available.
+        var context = x.getParserContext();
+        if(context != null) {
+            var interval = new Interval(context.start.getStartIndex(), context.stop.getStopIndex() + 1);
+            var text = context.start.getInputStream().getText(interval)
+                    .replaceAll("\\s+", " "); // remove all whitespaces (\n\f\t...) with an empty space
+            l.print(text);
         }
         l.end();
     }
