@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.statement.JavaStatement;
@@ -37,6 +38,7 @@ public class SetStatement extends JavaStatement {
         super(proto);
         this.context = proto.context;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -56,6 +58,7 @@ public class SetStatement extends JavaStatement {
 
     /**
      * A set statement has no recorder AST children
+     *
      * @return
      */
     @Override

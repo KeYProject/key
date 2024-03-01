@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.op.TermLabelSV;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be

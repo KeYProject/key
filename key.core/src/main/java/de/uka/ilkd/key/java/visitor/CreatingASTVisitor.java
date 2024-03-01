@@ -609,7 +609,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                // there are no AST elements below the set statement, so we can use the copy constructor.
+                // there are no AST elements below the set statement, so we can use the copy
+                // constructor.
                 return new SetStatement(x);
             }
         };

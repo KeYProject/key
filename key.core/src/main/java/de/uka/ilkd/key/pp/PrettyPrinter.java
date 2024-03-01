@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -29,14 +28,12 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
-import de.uka.ilkd.key.speclang.njml.JmlParser;
-import org.antlr.v4.runtime.misc.Interval;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 
 /**
  * A configurable pretty printer for Java source elements originally from COMPOST.
@@ -1932,26 +1929,28 @@ public class PrettyPrinter implements Visitor {
         l.brk();
 
         /*
-        var spec = Objects.requireNonNull(services.getStatementSpec(x));
-        Term target = spec.term();
-        Term value = spec.term();
-
-        if(target != null && value != null) {
-            l.print(LogicPrinter.quickPrintTerm(target, null));
-            l.print(" = ");
-            l.print(LogicPrinter.quickPrintTerm(value, null));
-            l.print(" // ");
-        } else {
-
+         * var spec = Objects.requireNonNull(services.getStatementSpec(x));
+         * Term target = spec.term();
+         * Term value = spec.term();
+         *
+         * if(target != null && value != null) {
+         * l.print(LogicPrinter.quickPrintTerm(target, null));
+         * l.print(" = ");
+         * l.print(LogicPrinter.quickPrintTerm(value, null));
+         * l.print(" // ");
+         * } else {
+         *
          */
 
         // FIXME weigl: we should rather access the specification repository here.
         // but services is currently not available.
         var context = x.getParserContext();
-        if(context != null) {
-            var interval = new Interval(context.start.getStartIndex(), context.stop.getStopIndex() + 1);
+        if (context != null) {
+            var interval =
+                new Interval(context.start.getStartIndex(), context.stop.getStopIndex() + 1);
             var text = context.start.getInputStream().getText(interval)
-                    .replaceAll("\\s+", " "); // remove all whitespaces (\n\f\t...) with an empty space
+                    .replaceAll("\\s+", " "); // remove all whitespaces (\n\f\t...) with an empty
+                                              // space
             l.print(text);
         }
         l.end();

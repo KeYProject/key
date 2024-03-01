@@ -38,12 +38,12 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1852,7 +1852,7 @@ public final class SpecificationRepository {
     }
 
 
-    //region Support SetStatement and JmlAssert
+    // region Support SetStatement and JmlAssert
     private final Map<Statement, JmlStatementSpec> statementMap = new IdentityHashMap<>();
 
     @Nullable
@@ -1861,7 +1861,7 @@ public final class SpecificationRepository {
     }
 
     public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
-        return statementMap.put(statement,spec);
+        return statementMap.put(statement, spec);
     }
 
     public record JmlStatementSpec(
@@ -1912,5 +1912,5 @@ public final class SpecificationRepository {
         var newSpec = spec.updateVariables(atPres, services);
         statementMap.put(statement, newSpec);
     }
-    //endregion
+    // endregion
 }

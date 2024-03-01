@@ -5,21 +5,10 @@ package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
-import de.uka.ilkd.key.speclang.TermReplacementMap;
-import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.key_project.util.ExtList;
 
-import java.util.Map;
 
 /**
  * JML set statement
@@ -57,8 +46,10 @@ public class SetStatement extends JavaStatement {
 
     /**
      * Removes the attached parser context from this set statement
-     * @deprecated weigl: The use of {@link org.antlr.v4.runtime.ParserRuleContext} directly is discouraged. It adds
-     * an (often) unnecessary dependency to the ANTLR across the project.
+     *
+     * @deprecated weigl: The use of {@link org.antlr.v4.runtime.ParserRuleContext} directly is
+     *             discouraged. It adds
+     *             an (often) unnecessary dependency to the ANTLR across the project.
      * @return the parser context that was attached
      */
     @Deprecated

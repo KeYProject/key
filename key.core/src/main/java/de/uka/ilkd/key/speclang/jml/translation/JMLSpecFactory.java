@@ -1474,9 +1474,8 @@ public class JMLSpecFactory {
         }
 
         services.getSpecificationRepository().addStatementSpec(
-                statement,
-                new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value))
-        );
+            statement,
+            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
     }
 
     /**

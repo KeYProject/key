@@ -652,7 +652,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnSetStatement(final SetStatement x) {
-        var spec = Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        var spec =
+            Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
         ProgramVariableCollection vars = spec.vars();
         Map<LocationVariable, Term> atPres = vars.atPres;
         Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
@@ -673,8 +674,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newAtPres.put(pv, replaceVariablesInTerm(t));
         }
         final ProgramVariableCollection newVars =
-                new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-                        newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
+            new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
+                newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
 
 
         var newTerms = spec.terms().map(this::replaceVariablesInTerm);
@@ -682,9 +683,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         services.getSpecificationRepository().addStatementSpec(x, newSpec);
 
-        /*if (!newAtPres.equals(vars.atPres)) {
-            changed();
-        }*/
+        /*
+         * if (!newAtPres.equals(vars.atPres)) {
+         * changed();
+         * }
+         */
         doDefaultAction(x);
     }
 

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -14,11 +17,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import org.jspecify.annotations.NonNull;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Objects;
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A rule for set statements. This unwraps the contained CopyAssignment
@@ -79,24 +81,26 @@ public final class SetStatementRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
         final Term formula = occurrence.subTerm();
-        assert formula.op() instanceof UpdateApplication :
-                "Currently, this can only be applied if there is an update application in front of the modality";
+        assert formula.op() instanceof UpdateApplication
+                : "Currently, this can only be applied if there is an update application in front of the modality";
 
         Term update = UpdateApplication.getUpdate(formula);
         Term target = UpdateApplication.getTarget(formula);
 
         SetStatement setStatement =
-                Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
-                        .filter(SetStatement.class::isInstance).map(SetStatement.class::cast)
-                        .orElseThrow(() -> new RuleAbortException("not a JML set statement."));
-        ExecutionContext exCtx = JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
+            Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
+                    .filter(SetStatement.class::isInstance).map(SetStatement.class::cast)
+                    .orElseThrow(() -> new RuleAbortException("not a JML set statement."));
+        ExecutionContext exCtx =
+            JavaTools.getInnermostExecutionContext(target.javaBlock(), services);
         ReferencePrefix prefix = Objects.requireNonNull(exCtx).getRuntimeInstance();
         Term self = tb.var((ProgramVariable) prefix);
 
         var spec = services.getSpecificationRepository().getStatementSpec(setStatement);
 
         if (spec == null) {
-            throw new RuleAbortException("No specification for the set statement found in the specification repository.");
+            throw new RuleAbortException(
+                "No specification for the set statement found in the specification repository.");
         }
 
         var targetTerm = spec.getTerm(services, self, SetStatement.INDEX_TARGET);
@@ -107,7 +111,7 @@ public final class SetStatementRule implements BuiltInRule {
         JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
         Term newTerm = tb.apply(update, tb.apply(newUpdate, services.getTermFactory().createTerm(
-                target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
+            target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
 
         ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(newTerm), occurrence);

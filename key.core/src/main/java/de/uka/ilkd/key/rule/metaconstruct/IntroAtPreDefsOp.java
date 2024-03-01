@@ -16,10 +16,8 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -189,7 +187,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         @Override
         public void performActionOnSetStatement(SetStatement x) {
-            var spec = Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+            var spec =
+                Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
             addNeededVariables(spec.vars().atPres.keySet());
             var newSpec = spec.updateVariables(atPres, services);
             services.getSpecificationRepository().addStatementSpec(x, newSpec);
