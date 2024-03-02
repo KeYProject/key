@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.newsmt2.SExpr;
 
 import java.io.IOException;
 import java.util.*;
@@ -14,6 +13,8 @@ public class IsabelleMasterHandler {
     private final List<Throwable> exceptions = new ArrayList<>();
 
     private final List<IsabelleHandler> handlers;
+
+    private final List<StringBuilder> preambles = new ArrayList<>();
 
     private final List<StringBuilder> constDeclarations = new ArrayList<>();
 
@@ -41,30 +42,7 @@ public class IsabelleMasterHandler {
     public IsabelleMasterHandler(Services services, String[] handlerNames,
                                  String[] handlerOptions) throws IOException {
         //TODO efficient loading of handlers. See MasterHandler in SMT
-        ArrayList<IsabelleHandler> handlers = new ArrayList<>();
-        BooleanOpHandler booleanOpHandler = new BooleanOpHandler();
-        booleanOpHandler.init(this, services, null, handlerOptions);
-
-        LogicalVariableHandler logicalVariableHandler = new LogicalVariableHandler();
-        logicalVariableHandler.init(this, services, null, handlerOptions);
-
-        IntegerOpHandler integerOpHandler = new IntegerOpHandler();
-        integerOpHandler.init(this, services, null, handlerOptions);
-
-        NumberConstantsHandler numberConstantsHandler = new NumberConstantsHandler();
-        numberConstantsHandler.init(this, services, null, handlerOptions);
-
-        PolymorphicHandler polymorphicHandler = new PolymorphicHandler();
-        polymorphicHandler.init(this, services, null, handlerOptions);
-        //TODO add handlers
-        handlers.add(booleanOpHandler);
-        handlers.add(logicalVariableHandler);
-        handlers.add(integerOpHandler);
-        handlers.add(numberConstantsHandler);
-        handlers.add(polymorphicHandler);
-
-
-        handlers.add(new UninterpretedSymbolsHandler());
+        List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
         this.handlers = handlers;
     }
 
@@ -157,10 +135,24 @@ public class IsabelleMasterHandler {
         return knownSymbols.contains(name);
     }
 
-    public void addDeclaration(SExpr sExpr) {
+    public void addPreamble(StringBuilder stringBuilder) {
+        preambles.add(stringBuilder);
+    }
+
+    public List<StringBuilder> getPreambles() {
+        return preambles;
     }
 
     public void addKnownSymbol(String name) {
         knownSymbols.add(name);
+    }
+
+    public void addPreambles(Properties handlerSnippets) {
+        for (Map.Entry<Object, Object> entry : handlerSnippets.entrySet()) {
+            String key = (String) entry.getKey();
+            if (key.endsWith(".preamble")) {
+                addPreamble(new StringBuilder((String) entry.getValue()));
+            }
+        }
     }
 }
