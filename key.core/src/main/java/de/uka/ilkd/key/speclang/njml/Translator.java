@@ -2016,7 +2016,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE().getText());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.LOOP_MODIFIABLE().getText());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
