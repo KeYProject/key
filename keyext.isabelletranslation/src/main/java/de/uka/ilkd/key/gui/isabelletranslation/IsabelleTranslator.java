@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,13 @@ public class IsabelleTranslator {
     public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
         Term problem = sequentToTerm(sequent, services);
         // TODO find correct values
-        StringBuilder hb = buildCompleteText(translateTerm(problem, new ArrayList<>(), services), new ArrayList<>());
+        IsabelleMasterHandler masterHandler;
+        try {
+            masterHandler = new IsabelleMasterHandler(services, new String[0], new String[0]);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        StringBuilder hb = buildCompleteText(masterHandler.translate(problem), new ArrayList<>());
         return hb;
     }
 

@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.newsmt2.SExpr;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,7 +18,7 @@ public class IsabelleMasterHandler {
     private final List<StringBuilder> constDeclarations = new ArrayList<>();
 
 
-    private final Set<StringBuilder> knownSymbols = new HashSet<>();
+    private final Set<String> knownSymbols = new HashSet<>();
 
     /**
      * A list of untranslatable values
@@ -41,7 +42,15 @@ public class IsabelleMasterHandler {
                                  String[] handlerOptions) throws IOException {
         //TODO efficient loading of handlers. See MasterHandler in SMT
         ArrayList<IsabelleHandler> handlers = new ArrayList<>();
+        BooleanOpHandler booleanOpHandler = new BooleanOpHandler();
+        booleanOpHandler.init(this, services, null, handlerOptions);
+
+        LogicalVariableHandler logicalVariableHandler = new LogicalVariableHandler();
+        logicalVariableHandler.init(this, services, null, handlerOptions);
         //TODO add handlers
+        handlers.add(booleanOpHandler);
+        handlers.add(logicalVariableHandler);
+        handlers.add(new UninterpretedSymbolsHandler());
         this.handlers = handlers;
     }
 
@@ -128,5 +137,16 @@ public class IsabelleMasterHandler {
             sorts.add(sort);
         }
         return false;
+    }
+
+    boolean isKnownSymbol(String name) {
+        return knownSymbols.contains(name);
+    }
+
+    public void addDeclaration(SExpr sExpr) {
+    }
+
+    public void addKnownSymbol(String name) {
+        knownSymbols.add(name);
     }
 }
