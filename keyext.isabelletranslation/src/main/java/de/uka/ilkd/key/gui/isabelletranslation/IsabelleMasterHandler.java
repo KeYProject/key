@@ -105,4 +105,13 @@ public class IsabelleMasterHandler {
     void addConstDeclaration(StringBuilder decl) {
         constDeclarations.add(decl);
     }
+
+    boolean isKnownSort(Sort s) {
+        return sorts.contains(s);
+    }
+
+    StringBuilder createSortDecl(Sort sort) {
+        //TODO IMPLEMENT
+        return new StringBuilder();
+    }
 }
