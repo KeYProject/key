@@ -1,0 +1,7 @@
+de.uka.ilkd.key.gui.isabelletranslation.BooleanOpHandler
+de.uka.ilkd.key.gui.isabelletranslation.PolymorphicHandler
+de.uka.ilkd.key.gui.isabelletranslation.QuantifierHandler
+de.uka.ilkd.key.gui.isabelletranslation.LogicalVariableHandler
+de.uka.ilkd.key.gui.isabelletranslation.NumberConstantsHandler
+de.uka.ilkd.key.gui.isabelletranslation.IntegerOpHandler
+de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler

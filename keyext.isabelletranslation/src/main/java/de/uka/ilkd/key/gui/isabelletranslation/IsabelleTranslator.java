@@ -104,20 +104,22 @@ public class IsabelleTranslator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        StringBuilder hb = buildCompleteText(masterHandler.translate(problem), new ArrayList<>());
+        StringBuilder hb = buildCompleteText(masterHandler.translate(problem), new ArrayList<>(), masterHandler);
         return hb;
     }
 
-    protected StringBuilder buildCompleteText(StringBuilder formula, ArrayList<StringBuilder> types) {
+    protected StringBuilder buildCompleteText(StringBuilder formula, ArrayList<StringBuilder> types, IsabelleMasterHandler masterHandler) {
         //TODO ensure usedSorts etc have the right values?
         StringBuilder result = new StringBuilder();
         result.append("theory Translation imports Main begin").append(System.lineSeparator());
 
         result.append(getSortDeclarations());
+        for (StringBuilder preamble : masterHandler.getPreambles()) {
+            result.append(preamble);
+        }
 
         result.append("locale varsAndFunctions =").append(System.lineSeparator());
         //TODO additional types of JFOL hierarchy and assumptions
-        result.append(getNullLocale());
 
         result.append(getFunctionDeclarations());
         result.append(getPredicateDeclarations());

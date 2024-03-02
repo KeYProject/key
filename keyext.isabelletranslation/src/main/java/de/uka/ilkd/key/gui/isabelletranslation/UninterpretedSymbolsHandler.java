@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.HandlerUtil;
 
 import java.util.List;
 import java.util.Properties;
@@ -28,6 +27,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
+        masterHandler.addPreambles(handlerSnippets);
     }
 
     @Override
@@ -52,7 +52,6 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         SortedOperator op = (SortedOperator) term.op();
         String name = PREFIX + op.name().toString();
         if (!trans.isKnownSymbol(name)) {
-            trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
             trans.addKnownSymbol(name);
         }
 
