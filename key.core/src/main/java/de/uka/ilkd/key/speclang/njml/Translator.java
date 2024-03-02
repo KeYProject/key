@@ -1998,7 +1998,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE().getText());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
@@ -2016,7 +2016,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.LOOP_MODIFIABLE().getText());
+        for (TerminalNode n
+                : new TerminalNode[] { ctx.MODIFIABLE(), ctx.LOOP_MODIFIABLE() }) {
+            warnPotentiallyUnintendedFramingSemantics(ctx, n);
+        }
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
@@ -2553,9 +2556,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private void warnPotentiallyUnintendedFramingSemantics(
-            ParserRuleContext ctx, String clauseName) {
-        clauseName =
-            clauseName.startsWith("loop_") ? clauseName.replaceFirst("loop_", "") : clauseName;
+            ParserRuleContext ctx, TerminalNode clauseHeader) {
+        final String clauseName =
+                clauseHeader != null && clauseHeader.getText().startsWith("loop_") ?
+                        clauseHeader.getText().replaceFirst("loop_", "")
+                        : clauseHeader != null ? clauseHeader.getText() : null;
         for (final String s : DISCOURAGED_CLAUSE_NAMES) {
             if (clauseName != null && clauseName.startsWith(s)) {
                 addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
