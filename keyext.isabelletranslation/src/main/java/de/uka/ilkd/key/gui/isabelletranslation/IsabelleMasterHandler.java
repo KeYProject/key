@@ -47,9 +47,23 @@ public class IsabelleMasterHandler {
 
         LogicalVariableHandler logicalVariableHandler = new LogicalVariableHandler();
         logicalVariableHandler.init(this, services, null, handlerOptions);
+
+        IntegerOpHandler integerOpHandler = new IntegerOpHandler();
+        integerOpHandler.init(this, services, null, handlerOptions);
+
+        NumberConstantsHandler numberConstantsHandler = new NumberConstantsHandler();
+        numberConstantsHandler.init(this, services, null, handlerOptions);
+
+        PolymorphicHandler polymorphicHandler = new PolymorphicHandler();
+        polymorphicHandler.init(this, services, null, handlerOptions);
         //TODO add handlers
         handlers.add(booleanOpHandler);
         handlers.add(logicalVariableHandler);
+        handlers.add(integerOpHandler);
+        handlers.add(numberConstantsHandler);
+        handlers.add(polymorphicHandler);
+
+
         handlers.add(new UninterpretedSymbolsHandler());
         this.handlers = handlers;
     }
