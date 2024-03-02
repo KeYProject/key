@@ -75,6 +75,14 @@ public class IsabelleMasterHandler {
         }
     }
 
+    public List<StringBuilder> translate(Iterable<Term> terms) {
+        List<StringBuilder> result = new LinkedList<>();
+        for (Term term : terms) {
+            result.add(translate(term));
+        }
+        return result;
+    }
+
     /**
      * If no handler can handle a term, it is taken care of here.
      *
@@ -113,5 +121,12 @@ public class IsabelleMasterHandler {
     StringBuilder createSortDecl(Sort sort) {
         //TODO IMPLEMENT
         return new StringBuilder();
+    }
+
+    boolean addSort(Sort sort) {
+        if (!isKnownSort(sort)) {
+            sorts.add(sort);
+        }
+        return false;
     }
 }
