@@ -31,7 +31,7 @@ public class LogicalVariableHandler implements IsabelleHandler {
         return makeVarRef(term.toString(), sort);
     }
 
-    public StringBuilder makeVarRef(String name, Sort sort) {
+    public static StringBuilder makeVarRef(String name, Sort sort) {
         StringBuilder result = new StringBuilder("(");
         result.append(VAR_PREFIX).append(name).append("::").append(sort.name()).append(")");
         return result;
