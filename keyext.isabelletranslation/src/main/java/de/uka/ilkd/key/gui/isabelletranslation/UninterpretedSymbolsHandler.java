@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -32,11 +34,14 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
                      String[] handlerOptions) {
         masterHandler.addPreamblesLocales(handlerSnippets);
         masterHandler.addPredefinedSort(Sort.ANY);
-        masterHandler.addPredefinedSort(new SortImpl(new Name("Object")));
-        masterHandler.addPredefinedSort(new SortImpl(new Name("Null")));
-        masterHandler.addPredefinedSort(new SortImpl(new Name("Heap")));
-        masterHandler.addPredefinedSort(new SortImpl(new Name("LocSet")));
-        masterHandler.addPredefinedSort(new SortImpl(new Name("Field")));
+
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        masterHandler.addPredefinedSort(new SortImpl(new Name("java.lang.Object")));
+        masterHandler.addPredefinedSort(new SortImpl(new Name("java.lang.Null")));
+        masterHandler.addPredefinedSort(heapLDT.targetSort());
+        masterHandler.addPredefinedSort(locSetLDT.targetSort());
+        masterHandler.addPredefinedSort(heapLDT.getFieldSort());
     }
 
     @Override
