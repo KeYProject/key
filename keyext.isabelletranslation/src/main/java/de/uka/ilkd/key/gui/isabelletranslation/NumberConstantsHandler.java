@@ -37,13 +37,8 @@ public class NumberConstantsHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        if (term.sub(0).op() == negNumberSign) {
-            String s = AbstractTermTransformer.convertToDecimalString(term, services);
-            return new StringBuilder("(-").append(s).append("::int)");
-        } else {
-            String string = AbstractTermTransformer.convertToDecimalString(term, services);
-            return new StringBuilder("(").append(string).append("::int)");
-        }
+        String string = AbstractTermTransformer.convertToDecimalString(term, services);
+        return new StringBuilder("(").append(string).append("::int)");
     }
 
 }
