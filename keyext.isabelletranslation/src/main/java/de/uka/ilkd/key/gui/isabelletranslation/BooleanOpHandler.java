@@ -34,7 +34,7 @@ public class BooleanOpHandler implements IsabelleHandler {
         Operator logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, new StringBuilder("True"));
         //TODO add boolean declarations
-        masterHandler.addSort(ldt.targetSort());
+        masterHandler.addPredefinedSort(ldt.targetSort());
     }
 
     @Override

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
@@ -34,7 +35,11 @@ public class QuantifierHandler implements IsabelleHandler {
         StringBuilder result = new StringBuilder("(");
         result.append(supportedOperators.get(term.op()));
         for (QuantifiableVariable bv : term.boundVars()) {
-            result.append(" ").append(LogicalVariableHandler.makeVarRef(bv.name().toString(), bv.sort()));
+            Sort sort = bv.sort();
+            result.append(" ").append(LogicalVariableHandler.makeVarRef(bv.name().toString(), sort));
+            if (!trans.isKnownSort(sort)) {
+                trans.addSort(sort);
+            }
         }
         result.append(". (");
         result.append(trans.translate(term.sub(0))).append("))");

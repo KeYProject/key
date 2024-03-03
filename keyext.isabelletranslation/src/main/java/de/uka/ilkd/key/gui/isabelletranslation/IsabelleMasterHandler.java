@@ -16,20 +16,19 @@ public class IsabelleMasterHandler {
 
     private final List<StringBuilder> preambles = new ArrayList<>();
 
-    private final List<StringBuilder> constDeclarations = new ArrayList<>();
-
-
-    private final Set<String> knownSymbols = new HashSet<>();
-
     /**
      * A list of untranslatable values
      */
-    private final Map<Term, StringBuilder> unknownValues = new HashMap<>();
+    private final Map<Operator, StringBuilder> unknownValues = new HashMap<>();
 
-    private final Set<Sort> sorts = new HashSet<>();
+    private final Set<Sort> predefinedSorts = new HashSet<>();
+
+    private final Set<Sort> extraSorts = new HashSet<>();
 
     private final Map<Operator, IsabelleHandler> handlerMap = new IdentityHashMap<>();
     private final List<StringBuilder> locales = new ArrayList<>();
+
+    private final List<StringBuilder> constDeclarations = new ArrayList<>();
 
     /**
      * Create a new handler with the default set of smt handlers.
@@ -44,6 +43,8 @@ public class IsabelleMasterHandler {
                                  String[] handlerOptions) throws IOException {
         //TODO efficient loading of handlers. See MasterHandler in SMT
         List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
+        predefinedSorts.add(Sort.ANY);
+        predefinedSorts.add(Sort.FORMULA);
         this.handlers = handlers;
     }
 
@@ -101,54 +102,55 @@ public class IsabelleMasterHandler {
         var freeVars = problem.freeVars();
         if (freeVars.isEmpty()) {
             // simple case: unknown value does not depend on anything else
-            StringBuilder e = new StringBuilder("consts" + System.lineSeparator() + abbr + "::Any");
-            addConstDeclaration(e);
-            translation = abbr;
         } else {
             // unknown value depends on quantified variables
             //TODO implement this
         }
-        unknownValues.put(problem, abbr);
+        unknownValues.put(problem.op(), abbr);
         return null;
     }
 
-    void addConstDeclaration(StringBuilder decl) {
+    private void addConstDeclaration(Term term) {
+        StringBuilder decl = new StringBuilder();
+        assert unknownValues.get(term.op()) != null;
+        decl.append("fixes ");
+        decl.append(unknownValues.get(term.op()));
+        decl.append("::\"");
+        for (Term sub : term.subs()) {
+            if (!isKnownSort(sub.sort())) {
+                addSort(sub.sort());
+            }
+            decl.append(sub.sort().name().toString()).append("=>");
+        }
+        decl.append((term.sort() == Sort.FORMULA ? "bool" : term.sort().name().toString()));
+        decl.append("\"");
         constDeclarations.add(decl);
     }
 
+    boolean isKnownSymbol(Term term) {
+        return unknownValues.containsKey(term.op());
+    }
+
     boolean isKnownSort(Sort s) {
-        return sorts.contains(s);
+        return (predefinedSorts.contains(s) || extraSorts.contains(s));
     }
 
-    StringBuilder createSortDecl(Sort sort) {
-        //TODO IMPLEMENT
-        return new StringBuilder();
-    }
-
-    boolean addSort(Sort sort) {
+    void addSort(Sort sort) {
         if (!isKnownSort(sort)) {
-            sorts.add(sort);
+            extraSorts.add(sort);
         }
-        return false;
     }
 
-    boolean isKnownSymbol(String name) {
-        return knownSymbols.contains(name);
-    }
-
-    public void addPreamble(StringBuilder stringBuilder) {
+    void addPreamble(StringBuilder stringBuilder) {
         preambles.add(stringBuilder);
     }
 
-    public List<StringBuilder> getPreambles() {
+    List<StringBuilder> getPreambles() {
         return preambles;
     }
 
-    public void addKnownSymbol(String name) {
-        knownSymbols.add(name);
-    }
 
-    public void addPreamblesLocales(Properties handlerSnippets) {
+    void addPreamblesLocales(Properties handlerSnippets) {
         for (Map.Entry<Object, Object> entry : handlerSnippets.entrySet()) {
             String key = (String) entry.getKey();
             if (key.endsWith(".preamble")) {
@@ -160,11 +162,32 @@ public class IsabelleMasterHandler {
         }
     }
 
-    public void addLocale(StringBuilder stringBuilder) {
+    void addLocale(StringBuilder stringBuilder) {
         locales.add(stringBuilder);
     }
 
-    public List<StringBuilder> getLocales() {
+    List<StringBuilder> getLocales() {
         return locales;
+    }
+
+    void addPredefinedSort(Sort s) {
+        predefinedSorts.add(s);
+    }
+
+    Set<Sort> getExtraSorts() {
+        return extraSorts;
+    }
+
+    void addKnownSymbol(Term term, StringBuilder s) {
+        unknownValues.put(term.op(), s);
+        addConstDeclaration(term);
+    }
+
+    StringBuilder getKnownSymbol(Term term) {
+        return unknownValues.get(term.op());
+    }
+
+    List<StringBuilder> getConstDeclarations() {
+        return constDeclarations;
     }
 }

@@ -4,11 +4,14 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.util.List;
@@ -28,6 +31,12 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         masterHandler.addPreamblesLocales(handlerSnippets);
+        masterHandler.addPredefinedSort(Sort.ANY);
+        masterHandler.addPredefinedSort(new SortImpl(new Name("Object")));
+        masterHandler.addPredefinedSort(new SortImpl(new Name("Null")));
+        masterHandler.addPredefinedSort(new SortImpl(new Name("Heap")));
+        masterHandler.addPredefinedSort(new SortImpl(new Name("LocSet")));
+        masterHandler.addPredefinedSort(new SortImpl(new Name("Field")));
     }
 
     @Override
@@ -50,16 +59,20 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
-        String name = PREFIX + op.name().toString();
-        if (!trans.isKnownSymbol(name)) {
-            trans.addKnownSymbol(name);
+        if (!trans.isKnownSymbol(term)) {
+            trans.addKnownSymbol(term, new StringBuilder(PREFIX + op.name().toString()));
         }
 
+        String name = trans.getKnownSymbol(term).toString();
         List<StringBuilder> children = trans.translate(term.subs());
         StringBuilder result = new StringBuilder("(");
         result.append(name);
         for (StringBuilder child : children) {
             result.append(" ").append(child);
+        }
+        Sort sort = op.sort();
+        if (!trans.isKnownSort(sort)) {
+            trans.addSort(sort);
         }
         result.append(")");
         return result;
