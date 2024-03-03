@@ -20,14 +20,12 @@ public class NumberConstantsHandler implements IsabelleHandler {
 
     private Function numberSymbol;
     private Services services;
-    private Function negNumberSign;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
-        negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();
     }
 
     @Override
