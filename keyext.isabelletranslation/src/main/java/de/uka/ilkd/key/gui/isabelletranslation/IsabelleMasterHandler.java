@@ -29,6 +29,7 @@ public class IsabelleMasterHandler {
     private final Set<Sort> sorts = new HashSet<>();
 
     private final Map<Operator, IsabelleHandler> handlerMap = new IdentityHashMap<>();
+    private final List<StringBuilder> locales = new ArrayList<>();
 
     /**
      * Create a new handler with the default set of smt handlers.
@@ -147,12 +148,23 @@ public class IsabelleMasterHandler {
         knownSymbols.add(name);
     }
 
-    public void addPreambles(Properties handlerSnippets) {
+    public void addPreamblesLocales(Properties handlerSnippets) {
         for (Map.Entry<Object, Object> entry : handlerSnippets.entrySet()) {
             String key = (String) entry.getKey();
             if (key.endsWith(".preamble")) {
                 addPreamble(new StringBuilder((String) entry.getValue()));
             }
+            if (key.endsWith(".locale")) {
+                addLocale(new StringBuilder((String) entry.getValue()));
+            }
         }
+    }
+
+    public void addLocale(StringBuilder stringBuilder) {
+        locales.add(stringBuilder);
+    }
+
+    public List<StringBuilder> getLocales() {
+        return locales;
     }
 }

@@ -201,7 +201,5 @@ definition instance_All_UnivRep::"Any\&lt;Rightarrow&gt;'a::Any\&lt;Rightarrow&g
 
 abbreviation instance_All_useSet2::"Any\&lt;Rightarrow&gt;Any set\&lt;Rightarrow&gt;bool"
   where "instance_All_useSet2 x y \&lt;equiv&gt; x : y"
-
-
-    </entry>
+  </entry>
 </properties>
