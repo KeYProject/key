@@ -190,13 +190,13 @@ axiomatization where onlyCreatedObjecteAreReferenced:"wellFormed h \&lt;Longrigh
 and onlyCreatedObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::Object), f2)\&lt;in&gt;((select h obj f)::LocSet) \&lt;Longrightarrow&gt; Null_to_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
 and wellFormedStoreObject:"wellFormed h \&lt;and&gt; ((x::Object)=null \&lt;or&gt; ((select h x created) \&lt;and&gt; instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
 
-definition instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
-  where "instance_All_useSet x y \&lt;equiv&gt; x : image to_any y"
+fun instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
+  where "instance_All_useSet x y = (to_any x : image to_any y)"
 
-definition instance_All_useRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_useRep x y \&lt;equiv&gt; \&lt;exists&gt;z::'a. to_any z = x"
+fun instance_All_useRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
+  where "instance_All_useRep x y = (\&lt;exists&gt;z::'a. to_any z = x)"
 
-definition instance_All_UnivRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_UnivRep x y \&lt;equiv&gt; x : image to_any (UNIV::'a set)"
+fun instance_All_UnivRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
+  where "instance_All_UnivRep x y = (x : image to_any (UNIV::'a set))"
   </entry>
 </properties>
