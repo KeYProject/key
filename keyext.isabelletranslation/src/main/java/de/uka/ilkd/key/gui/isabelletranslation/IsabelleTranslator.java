@@ -82,6 +82,8 @@ public class IsabelleTranslator {
 
     private static final Sort BOOL_SORT = new SortImpl(new Name("boolean"));
 
+    private static final String LINE_ENDING = "\n";
+
     public IsabelleTranslator(Services services) {
         //TODO add intrinsic sorts and functions that shouldnt be overridden
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
@@ -104,40 +106,46 @@ public class IsabelleTranslator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        StringBuilder hb = buildCompleteText(masterHandler.translate(problem), new ArrayList<>(), masterHandler);
-        return hb;
-    }
+        StringBuilder formula = masterHandler.translate(problem);
 
-    protected StringBuilder buildCompleteText(StringBuilder formula, ArrayList<StringBuilder> types, IsabelleMasterHandler masterHandler) {
-        //TODO ensure usedSorts etc have the right values?
         StringBuilder result = new StringBuilder();
-        result.append("theory Translation imports Main begin").append(System.lineSeparator());
+        result.append("theory Translation imports Main begin").append(LINE_ENDING);
 
         result.append(getSortDeclarations());
         for (StringBuilder preamble : masterHandler.getPreambles()) {
-            result.append(preamble);
+            result.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
         }
 
-        result.append("locale varsAndFunctions =").append(System.lineSeparator());
+        result.append("locale varsAndFunctions");
+        List<StringBuilder> locales = masterHandler.getLocales();
+
+        if (!locales.isEmpty()) {
+            result.append(" = ");
+            result.append(locales.remove(0));
+        }
+        for (StringBuilder locale : locales) {
+            result.append(" + ").append(locale);
+        }
+
         //TODO additional types of JFOL hierarchy and assumptions
 
         result.append(getFunctionDeclarations());
         result.append(getPredicateDeclarations());
         result.append(getFreeVariableDeclarations());
 
-        result.append("begin").append(System.lineSeparator());
+        result.append("begin").append(LINE_ENDING);
 
         result.append("theorem solve: \"");
         result.append(formula).append("\"");
-        result.append(System.lineSeparator());
+        result.append(LINE_ENDING);
 
-        return result.append("end").append(System.lineSeparator()).append("end");
+        return result.append("end").append(LINE_ENDING).append("end");
     }
 
     private StringBuilder getNullLocale() {
         //TODO handle null correctly
         StringBuilder result = new StringBuilder();
-        result.append("fixes null::'a").append(System.lineSeparator());
+        result.append("fixes null::'a").append(LINE_ENDING);
         return result;
     }
 
@@ -145,7 +153,7 @@ public class IsabelleTranslator {
         StringBuilder declarations = new StringBuilder();
         for (Function fun : usedFunctions.keySet()) {
             if (!intrinsicFunctions.containsKey(fun))
-                declarations.append(getFunctionDeclaration(fun)).append(System.lineSeparator());
+                declarations.append(getFunctionDeclaration(fun)).append(LINE_ENDING);
         }
         return declarations;
     }
@@ -166,7 +174,7 @@ public class IsabelleTranslator {
     private StringBuilder getPredicateDeclarations() {
         StringBuilder declarations = new StringBuilder();
         for (Function fun : usedPredicates.keySet()) {
-            declarations.append(getPredicateDeclaration(fun)).append(System.lineSeparator());
+            declarations.append(getPredicateDeclaration(fun)).append(LINE_ENDING);
         }
         return declarations;
     }
@@ -201,7 +209,7 @@ public class IsabelleTranslator {
 
     private StringBuilder getSortDeclaration(Sort sort) {
         StringBuilder result = new StringBuilder();
-        return result.append("typedecl ").append(usedSorts.get(sort)).append(System.lineSeparator());
+        return result.append("typedecl ").append(usedSorts.get(sort)).append(LINE_ENDING);
     }
 
     private StringBuilder translateTerm(Term term, List<QuantifiableVariable> quantifiedVariables, Services services) throws IllegalFormulaException {

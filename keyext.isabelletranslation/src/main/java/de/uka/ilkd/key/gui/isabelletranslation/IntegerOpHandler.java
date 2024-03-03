@@ -43,7 +43,7 @@ public class IntegerOpHandler implements IsabelleHandler {
         supportedOperators.put(integerLDT.getGreaterOrEquals(), ">=");
         supportedOperators.put(integerLDT.getGreaterThan(), ">");
 
-        //TODO add jArithmetics locale declaration
+        masterHandler.addPreamblesLocales(handlerSnippets);
     }
 
     @Override

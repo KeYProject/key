@@ -27,7 +27,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
-        masterHandler.addPreambles(handlerSnippets);
+        masterHandler.addPreamblesLocales(handlerSnippets);
     }
 
     @Override
