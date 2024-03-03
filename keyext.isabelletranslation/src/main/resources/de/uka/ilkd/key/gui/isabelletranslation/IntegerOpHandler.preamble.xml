@@ -3,8 +3,8 @@
 <properties>
 
 <comment>General preamble</comment>
-    <entry key="integers.preamble">
-    locale jArithmetics =
+  <entry key="integers.preamble">
+locale jArithmetics =
   fixes jDiv::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
   assumes jDiv_def [simp]: "b\&lt;noteq&gt;0 \&lt;Longrightarrow&gt; jDiv a b = 
 (if ((a\&lt;le&gt;0 \&lt;and&gt; b&lt;0) \&lt;or&gt; (a\&lt;ge&gt;0 \&lt;and&gt; b&gt;0) \&lt;or&gt; (b dvd a)) then (a div b)
@@ -243,9 +243,9 @@ next
   qed
 qed
 end
-    </entry>
+  </entry>
 
-    <entry key="integers.locale">
+  <entry key="integers.locale">
 jArithmetics
-    </entry>
+  </entry>
 </properties>

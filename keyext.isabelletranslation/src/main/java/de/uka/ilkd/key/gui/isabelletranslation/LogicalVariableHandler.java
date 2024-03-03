@@ -26,7 +26,7 @@ public class LogicalVariableHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         Sort sort = term.sort();
         if (!trans.isKnownSort(sort)) {
-            trans.createSortDecl(sort);
+            trans.addSort(sort);
         }
         return makeVarRef(term.toString(), sort);
     }

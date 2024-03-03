@@ -116,22 +116,69 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
         }
 
+        for (Sort sort : masterHandler.getExtraSorts()) {
+            String sortName = sort.name().toString();
+            String UNIV = sortName + "_UNIV";
+
+            result.append("lemma ex_").append(UNIV).append(":");
+            result.append(getUnivSpec(services, sort, "{bottom}")).append(LINE_ENDING);
+            result.append("  by simp").append(LINE_ENDING).append(LINE_ENDING);
+
+
+            result.append("consts").append(LINE_ENDING).append(UNIV).append("::\"any set\"").append(LINE_ENDING);
+            result.append(LINE_ENDING);
+
+            result.append("specification (").append(UNIV).append(") ");
+            result.append(getUnivSpec(services, sort, UNIV)).append(LINE_ENDING);
+            result.append("  using ex_").append(UNIV).append(" by blast").append(LINE_ENDING);
+            result.append(LINE_ENDING);
+
+            String UNIV_spec_lemma_name = UNIV + "_specification";
+            result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(services, sort, UNIV)).append(LINE_ENDING);
+            result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def UNIV_I subset_UNIV verit_sko_ex_indirect)").append(LINE_ENDING);
+            result.append(LINE_ENDING);
+
+            result.append("typedef ").append(sortName).append(" = \"").append(UNIV).append("\"").append(LINE_ENDING);
+            String repName = sortName + "2any";
+            String absName = "any2" + sortName;
+
+            result.append("  morphisms ").append(repName).append(" ").append(absName).append(LINE_ENDING);
+            result.append("  using ").append(UNIV_spec_lemma_name).append(" by auto").append(LINE_ENDING).append(LINE_ENDING);
+
+            result.append("declare [[coercion ").append(repName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
+
+            result.append("lemma ").append(sortName).append("_type_specification[simp]:").append(getUnivSpec(services, sort, "(UNIV::" + sortName + " set)")).append(LINE_ENDING);
+            result.append("  using ").append(UNIV_spec_lemma_name).append(" using type_definition.Rep_range type_definition_").append(sortName).append(" by blast").append(LINE_ENDING);
+            result.append(LINE_ENDING).append(LINE_ENDING);
+        }
+
         result.append("locale varsAndFunctions");
         List<StringBuilder> locales = masterHandler.getLocales();
+
+        boolean locale_empty = true;
 
         if (!locales.isEmpty()) {
             result.append(" = ");
             result.append(locales.remove(0));
+            locale_empty = false;
         }
         for (StringBuilder locale : locales) {
             result.append(" + ").append(locale);
         }
 
-        //TODO additional types of JFOL hierarchy and assumptions
+        List<StringBuilder> constDecls = masterHandler.getConstDeclarations();
+        if (!constDecls.isEmpty() && locale_empty) {
+            result.append(" = ");
+            result.append(locales.remove(0));
+            locale_empty = false;
+        } else if (!locale_empty) {
+            result.append(" + ").append(LINE_ENDING);
+        }
+        for (StringBuilder constDecl : constDecls) {
+            result.append(LINE_ENDING).append(constDecl);
+        }
+        result.append(LINE_ENDING);
 
-        result.append(getFunctionDeclarations());
-        result.append(getPredicateDeclarations());
-        result.append(getFreeVariableDeclarations());
 
         result.append("begin").append(LINE_ENDING);
 
@@ -140,6 +187,17 @@ public class IsabelleTranslator {
         result.append(LINE_ENDING);
 
         return result.append("end").append(LINE_ENDING).append("end");
+    }
+
+    private static String getUnivSpec(Services services, Sort sort, String insert) {
+        List<String> parentSortNames = sort.extendsSorts(services).stream().map(Sort::name).map(Name::toString).toList();
+        StringBuilder univSpec = new StringBuilder();
+        univSpec.append("\"").append(insert).append(" \\<subseteq> (UNIV::").append(parentSortNames.get(0)).append(" set)");
+        for (int i = 1; i < parentSortNames.size(); i++) {
+            univSpec.append(" \\<and> ").append(insert).append(" \\<subseteq> (UNIV::").append(parentSortNames.get(i)).append(" set)");
+        }
+        univSpec.append(" \\<and> bottom \\<in> ").append(insert).append("\"");
+        return univSpec.toString();
     }
 
     private StringBuilder getNullLocale() {
