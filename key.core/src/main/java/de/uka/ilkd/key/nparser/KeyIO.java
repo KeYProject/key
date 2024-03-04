@@ -54,7 +54,6 @@ public class KeyIO {
     private List<BuildingIssue> warnings = new LinkedList<>();
     private AbbrevMap abbrevMap;
 
-
     public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
         this.services = services;
         this.nss = nss;

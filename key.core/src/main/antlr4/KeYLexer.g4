@@ -212,6 +212,7 @@ DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
 FREE : '\\free';
+SYNTAX : '\\syntax';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -355,41 +356,12 @@ TILDE
 :	'~'
 	;
 
-PERCENT
-:   '%'
-      ;
-
-STAR
-:   '*'
-      ;
-
-MINUS
-:   '-'
-      ;
-
-PLUS
-:   '+'
-      ;
-
-GREATER
-:   '>'
-      ;
-
-GREATEREQUAL
-:   '>' '=' | '\u2265'
-      ;
 
 
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
-LESS: '<';
-LESSEQUAL: '<' '=' | '\u2264';
-LGUILLEMETS: '<' '<' | '«' | '‹';
-RGUILLEMETS: '>''>' | '»' | '›';
 IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
-EQV:	'<->' | '\u2194';
-PRIMES:	('\'')+;
 CHAR_LITERAL
 : '\''
                 ((' '..'&') |
@@ -427,6 +399,11 @@ fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 
 
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
+
+OPERATOR: ([*=#_$%&!~?<+>] | '-' | '\'' | '\u2265' | '\u2264' | '«' | '‹'
+          | '»' | '›' | '\u2194')+ ;
+
+MIXFIX_HOLE: '_' '/' DIGIT+ ;
 
 INT_LITERAL:
     (DIGIT | '_')+ ('l'|'L')?

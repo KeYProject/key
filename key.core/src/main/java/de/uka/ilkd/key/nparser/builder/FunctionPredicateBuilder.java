@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 
+import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -155,6 +156,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             // weigl: agreement on KaKeY meeting: this should be an error.
             semanticError(ctx, "Function '" + funcName + "' is already defined!");
         }
+
+        if(ctx.func_decl_syntax() != null) {
+            List<Token> tokens = MixFixResolver.extractTokens(ctx.func_decl_syntax());
+            tokens.remove(0);
+            services.mixFixResolver.addMixFixRule(f, tokens);
+        }
+
         return f;
     }
 
