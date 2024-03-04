@@ -2016,8 +2016,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        for (TerminalNode n
-                : new TerminalNode[] { ctx.MODIFIABLE(), ctx.LOOP_MODIFIABLE() }) {
+        for (TerminalNode n : new TerminalNode[] { ctx.MODIFIABLE(), ctx.LOOP_MODIFIABLE() }) {
             warnPotentiallyUnintendedFramingSemantics(ctx, n);
         }
         if (ctx.STRICTLY_NOTHING() != null) {
@@ -2558,9 +2557,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private void warnPotentiallyUnintendedFramingSemantics(
             ParserRuleContext ctx, TerminalNode clauseHeader) {
         final String clauseName =
-                clauseHeader != null && clauseHeader.getText().startsWith("loop_") ?
-                        clauseHeader.getText().replaceFirst("loop_", "")
-                        : clauseHeader != null ? clauseHeader.getText() : null;
+            clauseHeader != null && clauseHeader.getText().startsWith("loop_")
+                    ? clauseHeader.getText().replaceFirst("loop_", "")
+                    : clauseHeader != null ? clauseHeader.getText() : null;
         for (final String s : DISCOURAGED_CLAUSE_NAMES) {
             if (clauseName != null && clauseName.startsWith(s)) {
                 addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
