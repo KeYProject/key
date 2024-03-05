@@ -41,10 +41,8 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         Namespace<Sort> sorts = services.getNamespaces().sorts();
         masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")));
         masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")));
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("Field")));
         masterHandler.addPredefinedSort(heapLDT.targetSort());
         masterHandler.addPredefinedSort(locSetLDT.targetSort());
-        masterHandler.addPredefinedSort(heapLDT.getFieldSort());
     }
 
     @Override
