@@ -7,13 +7,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.util.List;
@@ -37,8 +37,11 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        masterHandler.addPredefinedSort(new SortImpl(new Name("java.lang.Object")));
-        masterHandler.addPredefinedSort(new SortImpl(new Name("java.lang.Null")));
+
+        Namespace<Sort> sorts = services.getNamespaces().sorts();
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")));
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")));
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("Field")));
         masterHandler.addPredefinedSort(heapLDT.targetSort());
         masterHandler.addPredefinedSort(locSetLDT.targetSort());
         masterHandler.addPredefinedSort(heapLDT.getFieldSort());
