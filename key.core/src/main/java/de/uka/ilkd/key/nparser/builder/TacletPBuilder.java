@@ -269,7 +269,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setDisplayName(
             String.format("%s_Deconstruct_%s", argName, constructor.name.getText()));
 
-        var schemaVariables = new SchemaVariable[constructor.argName.size()];
+        var schemaVariables = new OperatorSV[constructor.argName.size()];
         var args = new Term[constructor.argName.size()];
         var tb = services.getTermBuilder();
 
@@ -304,7 +304,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setDisplayName(
             String.format("%s_DeconstructEQ_%s", argName, constructor.name.getText()));
 
-        var schemaVariables = new SchemaVariable[constructor.argName.size()];
+        var schemaVariables = new OperatorSV[constructor.argName.size()];
         var args = new Term[constructor.argName.size()];
         var tb = services.getTermBuilder();
 
