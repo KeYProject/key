@@ -12,7 +12,8 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
 

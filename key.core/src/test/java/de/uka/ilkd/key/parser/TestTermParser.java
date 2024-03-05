@@ -9,10 +9,10 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private Function head, tail, nil, cons, isempty;
+    private JFunction head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;

@@ -6,12 +6,14 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+
+import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
 
@@ -209,9 +211,10 @@ public class OverloadedOperatorHandler {
         @Nullable
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
-            if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
+            if ((left.getTerm().sort() == sortBoolean
+                    || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean
-                            || right.getTerm().sort() == Sort.FORMULA)) {
+                            || right.getTerm().sort() == JavaDLTheory.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 return switch (op) {

@@ -7,9 +7,9 @@ package de.uka.ilkd.key.rule;
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
@@ -50,12 +52,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public static RewriteTaclet switchfirstsucc;
     public static SuccTaclet closewitheq;
 
-    static Function func_0;
-    static Function func_eq;
-    static Function func_plus;
-    static Function func_min1;
-    static Function func_plus1;
-    static Function func_p; // Sort.FORMULA
+    static JFunction func_0;
+    static JFunction func_eq;
+    static JFunction func_plus;
+    static JFunction func_min1;
+    static JFunction func_plus1;
+    static JFunction func_p; // Sort.FORMULA
 
     static Sequent seq_test1;
     static Sequent seq_test2;
@@ -105,11 +107,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void createNatTaclets() {
         // decls for nat
-        func_0 = new Function(new Name("zero"), nat, new Sort[] {});
-        func_eq = new Function(new Name("="), Sort.FORMULA, nat, nat);
-        func_plus = new Function(new Name("+"), nat, nat, nat);
-        func_min1 = new Function(new Name("pred"), nat, nat);
-        func_plus1 = new Function(new Name("succ"), nat, nat);
+        func_0 = new JFunction(new Name("zero"), nat, new Sort[] {});
+        func_eq = new JFunction(new Name("="), JavaDLTheory.FORMULA, nat, nat);
+        func_plus = new JFunction(new Name("+"), nat, nat, nat);
+        func_min1 = new JFunction(new Name("pred"), nat, nat);
+        func_plus1 = new JFunction(new Name("succ"), nat, nat);
 
         nss.functions().add(func_0);
         nss.functions().add(func_eq);
@@ -260,13 +262,13 @@ public class CreateTacletForTests extends AbstractTestTermParser {
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
 
 
-        func_p = new Function(new Name("P"), Sort.FORMULA, sort1);
+        func_p = new JFunction(new Name("P"), JavaDLTheory.FORMULA, sort1);
         nss.functions().add(func_p);
 
         // nat problem:
-        Function const_c = new Function(new Name("c"), nat, new SortImpl[0]);
+        JFunction const_c = new JFunction(new Name("c"), nat, new SortImpl[0]);
         nss.functions().add(const_c);
-        Function const_d = new Function(new Name("d"), nat, new SortImpl[0]);
+        JFunction const_d = new JFunction(new Name("d"), nat, new SortImpl[0]);
         nss.functions().add(const_d);
 
         Term t_c = tf.createTerm(const_c);

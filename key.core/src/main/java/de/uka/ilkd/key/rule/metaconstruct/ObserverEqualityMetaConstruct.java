@@ -7,20 +7,20 @@ import java.util.Collections;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.conditions.SameObserverCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -62,7 +62,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * This constructor is probably only called from {@link AbstractTermTransformer}.
      */
     public ObserverEqualityMetaConstruct() {
-        super(new Name(NAME), 2, Sort.FORMULA);
+        super(new Name(NAME), 2, JavaDLTheory.FORMULA);
     }
 
     /**
@@ -144,8 +144,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term result = tb.all(varObj,
             tb.all(varFld,
                 tb.imp(tb.elementOf(ov, fv, mod),
-                    tb.equals(tb.select(Sort.ANY, smaller.sub(0), ov, fv),
-                        tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
+                    tb.equals(tb.select(JavaDLTheory.ANY, smaller.sub(0), ov, fv),
+                        tb.select(JavaDLTheory.ANY, larger.sub(0), ov, fv)))));
 
         return result;
     }

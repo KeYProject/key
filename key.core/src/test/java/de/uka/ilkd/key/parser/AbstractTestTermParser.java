@@ -9,14 +9,16 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,7 +47,7 @@ public class AbstractTestTermParser {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected Function lookup_func(String name) {
+    protected JFunction lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 

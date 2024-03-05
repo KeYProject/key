@@ -67,9 +67,8 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         if (contracts.size() != 1) {
             return this; // incomplete app;
         }
-        Modality m = (Modality) programTerm().op();
-        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
+        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), m.transaction());
         return setContract(contracts.iterator().next());
     }
 
@@ -83,9 +82,8 @@ public class ContractRuleApp extends AbstractContractRuleApp {
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
                     .computeInstantiation(posInOccurrence().subTerm(), services),
                 services);
-        Modality m = (Modality) programTerm().op();
-        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
+        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), m.transaction());
         final FunctionalOperationContract combinedContract =
             services.getSpecificationRepository().combineOperationContracts(contracts);
         return setContract(combinedContract);

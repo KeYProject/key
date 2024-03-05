@@ -23,7 +23,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -36,12 +35,14 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -394,7 +395,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPredicate(JmlParser.PredicateContext ctx) {
         SLExpression expr = accept(ctx.expression());
         assert expr != null;
-        if (!expr.isTerm() && expr.getTerm().sort() == Sort.FORMULA) {
+        if (!expr.isTerm() && expr.getTerm().sort() == JavaDLTheory.FORMULA) {
             raiseError("Expected a formula: " + expr, ctx);
         }
         return expr;
@@ -615,7 +616,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        SortDependingFunction f = rtype.getSort().getInstanceofSymbol(services);
+        final SortDependingFunction f =
+            services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;
         return new SLExpression(tb.and(tb.not(tb.equals(result.getTerm(), tb.NULL())),
@@ -636,18 +638,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (result.getTerm() == null) {
             exc.addIgnoreWarning("subtype expression <: only supported for"
                 + " \\typeof() arguments on the left side.", ctx.ST().getSymbol());
-            final Namespace<Function> fns = services.getNamespaces().functions();
+            final Namespace<JFunction> fns = services.getNamespaces().functions();
             int x = -1;
             Name name;
             do {
                 name = new Name("subtype_" + ++x);
             } while (fns.lookup(name) != null);
-            final Function z = new Function(name, Sort.FORMULA);
+            final JFunction z = new JFunction(name, JavaDLTheory.FORMULA);
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
-            Sort os = right.getType().getSort();
-            Function ioFunc = os.getInstanceofSymbol(services);
+            final JFunction ioFunc =
+                services.getJavaDLTheory().getInstanceofSymbol(right.getType().getSort(), services);
             result = new SLExpression(tb.equals(tb.func(ioFunc, result.getTerm()), tb.TRUE()));
         }
         return result;
@@ -656,7 +658,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_lockset(JmlParser.Relational_locksetContext ctx) {
-        Function f = null;
+        JFunction f = null;
         SLExpression left = accept(ctx.shiftexpr());
         SLExpression right = accept(ctx.postfixexpr());
 
@@ -664,12 +666,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
             exc.addIgnoreWarning("Lockset ordering is not supported",
                 ctx.LOCKSET_LEQ().getSymbol());
             final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-            f = new Function(new Name("lockset_leq"), Sort.FORMULA, objSort, objSort);
+            f = new JFunction(new Name("lockset_leq"), JavaDLTheory.FORMULA, objSort, objSort);
         }
         if (ctx.LOCKSET_LT() != null) {
             exc.addIgnoreWarning("Lockset ordering is not supported", ctx.LOCKSET_LT().getSymbol());
             final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-            f = new Function(new Name("lockset_lt"), Sort.FORMULA, objSort, objSort);
+            f = new JFunction(new Name("lockset_lt"), JavaDLTheory.FORMULA, objSort, objSort);
         }
         assert f != null;
         assert right != null;
@@ -820,7 +822,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             }
             Term t = e.getTerm();
-            if (t.sort() == Sort.FORMULA) {
+            if (t.sort() == JavaDLTheory.FORMULA) {
                 return new SLExpression(tb.not(t));
             } else if (t.sort() == booleanLDT.targetSort()) {
                 return new SLExpression(tb.not(tb.equals(t, tb.TRUE())));
@@ -1117,7 +1119,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Token l = ctx.STRING_LITERAL().getSymbol();
         Term charListTerm =
             services.getTypeConverter().convertToLogicElement(new StringLiteral(l.getText()));
-        Function strPool = services.getNamespaces().functions().lookup(CharListLDT.STRINGPOOL_NAME);
+        JFunction strPool =
+            services.getNamespaces().functions().lookup(CharListLDT.STRINGPOOL_NAME);
         if (strPool == null) {
             raiseError("String literals used in specification, but string pool function not found",
                 ctx);
@@ -1284,7 +1287,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         String opName = ctx.getStart().getText();
         assert opName.startsWith("\\fp_");
-        Function op = ldt.getFunctionFor(opName.substring(4), services);
+        JFunction op = ldt.getFunctionFor(opName.substring(4), services);
         if (op == null) {
             raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
         }
@@ -1527,7 +1530,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimaryStringEq(JmlParser.PrimaryStringEqContext ctx) {
         SLExpression e1 = accept(ctx.expression(0));
         SLExpression e2 = accept(ctx.expression(1));
-        Function strContent =
+        JFunction strContent =
             services.getNamespaces().functions().lookup(CharListLDT.STRINGCONTENT_NAME);
         if (strContent == null) {
             raiseError("strings used in spec, but string content function not found", ctx);
@@ -2226,7 +2229,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Represents clause with unexpected rhs: " + rhs, ctx);
             }
             Term rhsTerm = rhs.getTerm();
-            if (rhsTerm.sort() == Sort.FORMULA) {
+            if (rhsTerm.sort() == JavaDLTheory.FORMULA) {
                 rhsTerm = tb.ife(rhsTerm, tb.TRUE(), tb.FALSE());
             }
             t = tb.equals(lhs.getTerm(), rhsTerm);

@@ -14,13 +14,10 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -30,11 +27,15 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.TermCreationException;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import org.antlr.runtime.Token;
 import org.jspecify.annotations.NonNull;
@@ -195,7 +196,7 @@ public final class JmlTermFactory {
     public SLExpression quantifiedMin(Term _guard, Term body, KeYJavaType declsType,
             boolean nullable, ImmutableList<LogicVariable> qvs) {
         Term guard = tb.convertToFormula(_guard);
-        assert guard.sort() == Sort.FORMULA;
+        assert guard.sort() == JavaDLTheory.FORMULA;
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         if (body.sort() != intSort) {
             throw exc.createException0("body of \\min expression must be integer type");
@@ -580,7 +581,7 @@ public final class JmlTermFactory {
             Sort origSort = result.getTerm().sort();
             Sort targetSort = type.getSort();
 
-            if (origSort == Sort.FORMULA) {
+            if (origSort == JavaDLTheory.FORMULA) {
                 // This case might occur since boolean expressions
                 // get converted prematurely (see bug #1121).
                 // Just check whether there is a cast to boolean.
@@ -667,7 +668,8 @@ public final class JmlTermFactory {
 
             Sort os = typeExpr.getType().getSort();
 
-            Function ioFunc = os.getExactInstanceofSymbol(services);
+            JFunction ioFunc =
+                services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
             Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
             if (os == ldt.targetSort()) {
@@ -687,11 +689,11 @@ public final class JmlTermFactory {
     private Term buildEqualityTerm(Term a, Term b) {
         Term result;
         try {
-            if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
+            if (a.sort() != JavaDLTheory.FORMULA && b.sort() != JavaDLTheory.FORMULA) {
                 result = tb.equals(a, b);
                 // Special case so that model methods are handled better
             } else if (a.sort() == services.getTypeConverter().getBooleanLDT().targetSort()
-                    && b.sort() == Sort.FORMULA) {
+                    && b.sort() == JavaDLTheory.FORMULA) {
                 result = tb.equals(a, tb.ife(b, tb.TRUE(), tb.FALSE()));
             } else {
                 result = tb.equals(tb.convertToFormula(a), tb.convertToFormula(b));
@@ -748,7 +750,7 @@ public final class JmlTermFactory {
     private SLExpression buildIntCastExpression(KeYJavaType resultType, Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
+            JFunction cast = integerLDT.getSpecCast(resultType.getJavaType());
             if (cast != null) {
                 return new SLExpression(tb.func(cast, term), resultType);
             } else {
@@ -858,7 +860,7 @@ public final class JmlTermFactory {
         }
         QuantifiableVariable qv = declVars.head();
         Term tt = t.getTerm();
-        if (tt.sort() == Sort.FORMULA) {
+        if (tt.sort() == JavaDLTheory.FORMULA) {
             // bugfix (CS): t.getTerm() delivers a formula instead of a
             // boolean term; obviously the original boolean terms are
             // converted to formulas somewhere else; however, we need
@@ -956,7 +958,7 @@ public final class JmlTermFactory {
 
     @NonNull
     public SLExpression seqGet(Term seq, Term idx) {
-        return new SLExpression(tb.seqGet(Sort.ANY, seq, idx));
+        return new SLExpression(tb.seqGet(JavaDLTheory.ANY, seq, idx));
     }
 
     public SLExpression seqConst(ImmutableList<SLExpression> exprList) {
@@ -998,7 +1000,8 @@ public final class JmlTermFactory {
     public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
-            Function instance = kjt.getSort().getInstanceofSymbol(services);
+            JFunction instance =
+                services.getJavaDLTheory().getInstanceofSymbol(kjt.getSort(), services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
 
@@ -1016,7 +1019,7 @@ public final class JmlTermFactory {
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
             Sort os = excType.getSort();
-            Function instance = os.getInstanceofSymbol(services);
+            JFunction instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
 
             result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
                 tb.convertToFormula(excVarReplacer.replace(result)));
@@ -1124,14 +1127,14 @@ public final class JmlTermFactory {
 
     public @NonNull SLExpression createSkolemExprBool(String jmlKeyWord) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
-        final Namespace<Function> fns = services.getNamespaces().functions();
+        final Namespace<JFunction> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.replace("\\", "");
         int x = -1;
         Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final Function sk = new Function(name, Sort.FORMULA);
+        final JFunction sk = new JFunction(name, JavaDLTheory.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t);
@@ -1185,14 +1188,14 @@ public final class JmlTermFactory {
     public SLExpression skolemExprHelper(@NonNull KeYJavaType type, @NonNull TermServices services,
             @NonNull String shortName) {
         shortName = shortName.replace("\\", "");
-        final Namespace<Function> fns = services.getNamespaces().functions();
+        final Namespace<JFunction> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         int x = -1;
         Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final Function sk = new Function(name, sort);
+        final JFunction sk = new JFunction(name, sort);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t, type);
@@ -1202,7 +1205,7 @@ public final class JmlTermFactory {
 
     public SLExpression translateToJDLTerm(final String functName,
             ImmutableList<SLExpression> list) {
-        Namespace<Function> funcs = services.getNamespaces().functions();
+        Namespace<JFunction> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
         // weigl 2021-07-20: Handling of typed parameter in functions,
@@ -1222,8 +1225,9 @@ public final class JmlTermFactory {
         if (symbol != null) {
             // Function or predicate symbol found
 
-            assert symbol instanceof Function : "Expecting a function symbol in this namespace";
-            Function function = (Function) symbol;
+            assert symbol instanceof JFunction
+                    : "Expecting a function symbol in this namespace";
+            JFunction function = (JFunction) symbol;
 
             Term[] args;
             if (list == null) {
