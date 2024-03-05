@@ -245,7 +245,93 @@ public class TacletPBuilder extends ExpressionBuilder {
         var tbSplit = createConstructorSplit(ctx);
         registerTaclet(ctx, tbSplit);
 
+        Sort dtSort = namespaces().sorts().lookup(ctx.name.getText());
+        for (var constructor : ctx.datatype_constructor()) {
+            for (int i = 0; i < constructor.sortId().size(); i++) {
+                var argName = constructor.argName.get(i).getText();
+
+                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i);
+                registerTaclet(ctx, tbDeconstructor);
+
+                var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, dtSort);
+                registerTaclet(ctx, tbDeconsEq);
+            }
+        }
+
         return null;
+    }
+
+    private TacletBuilder<? extends Taclet> createDeconstructorTaclet(
+            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex) {
+        var tacletBuilder = new RewriteTacletBuilder<>();
+        tacletBuilder
+                .setName(new Name(String.format("%s_Dec_%s", argName, constructor.name.getText())));
+        tacletBuilder.setDisplayName(
+            String.format("%s_Deconstruct_%s", argName, constructor.name.getText()));
+
+        var schemaVariables = new SchemaVariable[constructor.argName.size()];
+        var args = new Term[constructor.argName.size()];
+        var tb = services.getTermBuilder();
+
+        // Schema vars for constructor, e.g., Cons(head_sv, tail_sv)
+        for (int i = 0; i < constructor.argName.size(); i++) {
+            var name = constructor.argName.get(i).getText() + "_sv";
+            Sort sort = accept(constructor.argSort.get(i));
+            var sv = declareSchemaVariable(constructor, name, sort, false, false, false,
+                new SchemaVariableModifierSet.TermSV());
+            schemaVariables[i] = sv;
+            args[i] = tb.var(sv);
+        }
+
+        var function = namespaces().functions().lookup(argName);
+        var consFn = namespaces().functions().lookup(constructor.name.getText());
+
+        // Find, e.g, tail(Cons(head_sv, tail_sv))
+        tacletBuilder.setFind(tb.func(function, tb.func(consFn, args)));
+        tacletBuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(tb.var(schemaVariables[argIndex])));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+
+        return tacletBuilder;
+    }
+
+    private TacletBuilder<? extends Taclet> createDeconstructorEQTaclet(
+            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
+            Sort dtSort) {
+        var tacletBuilder = new RewriteTacletBuilder<>();
+        tacletBuilder.setName(
+            new Name(String.format("%s_DecEQ_%s", argName, constructor.name.getText())));
+        tacletBuilder.setDisplayName(
+            String.format("%s_DeconstructEQ_%s", argName, constructor.name.getText()));
+
+        var schemaVariables = new SchemaVariable[constructor.argName.size()];
+        var args = new Term[constructor.argName.size()];
+        var tb = services.getTermBuilder();
+
+        // Schema vars for constructor, e.g., Cons(head_sv, tail_sv)
+        for (int i = 0; i < constructor.argName.size(); i++) {
+            var name = constructor.argName.get(i).getText() + "_sv";
+            Sort sort = accept(constructor.argSort.get(i));
+            var sv = declareSchemaVariable(constructor, name, sort, false, false, false,
+                new SchemaVariableModifierSet.TermSV());
+            schemaVariables[i] = sv;
+            args[i] = tb.var(sv);
+        }
+
+        var function = namespaces().functions().lookup(argName);
+        var consFn = namespaces().functions().lookup(constructor.name.getText());
+
+        var x = declareSchemaVariable(constructor, argName + "_x", dtSort, false, false, false,
+            new SchemaVariableModifierSet.TermSV());
+        var res = schemaVariables[argIndex];
+
+        tacletBuilder.setFind(tb.func(function, tb.var(x)));
+        tacletBuilder.setIfSequent(Sequent.createAnteSequent(
+            new Semisequent(new SequentFormula(tb.equals(tb.var(x), tb.func(consFn, args))))));
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+
+        return tacletBuilder;
     }
 
 
@@ -361,12 +447,14 @@ public class TacletPBuilder extends ExpressionBuilder {
             KeYParser.Datatype_declContext ctx) {
         final var tb = services.getTermBuilder();
 
+        final String prefix = ctx.name.getText() + "_";
+
         Map<String, Term> variables = new HashMap<>();
         for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             for (int i = 0; i < context.argName.size(); i++) {
                 var name = context.argName.get(i).getText();
                 var sort = sorts().lookup(context.argSort.get(i).getText());
-                var sv = declareSchemaVariable(ctx, name, sort,
+                var sv = declareSchemaVariable(ctx, prefix + name, sort,
                     false, true, false,
                     new SchemaVariableModifierSet.TermSV());
                 variables.put(name, tb.var(sv));

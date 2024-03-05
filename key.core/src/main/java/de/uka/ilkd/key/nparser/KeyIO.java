@@ -51,8 +51,7 @@ public class KeyIO {
     private final NamespaceSet nss;
     @Nullable
     private Namespace<SchemaVariable> schemaNamespace;
-    @Nullable
-    private List<BuildingIssue> warnings;
+    private List<BuildingIssue> warnings = new LinkedList<>();
     private AbbrevMap abbrevMap;
 
 
@@ -166,23 +165,29 @@ public class KeyIO {
     public List<Taclet> findTaclets(KeyAst.File ctx) {
         TacletPBuilder visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
         return visitor.getTopLevelTaclets();
     }
 
     /**
      * @param ctx
+     * @return
      */
-    public void evalDeclarations(KeyAst.File ctx) {
+    public List<BuildingIssue> evalDeclarations(KeyAst.File ctx) {
         DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
         ctx.accept(declBuilder);
+        warnings.addAll(declBuilder.getBuildingIssues());
+        return declBuilder.getBuildingIssues();
     }
 
     /**
      * @param ctx
      */
-    public void evalFuncAndPred(KeyAst.File ctx) {
+    public List<BuildingIssue> evalFuncAndPred(KeyAst.File ctx) {
         FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
+        return visitor.getBuildingIssues();
     }
 
 
@@ -198,7 +203,6 @@ public class KeyIO {
         return abbrevMap;
     }
 
-    @Nullable
     public List<BuildingIssue> getWarnings() {
         return warnings;
     }

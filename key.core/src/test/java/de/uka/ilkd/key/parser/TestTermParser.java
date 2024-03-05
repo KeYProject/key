@@ -46,25 +46,27 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        parseDecls("""
-                \\sorts { boolean; elem; list; int; int_sort; numbers;  }
-                \\functions {
-                  elem head(list);
-                  list tail(list);
-                  list nil;
-                  list cons(elem,list);
-                int aa ;
-                int bb ;
-                int cc ;
-                int dd ;
-                int ee ;
-                }
-                \\predicates {
-                  isempty(list);
-                }
-                \\programVariables {int globalIntPV;}"""
+        if (lookup_sort("elem") == null) {// check whether declaration have already been parsed
+            parseDecls("""
+                    \\sorts { boolean; elem; list; int; int_sort; numbers;  }
+                    \\functions {
+                      elem head(list);
+                      list tail(list);
+                      list nil;
+                      list cons(elem,list);
+                    int aa ;
+                    int bb ;
+                    int cc ;
+                    int dd ;
+                    int ee ;
+                    }
+                    \\predicates {
+                      isempty(list);
+                    }
+                    \\programVariables {int globalIntPV;}"""
 
-        );
+            );
+        }
 
         elem = lookup_sort("elem");
         list = lookup_sort("list");

@@ -180,6 +180,7 @@ public final class QueryAxiom extends ClassAxiom {
         // create java block
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
+        // get real implementation of program method
         final IProgramMethod targetImpl =
             services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,

@@ -28,6 +28,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
@@ -447,6 +449,38 @@ public class TestJMLTranslator {
         final boolean condition = result.equalsModRenaming(expected);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "\\seq(1) + \\seq(2,3) : \\seq_concat(\\seq(1), \\seq(2,3))",
+        "\\locset(this.b) + \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) | \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) & \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) * \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) <= \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) < \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s)) && \\locset(this.b) != \\locset(this.s)",
+        "\\locset(this.b) >= \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b))",
+        "\\locset(this.b) > \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b)) && \\locset(this.b) != \\locset(this.s)",
+    }, delimiter = ':')
+    public void testOperatorOverloading(String expression, String expected) {
+        Term tTrans = null, tExp = null;
+        try {
+            tTrans = jmlIO.parseExpression(expression);
+        } catch (Exception e) {
+            fail("Cannot parse " + expression, e);
+        }
+
+        try {
+            tExp = jmlIO.parseExpression(expected);
+        } catch (Exception e) {
+            fail("Cannot parse " + expected, e);
+        }
+
+        if (!tTrans.equalsModTermLabels(tExp)) {
+            // this gives nicer error
+            assertEquals(tExp, tTrans);
+        }
     }
 
 }

@@ -14,7 +14,7 @@ For more information, refer to
   * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
   * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
-The current version of KeY is 2.12.0, licensed under GPL v2.
+The current version of KeY is 2.12.2, licensed under GPL v2.
 
 
 Feel free to use the project templates to get started using KeY:
@@ -26,7 +26,7 @@ Feel free to use the project templates to get started using KeY:
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java SE 11 or newer
+* Java 17 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
     * [Z3](https://github.com/Z3Prover/z3#z3)
@@ -113,7 +113,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2023 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2024 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 

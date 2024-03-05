@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -53,16 +54,30 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
+        var dtNamespace = new Namespace<JFunction>();
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
             Sort[] args = new Sort[constructorContext.sortId().size()];
+            var argNames = constructorContext.argName;
             for (int i = 0; i < args.length; i++) {
-                args[i] = accept(constructorContext.sortId(i));
+                Sort argSort = accept(constructorContext.sortId(i));
+                args[i] = argSort;
+                var argName = argNames.get(i).getText();
+                var alreadyDefinedFn = dtNamespace.lookup(argName);
+                if (alreadyDefinedFn != null
+                        && (!alreadyDefinedFn.sort().equals(argSort)
+                                || !alreadyDefinedFn.argSort(0).equals(sort))) {
+                    throw new RuntimeException("Name already in namespace: " + argName);
+                }
+                JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+                    false, false);
+                dtNamespace.add(fn);
             }
             JFunction function = new JFunction(name, sort, args, null, true, false);
-            namespaces().functions().add(function);
+            namespaces().functions().addSafely(function);
         }
+        namespaces().functions().addSafely(dtNamespace.allElements());
         return null;
     }
 
@@ -98,6 +113,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (lookup(p.name()) == null) {
             functions().add(p);
+        } else {
+            // weigl: agreement on KaKeY meeting: this should be an error.
+            semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");
         }
         return null;
     }
@@ -106,7 +124,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     public Object visitFunc_decl(KeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
-        String func_name = accept(ctx.funcpred_name());
+        String funcName = accept(ctx.funcpred_name());
         List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         assert argSorts != null;
@@ -116,11 +134,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         JFunction f = null;
-        assert func_name != null;
-        int separatorIndex = func_name.indexOf("::");
+        assert funcName != null;
+        int separatorIndex = funcName.indexOf("::");
         if (separatorIndex > 0) {
-            String sortName = func_name.substring(0, separatorIndex);
-            String baseName = func_name.substring(separatorIndex + 2);
+            String sortName = funcName.substring(0, separatorIndex);
+            String baseName = funcName.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
@@ -129,14 +147,15 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         if (f == null) {
-            f = new JFunction(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
+            f = new JFunction(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 
         if (lookup(f.name()) == null) {
             functions().add(f);
         } else {
-            addWarning("Function '" + func_name + "' is already defined!");
+            // weigl: agreement on KaKeY meeting: this should be an error.
+            semanticError(ctx, "Function '" + funcName + "' is already defined!");
         }
         return f;
     }

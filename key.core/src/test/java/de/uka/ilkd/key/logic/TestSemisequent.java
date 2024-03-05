@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.JFunction;
+import java.util.ArrayList;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -307,6 +308,13 @@ public class TestSemisequent {
         assertEquals(ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(sci), "Both semisequents should be equal.");
+    }
+
+    @Test
+    void constructorTest() {
+        var a = Semisequent.EMPTY_SEMISEQUENT;
+        var b = Semisequent.create(new ArrayList<>());
+        assertSame(a, b);
     }
 
 }

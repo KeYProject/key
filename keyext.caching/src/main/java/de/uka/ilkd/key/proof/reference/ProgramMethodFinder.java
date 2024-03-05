@@ -22,7 +22,8 @@ public class ProgramMethodFinder implements Visitor<Term> {
 
     @Override
     public boolean visitSubtree(Term visited) {
-        return false;
+        // visit all sub-terms
+        return true;
     }
 
     @Override

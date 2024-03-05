@@ -574,6 +574,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (floatResult != null) {
                 return floatResult;
             }
+            exc.updatePosition(ctx.getStart());
             if (tok.getText().equals("==")) {
                 result = termFactory.eq(result, expr.get(i));
             } else {

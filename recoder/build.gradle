@@ -11,5 +11,5 @@ dependencies {
     implementation 'net.sf.retrotranslator:retrotranslator-transformer:1.2.9'
 
     testCompileOnly 'junit:junit:4.13.2'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.2'
 }
