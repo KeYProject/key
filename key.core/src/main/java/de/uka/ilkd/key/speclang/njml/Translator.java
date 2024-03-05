@@ -2562,12 +2562,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     : clauseHeader != null ? clauseHeader.getText() : null;
         for (final String s : DISCOURAGED_CLAUSE_NAMES) {
             if (clauseName != null && clauseName.startsWith(s)) {
+                // Actually, KeY only talks about what is modifiable and not assignable in general,
+                // but for legacy reasons, we use the name 'assignable'.
                 addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
-                    + "but is interpreted by KeY as \"modifiable\" clause in order to deal with "
+                    + "but is interpreted by KeY as \"assignable\" clause in order to deal with "
                     + "other JML dialects. "
                     + "However, this interpretation may not correspond to the semantics "
                     + "which you actually intended. Please consult KeY's official documentation "
-                    + "of the \"modifiable\" clause.");
+                    + "of the \"assignable\" clause.");
             }
         }
     }

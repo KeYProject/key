@@ -920,10 +920,12 @@ public final class JmlTermFactory {
                         singletons = singletons.append(t);
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
-                        exc.addIgnoreWarning("local variable in modifiable clause");
+                        exc.addIgnoreWarning("local variable in assignable clause");
+                        // Actually, KeY only talks about what is modifiable and not assignable in
+                        // general, but for legacy reasons, we use the name 'assignable'.
                         LOGGER.debug("Cannot create a locset from local variable " + t + ".\n"
                             + "In this version of KeY, you do not need to put them in "
-                            + "modifiable clauses.");
+                            + "assignable clauses.");
                     } else {
                         throw exc.createException0("Cannot create a locset from " + t + ".");
                     }
