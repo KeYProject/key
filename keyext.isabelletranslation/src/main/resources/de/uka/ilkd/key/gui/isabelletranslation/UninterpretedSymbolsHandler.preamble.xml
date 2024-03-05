@@ -2,201 +2,201 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 
-<comment>General preamble</comment>
+    <comment>General preamble</comment>
     <entry key="uninterpreted.preamble">
-declare [[coercion_enabled]]
-declare [[coercion_map image]]
+        declare [[coercion_enabled]]
+        declare [[coercion_map image]]
 
 
-typedecl any
+        typedecl any
 
 
-consts
-int_subset_inany::"any set"
-int2any::"int\&lt;Rightarrow&gt;any"
-any2int::"any\&lt;Rightarrow&gt;int"
+        consts
+        int_subset_inany::"any set"
+        int2any::"int\&lt;Rightarrow&gt;any"
+        any2int::"any\&lt;Rightarrow&gt;int"
 
-axiomatization where int_sub_any:"type_definition int2any any2int (int_subset_inany)"
-declare [[coercion int2any]]
-
-
-consts
-bool_Image::"any set"
-bool2any::"bool\&lt;Rightarrow&gt;any"
-any2bool::"any\&lt;Rightarrow&gt;bool"
-
-axiomatization where bool_sub_any:"type_definition bool2any any2bool (bool_Image)"
-declare [[coercion bool2any]]
-
-consts
-bottom::"any"
-
-specification (bottom) "bottom = bottom"
-  by simp
-
-typedef (overloaded) Bottom = "{bottom}"
-  morphisms Bottom_to_any any_to_Bottom
-  by simp
-
-declare [[coercion Bottom_to_any]]
+        axiomatization where int_sub_any:"type_definition int2any any2int (int_subset_inany)"
+        declare [[coercion int2any]]
 
 
+        consts
+        bool_Image::"any set"
+        bool2any::"bool\&lt;Rightarrow&gt;any"
+        any2bool::"any\&lt;Rightarrow&gt;bool"
+
+        axiomatization where bool_sub_any:"type_definition bool2any any2bool (bool_Image)"
+        declare [[coercion bool2any]]
+
+        consts
+        bottom::"any"
+
+        specification (bottom) "bottom = bottom"
+        by simp
+
+        consts
+        Object_UNIV::"any set"
 
 
-consts
-Object_UNIV::"any set"
+        specification (Object_UNIV) "Object_UNIV \&lt;subseteq&gt; (UNIV::any set)" "bottom:Object_UNIV"
+        by auto
+
+        lemma Object_UNIV_specification:"Object_UNIV \&lt;subseteq&gt; (UNIV::any set) \&lt;and&gt; bottom:Object_UNIV"
+        by (metis (mono_tags, lifting) Object_UNIV_def UNIV_I subset_UNIV verit_sko_ex_indirect)
 
 
-specification (Object_UNIV) "Object_UNIV \&lt;subseteq&gt; (UNIV::any set)" "bottom:Object_UNIV"
-  by auto
+        typedef Object = "Object_UNIV"+
+        morphisms Object_to_any any_to_Object
+        using Object_UNIV_specification by auto
 
-lemma Object_UNIV_specification:"Object_UNIV \&lt;subseteq&gt; (UNIV::any set) \&lt;and&gt; bottom:Object_UNIV"
-  by (metis (mono_tags, lifting) Object_UNIV_def UNIV_I subset_UNIV verit_sko_ex_indirect)
+        declare [[coercion Object_to_any]]
 
+        lemma Object_subset_any[simp]:"(UNIV::Object set) \&lt;subseteq&gt; (UNIV::any set)"
+        by simp
 
-typedef Object = "Object_UNIV"
-  morphisms Object_to_any any_to_Object
-  using Object_UNIV_specification by auto
+        lemma bottom_in_Object[simp]:"bottom \&lt;in&gt; (UNIV::Object set)"
+        using Object_UNIV_specification
+        using type_definition.Rep_range type_definition_Object by blast
 
-declare [[coercion Object_to_any]]
+        typedecl Field
+        (* "TODO: implement Field type" *)
 
-lemma Object_subset_any:"(UNIV::Object set) \&lt;subseteq&gt; (UNIV::any set)"
-  by simp
+        typedef LocSet = "UNIV::(Object \&lt;times&gt; Field) set set"
+        by simp
 
-lemma bottom_in_Object:"bottom \&lt;in&gt; (UNIV::Object set)"
-  using Object_UNIV_specification
-  using type_definition.Rep_range type_definition_Object by blast
+        declare [[coercion Rep_LocSet]]
 
-typedecl Field
-(* "TODO: implement Field type" *)
+        consts
+        LocSet_Image::"any set"
+        LocSet2any::"LocSet\&lt;Rightarrow&gt;any"
+        any2LocSet::"any\&lt;Rightarrow&gt;LocSet"
 
-typedef LocSet = "UNIV::(Object \&lt;times&gt; Field) set set"
-  by simp
+        axiomatization where LocSet_sub_any:"type_definition LocSet2any any2LocSet LocSet_Image"
 
-declare [[coercion Rep_LocSet]]
+        declare [[coercion LocSet2any]]
 
-consts
-LocSet_Image::"any set"
-LocSet2any::"LocSet\&lt;Rightarrow&gt;any"
-any2LocSet::"any\&lt;Rightarrow&gt;LocSet"
+        typedef Heap = "UNIV::(Object \&lt;Rightarrow&gt; Field \&lt;Rightarrow&gt; any) set"
+        by simp
 
-axiomatization where LocSet_sub_any:"type_definition LocSet2any any2LocSet LocSet_Image"
+        declare [[coercion Rep_Heap]]
 
-declare [[coercion LocSet2any]]
+        consts
+        Heap_Image::"any set"
+        Heap2any::"Heap\&lt;Rightarrow&gt;any"
+        any2Heap::"any\&lt;Rightarrow&gt;Heap"
 
-typedef Heap = "UNIV::(Object \&lt;Rightarrow&gt; Field \&lt;Rightarrow&gt; any) set"
-  by simp
+        axiomatization where Heap_sub_any:"type_definition Heap2any any2Heap Heap_Image"
 
-declare [[coercion Rep_Heap]]
+        declare [[coercion Heap2any]]
 
-consts
-Heap_Image::"any set"
-Heap2any::"Heap\&lt;Rightarrow&gt;any"
-any2Heap::"any\&lt;Rightarrow&gt;Heap"
-
-axiomatization where Heap_sub_any:"type_definition Heap2any any2Heap Heap_Image"
-
-declare [[coercion Heap2any]]
-
-class any = 
-  fixes to_any::"'a\&lt;Rightarrow&gt;any"
-  fixes cast::"any\&lt;Rightarrow&gt;'a"
-  fixes exact_instance::"'a\&lt;Rightarrow&gt;bool"
+        class any =
+        fixes to_any::"'a\&lt;Rightarrow&gt;any"
+        fixes cast::"any\&lt;Rightarrow&gt;'a"
+        fixes exact_instance::"'a\&lt;Rightarrow&gt;bool"
 
 
-instantiation any::any
-begin
-definition "to_any_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
-definition "cast_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
-instance by standard
-end
+        instantiation any::any
+        begin
+        definition "to_any_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
+        definition "cast_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
+        instance by standard
+        end
 
 
+        instantiation int::any
+        begin
+        definition "to_any_int \&lt;equiv&gt; int2any"
+        definition "cast_int \&lt;equiv&gt; any2int"
+        instance by standard
+        end
 
-instantiation int::any
-begin
-definition "to_any_int \&lt;equiv&gt; int2any"
-definition "cast_int \&lt;equiv&gt; any2int"
-instance by standard
-end
+        instantiation bool::any
+        begin
+        definition "to_any_bool \&lt;equiv&gt; bool2any"
+        definition "cast_bool \&lt;equiv&gt; any2bool"
+        instance by standard
+        end
 
-instantiation bool::any
-begin
-definition "to_any_bool \&lt;equiv&gt; bool2any"
-definition "cast_bool \&lt;equiv&gt; any2bool"
-instance by standard
-end
+        instantiation LocSet::any
+        begin
+        definition "to_any_LocSet \&lt;equiv&gt; LocSet2any"
+        definition "cast_LocSet \&lt;equiv&gt; any2LocSet"
+        instance by standard
+        end
 
-instantiation LocSet::any
-begin
-definition "to_any_LocSet \&lt;equiv&gt; LocSet2any"
-definition "cast_LocSet \&lt;equiv&gt; any2LocSet"
-instance by standard
-end
+        class Object = any
 
-class Object = any
+        instantiation Object::Object
+        begin
+        definition "cast_Object \&lt;equiv&gt; any_to_Object"
+        definition "to_any_Object \&lt;equiv&gt; Object_to_any"
+        instance by standard
+        end
 
-instantiation Object::Object
-begin
-definition "cast_Object \&lt;equiv&gt; any_to_Object"
-definition "to_any_Object \&lt;equiv&gt; Object_to_any"
-instance by standard
-end
+        typedef (overloaded) Null = "{bottom}"
+        morphisms Null_to_any any_to_Null
+        by simp
 
-typedef (overloaded) Null = "{bottom}"
-  morphisms Null_to_any any_to_Null
-  by simp
+        declare [[coercion Null_to_any]]
 
-declare [[coercion Null_to_any]]
+        lemma bottom_Null_set:"(UNIV::Null set) = {bottom}"
+        using type_definition.Rep_range type_definition_Null by blast
 
-lemma bottom_Null_set:"(UNIV::Null set) = {bottom}"
-  using type_definition.Rep_range type_definition_Null by blast
+        lemma Null_sub_Object_Types: "(UNIV::Null set) \&lt;subseteq&gt; (UNIV::Object set)"
+        using bottom_Null_set bottom_in_Object by auto
 
-lemma Null_sub_Object_Types: "(UNIV::Null set) \&lt;subseteq&gt; (UNIV::Object set)"
-  using bottom_Null_set bottom_in_Object by auto
+        definition "null \&lt;equiv&gt; any_to_Null bottom"
 
-definition "null \&lt;equiv&gt; any_to_Null bottom"
+        instantiation Null::Object
+        begin
+        definition "to_any_Null \&lt;equiv&gt; Null_to_any"
+        definition "cast_Null \&lt;equiv&gt; any_to_Null"
+        instance by standard
+        end
 
-instantiation Null::Object
-begin
-definition "to_any_Null \&lt;equiv&gt; Null_to_any"
-definition "cast_Null \&lt;equiv&gt; any_to_Null"
-instance by standard
-end
+        abbreviation "Null_to_Object\&lt;equiv&gt;any_to_Object \&lt;circ&gt; Null_to_any"
 
-abbreviation "Null_to_Object\&lt;equiv&gt;any_to_Object \&lt;circ&gt; Null_to_any"
+        declare [[coercion Null_to_Object]]
 
-declare [[coercion Null_to_Object]]
+        consts
+        select::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;('a::any)"
+        store::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap"
+        create::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Heap"
+        anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap"
+        wellFormed::"Heap\&lt;Rightarrow&gt;bool"
+        created::"Field"
+        locEps::"(Object \&lt;times&gt; Field \&lt;times&gt; LocSet) \&lt;Rightarrow&gt; bool"
+        length::"Object=>int"
 
-consts
-select::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;('a::any)"
-store::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap"
-create::"Heap\&lt;Rightarrow&gt;Object\&lt;Rightarrow&gt;Heap"
-anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap"
-wellFormed::"Heap\&lt;Rightarrow&gt;bool"
-created::"Field"
-locEps::"(Object \&lt;times&gt; Field \&lt;times&gt; LocSet) \&lt;Rightarrow&gt; bool"
+        axiomatization where "length obj \&lt;geq&gt; 0"
 
-definition "unusedLocs (h::Heap) \&lt;equiv&gt; {((obj::Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
+        definition "unusedLocs (h::Heap) \&lt;equiv&gt; {((obj::Object), (f::Field)). (h obj created=False)\&lt;and&gt;
+        obj\&lt;noteq&gt;null}"
 
-section \&lt;open&gt;select Axioms\&lt;close&gt;
-axiomatization where selectOfStore:"select (store h obj f x) o2 f2 \&lt;equiv&gt; (if (obj = o2 \&lt;and&gt; f=f2 \&lt;and&gt; f\&lt;noteq&gt;created) then cast (any_to_Object x) else (select h o2 f2))"
-and selectOfCreate:"select (create h obj) o2 f \&lt;equiv&gt; (if (obj=o2 \&lt;and&gt; ((Object_to_any obj)\&lt;noteq&gt;null) \&lt;and&gt; f=created) then cast (any_to_Object True) else select h o2 f)"
-and selectOfAnon:"select (anon h s h') obj f \&lt;equiv&gt; (if ((((obj, f):s)\&lt;and&gt;(f\&lt;noteq&gt;created))\&lt;or&gt;(obj, f):unusedLocs(h)) then select h' obj f else select h obj f)"
+        section \&lt;open&gt;select Axioms\&lt;close&gt;
+        axiomatization where selectOfStore:"select (store h obj f x) o2 f2 \&lt;equiv&gt; (if (obj = o2 \&lt;and&gt;
+        f=f2 \&lt;and&gt; f\&lt;noteq&gt;created) then cast (any_to_Object x) else (select h o2 f2))"
+        and selectOfCreate:"select (create h obj) o2 f \&lt;equiv&gt; (if (obj=o2 \&lt;and&gt; ((Object_to_any obj)\&lt;noteq&gt;null)
+        \&lt;and&gt; f=created) then cast (any_to_Object True) else select h o2 f)"
+        and selectOfAnon:"select (anon h s h') obj f \&lt;equiv&gt; (if ((((obj, f):s)\&lt;and&gt;(f\&lt;noteq&gt;created))\&lt;or&gt;(obj,
+        f):unusedLocs(h)) then select h' obj f else select h obj f)"
 
 
-section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
-axiomatization where onlyCreatedObjecteAreReferenced:"wellFormed h \&lt;Longrightarrow&gt; select h obj f = null \&lt;or&gt; ((select h (select h obj f) created)::bool)"
-and onlyCreatedObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::Object), f2)\&lt;in&gt;((select h obj f)::LocSet) \&lt;Longrightarrow&gt; Null_to_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
-and wellFormedStoreObject:"wellFormed h \&lt;and&gt; ((x::Object)=null \&lt;or&gt; ((select h x created) \&lt;and&gt; instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
+        section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
+        axiomatization where onlyCreatedObjecteAreReferenced:"wellFormed h \&lt;Longrightarrow&gt; select h obj f = null
+        \&lt;or&gt; ((select h (select h obj f) created)::bool)"
+        and onlyCreatedObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::Object), f2)\&lt;in&gt;((select h obj
+        f)::LocSet) \&lt;Longrightarrow&gt; Null_to_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
+        and wellFormedStoreObject:"wellFormed h \&lt;and&gt; ((x::Object)=null \&lt;or&gt; ((select h x created) \&lt;and&gt;
+        instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
 
-fun instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
-  where "instance_All_useSet x y = (to_any x : image to_any y)"
+        fun instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
+        where "instance_All_useSet x y = (to_any x : image to_any y)"
 
-fun instance_All_useRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_useRep x y = (\&lt;exists&gt;z::'a. to_any z = x)"
+        fun instance_All_useRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
+        where "instance_All_useRep x y = (\&lt;exists&gt;z::'a. to_any z = x)"
 
-fun instance_All_UnivRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_UnivRep x y = (x : image to_any (UNIV::'a set))"
-  </entry>
+        fun instance_All_UnivRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
+        where "instance_All_UnivRep x y = (x : image to_any (UNIV::'a set))"
+    </entry>
 </properties>
