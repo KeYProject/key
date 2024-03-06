@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FieldHandler implements IsabelleHandler {
-    private final Collection<String> predefinedFields = new HashSet();
+    private final Collection<String> predefinedFields = new HashSet<String>();
 
     private Sort fieldSort;
 
@@ -40,7 +40,9 @@ public class FieldHandler implements IsabelleHandler {
         if (!trans.isKnownSymbol(term)) {
             Operator op = term.op();
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
-            assert m.find();
+            if (!m.find()) {
+                throw new SMTTranslationException("couldn't translate field: " + op.name());
+            }
             String fieldName = m.group(1);
             if (predefinedFields.contains(fieldName)) {
                 return new StringBuilder(fieldName);
