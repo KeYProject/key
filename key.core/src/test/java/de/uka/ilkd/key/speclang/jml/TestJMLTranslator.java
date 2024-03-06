@@ -32,6 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -478,7 +479,7 @@ public class TestJMLTranslator {
             fail("Cannot parse " + expected, e);
         }
 
-        if (!tTrans.equalsModTermLabels(tExp)) {
+        if (!tTrans.equalsModProperty(tExp, TERM_LABELS_PROPERTY)) {
             // this gives nicer error
             assertEquals(tExp, tTrans);
         }

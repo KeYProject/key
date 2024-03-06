@@ -134,7 +134,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
                     if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
                         return beforeChangeMod.kind() == afterChangeMod.kind()
                                 && beforeChangeTerm.sub(0)
-                                        .equalsModProperty(afterChangeTerm.sub(0), IRRELEVANT_TERM_LABELS_PROPERTY);
+                                        .equalsModProperty(afterChangeTerm.sub(0),
+                                            IRRELEVANT_TERM_LABELS_PROPERTY);
                     } else {
                         return false;
                     }

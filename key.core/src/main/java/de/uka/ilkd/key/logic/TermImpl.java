@@ -13,8 +13,6 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;

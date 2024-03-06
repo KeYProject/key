@@ -26,11 +26,9 @@ import org.key_project.util.java.CollectionUtil;
  *
  * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
  * the method {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)} can be used to
- * compare terms
- * while ignoring certain
- * given properties. E.g. by using {@link RenamingProperty#RENAMING_PROPERTY}, just the
- * term structures modulo
- * renaming are compared whilst ignoring annotations.
+ * compare terms while ignoring certain given properties. E.g. by using
+ * {@link RenamingProperty#RENAMING_PROPERTY}, just the term structures modulo renaming are compared
+ * whilst ignoring annotations.
  * <p>
  * Prior implementations of {@link EqualsModProofIrrelevancy} are now in
  * {@link ProofIrrelevancyProperty}.
