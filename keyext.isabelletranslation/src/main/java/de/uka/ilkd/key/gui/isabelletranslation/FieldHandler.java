@@ -39,7 +39,7 @@ public class FieldHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         if (!trans.isKnownSymbol(term)) {
             Operator op = term.op();
-            Matcher m = Pattern.compile("\\<(.*?)\\>").matcher(op.name().toString());
+            Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
             assert m.find();
             String fieldName = m.group(1);
             if (predefinedFields.contains(fieldName)) {
