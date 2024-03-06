@@ -71,6 +71,7 @@ public class IsabelleTranslator {
             String UNIV = sortName + "_UNIV";
             //TODO ensure that parent sorts are already known or not included
 
+            result.append("(* generated declaration for sort: ").append(sort.name().toString()).append(" *)").append(LINE_ENDING);
             result.append("lemma ex_").append(UNIV).append(":");
             result.append(getUnivSpec(services, sort, "{bottom}")).append(LINE_ENDING);
             result.append("  by simp").append(LINE_ENDING).append(LINE_ENDING);
@@ -87,7 +88,11 @@ public class IsabelleTranslator {
             //TODO needs other lemmata
             String UNIV_spec_lemma_name = UNIV + "_specification";
             result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(services, sort, UNIV)).append(LINE_ENDING);
-            result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def UNIV_I subset_UNIV verit_sko_ex_indirect)").append(LINE_ENDING);
+            result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex subset_iff_psubset_eq");
+            for (String parent : sort.extendsSorts(services).stream().map(Sort::name).map(Name::toString).toList()) {
+                result.append(" ").append("bottom_in_").append(parent);
+            }
+            result.append(")").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
             result.append("typedef ").append(sortName).append(" = \"").append(UNIV).append("\"").append(LINE_ENDING);

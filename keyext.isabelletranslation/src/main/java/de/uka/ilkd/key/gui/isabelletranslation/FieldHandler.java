@@ -39,19 +39,15 @@ public class FieldHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         if (!trans.isKnownSymbol(term)) {
             Operator op = term.op();
-            if (op.name().toString().equals("arr")) {
-                trans.addKnownSymbol(term, UninterpretedSymbolsHandler.getFunctionTranslation(trans, term, (Function) term.op(), "arr"));
-            } else {
-                Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
-                if (!m.find()) {
-                    throw new SMTTranslationException("couldn't translate field: " + op.name());
-                }
-                String fieldName = m.group(1);
-                if (predefinedFields.contains(fieldName)) {
-                    return new StringBuilder(fieldName);
-                }
-                trans.addKnownSymbol(term, new StringBuilder(fieldName));
+            Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
+            if (!m.find()) {
+                throw new SMTTranslationException("couldn't translate field: " + op.name());
             }
+            String fieldName = m.group(1);
+            if (predefinedFields.contains(fieldName)) {
+                return new StringBuilder(fieldName);
+            }
+            trans.addKnownSymbol(term, new StringBuilder(fieldName));
         }
         return trans.getKnownSymbol(term);
     }
