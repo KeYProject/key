@@ -22,7 +22,7 @@ public class BooleanOpHandler implements IsabelleHandler {
         supportedOperators.put(Junctor.NOT, new StringBuilder("Not"));
         supportedOperators.put(Junctor.FALSE, new StringBuilder("False"));
         supportedOperators.put(Junctor.TRUE, new StringBuilder("True"));
-        supportedOperators.put(Equality.EQV, new StringBuilder("<-->"));
+        supportedOperators.put(Equality.EQV, new StringBuilder("\\<longleftrightarrow>"));
     }
 
     @Override

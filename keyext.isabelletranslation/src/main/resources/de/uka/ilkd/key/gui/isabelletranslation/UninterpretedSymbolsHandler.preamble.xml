@@ -34,12 +34,8 @@ bottom::"any"
 specification (bottom) "bottom = bottom"
   by simp
 
-typedef (overloaded) Bottom = "{bottom}"
-  morphisms Bottom_to_any any_to_Bottom
+lemma bottom_in_any:"bottom \&lt;in&gt; (UNIV::any set)"
   by simp
-
-declare [[coercion Bottom_to_any]]
-
 
 
 
