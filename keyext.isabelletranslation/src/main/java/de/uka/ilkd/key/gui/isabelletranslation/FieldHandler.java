@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FieldHandler implements IsabelleHandler {
-    private final Collection<String> predefinedFields = new HashSet<String>();
+    private final Collection<String> predefinedFields = new HashSet<>();
 
     private Sort fieldSort;
 
@@ -32,7 +32,7 @@ public class FieldHandler implements IsabelleHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return (op instanceof Function && ((Function) op).sort() == fieldSort);
+        return (op instanceof Function && ((Function) op).sort() == fieldSort && op.arity() == 0);
     }
 
     @Override
