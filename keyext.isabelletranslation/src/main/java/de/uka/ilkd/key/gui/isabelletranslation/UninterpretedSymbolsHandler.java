@@ -66,11 +66,12 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
         if (!trans.isKnownSymbol(term)) {
-            trans.addKnownSymbol(term, new StringBuilder(PREFIX + op.name().toString()));
+            String name = PREFIX + op.name().toString();
+            trans.addKnownSymbol(term, new StringBuilder(name.replace("::", "_").replace(".", "_")));
         }
 
         String name = trans.getKnownSymbol(term).toString();
-        return getFunctionTranslation(trans, term, op, name.replace("::", "_").replace(".", "_"));
+        return getFunctionTranslation(trans, term, op, name);
     }
 
     static StringBuilder getFunctionTranslation(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {

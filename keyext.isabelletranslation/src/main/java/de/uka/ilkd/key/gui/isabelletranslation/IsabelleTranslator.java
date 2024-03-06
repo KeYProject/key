@@ -71,11 +71,7 @@ public class IsabelleTranslator {
             //TODO needs other lemmata
             String UNIV_spec_lemma_name = UNIV + "_specification";
             result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
-            result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex subset_iff_psubset_eq");
-            for (String parentName : sortParentsMap.get(sort).stream().map(IsabelleTranslator::getSortName).toList()) {
-                result.append(" ").append("bottom_in_").append(parentName);
-            }
-            result.append(")").append(LINE_ENDING);
+            result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex ex_").append(UNIV).append(")").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
             result.append("typedef ").append(sortName).append(" = \"").append(UNIV).append("\"").append(LINE_ENDING);
