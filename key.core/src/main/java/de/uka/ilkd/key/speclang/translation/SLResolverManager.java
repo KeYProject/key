@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -82,18 +83,20 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        for (Namespace<LocationVariable> ns : localVariablesNamespaces) {
-            var localVar = ns.lookup(n);
-            if (localVar != null) {
-                Term varTerm = tb.var(localVar);
-                return new SLExpression(varTerm, kjts.get(localVar));
-            }
-        }
+        // TODO: Is checking logic vars first sufficient? Can it happen that localVariables are
+        // inside logic?
         for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
             var logicVar = ns.lookup(n);
             if (logicVar != null) {
                 Term varTerm = tb.var(logicVar);
                 return new SLExpression(varTerm, kjts.get(logicVar));
+            }
+        }
+        for (Namespace<LocationVariable> ns : localVariablesNamespaces) {
+            var localVar = ns.lookup(n);
+            if (localVar != null) {
+                Term varTerm = tb.var(localVar);
+                return new SLExpression(varTerm, kjts.get(localVar));
             }
         }
 
