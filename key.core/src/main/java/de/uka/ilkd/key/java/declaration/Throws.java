@@ -23,7 +23,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
 
     /**
-     * Exceptions.
+     * Exceptions thrown.
      */
     protected final ImmutableArray<TypeReference> exceptions;
 

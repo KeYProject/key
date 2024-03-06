@@ -7,7 +7,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path

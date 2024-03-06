@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;

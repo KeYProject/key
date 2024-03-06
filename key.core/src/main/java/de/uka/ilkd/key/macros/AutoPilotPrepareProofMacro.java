@@ -5,7 +5,6 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =

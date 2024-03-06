@@ -6,10 +6,9 @@ package de.uka.ilkd.key.logic.op;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
@@ -51,17 +50,6 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
-    }
-
-
-    @Override
-    public UpdateableOperator rename(Name name) {
-        if (getKeYJavaType() != null) {
-            return new LocationVariable(new ProgramElementName(name.toString()), getKeYJavaType(),
-                getContainerType(), isStatic(), isModel());
-        } else {
-            return new LocationVariable(new ProgramElementName(name.toString()), sort());
-        }
     }
 
     @Override

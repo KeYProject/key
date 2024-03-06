@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -26,8 +26,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -43,6 +41,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
@@ -95,8 +96,8 @@ public final class TruthValueTracingUtil {
                 || operator == AbstractTermTransformer.META_LEQ
                 || operator == AbstractTermTransformer.META_LESS) {
             return true; // These Meta constructs evaluate always to true or false
-        } else if (operator instanceof SortedOperator) {
-            return ((SortedOperator) operator).sort() == Sort.FORMULA;
+        } else if (operator instanceof final SortedOperator sortedOperator) {
+            return sortedOperator.sort() == JavaDLTheory.FORMULA;
         } else {
             return false;
         }
@@ -156,8 +157,12 @@ public final class TruthValueTracingUtil {
      */
     public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
-            Sort sort = operator.sort(subs);
-            return sort == Sort.FORMULA;
+            Sort[] sorts = new Sort[subs.size()];
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
+            Sort sort = operator.sort(sorts);
+            return sort == JavaDLTheory.FORMULA;
         } else {
             return false;
         }

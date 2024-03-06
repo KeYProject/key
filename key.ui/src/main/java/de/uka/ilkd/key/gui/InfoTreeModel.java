@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui;
 import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.XMLResources;
+
+import org.key_project.logic.Name;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.

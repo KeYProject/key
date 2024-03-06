@@ -7,17 +7,18 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -42,7 +43,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<Term> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
         final Sort[] argSorts = generateContApplArgumentSorts(termList, pm);
-        final Function contApplPred =
+        final JFunction contApplPred =
             generateContApplPredicate(nameString, argSorts, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
@@ -63,10 +64,11 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Function generateContApplPredicate(String nameString, Sort[] argSorts, TermBuilder tb,
+    private JFunction generateContApplPredicate(String nameString, Sort[] argSorts,
+            TermBuilder tb,
             Services services) {
         final Name name = new Name(nameString);
-        Namespace<Function> functionNS = services.getNamespaces().functions();
+        Namespace<JFunction> functionNS = services.getNamespaces().functions();
 
         /*
          * This predicate needs to present on all branches and, therefore, must be added to the
@@ -76,17 +78,17 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             functionNS = functionNS.parent();
         }
 
-        Function pred = functionNS.lookup(name);
+        JFunction pred = functionNS.lookup(name);
 
         if (pred == null) {
-            pred = new Function(name, Sort.FORMULA, argSorts);
+            pred = new JFunction(name, JavaDLTheory.FORMULA, argSorts);
             functionNS.addSafely(pred);
         }
         return pred;
     }
 
 
-    private Term instantiateContApplPredicate(Function pred, ImmutableList<Term> termList,
+    private Term instantiateContApplPredicate(JFunction pred, ImmutableList<Term> termList,
             TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);

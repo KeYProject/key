@@ -11,7 +11,6 @@ import javax.swing.*;
 
 import org.jspecify.annotations.NonNull;
 
-
 /**
  * Provides static methods to work with strings.
  *
