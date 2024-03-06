@@ -524,13 +524,13 @@ public class JMLSpecFactory {
 
     @NonNull
     private LabeledParserRuleContext getModifiableNothing() {
-        return new LabeledParserRuleContext(JmlFacade.parseClause("modifiable \\nothing;"),
+        return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
     @NonNull
     private LabeledParserRuleContext getModifiableFreeNothing() {
-        return new LabeledParserRuleContext(JmlFacade.parseClause("modifiable_free \\nothing;"),
+        return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
@@ -628,8 +628,8 @@ public class JMLSpecFactory {
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
-                        "\"modifiable \\strictly_nothing\" cannot be joined with other "
-                            + "\"modifiable\" clauses (even if they declare the same).",
+                        "\"assignable \\strictly_nothing\" cannot be joined with other "
+                            + "\"assignable\" clauses (even if they declare the same).",
                         Location.fromToken(expr.first.start));
                 }
                 return tb.empty();
