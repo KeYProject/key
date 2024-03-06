@@ -1,51 +1,20 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
 public class IsabelleTranslator {
 
-    private final HashMap<Sort, StringBuilder> usedSorts = new HashMap<>();
-
-    private final HashMap<Function, StringBuilder> usedFunctions = new HashMap<>();
-
-    private final HashMap<Function, StringBuilder> usedPredicates = new HashMap<>();
-
-    private static final StringBuilder FALSESTRING = new StringBuilder("False");
-
-    private static final StringBuilder TRUESTRING = new StringBuilder("True");
-
-    private static final StringBuilder ALLSTRING = new StringBuilder("\\<forall>");
-
-    private static final StringBuilder EXISTSTRING = new StringBuilder("\\<exists>");
-
-    private static final StringBuilder ANDSTRING = new StringBuilder("\\<and>");
-
-    private static final StringBuilder ORSTRING = new StringBuilder("\\<or>");
-
-    private static final StringBuilder NOTSTRING = new StringBuilder("\\<not>");
-
-    private static final StringBuilder EQSTRING = new StringBuilder("=");
-
-    private static final StringBuilder IMPLYSTRING = new StringBuilder("-->");
-
-
     private static final String LINE_ENDING = "\n";
 
     public IsabelleTranslator(Services services) {
-        //TODO add intrinsic sorts and functions that shouldnt be overridden
-        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
     }
 
     public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
@@ -57,6 +26,15 @@ public class IsabelleTranslator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        List<Throwable> exceptions = masterHandler.getExceptions();
+        if (!exceptions.isEmpty()) {
+            StringBuilder message = new StringBuilder();
+            for (Throwable t : exceptions) {
+                message.append(t.getMessage()).append(System.lineSeparator());
+            }
+            throw new RuntimeException(message.toString());
+        }
+
         StringBuilder formula = masterHandler.translate(problem);
 
         StringBuilder result = new StringBuilder();
@@ -66,14 +44,19 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
         }
 
-        for (Sort sort : masterHandler.getExtraSorts()) {
-            String sortName = sort.name().toString();
+        Set<Sort> extraParentsToCheck = new HashSet<>();
+        extraParentsToCheck.add(Sort.ANY);
+        extraParentsToCheck.add(services.getNamespaces().sorts().lookup("java.lang.Object"));
+
+        Map<Sort, Set<Sort>> sortParentsMap = getSortsParents(masterHandler.getExtraSorts(), extraParentsToCheck);
+        for (Sort sort : sortParentsMap.keySet()) {
+            String sortName = getSortName(sort);
             String UNIV = sortName + "_UNIV";
             //TODO ensure that parent sorts are already known or not included
 
             result.append("(* generated declaration for sort: ").append(sort.name().toString()).append(" *)").append(LINE_ENDING);
             result.append("lemma ex_").append(UNIV).append(":");
-            result.append(getUnivSpec(services, sort, "{bottom}")).append(LINE_ENDING);
+            result.append(getUnivSpec(sortParentsMap.get(sort), "{bottom}")).append(LINE_ENDING);
             result.append("  by simp").append(LINE_ENDING).append(LINE_ENDING);
 
 
@@ -81,16 +64,16 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING);
 
             result.append("specification (").append(UNIV).append(") ");
-            result.append(getUnivSpec(services, sort, UNIV)).append(LINE_ENDING);
+            result.append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
             result.append("  using ex_").append(UNIV).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
             //TODO needs other lemmata
             String UNIV_spec_lemma_name = UNIV + "_specification";
-            result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(services, sort, UNIV)).append(LINE_ENDING);
+            result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
             result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex subset_iff_psubset_eq");
-            for (String parent : sort.extendsSorts(services).stream().map(Sort::name).map(Name::toString).toList()) {
-                result.append(" ").append("bottom_in_").append(parent);
+            for (String parentName : sortParentsMap.get(sort).stream().map(IsabelleTranslator::getSortName).toList()) {
+                result.append(" ").append("bottom_in_").append(parentName);
             }
             result.append(")").append(LINE_ENDING);
             result.append(LINE_ENDING);
@@ -104,7 +87,7 @@ public class IsabelleTranslator {
 
             result.append("declare [[coercion ").append(repName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
 
-            result.append("lemma ").append(sortName).append("_type_specification[simp]:").append(getUnivSpec(services, sort, "(UNIV::" + sortName + " set)")).append(LINE_ENDING);
+            result.append("lemma ").append(sortName).append("_type_specification[simp]:").append(getUnivSpec(sortParentsMap.get(sort), "(UNIV::" + sortName + " set)")).append(LINE_ENDING);
             result.append("  using ").append(UNIV_spec_lemma_name).append(" using type_definition.Rep_range type_definition_").append(sortName).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING).append(LINE_ENDING);
 
@@ -155,14 +138,41 @@ public class IsabelleTranslator {
         return result.append("end").append(LINE_ENDING).append("end");
     }
 
-    private static String getUnivSpec(Services services, Sort sort, String insert) {
-        List<String> parentSortNames = sort.extendsSorts(services).stream().map(Sort::name).map(Name::toString).toList();
+    static String getSortName(Sort sort) {
+        String name = sort.name().toString();
+        return name.replace("[]", "arr").replace(".", "_");
+    }
+
+    private static String getUnivSpec(Set<Sort> parents, String insert) {
+        List<String> parentSortNames = new ArrayList<>(parents.stream().map(IsabelleTranslator::getSortName).toList());
         StringBuilder univSpec = new StringBuilder();
+        if (parentSortNames.isEmpty()) {
+            parentSortNames.add("any");
+        }
         univSpec.append("\"").append(insert).append(" \\<subseteq> (UNIV::").append(parentSortNames.get(0)).append(" set)");
         for (int i = 1; i < parentSortNames.size(); i++) {
             univSpec.append(" \\<and> ").append(insert).append(" \\<subseteq> (UNIV::").append(parentSortNames.get(i)).append(" set)");
         }
         univSpec.append(" \\<and> bottom \\<in> ").append(insert).append("\"");
         return univSpec.toString();
+    }
+
+    private static Map<Sort, Set<Sort>> getSortsParents(Set<Sort> sorts, Set<Sort> outsideParents) {
+        HashMap<Sort, Set<Sort>> result = new HashMap<>();
+        for (Sort sort : sorts) {
+            Set<Sort> parents = new HashSet<>();
+            for (Sort sort2 : sorts) {
+                if (!sort.equals(sort2) && sort.extendsTrans(sort2)) {
+                    parents.add(sort2);
+                }
+            }
+            for (Sort sort2 : outsideParents) {
+                if (!sort.equals(sort2) && sort.extendsTrans(sort2)) {
+                    parents.add(sort2);
+                }
+            }
+            result.put(sort, parents);
+        }
+        return result;
     }
 }

@@ -93,8 +93,8 @@ public class IsabelleMasterHandler {
      * @return a generic translation as unknown value
      */
     private StringBuilder handleAsUnknownValue(Term problem) {
-        if (unknownValues.containsKey(problem)) {
-            return unknownValues.get(problem);
+        if (unknownValues.containsKey(problem.op())) {
+            return unknownValues.get(problem.op());
         }
         int number = unknownValues.size();
         StringBuilder translation;
@@ -120,7 +120,7 @@ public class IsabelleMasterHandler {
             if (!isKnownSort(sub.sort())) {
                 addSort(sub.sort());
             }
-            decl.append(sub.sort().name().toString()).append("=>");
+            decl.append(IsabelleTranslator.getSortName(sub.sort())).append("=>");
         }
         decl.append((term.sort() == Sort.FORMULA ? "bool" : term.sort().name().toString()));
         decl.append("\"");
@@ -189,5 +189,13 @@ public class IsabelleMasterHandler {
 
     List<StringBuilder> getConstDeclarations() {
         return constDeclarations;
+    }
+
+    Collection<Sort> getPredefinedSorts() {
+        return predefinedSorts;
+    }
+
+    List<Throwable> getExceptions() {
+        return exceptions;
     }
 }
