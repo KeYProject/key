@@ -98,7 +98,7 @@ public class IsabelleMasterHandler {
         }
         int number = unknownValues.size();
         StringBuilder translation;
-        StringBuilder abbr = new StringBuilder("unknown_" + number);
+        StringBuilder abbr = new StringBuilder("unknown_" + problem.op().name().toString());
         var freeVars = problem.freeVars();
         if (freeVars.isEmpty()) {
             // simple case: unknown value does not depend on anything else
@@ -107,7 +107,7 @@ public class IsabelleMasterHandler {
             //TODO implement this
         }
         unknownValues.put(problem.op(), abbr);
-        return null;
+        return abbr;
     }
 
     private void addConstDeclaration(Term term) {
