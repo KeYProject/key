@@ -70,8 +70,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         }
 
         String name = trans.getKnownSymbol(term).toString();
-        name.replace("::", "_");
-        return getFunctionTranslation(trans, term, op, name);
+        return getFunctionTranslation(trans, term, op, name.replace("::", "_").replace(".", "_"));
     }
 
     static StringBuilder getFunctionTranslation(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
