@@ -10,9 +10,10 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import java.io.IOException;
 import java.util.Properties;
 
-import static de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler.getFunctionWithSignature;
+import static de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler.getFunctionTranslation;
 
 public class SortDependingFunctionHandler implements IsabelleHandler {
+    private final String PREFIX = "var_";
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
@@ -34,7 +35,10 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
             trans.addSort(dependentSort);
         }
 
-        String name = op.name().toString().split("::")[1];
-        return getFunctionWithSignature(trans, term, op, name);
+        String name = PREFIX + op.name().toString().split("::")[1];
+        if (!trans.isKnownSymbol(term)) {
+            trans.addKnownSymbol(term, new StringBuilder(name));
+        }
+        return getFunctionTranslation(trans, term, op, name);
     }
 }

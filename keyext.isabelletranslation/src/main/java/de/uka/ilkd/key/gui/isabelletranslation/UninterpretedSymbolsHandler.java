@@ -70,13 +70,15 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         }
 
         String name = trans.getKnownSymbol(term).toString();
-        return getFunctionWithSignature(trans, term, op, name);
+        name.replace("::", "_");
+        return getFunctionTranslation(trans, term, op, name);
     }
 
-    static StringBuilder getFunctionWithSignature(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
+    static StringBuilder getFunctionTranslation(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
         List<StringBuilder> children = trans.translate(term.subs());
         StringBuilder result = new StringBuilder("(");
         result.append(name);
+
         for (StringBuilder child : children) {
             result.append(" ").append(child);
         }
