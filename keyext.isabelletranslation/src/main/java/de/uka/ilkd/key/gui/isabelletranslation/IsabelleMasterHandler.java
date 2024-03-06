@@ -122,7 +122,7 @@ public class IsabelleMasterHandler {
             }
             decl.append(IsabelleTranslator.getSortName(sub.sort())).append("=>");
         }
-        decl.append((term.sort() == Sort.FORMULA ? "bool" : term.sort().name().toString()));
+        decl.append((term.sort() == Sort.FORMULA ? "bool" : IsabelleTranslator.getSortName(term.sort())));
         decl.append("\"");
         constDeclarations.add(decl);
     }
