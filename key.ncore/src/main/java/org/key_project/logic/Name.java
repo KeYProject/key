@@ -1,9 +1,8 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic;
+package org.key_project.logic;
 
-import java.util.Objects;
 
 /**
  * A Name object is created to represent the name of an object which usually implements the
@@ -17,8 +16,7 @@ public class Name implements Comparable<Name> {
 
     private static final String NONAME = "_noname_";
 
-    private final /** Interned */
-    String nameString;
+    private final /* Interned */ String nameString;
 
     /**
      * creates a name object
@@ -33,13 +31,15 @@ public class Name implements Comparable<Name> {
     }
 
     @Override
+    @SuppressWarnings("all") // Suppress String comparison ==-warning, which is unnecessary due to
+                             // interning
     public boolean equals(Object o) {
-        if (!(o instanceof Name)) {
+        if (!(o instanceof Name other)) {
             return false;
         }
         // since ALL nameStrings are interned, equality can be safely reduced to
         // identity in THIS case:
-        return Objects.equals(nameString, ((Name) o).nameString);
+        return this.nameString == other.nameString;
     }
 
     @Override

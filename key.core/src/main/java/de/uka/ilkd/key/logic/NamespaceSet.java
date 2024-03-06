@@ -3,17 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Function;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 
 public class NamespaceSet {
 
     private Namespace<QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<IProgramVariable> progVarNS = new Namespace<>();
-    private Namespace<Function> funcNS = new Namespace<>();
+    // TODO: Operators should not be local to goals
+    private Namespace<JFunction> funcNS = new Namespace<>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
@@ -21,7 +26,8 @@ public class NamespaceSet {
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace<QuantifiableVariable> varNS, Namespace<Function> funcNS,
+    public NamespaceSet(Namespace<QuantifiableVariable> varNS,
+            Namespace<JFunction> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
@@ -33,12 +39,14 @@ public class NamespaceSet {
     }
 
     public NamespaceSet copy() {
-        return new NamespaceSet(variables().copy(), functions().copy(), sorts().copy(),
+        return new NamespaceSet(variables().copy(), functions().copy(),
+            sorts().copy(),
             ruleSets().copy(), choices().copy(), programVariables().copy());
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(), choices(),
+        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(),
+            choices(),
             programVariables());
     }
 
@@ -66,11 +74,11 @@ public class NamespaceSet {
         this.progVarNS = progVarNS;
     }
 
-    public Namespace<Function> functions() {
+    public Namespace<JFunction> functions() {
         return funcNS;
     }
 
-    public void setFunctions(Namespace<Function> funcNS) {
+    public void setFunctions(Namespace<JFunction> funcNS) {
         this.funcNS = funcNS;
     }
 

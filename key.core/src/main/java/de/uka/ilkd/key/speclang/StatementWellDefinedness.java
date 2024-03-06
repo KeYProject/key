@@ -12,10 +12,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
 import org.key_project.util.collection.ImmutableList;
@@ -76,7 +73,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final Function generateMbyAtPreFunc(Services services) {
+    final JFunction generateMbyAtPreFunc(Services services) {
         return null;
     }
 

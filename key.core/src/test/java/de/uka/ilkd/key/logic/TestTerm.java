@@ -5,11 +5,14 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -29,17 +32,18 @@ public class TestTerm {
     private final Sort sort3 = new SortImpl(new Name("S3"));
 
 
-    private final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    private final JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     private final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
     // q(:Whatever):BOOL
     private final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
     private final LogicVariable zz = new LogicVariable(new Name("zz"), sort1); // zz:S1
-    private final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    private final JFunction r =
+        new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     private final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    private final Function f = new Function(new Name("f"), sort1, sort3);
+    private final JFunction f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); // pv0:S1
@@ -191,7 +195,9 @@ public class TestTerm {
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
+        Term withJB =
+            tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, javaBlock),
+                new ImmutableArray<>(noJB), null, null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         assertFalse(noJB.containsJavaBlockRecursive());

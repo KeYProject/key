@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
@@ -35,7 +35,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                 primitiveHeapTermFeature.filter(t.sub(0), mState, services) ||
                 // or the heap term of the select operator is an anon heap symbol
                 // (for instance an anonHeap function)
-                (t.sub(0).op() instanceof Function && t.sub(0).op().arity() == 0
+                (t.sub(0).op() instanceof JFunction && t.sub(0).op().arity() == 0
                         && t.sub(0).hasLabels()
                         && t.sub(0).containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
 

@@ -16,7 +16,8 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 class DataRecordingTestFile extends TestFile {
     public final ProfilingDirectories directories;

@@ -44,7 +44,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origFreePre;
     private final Term origMby;
     private final Term origMod;
-    private final Modality modality;
+    private final Modality.JavaModalityKind modality;
     private final Term origSelf;
     private final ImmutableList<Term> origParams;
     private final Term origResult;
@@ -68,14 +68,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     private InformationFlowContractImpl(
             String baseName, String name, KeYJavaType forClass,
-            IProgramMethod pm, KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre,
+            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
+            Term pre, Term freePre,
             Term mby, Term mod, boolean hasRealMod, Term self, ImmutableList<Term> params,
             Term result, Term exc, Term heapAtPre, Term dep,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved, int id) {
         assert baseName != null;
         assert forClass != null;
         assert pm != null;
-        assert modality != null;
+        assert modalityKind != null;
         assert pre != null;
         assert freePre != null;
         assert mod != null;
@@ -111,7 +112,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.origExc = exc;
         this.origAtPre = heapAtPre;
         this.id = id;
-        this.modality = modality;
+        this.modality = modalityKind;
         this.hasRealModifiesClause = hasRealMod;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
@@ -120,10 +121,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     public InformationFlowContractImpl(String baseName, KeYJavaType forClass, IProgramMethod pm,
-            KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre, Term mby, Term mod,
+            KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind, Term pre, Term freePre,
+            Term mby, Term mod,
             boolean hasRealMod, Term self, ImmutableList<Term> params, Term result, Term exc,
             Term heapAtPre, Term dep, ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
-        this(baseName, null, forClass, pm, specifiedIn, modality, pre, freePre, mby, mod,
+        this(baseName, null, forClass, pm, specifiedIn, modalityKind, pre, freePre, mby, mod,
             hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
             INVALID_ID);
     }
@@ -205,7 +207,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Modality getModality() {
+    public Modality.JavaModalityKind getModalityKind() {
         return modality;
     }
 
@@ -264,6 +266,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean hasInfFlowSpec() {
+        // TODO (KIT): This is always true (except null)
         return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
     }
 
@@ -465,8 +468,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public InformationFlowContract setModality(Modality modality) {
-        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
+    public InformationFlowContract setModality(Modality.JavaModalityKind modalityKind) {
+        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn,
+            modalityKind,
             origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
@@ -508,7 +512,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert origDep != null;
         assert origInfFlowSpecs != null;
         return name.equals(ifc.getName()) && forClass.equals(ifc.getKJT())
-                && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModality())
+                && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModalityKind())
                 && origPre.equals(ifc.getPre()) && origFreePre.equals(ifc.getFreePre())
                 && (origMby != null ? origMby.equals(ifc.getMby()) : ifc.getMby() == null)
                 && origMod.equals(ifc.getMod())

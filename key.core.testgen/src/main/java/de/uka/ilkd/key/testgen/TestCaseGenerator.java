@@ -17,7 +17,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -32,6 +31,8 @@ import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.java.StringUtil;
 
 import org.slf4j.Logger;
@@ -622,7 +623,7 @@ public class TestCaseGenerator {
                     pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
-        } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
+        } else if (op instanceof JFunction && !(op instanceof ObserverFunction)) {
             // This case collects fields of classes. The function itself has
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
@@ -658,7 +659,7 @@ public class TestCaseGenerator {
     private ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function function) {
+        if (locationTerm.op() instanceof JFunction function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);

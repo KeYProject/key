@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -21,6 +20,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
 
 /**
  * Creates the anonymizing update for the heap. Expects as arguments the loop formula (for
@@ -50,7 +51,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createHeapAnonUpdate(loopSpec.get(),
-            MiscTools.isTransaction((Modality) loopTerm.op()), MiscTools.isPermissions(services),
+            MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
+            MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 

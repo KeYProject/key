@@ -52,9 +52,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected final IProgramMethod method;
 
     /**
-     * @see #getModality()
+     * @see AuxiliaryContract#getModalityKind()
      */
-    protected final Modality modality;
+    protected final Modality.JavaModalityKind modalityKind;
 
     /**
      * @see #getInstantiationSelfTerm()
@@ -137,7 +137,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param block the block this contract belongs to.
      * @param labels all labels belonging to the block.
      * @param method the method containing the block.
-     * @param modality this contract's modality.
+     * @param modalityKind this contract's modality kind.
      * @param preconditions this contract's preconditions on every heap.
      * @param measuredBy this contract's measured-by term.
      * @param postconditions this contract's postconditions on every heap.
@@ -150,7 +150,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
-            final List<Label> labels, final IProgramMethod method, final Modality modality,
+            final List<Label> labels, final IProgramMethod method,
+            final Modality.JavaModalityKind modalityKind,
             final Map<LocationVariable, Term> preconditions,
             final Map<LocationVariable, Term> freePreconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -166,7 +167,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert block != null;
         assert labels != null;
         assert method != null;
-        assert modality != null;
+        assert modalityKind != null;
         assert preconditions != null;
         assert postconditions != null;
         assert modifiesClauses != null;
@@ -179,7 +180,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         this.block = block;
         this.labels = labels;
         this.method = method;
-        this.modality = modality;
+        this.modalityKind = modalityKind;
         this.preconditions = preconditions;
         this.freePreconditions = freePreconditions;
         this.measuredBy = measuredBy;
@@ -221,8 +222,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Modality getModality() {
-        return modality;
+    public Modality.JavaModalityKind getModalityKind() {
+        return modalityKind;
     }
 
     @Override
@@ -603,7 +604,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String pres = getHtmlPres(baseHeap, heapLDT, services);
         String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>" + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
-            + pres + posts + mods + "<br><b>termination</b> " + getModality()
+            + pres + posts + mods + "<br><b>termination</b> " + getModalityKind()
             /*
              * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
              * "")
@@ -643,7 +644,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
         String pres = getPlainPres(terms, baseHeap, heapLDT, services);
         String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
-        return stringBuilder + pres + posts + mods + "termination " + getModality();
+        return stringBuilder + pres + posts + mods + "termination " + getModalityKind();
     }
 
     @Override
@@ -678,8 +679,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         } else if ((method == null && other.method != null)
                 || (method != null && !method.equals(other.method))) {
             return false;
-        } else if ((modality == null && other.modality != null)
-                || (modality != null && !modality.equals(other.modality))) {
+        } else if ((modalityKind == null && other.modalityKind != null)
+                || (modalityKind != null && !modalityKind.equals(other.modalityKind))) {
             return false;
         } else if ((modifiesClauses == null && other.modifiesClauses != null)
                 || (modifiesClauses != null && !modifiesClauses.equals(other.modifiesClauses))) {
@@ -708,7 +709,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         result = prime * result + ((instantiationSelf == null) ? 0 : instantiationSelf.hashCode());
         result = prime * result + ((labels == null) ? 0 : labels.hashCode());
         result = prime * result + ((method == null) ? 0 : method.hashCode());
-        result = prime * result + ((modality == null) ? 0 : modality.hashCode());
+        result = prime * result + ((modalityKind == null) ? 0 : modalityKind.hashCode());
         result = prime * result + ((modifiesClauses == null) ? 0 : modifiesClauses.hashCode());
         result = prime * result + ((postconditions == null) ? 0 : postconditions.hashCode());
         result = prime * result + ((preconditions == null) ? 0 : preconditions.hashCode());
@@ -1459,12 +1460,15 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final boolean transactionApplicable = modifiesClauses
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
-                diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions,
+                diverges.equals(ff()) ? Modality.JavaModalityKind.DIA
+                        : Modality.JavaModalityKind.BOX,
+                preconditions,
                 freePreconditions, measuredBy, postconditions, freePostconditions,
                 modifiesClauses, freeModifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod));
             if (divergesConditionCannotBeExpressedByAModality()) {
-                result = result.add(build(baseName, block, labels, method, Modality.DIA,
+                result = result.add(build(baseName, block, labels, method,
+                    Modality.JavaModalityKind.DIA,
                     addNegatedDivergesConditionToPreconditions(preconditions), freePreconditions,
                     measuredBy, postconditions, freePostconditions,
                     modifiesClauses, freeModifiesClauses,
@@ -1474,12 +1478,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         }
 
         /**
-         *
          * @param baseName the base name.
          * @param block the block this contract belongs to.
          * @param labels all labels belonging to the block.
          * @param method the method containing the block.
-         * @param modality this contract's modality.
+         * @param modalityKind this contract's modality kind.
          * @param preconditions this contract's preconditions on every heap.
          * @param measuredBy this contract's measured-by term.
          * @param postconditions this contract's postconditions on every heap.
@@ -1494,7 +1497,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
-                IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
+                IProgramMethod method, Modality.JavaModalityKind modalityKind,
+                Map<LocationVariable, Term> preconditions,
                 Map<LocationVariable, Term> freePreconditions, Term measuredBy,
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> freePostconditions,
