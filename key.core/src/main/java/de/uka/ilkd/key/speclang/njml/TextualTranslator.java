@@ -280,7 +280,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
             (ctx.LOOP_MODIFIABLE() != null && ctx.LOOP_MODIFIABLE().getText().endsWith("_free"))
-            || (ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free"));
+                    || (ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free"));
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.MODIFIABLE_FREE
