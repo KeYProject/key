@@ -51,10 +51,10 @@ lemma java_lang_Object_UNIV_specification:"java_lang_Object_UNIV \&lt;subseteq&g
 
 
 typedef java_lang_Object = "java_lang_Object_UNIV"
-  morphisms java_lang_Object_to_any any_to_java_lang_Object
+  morphisms java_lang_Object2any any2java_lang_Object
   using java_lang_Object_UNIV_specification by auto
 
-declare [[coercion java_lang_Object_to_any]]
+declare [[coercion java_lang_Object2any]]
 
 lemma java_lang_Object_subset_any[simp]:"(UNIV::java_lang_Object set) \&lt;subseteq&gt; (UNIV::any set)"
   by simp
@@ -134,16 +134,16 @@ class java_lang_Object = any
 
 instantiation java_lang_Object::java_lang_Object
 begin
-definition "cast_java_lang_Object \&lt;equiv&gt; any_to_java_lang_Object"
-definition "to_any_java_lang_Object \&lt;equiv&gt; java_lang_Object_to_any"
+definition "cast_java_lang_Object \&lt;equiv&gt; any2java_lang_Object"
+definition "to_any_java_lang_Object \&lt;equiv&gt; java_lang_Object2any"
 instance by standard
 end
 
 typedef (overloaded) Null = "{bottom}"
-  morphisms Null_to_any any_to_Null
+  morphisms Null2any any2Null
   by simp
 
-declare [[coercion Null_to_any]]
+declare [[coercion Null2any]]
 
 lemma bottom_Null_set:"(UNIV::Null set) = {bottom}"
   using type_definition.Rep_range type_definition_Null by blast
@@ -151,18 +151,18 @@ lemma bottom_Null_set:"(UNIV::Null set) = {bottom}"
 lemma Null_sub_java_lang_Object_Types: "(UNIV::Null set) \&lt;subseteq&gt; (UNIV::java_lang_Object set)"
   using bottom_Null_set bottom_in_java_lang_Object by auto
 
-definition "null \&lt;equiv&gt; any_to_Null bottom"
+definition "null \&lt;equiv&gt; any2Null bottom"
 
 instantiation Null::java_lang_Object
 begin
-definition "to_any_Null \&lt;equiv&gt; Null_to_any"
-definition "cast_Null \&lt;equiv&gt; any_to_Null"
+definition "to_any_Null \&lt;equiv&gt; Null2any"
+definition "cast_Null \&lt;equiv&gt; any2Null"
 instance by standard
 end
 
-abbreviation "Null_to_java_lang_Object\&lt;equiv&gt;any_to_java_lang_Object \&lt;circ&gt; Null_to_any"
+abbreviation "Null2java_lang_Object\&lt;equiv&gt;any2java_lang_Object \&lt;circ&gt; Null2any"
 
-declare [[coercion Null_to_java_lang_Object]]
+declare [[coercion Null2java_lang_Object]]
 
 consts
 select::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;('a::any)"
@@ -176,14 +176,14 @@ locEps::"(java_lang_Object \&lt;times&gt; Field \&lt;times&gt; LocSet) \&lt;Righ
 definition "unusedLocs (h::Heap) \&lt;equiv&gt; {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
 
 section \&lt;open&gt;select Axioms\&lt;close&gt;
-axiomatization where selectOfStore:"select (store h obj f x) o2 f2 \&lt;equiv&gt; (if (obj = o2 \&lt;and&gt; f=f2 \&lt;and&gt; f\&lt;noteq&gt;created) then cast (any_to_java_lang_Object x) else (select h o2 f2))"
-and selectOfCreate:"select (create h obj) o2 f \&lt;equiv&gt; (if (obj=o2 \&lt;and&gt; ((java_lang_Object_to_any obj)\&lt;noteq&gt;null) \&lt;and&gt; f=created) then cast (any_to_java_lang_Object True) else select h o2 f)"
+axiomatization where selectOfStore:"select (store h obj f x) o2 f2 \&lt;equiv&gt; (if (obj = o2 \&lt;and&gt; f=f2 \&lt;and&gt; f\&lt;noteq&gt;created) then cast (any2java_lang_Object x) else (select h o2 f2))"
+and selectOfCreate:"select (create h obj) o2 f \&lt;equiv&gt; (if (obj=o2 \&lt;and&gt; ((java_lang_Object2any obj)\&lt;noteq&gt;null) \&lt;and&gt; f=created) then cast (any2java_lang_Object True) else select h o2 f)"
 and selectOfAnon:"select (anon h s h') obj f \&lt;equiv&gt; (if ((((obj, f):s)\&lt;and&gt;(f\&lt;noteq&gt;created))\&lt;or&gt;(obj, f):unusedLocs(h)) then select h' obj f else select h obj f)"
 
 
 section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
 axiomatization where onlyCreatedjava_lang_ObjecteAreReferenced:"wellFormed h \&lt;Longrightarrow&gt; select h obj f = null \&lt;or&gt; ((select h (select h obj f) created)::bool)"
-and onlyCreatedjava_lang_ObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::java_lang_Object), f2)\&lt;in&gt;((select h obj f)::LocSet) \&lt;Longrightarrow&gt; Null_to_java_lang_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
+and onlyCreatedjava_lang_ObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::java_lang_Object), f2)\&lt;in&gt;((select h obj f)::LocSet) \&lt;Longrightarrow&gt; Null2java_lang_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
 and wellFormedStorejava_lang_Object:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; ((select h x created) \&lt;and&gt; instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
 
 fun instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
