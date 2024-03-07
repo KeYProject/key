@@ -140,7 +140,8 @@ public class IsabelleTranslator {
 
         result.append("theorem solve: \"");
         result.append(formula).append("\"");
-        result.append(LINE_ENDING);
+        result.append(LINE_ENDING).append(LINE_ENDING);
+        result.append("(* Solve here *)").append(LINE_ENDING);
 
         return result.append("end").append(LINE_ENDING).append("end");
     }
