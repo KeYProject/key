@@ -67,7 +67,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -302,8 +304,17 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(final Services services, final String name,
             final KeYJavaType type) {
+        // first check for a saved name for this variable
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        for (var prop : nameRecorder.getSetProposals()) {
+            if (prop.toString().startsWith(name + VariableNamer.TEMPORARY_VAR_SEPARATOR)) {
+                return KeYJavaASTFactory.localVariable(new ProgramElementName(prop.toString()),
+                    type);
+            }
+        }
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
+        nameRecorder.addProposal(new Name(uniqueName.getProgramName()));
         final ProgramVariable variable = KeYJavaASTFactory.localVariable(uniqueName, type);
 
         return variable;

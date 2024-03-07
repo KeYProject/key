@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 public abstract class VariableNamer implements InstantiationProposer {
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableNamer.class);
 
+    public static final char TEMPORARY_VAR_SEPARATOR = '#';
+
     // -------------------------------------------------------------------------
     // member variables
     // -------------------------------------------------------------------------
@@ -507,7 +509,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             Comment[] comments) {
         ProgramElementName result;
 
-        int sepPos = name.lastIndexOf(TempIndProgramElementName.SEPARATOR);
+        int sepPos = name.lastIndexOf(TEMPORARY_VAR_SEPARATOR);
         if (sepPos > 0) {
             String basename = name.substring(0, sepPos);
             int index = Integer.parseInt(name.substring(sepPos + 1));
@@ -663,15 +665,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * temporary indexed ProgramElementName
      */
     private static class TempIndProgramElementName extends IndProgramElementName {
-        static final char SEPARATOR = '#';
-
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo);
+            super(basename + TEMPORARY_VAR_SEPARATOR + index, basename, index, creationInfo);
         }
 
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo, comments);
+            super(basename + TEMPORARY_VAR_SEPARATOR + index, basename, index, creationInfo,
+                comments);
         }
     }
 
