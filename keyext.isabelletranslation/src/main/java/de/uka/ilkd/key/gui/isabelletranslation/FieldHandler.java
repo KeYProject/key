@@ -41,7 +41,7 @@ public class FieldHandler implements IsabelleHandler {
             Operator op = term.op();
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
             if (!m.find()) {
-                throw new SMTTranslationException("couldn't translate field: " + op.name());
+                return new StringBuilder(op.name().toString().replace("::$", "_"));
             }
             String fieldName = m.group(1);
             if (predefinedFields.contains(fieldName)) {
