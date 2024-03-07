@@ -2,13 +2,12 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import java.io.IOException;
 import java.util.*;
-
-import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
 public class IsabelleTranslator {
 
@@ -18,7 +17,8 @@ public class IsabelleTranslator {
     }
 
     public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
-        Term problem = sequentToTerm(sequent, services);
+        List<Term> antecedents = sequent.antecedent().asList().stream().map(SequentFormula::formula).toList();
+        List<Term> succedents = sequent.succedent().asList().stream().map(SequentFormula::formula).toList();
         // TODO find correct values
         IsabelleMasterHandler masterHandler;
         try {
@@ -26,6 +26,9 @@ public class IsabelleTranslator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        List<StringBuilder> antecedentTranslations = antecedents.stream().map(masterHandler::translate).toList();
+        List<StringBuilder> succedentTranslations = new ArrayList<>(succedents.stream().map(masterHandler::translate).toList());
+
         List<Throwable> exceptions = masterHandler.getExceptions();
         if (!exceptions.isEmpty()) {
             StringBuilder message = new StringBuilder();
@@ -34,8 +37,6 @@ public class IsabelleTranslator {
             }
             throw new RuntimeException(message.toString());
         }
-
-        StringBuilder formula = masterHandler.translate(problem);
 
         StringBuilder result = new StringBuilder();
         result.append("theory Translation imports Main begin").append(LINE_ENDING);
@@ -138,8 +139,19 @@ public class IsabelleTranslator {
 
         result.append("begin").append(LINE_ENDING);
 
-        result.append("theorem solve: \"");
-        result.append(formula).append("\"");
+        result.append("theorem solve: ");
+        for (int i = 0; i < antecedentTranslations.size(); i++) {
+            StringBuilder antecedentFormula = antecedentTranslations.get(i);
+            result.append(LINE_ENDING).append("assumes antecedent_").append(i).append(":\"").append(antecedentFormula).append("\"");
+        }
+        result.append(LINE_ENDING);
+        result.append("shows \"").append(succedentTranslations.get(0));
+        for (int i = 1; i < succedentTranslations.size(); i++) {
+
+            StringBuilder succedentFormula = succedentTranslations.get(i);
+            result.append(LINE_ENDING).append("\\<or>").append(succedentFormula);
+        }
+        result.append("\"");
         result.append(LINE_ENDING).append(LINE_ENDING);
         result.append("(* Solve here *)").append(LINE_ENDING);
 
