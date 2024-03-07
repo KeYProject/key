@@ -172,6 +172,9 @@ anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;He
 wellFormed::"Heap\&lt;Rightarrow&gt;bool"
 created::"Field"
 locEps::"(java_lang_Object \&lt;times&gt; Field \&lt;times&gt; LocSet) \&lt;Rightarrow&gt; bool"
+length::"java_lang_Object\&lt;Rightarrow&gt;int"
+
+axiomatization "length obj \&lt;ge&gt; 0"
 
 definition "unusedLocs (h::Heap) \&lt;equiv&gt; {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
 
