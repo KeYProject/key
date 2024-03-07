@@ -6,5 +6,6 @@ de.uka.ilkd.key.gui.isabelletranslation.LogicalVariableHandler
 de.uka.ilkd.key.gui.isabelletranslation.NumberConstantsHandler
 de.uka.ilkd.key.gui.isabelletranslation.IntegerOpHandler
 de.uka.ilkd.key.gui.isabelletranslation.FieldHandler
+de.uka.ilkd.key.gui.isabelletranslation.ObserverFunctionHandler
 de.uka.ilkd.key.gui.isabelletranslation.SortDependingFunctionHandler
 de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler
