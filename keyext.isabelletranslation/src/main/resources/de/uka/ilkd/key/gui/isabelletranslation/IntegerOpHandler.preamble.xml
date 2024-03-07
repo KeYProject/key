@@ -245,7 +245,5 @@ qed
 end
   </entry>
 
-  <entry key="integers.locale">
-jArithmetics
-  </entry>
+  <entry key="integers.locale">jArithmetics</entry>
 </properties>
