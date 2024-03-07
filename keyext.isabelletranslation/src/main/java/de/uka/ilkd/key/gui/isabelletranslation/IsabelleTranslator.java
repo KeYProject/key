@@ -52,7 +52,6 @@ public class IsabelleTranslator {
         for (Sort sort : sortParentsMap.keySet()) {
             String sortName = getSortName(sort);
             String UNIV = sortName + "_UNIV";
-            //TODO ensure that parent sorts are already known or not included
 
             result.append("(* generated declaration for sort: ").append(sort.name().toString()).append(" *)").append(LINE_ENDING);
             result.append("lemma ex_").append(UNIV).append(":");
@@ -68,7 +67,7 @@ public class IsabelleTranslator {
             result.append("  using ex_").append(UNIV).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
-            //TODO needs other lemmata
+
             String UNIV_spec_lemma_name = UNIV + "_specification";
             result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
             result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex ex_").append(UNIV).append(")").append(LINE_ENDING);
@@ -86,6 +85,18 @@ public class IsabelleTranslator {
             result.append("lemma ").append(sortName).append("_type_specification[simp]:").append(getUnivSpec(sortParentsMap.get(sort), "(UNIV::" + sortName + " set)")).append(LINE_ENDING);
             result.append("  using ").append(UNIV_spec_lemma_name).append(" using type_definition.Rep_range type_definition_").append(sortName).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING).append(LINE_ENDING);
+
+            for (Sort parentSort : sortParentsMap.get(sort)) {
+                if (parentSort == Sort.ANY) {
+                    continue;
+                }
+                String parentSortName = getSortName(parentSort);
+                String parentSortInj = sortName + "2" + parentSortName;
+                result.append(LINE_ENDING).append("abbreviation \"").append(parentSortInj).append(" \\<equiv> ");
+                result.append("any2").append(parentSortName).append(" \\<circ> ").append(repName).append("\"").append(LINE_ENDING);
+
+                result.append("declare [[coercion ").append(parentSortInj).append("]]").append(LINE_ENDING).append(LINE_ENDING);
+            }
 
             result.append("instantiation ").append(sortName).append("::any").append(LINE_ENDING);
             result.append("begin").append(LINE_ENDING);
