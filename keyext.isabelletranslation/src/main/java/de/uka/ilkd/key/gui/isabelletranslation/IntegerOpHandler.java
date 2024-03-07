@@ -23,13 +23,12 @@ import java.util.Properties;
  */
 public class IntegerOpHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
-    private IntegerLDT integerLDT;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         supportedOperators.clear();
-        this.integerLDT = services.getTypeConverter().getIntegerLDT();
+        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
         supportedOperators.put(integerLDT.getAdd(), "+");
         supportedOperators.put(integerLDT.getMul(), "*");
