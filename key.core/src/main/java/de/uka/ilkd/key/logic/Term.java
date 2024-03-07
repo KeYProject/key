@@ -44,10 +44,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface Term
         extends SVSubstitute, Sorted, TermEqualsModProperty, org.key_project.logic.Term {
-
-    /**
-     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
-     */
+    @Override
     Operator op();
 
     /**
