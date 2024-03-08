@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

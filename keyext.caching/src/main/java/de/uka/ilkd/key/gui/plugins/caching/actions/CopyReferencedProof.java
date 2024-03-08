@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -30,37 +32,45 @@ public final class CopyReferencedProof extends KeyAction {
      */
     private final KeYMediator mediator;
     /**
-     * The node to copy the steps to.
+     * The nodes to copy the steps to.
      */
-    private final Node node;
+    private final List<Node> nodes;
 
     /**
      * Construct a new action.
      *
      * @param mediator the mediator
-     * @param node the node
+     * @param node the node to apply the action on
      */
     public CopyReferencedProof(KeYMediator mediator, Node node) {
         this.mediator = mediator;
-        this.node = node;
+        this.nodes = new ArrayList<>();
         setName("Copy referenced proof steps here");
-        setEnabled(node.leaf() && node.isClosed()
-                && node.lookup(ClosedBy.class) != null);
+        var iter = node.leavesIterator();
+        while (iter.hasNext()) {
+            var goal = iter.next();
+            if (goal.isClosed() && goal.lookup(ClosedBy.class) != null) {
+                nodes.add(goal);
+            }
+        }
+        setEnabled(!nodes.isEmpty());
         setMenuPath("Proof Caching");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ClosedBy c = node.lookup(ClosedBy.class);
-        Goal current = node.proof().getClosedGoal(node);
-        try {
-            mediator.stopInterface(true);
-            new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current,
-                c.nodesToSkip());
-            mediator.startInterface(true);
-        } catch (Exception ex) {
-            LOGGER.error("failed to copy proof ", ex);
-            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
+        for (Node node : nodes) {
+            ClosedBy c = node.lookup(ClosedBy.class);
+            Goal current = node.proof().getClosedGoal(node);
+            try {
+                mediator.stopInterface(true);
+                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current,
+                    c.nodesToSkip());
+                mediator.startInterface(true);
+            } catch (Exception ex) {
+                LOGGER.error("failed to copy proof ", ex);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
+            }
         }
     }
 }
