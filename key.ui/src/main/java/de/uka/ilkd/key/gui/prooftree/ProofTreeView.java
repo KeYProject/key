@@ -102,13 +102,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private KeYMediator mediator;
 
     /**
-     * Stores for each loaded proof the GUI tree model.
+     * Stores for each loaded proof the view state
      */
-    private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
-    /**
-     * Stores for each loaded proof the position of the scroll view.
-     */
-    private final WeakHashMap<Proof, Integer> scrollState = new WeakHashMap<>();
+    private final WeakHashMap<Proof, ProofTreeViewState> viewStates = new WeakHashMap<>(20);
 
     /**
      * The (currently selected) proof this view shows.
@@ -407,8 +403,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         int row = delegateView.getRowForPath(path);
         row--;
         while (delegateView.getPathForRow(row) != null) {
-            TreePath tp = delegateView.getPathForRow(row);
-            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            final TreePath tp = delegateView.getPathForRow(row);
+            final var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
             if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
                     && treeNode.getNode().parent().childrenCount() > 1
                     && !delegateView.isExpanded(tp)) {
@@ -463,37 +459,47 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
-        if (proof != null) {
-            // save old scroll height
-            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
-            scrollState.put(proof, scroller.getVerticalScrollBar().getValue());
-        }
         if (proof == p) {
             return; // proof is already loaded
         }
-        ProofTreeViewFilter.NodeFilter filter = null;
-        if (delegateModel != null) {
-            filter = delegateModel.getActiveNodeFilter();
-            expansionState.disconnect();
-            delegateModel.setExpansionState(expansionState.copyState());
-            delegateModel.storeSelection(delegateView.getSelectionPath());
-            delegateModel.unregister();
-            delegateModel.removeTreeModelListener(proofTreeSearchPanel);
+
+        ProofTreeViewFilter.NodeFilter previousNodeFilter = null;
+        boolean previousNodeFilterState = false;
+        if (proof != null) {
+            // save old view state
+            if (delegateModel != null) { // is it ever not null when proof != null?
+                JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+                expansionState.disconnect();
+                previousNodeFilter = delegateModel.getActiveNodeFilter();
+                previousNodeFilterState =
+                    previousNodeFilter != null && previousNodeFilter.isActive();
+                ProofTreeViewState memorizeProofTreeViewState = new ProofTreeViewState(
+                    delegateModel,
+                    expansionState.copyState(),
+                    delegateView.getSelectionPath(),
+                    scroller.getVerticalScrollBar().getValue());
+                viewStates.put(proof, memorizeProofTreeViewState);
+                delegateModel.unregister();
+                delegateModel.removeTreeModelListener(proofTreeSearchPanel);
+            }
         }
 
         proof = p;
 
         if (proof != null) {
-            delegateModel = models.get(p);
-            if (delegateModel == null) {
-                delegateModel = new GUIProofTreeModel(p);
-                models.put(p, delegateModel);
+            ProofTreeViewState memorizedState = viewStates.get(proof);
+
+            if (memorizedState == null) {
+                memorizedState = new ProofTreeViewState(new GUIProofTreeModel(proof),
+                    Collections.emptyList(), null, 0);
             }
+
+            delegateModel = memorizedState.model;
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
             expansionState =
-                new ProofTreeExpansionState(delegateView, delegateModel.getExpansionState());
+                new ProofTreeExpansionState(delegateView, memorizedState.expansionState);
             delegateView.expandRow(0);
 
             // Save expansion state to restore:
@@ -505,9 +511,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             Collections.sort(rowsToExpand);
 
-            // Redraw the tree in case the ProofTreeViewFilters have changed
-            // since the last time the proof was loaded.
-            delegateModel.setFilter(filter, filter != null && filter.isActive());
+            // restore filters
+            for (var viewFilter : ProofTreeViewFilter.ALL) {
+                setFilter(viewFilter, viewFilter.isActive());
+            }
+
+            // restore node filter
+            delegateModel.setFilter(previousNodeFilter, previousNodeFilterState);
+
+            // restore selection
+            if (memorizedState.selectionPath != null) {
+                delegateView.setSelectionPath(memorizedState.selectionPath);
+                delegateView.scrollPathToVisible(memorizedState.selectionPath);
+            } else {
+                if (mediator.getSelectedProof() == p && mediator.getSelectedNode() != null) {
+                    makeNodeVisible(mediator.getSelectedNode());
+                } else {
+                    // new proof with not yet selected node, select initial node
+                    delegateView.setSelectionRow(1);
+                }
+            }
 
             // Expand previously visible rows.
             for (int i : rowsToExpand) {
@@ -517,19 +540,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateModel.setFilter(filter, true);
             }
 
-            if (delegateModel.getSelection() != null) {
-                delegateView.setSelectionPath(delegateModel.getSelection());
-                delegateView.scrollPathToVisible(delegateModel.getSelection());
-            } else {
-                // new proof, select initial node
-                delegateView.setSelectionRow(1);
-            }
-
             // Restore previous scroll position.
             JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
-            Integer i = scrollState.get(proof);
-            if (i != null) {
-                scroller.getVerticalScrollBar().setValue(i);
+            Integer scrollState = memorizedState.scrollState;
+            if (scrollState != null) {
+                scroller.getVerticalScrollBar().setValue(scrollState);
             }
         } else {
             delegateModel = null;
@@ -538,18 +553,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
-
-        for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
-            if (f.isActive()) {
-                setFilter(f, true);
-            }
-        }
     }
 
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
-            models.remove(p);
-            scrollState.remove(p);
+            viewStates.remove(p);
             mediator.getCurrentlyOpenedProofs().remove(p);
         }
     }
@@ -561,13 +569,29 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (n == null) {
             return;
         }
-
         final GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node == null) {
             return;
         }
 
         TreeNode[] obs = node.getPath();
+
+        if (n.sequent() != mediator.getSelectionModel().getSelectedSequent()) {
+            // in this case we have to select a child of an OSS node
+            ArrayList<TreeNode> pathToOSSChild = new ArrayList<>();
+            pathToOSSChild.addAll(Arrays.asList(obs));
+            for (int i = 0; i < node.getChildCount(); i++) {
+                if (node.getChildAt(i) instanceof GUIOneStepChildTreeNode ossChild) {
+                    if (ossChild.getRuleApp() == mediator.getSelectionModel()
+                            .getSelectedRuleApp()) {
+                        pathToOSSChild.add(ossChild);
+                        break;
+                    }
+                }
+            }
+            obs = pathToOSSChild.toArray(new TreeNode[0]);
+        }
+
         TreePath tp = new TreePath(obs);
         treeSelectionListener.ignoreChange = true;
         delegateView.getSelectionModel().setSelectionPath(tp);
@@ -600,7 +624,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         Object node = path.getLastPathComponent();
 
-        if (node instanceof GUIBranchNode && ((GUIBranchNode) node).getNode().isClosed()) {
+        if (node instanceof GUIBranchNode branchNode && branchNode.getNode().isClosed()) {
             delegateView.collapsePath(path);
             return;
         }
@@ -644,22 +668,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Selects the given Branchnode in the ProofTreeView and displays the first child in the main
      * view.
      */
-    void selectBranchNode(GUIBranchNode node) {
+    TreePath selectBranchNode(GUIBranchNode node) {
         if (node == null) {
-            return;
+            return null;
         }
         proofListener.ignoreNodeSelectionChange = true;
         mediator.getSelectionModel().setSelectedNode(node.getNode());
         proofListener.ignoreNodeSelectionChange = false;
-        TreePath tp = new TreePath(node.getPath());
-        treeSelectionListener.ignoreChange = true;
-        delegateView.getSelectionModel().setSelectionPath(tp);
-        delegateView.scrollPathToVisible(tp);
-        delegateView.validate();
-        treeSelectionListener.ignoreChange = false;
-
-        delegateModel.storeSelection(delegateView.getSelectionPath());
-
+        return new TreePath(node.getPath());
     }
 
     public void showSearchPanel() {
@@ -688,7 +704,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return false;
         }
 
-        final TreePath selectedPath = delegateModel.getSelection();
+        TreePath selectedPath = delegateView.getSelectionPath();
+
         if (selectedPath == null) {
             return false;
         }
@@ -696,82 +713,70 @@ public class ProofTreeView extends JPanel implements TabPanel {
         // Save expansion state to restore.
         List<TreePath> rowsToExpand = new ArrayList<>(expansionState);
 
-
         final TreePath branch;
         final Node invokedNode;
-        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
+
+        final var lastPathComponent = selectedPath.getLastPathComponent();
+        if (lastPathComponent instanceof GUIProofTreeNode guiNode) {
             branch = selectedPath.getParentPath();
-            invokedNode =
-                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+            invokedNode = guiNode.getNode();
         } else {
             branch = selectedPath;
-            invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+            invokedNode = ((GUIAbstractTreeNode) lastPathComponent).getNode();
         }
 
-        if (!filter.global()) {
-            delegateModel.setFilter(filter, selected);
-            if (branch == selectedPath) {
-                if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                    TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
-                            .findBranch(invokedNode);
-                    if (node instanceof GUIBranchNode) {
-                        selectBranchNode((GUIBranchNode) node);
-                    }
-                }
-            } else {
-                delegateView.scrollPathToVisible(selectedPath);
-                delegateView.setSelectionPath(selectedPath);
-            }
+        delegateModel.setFilter(filter, selected);
+
+        if (!filter.global() && branch == selectedPath) {
+            selectedPath = getPathForBranchNode(invokedNode, selectedPath);
+        } else if (branch == selectedPath &&
+                (!selected || invokedNode.parent() == null ||
+                        delegateModel
+                                .getProofTreeNode(invokedNode.parent())
+                                .findChild(invokedNode.parent()) == null)) {
+            selectedPath = getPathForBranchNode(invokedNode, selectedPath);
         } else {
-            delegateModel.setFilter(filter, selected);
-            if (branch == selectedPath) {
-                if (!selected) {
-                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
-                                .findBranch(invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            selectBranchNode((GUIBranchNode) node);
-                        }
-                    }
-                } else {
-                    if (invokedNode.parent() == null || delegateModel
-                            .getProofTreeNode(invokedNode.parent())
-                            .findChild(invokedNode.parent()) == null) {
-                        // it's still a branch
-                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node =
-                                ((GUIAbstractTreeNode) delegateModel.getRoot())
-                                        .findBranch(invokedNode);
-                            if (node instanceof GUIBranchNode) {
-                                selectBranchNode((GUIBranchNode) node);
-                            }
-                        }
-                    } else {
-                        TreePath tp = new TreePath(delegateModel
-                                .getProofTreeNode(invokedNode).getPath());
-                        delegateView.scrollPathToVisible(tp);
-                        delegateView.setSelectionPath(tp);
-                    }
-                }
-            } else {
-                TreePath tp = new TreePath(
-                    delegateModel.getProofTreeNode(invokedNode).getPath());
-                delegateView.scrollPathToVisible(tp);
-                delegateView.setSelectionPath(tp);
+            selectedPath = new TreePath(delegateModel.getProofTreeNode(invokedNode).getPath());
+            if (lastPathComponent instanceof GUIOneStepChildTreeNode) {
+                selectedPath = selectedPath.pathByAddingChild(lastPathComponent);
             }
         }
+
+        delegateView.setSelectionPath(selectedPath);
+        delegateView.scrollPathToVisible(selectedPath);
 
         // Expand previously visible rows.
         for (TreePath tp : rowsToExpand) {
             TreePath newTp = delegateView.getPathForRow(0);
             for (int i = 1; i < tp.getPathCount(); i++) {
-                Node n = ((GUIBranchNode) tp.getPathComponent(i)).getNode();
-                newTp = newTp.pathByAddingChild(
-                    delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+                if (tp.getPathComponent(i) instanceof GUIBranchNode pathComp) {
+                    final Node n = pathComp.getNode();
+                    newTp = newTp.pathByAddingChild(
+                        delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+                }
             }
             delegateView.expandPath(newTp);
         }
         return true;
+    }
+
+    /**
+     * if invoked node is modelled as branch node, select the branch node
+     *
+     * @param invokedNode the selected node in the proof
+     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an
+     *        associated branch node
+     * @return the path to the branch node if available otherwise {@code defaultPath}
+     */
+    private TreePath getPathForBranchNode(Node invokedNode, TreePath defaultPath) {
+        if (delegateModel.getRoot() instanceof GUIBranchNode rootNode) {
+            final TreeNode node = rootNode.findBranch(invokedNode);
+            if (node instanceof GUIBranchNode childAsBranchNode &&
+                    !(defaultPath.getLastPathComponent() instanceof GUIOneStepChildTreeNode)) {
+                return selectBranchNode(childAsBranchNode);
+            }
+        }
+        return defaultPath;
     }
 
     @NonNull
@@ -940,15 +945,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             TreePath newTP = e.getNewLeadSelectionPath();
-            delegateModel.storeSelection(newTP);
-
 
             if (treeNode.getNode().proof().isDisposed()) {
                 setProof(null);
                 return;
             }
+
             if (treeNode instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode) treeNode);
+                newTP = selectBranchNode((GUIBranchNode) treeNode);
             } else {
                 Node node = treeNode.getNode();
                 Goal selected = proof.getOpenGoal(node);
@@ -964,14 +968,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
                             .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
                         ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
-
-                    // ensure the proper node is selected in the tree
-                    ignoreChange = true;
-                    delegateView.setSelectionPath(newTP);
-                    ignoreChange = false;
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
+            }
+            // ensure the proper node is selected in the tree
+            if (newTP != null && !newTP.equals(e.getNewLeadSelectionPath())) {
+                ignoreChange = true;
+                delegateView.setSelectionPath(newTP);
+                ignoreChange = false;
             }
         }
     }
@@ -1284,5 +1289,21 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return (treeNode instanceof GUIAbstractTreeNode)
                 ? ((GUIAbstractTreeNode) treeNode).getNode()
                 : null;
+    }
+
+    /**
+     * Record used to store the state of the proof tree view for a particular proof such that it can
+     * be stored and
+     * restored when switching proofs
+     *
+     * @param model the {@link GUIProofTreeModel} of the proof
+     * @param expansionState the expanded tree paths
+     * @param selectionPath the path to the currently selected node
+     * @param scrollState the state of the scroll pane
+     */
+    record ProofTreeViewState(GUIProofTreeModel model,
+            Collection<TreePath> expansionState,
+            TreePath selectionPath,
+            Integer scrollState) {
     }
 }

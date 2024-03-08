@@ -34,7 +34,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
@@ -67,7 +68,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private static class SubFormulaVisitor extends DefaultVisitor {
+    private static class SubFormulaVisitor implements DefaultVisitor {
 
         final Term potentialSub;
 
@@ -81,7 +82,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            isSubFormula |= visited.equalsModRenaming(potentialSub);
+            var term = (Term) visited;
+            isSubFormula |= term.equalsModRenaming(potentialSub);
         }
 
 

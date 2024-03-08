@@ -7,9 +7,10 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+
+import org.key_project.logic.op.Function;
 
 // W I P
 public class SumProdHandler implements SMTHandler {

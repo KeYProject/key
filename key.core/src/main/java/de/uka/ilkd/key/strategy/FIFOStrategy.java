@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -28,7 +30,8 @@ public class FIFOStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());
     }
 

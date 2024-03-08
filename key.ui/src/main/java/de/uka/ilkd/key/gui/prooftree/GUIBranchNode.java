@@ -2,53 +2,42 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
-/**
- * this class implements a TreeModel that can be displayed using the JTree class framework
- */
 
+import java.util.ArrayList;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * this class implements a TreeModel that can be displayed using the JTree class framework
+ */
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
     private final Object label;
+
+    private ArrayList<TreeNode> childrenCache = null;
+
 
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
         super(tree, subTree);
         this.label = label;
     }
 
-
-    private TreeNode[] childrenCache = null;
-
-    private void createChildrenCache() {
-        childrenCache = new TreeNode[getChildCountHelp()];
-    }
-
+    @Override
     public TreeNode getChildAt(int childIndex) {
-        fillChildrenCache();
-        return childrenCache[childIndex];
-
-        /*
-         * int count = 0; Node n = subTree; while ( childIndex != count && n.childrenCount() == 1 )
-         * { count++; n = n.child(0); } if ( childIndex == count ) { return getProofTreeModel
-         * ().getProofTreeNode(n); } else { return findBranch ( n.child(childIndex-count-1) ); }
-         */
+        ensureChildrenCacheExists();
+        return childrenCache.get(childIndex);
     }
 
-    private void fillChildrenCache() {
+    private void ensureChildrenCacheExists() {
         if (childrenCache == null) {
-            createChildrenCache();
-        }
-
-        if (childrenCache.length == 0 || childrenCache[0] != null) {
+            childrenCache = new ArrayList<>();
+        } else {
             return;
         }
 
-        int count = 0;
         Node n = getNode();
 
         if (n == null) {
@@ -56,9 +45,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         while (true) {
-            childrenCache[count] = getProofTreeModel().getProofTreeNode(n);
-            count++;
+            childrenCache.add(getProofTreeModel().getProofTreeNode(n));
             Node nextN = findChild(n);
+            // skip nodes that are hidden in the proof tree
             while (nextN != null && nextN.isHideInProofTree()) {
                 nextN = findChild(nextN);
             }
@@ -71,8 +60,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
                     && !n.child(i).isHideInProofTree()) {
-                childrenCache[count] = findBranch(n.child(i));
-                count++;
+                childrenCache.add(findBranch(n.child(i)));
             }
         }
     }
@@ -90,39 +78,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
     public int getChildCount() {
         if (childrenCache == null) {
-            createChildrenCache();
+            ensureChildrenCacheExists();
         }
-        return childrenCache.length;
-    }
-
-    private int getChildCountHelp() {
-        int count = 0;
-        Node n = getNode();
-
-        if (n == null) {
-            return 0;
-        }
-
-        while (true) {
-            count++;
-            Node nextN = findChild(n);
-            while (nextN != null && nextN.isHideInProofTree()) {
-                nextN = findChild(nextN);
-            }
-            if (nextN == null) {
-                break;
-            }
-            n = nextN;
-        }
-
-        for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
-                    && !n.child(i).isHideInProofTree()) {
-                count++;
-            }
-        }
-
-        return count;
+        return childrenCache.size();
     }
 
 

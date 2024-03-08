@@ -3,20 +3,37 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Named;
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
 public interface Strategy extends Named, Feature {
     /**
-     * Checks if the {@link Strategy} should stop at the first non closeable {@link Goal}.
+     * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
+     *
+     * @param app the RuleApp
+     * @param pos position where <code>app</code> is to be applied
+     * @param goal the goal on which <code>app</code> is to be applied
+     * @return the cost of the rule application expressed as a
+     *         <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
+     *         indicates that the rule shall not be applied at all (it is discarded by
+     *         the strategy).
+     */
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return computeCost(app, pos, goal, new MutableState());
+    }
+
+    /**
+     * Checks if the {@link Strategy} should stop at the first non-closeable {@link Goal}.
      *
      * @return {@code true} stop, {@code false} continue on other {@link Goal}s.
      */

@@ -40,7 +40,7 @@ public interface SettingsProvider {
      * @param window non-null reference
      * @return
      */
-    JComponent getPanel(MainWindow window);
+    JPanel getPanel(MainWindow window);
 
     /**
      * Provides the visual component for the right side.

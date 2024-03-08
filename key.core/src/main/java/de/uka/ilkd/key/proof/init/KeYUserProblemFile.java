@@ -105,7 +105,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
         // read key file itself (except contracts)
-        super.readExtendedSignature();
+        warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
@@ -127,10 +127,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         if (initConfig == null) {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
-
-        readSorts();
-        readFuncAndPred();
-        readRules();
 
         try {
             problem = getProblemFinder().getProblem();

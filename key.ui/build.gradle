@@ -20,15 +20,16 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.2'
+    api 'com.miglayout:miglayout-swing:11.3'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.4.11'
+    implementation 'ch.qos.logback:logback-classic:1.5.0'
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
+    runtimeOnly project(":keyext.caching")
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")

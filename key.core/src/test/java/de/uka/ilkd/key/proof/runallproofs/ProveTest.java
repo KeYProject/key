@@ -14,10 +14,12 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +48,12 @@ public class ProveTest {
 
     protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
-    protected final String statisticsFile = "tmp.csv";
+    protected String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
-    protected final boolean reloadEnabled = false;
+    protected boolean reloadEnabled = false;
     protected String tempDir = "/tmp";
-    protected final String globalSettings = "";
-    protected final String localSettings = "";
+    protected String globalSettings = "";
+    protected String localSettings = "";
     private StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {
@@ -72,10 +74,10 @@ public class ProveTest {
 
     private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
-        if (localSettings != null && !localSettings.isEmpty()) {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(globalSettings);
+        if (localSettings != null && !"".equals(localSettings)) {
             // local settings must be complete to have desired effect
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(localSettings);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
         }
 
         File keyFile = new File(file);
@@ -153,7 +155,7 @@ public class ProveTest {
         if (reloadEnabled) {
             System.err.println("Test reloadability.");
             // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
+            ProofSaver.saveToFile(proofFile, loadedProof);
             boolean reloadedClosed = reloadProof(proofFile);
 
             assertEquals(loadedProof.closed(), reloadedClosed,

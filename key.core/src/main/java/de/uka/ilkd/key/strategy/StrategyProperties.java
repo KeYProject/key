@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import de.uka.ilkd.key.settings.Configuration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,7 @@ public final class StrategyProperties extends Properties {
     public static final String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public static final String LOOP_EXPAND = "LOOP_EXPAND";
     public static final String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; // Used for test
-                                                                            // generation chrisg
+    // generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
     public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public static final String LOOP_SCOPE_INV_TACLET = "LOOP_SCOPE_INV_TACLET";
@@ -149,12 +151,12 @@ public final class StrategyProperties extends Properties {
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF =
         "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
 
-    private static final long serialVersionUID = -4647245742912258421L;
+    private static final String CATEGORY = "StrategyProperty";
 
     /**
      * Section key for storage file to identify strategy settings
      */
-    private static final String STRATEGY_PROPERTY = "[StrategyProperty]";
+    private static final String STRATEGY_PROPERTY = "[" + CATEGORY + "]";
 
     private static final String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
 
@@ -182,7 +184,6 @@ public final class StrategyProperties extends Properties {
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
-
 
     private static final Properties DEFAULT_MAP = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategyProperties.class);
@@ -370,6 +371,29 @@ public final class StrategyProperties extends Properties {
         return null;
     }
 
+    public static StrategyProperties read(Configuration category) {
+        category = category.getOrCreateSection("options");
+        StrategyProperties sp = new StrategyProperties();
+        for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
+            final var def = entry.getValue();
+            final var obj = category.get(entry.getKey().toString());
+            if (obj != null && def.getClass() == obj.getClass()) {
+                sp.put(entry.getKey(), obj);
+            }
+        }
+        return sp;
+    }
+
+    public void write(Configuration category) {
+        category = category.getOrCreateSection("options");
+        for (Map.Entry<Object, Object> entry : entrySet()) {
+            final var value = entry.getValue();
+            if (value != null) {
+                category.set(entry.getKey().toString(), value);
+            }
+        }
+    }
+
 
     public String getProperty(String key) {
         String val = super.getProperty(key);
@@ -431,4 +455,6 @@ public final class StrategyProperties extends Properties {
         }
         return result;
     }
+
+
 }

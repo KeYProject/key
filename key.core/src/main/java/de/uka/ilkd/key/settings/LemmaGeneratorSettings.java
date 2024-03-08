@@ -6,10 +6,11 @@ package de.uka.ilkd.key.settings;
 import java.util.Properties;
 
 public class LemmaGeneratorSettings extends AbstractSettings {
+    public static final String CATEGORY = "LemmaGenerator";
     private static final String SHOW_DIALOG_ADDING_AXIOMS =
-        "[LemmaGenerator]showDialogWhenAddingAxioms";
+        "showDialogWhenAddingAxioms";
     private static final String SHOW_DIALOG_USING_AXIOMS =
-        "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
+        "showDialogWhenUsingTacletsAsAxioms";
 
     private boolean showDialogAddingAxioms = true;
     private boolean showDialogUsingAxioms = true;
@@ -36,13 +37,33 @@ public class LemmaGeneratorSettings extends AbstractSettings {
 
     @Override
     public void readSettings(Properties props) {
-        setShowDialogAddingAxioms(SettingsConverter.read(props, SHOW_DIALOG_ADDING_AXIOMS, true));
-        setShowDialogUsingAxioms(SettingsConverter.read(props, SHOW_DIALOG_USING_AXIOMS, true));
+        setShowDialogAddingAxioms(SettingsConverter.read(props,
+            "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS, true));
+        setShowDialogUsingAxioms(SettingsConverter.read(props,
+            "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, true));
     }
 
     @Override
     public void writeSettings(Properties props) {
-        SettingsConverter.store(props, SHOW_DIALOG_ADDING_AXIOMS, showDialogAddingAxioms);
-        SettingsConverter.store(props, SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
+        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS,
+            showDialogAddingAxioms);
+        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS,
+            showDialogUsingAxioms);
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        var cat = props.getSection(CATEGORY);
+        if (cat == null)
+            return;
+        setShowDialogAddingAxioms(cat.getBool(SHOW_DIALOG_ADDING_AXIOMS, true));
+        setShowDialogUsingAxioms(cat.getBool(SHOW_DIALOG_USING_AXIOMS, true));
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var cat = props.getOrCreateSection(CATEGORY);
+        cat.set(SHOW_DIALOG_ADDING_AXIOMS, showDialogAddingAxioms);
+        cat.set(SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
     }
 }

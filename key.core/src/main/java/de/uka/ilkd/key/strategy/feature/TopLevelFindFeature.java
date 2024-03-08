@@ -76,7 +76,7 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
         }
     };
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return checkPosition(pos);
     }

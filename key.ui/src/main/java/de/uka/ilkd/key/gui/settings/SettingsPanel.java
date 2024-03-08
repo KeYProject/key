@@ -187,6 +187,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
+     * Adds a new combobox to the panel.
+     *
      * @param title label of the combo box
      * @param info help text
      * @param selectionIndex which item to initially select

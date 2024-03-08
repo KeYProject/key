@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
@@ -51,6 +51,7 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Tracks proof steps as they are applied on the proof.
@@ -92,6 +93,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // skip further tracking if disabled
         if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
             return;
+        }
+        // exotic use case: registering a dependency tracker after the proof is loaded
+        if (proof.countNodes() > 1) {
+            graph.ensureProofIsTracked(proof);
         }
         proof.addRuleAppListener(this);
     }
@@ -172,13 +177,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
 
         // determine for each instantiated schema variable which node first introduced that variable
-        if (ruleApp instanceof TacletApp) {
-            TacletApp t = (TacletApp) ruleApp;
+        if (ruleApp instanceof TacletApp t) {
             var it = t.instantiations().pairIterator();
             while (it.hasNext()) {
                 var x = it.next();
-                var y = x.value();
-                var z = y.getInstantiation();
+                InstantiationEntry<?> y = x.value();
+                Object z = y.getInstantiation();
                 if (z instanceof Term) {
                     z = ((Term) z).op();
                 }
@@ -187,8 +191,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     Operator finalZ = (Function) z;
                     if (input.stream().anyMatch(form -> {
                         var graphNode = form.first;
-                        if (graphNode instanceof TrackedFormula) {
-                            TrackedFormula tf = (TrackedFormula) graphNode;
+                        if (graphNode instanceof TrackedFormula tf) {
                             OpCollector op = new OpCollector();
                             tf.formula.formula().execPreOrder(op);
                             return op.contains(finalZ);
@@ -309,16 +312,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // record any rules added by this rule application
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             for (NoPosTacletApp newRule : newNode.getNode().getLocalIntroducedRules()) {
-                if (newRule.rule() instanceof Taclet taclet) {
-                    final var justification =
-                        newNode.getNode().proof().getInitConfig().getJustifInfo()
-                                .getJustification(taclet);
-                    if (justification instanceof RuleJustificationByAddRules justAddRule &&
-                            justAddRule.node() == n) {
-                        AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
-                        output.add(ruleNode);
-                        dynamicRules.put((Taclet) newRule.rule(), ruleNode);
-                    }
+                final var justification =
+                    newNode.getNode().proof().getInitConfig().getJustifInfo()
+                            .getJustification(newRule.taclet());
+                if (justification instanceof RuleJustificationByAddRules justAddRule &&
+                        justAddRule.node() == n) {
+                    AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
+                    output.add(ruleNode);
+                    dynamicRules.put((Taclet) newRule.rule(), ruleNode);
                 }
             }
         }
@@ -393,17 +394,16 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         List<GraphNode> output = new ArrayList<>();
 
         // record any rules added by this rule application
-        for (Node newNode : goalList) {
+        for (final Node newNode : goalList) {
             for (NoPosTacletApp newRule : newNode.getLocalIntroducedRules()) {
-                if (newRule.rule() instanceof Taclet taclet) {
-                    var justification =
-                        newNode.proof().getInitConfig().getJustifInfo().getJustification(taclet);
-                    if (justification instanceof RuleJustificationByAddRules justAddRule
-                            && justAddRule.node() == n) {
-                        AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
-                        output.add(ruleNode);
-                        dynamicRules.put((Taclet) newRule.rule(), ruleNode);
-                    }
+                final Taclet newTaclet = newRule.taclet();
+                var justification =
+                    newNode.proof().getInitConfig().getJustifInfo().getJustification(newTaclet);
+                if (justification instanceof RuleJustificationByAddRules justAddRule
+                        && justAddRule.node() == n) {
+                    AddedRule ruleNode = new AddedRule(newTaclet.name().toString());
+                    output.add(ruleNode);
+                    dynamicRules.put(newTaclet, ruleNode);
                 }
             }
         }
@@ -472,11 +472,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * See {@link DotExporter}.
      *
      * @param abbreviateFormulas whether to shorten formula labels
+     * @param abbreviateChains whether to reduce long chains to one link
      * @return DOT string
      */
-    public String exportDot(boolean abbreviateFormulas) {
-        return DotExporter.exportDot(proof, graph.getInternalGraph(), analysisResults,
-            abbreviateFormulas);
+    public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
+        return DotExporter.exportDot(proof, abbreviateChains ? graph.removeChains() : graph,
+            analysisResults, abbreviateFormulas);
     }
 
     /**

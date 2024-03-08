@@ -19,19 +19,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.replay.AbstractProofReplayer;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Proof slicer: constructs a new proof based on the original proof by omitting some steps that
@@ -109,7 +105,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
                 "Preparing proof slicing", 2);
         }
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        originalProof.saveProofObligationToFile(tmpFile.toFile());
+        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), originalProof);
         if (progressMonitor != null) {
             progressMonitor.setProgress(1);
         }
@@ -235,17 +231,23 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             // proofs)
             filename = MiscTools.toValidFileName(filename);
         }
-        int prevSlice = filename.indexOf("_slice");
+        String sliceSuffix = "_slice";
+        int prevSlice = filename.indexOf(sliceSuffix);
         if (prevSlice != -1) {
-            int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
-            sliceNr++;
-            filename = filename.substring(0, prevSlice) + "_slice" + sliceNr;
+            var slicingIteration = filename.substring(prevSlice + sliceSuffix.length());
+            if (slicingIteration.matches("\\d+")) {
+                int sliceNr = Integer.parseInt(slicingIteration);
+                sliceNr++;
+                filename = filename.substring(0, prevSlice) + sliceSuffix + sliceNr;
+            } else {
+                filename = filename + sliceSuffix + "1";
+            }
         } else {
-            filename = filename + "_slice1";
+            filename = filename + sliceSuffix + "1";
         }
         filename = filename + ".proof";
         File tempFile = tempDir.resolve(filename).toFile();
-        proof.saveToFile(tempFile);
+        ProofSaver.saveToFile(tempFile, proof);
         proof.dispose();
         return tempFile;
     }

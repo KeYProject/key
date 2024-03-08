@@ -9,15 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
@@ -327,8 +327,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @param preferences The preferences to load.
      */
     private void loadPreferences(String preferences) {
-        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
-        proofSettings.loadSettingsFromString(preferences);
+        final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+        proofSettings.loadSettingsFromPropertyString(preferences);
     }
 
     /**

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.settings;
 import java.util.Objects;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.logic.Name;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,11 @@ import org.slf4j.LoggerFactory;
 public class StrategySettings extends AbstractSettings {
     public static final Logger LOGGER = LoggerFactory.getLogger(StrategySettings.class);
 
-    public static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
-    public static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
-    public static final String TIMEOUT_KEY = "[Strategy]Timeout";
+    public static final String CATEGORY = "Strategy";
+
+    public static final String STRATEGY_KEY = "ActiveStrategy";
+    public static final String STEPS_KEY = "MaximumNumberOfAutomaticApplications";
+    public static final String TIMEOUT_KEY = "Timeout";
     private static final String PROP_STRATEGY_PROPERTIES = "strategyProperties";
 
 
@@ -33,7 +36,7 @@ public class StrategySettings extends AbstractSettings {
     /**
      * maximal number of automatic rule applications before an interaction is required
      */
-    private int maxSteps = -1;
+    private int maxSteps = 10000;
 
     /**
      * maximal time in ms after which automatic rule application is aborted
@@ -101,9 +104,9 @@ public class StrategySettings extends AbstractSettings {
      * @see de.uka.ilkd.key.gui.Settings#readSettings(java.util.Properties)
      */
     public void readSettings(Properties props) {
-        String numString = props.getProperty(STEPS_KEY);
-        String strategyString = props.getProperty(STRATEGY_KEY);
-        String timeoutString = props.getProperty(TIMEOUT_KEY);
+        String numString = props.getProperty("[" + CATEGORY + "]" + STEPS_KEY);
+        String strategyString = props.getProperty("[" + CATEGORY + "]" + STRATEGY_KEY);
+        String timeoutString = props.getProperty("[" + CATEGORY + "]" + TIMEOUT_KEY);
 
         long localTimeout = -1;
         int numSteps = 10000;
@@ -167,10 +170,59 @@ public class StrategySettings extends AbstractSettings {
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
-        props.setProperty(STRATEGY_KEY, getStrategy().toString());
-        props.setProperty(STEPS_KEY, String.valueOf(getMaxSteps()));
+        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
+        props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
+        props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
+        strategyProperties.write(props);
+    }
 
-        props.setProperty(TIMEOUT_KEY, String.valueOf(getTimeout()));
+    @Override
+    public void readSettings(Configuration props) {
+        props = props.getSection(CATEGORY);
+        if (props == null) {
+            return;
+        }
+
+        try {
+            setMaxSteps(props.getInt(STEPS_KEY));
+        } catch (NumberFormatException | NullPointerException e) {
+            LOGGER.debug("StrategySettings: failure while converting the string "
+                + "with the allowed steps of heuristics applications to int."
+                + "Use default value 1000 instead."
+                + "\nThe String that has been tried to convert was {}", props.get(STEPS_KEY));
+        }
+
+        try {
+            setTimeout(props.getInt(TIMEOUT_KEY));
+        } catch (NumberFormatException | NullPointerException e) {
+            LOGGER.debug("StrategySettings: failure while converting the string "
+                + "with rule application timeout. "
+                + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
+        }
+
+        // set active strategy
+        var strategy = props.getString(STRATEGY_KEY);
+        if (strategy != null) {
+            activeStrategy = new Name(strategy);
+        }
+
+        setStrategyProperties(StrategyProperties.read(props));
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        props = props.getOrCreateSection(CATEGORY);
+        if (getStrategy() == null) {
+            setStrategy(JavaCardDLStrategyFactory.NAME);
+        }
+        if (maxSteps < 0) {
+            setMaxSteps(10000);
+        }
+
+        props.set(STRATEGY_KEY, getStrategy().toString());
+        props.set(STEPS_KEY, getMaxSteps());
+        props.set(TIMEOUT_KEY, getTimeout());
+
         strategyProperties.write(props);
     }
 

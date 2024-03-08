@@ -31,12 +31,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 /**
  * This class encapsulates the matching logic for taclet's.
@@ -219,11 +219,10 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     /**
      * (non-Javadoc)
      *
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term,
-     *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see TacletMatcher#matchIf(ImmutableArray, Term, MatchConditions, Services)
      */
     @Override
-    public IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
+    public IfMatchResult matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services) {
         ImmutableList<IfFormulaInstantiation> resFormulas =
             ImmutableSLList.nil();

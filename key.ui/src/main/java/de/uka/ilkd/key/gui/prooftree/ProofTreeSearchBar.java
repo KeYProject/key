@@ -11,7 +11,8 @@ import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -71,11 +72,12 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
             tp = new TreePath(node.getPath());
         }
         if (node instanceof GUIBranchNode) {
-            this.proofTreeView.selectBranchNode((GUIBranchNode) node);
-        } else {
-            this.proofTreeView.delegateView.scrollPathToVisible(tp);
-            this.proofTreeView.delegateView.setSelectionPath(tp);
+            tp = this.proofTreeView.selectBranchNode((GUIBranchNode) node);
         }
+
+        this.proofTreeView.delegateView.scrollPathToVisible(tp);
+        this.proofTreeView.delegateView.setSelectionPath(tp);
+
         return currentRow != -1;
     }
 

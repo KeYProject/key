@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
 
 /**
  * Projection of taclet apps to the instantiation of a schema variable. The projection can either be
@@ -31,7 +33,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         if (!(app instanceof final TacletApp tapp)) {
             Debug.fail("Projection is only applicable to taclet apps," + " but got " + app);
             throw new IllegalArgumentException(

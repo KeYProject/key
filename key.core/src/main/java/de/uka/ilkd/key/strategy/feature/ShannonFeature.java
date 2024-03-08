@@ -46,11 +46,12 @@ public class ShannonFeature implements Feature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (cond.computeCost(app, pos, goal).equals(trueCost)) {
-            return thenFeature.computeCost(app, pos, goal);
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        if (cond.computeCost(app, pos, goal, mState).equals(trueCost)) {
+            return thenFeature.computeCost(app, pos, goal, mState);
         } else {
-            return elseFeature.computeCost(app, pos, goal);
+            return elseFeature.computeCost(app, pos, goal, mState);
         }
     }
 

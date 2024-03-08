@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
@@ -24,6 +24,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -106,13 +107,14 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         d.clear(getHeuristic(ruleSet));
     }
 
-    private final BackTrackingManager btManager = new BackTrackingManager();
 
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {
+        final MutableState mState = new MutableState();
+        final BackTrackingManager btManager = mState.getBacktrackingManager();
         btManager.setup(app);
         do {
-            final RuleAppCost cost = instantiateApp(app, pio, goal);
+            final RuleAppCost cost = instantiateApp(app, pio, goal, mState);
             if (cost instanceof TopRuleAppCost) {
                 continue;
             }
@@ -124,14 +126,15 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         } while (btManager.backtrack());
     }
 
-    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal);
+    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+            MutableState mState);
 
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
-        return ForEachCP.create(x, gen, body, btManager);
+        return ForEachCP.create(x, gen, body);
     }
 
     protected Feature oneOf(Feature[] features) {
-        return OneOfCP.create(features, btManager);
+        return OneOfCP.create(features);
     }
 
     protected Feature oneOf(Feature feature0, Feature feature1) {
@@ -154,7 +157,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if (instantiateActive) {
-            return SVInstantiationCP.create(sv, value, btManager);
+            return SVInstantiationCP.create(sv, value);
         } else {
             return longConst(0);
         }
@@ -162,7 +165,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
         if (instantiateActive) {
-            return SVInstantiationCP.createTriggeredVarCP(value, btManager);
+            return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
             return longConst(0);
         }

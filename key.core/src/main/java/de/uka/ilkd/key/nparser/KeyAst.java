@@ -4,12 +4,14 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URL;
+import java.util.List;
 
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
 
@@ -58,10 +60,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.preferences() != null) {
-                String text =
-                    StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
-                settings.loadSettingsFromString(text);
+
+            if (ctx.preferences() != null && ctx.preferences().s != null) {
+                String text = StringUtil.trim(ctx.preferences().s.getText(), '"')
+                        .replace("\\\\:", ":");
+                settings.loadSettingsFromPropertyString(text);
+            } else if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
             }
             return settings;
         }
@@ -127,6 +134,22 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class ConfigurationFile extends KeyAst<KeYParser.CfileContext> {
+        ConfigurationFile(KeYParser.CfileContext ctx) {
+            super(ctx);
+        }
+
+        public Configuration asConfiguration() {
+            final var cfg = new ConfigurationBuilder();
+            List<Object> res = cfg.visitCfile(ctx);
+            if (!res.isEmpty())
+                return (Configuration) res.get(0);
+            else
+                throw new RuntimeException();
+        }
+    }
+
+
     public static class Term extends KeyAst<KeYParser.TermContext> {
         Term(KeYParser.TermContext ctx) {
             super(ctx);
@@ -136,6 +159,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
+        public Taclet(KeYParser.TacletContext taclet) {
+            super(taclet);
         }
     }
 }

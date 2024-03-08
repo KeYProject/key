@@ -10,9 +10,17 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 public class ExtensionSettings extends AbstractPropertiesSettings {
-    public final static String KEY_DISABLED = "[Extensions]disabled";
+    private static final String NAME = "Extensions";
+    public static final String KEY_DISABLED = "disabled";
+    /**
+     * Class names of disabled extensions.
+     */
     private final PropertyEntry<Set<String>> forbiddenClasses =
         createStringSetProperty(KEY_DISABLED, "");
+
+    public ExtensionSettings() {
+        super(NAME);
+    }
 
     public Collection<String> getForbiddenClasses() {
         return forbiddenClasses.get();

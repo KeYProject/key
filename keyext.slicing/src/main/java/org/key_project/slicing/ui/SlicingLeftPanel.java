@@ -40,11 +40,8 @@ import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.slicing.graph.AnnotatedEdge;
-import org.key_project.slicing.graph.DotExporter;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
-import org.key_project.util.collection.GraphUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
@@ -94,10 +91,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private JButton showGraphRendering = null;
     /**
-     * "Show rendering of graph (shortened)" button.
-     */
-    private JButton showGraphRenderingShort = null;
-    /**
      * "Slice proof" button.
      */
     private JButton sliceProof = null;
@@ -145,6 +138,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Checkbox to abbreviate formulas in DOT output.
      */
     private JCheckBox abbreviateFormulas = null;
+    /**
+     * Checkbox to shorten chains in DOT output.
+     */
+    private JCheckBox abbreviateChains = null;
     /**
      * Checkbox to enable the dependency analysis algorithm.
      */
@@ -293,20 +290,22 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
 
-        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
+        abbreviateFormulas = new JCheckBox("Abbreviate node labels");
+        abbreviateFormulas.setToolTipText("Replace node labels with their hash value.");
+        abbreviateChains = new JCheckBox("Shorten long chains");
+        abbreviateChains.setToolTipText("""
+                Collapse long chains when rendering the graph.
+                 When enabled: dependency graph nodes with both input and output degree equal to one
+                 will be collapsed.
+                 These shortened edges are labeled by: initial step ... last step""");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
         showGraphRendering.addActionListener(this::previewGraph);
-        showGraphRenderingShort = new JButton("Show rendering of graph (shortened)");
-        showGraphRenderingShort.addActionListener(this::previewGraphShort);
 
         if (!GraphvizDotExecutor.isDotInstalled()) {
             showGraphRendering.setEnabled(false);
-            showGraphRenderingShort.setEnabled(false);
             showGraphRendering.setToolTipText(
-                "Install graphviz (dot) to enable graph rendering functionality.");
-            showGraphRenderingShort.setToolTipText(
                 "Install graphviz (dot) to enable graph rendering functionality.");
         }
 
@@ -315,15 +314,16 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         resetGraphLabels();
 
         abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
+        abbreviateChains.setAlignmentX(Component.LEFT_ALIGNMENT);
         dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
         showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel1.add(graphNodes);
         panel1.add(graphEdges);
         panel1.add(abbreviateFormulas);
+        panel1.add(abbreviateChains);
         panel1.add(dotExport);
         panel1.add(showGraphRendering);
-        panel1.add(showGraphRenderingShort);
 
         return panel1;
     }
@@ -361,7 +361,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 String text = extension.trackers.get(currentProof)
-                        .exportDot(abbreviateFormulas.isSelected());
+                        .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
                 writer.write(text);
             } catch (IOException e) {
                 LOGGER.error("failed to export DOT file", e);
@@ -387,17 +387,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             return;
         }
         String text = extension.trackers.get(currentProof)
-                .exportDot(abbreviateFormulas.isSelected());
-        new PreviewDialog(MainWindow.getInstance(), text);
-    }
-
-    private void previewGraphShort(ActionEvent e) {
-        if (currentProof == null) {
-            return;
-        }
-        var g = extension.trackers.get(currentProof).getDependencyGraph().getInternalGraph();
-        GraphUtil.collapseChains(g, q -> new AnnotatedEdge(q.fourth().getProofStep(), false));
-        String text = DotExporter.exportDot2(g);
+                .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
@@ -590,8 +580,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             dotExport.setToolTipText(noProof);
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(noProof);
-            showGraphRenderingShort.setEnabled(false);
-            showGraphRenderingShort.setToolTipText(noProof);
             runAnalysis.setEnabled(false);
             runAnalysis.setToolTipText(noProof);
             showRuleStatistics.setEnabled(false);

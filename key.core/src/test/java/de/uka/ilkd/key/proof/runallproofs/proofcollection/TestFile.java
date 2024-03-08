@@ -17,10 +17,12 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,9 +144,9 @@ public class TestFile implements Serializable {
 
             // Initialize KeY settings.
             String gks = settings.getGlobalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(gks);
             String lks = settings.getLocalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(lks);
 
             // Name resolution for the available KeY file.
             File keyFile = getKeYFile();
@@ -203,7 +205,8 @@ public class TestFile implements Serializable {
 
                 if (testProperty == TestProperty.PROVABLE
                         || testProperty == TestProperty.NOTPROVABLE) {
-                    loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+                    ProofSaver.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"),
+                        loadedProof);
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
@@ -247,7 +250,7 @@ public class TestFile implements Serializable {
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
+            ProofSaver.saveToFile(proofFile, loadedProof);
             reloadProof(proofFile);
             if (verbose) {
                 LOGGER.debug("... success: reloaded.");
