@@ -7,25 +7,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
 
 public class ProofRegroupSettings extends AbstractPropertiesSettings {
-    private static final String PREFIX = "[ProofRegrouping]Group";
+    private static final String CATEGORY = "ProofRegrouping";
     private static final List<String> DEFAULT_GROUPS = List.of("Propositional expansion",
         "Negation/conjunctive normal form", "Polynomial/inequation normal form", "Simplification");
 
     private final List<PropertyEntry<String>> groups = new ArrayList<>();
 
+    public ProofRegroupSettings() {
+        super(CATEGORY);
+    }
+
     @Override
-    public void readSettings(Properties props) {
-        for (var key : props.keySet()) {
-            var k = (String) key;
-            var v = props.get(k);
-            if (k.startsWith(PREFIX)) {
-                var groupName = k.substring(PREFIX.length());
-                var prop = createStringProperty(PREFIX + groupName, "");
+    public void readSettings(Configuration configuration) {
+        var cat = configuration.getSection(category);
+        if (cat != null) {
+            for (var entry : cat.getEntries()) {
+                var groupName = entry.getKey();
+                var v = entry.getValue();
+                var prop = createStringProperty(groupName, "");
                 prop.set((String) v);
                 groups.add(prop);
             }
@@ -50,12 +54,12 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
     }
 
     public void addGroup(String name, List<String> ruleSets) {
-        groups.add(createStringProperty(PREFIX + name, String.join(",", ruleSets)));
+        groups.add(createStringProperty(name, String.join(",", ruleSets)));
     }
 
     public void updateGroup(String name, List<String> ruleSets) {
         for (var prop : groups) {
-            if (prop.getKey().equals(PREFIX + name)) {
+            if (prop.getKey().equals(name)) {
                 prop.set(String.join(",", ruleSets));
             }
         }
@@ -64,7 +68,7 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
     public Map<String, List<String>> getGroups() {
         Map<String, List<String>> m = new HashMap<>();
         for (var pe : groups) {
-            var name = pe.getKey().substring(PREFIX.length());
+            var name = pe.getKey();
             m.put(name, List.of(pe.get().split(",")));
         }
         return m;
@@ -73,7 +77,7 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
     public Map<String, List<String>> getUserGroups() {
         Map<String, List<String>> m = new HashMap<>();
         for (var pe : groups) {
-            var name = pe.getKey().substring(PREFIX.length());
+            var name = pe.getKey();
             if (DEFAULT_GROUPS.contains(name)) {
                 continue;
             }
@@ -85,13 +89,12 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
     public void removeGroup(String name) {
         PropertyEntry<String> toRemove = null;
         for (var pe : groups) {
-            if (pe.getKey().substring(PREFIX.length()).equals(name)) {
+            if (pe.getKey().equals(name)) {
                 toRemove = pe;
                 break;
             }
         }
         groups.remove(toRemove);
         propertyEntries.remove(toRemove);
-        properties.remove(toRemove);
     }
 }

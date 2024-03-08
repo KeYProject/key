@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.DependencyGraph;
@@ -47,12 +46,12 @@ public final class ProofReorder {
 
         Set<BranchLocation> done = new HashSet<>();
 
-        Deque<Pair<BranchLocation, Node>> todo = new ArrayDeque<>();
-        todo.add(new Pair<>(BranchLocation.ROOT, proof.root()));
+        Deque<BranchTodo> todo = new ArrayDeque<>();
+        todo.add(new BranchTodo(BranchLocation.ROOT, proof.root()));
         while (!todo.isEmpty()) {
             var t = todo.pop();
-            var loc = t.first;
-            var root = t.second;
+            var loc = t.location;
+            var root = t.rootNode;
             if (done.contains(loc)) {
                 continue;
             }
@@ -142,7 +141,8 @@ public final class ProofReorder {
                     var c = last.childrenCount();
                     c--;
                     while (c >= 0) {
-                        todo.addFirst(new Pair<>(last.child(c).getBranchLocation(), last.child(c)));
+                        todo.addFirst(
+                            new BranchTodo(last.child(c).getBranchLocation(), last.child(c)));
                         c--;
                     }
                     newOrder.add(last);
@@ -157,7 +157,7 @@ public final class ProofReorder {
 
         ProblemLoaderControl control = new DefaultUserInterfaceControl();
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        proof.saveProofObligationToFile(tmpFile.toFile());
+        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), proof);
 
         String bootClassPath = proof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
@@ -172,7 +172,7 @@ public final class ProofReorder {
         // Files.delete(tmpFile);
         Proof newProof = problemLoader.getProof();
         new ReorderingReplayer(proof, newProof, steps).copy();
-        newProof.saveToFile(tmpFile.toFile());
+        ProofSaver.saveToFile(tmpFile.toFile(), newProof);
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.startInterface(true);
 
@@ -181,5 +181,8 @@ public final class ProofReorder {
         // user already knows about any warnings
         problemLoader2.setIgnoreWarnings(true);
         problemLoader2.runAsynchronously();
+    }
+
+    private record BranchTodo(BranchLocation location, Node rootNode) {
     }
 }

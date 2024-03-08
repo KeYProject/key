@@ -16,8 +16,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.FunctionTracker;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,6 +37,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
+import org.key_project.logic.op.Function;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -183,12 +182,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 var x = it.next();
                 InstantiationEntry<?> y = x.value();
                 Object z = y.getInstantiation();
-                if (z instanceof Term) {
-                    z = ((Term) z).op();
+                if (z instanceof Term term) {
+                    z = term.op();
                 }
-                if (z instanceof Function) {
+                if (z instanceof Function finalZ) {
                     // skip if z is contained in any of the other inputs
-                    Operator finalZ = (Function) z;
                     if (input.stream().anyMatch(form -> {
                         var graphNode = form.first;
                         if (graphNode instanceof TrackedFormula tf) {
@@ -204,7 +202,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     var a = FunctionTracker.getIntroducedBy(((Function) z));
                     if (a != null && a != n) {
                         input.add(new Pair<>(
-                            graph.getFunctionNode((Function) z, a.getBranchLocation()), false));
+                            graph.getFunctionNode(finalZ, a.getBranchLocation()), false));
                     }
                 }
             }

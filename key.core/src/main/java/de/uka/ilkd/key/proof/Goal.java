@@ -30,6 +30,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

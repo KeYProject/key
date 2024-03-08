@@ -4,19 +4,19 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.*;
-
-import de.uka.ilkd.key.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple and generic input form dialog. Support {@link JTextField} and {@link JTextArea} as fields.
+ * Simple and generic input form dialog. Supports {@link JTextField} and {@link JTextArea} as
+ * fields.
  *
  * @author Arne Keller
  */
@@ -33,9 +33,9 @@ public class FormDialog extends JDialog {
      * @param onSubmit callback for submit action
      * @param onCancel callback for cancel action
      */
-    public FormDialog(JDialog owner, String title, List<Pair<String, JComponent>> comps,
-            Function<List<Pair<String, String>>, String> validate,
-            Consumer<List<Pair<String, String>>> onSubmit, Runnable onCancel) {
+    public FormDialog(JDialog owner, String title, List<NamedInputElement> comps,
+            Function<Map<String, String>, String> validate,
+            Consumer<Map<String, String>> onSubmit, Runnable onCancel) {
         super(owner);
 
         setTitle(title);
@@ -55,10 +55,10 @@ public class FormDialog extends JDialog {
 
         for (var comp : comps) {
             c.gridx = 1;
-            mainPane.add(new JLabel(comp.first), c.clone());
+            mainPane.add(new JLabel(comp.name), c.clone());
             c.gridx = 2;
             c.fill = GridBagConstraints.HORIZONTAL;
-            mainPane.add(comp.second, c.clone());
+            mainPane.add(comp.element, c.clone());
 
             c.gridy++;
         }
@@ -66,9 +66,9 @@ public class FormDialog extends JDialog {
         var submit = new JButton("Submit");
         submit.addActionListener(e -> {
             try {
-                List<Pair<String, String>> data = new ArrayList<>();
+                Map<String, String> data = new HashMap<>();
                 for (var comp : comps) {
-                    data.add(new Pair<>(comp.first, extractValue(comp.second)));
+                    data.put(comp.name, extractValue(comp.element));
                 }
                 var error = validate.apply(data);
                 if (error != null) {
@@ -104,11 +104,21 @@ public class FormDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * An input element with a name to show in the form dialog.
+     * The element has to be a {@link JTextArea} or {@link JTextField}!
+     *
+     * @param name the name
+     * @param element the element
+     */
+    public record NamedInputElement(String name, JComponent element) {
+    }
+
     private static String extractValue(JComponent comp) {
-        if (comp instanceof JTextArea) {
-            return ((JTextArea) comp).getText();
-        } else if (comp instanceof JTextField) {
-            return ((JTextField) comp).getText();
+        if (comp instanceof JTextArea textArea) {
+            return textArea.getText();
+        } else if (comp instanceof JTextField textField) {
+            return textField.getText();
         } else {
             throw new IllegalStateException("FormDialog used with incorrect component");
         }

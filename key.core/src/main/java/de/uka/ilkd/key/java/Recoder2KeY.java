@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.key_project.logic.Name;

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,15 +93,6 @@ public abstract class AbstractProofReplayer {
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
-        System.out.println(
-            "reapplying " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName()
-                + " on node " + openGoal.node().serialNr());
-
-        try {
-            openGoal.proof().saveToFile(new File("/tmp/p" + openGoal.node().serialNr() + ".proof"));
-        } catch (Exception e) {
-            // .
-        }
 
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);

@@ -536,9 +536,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             for (int i : rowsToExpand) {
                 delegateView.expandRow(i);
             }
-            if (filter != null) {
-                delegateModel.setFilter(filter, true);
-            }
 
             // Restore previous scroll position.
             JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();

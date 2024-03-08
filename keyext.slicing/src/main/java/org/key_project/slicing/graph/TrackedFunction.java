@@ -5,8 +5,9 @@ package org.key_project.slicing.graph;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.BranchLocation;
+
+import org.key_project.logic.op.Function;
 
 /**
  * A skolem constant tracked in the dependency graph.

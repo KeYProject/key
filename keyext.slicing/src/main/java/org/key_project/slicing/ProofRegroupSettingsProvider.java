@@ -13,7 +13,8 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.utilities.FormDialog;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import net.miginfocom.layout.CC;
 import org.slf4j.Logger;
@@ -64,12 +65,12 @@ public class ProofRegroupSettingsProvider extends SettingsPanel implements Setti
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         return getPanel(window, null);
     }
 
     @Override
-    public JComponent getPanel(MainWindow window, JDialog dialog) {
+    public JPanel getPanel(MainWindow window, JDialog dialog) {
         ProofRegroupSettings ss = getSettings();
 
         pCenter.removeAll();
@@ -99,18 +100,18 @@ public class ProofRegroupSettingsProvider extends SettingsPanel implements Setti
         addNew.addActionListener(e -> {
             try {
                 new FormDialog(dialog, "Add new group",
-                    List.of(new Pair<>("Name", new JTextField()),
-                        new Pair<>("Heuristics", new JTextArea())),
+                    List.of(new FormDialog.NamedInputElement("Name", new JTextField()),
+                        new FormDialog.NamedInputElement("Heuristics", new JTextArea())),
                     data -> {
-                        var name = data.get(0).second;
+                        var name = data.get("Name");
                         if (ss.getGroups().containsKey(name)) {
                             return "Group name already in use!";
                         }
                         return null;
                     },
                     data -> {
-                        var name = data.get(0).second;
-                        var content = data.get(1).second;
+                        var name = data.get("Name");
+                        var content = data.get("Heuristics");
                         var ta =
                             addTextArea(name, "", null, emptyValidator());
                         ta.setText(content);
