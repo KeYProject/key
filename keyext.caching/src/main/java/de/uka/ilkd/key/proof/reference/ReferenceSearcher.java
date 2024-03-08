@@ -18,6 +18,8 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for proof caching.
@@ -25,6 +27,8 @@ import org.key_project.slicing.analysis.AnalysisResults;
  * @author Arne Keller
  */
 public final class ReferenceSearcher {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearcher.class);
+
     private ReferenceSearcher() {
 
     }
@@ -91,8 +95,9 @@ public final class ReferenceSearcher {
                     .noneMatch(x -> x.node().lookup(ClosedBy.class) != null)) {
                 try {
                     results = depTracker.analyze(true, false);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
                     // if the analysis for some reason fails, we simply proceed as usual
+                    LOGGER.debug("failed to analyze target proof ", e);
                 }
             }
             while (!nodesToCheck.isEmpty()) {
