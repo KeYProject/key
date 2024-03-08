@@ -115,7 +115,7 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 

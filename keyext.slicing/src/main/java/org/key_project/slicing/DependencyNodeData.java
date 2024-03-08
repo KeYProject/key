@@ -40,7 +40,7 @@ public class DependencyNodeData {
     public DependencyNodeData(List<Pair<GraphNode, Boolean>> inputs, List<GraphNode> outputs,
             String label) {
         this.inputs = Collections.unmodifiableList(inputs);
-        this.outputs = Collections.unmodifiableList(outputs);
+        this.outputs = outputs;
         this.label = label;
     }
 }

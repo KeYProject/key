@@ -9,33 +9,33 @@ package org.key_project.util.collection;
  *
  * @author Arne Keller
  */
-public class DefaultEdge implements GraphEdge {
+public class DefaultEdge<V> implements GraphEdge<V> {
     /**
      * Source node of this edge.
      */
-    private Object source;
+    private V source;
     /**
      * Target node of this edge.
      */
-    private Object target;
+    private V target;
 
     @Override
-    public Object getSource() {
+    public V getSource() {
         return source;
     }
 
     @Override
-    public void setSource(Object source) {
+    public void setSource(V source) {
         this.source = source;
     }
 
     @Override
-    public Object getTarget() {
+    public V getTarget() {
         return target;
     }
 
     @Override
-    public void setTarget(Object target) {
+    public void setTarget(V target) {
         this.target = target;
     }
 }

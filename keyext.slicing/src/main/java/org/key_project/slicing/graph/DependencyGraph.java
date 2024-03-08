@@ -9,13 +9,16 @@ import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.proof.FunctionTracker;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.op.Function;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.DirectedGraph;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -48,6 +51,9 @@ public class DependencyGraph {
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
+    /**
+     * Create a new empty dependency graph.
+     */
     public DependencyGraph() {
         graph = new EquivalenceDirectedGraph();
     }
@@ -362,6 +368,52 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    /**
+     * Get the graph node for a given function and branch location.
+     * If the function is not registered in the graph yet, a new graph node is created.
+     * The function has to be a skolem constant!
+     *
+     * @param function function
+     * @param loc branch location
+     * @return graph node representing the function
+     */
+    public TrackedFunction getFunctionNode(Function function, BranchLocation loc) {
+        TrackedFunction candidate = new TrackedFunction(function, loc);
+        if (graph.containsVertex(candidate)) {
+            return candidate;
+        }
+        graph.addVertex(candidate);
+        var edges = edgeDataReversed.get(FunctionTracker.getIntroducedBy(function));
+        var sourcesDone = new HashSet<>();
+        Collection<AnnotatedEdge> newEdges = new ArrayList<>();
+        for (var x : edges) {
+            GraphNode g = x.getSource();
+            if (sourcesDone.contains(g)) {
+                continue;
+            }
+            sourcesDone.add(g);
+            AnnotatedEdge e = new AnnotatedEdge(FunctionTracker.getIntroducedBy(function), false);
+            graph.addEdge(g, candidate, e);
+            newEdges.add(e);
+        }
+        edgeDataReversed.get(FunctionTracker.getIntroducedBy(function)).addAll(newEdges);
+        DependencyNodeData n =
+            FunctionTracker.getIntroducedBy(function).lookup(DependencyNodeData.class);
+        if (n != null) {
+            n.outputs.add(candidate);
+        }
+        return candidate;
+    }
+
+    /**
+     * Get a copy of the internal graph.
+     *
+     * @return internal graph data
+     */
+    public DirectedGraph<GraphNode, AnnotatedEdge> getInternalGraph() {
+        return graph.copy();
     }
 
     /**

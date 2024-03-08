@@ -25,14 +25,10 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         this.label = label;
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         ensureChildrenCacheExists();
         return childrenCache.get(childIndex);
-        /*
-         * int count = 0; Node n = subTree; while ( childIndex != count && n.childrenCount() == 1 )
-         * { count++; n = n.child(0); } if ( childIndex == count ) { return getProofTreeModel
-         * ().getProofTreeNode(n); } else { return findBranch ( n.child(childIndex-count-1) ); }
-         */
     }
 
     private void ensureChildrenCacheExists() {
@@ -42,7 +38,6 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
             return;
         }
 
-        int count = 0;
         Node n = getNode();
 
         if (n == null) {
@@ -50,9 +45,12 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         while (true) {
-            childrenCache.add(count, getProofTreeModel().getProofTreeNode(n));
-            count++;
-            final Node nextN = findChild(n);
+            childrenCache.add(getProofTreeModel().getProofTreeNode(n));
+            Node nextN = findChild(n);
+            // skip nodes that are hidden in the proof tree
+            while (nextN != null && nextN.isHideInProofTree()) {
+                nextN = findChild(nextN);
+            }
             if (nextN == null) {
                 break;
             }
@@ -60,9 +58,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
-                childrenCache.add(count, findBranch(n.child(i)));
-                count++;
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
+                    && !n.child(i).isHideInProofTree()) {
+                childrenCache.add(findBranch(n.child(i)));
             }
         }
     }
@@ -84,6 +82,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
         return childrenCache.size();
     }
+
 
     public TreeNode getParent() {
         Node self = getNode();

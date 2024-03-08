@@ -17,7 +17,7 @@ import java.util.Set;
  * @param <E> edge type
  * @author Arne Keller
  */
-public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
+public class DirectedGraph<V, E extends GraphEdge<V>> implements Graph<V, E> {
     /**
      * Set of vertices in this graph.
      */
@@ -129,5 +129,22 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
         outgoingEdges.get(e.getSource()).remove(e);
         incomingEdges.get(e.getTarget()).remove(e);
         edges.remove(e);
+    }
+
+    /**
+     * Create a copy of this graph. A new set of vertices and edges is created,
+     * but the vertex and edge objects are shared.
+     *
+     * @return copy of this graph
+     */
+    public DirectedGraph<V, E> copy() {
+        DirectedGraph<V, E> graph = new DirectedGraph<>();
+        for (V v : vertices) {
+            graph.addVertex(v);
+        }
+        for (E e : edges) {
+            graph.addEdge((V) e.getSource(), (V) e.getTarget(), e);
+        }
+        return graph;
     }
 }

@@ -68,7 +68,7 @@ public abstract class AbstractProofReplayer {
     /**
      * The new proof.
      */
-    private final Proof proof;
+    protected final Proof proof;
 
     /**
      * Instantiate a new replayer.
@@ -93,6 +93,7 @@ public abstract class AbstractProofReplayer {
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
+
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
             if (!builtInRuleApp.complete()) {
@@ -318,6 +319,7 @@ public abstract class AbstractProofReplayer {
         }
 
         if (!ourApp.complete()) {
+            System.out.println("incomplete!");
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 

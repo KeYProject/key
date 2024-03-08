@@ -15,7 +15,8 @@ import org.jspecify.annotations.NonNull;
 /**
  * List interface to be implemented by non-destructive lists
  */
-public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
+public interface ImmutableList<T>
+        extends Iterable<T>, java.io.Serializable, Comparable<ImmutableList<T>> {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.
@@ -355,8 +356,43 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return remainder.head();
     }
 
+    @Override
+    default int compareTo(ImmutableList<T> other) {
+        if (this.isEmpty() && other.isEmpty()) {
+            return 0;
+        } else if (this.isEmpty()) {
+            return -1;
+        } else if (other.isEmpty()) {
+            return 1;
+        } else if (this.head().getClass() != other.head().getClass()) {
+            throw new IllegalStateException(
+                "tried to compare lists with elements of different classes");
+        } else if (!(this.head() instanceof Comparable)) {
+            throw new IllegalStateException("tried to compare list with incomparable elements");
+        } else {
+            var l1 = this;
+            var l2 = other;
+            while (true) {
+                if (l1.isEmpty()) {
+                    return -1;
+                } else if (l2.isEmpty()) {
+                    return 1;
+                }
+                var a = (Comparable<T>) l1.head();
+                var b = (T) l2.head();
+                var value = a.compareTo(b);
+                if (value != 0) {
+                    return value;
+                }
+                l1 = l1.tail();
+                l2 = l2.tail();
+            }
+        }
+    }
+
     /**
      * Get the n-th element of this list.
+     * Time complexity: Θ(n).
      *
      * @param idx the 0-based index of the element
      * @return the element at index idx.
@@ -366,5 +402,4 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     default T get(int idx) {
         return take(idx).head();
     }
-
 }

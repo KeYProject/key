@@ -43,6 +43,22 @@ public interface SettingsProvider {
     JPanel getPanel(MainWindow window);
 
     /**
+     * Provides the visual component for the right side.
+     * <p>
+     * This panel will be wrapped inside a {@link JScrollPane}.
+     * <p>
+     * You are allowed to reuse the return component. But then you should update the components,
+     * e.g. text field, during handling of the call.
+     *
+     * @param window non-null reference
+     * @param settingsDialog the settings dialog
+     * @return
+     */
+    default JComponent getPanel(MainWindow window, JDialog settingsDialog) {
+        return getPanel(window);
+    }
+
+    /**
      * Tree children of your settings dialog.
      * <p>
      * You can use this method, if you need to split your settings into multiple panels. The

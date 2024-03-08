@@ -8,7 +8,6 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -728,8 +728,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
 
         for (Operator op : oc.ops()) {
-            if (op instanceof SchemaVariable) {
-                result.add((SchemaVariable) op);
+            if (op instanceof SchemaVariable sv) {
+                result.add(sv);
             }
         }
 
