@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
 import java.util.*;
@@ -70,7 +71,7 @@ public class IsabelleMasterHandler {
                     }
                 }
             }
-
+            exceptions.add(new SMTTranslationException("Couldn't translate: \"" + problem.op().name().toString() + "\""));
             return handleAsUnknownValue(problem);
         } catch (Exception ex) {
             exceptions.add(ex);
