@@ -24,9 +24,9 @@ before_script:
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - export SONAR_SCANNER_OPTS="-Xmx8G"
-  - add-apt-repository ppa:cwchien/gradle
-  - apt-get update
-  - apt upgrade gradle
+  - sudo add-apt-repository ppa:cwchien/gradle
+  - sudo apt-get update
+  - sudo apt upgrade gradle
 
 stages:
   - primary
