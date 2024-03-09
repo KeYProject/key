@@ -44,10 +44,9 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
     }
 
     static StringBuilder getSortDependingFunctionRef(IsabelleMasterHandler trans, Term term, SortDependingFunction op, String name) {
-        Sort dependentSort = op.getSortDependingOn();
         StringBuilder ref = new StringBuilder("(").append(name).append("::");
         String parameterTypesDecl = op.argSorts().stream().map(trans::translateSortName).collect(Collectors.joining("=>"));
-        ref.append(parameterTypesDecl).append("=>").append(trans.translateSortName(dependentSort)).append(")");
+        ref.append(parameterTypesDecl).append("=>").append(trans.translateSortName(op.sort())).append(")");
         return UninterpretedSymbolsHandler.getFunctionRef(trans, term, op, ref.toString());
     }
 }
