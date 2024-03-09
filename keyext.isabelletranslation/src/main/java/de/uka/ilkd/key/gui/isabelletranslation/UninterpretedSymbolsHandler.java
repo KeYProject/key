@@ -33,16 +33,16 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         masterHandler.addPreamblesLocales(handlerSnippets);
-        masterHandler.addPredefinedSort(Sort.ANY);
+        masterHandler.addPredefinedSort(Sort.ANY, "any");
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
         Namespace<Sort> sorts = services.getNamespaces().sorts();
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")));
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")));
-        masterHandler.addPredefinedSort(heapLDT.targetSort());
-        masterHandler.addPredefinedSort(locSetLDT.targetSort());
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")), "java_lang_Object");
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")), "Null");
+        masterHandler.addPredefinedSort(heapLDT.targetSort(), "Heap");
+        masterHandler.addPredefinedSort(locSetLDT.targetSort(), "LocSet");
     }
 
     @Override
@@ -71,10 +71,10 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         }
 
         String name = trans.getKnownSymbol(term).toString();
-        return getFunctionTranslation(trans, term, op, name);
+        return getFunctionRef(trans, term, op, name);
     }
 
-    static StringBuilder getFunctionTranslation(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
+    static StringBuilder getFunctionRef(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
         List<StringBuilder> children = trans.translate(term.subs());
         StringBuilder result = new StringBuilder("(");
         result.append(name);
@@ -84,7 +84,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         }
         Sort sort = op.sort();
         if (!trans.isKnownSort(sort)) {
-            trans.addSort(sort);
+            trans.addGenericSort(sort);
         }
         result.append(")");
         return result;

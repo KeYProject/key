@@ -43,7 +43,7 @@ public class IntegerOpHandler implements IsabelleHandler {
         supportedOperators.put(integerLDT.getGreaterThan(), ">");
 
         masterHandler.addPreamblesLocales(handlerSnippets);
-        masterHandler.addPredefinedSort(integerLDT.targetSort());
+        masterHandler.addPredefinedSort(integerLDT.targetSort(), "int");
     }
 
     @Override
