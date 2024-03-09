@@ -40,10 +40,10 @@ public class FieldHandler implements IsabelleHandler {
         if (!trans.isKnownSymbol(term)) {
             Operator op = term.op();
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
-            if (!m.find()) {
-                return new StringBuilder(op.name().toString().replace("::$", "_"));
+            String fieldName = op.name().toString().replace("::$", "_");
+            if (m.find()) {
+                fieldName = m.group(1);
             }
-            String fieldName = m.group(1);
             if (predefinedFields.contains(fieldName)) {
                 return new StringBuilder(fieldName);
             }
