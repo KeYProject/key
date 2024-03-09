@@ -99,8 +99,14 @@ public class IsabelleTranslator {
 
             result.append("instantiation ").append(sortName).append("::any").append(LINE_ENDING);
             result.append("begin").append(LINE_ENDING);
-            result.append("definition \"to_any_").append(sortName).append(" \\<equiv> ").append(repName).append("\"").append(LINE_ENDING);
-            result.append("definition \"cast_").append(sortName).append(" \\<equiv> ").append(absName).append("\"").append(LINE_ENDING);
+            String to_any_fun_Name = "to_any_" + sortName;
+            result.append("fun ").append(to_any_fun_Name)
+                    .append(" where \"").append(to_any_fun_Name).append(" x = ").append(repName).append(" x\"")
+                    .append(LINE_ENDING);
+            String cast_fun_Name = "cast_" + sortName;
+            result.append("fun ").append(cast_fun_Name)
+                    .append(" where \"").append(cast_fun_Name).append(" x = ").append(absName).append(" x\"")
+                    .append(LINE_ENDING);
             result.append("instance by standard").append(LINE_ENDING);
             result.append("end").append(LINE_ENDING);
 
