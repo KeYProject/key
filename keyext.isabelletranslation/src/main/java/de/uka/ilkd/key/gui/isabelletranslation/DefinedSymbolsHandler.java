@@ -56,6 +56,10 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
-        return UninterpretedSymbolsHandler.getFunctionTranslation(trans, term, (SortedOperator) term.op(), supportedOperators.get(term.op()));
+        if (term.op() instanceof SortDependingFunction) {
+            return SortDependingFunctionHandler.getSortDependingFunctionRef(trans, term, (SortDependingFunction) term.op(),
+                    supportedOperators.get(term.op()));
+        }
+        return UninterpretedSymbolsHandler.getFunctionRef(trans, term, (SortedOperator) term.op(), supportedOperators.get(term.op()));
     }
 }

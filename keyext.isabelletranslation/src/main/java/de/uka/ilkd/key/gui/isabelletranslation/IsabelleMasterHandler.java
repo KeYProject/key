@@ -22,9 +22,9 @@ public class IsabelleMasterHandler {
      */
     private final Map<Operator, StringBuilder> unknownValues = new HashMap<>();
 
-    private final Set<Sort> predefinedSorts = new HashSet<>();
+    private final Map<Sort, StringBuilder> predefinedSorts = new HashMap<>();
 
-    private final Set<Sort> extraSorts = new HashSet<>();
+    private final Map<Sort, StringBuilder> extraSorts = new HashMap<>();
 
     private final Map<Operator, IsabelleHandler> handlerMap = new IdentityHashMap<>();
     private final List<StringBuilder> locales = new ArrayList<>();
@@ -44,8 +44,8 @@ public class IsabelleMasterHandler {
                                  String[] handlerOptions) throws IOException {
         //TODO efficient loading of handlers. See MasterHandler in SMT
         List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
-        predefinedSorts.add(Sort.ANY);
-        predefinedSorts.add(Sort.FORMULA);
+        predefinedSorts.put(Sort.ANY, new StringBuilder("any"));
+        predefinedSorts.put(Sort.FORMULA, new StringBuilder("bool"));
         this.handlers = handlers;
     }
 
@@ -117,13 +117,14 @@ public class IsabelleMasterHandler {
         decl.append("fixes ");
         decl.append(unknownValues.get(term.op()));
         decl.append("::\"");
+
         for (Term sub : term.subs()) {
             if (!isKnownSort(sub.sort())) {
-                addSort(sub.sort());
+                addGenericSort(sub.sort());
             }
-            decl.append(IsabelleTranslator.getSortName(sub.sort())).append("=>");
+            decl.append(translateSortName(sub.sort())).append("=>");
         }
-        decl.append((term.sort() == Sort.FORMULA ? "bool" : IsabelleTranslator.getSortName(term.sort())));
+        decl.append((translateSortName(term.sort())));
         decl.append("\"");
         constDeclarations.add(decl);
     }
@@ -133,12 +134,12 @@ public class IsabelleMasterHandler {
     }
 
     boolean isKnownSort(Sort s) {
-        return (predefinedSorts.contains(s) || extraSorts.contains(s));
+        return (predefinedSorts.containsKey(s) || extraSorts.containsKey(s));
     }
 
-    void addSort(Sort sort) {
+    void addGenericSort(Sort sort) {
         if (!isKnownSort(sort)) {
-            extraSorts.add(sort);
+            extraSorts.put(sort, new StringBuilder(sort.name().toString().replace("[]", "arr").replace(".", "_")));
         }
     }
 
@@ -148,6 +149,16 @@ public class IsabelleMasterHandler {
 
     List<StringBuilder> getPreambles() {
         return preambles;
+    }
+
+    String translateSortName(Sort sort) {
+        if (!isKnownSort(sort)) {
+            addGenericSort(sort);
+        }
+        if (predefinedSorts.containsKey(sort)) {
+            return predefinedSorts.get(sort).toString();
+        }
+        return extraSorts.get(sort).toString();
     }
 
 
@@ -171,12 +182,12 @@ public class IsabelleMasterHandler {
         return locales;
     }
 
-    void addPredefinedSort(Sort s) {
-        predefinedSorts.add(s);
+    void addPredefinedSort(Sort s, String name) {
+        predefinedSorts.put(s, new StringBuilder(name));
     }
 
     Set<Sort> getExtraSorts() {
-        return extraSorts;
+        return extraSorts.keySet();
     }
 
     void addKnownSymbol(Term term, StringBuilder s) {
@@ -192,8 +203,8 @@ public class IsabelleMasterHandler {
         return constDeclarations;
     }
 
-    Collection<Sort> getPredefinedSorts() {
-        return predefinedSorts;
+    Set<Sort> getPredefinedSorts() {
+        return predefinedSorts.keySet();
     }
 
     List<Throwable> getExceptions() {

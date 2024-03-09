@@ -34,6 +34,6 @@ public class ObserverFunctionHandler implements IsabelleHandler {
             String functionName = m.group(1);
             trans.addKnownSymbol(term, new StringBuilder(functionName));
         }
-        return UninterpretedSymbolsHandler.getFunctionTranslation(trans, term, (SortedOperator) term.op(), trans.getKnownSymbol(term).toString());
+        return UninterpretedSymbolsHandler.getFunctionRef(trans, term, (SortedOperator) term.op(), trans.getKnownSymbol(term).toString());
     }
 }

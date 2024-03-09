@@ -27,7 +27,7 @@ public class FieldHandler implements IsabelleHandler {
         predefinedFields.add("created");
 
         Namespace<Sort> sorts = services.getNamespaces().sorts();
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("Field")));
+        masterHandler.addPredefinedSort(sorts.lookup(new Name("Field")), "Field");
     }
 
     @Override

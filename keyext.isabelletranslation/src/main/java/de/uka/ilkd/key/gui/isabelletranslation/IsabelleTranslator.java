@@ -45,18 +45,14 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
         }
 
-        Set<Sort> extraParentsToCheck = new HashSet<>();
-        extraParentsToCheck.add(Sort.ANY);
-        extraParentsToCheck.add(services.getNamespaces().sorts().lookup("java.lang.Object"));
-
-        Map<Sort, Set<Sort>> sortParentsMap = getSortsParents(masterHandler.getExtraSorts(), extraParentsToCheck);
+        Map<Sort, Set<Sort>> sortParentsMap = getSortsParents(masterHandler.getExtraSorts(), masterHandler.getPredefinedSorts());
         for (Sort sort : sortParentsMap.keySet()) {
-            String sortName = getSortName(sort);
+            String sortName = masterHandler.translateSortName(sort);
             String UNIV = sortName + "_UNIV";
 
             result.append("(* generated declaration for sort: ").append(sort.name().toString()).append(" *)").append(LINE_ENDING);
             result.append("lemma ex_").append(UNIV).append(":");
-            result.append(getUnivSpec(sortParentsMap.get(sort), "{bottom}")).append(LINE_ENDING);
+            result.append(getUnivSpec(masterHandler, sortParentsMap.get(sort), "{bottom}")).append(LINE_ENDING);
             result.append("  by simp").append(LINE_ENDING).append(LINE_ENDING);
 
 
@@ -64,13 +60,13 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING);
 
             result.append("specification (").append(UNIV).append(") ");
-            result.append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
+            result.append(getUnivSpec(masterHandler, sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
             result.append("  using ex_").append(UNIV).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
 
             String UNIV_spec_lemma_name = UNIV + "_specification";
-            result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
+            result.append("lemma ").append(UNIV_spec_lemma_name).append(":").append(getUnivSpec(masterHandler, sortParentsMap.get(sort), UNIV)).append(LINE_ENDING);
             result.append("  by (metis (mono_tags, lifting) ").append(UNIV).append("_def someI_ex ex_").append(UNIV).append(")").append(LINE_ENDING);
             result.append(LINE_ENDING);
 
@@ -83,7 +79,9 @@ public class IsabelleTranslator {
 
             result.append("declare [[coercion ").append(repName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
 
-            result.append("lemma ").append(sortName).append("_type_specification[simp]:").append(getUnivSpec(sortParentsMap.get(sort), "(UNIV::" + sortName + " set)")).append(LINE_ENDING);
+            result.append("lemma ").append(sortName).append("_type_specification[simp]:")
+                    .append(getUnivSpec(masterHandler, sortParentsMap.get(sort), "(UNIV::" + sortName + " set)"))
+                    .append(LINE_ENDING);
             result.append("  using ").append(UNIV_spec_lemma_name).append(" using type_definition.Rep_range type_definition_").append(sortName).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING).append(LINE_ENDING);
 
@@ -91,7 +89,7 @@ public class IsabelleTranslator {
                 if (parentSort == Sort.ANY) {
                     continue;
                 }
-                String parentSortName = getSortName(parentSort);
+                String parentSortName = masterHandler.translateSortName(parentSort);
                 String parentSortInj = sortName + "2" + parentSortName;
                 result.append(LINE_ENDING).append("abbreviation \"").append(parentSortInj).append(" \\<equiv> ");
                 result.append("any2").append(parentSortName).append(" \\<circ> ").append(repName).append("\"").append(LINE_ENDING);
@@ -158,13 +156,8 @@ public class IsabelleTranslator {
         return result.append("end").append(LINE_ENDING).append("end");
     }
 
-    static String getSortName(Sort sort) {
-        String name = sort.name().toString();
-        return name.replace("[]", "arr").replace(".", "_");
-    }
-
-    private static String getUnivSpec(Set<Sort> parents, String insert) {
-        List<String> parentSortNames = new ArrayList<>(parents.stream().map(IsabelleTranslator::getSortName).toList());
+    private static String getUnivSpec(IsabelleMasterHandler masterHandler, Set<Sort> parents, String insert) {
+        List<String> parentSortNames = new ArrayList<>(parents.stream().map(masterHandler::translateSortName).toList());
         StringBuilder univSpec = new StringBuilder();
         if (parentSortNames.isEmpty()) {
             parentSortNames.add("any");

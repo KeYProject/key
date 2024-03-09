@@ -9,11 +9,9 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
 import java.util.Properties;
-
-import static de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler.getFunctionTranslation;
+import java.util.stream.Collectors;
 
 public class SortDependingFunctionHandler implements IsabelleHandler {
-    private final String PREFIX = "var_";
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
@@ -31,14 +29,25 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
         SortDependingFunction op = (SortDependingFunction) term.op();
         Sort dependentSort = op.getSortDependingOn();
 
-        if (!trans.isKnownSort(op.getSortDependingOn())) {
-            trans.addSort(dependentSort);
+        if (!trans.isKnownSort(dependentSort)) {
+            trans.addGenericSort(dependentSort);
+        }
+        StringBuilder name;
+        if (!trans.isKnownSymbol(term)) {
+            name = LogicalVariableHandler.makeVarRef(trans, op.name().toString().split("::")[1], dependentSort);
+            trans.addKnownSymbol(term, name);
+        } else {
+            name = trans.getKnownSymbol(term);
         }
 
-        String name = PREFIX + op.name().toString().split("::")[1];
-        if (!trans.isKnownSymbol(term)) {
-            trans.addKnownSymbol(term, new StringBuilder(name));
-        }
-        return getFunctionTranslation(trans, term, op, name);
+        return getSortDependingFunctionRef(trans, term, op, name.toString());
+    }
+
+    static StringBuilder getSortDependingFunctionRef(IsabelleMasterHandler trans, Term term, SortDependingFunction op, String name) {
+        Sort dependentSort = op.getSortDependingOn();
+        StringBuilder ref = new StringBuilder("(").append(name).append("::");
+        String parameterTypesDecl = op.argSorts().stream().map(trans::translateSortName).collect(Collectors.joining("=>"));
+        ref.append(parameterTypesDecl).append("=>").append(trans.translateSortName(dependentSort)).append(")");
+        return UninterpretedSymbolsHandler.getFunctionRef(trans, term, op, ref.toString());
     }
 }

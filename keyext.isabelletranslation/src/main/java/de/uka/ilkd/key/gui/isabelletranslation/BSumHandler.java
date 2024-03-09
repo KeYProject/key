@@ -35,9 +35,9 @@ public class BSumHandler implements IsabelleHandler {
         result.append(supportedOperators.get(term.op()));
         for (QuantifiableVariable bv : term.boundVars()) {
             Sort sort = bv.sort();
-            result.append(" ").append(LogicalVariableHandler.makeVarRef(bv.name().toString(), sort));
+            result.append(" ").append(LogicalVariableHandler.makeVarRef(trans, bv.name().toString(), sort));
             if (!trans.isKnownSort(sort)) {
-                trans.addSort(sort);
+                trans.addGenericSort(sort);
             }
         }
         result.append("=");

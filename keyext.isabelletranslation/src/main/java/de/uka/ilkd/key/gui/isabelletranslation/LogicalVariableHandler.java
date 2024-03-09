@@ -26,14 +26,14 @@ public class LogicalVariableHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         Sort sort = term.sort();
         if (!trans.isKnownSort(sort)) {
-            trans.addSort(sort);
+            trans.addGenericSort(sort);
         }
-        return makeVarRef(term.toString(), sort);
+        return makeVarRef(trans, term.toString(), sort);
     }
 
-    public static StringBuilder makeVarRef(String name, Sort sort) {
+    public static StringBuilder makeVarRef(IsabelleMasterHandler trans, String name, Sort sort) {
         StringBuilder result = new StringBuilder("(");
-        result.append(VAR_PREFIX).append(name).append("::").append(IsabelleTranslator.getSortName(sort)).append(")");
+        result.append(VAR_PREFIX).append(name).append("::").append(trans.translateSortName(sort)).append(")");
         return result;
     }
 }
