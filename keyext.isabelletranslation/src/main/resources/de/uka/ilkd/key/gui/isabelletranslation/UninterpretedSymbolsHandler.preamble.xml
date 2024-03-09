@@ -64,7 +64,6 @@ lemma bottom_in_java_lang_Object[simp] :"bottom \&lt;in&gt; (UNIV::java_lang_Obj
   using type_definition.Rep_range type_definition_java_lang_Object by blast
 
 typedecl Field
-(* "TODO: implement Field type" *)
 
 typedef LocSet = "UNIV::(java_lang_Object \&lt;times&gt; Field) set set"
   by simp
@@ -100,10 +99,11 @@ class any =
   fixes exact_instance::"'a\&lt;Rightarrow&gt;bool"
 
 
+
 instantiation any::any
 begin
-definition "to_any_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
-definition "cast_any \&lt;equiv&gt; (id::any\&lt;Rightarrow&gt;any)"
+fun to_any_any where "to_any_any x = (id::any\&lt;Rightarrow&gt;any) x"
+fun cast_any where "cast_any x = (id::any\&lt;Rightarrow&gt;any) x"
 instance by standard
 end
 
@@ -111,22 +111,22 @@ end
 
 instantiation int::any
 begin
-definition "to_any_int \&lt;equiv&gt; int2any"
-definition "cast_int \&lt;equiv&gt; any2int"
+fun to_any_int where "to_any_int x = int2any x"
+fun cast_int where "cast_int x = any2int x"
 instance by standard
 end
 
 instantiation bool::any
 begin
-definition "to_any_bool \&lt;equiv&gt; bool2any"
-definition "cast_bool \&lt;equiv&gt; any2bool"
+fun to_any_bool where "to_any_bool x = bool2any x"
+fun cast_bool where "cast_bool x = any2bool x"
 instance by standard
 end
 
 instantiation LocSet::any
 begin
-definition "to_any_LocSet \&lt;equiv&gt; LocSet2any"
-definition "cast_LocSet \&lt;equiv&gt; any2LocSet"
+fun to_any_LocSet where "to_any_LocSet x = LocSet2any x"
+fun cast_LocSet where "cast_LocSet x = any2LocSet x"
 instance by standard
 end
 
@@ -134,8 +134,8 @@ class java_lang_Object = any
 
 instantiation java_lang_Object::java_lang_Object
 begin
-definition "cast_java_lang_Object \&lt;equiv&gt; any2java_lang_Object"
-definition "to_any_java_lang_Object \&lt;equiv&gt; java_lang_Object2any"
+fun cast_java_lang_Object where "cast_java_lang_Object x = any2java_lang_Object x"
+fun to_any_java_lang_Object where "to_any_java_lang_Object x = java_lang_Object2any x"
 instance by standard
 end
 
@@ -155,8 +155,8 @@ definition "null \&lt;equiv&gt; any2Null bottom"
 
 instantiation Null::java_lang_Object
 begin
-definition "to_any_Null \&lt;equiv&gt; Null2any"
-definition "cast_Null \&lt;equiv&gt; any2Null"
+fun to_any_Null where "to_any_Null (x::Null) = Null2any x"
+fun cast_Null where "cast_Null x = any2Null x"
 instance by standard
 end
 
@@ -165,23 +165,19 @@ abbreviation "Null2java_lang_Object\&lt;equiv&gt;any2java_lang_Object \&lt;circ&
 declare [[coercion Null2java_lang_Object]]
 
 consts
-select::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;('a::any)"
 store::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap"
 create::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Heap"
 anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap"
 wellFormed::"Heap\&lt;Rightarrow&gt;bool"
 created::"Field"
 locEps::"(java_lang_Object \&lt;times&gt; Field \&lt;times&gt; LocSet) \&lt;Rightarrow&gt; bool"
-length::"java_lang_Object\&lt;Rightarrow&gt;int"
+obj_length::"java_lang_Object\&lt;Rightarrow&gt;int"
 
-axiomatization where length_nonneg[simp]:"length obj \&lt;ge&gt; 0"
+axiomatization where length_nonneg[simp]:"obj_length obj \&lt;ge&gt; 0"
 
-definition "unusedLocs (h::Heap) \&lt;equiv&gt; {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
+fun unusedLocs where "unusedLocs (h::Heap) = {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
 
-section \&lt;open&gt;select Axioms\&lt;close&gt;
-axiomatization where selectOfStore:"select (store h obj f x) o2 f2 \&lt;equiv&gt; (if (obj = o2 \&lt;and&gt; f=f2 \&lt;and&gt; f\&lt;noteq&gt;created) then cast (any2java_lang_Object x) else (select h o2 f2))"
-and selectOfCreate:"select (create h obj) o2 f \&lt;equiv&gt; (if (obj=o2 \&lt;and&gt; ((java_lang_Object2any obj)\&lt;noteq&gt;null) \&lt;and&gt; f=created) then cast (any2java_lang_Object True) else select h o2 f)"
-and selectOfAnon:"select (anon h s h') obj f \&lt;equiv&gt; (if ((((obj, f):s)\&lt;and&gt;(f\&lt;noteq&gt;created))\&lt;or&gt;(obj, f):unusedLocs(h)) then select h' obj f else select h obj f)"
+fun select::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;'a::any" where "select h obj f = cast (h obj f)"
 
 
 section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
@@ -189,13 +185,7 @@ axiomatization where onlyCreatedjava_lang_ObjecteAreReferenced:"wellFormed h \&l
 and onlyCreatedjava_lang_ObjectsAreInLocSets:"wellFormed h \&lt;and&gt; ((o2::java_lang_Object), f2)\&lt;in&gt;((select h obj f)::LocSet) \&lt;Longrightarrow&gt; Null2java_lang_Object null=o2 \&lt;or&gt; ((select h o2 created)::bool)"
 and wellFormedStorejava_lang_Object:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; ((select h x created) \&lt;and&gt; instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
 
-fun instance_All_useSet::"any\&lt;Rightarrow&gt;('a::any) set\&lt;Rightarrow&gt;bool"
-  where "instance_All_useSet x y = (to_any x : image to_any y)"
-
-fun instance_All_useRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_useRep x y = (\&lt;exists&gt;z::'a. to_any z = x)"
-
-fun instance_All_UnivRep::"any\&lt;Rightarrow&gt;'a::any\&lt;Rightarrow&gt;bool"
-  where "instance_All_UnivRep x y = (x : image to_any (UNIV::'a set))"
+fun instanceof::"any\&lt;Rightarrow&gt;'a::any set\&lt;Rightarrow&gt;bool"
+  where "instanceof x y = (x : image to_any y)"
   </entry>
 </properties>
