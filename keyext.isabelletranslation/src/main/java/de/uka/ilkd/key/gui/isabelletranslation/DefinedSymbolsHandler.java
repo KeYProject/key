@@ -23,6 +23,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         Map<String, String> definedFunctions = new HashMap<>();
         definedFunctions.put("null", "null");
         definedFunctions.put("length", "obj_length");
+        definedFunctions.put("arr", "arr");
         definedFunctions.put("wellFormed", "wellFormed");
 
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
