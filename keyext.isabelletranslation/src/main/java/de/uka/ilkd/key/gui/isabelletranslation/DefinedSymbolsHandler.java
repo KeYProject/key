@@ -26,6 +26,20 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         definedFunctions.put("arr", "arr");
         definedFunctions.put("wellFormed", "wellFormed");
 
+        //LocSet functions
+        definedFunctions.put("elementOf", "elementOf");
+        definedFunctions.put("subset", "subset");
+        definedFunctions.put("disjoint", "disjoint");
+        definedFunctions.put("empty", "empty");
+        definedFunctions.put("allLocs", "allLocs");
+        definedFunctions.put("singleton", "singleton");
+        definedFunctions.put("union", "union");
+        definedFunctions.put("intersect", "intersect");
+        definedFunctions.put("setMinus", "setMinus");
+        definedFunctions.put("allFields", "allFields");
+        definedFunctions.put("allObjects", "allObjects");
+        definedFunctions.put("arrayRange", "arrayRange");
+
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
         definedSortDependingFunctions.put("select", "select");
         definedSortDependingFunctions.put("cast", "cast");
