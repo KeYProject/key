@@ -33,6 +33,8 @@ public class GeneralSettings extends AbstractSettings {
      */
     private static final String KEY_ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
 
+    /** Default value for {@link #getJmlEnabledKeys()} */
+    public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
 
     /**
      * This parameter disables the possibility to prune in closed branches. It is meant as a

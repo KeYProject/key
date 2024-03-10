@@ -54,7 +54,6 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -68,6 +67,8 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+
+import org.key_project.logic.Name;
 
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
@@ -833,6 +834,9 @@ public final class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Update the sequent view.
+     */
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());

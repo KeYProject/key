@@ -8,20 +8,17 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -203,7 +200,7 @@ public class StateVars {
         if (t == null) {
             return null;
         }
-        if (!(t.op() instanceof Function)) {
+        if (!(t.op() instanceof JFunction)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
             // in this case.
@@ -222,7 +219,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        final Function newFunc = new Function(new Name(name), t.sort());
+        final JFunction newFunc = new JFunction(new Name(name), t.sort());
         register(newFunc, services);
         return tb.func(newFunc);
     }
@@ -338,7 +335,7 @@ public class StateVars {
             return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
-            Function heap = new Function(heapName, heapLDT.getHeap().sort());
+            JFunction heap = new JFunction(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
@@ -358,7 +355,7 @@ public class StateVars {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
-        final Function mbyAtPreFunc = new Function(new Name(newName), intSort);
+        final JFunction mbyAtPreFunc = new JFunction(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
     }
@@ -379,11 +376,11 @@ public class StateVars {
     }
 
 
-    static void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    static void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
+            assert f.sort() != JavaDLTheory.UPDATE;
+            if (f.sort() == JavaDLTheory.FORMULA) {
                 functionNames.addSafely(f);
             } else {
                 functionNames.addSafely(f);

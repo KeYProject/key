@@ -6,10 +6,10 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -27,8 +27,10 @@ public class InstanceOfHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        this.instanceOfOp = Sort.ANY.getInstanceofSymbol(services);
-        this.exactInstanceOfOp = Sort.ANY.getExactInstanceofSymbol(services);
+        this.instanceOfOp =
+            services.getJavaDLTheory().getInstanceofSymbol(JavaDLTheory.ANY, services);
+        this.exactInstanceOfOp =
+            services.getJavaDLTheory().getExactInstanceofSymbol(JavaDLTheory.ANY, services);
     }
 
     @Override

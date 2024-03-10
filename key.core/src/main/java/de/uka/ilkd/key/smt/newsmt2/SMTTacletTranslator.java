@@ -115,7 +115,7 @@ public class SMTTacletTranslator {
 
         if (changes) {
             var bvars = new ImmutableArray<>(qvars);
-            return services.getTermFactory().createTerm(op, subs, bvars, null, term.getLabels());
+            return services.getTermFactory().createTerm(op, subs, bvars, term.getLabels());
         } else {
             return term;
         }

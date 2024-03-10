@@ -14,17 +14,22 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
@@ -407,9 +412,11 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
-        Function ioFuncObject = javaInfo.objectSort().getInstanceofSymbol(services);
-        Function ioFuncInt =
-            services.getNamespaces().sorts().lookup("int").getInstanceofSymbol(services);
+        JFunction ioFuncObject =
+            services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
+        JFunction ioFuncInt =
+            services.getJavaDLTheory()
+                    .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
 
         assertTrue(termContains(resultTypeofClass, ioFuncObject));
         assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));
@@ -427,7 +434,7 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final Function fieldSymbol =
+        final JFunction fieldSymbol =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = TB.all(qv,
             TB.imp(
@@ -442,6 +449,38 @@ public class TestJMLTranslator {
         final boolean condition = result.equalsModRenaming(expected);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "\\seq(1) + \\seq(2,3) : \\seq_concat(\\seq(1), \\seq(2,3))",
+        "\\locset(this.b) + \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) | \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) & \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) * \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) <= \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) < \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s)) && \\locset(this.b) != \\locset(this.s)",
+        "\\locset(this.b) >= \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b))",
+        "\\locset(this.b) > \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b)) && \\locset(this.b) != \\locset(this.s)",
+    }, delimiter = ':')
+    public void testOperatorOverloading(String expression, String expected) {
+        Term tTrans = null, tExp = null;
+        try {
+            tTrans = jmlIO.parseExpression(expression);
+        } catch (Exception e) {
+            fail("Cannot parse " + expression, e);
+        }
+
+        try {
+            tExp = jmlIO.parseExpression(expected);
+        } catch (Exception e) {
+            fail("Cannot parse " + expected, e);
+        }
+
+        if (!tTrans.equalsModTermLabels(tExp)) {
+            // this gives nicer error
+            assertEquals(tExp, tTrans);
+        }
     }
 
 }

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
-
+import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -41,5 +42,23 @@ public abstract class AbstractSV extends AbstractSortedOperator implements Schem
     @Override
     public final boolean isStrict() {
         return isStrict;
+    }
+
+    @Override
+    public void validTopLevelException(Term term) throws TermCreationException {
+        if (arity() != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
+
+        if (arity() != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
+
+        for (int i = 0; i < arity(); i++) {
+            if (term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
+
     }
 }

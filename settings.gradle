@@ -1,5 +1,6 @@
 include "key.util"
 include "key.ui"
+include "key.ncore"
 include "key.core"
 include "key.core.rifl"
 include "key.core.symbolic_execution"
@@ -13,3 +14,4 @@ include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
+include 'keyext.caching'

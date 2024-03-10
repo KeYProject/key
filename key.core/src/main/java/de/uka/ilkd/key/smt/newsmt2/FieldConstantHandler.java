@@ -9,13 +9,15 @@ import java.util.Properties;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
+
 
 /**
  * This SMT translation handler takes care of field constants.
@@ -42,7 +44,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
-    private static final ImmutableArray<Term> NO_ARGS = new ImmutableArray<>();
+    private static final Sort[] NO_ARGS = new Sort[0];
     private Services services;
 
     @Override
@@ -56,7 +58,7 @@ public class FieldConstantHandler implements SMTHandler {
     public boolean canHandle(Operator op) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
-                && op instanceof Function && ((Function) op).isUnique()
+                && op instanceof JFunction && ((Function) op).isUnique()
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr();
     }
@@ -67,33 +69,38 @@ public class FieldConstantHandler implements SMTHandler {
         String smtName = "field_" + name;
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        Operator op = term.op();
 
-        trans.addSort(((SortedOperator) op).sort());
+        if (term.op() instanceof SortedOperator op) {
 
-        if (op == heapLDT.getArr()) {
-            trans.introduceSymbol("arr");
-            return trans.handleAsFunctionCall("arr", term);
+            trans.addSort(op.sort());
+
+            if (op == heapLDT.getArr()) {
+                trans.introduceSymbol("arr");
+                return trans.handleAsFunctionCall("arr", term);
+            }
+
+            if (!trans.isKnownSymbol(smtName)) {
+                Map<String, Object> state = trans.getTranslationState();
+                Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
+
+                trans.introduceSymbol("fieldIdentifier");
+
+                trans.addDeclaration(new SExpr("declare-const", smtName, "U"));
+
+                trans.addAxiom(HandlerUtil.funTypeAxiom(op, smtName, trans));
+
+                trans.addAxiom(
+                    new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
+                        new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+
+                state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
+                trans.addKnownSymbol(smtName);
+            }
+
+            return new SExpr(smtName, Type.UNIVERSE);
+        } else {
+            throw new SMTTranslationException("Expected a sorted operator, but is " + term.op());
         }
-
-        if (!trans.isKnownSymbol(smtName)) {
-            Map<String, Object> state = trans.getTranslationState();
-            Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
-
-            trans.introduceSymbol("fieldIdentifier");
-
-            trans.addDeclaration(new SExpr("declare-const", smtName, "U"));
-
-            trans.addAxiom(HandlerUtil.funTypeAxiom((SortedOperator) op, smtName, trans));
-
-            trans.addAxiom(new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
-                new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
-
-            state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
-            trans.addKnownSymbol(smtName);
-        }
-
-        return new SExpr(smtName, Type.UNIVERSE);
     }
 
 }

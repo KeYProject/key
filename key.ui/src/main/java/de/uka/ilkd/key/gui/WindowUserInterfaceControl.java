@@ -46,10 +46,10 @@ import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;

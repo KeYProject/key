@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.rule;
 
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 
 /**
  * this class represents a heuristic. Taclets can belong to different heuristics and are executed

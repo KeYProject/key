@@ -9,6 +9,7 @@ configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
+    api project(':key.ncore')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
