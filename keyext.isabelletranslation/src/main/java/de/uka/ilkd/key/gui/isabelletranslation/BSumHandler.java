@@ -41,7 +41,7 @@ public class BSumHandler implements IsabelleHandler {
             }
         }
         result.append("=");
-        result.append(trans.translate(term.sub(0))).append("..").append(trans.translate(term.sub(1))).append("-1. ");
+        result.append(trans.translate(term.sub(0))).append("..<").append(trans.translate(term.sub(1)));
         result.append(trans.translate(term.sub(2))).append(")");
         return result;
     }
