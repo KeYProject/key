@@ -82,8 +82,6 @@ public abstract class SLResolverManager {
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        // TODO: Is checking logic vars first sufficient? Can it happen that localVariables are
-        // inside logic?
         for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
             var logicVar = ns.lookup(n);
             if (logicVar != null) {
