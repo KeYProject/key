@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-public final class CachedFile {
-    /**
-     * Name of this file. Always located in ~/.key/cachedProofs
-     */
-    public final String filename;
-    public final int hash;
+import java.nio.file.Path;
 
-    public CachedFile(String filename, int hash) {
-        this.filename = filename;
-        this.hash = hash;
-    }
+/**
+ * A file used by some cached proof as part of the {@link CachingDatabase}.
+ *
+ * @param file path to the file (always located in ~/.key/cachedProofs)
+ * @param hash {@link String#hashCode()} of this file's content
+ * @author Arne Keller
+ */
+public record CachedFile(Path file, int hash) {
 }

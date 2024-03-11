@@ -39,6 +39,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.PathConfig;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -79,6 +80,7 @@ public class CachingExtension
     private ReferenceSearchButton referenceSearchButton;
     private CachingToggleAction toggleAction = null;
     private CachingPruneHandler cachingPruneHandler = null;
+    private CachingDatabase database = null;
 
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {
@@ -116,7 +118,7 @@ public class CachingExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         if (p == null || trackedProofs.contains(p)) {
             return;
@@ -184,7 +186,8 @@ public class CachingExtension
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        Runtime.getRuntime().addShutdownHook(new Thread(CachingDatabase::save));
+        database = new CachingDatabase(PathConfig.getCacheIndex(), PathConfig.getCacheDirectory());
+        Runtime.getRuntime().addShutdownHook(new Thread(database::shutdown));
         cachingPruneHandler = new CachingPruneHandler(mediator);
     }
 
@@ -337,5 +340,9 @@ public class CachingExtension
     @Override
     public SettingsProvider getSettings() {
         return new CachingSettingsProvider();
+    }
+
+    public CachingDatabase getDatabase() {
+        return database;
     }
 }

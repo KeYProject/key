@@ -25,8 +25,9 @@ public class SearchInDatabaseAction extends KeyAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         var seq = node.sequent();
-        var matches = CachingDatabase.findMatching(node.proof().getSettings().getChoiceSettings(),
-            seq, node.proof().getServices());
+        var matches =
+            extension.getDatabase().findMatching(node.proof().getSettings().getChoiceSettings(),
+                seq, node.proof().getServices());
         if (!matches.isEmpty()) {
             node.register(matches.stream().findFirst().get(), CachedProofBranch.class);
             Goal openGoal = node.proof().getOpenGoal(node);

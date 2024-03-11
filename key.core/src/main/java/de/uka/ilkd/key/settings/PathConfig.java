@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.key_project.util.java.IOUtil;
 
@@ -41,11 +42,6 @@ public final class PathConfig {
      * In which file to store the proof-independent settings.
      */
     private static String proofIndependentSettings;
-    /**
-     * In which file to store the proof cache index.
-     * Usually: ~/.key/cachedProofs.json
-     */
-    private static File cacheIndex;
 
     /**
      * directory where to find the KeY configuration files
@@ -57,9 +53,14 @@ public final class PathConfig {
      */
     private static File logDirectory;
     /**
+     * In which file to store the proof cache database index.
+     * Usually: ~/.key/cachedProofs.json
+     */
+    private static Path cacheIndex;
+    /**
      * Directory in which cached proofs are stored.
      */
-    private static File cacheDirectory;
+    private static Path cacheDirectory;
 
     private PathConfig() {
     }
@@ -90,9 +91,9 @@ public final class PathConfig {
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
         PathConfig.proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.cacheIndex = new File(keyConfigDir, "cachedProofs.json");
         PathConfig.logDirectory = new File(keyConfigDir, "logs");
-        PathConfig.cacheDirectory = new File(keyConfigDir, "cachedProofs");
+        PathConfig.cacheIndex = Path.of(keyConfigDir, "cachedProofs.json");
+        PathConfig.cacheDirectory = Path.of(keyConfigDir, "cachedProofs");
     }
 
     /**
@@ -105,7 +106,7 @@ public final class PathConfig {
     }
 
     /**
-     *
+     * @return path to the directory for log files
      */
     public static File getLogDirectory() {
         return PathConfig.logDirectory;
@@ -120,11 +121,11 @@ public final class PathConfig {
         return proofIndependentSettings;
     }
 
-    public static File getCacheIndex() {
+    public static Path getCacheIndex() {
         return cacheIndex;
     }
 
-    public static File getCacheDirectory() {
+    public static Path getCacheDirectory() {
         return cacheDirectory;
     }
 }

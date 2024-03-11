@@ -12,10 +12,14 @@ import javax.swing.table.AbstractTableModel;
 
 public class CachingDatabaseTable extends AbstractTableModel {
 
-    private final List<File> cachedProofs;
-    private final Map<File, List<CachedProofBranch>> cache;
+    private List<File> cachedProofs;
+    private Map<File, List<CachedProofBranch>> cache;
 
     CachingDatabaseTable() {
+        refresh();
+    }
+
+    public void refresh() {
         cachedProofs = new ArrayList<>(CachingDatabase.getAllCachedProofs());
         cache = CachingDatabase.getAllCachedProofBranches();
     }
@@ -46,15 +50,11 @@ public class CachingDatabaseTable extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-        case 0:
-            return File.class;
-        case 1:
-        case 2:
-            return String.class;
-        default:
-            return null;
-        }
+        return switch (columnIndex) {
+        case 0 -> File.class;
+        case 1, 2 -> String.class;
+        default -> null;
+        };
     }
 
     @Override

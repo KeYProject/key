@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javax.swing.*;
 
