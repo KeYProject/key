@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import javax.sound.sampled.Line;
 import java.io.IOException;
 import java.util.*;
 
@@ -44,6 +45,8 @@ public class IsabelleTranslator {
         for (StringBuilder preamble : masterHandler.getPreambles()) {
             result.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
         }
+
+        Sort nullSort = services.getNamespaces().sorts().lookup("Null");
 
         Map<Sort, Set<Sort>> sortParentsMap = getSortsParents(masterHandler.getExtraSorts(), masterHandler.getPredefinedSorts());
         for (Sort sort : sortParentsMap.keySet()) {
@@ -108,7 +111,12 @@ public class IsabelleTranslator {
                     .append(" where \"").append(cast_fun_Name).append(" x = ").append(absName).append(" x\"")
                     .append(LINE_ENDING);
             result.append("instance by standard").append(LINE_ENDING);
-            result.append("end").append(LINE_ENDING);
+            result.append("end").append(LINE_ENDING).append(LINE_ENDING);
+
+            if (nullSort.extendsTrans(sort)) {
+                result.append("abbreviation \"Null2").append(sortName).append("\\<equiv> any2Null \\<circ> ").append(repName).append("\"").append(LINE_ENDING);
+                result.append("declare [[coercion Null2").append(sortName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
+            }
 
             result.append(LINE_ENDING).append(LINE_ENDING);
         }
