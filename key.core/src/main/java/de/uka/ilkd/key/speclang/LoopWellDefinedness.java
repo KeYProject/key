@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -36,11 +35,10 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         this.inv = inv;
     }
 
-    public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<ProgramVariable> params,
+    public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<LocationVariable> params,
             Services services) {
         super(inv.getName(), inv.getLoop().getStartPosition().line(), inv.getTarget(),
             inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
-        assert inv != null;
         final LocationVariable h = getHeap();
         this.inv = inv;
         setMby(inv.getInternalVariant());

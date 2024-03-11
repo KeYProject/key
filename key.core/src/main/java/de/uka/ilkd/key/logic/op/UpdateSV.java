@@ -12,7 +12,7 @@ import org.key_project.logic.Name;
 /**
  * A schema variable that is used as placeholder for updates.
  */
-public final class UpdateSV extends AbstractSV {
+public final class UpdateSV extends OperatorSV {
 
 
     UpdateSV(Name name) {

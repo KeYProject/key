@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -48,8 +47,8 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifies clause.
      */
-    Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services);
+    Term getMod(LocationVariable heapVar, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Returns the modifies clause of the contract.
@@ -73,8 +72,8 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the free modifies clause.
      */
-    Term getFreeMod(LocationVariable heapVar, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    Term getFreeMod(LocationVariable heapVar, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
@@ -92,13 +91,13 @@ public interface OperationContract extends Contract {
             ImmutableList<Term> paramTerms,
             Services services);
 
-    Term getFreePre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getFreePre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    Term getFreePre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     Term getFreePre(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);

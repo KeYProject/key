@@ -11,13 +11,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
@@ -52,7 +50,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The original self variable of the receiver object.
      */
-    private final ParsableVariable originalSelfVar;
+    private final LocationVariable originalSelfVar;
     /**
      * Whether the class invariant is a static (i.e., &lt;$inv&gt;) or an instance invariant (i.e.,
      * &lt;inv&gt;).
@@ -79,7 +77,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
+            VisibilityModifier visibility, Term inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -95,7 +93,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
+            VisibilityModifier visibility, Term inv, LocationVariable selfVar,
             boolean free) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -118,7 +116,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
+    private Map<Operator, Operator> getReplaceMap(AbstractSortedOperator selfVar,
+            TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
@@ -160,7 +159,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public Term getInv(ParsableVariable selfVar, TermServices services) {
+    public Term getInv(AbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
@@ -207,14 +206,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public OriginalVariables getOrigVars() {
-        final ProgramVariable self;
-        if (this.originalSelfVar instanceof ProgramVariable) {
-            self = (ProgramVariable) this.originalSelfVar;
-        } else if (this.originalSelfVar != null) {
-            self = new LocationVariable(new ProgramElementName(originalSelfVar.toString()), kjt);
-        } else {
-            self = null;
-        }
+        final LocationVariable self;
+        // TODO: Is this a correct change?
+        self = this.originalSelfVar;
         return new OriginalVariables(self, null, null,
             new LinkedHashMap<>(),
             ImmutableSLList.nil());

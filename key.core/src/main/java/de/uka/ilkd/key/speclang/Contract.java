@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -55,7 +54,8 @@ public interface Contract extends SpecificationElement {
     boolean hasMby();
 
     /**
-     * Returns the original ProgramVariables to replace them easier. The second list consists of the
+     * Returns the original LocationVariables to replace them easier. The second list consists of
+     * the
      * parameters.
      */
     OriginalVariables getOrigVars();
@@ -70,9 +70,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return precondition
      */
-    Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -84,9 +84,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return precondition
      */
-    Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -128,9 +128,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the dependency set
      */
-    Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the dependency set of the contract.
@@ -151,7 +151,7 @@ public interface Contract extends SpecificationElement {
 
     Term getAssignable(LocationVariable heap);
 
-    Term getAccessible(ProgramVariable heap);
+    Term getAccessible(LocationVariable heap);
 
     Term getGlobalDefs();
 
@@ -168,7 +168,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
-    Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
@@ -302,11 +302,11 @@ public interface Contract extends SpecificationElement {
      */
     final class OriginalVariables {
 
-        public final ProgramVariable self;
-        public final ProgramVariable result;
-        public final ProgramVariable exception;
-        public final Map<LocationVariable, ProgramVariable> atPres;
-        public final ImmutableList<ProgramVariable> params;
+        public final LocationVariable self;
+        public final LocationVariable result;
+        public final LocationVariable exception;
+        public final Map<LocationVariable, LocationVariable> atPres;
+        public final ImmutableList<LocationVariable> params;
 
         /**
          * Create new instance of original variables
@@ -318,18 +318,18 @@ public interface Contract extends SpecificationElement {
          * @param paramVars the original parameter variables
          */
         @SuppressWarnings("unchecked")
-        public OriginalVariables(ProgramVariable selfVar, ProgramVariable resVar,
-                ProgramVariable excVar,
-                Map<? extends LocationVariable, ? extends ProgramVariable> atPreVars,
-                ImmutableList<? extends ProgramVariable> paramVars) {
+        public OriginalVariables(LocationVariable selfVar, LocationVariable resVar,
+                LocationVariable excVar,
+                Map<LocationVariable, LocationVariable> atPreVars,
+                ImmutableList<LocationVariable> paramVars) {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;
-            this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
+            this.atPres = (Map<LocationVariable, LocationVariable>) atPreVars;
             if (paramVars == null) {
                 this.params = ImmutableSLList.nil();
             } else {
-                this.params = (ImmutableList<ProgramVariable>) paramVars;
+                this.params = (ImmutableList<LocationVariable>) paramVars;
             }
         }
 
@@ -339,7 +339,7 @@ public interface Contract extends SpecificationElement {
          * @param newParams
          * @return the changed original variables
          */
-        public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
+        public OriginalVariables add(ImmutableList<LocationVariable> newParams) {
             return new OriginalVariables(self, result, exception, atPres, newParams);
         }
     }

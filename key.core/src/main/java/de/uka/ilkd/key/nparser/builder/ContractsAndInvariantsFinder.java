@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -35,7 +35,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final List<ClassInvariant> invariants = new ArrayList<>();
 
 
-    private ParsableVariable selfVar;
+    private LocationVariable selfVar;
 
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -88,7 +88,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
+        selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);
         return null;

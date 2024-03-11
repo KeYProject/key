@@ -121,15 +121,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return an anonymizing update for the specified variables.
      */
-    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    protected static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
+        for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
             } else {
@@ -147,7 +147,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return a new local variable with the specified base name of the specified type.
      */
-    protected static ProgramVariable createLocalVariable(final String nameBase,
+    protected static LocationVariable createLocalVariable(final String nameBase,
             final KeYJavaType type, final Services services) {
         return KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
