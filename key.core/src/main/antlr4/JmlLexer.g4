@@ -82,6 +82,7 @@ CAPTURES: 'captures' Pred -> pushMode(expr);
 CODE: 'code'; //?
 CONSTRAINT: 'constraint' Pred -> pushMode(expr);
 CONTINUES: 'continues' -> pushMode(expr);
+DATATYPE: 'datatype';
 DEBUG: 'debug'; //?
 DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred -> pushMode(expr);
 DETERMINES: 'determines' -> pushMode(expr);
@@ -143,6 +144,7 @@ C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
 C_COLON: ':' -> type(COLON);
 C_DOT: '.' -> type(DOT);
 C_COMMA: ',' -> type(COMMA);
+C_INCLUSIVEOR: '|' -> type(INCLUSIVEOR);
 
 SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
 ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
