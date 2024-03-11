@@ -9,7 +9,7 @@ public class Object {
     /*@ public normal_behavior
       @   assignable packed;
       @*/
-    public void havocPacked();
+    public /*@ helper @*/ void havocPacked();
     
     /*@ public normal_behavior
       @   assignable \nothing;
