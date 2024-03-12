@@ -397,7 +397,6 @@ public final class ProblemInitializer {
         }
 
         // register non-built-in rules
-        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
