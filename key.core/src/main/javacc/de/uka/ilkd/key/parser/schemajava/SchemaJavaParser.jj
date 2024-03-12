@@ -4000,6 +4000,8 @@ Switch SwitchStatement() :
 	    {
 		if (branch instanceof Case) {
 		    ((Case)branch).setBody(stats);
+		} else if (branch instanceof ActiveCase) {
+            ((ActiveCase) branch).setBody(stats);
 		} else {
 		    ((Default)branch).setBody(stats);
 		}
@@ -4043,6 +4045,14 @@ Branch SwitchLabel() :
      {
 	 result = factory.createDefault();
 	 setPrefixInfo(result);
+     }
+       ":"
+       )
+     |
+     ( "active-case"
+     {
+     result = factory.createActiveCase();
+     setPrefixInfo(result);
      }
        ":"
        )

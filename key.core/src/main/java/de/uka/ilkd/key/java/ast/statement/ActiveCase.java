@@ -1,63 +1,49 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.java.ast.statement;
+package de.uka.ilkd.key.java.statement;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.ast.Comment;
-import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-/**
- * Default.
- *
- */
-public class Default extends SwitchBranch {
-
+public class ActiveCase extends SwitchBranch {
     /**
      * Body.
      */
     protected final ImmutableArray<Statement> body;
 
-    /**
-     * Default.
-     */
-    public Default() {
+    public ActiveCase() {
         this.body = null;
     }
 
-    /**
-     * Default.
-     *
-     * @param body
-     *        a statement array.
-     */
-
-    public Default(Statement[] body) {
+    public ActiveCase(Statement[] body) {
         this.body = new ImmutableArray<>(body);
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments,
+     * @param children the children of this AST element as KeY classes. May contain: Comments,
      *        several of Statement (as the statements for Default)
      */
-    public Default(ExtList children) {
+    public ActiveCase(ExtList children) {
         super(children);
         this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
-    public Default(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
-        super(pi, comments);
-        this.body = body;
+    /**
+     * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
+     * @param children the children of this AST element as KeY classes. May contain: Comments a
+     *        Statement (as the statement following case) Must NOT contain: an Expression indicating
+     *        the condition of the case as there are classes that are Expression and Statement, so
+     *        they might get mixed up. Use the second parameter of this constructor for the
+     *        expression.
+     */
+    public ActiveCase(ExtList children, PositionInfo pos) {
+        super(children, pos);
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**
@@ -76,11 +62,9 @@ public class Default extends SwitchBranch {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
@@ -130,10 +114,9 @@ public class Default extends SwitchBranch {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
-        v.performActionOnDefault(this);
+        v.performActionOnActiveCase(this);
     }
 }

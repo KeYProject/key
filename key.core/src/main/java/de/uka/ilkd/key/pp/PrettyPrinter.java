@@ -1780,6 +1780,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnActiveCase(ActiveCase x) {
+        l.keyWord("active-case").print(":");
+        printCaseBody(x.getBody());
+    }
+
+    @Override
     public void performActionOnFinally(Finally x) {
         layouter.print(" ");
         layouter.keyWord("finally");

@@ -23,7 +23,7 @@ public class Switch extends BranchStatement
      * Branches.
      */
 
-    protected final ImmutableArray<Branch> branches;
+    protected final ImmutableArray<SwitchBranch> branches;
 
     /**
      * Expression.
@@ -63,7 +63,7 @@ public class Switch extends BranchStatement
      *        a branch array
      */
 
-    public Switch(Expression e, Branch[] branches) {
+    public Switch(Expression e, SwitchBranch[] branches) {
         this.branches = new ImmutableArray<>(branches);
         this.expression = e;
     }
@@ -78,7 +78,7 @@ public class Switch extends BranchStatement
     public Switch(ExtList children) {
         super(children);
         this.expression = children.get(Expression.class);
-        this.branches = new ImmutableArray<>(children.collect(Branch.class));
+        this.branches = new ImmutableArray<>(children.collect(SwitchBranch.class));
     }
 
     public Switch(PositionInfo pi, List<Comment> c, Expression expr,
@@ -187,7 +187,7 @@ public class Switch extends BranchStatement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
-    public Branch getBranchAt(int index) {
+    public SwitchBranch getBranchAt(int index) {
         if (branches != null) {
             return branches.get(index);
         }
@@ -200,7 +200,7 @@ public class Switch extends BranchStatement
      *
      * @return the array wrapper of the branches
      */
-    public ImmutableArray<Branch> getBranchList() {
+    public ImmutableArray<SwitchBranch> getBranchList() {
         return branches;
     }
 

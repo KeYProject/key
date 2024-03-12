@@ -363,6 +363,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
+    public void performActionOnActiveCase(ActiveCase x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new ActiveCase(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
     // eee
     @Override
     public void performActionOnCase(Case x) {

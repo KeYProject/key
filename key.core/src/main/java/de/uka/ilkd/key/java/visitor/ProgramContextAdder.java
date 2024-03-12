@@ -67,18 +67,18 @@ public class ProgramContextAdder {
         } else {
             body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos, prefixDepth, prefix,
                 suffix);
-            if (context instanceof StatementBlock) {
-                return createStatementBlockWrapper((StatementBlock) context, body);
-            } else if (context instanceof Try) {
-                return createTryStatementWrapper((StatementBlock) body, (Try) context);
-            } else if (context instanceof MethodFrame) {
-                return createMethodFrameWrapper((MethodFrame) context, (StatementBlock) body);
-            } else if (context instanceof LabeledStatement) {
-                return createLabeledStatementWrapper((LabeledStatement) context, body);
-            } else if (context instanceof LoopScopeBlock) {
-                return createLoopScopeBlockWrapper((LoopScopeBlock) context, (StatementBlock) body);
-            } else if (context instanceof SynchronizedBlock) {
-                return createSynchronizedBlockWrapper((SynchronizedBlock) context,
+            if (context instanceof StatementBlock block) {
+                return createStatementBlockWrapper(block, body);
+            } else if (context instanceof Try t) {
+                return createTryStatementWrapper((StatementBlock) body, t);
+            } else if (context instanceof MethodFrame mf) {
+                return createMethodFrameWrapper(mf, (StatementBlock) body);
+            } else if (context instanceof LabeledStatement ls) {
+                return createLabeledStatementWrapper(ls, body);
+            } else if (context instanceof LoopScopeBlock lsb) {
+                return createLoopScopeBlockWrapper(lsb, (StatementBlock) body);
+            } else if (context instanceof SynchronizedBlock sb) {
+                return createSynchronizedBlockWrapper(sb,
                     (StatementBlock) body);
             } else if (context instanceof Exec) {
                 return createExecStatementWrapper((StatementBlock) body, (Exec) context);
@@ -146,7 +146,7 @@ public class ProgramContextAdder {
     /**
      * Replaces the first statement in the wrapper block. The replacement is optimized as it just
      * returns the replacement block if it is the only child of the statement block to be
-     * constructed and the chld is a statementblock too.
+     * constructed and the child is a statementblock too.
      *
      * @param wrapper
      *        the StatementBlock where to replace the first statement
