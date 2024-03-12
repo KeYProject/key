@@ -18,7 +18,7 @@ public class JavaASTTreeWalker implements TreeWalker {
     /**
      * The root of the tree that is being walked.
      */
-    private SourceElement root;
+    private final SourceElement root;
 
     /**
      * The node of the tree the walker is currently at.
@@ -28,12 +28,16 @@ public class JavaASTTreeWalker implements TreeWalker {
     /**
      * The stack used to store the path from the root to the current node.
      */
-    private Stack stack;
+    private final Stack stack;
 
     /**
-     * The index of the next child of {@code currentNode} to be visited.
+     * Creates a new {@link JavaASTTreeWalker} with the given {@code root} as the root of the tree.
      */
-    private int nextChildToVisitIndex;
+    public JavaASTTreeWalker(SourceElement root) {
+        this.root = root;
+        currentNode = root;
+        stack = new Stack();
+    }
 
     @Override
     public SourceElement getRoot() {
@@ -52,7 +56,6 @@ public class JavaASTTreeWalker implements TreeWalker {
             // at index 0 is visited.
             stack.push(new NonTerminalProgramElementChildIndexPair(ntpe, 1));
             currentNode = ntpe.getChildAt(0);
-            nextChildToVisitIndex = 0;
             return currentNode;
         }
         return null;
@@ -67,7 +70,6 @@ public class JavaASTTreeWalker implements TreeWalker {
             stack.push(
                 new NonTerminalProgramElementChildIndexPair(ntpe, ntpe.getChildCount()));
             currentNode = ntpe.getChildAt(ntpe.getChildCount() - 1);
-            nextChildToVisitIndex = 0;
             return currentNode;
         }
         return null;
@@ -75,17 +77,17 @@ public class JavaASTTreeWalker implements TreeWalker {
 
     @Override
     public SourceElement nextNode() {
-        SourceElement node = firstChild();
         // TreeWalker is depth-first, so if the current node has children, the first child is taken
+        SourceElement node = firstChild();
         if (node != null) {
             return node;
         }
-        // If the current node has no children, the next sibling would be the next node
+        // As the current node has no children, the next sibling would be the next node
         node = nextSibling();
         if (node != null) {
             return node;
         }
-        // If the current node has no children and no next sibling, we have to go up the tree and
+        // As the current node has no children and no next sibling, we have to go up the tree and
         // find siblings of the ancestors
         while (!stack.empty()) {
             parentNode();
@@ -94,12 +96,33 @@ public class JavaASTTreeWalker implements TreeWalker {
                 return node;
             }
         }
+        // The current node is the last node in the tree
         return null;
     }
 
     @Override
     public SourceElement previousNode() {
-        return null;
+        // If the current node is the root, there is no previous node
+        if (currentNode == root) {
+            return null;
+        }
+        // If the current node has no previous sibling, it is a first child, and we must therefore
+        // go to the parent
+        SourceElement node = previousSibling();
+        if (node == null) {
+            node = parentNode();
+            return node;
+        }
+        // As the current node has a previous sibling, we must go down the tree through all last
+        // children to find the real previous node
+        while (true) {
+            SourceElement lastChild = lastChild();
+            if (lastChild != null) {
+                node = lastChild;
+            } else {
+                return node;
+            }
+        }
     }
 
     @Override
@@ -113,7 +136,6 @@ public class JavaASTTreeWalker implements TreeWalker {
                 // increased by one
                 parent.setNextChildToVisitIndex(parentChildIndex + 1);
                 currentNode = parentNode.getChildAt(parentChildIndex);
-                nextChildToVisitIndex = 0;
                 return currentNode;
             }
         }
@@ -133,7 +155,6 @@ public class JavaASTTreeWalker implements TreeWalker {
                 // decreased by one
                 parent.setNextChildToVisitIndex(parentChildIndex - 1);
                 currentNode = parentNode.getChildAt(parentChildIndex - 2);
-                nextChildToVisitIndex = 0;
                 return currentNode;
             }
         }
@@ -147,7 +168,6 @@ public class JavaASTTreeWalker implements TreeWalker {
         }
         final NonTerminalProgramElementChildIndexPair parent = stack.pop();
         currentNode = parent.getNonTerminalProgramElement();
-        nextChildToVisitIndex = parent.getNextChildToVisitIndex();
         return currentNode;
     }
 
