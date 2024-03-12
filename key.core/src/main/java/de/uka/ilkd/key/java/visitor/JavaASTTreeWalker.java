@@ -6,6 +6,14 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 
+/**
+ * This class is used to walk a tree of {@link SourceElement}s. The tree is
+ * traversed in depth-first order, and the walker can be used to visit the
+ * children of a node, the siblings of a node and the parent of a node.
+ * <p>
+ * The walker is backed by a stack, which is used to store the path from the root to the current
+ * node.
+ */
 public class JavaASTTreeWalker implements TreeWalker {
     /**
      * The root of the tree that is being walked.
@@ -67,6 +75,25 @@ public class JavaASTTreeWalker implements TreeWalker {
 
     @Override
     public SourceElement nextNode() {
+        SourceElement node = firstChild();
+        // TreeWalker is depth-first, so if the current node has children, the first child is taken
+        if (node != null) {
+            return node;
+        }
+        // If the current node has no children, the next sibling would be the next node
+        node = nextSibling();
+        if (node != null) {
+            return node;
+        }
+        // If the current node has no children and no next sibling, we have to go up the tree and
+        // find siblings of the ancestors
+        while (!stack.empty()) {
+            parentNode();
+            node = nextSibling();
+            if (node != null) {
+                return node;
+            }
+        }
         return null;
     }
 
@@ -125,7 +152,7 @@ public class JavaASTTreeWalker implements TreeWalker {
     }
 
 
-    // ----------------- internal classes for easier handling of the tree -----------------
+    // ----------------- internal classes for easier handling of the tree ----------------- //
 
     /**
      * A pair consisting of a {@link NonTerminalProgramElement} and how many children of it have
