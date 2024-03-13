@@ -12,13 +12,15 @@ typedecl any
 
 
 consts
-  int_subset_inany::"any set"
+  int_Image::"any set"
   int2any::"int\&lt;Rightarrow&gt;any"
   any2int::"any\&lt;Rightarrow&gt;int"
 
-axiomatization where int_sub_any[simp]:"type_definition int2any any2int (int_subset_inany)"
+axiomatization where int_sub_any[simp]:"type_definition int2any any2int (int_Image)"
 declare [[coercion int2any]]
 
+interpretation int: type_definition int2any any2int int_Image
+  using int_sub_any by simp
 
 consts
   bool_Image::"any set"
@@ -27,6 +29,10 @@ consts
 
 axiomatization where bool_sub_any[simp]:"type_definition bool2any any2bool (bool_Image)"
 declare [[coercion bool2any]]
+
+interpretation bool: type_definition bool2any any2bool bool_Image
+  using bool_sub_any by simp
+
 
 consts
   bottom::"any"
