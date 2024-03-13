@@ -121,6 +121,9 @@ class any =
   fixes cast::"any\&lt;Rightarrow&gt;'a"
   fixes exact_instance::"'a\&lt;Rightarrow&gt;bool"
 
+class array =
+  fixes legal_Values::"'a\&lt;Rightarrow&gt;any set"
+
 instantiation any::any
 begin
 fun to_any_any where "to_any_any x = (id::any\&lt;Rightarrow&gt;any) x"
@@ -151,10 +154,7 @@ instance by standard
 end
 
 
-
-class java_lang_Object = any
-
-instantiation java_lang_Object::java_lang_Object
+instantiation java_lang_Object::any
 begin
 fun cast_java_lang_Object where "cast_java_lang_Object x = any2java_lang_Object x"
 fun to_any_java_lang_Object where "to_any_java_lang_Object x = java_lang_Object2any x"
@@ -175,7 +175,7 @@ lemma Null_sub_java_lang_Object_Types: "(UNIV::Null set) \&lt;subseteq&gt; (UNIV
 
 definition "null \&lt;equiv&gt; any2Null bottom"
 
-instantiation Null::java_lang_Object
+instantiation Null::any
 begin
 fun to_any_Null where "to_any_Null (x::Null) = Null2any x"
 fun cast_Null where "cast_Null x = any2Null x"

@@ -4,9 +4,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.sound.sampled.Line;
 import java.io.IOException;
 import java.util.*;
 
@@ -94,9 +94,8 @@ public class IsabelleTranslator {
                 }
                 String parentSortName = masterHandler.translateSortName(parentSort);
                 String parentSortInj = sortName + "2" + parentSortName;
-                result.append(LINE_ENDING).append("abbreviation \"").append(parentSortInj).append(" \\<equiv> ");
-                result.append("any2").append(parentSortName).append(" \\<circ> ").append(repName).append("\"").append(LINE_ENDING);
-
+                result.append(LINE_ENDING).append("fun ").append(parentSortInj).append(" where \"").append(parentSortInj)
+                        .append(" x = ").append("any2").append(parentSortName).append(" (").append(repName).append(" x)\"").append(LINE_ENDING);
                 result.append("declare [[coercion ").append(parentSortInj).append("]]").append(LINE_ENDING).append(LINE_ENDING);
             }
 
@@ -108,14 +107,33 @@ public class IsabelleTranslator {
                     .append(LINE_ENDING);
             String cast_fun_Name = "cast_" + sortName;
             result.append("fun ").append(cast_fun_Name)
-                    .append(" where \"").append(cast_fun_Name).append(" x = ").append(absName).append(" x\"")
+                    .append("  where \"").append(cast_fun_Name).append(" x = ").append(absName).append(" x\"")
                     .append(LINE_ENDING);
             result.append("instance by standard").append(LINE_ENDING);
             result.append("end").append(LINE_ENDING).append(LINE_ENDING);
 
             if (nullSort.extendsTrans(sort)) {
-                result.append("abbreviation \"Null2").append(sortName).append("\\<equiv> any2Null \\<circ> ").append(repName).append("\"").append(LINE_ENDING);
+                String null_to_sort_name = "Null2" + sortName;
+                result.append("fun ").append(null_to_sort_name).append(" where \"").append(null_to_sort_name)
+                        .append(" x = ").append(absName).append("(Null2any x)\"").append(LINE_ENDING);
                 result.append("declare [[coercion Null2").append(sortName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
+            }
+
+            if (sort instanceof ArraySort) {
+                result.append("instantiation ").append(sortName).append("::array").append(LINE_ENDING);
+                result.append("begin").append(LINE_ENDING);
+
+                String legal_Values_name = "legal_Values_" + sortName;
+                String elementSortName = masterHandler.translateSortName(((ArraySort) sort).elementSort());
+                String elementSortUNIV = "((UNIV::" + elementSortName + " set)::any set)";
+                result.append("fun ").append(legal_Values_name)
+                        .append(" where \"").append(legal_Values_name)
+                        .append(" (x::").append(sortName).append(")").append(" = ")
+                        .append(elementSortUNIV).append("\"")
+                        .append(LINE_ENDING);
+
+                result.append("instance by standard").append(LINE_ENDING);
+                result.append("end").append(LINE_ENDING).append(LINE_ENDING);
             }
 
             result.append(LINE_ENDING).append(LINE_ENDING);
