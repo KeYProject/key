@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
@@ -140,6 +141,9 @@ public class IsabelleMasterHandler {
     void addGenericSort(Sort sort) {
         if (!isKnownSort(sort)) {
             extraSorts.put(sort, new StringBuilder(sort.name().toString().replace("[]", "arr").replace(".", "_")));
+            if (sort instanceof ArraySort) {
+                addGenericSort(((ArraySort) sort).elementSort());
+            }
         }
     }
 
