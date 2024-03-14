@@ -123,13 +123,13 @@ public class IsabelleTranslator {
                 result.append("instantiation ").append(sortName).append("::array").append(LINE_ENDING);
                 result.append("begin").append(LINE_ENDING);
 
-                String legal_Values_name = "legal_Values_" + sortName;
+                String element_type_name = "element_type_" + sortName;
                 String elementSortName = masterHandler.translateSortName(((ArraySort) sort).elementSort());
-                String elementSortUNIV = "((UNIV::" + elementSortName + " set)::any set)";
-                result.append("fun ").append(legal_Values_name)
-                        .append(" where \"").append(legal_Values_name)
+                String elementSortType = "Abs_javaDL_type ((UNIV::" + elementSortName + " set)::any set)";
+                result.append("fun ").append(element_type_name)
+                        .append(" where \"").append(element_type_name)
                         .append(" (x::").append(sortName).append(")").append(" = ")
-                        .append(elementSortUNIV).append("\"")
+                        .append(elementSortType).append("\"")
                         .append(LINE_ENDING);
 
                 result.append("instance by standard").append(LINE_ENDING);
