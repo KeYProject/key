@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
 
 
 
@@ -31,10 +31,10 @@ public class SetStatement extends JavaStatement {
     /**
      * The parser context of the statement produced during parsing.
      */
-    private final JmlParser.Set_statementContext context;
+    private final SetStatementContext context;
 
     /** Constructor used in recoderext */
-    public SetStatement(JmlParser.Set_statementContext context, PositionInfo positionInfo) {
+    public SetStatement(SetStatementContext context, PositionInfo positionInfo) {
         super(positionInfo);
         this.context = context;
     }
@@ -47,13 +47,9 @@ public class SetStatement extends JavaStatement {
     /**
      * Removes the attached parser context from this set statement
      *
-     * @deprecated weigl: The use of {@link org.antlr.v4.runtime.ParserRuleContext} directly is
-     *             discouraged. It adds
-     *             an (often) unnecessary dependency to the ANTLR across the project.
      * @return the parser context that was attached
      */
-    @Deprecated
-    public JmlParser.Set_statementContext getParserContext() {
+    public SetStatementContext getParserContext() {
         return context;
     }
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
 
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -18,14 +18,14 @@ public class SetStatement extends JavaStatement {
     /**
      * Parser context of the assignment
      */
-    private final JmlParser.Set_statementContext context;
+    private final SetStatementContext context;
 
     /**
      * Primary constructor
      *
      * @param context the context of the assignment
      */
-    public SetStatement(JmlParser.Set_statementContext context) {
+    public SetStatement(SetStatementContext context) {
         this.context = context;
     }
 
@@ -52,14 +52,12 @@ public class SetStatement extends JavaStatement {
      *
      * @return the parser context
      */
-    public JmlParser.Set_statementContext getParserContext() {
+    public SetStatementContext getParserContext() {
         return context;
     }
 
     /**
      * A set statement has no recorder AST children
-     *
-     * @return
      */
     @Override
     public int getChildCount() {

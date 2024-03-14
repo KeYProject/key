@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -1456,13 +1457,13 @@ public class JMLSpecFactory {
     public void translateSetStatement(final SetStatement statement, final IProgramMethod pm)
             throws SLTranslationException {
         final var pv = createProgramVariablesForStatement(statement, pm);
-        JmlParser.Set_statementContext setStatementContext = statement.getParserContext();
+        KeyAst.SetStatementContext setStatementContext = statement.getParserContext();
         var io = new JmlIO(services).context(Context.inMethod(pm, tb)).selfVar(pv.selfVar)
                 .parameters(pv.paramVars)
                 .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
                 .atBefore(pv.atBefores);
-        Term assignee = io.translateTerm(setStatementContext.assignee);
-        Term value = io.translateTerm(setStatementContext.value);
+        Term assignee = io.translateTerm(setStatementContext.getAssignee());
+        Term value = io.translateTerm(setStatementContext.getValue());
         if (value.sort() == JavaDLTheory.FORMULA) {
             value = tb.convertToBoolean(value);
         }
@@ -1470,7 +1471,7 @@ public class JMLSpecFactory {
         if (error != null) {
             throw new SLTranslationException(
                 "Invalid assignment target for set statement: " + error,
-                Location.fromToken(setStatementContext.start));
+                setStatementContext.getStartLocation());
         }
 
         services.getSpecificationRepository().addStatementSpec(

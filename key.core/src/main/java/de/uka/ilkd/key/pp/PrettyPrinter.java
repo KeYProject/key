@@ -30,7 +30,6 @@ import de.uka.ilkd.key.speclang.MergeContract;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1946,11 +1945,8 @@ public class PrettyPrinter implements Visitor {
         // but services is currently not available.
         var context = x.getParserContext();
         if (context != null) {
-            var interval =
-                new Interval(context.start.getStartIndex(), context.stop.getStopIndex() + 1);
-            var text = context.start.getInputStream().getText(interval)
-                    .replaceAll("\\s+", " "); // remove all whitespaces (\n\f\t...) with an empty
-                                              // space
+            // remove all whitespaces (\n\f\t...) with an empty space
+            var text = context.getText().replaceAll("\\s+", " ");
             l.print(text);
         }
         l.end();
