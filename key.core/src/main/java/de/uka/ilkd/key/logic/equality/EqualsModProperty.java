@@ -7,6 +7,8 @@ package de.uka.ilkd.key.logic.equality;
  * Interface to check for equality ignoring given properties and to compute according hash codes.
  *
  * @param <T> the type of the objects that are checked for equality or hashed
+ * @param <V> the type of additional arguments needed for the equality check
+ *
  * @author Tobias Reinhold
  */
 public interface EqualsModProperty<T, V> {

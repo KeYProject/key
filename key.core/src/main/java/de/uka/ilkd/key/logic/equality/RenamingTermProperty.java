@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A property that can be used in
- * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * Renaming of variables is ignored in this equality check.
  */
 public class RenamingTermProperty implements Property<Term> {
@@ -30,7 +30,7 @@ public class RenamingTermProperty implements Property<Term> {
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
      * through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
+     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private RenamingTermProperty() {}
 

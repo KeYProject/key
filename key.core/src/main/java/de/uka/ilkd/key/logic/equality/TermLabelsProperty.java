@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All term labels are ignored in this equality check.
  */
 public class TermLabelsProperty implements Property<Term> {
@@ -22,7 +22,7 @@ public class TermLabelsProperty implements Property<Term> {
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
      * through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
+     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private TermLabelsProperty() {}
 

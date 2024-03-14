@@ -50,12 +50,11 @@ public interface TreeWalker {
      * the tree.
      * <p>
      * Possible candidates for the next node are (in this order):
-     * <p>
-     * 1. The first child of the current node
-     * <p>
-     * 2. The next sibling of the current node
-     * <p>
-     * 3. The first found next sibling of some ancestor of the current node from bottom to top
+     * <ol>
+     * <li>The first child of the current node</li>
+     * <li>The next sibling of the current node</li>
+     * <li>The first found next sibling of some ancestor of the current node from bottom to top</li>
+     * </ol>
      *
      * @return the next node in the tree, or {@code null} if the current node is the last node in
      *         the tree
@@ -67,12 +66,12 @@ public interface TreeWalker {
      * node in the tree.
      * <p>
      * Possible candidates for the previous node are (in this order):
-     * <p>
-     * 1. The furthest down last descendant of the previous sibling of the current node in the tree
-     * <p>
-     * 2. The previous sibling of the current node
-     * <p>
-     * 3. The parent of the current node
+     * <ol>
+     * <li>The furthest down last descendant of the previous sibling of the current node in the tree
+     * </li>
+     * <li>The previous sibling of the current node</li>
+     * <li>The parent of the current node</li>
+     * </ol>
      *
      * @return the previous node in the tree, or {@code null} if the current node is the last node
      *         in the tree
