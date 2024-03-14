@@ -175,7 +175,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     }
 
     public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
-        protected Expression(JmlParser.@NonNull ExpressionContext ctx) {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
             super(ctx);
         }
     }

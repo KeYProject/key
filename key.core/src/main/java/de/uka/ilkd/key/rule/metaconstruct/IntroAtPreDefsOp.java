@@ -5,11 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -181,12 +177,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         @Override
         public void performActionOnJmlAssert(final JmlAssert x) {
-            addNeededVariables(x.getVars().atPres.keySet());
-            x.updateVars(atPres, services);
+            handleJmlStatement(x);
         }
 
         @Override
         public void performActionOnSetStatement(SetStatement x) {
+            handleJmlStatement(x);
+        }
+
+        private void handleJmlStatement(Statement x) {
             var spec =
                 Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
             addNeededVariables(spec.vars().atPres.keySet());

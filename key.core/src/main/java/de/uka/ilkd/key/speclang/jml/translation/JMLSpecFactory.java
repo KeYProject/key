@@ -1415,7 +1415,17 @@ public class JMLSpecFactory {
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
         final var pv = createProgramVariablesForStatement(jmlAssert, pm);
-        jmlAssert.translateCondition(new JmlIO(services).context(Context.inMethod(pm, tb)), pv);
+        var io = new JmlIO(services).context(Context.inMethod(pm, tb))
+                .selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar)
+                .exceptionVariable(pv.excVar)
+                .atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        Term expr = io.translateTerm(jmlAssert.getCondition());
+        services.getSpecificationRepository().addStatementSpec(
+            jmlAssert,
+            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(expr)));
     }
 
     public @Nullable String checkSetStatementAssignee(Term assignee) {

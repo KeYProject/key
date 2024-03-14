@@ -44,6 +44,7 @@ public class SetStatement extends JavaStatement {
         this(copyFrom.context, copyFrom.getPositionInfo());
     }
 
+
     /**
      * Removes the attached parser context from this set statement
      *

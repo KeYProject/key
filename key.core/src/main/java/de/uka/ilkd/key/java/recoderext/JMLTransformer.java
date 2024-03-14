@@ -407,18 +407,18 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
-        ParserRuleContext ctx = stat.getContext().first;
+        var ctx = stat.getContext();
 
-        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromToken(ctx.start);
+        de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         final Kind kind = stat.getKind();
-        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext());
+        JmlAssert jmlAssert = new JmlAssert(kind, ctx);
         try {
             updatePositionInformation(jmlAssert, pos);
             doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
                 String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
-                Location.fromToken(ctx.start), e);
+                ctx.getStartLocation(), e);
         }
     }
 
