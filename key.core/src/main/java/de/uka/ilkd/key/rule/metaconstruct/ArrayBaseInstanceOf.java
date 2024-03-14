@@ -4,15 +4,17 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Creates an <tt>Type::instance(..)</tt> term for the component type of the array. The component
@@ -35,7 +37,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arraySort;
         if (array.op() instanceof SortDependingFunction && ((SortDependingFunction) array.op())
-                .getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+                .getKind().equals(JavaDLTheory.EXACT_INSTANCE_NAME)) {
             arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
@@ -45,7 +47,8 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol = arrayElementSort.getInstanceofSymbol(services);
+        JFunction instanceofSymbol =
+            services.getJavaDLTheory().getInstanceofSymbol(arrayElementSort, services);
         Debug.assertTrue(instanceofSymbol != null, "Instanceof symbol not found for ",
             arrayElementSort);
 

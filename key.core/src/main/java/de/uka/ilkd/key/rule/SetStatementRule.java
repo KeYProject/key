@@ -13,11 +13,13 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -110,8 +112,9 @@ public final class SetStatementRule implements BuiltInRule {
 
         JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
-        Term newTerm = tb.apply(update, tb.apply(newUpdate, services.getTermFactory().createTerm(
-            target.op(), target.subs(), target.boundVars(), javaBlock, target.getLabels())));
+        Term term =
+            tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), target.getLabels());
+        Term newTerm = tb.apply(update, tb.apply(newUpdate, term));
 
         ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(newTerm), occurrence);

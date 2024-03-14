@@ -8,8 +8,9 @@ import java.util.Properties;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.logic.op.Function;
 
 /**
  * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".

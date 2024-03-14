@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabel;
+
+import org.key_project.logic.Name;
 
 /**
  * This abstract class is used by SequentViewLogicPrinter to determine the set of printed

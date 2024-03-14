@@ -9,11 +9,11 @@ import java.util.List;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.util.collection.ImmutableList;
@@ -71,7 +71,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             if (et != null && pm == null) {
                 containingType = et.getKeYJavaType();
                 if (recTerm != null) {
-                    final Function fieldSymbol =
+                    final JFunction fieldSymbol =
                         services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
                     recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
@@ -117,7 +117,8 @@ public final class SLMethodResolver extends SLExpressionResolver {
         for (SLExpression slExpression : params) {
             // Remember: parameters.isLisOfTerm() is true!
             final Term term = slExpression.getTerm();
-            subs[i] = term.sort() == Sort.FORMULA ? services.getTermBuilder().convertToBoolean(term)
+            subs[i] = term.sort() == JavaDLTheory.FORMULA
+                    ? services.getTermBuilder().convertToBoolean(term)
                     : term;
             i++;
         }

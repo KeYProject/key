@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import java.util.ArrayList;
+
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,13 +30,13 @@ public class TestSemisequent {
     @BeforeEach
     public void setUp() {
         TermBuilder TB = TacletForTests.services().getTermBuilder();
-        Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[] {});
-        Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[] {});
-        Function r = new Function(new Name("r"), Sort.FORMULA, new Sort[] {});
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, new Sort[] {});
+        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, new Sort[] {});
+        JFunction r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, new Sort[] {});
 
-        Function a = new Function(new Name("a"), Sort.FORMULA, new Sort[] {});
-        Function b = new Function(new Name("b"), Sort.FORMULA, new Sort[] {});
-        Function c = new Function(new Name("c"), Sort.FORMULA, new Sort[] {});
+        JFunction a = new JFunction(new Name("a"), JavaDLTheory.FORMULA, new Sort[] {});
+        JFunction b = new JFunction(new Name("b"), JavaDLTheory.FORMULA, new Sort[] {});
+        JFunction c = new JFunction(new Name("c"), JavaDLTheory.FORMULA, new Sort[] {});
 
 
         Term t_p = TB.func(p, new Term[] {});
@@ -53,7 +58,7 @@ public class TestSemisequent {
         con[6] = new SequentFormula(t_c);
 
         Sort s = new SortImpl(new Name("test"));
-        Function f = new Function(new Name("f"), s, new Sort[] {});
+        Function f = new JFunction(new Name("f"), s, new Sort[] {});
     }
 
     @AfterEach
@@ -304,6 +309,13 @@ public class TestSemisequent {
         assertEquals(ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(sci), "Both semisequents should be equal.");
+    }
+
+    @Test
+    void constructorTest() {
+        var a = Semisequent.EMPTY_SEMISEQUENT;
+        var b = Semisequent.create(new ArrayList<>());
+        assertSame(a, b);
     }
 
 }

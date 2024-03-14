@@ -5,13 +5,12 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -108,15 +109,15 @@ public class ProofObligationCreator {
         for (Term sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);
         }
-        if (term.op() instanceof SortedOperator) {
-            Sort sort = ((SortedOperator) term.op()).sort();
+        if (term.op() instanceof final SortedOperator op) {
+            final Sort sort = op.sort();
             userDefinedSymbols.addSort(sort);
 
-            if (term.op() instanceof Function) {
-                if (sort == Sort.FORMULA) {
-                    userDefinedSymbols.addPredicate((Function) term.op());
+            if (term.op() instanceof JFunction) {
+                if (sort == JavaDLTheory.FORMULA) {
+                    userDefinedSymbols.addPredicate((JFunction) term.op());
                 } else {
-                    userDefinedSymbols.addFunction((Function) term.op());
+                    userDefinedSymbols.addFunction((JFunction) term.op());
                 }
             }
             if (term.op() instanceof LogicVariable) {

@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Visitor;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -22,7 +24,8 @@ import org.jspecify.annotations.Nullable;
  * done for implementation reasons, as their structure is quite similar and there are good reasons
  * concerning the software's design/architecture (for example using same visitors, reduction of case
  * distinction, unified interfaces etc.). However, they are strictly separated by their sorts. A
- * formula (and just a formula) must have the sort {@link Sort#FORMULA}. Terms of a different sort
+ * formula (and just a formula) must have the sort {@link JavaDLTheory#FORMULA}. Terms of a
+ * different sort
  * are terms in the customary logic sense. A term of sort formula is allowed exact there, where a
  * formula in logic is allowed to appear, same for terms of different sorts. Some words about other
  * design decisions:
@@ -39,86 +42,46 @@ import org.jspecify.annotations.Nullable;
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
-
-    /**
-     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
-     */
+public interface Term
+        extends SVSubstitute, Sorted, EqualsModProofIrrelevancy, org.key_project.logic.Term {
+    @Override
     Operator op();
-
-    /**
-     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f") cast to the passed
-     * type.
-     */
-    <T> T op(Class<T> opClass) throws IllegalArgumentException;
 
     /**
      * The subterms.
      */
+    @Override
     ImmutableArray<Term> subs();
 
     /**
-     * The <code>n</code>-th direct subterm.
+     * {@inheritDoc}
      */
+    @Override
     Term sub(int n);
 
     /**
-     * The logical variables bound by the top level operator.
+     * {@inheritDoc}
      */
+    @Override
     ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
-     * The logical variables bound by the top level operator for the nth subterm.
+     * {@inheritDoc}
      */
+    @Override
     ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ImmutableSet<QuantifiableVariable> freeVars();
 
     /**
      * The Java block at top level.
      */
     @NonNull
     JavaBlock javaBlock();
-
-    /**
-     * The arity of the term.
-     */
-    int arity();
-
-    /**
-     * The sort of the term.
-     */
-    @Override
-    Sort sort();
-
-    /**
-     * The nesting depth of this term.
-     */
-    int depth();
-
-    /**
-     * Whether all operators in this term are rigid.
-     */
-    boolean isRigid();
-
-    /**
-     * The set of free quantifiable variables occurring in this term.
-     */
-    ImmutableSet<QuantifiableVariable> freeVars();
-
-    /**
-     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while
-     * at each upstep the method visit of the visitor is called.
-     *
-     * @param visitor the Visitor
-     */
-    void execPostOrder(Visitor visitor);
-
-    /**
-     * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
-     * is called.
-     *
-     * @param visitor the Visitor
-     */
-    void execPreOrder(Visitor visitor);
 
     /**
      * Compares if two terms are equal modulo bound renaming
@@ -155,12 +118,6 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
     TermLabel getLabel(Name termLabelName);
-
-    /**
-     * Returns a serial number for a term. The serial number is not persistent.
-     */
-    int serialNumber();
-
 
     /**
      * Checks if the {@link Term} or one of its direct or indirect children contains a non-empty
