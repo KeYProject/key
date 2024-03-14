@@ -10,6 +10,15 @@ declare [[coercion_map image]]
 
 typedecl any
 
+typedef javaDL_type = "(UNIV::any set set)"
+  by auto
+
+setup_lifting type_definition_javaDL_type
+lift_definition typeof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.member.
+lift_definition subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset_eq.
+lift_definition strict_subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset.
+
+
 
 consts
   int_Image::"any set"
@@ -22,6 +31,8 @@ declare [[coercion int2any]]
 interpretation int: type_definition int2any any2int int_Image
   using int_sub_any by simp
 
+definition int_type::"javaDL_type" where "int_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::int set)"
+
 consts
   bool_Image::"any set"
   bool2any::"bool\&lt;Rightarrow&gt;any"
@@ -32,6 +43,8 @@ declare [[coercion bool2any]]
 
 interpretation bool: type_definition bool2any any2bool bool_Image
   using bool_sub_any by simp
+
+definition bool_type::"javaDL_type" where "bool_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::bool set)"
 
 
 consts
@@ -63,6 +76,8 @@ typedef java_lang_Object = "java_lang_Object_UNIV"
 
 declare [[coercion java_lang_Object2any]]
 
+definition java_lang_Object_type::"javaDL_type" where "java_lang_Object_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::java_lang_Object set)"
+
 lemma java_lang_Object_subset_any[simp]:"(UNIV::java_lang_Object set) \&lt;subseteq&gt; (UNIV::any set)"
   by simp
 
@@ -70,7 +85,12 @@ lemma bottom_in_java_lang_Object[simp] :"bottom \&lt;in&gt; (UNIV::java_lang_Obj
   using java_lang_Object_UNIV_specification
   using type_definition.Rep_range type_definition_java_lang_Object by blast
 
+
 typedecl Field
+
+consts
+  created::"Field"
+  fieldType::"Field\&lt;Rightarrow&gt;javaDL_type"
 
 axiomatization arr::"int\&lt;Rightarrow&gt;Field" where arr_inject[simp]:"(arr x = arr y) = (x = y)"
 
@@ -83,7 +103,7 @@ setup_lifting  type_definition_LocSet
 lift_definition elementOf::"(java_lang_Object \&lt;times&gt; Field)\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;bool" is Set.member.
 lift_definition empty::"LocSet" is Set.empty.
 lift_definition allLocs::"LocSet" is Set.UNIV.
-lift_definition singleton::"(java_lang_Object \&lt;times&gt; Field)\&lt;Rightarrow&gt;LocSet" is "\&lt;lambda&gt;x. {x}".
+lift_definition singleton::"java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;LocSet" is "\&lt;lambda&gt;obj f. {(obj, f)}".
 lift_definition disjoint::"LocSet\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;bool" is Set.disjnt.
 lift_definition union::"LocSet\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;LocSet" is Set.union.
 lift_definition intersect::"LocSet\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;LocSet" is Set.inter.
@@ -98,9 +118,16 @@ consts
   LocSet2any::"LocSet\&lt;Rightarrow&gt;any"
   any2LocSet::"any\&lt;Rightarrow&gt;LocSet"
 
-axiomatization where LocSet_sub_any[simp]:"type_definition LocSet2any any2LocSet LocSet_Image"
+axiomatization where LocSet_sub_any:"type_definition LocSet2any any2LocSet LocSet_Image"
+
+interpretation LocSet:type_definition LocSet2any any2LocSet LocSet_Image
+  using LocSet_sub_any by simp
 
 declare [[coercion LocSet2any]]
+
+definition LocSet_type::"javaDL_type" where "LocSet_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::LocSet set)"
+
+
 
 typedef Heap = "UNIV::(java_lang_Object \&lt;Rightarrow&gt; Field \&lt;Rightarrow&gt; any) set"
   by simp
@@ -114,15 +141,17 @@ consts
 
 axiomatization where Heap_sub_any:"type_definition Heap2any any2Heap Heap_Image"
 
+interpretation Heap:type_definition Heap2any any2Heap Heap_Image
+  using Heap_sub_any by simp
+
 declare [[coercion Heap2any]]
+
+definition Heap_type::"javaDL_type" where "Heap_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::Heap set)"
+
 
 class any = 
   fixes to_any::"'a\&lt;Rightarrow&gt;any"
   fixes cast::"any\&lt;Rightarrow&gt;'a"
-  fixes exact_instance::"'a\&lt;Rightarrow&gt;bool"
-
-class array =
-  fixes legal_Values::"'a\&lt;Rightarrow&gt;any set"
 
 instantiation any::any
 begin
@@ -130,7 +159,6 @@ fun to_any_any where "to_any_any x = (id::any\&lt;Rightarrow&gt;any) x"
 fun cast_any where "cast_any x = (id::any\&lt;Rightarrow&gt;any) x"
 instance by standard
 end
-
 
 instantiation int::any
 begin
@@ -153,6 +181,12 @@ fun cast_LocSet where "cast_LocSet x = any2LocSet x"
 instance by standard
 end
 
+instantiation Heap::any
+begin
+fun to_any_Heap where "to_any_Heap x = Heap2any x"
+fun cast_Heap where "cast_Heap x = any2Heap x"
+instance by standard
+end
 
 instantiation java_lang_Object::any
 begin
@@ -190,10 +224,10 @@ typedef Seq = "UNIV::any list set"
   by auto
 
 consts
-getSeqOutside::any
+  getSeqOutside::any
 
 setup_lifting type_definition_Seq
-lift_definition seqLen::"Seq\&lt;Rightarrow&gt;int" is "\&lt;lambda&gt;x. int (List.length x)".
+lift_definition seqLen::"Seq\&lt;Rightarrow&gt;int" is "int \&lt;circ&gt; List.length".
 lift_definition seqGet::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a::any" is "\&lt;lambda&gt;s i. (if (0::int)\&lt;le&gt;i\&lt;and&gt;i&lt;(int (length s)) then cast (s ! (nat i)) else cast getSeqOutside)".
 lift_definition seqDef::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;(int\&lt;Rightarrow&gt;any)\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;le ri e. map e [le..ri - 1]".
 lift_definition seqEmpty::"Seq" is "[]".
@@ -201,31 +235,54 @@ lift_definition seqSingleton::"any\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;x. 
 lift_definition seqConcat::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" is List.append.
 lift_definition seqReverse::"Seq\&lt;Rightarrow&gt;Seq" is List.rev.
 
-
+fun seqSub::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" where
+  "seqSub i j s = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
 
 primrec listIndexOf::"any list\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" where
-"listIndexOf [] a = undefined" |
-"listIndexOf (x#xs) a = (if (x=a) then 0 else Suc (listIndexOf xs a))"
+  "listIndexOf [] a = undefined" |
+  "listIndexOf (x#xs) a = (if (x=a) then 0 else Suc (listIndexOf xs a))"
 
 lift_definition seqIndexOf::"Seq\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" is listIndexOf.
 
-fun seqSub::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" where
-"seqSub i j s = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
+axiomatization Seq2any any2Seq Seq_UNIV
+  where Seq_sub_any:"type_definition (Seq2any::Seq\&lt;Rightarrow&gt;any) (any2Seq::any\&lt;Rightarrow&gt;Seq) (Seq_UNIV::any set)"
 
-consts
-  store::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap"
-  create::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Heap"
-  anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap"
-  created::"Field"
+interpretation Seq: type_definition Seq2any any2Seq Seq_UNIV
+  using Seq_sub_any by simp
 
+declare [[coercion Seq2any]]
+
+instantiation Seq::any
+begin
+fun to_any_Seq where "to_any_Seq (x::Seq) = Seq2any x"
+fun cast_Seq where "cast_Seq (x::any) = any2Seq x"
+instance by standard
+end
+
+
+fun instanceof::"javaDL_type\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;bool"
+  where "instanceof x type = typeof type x"
 
 axiomatization obj_length::"java_lang_Object\&lt;Rightarrow&gt;int" where length_nonneg[simp]:"obj_length obj \&lt;ge&gt; 0"
 
-fun unusedLocs where "unusedLocs (h::Heap) = {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
+fun unusedLocs where "unusedLocs (h::Heap) = Abs_LocSet {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
 
 fun select::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;'a::any" where
   "select h obj f = cast (h obj f)"
 
+fun anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap" where
+  "anon h1 s h2 = Abs_Heap (\&lt;lambda&gt;(obj::java_lang_Object) (f::Field). (if elementOf (obj, f) s \&lt;and&gt; f\&lt;noteq&gt;created \&lt;or&gt; elementOf (obj, f) (unusedLocs h1)
+    then select h2 obj f else select h1 obj f))"
+
+fun store::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap" where
+  "store h obj f x = Abs_Heap (\&lt;lambda&gt;(obj'::java_lang_Object) (f'::Field). (if obj'=obj \&lt;and&gt; f'=f \&lt;and&gt; f\&lt;noteq&gt;created then x else h obj' f'))"
+
+fun create::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Heap" where
+  "create h obj = Abs_Heap (\&lt;lambda&gt;(obj'::java_lang_Object) (f'::Field). (if obj'=obj \&lt;and&gt; f'=created \&lt;and&gt; obj\&lt;noteq&gt;null then cast True else h obj' f'))"
+
+
+class array = any +
+  fixes element_type::"'a\&lt;Rightarrow&gt;javaDL_type"
 
 section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
 axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
@@ -235,9 +292,15 @@ axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
       h obj f)::LocSet) \&lt;Longrightarrow&gt; Null2java_lang_Object null=o2 \&lt;or&gt; ((select h o2
       created)::bool)"
   and wellFormedStorejava_lang_Object:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; ((select
-      h x created) \&lt;and&gt; instanceof x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
+      h x created) \&lt;and&gt; instanceof (fieldType f) x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
+  and wellFormedStoreLocSet:"wellFormed h \&lt;and&gt; (\&lt;forall&gt;ov fv. (elementOf (ov,fv) y \&lt;longrightarrow&gt; ov = null \&lt;or&gt; select h ov created))
+      \&lt;Longrightarrow&gt; wellFormed (store h obj f y)"
+  and wellFormedStorePrimitive:"(typeof x (fieldType f) \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x java_lang_Object_type \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x LocSet_type  \&lt;Longrightarrow&gt;  wellFormed h 
+    \&lt;Longrightarrow&gt; wellFormed (store h obj f x))"
+  and wellFormedCreate:"wellFormed h \&lt;Longrightarrow&gt; wellFormed (create h obj)"
+  and wellFormedAnon:"wellFormed h \&lt;and&gt; wellFormed h2 \&lt;Longrightarrow&gt; wellFormed (anon h y h2)"
 
-fun instanceof::"any\&lt;Rightarrow&gt;'a::any set\&lt;Rightarrow&gt;bool"
-  where "instanceof x y = (x : image to_any y)"
+axiomatization where wellFormedStoreArray:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; (select h x created \&lt;and&gt; (typeof x (element_type obj))))
+      \&lt;Longrightarrow&gt; wellFormed (store h (cast (to_any (obj::'a::{array, any}))) (arr idx) x)"
     </entry>
 </properties>
