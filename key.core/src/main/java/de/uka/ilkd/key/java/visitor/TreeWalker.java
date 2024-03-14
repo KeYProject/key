@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.SourceElement;
  * This interface is used to walk a tree of {@link SourceElement}s. The tree is
  * traversed in depth-first order, and the walker can be used to visit the
  * children of a node, the siblings of a node and the parent of a node.
+ *
+ * @author Tobias Reinhold
  */
 public interface TreeWalker {
     /**

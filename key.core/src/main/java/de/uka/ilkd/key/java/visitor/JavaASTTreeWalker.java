@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.SourceElement;
  * <p>
  * The walker is backed by a stack, which is used to store the path from the root to the current
  * node.
+ *
+ * @author Tobias Reinhold
  */
 public class JavaASTTreeWalker implements TreeWalker {
     /**
