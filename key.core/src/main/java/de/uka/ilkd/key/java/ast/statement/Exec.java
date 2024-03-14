@@ -131,7 +131,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
 
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(body.getBody(), this);
+        return StatementBlock.computePrefixElements(this);
     }
 
     @NonNull

@@ -128,9 +128,9 @@ public class LabeledStatement extends JavaStatement
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         if (body instanceof StatementBlock) {
-            return StatementBlock.computePrefixElements(((StatementBlock) body).getBody(), this);
+            return StatementBlock.computePrefixElements(this);
         } else if (body instanceof ProgramPrefix) {
-            return StatementBlock.computePrefixElements(new ImmutableArray<>(body), this);
+            return StatementBlock.computePrefixElements(this);
         }
         return new ImmutableArray<>(this);
     }

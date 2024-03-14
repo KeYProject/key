@@ -134,7 +134,7 @@ public class SynchronizedBlock extends JavaStatement
 
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(body.getBody(), this);
+        return StatementBlock.computePrefixElements(this);
     }
 
     /**

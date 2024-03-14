@@ -2358,7 +2358,6 @@ ExpressionSVWrapper ExpressionSV() :
 	}
 }
 
-
 CatchSVWrapper CatchSV() :
 {
 }
@@ -2376,6 +2375,16 @@ CcatchSVWrapper CcatchSV() :
     <SVIDENTIFIER>
     {
         return factory.getCcatchSV(token.image);
+    }
+}
+
+SwitchBranchSVWrapper SwitchBranchSV() :
+{
+}
+{
+    <SVIDENTIFIER>
+    {
+        return factory.getSwitchBranchSV(token.image);
     }
 }
 
@@ -3987,6 +3996,10 @@ Switch SwitchStatement() :
 	}
     "(" expr = Expression() ")" "{"
 
+	(
+	    { SwitchBranchSVWrapper sbsv; } sbsv=SwitchBranchSV()
+    	{ branches.add(sbsv); }
+    |
 	( branch = SwitchLabel()
 	    {
 		stats = new ASTArrayList<Statement>();
@@ -4007,7 +4020,8 @@ Switch SwitchStatement() :
 		}
 		branches.add(branch);
 	    }
-	  )*
+	  )
+	)*
 
 
 	"}"

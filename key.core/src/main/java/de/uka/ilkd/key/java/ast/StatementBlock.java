@@ -322,7 +322,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return computePrefixElements(body, this);
+        return computePrefixElements(this);
     }
 
     @Override

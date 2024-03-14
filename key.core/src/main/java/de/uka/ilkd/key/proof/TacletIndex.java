@@ -583,7 +583,8 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
          */
         static final Class<?>[] prefixClasses =
             new Class<?>[] { StatementBlock.class, LabeledStatement.class, Try.class,
-                MethodFrame.class, SynchronizedBlock.class, LoopScopeBlock.class, Exec.class };
+                MethodFrame.class, SynchronizedBlock.class, LoopScopeBlock.class, Exec.class,
+                Switch.class, ActiveCase.class };
 
         /**
          * number of prefix types
@@ -599,7 +600,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
          * fields to indicate the position of the next relevant child (the next possible prefix
          * element or real statement
          */
-        static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0 };
+        static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0, 1, 0 };
 
         PrefixOccurrences() {
             reset();

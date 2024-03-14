@@ -1,24 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-public class ActiveCase extends SwitchBranch {
+public class ActiveCase extends SwitchBranch implements ProgramPrefix {
     /**
      * Body.
      */
     protected final ImmutableArray<Statement> body;
 
+    private final MethodFrame innerMostMethodFrame;
+
+    private final int prefixLength;
+
     public ActiveCase() {
         this.body = null;
+        prefixLength = 0;
+        innerMostMethodFrame = null;
     }
 
     public ActiveCase(Statement[] body) {
         this.body = new ImmutableArray<>(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
@@ -30,6 +43,9 @@ public class ActiveCase extends SwitchBranch {
     public ActiveCase(ExtList children) {
         super(children);
         this.body = new ImmutableArray<>(children.collect(Statement.class));
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
@@ -44,6 +60,9 @@ public class ActiveCase extends SwitchBranch {
     public ActiveCase(ExtList children, PositionInfo pos) {
         super(children, pos);
         this.body = new ImmutableArray<>(children.collect(Statement.class));
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
@@ -118,5 +137,44 @@ public class ActiveCase extends SwitchBranch {
      */
     public void visit(Visitor v) {
         v.performActionOnActiveCase(this);
+    }
+
+    @Override
+    public boolean hasNextPrefixElement() {
+        return body != null && !body.isEmpty() && body.get(0) instanceof ProgramPrefix;
+    }
+
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) body.get(0);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
+    }
+
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
+    }
+
+    @Override
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+        return StatementBlock.computePrefixElements(this);
+    }
+
+    @Override
+    public PosInProgram getFirstActiveChildPos() {
+        return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
+    }
+
+    @Override
+    public int getPrefixLength() {
+        return prefixLength;
+    }
+
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
     }
 }
