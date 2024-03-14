@@ -24,7 +24,7 @@ import org.key_project.util.java.CollectionUtil;
  * </p>
  *
  * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
- * the method {@link EqualsModProperty#equalsModProperty(Object, Property)} can be used to
+ * the method {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} can be used to
  * compare terms
  * while ignoring certain
  * given properties. E.g. by using {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the

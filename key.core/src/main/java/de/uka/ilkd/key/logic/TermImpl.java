@@ -339,7 +339,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public boolean equalsModProperty(Object o, Property property) {
+    public boolean equalsModProperty(Object o, Property<Term> property, Void... v) {
         if (!(o instanceof Term other)) {
             return false;
         }
@@ -347,7 +347,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public int hashCodeModProperty(Property property) {
+    public int hashCodeModProperty(Property<Term> property) {
         return property.hashCodeModThisProperty(this);
     }
 

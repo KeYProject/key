@@ -4,13 +4,12 @@
 package de.uka.ilkd.key.logic.equality;
 
 /**
- * Interface to check for equality ignoring given properties and to compute according hash codes on
- * terms.
+ * Interface to check for equality ignoring given properties and to compute according hash codes.
  *
  * @param <T> the type of the objects that are checked for equality or hashed
  * @author Tobias Reinhold
  */
-public interface EqualsModProperty<T> {
+public interface EqualsModProperty<T, V> {
 
     /**
      * Checks whether this object is equal to {@code o} modulo the property described by
@@ -21,7 +20,7 @@ public interface EqualsModProperty<T> {
      * @return whether this object is equal to <code>o</code>
      */
 
-    boolean equalsModProperty(Object o, Property<T> property);
+    boolean equalsModProperty(Object o, Property<T> property, V... v);
 
     /**
      * Computes the hash code according to the given ignored {@code property}.

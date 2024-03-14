@@ -40,7 +40,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, EqualsModProperty<Term> {
+        extends SVSubstitute, Sorted, EqualsModProperty<Term, Void> {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
