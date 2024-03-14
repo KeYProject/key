@@ -150,10 +150,10 @@ public final class HeapLDT extends LDT {
     /**
      * Wrapper class
      *
-     * @param className     the class name
+     * @param className the class name
      * @param attributeName the attribute name
      */
-    public record SplitFieldName(String className, String attributeName) { }
+    public record SplitFieldName(String className, String attributeName) {}
 
     /**
      * Splits a field name.

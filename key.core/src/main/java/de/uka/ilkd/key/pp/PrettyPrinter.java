@@ -70,7 +70,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     public PrettyPrinter(PosTableLayouter o, SVInstantiations svi, @Nullable Services services,
-                         boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         this.layouter = o;
         this.instantiations = svi;
         this.services = services;

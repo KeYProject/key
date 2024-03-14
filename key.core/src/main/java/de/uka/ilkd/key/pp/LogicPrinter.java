@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -23,16 +26,15 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.Set;
 
 import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
 
@@ -595,8 +597,8 @@ public class LogicPrinter {
 
     private void printSourceElement(SourceElement element) {
         new PrettyPrinter(layouter, instantiations, services,
-                notationInfo.isPrettySyntax(),
-                notationInfo.isUnicodeEnabled()).print(element);
+            notationInfo.isPrettySyntax(),
+            notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**

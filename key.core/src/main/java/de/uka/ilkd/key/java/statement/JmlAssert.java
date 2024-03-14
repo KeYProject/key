@@ -20,7 +20,8 @@ import org.key_project.util.ExtList;
  */
 public class JmlAssert extends JavaStatement {
     /**
-     * Index in the list of terms of {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository.JmlStatementSpec}
+     * Index in the list of terms of
+     * {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository.JmlStatementSpec}
      */
     public static final int INDEX_CONDITION = 0;
     /**
