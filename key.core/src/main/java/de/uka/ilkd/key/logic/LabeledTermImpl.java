@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.equality.Property;
-import de.uka.ilkd.key.logic.equality.RenamingProperty;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -27,7 +27,7 @@ import org.key_project.util.java.CollectionUtil;
  * the method {@link EqualsModProperty#equalsModProperty(Object, Property)} can be used to
  * compare terms
  * while ignoring certain
- * given properties. E.g. by using {@link RenamingProperty#RENAMING_TERM_PROPERTY}, just the
+ * given properties. E.g. by using {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the
  * term structures modulo
  * renaming are compared whilst ignoring annotations.
  * <p>

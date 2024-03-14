@@ -20,19 +20,19 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link EqualsModProperty#equalsModProperty(Object, Property)} for terms.
  * Renaming of variables is ignored in this equality check.
  */
-public class RenamingProperty implements Property<Term> {
+public class RenamingTermProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
-    public static final RenamingProperty RENAMING_TERM_PROPERTY = new RenamingProperty();
+    public static final RenamingTermProperty RENAMING_TERM_PROPERTY = new RenamingTermProperty();
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
-     * through {@link RenamingProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
+     * through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
      * {@link EqualsModProperty#equalsModProperty(Object, Property)}.
      */
-    private RenamingProperty() {}
+    private RenamingTermProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1} modulo bound renaming.
