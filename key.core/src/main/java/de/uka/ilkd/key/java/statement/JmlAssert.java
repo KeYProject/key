@@ -19,7 +19,10 @@ import org.key_project.util.ExtList;
  * @author Benjamin Takacs
  */
 public class JmlAssert extends JavaStatement {
-
+    /**
+     * Index in the list of terms of {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository.JmlStatementSpec}
+     */
+    public static final int INDEX_CONDITION = 0;
     /**
      * the kind of the statement, assert or assume
      */

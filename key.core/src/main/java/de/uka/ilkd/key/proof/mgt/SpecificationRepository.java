@@ -1870,12 +1870,19 @@ public final class SpecificationRepository {
     }
 
     /**
-     * This record represents mutable information for JML statements.
+     * This record represents information which are necessary to evaluate JML statements.
      * JML statements need to maintain the current variable set as well as the updated information for the KeY terms
-     * they describe.
+     * they describe. This record represents this information, i.e., the scope of variables, and a list of terms, in
+     * an immutable fasion. Updates require to create instances.
+     * <p>
+     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable {@link Map}
      * <p>
      * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
      * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value terms.
+     * You may want to use the index constant for accessing them:
+     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_TARGET},
+     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_VALUE},
+     * {@link de.uka.ilkd.key.java.statement.JmlAssert#INDEX_CONDITION}
      *
      * @param vars
      * @param terms
@@ -1920,11 +1927,11 @@ public final class SpecificationRepository {
          * The update is applied directly and an updated specification is returned. You need to add
          * the updated spec to the statement in the {@link SpecificationRepository} by yourself.
          *
-         * @param atPres a non-null map of a map of program variable to a term which describes the value of this variable in the pre-state.
+         * @param atPres a non-null map of a map of program variable to a term which describes
+         *               the value of this variable in the pre-state.
          * @param services the corresponding services object
          * @return a fresh {@link JmlStatementSpec} instance, non-registered.
          */
-
         public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
             var termFactory = services.getTermFactory();
             var replacementMap = new TermReplacementMap(termFactory);

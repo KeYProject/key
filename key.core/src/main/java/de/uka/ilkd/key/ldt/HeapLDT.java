@@ -149,19 +149,11 @@ public final class HeapLDT extends LDT {
 
     /**
      * Wrapper class
+     *
+     * @param className     the class name
+     * @param attributeName the attribute name
      */
-    public static final class SplitFieldName {
-        /** the class name */
-        public final String className;
-        /** the attribute name */
-        public final String attributeName;
-
-        /** Constructor */
-        public SplitFieldName(String className, String attributeName) {
-            this.className = className;
-            this.attributeName = attributeName;
-        }
-    }
+    public record SplitFieldName(String className, String attributeName) { }
 
     /**
      * Splits a field name.

@@ -1442,7 +1442,7 @@ public class JMLSpecFactory {
             SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split != null) {
                 ProgramVariable attribute =
-                    services.getJavaInfo().getAttribute(split.attributeName, split.className);
+                    services.getJavaInfo().getAttribute(split.attributeName(), split.className());
                 if (attribute.isGhost()) {
                     return null;
                 } else {

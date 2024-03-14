@@ -61,21 +61,21 @@ public class PrettyPrinter implements Visitor {
     private final SVInstantiations instantiations;
     @Nullable
     private final Services services;
-
-    @Nullable
-    private final LogicPrinter logicPrinter;
+    private boolean usePrettyPrinting;
+    private boolean useUnicodeSymbols;
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(PosTableLayouter out) {
-        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null);
+        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
     }
 
     public PrettyPrinter(PosTableLayouter o, SVInstantiations svi, @Nullable Services services,
-            @Nullable LogicPrinter logicPrinter) {
+                         boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         this.layouter = o;
         this.instantiations = svi;
         this.services = services;
-        this.logicPrinter = logicPrinter;
+        this.usePrettyPrinting = usePrettyPrinting;
+        this.useUnicodeSymbols = useUnicodeSymbols;
     }
 
     /**
@@ -1929,7 +1929,7 @@ public class PrettyPrinter implements Visitor {
             if (spec == null) {
                 layouter.print(jmlAssert.getCondition().getText().trim());
             } else {
-                Term t = spec.term(0);
+                Term t = spec.term(JmlAssert.INDEX_CONDITION);
                 String text = printInLogicPrinter(t);
                 layouter.print(text);
             }
@@ -1952,8 +1952,8 @@ public class PrettyPrinter implements Visitor {
         if (services != null) {
             var spec =
                 Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-            Term target = spec.term(0);
-            Term value = spec.term(1);
+            Term target = spec.term(SetStatement.INDEX_TARGET);
+            Term value = spec.term(SetStatement.INDEX_VALUE);
             layouter.print(printInLogicPrinter(target));
             layouter.print(" = ");
             layouter.print(printInLogicPrinter(value));
@@ -1962,17 +1962,15 @@ public class PrettyPrinter implements Visitor {
             if (context != null) {
                 // remove all whitespaces (\n\f\t...) with an empty space
                 var text = context.getText();
+                text = text.substring(4, text.length() - 1);
                 layouter.print(text);
             }
         }
-
-        layouter.print(";");
         layouter.end();
     }
 
     public String printInLogicPrinter(Term t) {
-        var lp = logicPrinter != null ? logicPrinter
-                : LogicPrinter.quickPrinter(services, true, true);
+        var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         lp.printTerm(t);
         return lp.result();
     }

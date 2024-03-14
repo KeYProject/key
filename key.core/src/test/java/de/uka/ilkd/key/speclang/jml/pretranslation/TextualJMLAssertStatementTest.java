@@ -6,11 +6,10 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.key_project.util.collection.ImmutableList;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,12 +20,13 @@ public class TextualJMLAssertStatementTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '#', textBlock = """
-            //@ assert true; # true;
-            //@ assert 1 + 2 == 3 && 2 != 3; # 1 + 2 == 3 && 2 != 3;
-            //@ assert (\\forall int j; 0 <= j < 10; true); # (\\forall int j; 0 <= j < 10; true);
-            //@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k)); # (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));
-            """)
+    @CsvSource(delimiter = '#',
+        textBlock = """
+                //@ assert true; # true;
+                //@ assert 1 + 2 == 3 && 2 != 3; # 1 + 2 == 3 && 2 != 3;
+                //@ assert (\\forall int j; 0 <= j < 10; true); # (\\forall int j; 0 <= j < 10; true);
+                //@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k)); # (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));
+                """)
     void assertTextRepr(String input, String text) {
         var constructs = parseMethodLevel(input);
         assertNotNull(constructs);
