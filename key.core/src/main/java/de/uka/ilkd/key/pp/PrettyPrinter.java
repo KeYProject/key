@@ -865,6 +865,8 @@ public class PrettyPrinter implements Visitor {
 
     public boolean printStatementBlock(StatementBlock x) {
         boolean emptyBlock = x.getBody() == null || x.getBody().isEmpty();
+        var noSpec = services!=null? services.getSpecificationRepository().getBlockContracts(x).isEmpty():true;
+
         if (emptyBlock) {
             // We have an empty statement block ...
             markStart(x);
@@ -873,6 +875,7 @@ public class PrettyPrinter implements Visitor {
             return false;
         } else {
             beginBlock();
+            if(!noSpec)showContractIndicator();
             for (Statement statement : x.getBody()) {
                 layouter.nl();
                 performActionOnStatement(statement);
@@ -955,7 +958,9 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnDo(Do x, boolean includeBody) {
         layouter.keyWord("do");
-
+        if(services!=null) {
+            showContractIndicator(services.getSpecificationRepository().getLoopSpec(x));
+        }
         boolean newBlock = handleBlockStatementOrEmpty(x.getBody(), includeBody);
         handleContinuationAfterNewBlock(newBlock);
 
@@ -1003,6 +1008,9 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnFor(For x, boolean includeBody) {
         layouter.keyWord("for");
+        if(services!=null) {
+            showContractIndicator(services.getSpecificationRepository().getLoopSpec(x));
+        }
         layouter.print(" ");
         beginMultilineBracket();
 
@@ -1028,6 +1036,16 @@ public class PrettyPrinter implements Visitor {
         handleBlockStatementOrEmpty(x.getBody(), includeBody);
     }
 
+    private void showContractIndicator(LoopSpecification loopSpec) {
+        if (loopSpec == null) {
+            return;
+        }
+        showContractIndicator();
+    }
+    private void showContractIndicator(){
+        layouter.print(" /*C*/ ");
+    }
+
     @Override
     public void performActionOnWhile(While x) {
         performActionOnWhile(x, true);
@@ -1035,7 +1053,11 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnWhile(While x, boolean includeBody) {
         layouter.keyWord("while");
-        layouter.print(" ");
+        if (services != null) {
+            showContractIndicator(services.getSpecificationRepository().getLoopSpec(x));
+        }else {
+            layouter.print(" ");
+        }
         beginMultilineBracket();
         if (x.getGuardExpression() != null) {
             x.getGuardExpression().visit(this);
