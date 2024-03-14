@@ -25,6 +25,21 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         definedFunctions.put("length", "obj_length");
         definedFunctions.put("arr", "arr");
         definedFunctions.put("wellFormed", "wellFormed");
+        definedFunctions.put("anon", "anon");
+        definedFunctions.put("store", "store");
+
+        //Seq functions
+        definedFunctions.put("seqLen", "seqLen");
+        definedFunctions.put("seqIndexOf", "seqIndexOf");
+        definedFunctions.put("seqGetOutside", "seqGetOutside");
+        definedFunctions.put("seqEmpty", "seqEmpty");
+        definedFunctions.put("seqSingleton", "seqSingleton");
+        definedFunctions.put("seqConcat", "seqConcat");
+        definedFunctions.put("seqSub", "seqSub");
+        //TODO seqPerm
+        definedFunctions.put("seqSwap", "seqSwap");
+        definedFunctions.put("seqRemove", "seqRemove");
+        definedFunctions.put("seqReverse", "seqReverse");
 
         //LocSet functions
         definedFunctions.put("elementOf", "elementOf");
@@ -43,8 +58,10 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
         definedSortDependingFunctions.put("select", "select");
         definedSortDependingFunctions.put("cast", "cast");
-        definedSortDependingFunctions.put("instance", "instance");
-        definedSortDependingFunctions.put("exactInstance", "exactInstance");
+        //TODO separate handler for instance syntax
+        //definedSortDependingFunctions.put("instance", "instanceof");
+        //definedSortDependingFunctions.put("exactInstance", "exactInstance");
+        definedSortDependingFunctions.put("seqGet", "seqGet");
 
         for (String name : definedFunctions.keySet()) {
             Function function = functionNamespace.lookup(name);
