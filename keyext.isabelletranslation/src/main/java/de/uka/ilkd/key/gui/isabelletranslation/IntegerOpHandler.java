@@ -37,6 +37,9 @@ public class IntegerOpHandler implements IsabelleHandler {
         supportedOperators.put(integerLDT.getMod(), "euclMod");
         supportedOperators.put(integerLDT.getNeg(), "-");
 
+        supportedOperators.put(integerLDT.getJDivision(), "jdiv");
+        supportedOperators.put(integerLDT.getJModulo(), "jmod");
+
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
         supportedOperators.put(integerLDT.getLessThan(), "<");
         supportedOperators.put(integerLDT.getGreaterOrEquals(), ">=");
