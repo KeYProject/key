@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.visitor.JavaASTTreeWalker;
 
 /**
  * A property that can be used in
@@ -27,12 +29,34 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     private RenamingSourceElementProperty() {}
 
     @Override
-    public Boolean equalsModThisProperty(SourceElement se1, SourceElement se2) {
-        return null;
+    public boolean equalsModThisProperty(SourceElement se1, SourceElement se2) {
+        JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
+        JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
+
+        SourceElement next1 = tw1.getCurrentNode();
+        SourceElement next2 = tw2.getCurrentNode();
+
+        while (next1 != null && next2 != null) {
+            if (!next1.equals(next2)) {
+                return false;
+            }
+            next1 = tw1.nextNode();
+            next2 = tw2.nextNode();
+        }
+
+        return next1 == null && next2 == null;
     }
 
     @Override
     public int hashCodeModThisProperty(SourceElement sourceElement) {
         return 0;
+    }
+
+    private boolean comparison(SourceElement se1, SourceElement se2) {
+        return se1.equals(se2);
+    }
+
+    private boolean comparison(Comment comment, SourceElement se) {
+        return true;
     }
 }
