@@ -219,7 +219,7 @@ public class CachingExtension
             Proof proof = (Proof) underlyingObject;
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseAllByReference(this, mediator, proof));
-            actions.add(new AddToDatabaseAction(proof));
+            actions.add(new AddToDatabaseAction(database, proof));
             return actions;
         }
         return new ArrayList<>();

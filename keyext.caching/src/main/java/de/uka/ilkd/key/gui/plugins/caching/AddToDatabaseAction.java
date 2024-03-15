@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class AddToDatabaseAction extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddToDatabaseAction.class);
 
+    private CachingDatabase cachingDatabase;
     /**
      * Proof to add.
      */
@@ -33,7 +34,7 @@ public class AddToDatabaseAction extends KeyAction {
      *
      * @param proof proof to add
      */
-    AddToDatabaseAction(Proof proof) {
+    AddToDatabaseAction(CachingDatabase cachingDatabase, Proof proof) {
         this.proof = proof;
 
         setName("Add to proof caching database");
@@ -43,7 +44,7 @@ public class AddToDatabaseAction extends KeyAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            CachingDatabase.addProof(proof);
+            cachingDatabase.addProof(proof);
         } catch (IOException ex) {
             LOGGER.warn("failed to add proof ", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
