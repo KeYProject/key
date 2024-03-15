@@ -65,7 +65,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
-        if (!trans.isKnownSymbol(term)) {
+        if (trans.isNewSymbol(term)) {
             String name = PREFIX + op.name().toString();
             trans.addKnownSymbol(term, new StringBuilder(name.replace("::", "_").replace(".", "_")));
         }
@@ -83,7 +83,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
             result.append(" ").append(child);
         }
         Sort sort = op.sort();
-        if (!trans.isKnownSort(sort)) {
+        if (trans.isNewSort(sort)) {
             trans.addGenericSort(sort);
         }
         result.append(")");
