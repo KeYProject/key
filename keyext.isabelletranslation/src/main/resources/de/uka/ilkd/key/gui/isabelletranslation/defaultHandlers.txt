@@ -1,4 +1,5 @@
 de.uka.ilkd.key.gui.isabelletranslation.DefinedSymbolsHandler
+de.uka.ilkd.key.gui.isabelletranslation.InstanceOperatorHandler
 de.uka.ilkd.key.gui.isabelletranslation.BooleanOpHandler
 de.uka.ilkd.key.gui.isabelletranslation.PolymorphicHandler
 de.uka.ilkd.key.gui.isabelletranslation.QuantifierHandler
