@@ -787,21 +787,22 @@ public class Node implements Iterable<Node> {
 
     /**
      * Register a user-defined data in this node info.
+     * It can be retrieved using {@link #lookup(Class)}.
      *
      * @param obj an object to be registered
      * @param service the key under it should be registered
-     * @param <T>
+     * @param <T> arbitrary object type
      */
     public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
     }
 
     /**
-     * Remove a previous registered user-defined data.
+     * Remove a previously registered user-defined data.
      *
      * @param obj registered object
      * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param <T> arbitrary object type
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -810,17 +811,22 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Get the assocated lookup of user-defined data.
+     * Get the associated lookup of user-defined data.
      *
-     * @return
+     * @return Lookup instance for user-defined data
      */
-    public @NonNull Lookup getUserData() {
+    private @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
         return userData;
     }
 
+    /**
+     * Get the branch location of this node.
+     *
+     * @return this node's branch location
+     */
     public BranchLocation getBranchLocation() {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
@@ -832,10 +838,23 @@ public class Node implements Iterable<Node> {
         return branchLocation;
     }
 
+    /**
+     * Get the step index of this node. This is an identifier for the node. It is different for
+     * each node and increases monotonically in a proof tree depth-first order.
+     * This value is only valid after calling {@link Proof#setStepIndices()}!
+     *
+     * @return this node's step index
+     */
     public int getStepIndex() {
         return stepIndex;
     }
 
+    /**
+     * Set this node's step index to the specified value.
+     * Do not use this method unless you are {@link Proof#setStepIndices()}.
+     *
+     * @param stepIndex the step index to set
+     */
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
     }

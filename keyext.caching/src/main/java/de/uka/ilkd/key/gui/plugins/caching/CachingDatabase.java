@@ -32,6 +32,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.Configuration;
@@ -139,6 +140,7 @@ public final class CachingDatabase {
             for (int i = 0; i < cachedProofsJson.getEntries().size(); i++) {
                 var entry = cachedProofsJson.getSection(Integer.toString(i));
                 var file = Path.of(entry.getString("file"));
+                var name = entry.getString("name");
                 var choiceSettings = entry.getString("choiceSettings");
                 var keyVersion = entry.getString("keyVersion");
                 var references = entry.getSection("referencedFiles").getEntries().stream()
@@ -163,7 +165,7 @@ public final class CachingDatabase {
                     var succ = branch.getStringList("sequentSucc");
                     cacheProofs.add(file);
                     cache.add(
-                        new CachedProofBranch(file, references, choiceSettings, keyVersion,
+                        new CachedProofBranch(file, name, references, choiceSettings, keyVersion,
                             branch.getInt("stepIndex"),
                             ante, succ,
                             typesFunctionsMap,
@@ -202,7 +204,7 @@ public final class CachingDatabase {
             for (var entry : entries.values()) {
                 var entryElJson = cachedProofsJson.getOrCreateSection(Integer.toString(i));
                 i++;
-                entryElJson.set("name", entry.get(0).proofFile.getFileName().toString());
+                entryElJson.set("name", entry.get(0).proofName);
                 entryElJson.set("file", entry.get(0).proofFile.toAbsolutePath());
                 entryElJson.set("keyVersion", entry.get(0).keyVersion);
                 entryElJson.set("choiceSettings", entry.get(0).choiceSettings);
@@ -299,7 +301,7 @@ public final class CachingDatabase {
         // save included (or otherwise referenced files) in ~/.key/cachedProofs/
         var included = proof.getServices().getJavaModel().getIncludedFiles();
         List<CachedFile> includedNew = new ArrayList<>();
-        if (included != null && included.length() > 0) {
+        if (included != null && !included.isEmpty()) {
             for (var include : included.split(", ")) {
                 var absPath = include.substring(1, include.length() - 1);
                 // load into memory
@@ -378,14 +380,44 @@ public final class CachingDatabase {
             }
             return n;
         }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+        // expand candidate nodes to higher branches
+        // seenLastNodes: which last nodes of branches have already been checked
+        Set<Node> seenLastNodes = new HashSet<>();
+        // lastNodesToCheck: which last nodes of branches should be traversed upwards
+        List<Node> lastNodesToCheck = new ArrayList<>();
+        nodesToCheck.forEach(x -> {
+            var parent = x.parent();
+            if (parent != null) {
+                lastNodesToCheck.add(parent);
+            }
+        });
+        while (!lastNodesToCheck.isEmpty()) {
+            Node toCheck = lastNodesToCheck.remove(lastNodesToCheck.size() - 1);
+            if (seenLastNodes.contains(toCheck)) {
+                continue;
+            }
+            seenLastNodes.add(toCheck);
+            while (toCheck.parent() != null && toCheck.parent().childrenCount() == 1) {
+                toCheck = toCheck.parent();
+            }
+            // check whether this node is even suitable for close by reference first
+            if (ReferenceSearcher.suitableForCloseByReference(toCheck)) {
+                nodesToCheck.add(toCheck);
+                if (toCheck.parent() != null) {
+                    lastNodesToCheck.add(toCheck.parent());
+                }
+            }
+        }
+
         var finalReferences = new ArrayList<CachedFile>();
         finalReferences.addAll(includedNew);
         finalReferences.addAll(sourceNew);
         for (var node : nodesToCheck) {
             cache.add(
-                new CachedProofBranch(file, finalReferences, choiceSettings, KeYConstants.VERSION,
-                    node.getStepIndex(),
-                    node.sequent(), proof.getServices()));
+                new CachedProofBranch(file, proof.name().toString(), finalReferences,
+                    choiceSettings,
+                    KeYConstants.VERSION, node.getStepIndex(), node.sequent(),
+                    proof.getServices()));
         }
 
         // always immediately save database

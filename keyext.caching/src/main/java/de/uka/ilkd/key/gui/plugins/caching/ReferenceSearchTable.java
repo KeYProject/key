@@ -98,7 +98,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
             CachedProofBranch c2 = g.node().lookup(CachedProofBranch.class);
             if (c2 != null) {
                 return String.format("reference available to ext. cache (proof %s)",
-                    c2.proofFile.getName());
+                    c2.proofFile.getFileName().toString());
             }
             ClosedBy c = g.node().lookup(ClosedBy.class);
             if (c == null) {

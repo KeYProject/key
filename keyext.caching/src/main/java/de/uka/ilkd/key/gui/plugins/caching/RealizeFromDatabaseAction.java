@@ -53,13 +53,14 @@ public class RealizeFromDatabaseAction extends KeyAction {
             this::proofLoaded,
             exc -> {
                 LOGGER.warn("failed to load proof ", exc);
+                node.deregister(node.lookup(CachedProofBranch.class), CachedProofBranch.class);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             });
         worker.execute();
     }
 
     private Proof loadProof() throws ProblemLoaderException {
-        KeYEnvironment<?> e = KeYEnvironment.load(cachedProofBranch.proofFile);
+        KeYEnvironment<?> e = KeYEnvironment.load(cachedProofBranch.proofFile.toFile());
         return e.getLoadedProof();
     }
 

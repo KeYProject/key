@@ -110,7 +110,7 @@ public class CachingExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         initActions(mainWindow);
-        return List.of(toggleAction, CachingDatabaseDialog.getOpenAction());
+        return List.of(toggleAction, CachingDatabaseDialog.getOpenAction(database));
     }
 
     public boolean getProofCachingEnabled() {

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,16 +13,18 @@ import javax.swing.table.AbstractTableModel;
 
 public class CachingDatabaseTable extends AbstractTableModel {
 
-    private List<File> cachedProofs;
-    private Map<File, List<CachedProofBranch>> cache;
+    private final CachingDatabase database;
+    private List<Path> cachedProofs;
+    private Map<Path, List<CachedProofBranch>> cache;
 
-    CachingDatabaseTable() {
+    CachingDatabaseTable(CachingDatabase database) {
+        this.database = database;
         refresh();
     }
 
     public void refresh() {
-        cachedProofs = new ArrayList<>(CachingDatabase.getAllCachedProofs());
-        cache = CachingDatabase.getAllCachedProofBranches();
+        cachedProofs = new ArrayList<>(database.getAllCachedProofs());
+        cache = database.getAllCachedProofBranches();
     }
 
     @Override
@@ -66,7 +69,7 @@ public class CachingDatabaseTable extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
         case 0:
-            return cachedProofs.get(rowIndex).getName();
+            return cache.get(cachedProofs.get(rowIndex)).get(0).proofName;
         case 1:
             return "?";
         case 2:

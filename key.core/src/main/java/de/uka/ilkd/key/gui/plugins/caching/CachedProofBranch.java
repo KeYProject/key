@@ -22,6 +22,10 @@ public class CachedProofBranch {
      */
     public final Path proofFile;
     /**
+     * Name of the cached proof.
+     */
+    public final String proofName;
+    /**
      * The choice settings used in the proof.
      */
     public final String choiceSettings;
@@ -59,15 +63,20 @@ public class CachedProofBranch {
      * Create a new data object about a cached proof branch.
      *
      * @param proofFile the file the proof is stored in
+     * @param proofName the name of the cached proof
+     * @param referencedFiles java/key files referenced by the proof
+     * @param keyVersion KeY version used to save the proof
      * @param choiceSettings choice settings of the proof
      * @param stepIndex step index of the referenced node
      * @param sequent sequent of that node
      * @param services services of that node's proof
      */
-    CachedProofBranch(Path proofFile, Collection<CachedFile> referencedFiles, String choiceSettings,
+    CachedProofBranch(Path proofFile, String proofName, Collection<CachedFile> referencedFiles,
+            String choiceSettings,
             String keyVersion,
             int stepIndex, Sequent sequent, Services services) {
         this.proofFile = proofFile;
+        this.proofName = proofName;
         this.referencedFiles = referencedFiles;
         this.keyVersion = keyVersion;
         this.choiceSettings = choiceSettings;
@@ -95,6 +104,7 @@ public class CachedProofBranch {
      * Create a new data object about a cached proof branch.
      *
      * @param proofFile the file the proof is stored in
+     * @param proofName name of the cached proof
      * @param referencedFiles files referenced by the proof
      * @param choiceSettings choice settings of the proof
      * @param keyVersion KeY version used to save the cached proof branch
@@ -104,12 +114,14 @@ public class CachedProofBranch {
      * @param typesFunctions types of the functions present in the sequent
      * @param typesLocVars types of the location variables present in the sequent
      */
-    CachedProofBranch(Path proofFile, Collection<CachedFile> referencedFiles, String choiceSettings,
+    CachedProofBranch(Path proofFile, String proofName, Collection<CachedFile> referencedFiles,
+            String choiceSettings,
             String keyVersion,
             int stepIndex, List<String> sequentAnte, List<String> sequentSucc,
             Map<String, String> typesFunctions,
             Map<String, String> typesLocVars) {
         this.proofFile = proofFile;
+        this.proofName = proofName;
         this.referencedFiles = referencedFiles;
         this.keyVersion = keyVersion;
         this.choiceSettings = choiceSettings;

@@ -23,10 +23,14 @@ import org.slf4j.LoggerFactory;
 
 public class CachingDatabaseDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingDatabaseDialog.class);
+
+    private CachingDatabase database;
     private JTable databaseTable;
 
-    public CachingDatabaseDialog() {
+    public CachingDatabaseDialog(CachingDatabase database) {
         super(MainWindow.getInstance(), "Proof Caching Database");
+
+        this.database = database;
 
         var contentPane = new JPanel();
         contentPane
@@ -42,7 +46,7 @@ public class CachingDatabaseDialog extends JDialog {
         buttonPane.add(deleteAllButton);
         contentPane.add(buttonPane);
 
-        var tableModel = new CachingDatabaseTable();
+        var tableModel = new CachingDatabaseTable(database);
         databaseTable = new JTable(tableModel);
         databaseTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         SwingUtil.resizeTableColumns(databaseTable);
@@ -67,11 +71,12 @@ public class CachingDatabaseDialog extends JDialog {
 
     private void refreshUI() {
         ((CachingDatabaseTable) databaseTable.getModel()).refresh();
+        invalidate();
     }
 
     private void resetDatabase() {
         try {
-            CachingDatabase.reset();
+            database.reset();
             refreshUI();
         } catch (IOException e) {
             LOGGER.error("failed to reset database ", e);
@@ -79,12 +84,15 @@ public class CachingDatabaseDialog extends JDialog {
         }
     }
 
-    public static KeyAction getOpenAction() {
-        return new CachingDatabaseOpenAction();
+    public static KeyAction getOpenAction(CachingDatabase database) {
+        return new CachingDatabaseOpenAction(database);
     }
 
     private static final class CachingDatabaseOpenAction extends KeyAction {
-        CachingDatabaseOpenAction() {
+        private CachingDatabase database;
+
+        CachingDatabaseOpenAction(CachingDatabase database) {
+            this.database = database;
             setName("Open proof caching database");
             setMenuPath("Proof.Proof Caching");
             setAcceleratorLetter(KeyEvent.VK_D);
@@ -92,7 +100,7 @@ public class CachingDatabaseDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new CachingDatabaseDialog();
+            new CachingDatabaseDialog(database);
         }
     }
 }
