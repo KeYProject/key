@@ -5,6 +5,8 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -15,7 +17,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * future versions it can be enhanced to do other simplifications. A sequent and so a semisequent
  * has to be immutable.
  */
-public class Semisequent implements Iterable<SequentFormula> {
+public class Semisequent implements Iterable<SequentFormula>, EqualsModProofIrrelevancy {
 
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -429,12 +431,25 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.equals(((Semisequent) o).seqList);
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (!(o instanceof Semisequent)) {
+            return false;
+        }
+        return EqualsModProofIrrelevancyUtil.compareImmutableLists(seqList,
+            ((Semisequent) o).seqList);
+    }
+
 
     @Override
     public int hashCode() {
         return seqList.hashCode();
     }
 
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return 0;
+    }
 
     /** @return String representation of this Semisequent */
     @Override

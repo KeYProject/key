@@ -86,7 +86,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
                 || !(obj instanceof AntecSuccTacletGoalTemplate other)) {
             return false;
         }
-        return replacewith.equals(other.replacewith);
+        return replacewith.equalsModProofIrrelevancy(other.replacewith);
     }
 
     @Override

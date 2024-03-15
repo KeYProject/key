@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -179,11 +180,11 @@ public class TacletGoalTemplate implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletGoalTemplate)) {
+        if (!(obj instanceof TacletGoalTemplate other)) {
             return false;
         }
-        TacletGoalTemplate other = (TacletGoalTemplate) obj;
-        return addedSeq.equals(other.addedSeq) && addedRules.equals(other.addedRules);
+        return addedSeq.equalsModProofIrrelevancy(other.addedSeq) && EqualsModProofIrrelevancyUtil
+                .compareImmutableLists(addedRules, other.addedRules);
     }
 
     @Override
