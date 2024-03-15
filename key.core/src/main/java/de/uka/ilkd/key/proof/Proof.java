@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -16,8 +17,11 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -26,6 +30,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
@@ -1253,5 +1259,47 @@ public class Proof implements Named {
 
     public void setMutedProofCloseEvents(boolean mutedProofCloseEvents) {
         this.mutedProofCloseEvents = mutedProofCloseEvents;
+    }
+
+    /**
+     * For each branch closed by reference to another proof,
+     * copy the relevant proof steps into this proof.
+     *
+     * @param referencedFrom filter, if not null copy only from that proof
+     * @param callbackTotal callback that gets the total number of branches to complete
+     * @param callbackBranch callback notified every time a branch has been copied
+     */
+    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
+            Runnable callbackBranch) {
+        // first, ensure that all cached goals are copied over
+        List<Goal> goals = closedGoals().toList();
+        List<Goal> todo = new ArrayList<>();
+        for (Goal g : goals) {
+            Node node = g.node();
+            ClosedBy c = node.lookup(ClosedBy.class);
+            if (c == null) {
+                continue;
+            }
+            if (referencedFrom != null && referencedFrom != c.proof()) {
+                continue;
+            }
+            todo.add(g);
+        }
+        if (callbackTotal != null) {
+            callbackTotal.accept(todo.size());
+        }
+        for (Goal g : todo) {
+            reOpenGoal(g);
+            ClosedBy c = g.node().lookup(ClosedBy.class);
+            g.node().deregister(c, ClosedBy.class);
+            try {
+                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g, c.nodesToSkip());
+            } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
+                throw new RuntimeException(e);
+            }
+            if (callbackBranch != null) {
+                callbackBranch.run();
+            }
+        }
     }
 }

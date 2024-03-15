@@ -6,16 +6,16 @@ package de.uka.ilkd.key.rule.merge.procedures;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -61,7 +61,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         final TermBuilder tb = services.getTermBuilder();
 
-        Function newSkolemConst = MergeRuleUtils
+        JFunction newSkolemConst = MergeRuleUtils
                 .getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());

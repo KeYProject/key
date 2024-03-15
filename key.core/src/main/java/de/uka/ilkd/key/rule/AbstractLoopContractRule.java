@@ -11,15 +11,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,6 +23,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -54,42 +51,45 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement(), instantiation.modality(), goal);
+            instantiation.statement(), instantiation.modality().kind(), goal);
     }
 
     /**
-     *
      * @param specifications a specification repository.
      * @param statement a statement.
-     * @param modality the current goal's modality.
+     * @param modalityKind the current goal's modality.
      * @param goal the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality modality, final Goal goal) {
+            final Modality.JavaModalityKind modalityKind, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
         if (statement instanceof StatementBlock block) {
 
-            collectedContracts = specifications.getLoopContracts(block, modality);
-            if (modality == Modality.BOX) {
+            collectedContracts = specifications.getLoopContracts(block, modalityKind);
+            if (modalityKind == Modality.JavaModalityKind.BOX) {
                 collectedContracts =
-                    collectedContracts.union(specifications.getLoopContracts(block, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
+                    collectedContracts.union(
+                        specifications.getLoopContracts(block, Modality.JavaModalityKind.DIA));
+            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(block,
+                            Modality.JavaModalityKind.DIA_TRANSACTION));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
-            collectedContracts = specifications.getLoopContracts(loop, modality);
-            if (modality == Modality.BOX) {
+            collectedContracts = specifications.getLoopContracts(loop, modalityKind);
+            if (modalityKind == Modality.JavaModalityKind.BOX) {
                 collectedContracts =
-                    collectedContracts.union(specifications.getLoopContracts(loop, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
+                    collectedContracts.union(
+                        specifications.getLoopContracts(loop, Modality.JavaModalityKind.DIA));
+            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(loop,
+                            Modality.JavaModalityKind.DIA_TRANSACTION));
             }
         }
 
@@ -209,17 +209,17 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
+    protected Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final Function anonymisationFunction =
-                    new Function(new Name(anonymisationName), variable.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -244,9 +244,10 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality modality, Goal goal) {
+                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
-                services.getSpecificationRepository(), statement, modality, goal);
+                services.getSpecificationRepository(), statement, modalityKind, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Iterator over subtree. Current implementation iteratively traverses the tree depth-first.
@@ -58,6 +59,8 @@ class SubtreeIterator implements Iterator<Node> {
             Node s = nextSibling(n);
             if (s != null) {
                 n = s;
+            } else {
+                throw new NoSuchElementException();
             }
         } else {
             n = n.child(0);

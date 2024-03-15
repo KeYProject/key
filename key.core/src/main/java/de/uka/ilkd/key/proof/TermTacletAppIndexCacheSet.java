@@ -6,16 +6,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -214,7 +205,8 @@ public class TermTacletAppIndexCacheSet {
      * @return <code>true</code> if <code>op</code> is an operator below which we are caching
      */
     private boolean isAcceptedOperator(Operator op) {
-        return op instanceof IfThenElse || (op instanceof Function && !(op instanceof Transformer))
+        return op instanceof IfThenElse
+                || (op instanceof JFunction && !(op instanceof Transformer))
                 || op instanceof Junctor || op instanceof Equality || op instanceof Quantifier
                 || op instanceof UpdateApplication || op instanceof Modality;
     }

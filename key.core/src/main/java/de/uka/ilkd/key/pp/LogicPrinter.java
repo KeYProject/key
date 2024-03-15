@@ -13,15 +13,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.*;
@@ -32,6 +28,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -921,7 +919,7 @@ public class LogicPrinter {
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
             if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");
                     layouter.keyWord(op.getKind().toString());
@@ -1074,7 +1072,7 @@ public class LogicPrinter {
     public void printSeqGet(Term t) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(2);
-            if (!t.sort().equals(Sort.ANY)) {
+            if (!t.sort().equals(JavaDLTheory.ANY)) {
                 layouter.print("(" + t.sort().toString() + ")");
             }
             layouter.markStartSub();
@@ -1659,8 +1657,8 @@ public class LogicPrinter {
     public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
-        if (phi.op() instanceof ModalOperatorSV) {
-            Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
+        if ((phi.op() instanceof Modality mod) && mod.kind() instanceof ModalOperatorSV) {
+            Object o = getInstantiations().getInstantiation(mod.kind());
             if (o != null) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
@@ -1670,9 +1668,11 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = services.getTermFactory().createTerm((Modality) o, ta,
-                        phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality) o).print(term, this);
+                    JavaBlock jb1 = mod.program();
+                    Modality m = Modality.getModality(mod.kind(), jb1);
+                    Term term = services.getTermFactory().createTerm(m, ta,
+                        phi.boundVars(), null);
+                    notationInfo.getNotation(m).print(term, this);
                     return;
                 }
 

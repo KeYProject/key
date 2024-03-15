@@ -4,14 +4,13 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.Name;
 
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
@@ -69,7 +70,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), Sort.ANY);
+        JFunction notAValueFunction =
+            new JFunction(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
 
@@ -107,21 +109,23 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
                     : getParentValue().getCondition();
             Term arrayTerm = createArrayTerm();
             // Create index constant
-            Function constantFunction =
-                new Function(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
+            JFunction constantFunction =
+                new JFunction(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
                     sideServices.getTypeConverter().getIntegerLDT().targetSort());
             constant = tb.func(constantFunction);
             setName(lazyComputeName()); // Update name because constant has changed
             Term arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
-            Function arrayLengthFunction = sideServices.getTypeConverter().getHeapLDT().getLength();
+            JFunction arrayLengthFunction =
+                sideServices.getTypeConverter().getHeapLDT().getLength();
             Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
                 tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
             Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
-            Function resultPredicate = new Function(new Name(tb.newName("ResultPredicate")),
-                Sort.FORMULA, resultIf.sort());
+            JFunction resultPredicate =
+                new JFunction(new Name(tb.newName("ResultPredicate")),
+                    JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
             Term resultTerm = tb.func(resultPredicate, resultIf);
             // Create Sequent to prove with new succedent.

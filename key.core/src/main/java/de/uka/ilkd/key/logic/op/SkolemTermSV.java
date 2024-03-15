@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the moment, such schema
@@ -23,7 +25,7 @@ public final class SkolemTermSV extends AbstractSV {
      */
     SkolemTermSV(Name name, Sort sort) {
         super(name, sort, true, false);
-        assert sort != Sort.UPDATE;
+        assert sort != JavaDLTheory.UPDATE;
     }
 
     @Override
@@ -34,7 +36,7 @@ public final class SkolemTermSV extends AbstractSV {
     @Override
     public void layout(Layouter<?> l) {
         l.print("\\schemaVar ");
-        if (sort() == Sort.FORMULA) {
+        if (sort() == JavaDLTheory.FORMULA) {
             l.print("\\skolemFormula");
         } else {
             l.print("\\skolemTerm ").print(sort().name().toString());

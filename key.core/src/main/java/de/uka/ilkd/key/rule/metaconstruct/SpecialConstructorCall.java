@@ -9,9 +9,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Name;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like

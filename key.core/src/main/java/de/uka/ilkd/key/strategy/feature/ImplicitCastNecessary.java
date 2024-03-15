@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.logic.sort.Sort;
 
 public class ImplicitCastNecessary extends BinaryFeature {
 
@@ -23,8 +24,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
 
         int subPos = pos.getIndex();
 
-        final Sort maxSort =
-            TermHelper.getMaxSort(pos.up().subTerm(), subPos, goal.proof().getServices());
+        final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
         return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 

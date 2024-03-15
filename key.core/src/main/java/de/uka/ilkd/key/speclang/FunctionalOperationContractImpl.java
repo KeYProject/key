@@ -17,9 +17,9 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -46,7 +47,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final KeYJavaType kjt;
     final IProgramMethod pm;
     final KeYJavaType specifiedIn;
-    final Modality modality;
+    final Modality.JavaModalityKind modalityKind;
     /**
      * The original precondition terms.
      */
@@ -123,7 +124,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param kjt the KeYJavaType of the method's Java class
      * @param pm the IProgramMethod to which the contract belongs
      * @param specifiedIn TODO
-     * @param modality the modality of the contract
+     * @param modalityKind the modality of the contract
      * @param pres the precondition of the contract
      * @param freePres the free/unchecked precondition of the contract
      * @param mby the measured_by clause of the contract
@@ -147,7 +148,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param services TODO
      */
     FunctionalOperationContractImpl(String baseName, String name, KeYJavaType kjt,
-            IProgramMethod pm, KeYJavaType specifiedIn, Modality modality,
+            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
             Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres,
             Term mby,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> freePosts,
@@ -167,9 +168,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert posts != null;
         assert freePres != null;
         assert freePosts != null;
-        assert modality != null;
+        assert modalityKind != null;
         assert (selfVar == null) == pm.isStatic();
-        assert globalDefs == null || globalDefs.sort() == Sort.UPDATE;
+        assert globalDefs == null || globalDefs.sort() == JavaDLTheory.UPDATE;
         assert paramVars != null;
         assert paramVars.size() >= pm.getParameterDeclarationCount();
         // may be more parameters in specifications (ghost parameters)
@@ -191,7 +192,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.pm = pm;
         this.kjt = kjt;
         this.specifiedIn = specifiedIn;
-        this.modality = modality;
+        this.modalityKind = modalityKind;
         this.originalPres = pres;
         this.originalFreePres = freePres;
         this.originalMby = mby;
@@ -236,7 +237,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
 
-        return new FunctionalOperationContractImpl(baseName, name, kjt, pm, specifiedIn, modality,
+        return new FunctionalOperationContractImpl(baseName, name, kjt, pm, specifiedIn,
+            modalityKind,
             newPres, newFreePres, newMby, newPosts, newFreePosts, newAxioms, newMods, newFreeMods,
             newAccessibles, hasRealModifiesClause, hasRealFreeModifiesClause, originalSelfVar,
             originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, newGlobalDefs,
@@ -646,7 +648,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     private String getText(boolean includeHtmlMarkup, Services services) {
         return getText(pm, originalResultVar, originalSelfVar, originalParamVars, originalExcVar,
             hasMby(), originalMby, originalMods, hasRealModifiesClause, globalDefs, originalPres,
-            originalFreePres, originalPosts, originalFreePosts, originalAxioms, getModality(),
+            originalFreePres, originalPosts, originalFreePosts, originalAxioms, getModalityKind(),
             transactionApplicableContract(), includeHtmlMarkup, services,
             NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
@@ -732,7 +734,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getText(contract.getTarget(), originalResultVar, originalSelfVar, contractParams,
             (ProgramVariable) excTerm.op(), contract.hasMby(), originalMby, originalMods,
             hasRealModifiesClause, globalDefs, originalPres, originalFreePres, originalPosts,
-            originalFreePosts, originalAxioms, contract.getModality(),
+            originalFreePosts, originalAxioms, contract.getModalityKind(),
             contract.transactionApplicableContract(), includeHtmlMarkup, services,
             usePrettyPrinting, useUnicodeSymbols);
     }
@@ -868,7 +870,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, Term> originalPres, Map<LocationVariable, Term> originalFreePres,
             Map<LocationVariable, Term> originalPosts,
             Map<LocationVariable, Term> originalFreePosts,
-            Map<LocationVariable, Term> originalAxioms, Modality modality, boolean transaction,
+            Map<LocationVariable, Term> originalAxioms, Modality.JavaModalityKind modalityKind,
+            boolean transaction,
             boolean includeHtmlMarkup, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         final String sig = getSignatureText(pm, originalResultVar, originalSelfVar,
@@ -901,12 +904,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (includeHtmlMarkup) {
             return "<html>" + "<i>" + LogicPrinter.escapeHTML(sig, false) + "</i>" + clauses
                 + (hasMby ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false) : "")
-                + "<br><b>termination</b> " + modality
+                + "<br><b>termination</b> " + modalityKind.name()
                 + (transaction ? "<br><b>transaction applicable</b>" : "") + "</html>";
 
         } else {
             return sig + clauses + (hasMby ? "\nmeasured-by: " + mby : "") + "\ntermination: "
-                + modality + (transaction ? "\ntransaction applicable:" : "");
+                + modalityKind + (transaction ? "\ntransaction applicable:" : "");
         }
     }
 
@@ -961,8 +964,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final Term update = tb.tf().createTerm(
             ElementaryUpdate.getInstance(originalAtPreVars.get(baseHeap)), tb.getBaseHeap());
         final Term modalityTerm =
-            tb.tf().createTerm(modality, new Term[] { originalPosts.get(baseHeap) },
-                new ImmutableArray<>(), jb);
+            tb.prog(modalityKind, jb, originalPosts.get(baseHeap));
         final Term updateTerm =
             tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, update, modalityTerm);
         final Term contractTerm =
@@ -981,8 +983,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Modality getModality() {
-        return modality;
+    public Modality.JavaModalityKind getModalityKind() {
+        return modalityKind;
     }
 
     @Override
@@ -1376,7 +1378,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             + "; mods: " + originalMods + "; hasMod: " + hasRealModifiesClause
             + (originalAxioms != null && originalAxioms.size() > 0 ? ("; axioms: " + originalAxioms)
                     : "")
-            + "; termination: " + getModality() + "; transaction: "
+            + "; termination: " + getModalityKind() + "; transaction: "
             + transactionApplicableContract();
     }
 
@@ -1421,7 +1423,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public FunctionalOperationContract setID(int newId) {
-        return new FunctionalOperationContractImpl(baseName, null, kjt, pm, specifiedIn, modality,
+        return new FunctionalOperationContractImpl(baseName, null, kjt, pm, specifiedIn,
+            modalityKind,
             originalPres, originalFreePres, originalMby, originalPosts, originalFreePosts,
             originalAxioms, originalMods, originalFreeMods, originalDeps, hasRealModifiesClause,
             hasRealFreeModifiesClause, originalSelfVar, originalParamVars, originalResultVar,
@@ -1432,7 +1435,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new FunctionalOperationContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
-            specifiedIn, modality, originalPres, originalFreePres, originalMby, originalPosts,
+            specifiedIn, modalityKind, originalPres, originalFreePres, originalMby, originalPosts,
             originalFreePosts, originalAxioms, originalMods, originalFreeMods, originalDeps,
             hasRealModifiesClause, hasRealFreeModifiesClause, originalSelfVar, originalParamVars,
             originalResultVar, originalExcVar, originalAtPreVars, globalDefs, id,

@@ -5,10 +5,10 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -54,7 +54,7 @@ public final class DependencyContractFeature extends BinaryFeature {
             return false;
         }
 
-        if (pos.isTopLevel() && focus.sort() == Sort.FORMULA
+        if (pos.isTopLevel() && focus.sort() == JavaDLTheory.FORMULA
                 && pos.isInAntec() == steps.get(0).isInAntec()) {
             return false;
         }

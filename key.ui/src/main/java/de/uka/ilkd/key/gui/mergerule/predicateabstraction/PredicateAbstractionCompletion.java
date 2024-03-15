@@ -16,11 +16,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.

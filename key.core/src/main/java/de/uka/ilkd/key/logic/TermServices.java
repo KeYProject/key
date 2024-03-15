@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+
 /**
  * This interface defines the basic functionalities of services required to construct {@link Term}s.
  *

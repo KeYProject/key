@@ -35,8 +35,8 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -48,15 +48,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -67,13 +60,14 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -238,7 +232,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // there must be applicable contracts for the operation
-        return getApplicableContracts(services, inst.pm, inst.staticType, inst.mod);
+        return getApplicableContracts(services, inst.pm, inst.staticType, inst.mod.kind());
     }
 
     /**
@@ -248,21 +242,23 @@ public final class UseOperationContractRule implements BuiltInRule {
      * @param services the services object
      * @param pm the program method
      * @param kjt the KeYJavaType of the class
-     * @param modality the modality
+     * @param modalityKind the modality
      * @return all applicable contracts
      */
     private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-            Services services, IProgramMethod pm, KeYJavaType kjt, Modality modality) {
+            Services services, IProgramMethod pm, KeYJavaType kjt,
+            Modality.JavaModalityKind modalityKind) {
         ImmutableSet<FunctionalOperationContract> result =
-            services.getSpecificationRepository().getOperationContracts(kjt, pm, modality);
+            services.getSpecificationRepository().getOperationContracts(kjt, pm, modalityKind);
 
         // in box modalities, diamond contracts may be applied as well
-        if (modality == Modality.BOX) {
+        if (modalityKind == Modality.JavaModalityKind.BOX) {
             result = result.union(
-                services.getSpecificationRepository().getOperationContracts(kjt, pm, Modality.DIA));
-        } else if (modality == Modality.BOX_TRANSACTION) {
+                services.getSpecificationRepository().getOperationContracts(kjt, pm,
+                    Modality.JavaModalityKind.DIA));
+        } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
             result = result.union(services.getSpecificationRepository().getOperationContracts(kjt,
-                pm, Modality.DIA_TRANSACTION));
+                pm, Modality.JavaModalityKind.DIA_TRANSACTION));
         }
 
         return result;
@@ -279,11 +275,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
-        final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
+        final JFunction methodHeapFunc =
+            new JFunction(methodHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(methodHeapFunc);
         final Term methodHeap = tb.func(methodHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
-        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
+        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeap =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
@@ -468,12 +465,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (progPost.op() != Modality.BOX && progPost.op() != Modality.DIA
-                && progPost.op() != Modality.BOX_TRANSACTION
-                && progPost.op() != Modality.DIA_TRANSACTION) {
+        if (!(progPost.op() instanceof Modality mod)) {
             return null;
         }
-        final Modality mod = (Modality) progPost.op();
 
         // active statement must be method call or new
         final Pair<Expression, MethodOrConstructorReference> methodCall =
@@ -505,7 +499,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         // cache and return result
         final Instantiation result =
             new Instantiation(u, progPost, mod, actualResult, actualSelf, staticType, mr, pm,
-                actualParams, mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
+                actualParams, mod.<Modality.JavaModalityKind>kind().transaction());
         return result;
     }
 
@@ -534,7 +528,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts =
-            getApplicableContracts(goal.proof().getServices(), inst.pm, inst.staticType, inst.mod);
+            getApplicableContracts(goal.proof().getServices(), inst.pm, inst.staticType,
+                inst.mod.kind());
         if (contracts.isEmpty()) {
             return false;
         }
@@ -542,7 +537,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         // contract can be applied if modality is box and needs no termination
         // argument
         // see #1417, BOX_TRANSACTION added according to Wojciech's proposal.
-        if (inst.mod == Modality.BOX || inst.mod == Modality.BOX_TRANSACTION) {
+        if (inst.mod.kind() == Modality.JavaModalityKind.BOX
+                || inst.mod.kind() == Modality.JavaModalityKind.BOX_TRANSACTION) {
             return true;
         }
 
@@ -728,7 +724,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 
             final Term mbyOk;
             // see #1417
-            if (inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null
+            if (inst.mod.kind() != Modality.JavaModalityKind.BOX
+                    && inst.mod.kind() != Modality.JavaModalityKind.BOX_TRANSACTION
+                    && po != null
                     && mby != null) {
                 // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
                 // TB.lt(mby, po.getMbyAtPre(), services));
@@ -763,12 +761,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         final StatementBlock postSB = replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        Modality mod = Modality.getModality(inst.mod.kind(), postJavaBlock);
         final Term normalPost = tb.apply(anonUpdate,
-            tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
+            tb.prog(mod.kind(), mod.program(), inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    tb.tf().createTerm(inst.mod,
-                        new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
+                    tb.tf().createTerm(mod,
+                        new ImmutableArray<>(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels()))),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
@@ -783,13 +782,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB =
             replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
-            inst.progPost.sub(0),
+        final Modality instantiatedMod = Modality.getModality(inst.mod.kind(), excJavaBlock);
+        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(instantiatedMod.kind(),
+            instantiatedMod.program(), inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
-                tb.tf().createTerm(inst.mod,
-                    new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
-                    inst.progPost.getLabels()))),
+                tb.tf().createTerm(instantiatedMod,
+                    new ImmutableArray<>(inst.progPost.sub(0)), null, inst.progPost.getLabels()))),
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
@@ -895,9 +894,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                 Term actualSelf, KeYJavaType staticType, MethodOrConstructorReference mr,
                 IProgramMethod pm, ImmutableList<Term> actualParams, boolean transaction) {
             assert u != null;
-            assert u.sort() == Sort.UPDATE;
+            assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
+            assert progPost.sort() == JavaDLTheory.FORMULA;
             assert mod != null;
             assert mr != null;
             assert pm != null;

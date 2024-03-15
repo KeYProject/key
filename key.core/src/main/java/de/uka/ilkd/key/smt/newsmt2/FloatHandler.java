@@ -16,13 +16,14 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -198,7 +199,7 @@ public class FloatHandler implements SMTHandler {
             exprType = FLOAT;
         } else if (sort.equals(doubleLDT.targetSort())) {
             exprType = DOUBLE;
-        } else if (sort.equals(Sort.FORMULA)) {
+        } else if (sort.equals(JavaDLTheory.FORMULA)) {
             exprType = Type.BOOL;
         } else {
             throw new SMTTranslationException("Unexpected sort: " + sort);

@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Standard first-order substitution operator, resolving clashes but not preventing (usually
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
  * <code>WarySubstOp</code> is used and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator {
+public abstract class SubstOp extends AbstractOperator implements Operator {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);
@@ -28,9 +28,9 @@ public abstract class SubstOp extends AbstractOperator {
      *         has no correct (2=) arity
      */
     @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        if (terms.size() == 2) {
-            return terms.get(1).sort();
+    public Sort sort(Sort[] sorts) {
+        if (sorts.length == 2) {
+            return sorts[1];
         } else {
             throw new IllegalArgumentException(
                 "Cannot determine sort of " + "invalid term (Wrong arity).");
@@ -46,7 +46,9 @@ public abstract class SubstOp extends AbstractOperator {
      * @throws TermCreationException if the check fails
      */
     @Override
-    protected void additionalValidTopLevel(Term term) throws TermCreationException {
+    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+            throws TermCreationException {
+        super.validTopLevelException(term);
         if (term.varsBoundHere(1).size() != 1) {
             throw new TermCreationException(this, term);
         }
@@ -56,7 +58,6 @@ public abstract class SubstOp extends AbstractOperator {
             throw new TermCreationException(this, term);
         }
     }
-
 
     /**
      * Apply this substitution operator to <code>term</code>, which has this operator as top-level
