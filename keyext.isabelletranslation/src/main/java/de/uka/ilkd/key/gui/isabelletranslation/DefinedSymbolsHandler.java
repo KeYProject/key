@@ -58,9 +58,6 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
         definedSortDependingFunctions.put("select", "select");
         definedSortDependingFunctions.put("cast", "cast");
-        //TODO separate handler for instance syntax
-        //definedSortDependingFunctions.put("instance", "instanceof");
-        //definedSortDependingFunctions.put("exactInstance", "exactInstance");
         definedSortDependingFunctions.put("seqGet", "seqGet");
 
         for (String name : definedFunctions.keySet()) {
