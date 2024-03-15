@@ -85,13 +85,13 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the modality of the contract.
      */
-    Modality getModality();
+    Modality.JavaModalityKind getModalityKind();
 
 
     InformationFlowContract setName(String name);
 
 
-    InformationFlowContract setModality(Modality modality);
+    InformationFlowContract setModality(Modality.JavaModalityKind modalityKind);
 
 
     InformationFlowContract setModifies(Term modifies);

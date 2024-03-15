@@ -5,13 +5,14 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.logic.Visitor;
 
 
 /**
@@ -65,7 +66,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private static class ContainsTermVisitor implements Visitor {
+    private static class ContainsTermVisitor implements Visitor<Term> {
         boolean found = false;
         final Term term;
 
@@ -81,7 +82,9 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = found || visited.equalsModRenaming(term);
+            // TODO: Fix with better equalsModRenaming handling
+            var t = (Term) visited;
+            found = found || t.equalsModRenaming(term);
         }
 
         @Override

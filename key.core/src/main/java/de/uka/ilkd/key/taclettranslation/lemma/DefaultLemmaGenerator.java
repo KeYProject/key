@@ -9,24 +9,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -34,6 +20,8 @@ import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -231,7 +219,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Term[] args = computeArgs(owner, prefix, services);
         Name name = createUniqueName(services, "f_" + sv.name().toString());
 
-        Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
+        JFunction function =
+            new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }
 
@@ -289,7 +278,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<>(qvars), term.javaBlock());
+            new ImmutableArray<>(qvars), null);
     }
 
     /**

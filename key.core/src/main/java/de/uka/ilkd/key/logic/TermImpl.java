@@ -9,13 +9,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Visitor;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.Strings;
@@ -59,7 +57,6 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     private final Operator op;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
-    private final JavaBlock javaBlock;
 
     // caches
     private enum ThreeValuedTruth {
@@ -81,6 +78,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     private int hashcode2 = -1;
 
+    private Sort sort;
+
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
      * {@link JavaBlock}. {@link Term}s which provides a {@link JavaBlock} directly or indirectly
@@ -101,23 +100,21 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      * @param subs the sub terms of the constructed term (whose type is constrained by the used
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
-     * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
         this.origin = origin;
     }
 
     TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
-        this(op, subs, boundVars, javaBlock, "");
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        this(op, subs, boundVars, "");
     }
 
     /**
@@ -213,7 +210,11 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     @Override
     public @NonNull JavaBlock javaBlock() {
-        return javaBlock;
+        if (op instanceof Modality mod) {
+            return mod.program();
+        } else {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
     }
 
 
@@ -225,7 +226,14 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     @Override
     public Sort sort() {
-        return op.sort(subs);
+        if (sort == null) {
+            Sort[] sorts = new Sort[subs.size()];
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
+            sort = op.sort(sorts);
+        }
+        return sort;
     }
 
 
@@ -372,6 +380,10 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
+        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
+            return false;
+        }
+
         final Operator op0 = t0.op();
 
         if (op0 instanceof QuantifiableVariable) {
@@ -380,17 +392,27 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
         final Operator op1 = t1.op();
 
-        if (!(op0 instanceof ProgramVariable) && op0 != op1) {
+        if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
+            if (mod0.kind() != mod1.kind()) {
+                return false;
+            }
+            nat = handleJava(mod0.program(), mod1.program(), nat);
+            if (nat == FAILED) {
+                return false;
+            }
+        } else if (!(op0 instanceof ProgramVariable) && op0 != op1) {
             return false;
         }
 
-        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-            return false;
-        }
-
-        nat = handleJava(t0, t1, nat);
-        if (nat == FAILED) {
-            return false;
+        if (!(op0 instanceof SchemaVariable) && op0 instanceof ProgramVariable pv0) {
+            if (op1 instanceof ProgramVariable pv1) {
+                nat = checkNat(nat);
+                if (!pv0.equalsModRenaming(pv1, nat)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
@@ -410,25 +432,14 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(Term t0, Term t1, NameAbstractionTable nat) {
-
-        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
+    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
+            NameAbstractionTable nat) {
+        if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
-            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+            if (!jb0.equalsModRenaming(jb1, nat)) {
                 return FAILED;
             }
         }
-
-        if (!(t0.op() instanceof SchemaVariable) && t0.op() instanceof ProgramVariable) {
-            if (!(t1.op() instanceof ProgramVariable)) {
-                return FAILED;
-            }
-            nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
-                return FAILED;
-            }
-        }
-
         return nat;
     }
 
@@ -491,7 +502,9 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         final TermImpl t = (TermImpl) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
-                && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
+                && boundVars.equals(t.boundVars)
+                // TODO (DD): below is no longer necessary
+                && javaBlock().equals(t.javaBlock());
     }
 
     @Override
@@ -504,7 +517,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
+        if (!(op.equals(t.op) && boundVars.equals(t.boundVars)
+                && javaBlock().equals(t.javaBlock()))) {
             return false;
         }
 
@@ -541,7 +555,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
+        if (!(op.equals(t.op) && boundVars.equals(t.boundVars)
+                && javaBlock().equals(t.javaBlock()))) {
             return false;
         }
 
@@ -566,7 +581,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult
                 && EqualsModProofIrrelevancyUtil.compareImmutableArrays(boundVars, t.boundVars)
-                && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
+                && javaBlock().equalsModProofIrrelevancy(t.javaBlock()))) {
             return false;
         }
 
@@ -642,13 +657,14 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (!javaBlock.isEmpty()) {
-            if (op() == Modality.DIA) {
-                sb.append("\\<").append(javaBlock).append("\\> ");
-            } else if (op() == Modality.BOX) {
-                sb.append("\\[").append(javaBlock).append("\\] ");
+        if (!javaBlock().isEmpty()) {
+            var op = (Modality) op();
+            if (op.kind() == Modality.JavaModalityKind.DIA) {
+                sb.append("\\<").append(javaBlock()).append("\\> ");
+            } else if (op.kind() == Modality.JavaModalityKind.BOX) {
+                sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
-                sb.append(op()).append("\\[").append(javaBlock).append("\\] ");
+                sb.append(op()).append("\\[").append(javaBlock()).append("\\] ");
             }
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
@@ -699,7 +715,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     public boolean containsJavaBlockRecursive() {
         if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (javaBlock != null && !javaBlock.isEmpty()) {
+            if (!javaBlock().isEmpty()) {
                 result = ThreeValuedTruth.TRUE;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {

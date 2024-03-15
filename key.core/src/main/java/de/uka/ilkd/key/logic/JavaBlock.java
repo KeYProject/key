@@ -8,12 +8,13 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
+import org.key_project.logic.Program;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock implements EqualsModProofIrrelevancy {
+public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**

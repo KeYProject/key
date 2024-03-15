@@ -36,7 +36,6 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
@@ -49,6 +48,7 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -18,6 +19,9 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -66,7 +70,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 : null;
         var origin = BuilderHelpers.getPosition(ctx);
         var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
-        sorts().add(s);
+        sorts().addSafely(s);
         return null;
     }
 
@@ -155,7 +159,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                         semanticError(ctx, "Illegal sort given");
                     }
                 } else if (new Name("any").equals(sortName)) {
-                    s = Sort.ANY;
+                    s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
                         var ps = new ProxySort(sortName, ext, documentation,

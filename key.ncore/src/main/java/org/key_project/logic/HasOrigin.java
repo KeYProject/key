@@ -1,12 +1,12 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package org.key_project.logic;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * Classes with this interfaces provides a simple human-readable String where they came from.
+ * Classes with this interface provides a simple human-readable String where they came from.
  *
  * @author Alexander Weigl
  * @version 1 (12/30/21)

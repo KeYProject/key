@@ -8,9 +8,9 @@ import java.util.HashMap;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.collection.ImmutableSLList;
@@ -45,7 +45,7 @@ public class ExpressionTranslatorTest {
     @ParameterizedTest
     @CsvFileSource(resources = "exprs.txt", delimiter = '^')
     public void parseAndInterpret(String expr) {
-        KeYJavaType kjt = new KeYJavaType(Sort.ANY);
+        KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
         LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
         LocationVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);

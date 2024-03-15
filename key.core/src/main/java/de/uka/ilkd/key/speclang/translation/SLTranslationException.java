@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -34,7 +33,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     public SLTranslationException(String message) {
-        this(message, null, new Location((URI) null, Position.UNDEFINED));
+        this(message, null, new Location(null, Position.UNDEFINED));
     }
 
     @Nullable
