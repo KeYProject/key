@@ -37,7 +37,7 @@ public class QuantifierHandler implements IsabelleHandler {
         for (QuantifiableVariable bv : term.boundVars()) {
             Sort sort = bv.sort();
             result.append(" ").append(LogicalVariableHandler.makeVarRef(trans, bv.name().toString(), sort));
-            if (!trans.isKnownSort(sort)) {
+            if (trans.isNewSort(sort)) {
                 trans.addGenericSort(sort);
             }
         }

@@ -120,7 +120,7 @@ public class IsabelleMasterHandler {
         decl.append("::\"");
 
         for (Term sub : term.subs()) {
-            if (!isKnownSort(sub.sort())) {
+            if (isNewSort(sub.sort())) {
                 addGenericSort(sub.sort());
             }
             decl.append(translateSortName(sub.sort())).append("=>");
@@ -130,16 +130,16 @@ public class IsabelleMasterHandler {
         constDeclarations.add(decl);
     }
 
-    boolean isKnownSymbol(Term term) {
-        return unknownValues.containsKey(term.op());
+    boolean isNewSymbol(Term term) {
+        return !unknownValues.containsKey(term.op());
     }
 
-    boolean isKnownSort(Sort s) {
-        return (predefinedSorts.containsKey(s) || extraSorts.containsKey(s));
+    boolean isNewSort(Sort s) {
+        return (!predefinedSorts.containsKey(s) && !extraSorts.containsKey(s));
     }
 
     void addGenericSort(Sort sort) {
-        if (!isKnownSort(sort)) {
+        if (isNewSort(sort)) {
             extraSorts.put(sort, new StringBuilder(sort.name().toString().replace("[]", "arr").replace(".", "_")));
             if (sort instanceof ArraySort) {
                 addGenericSort(((ArraySort) sort).elementSort());
@@ -156,7 +156,7 @@ public class IsabelleMasterHandler {
     }
 
     String translateSortName(Sort sort) {
-        if (!isKnownSort(sort)) {
+        if (isNewSort(sort)) {
             addGenericSort(sort);
         }
         if (predefinedSorts.containsKey(sort)) {

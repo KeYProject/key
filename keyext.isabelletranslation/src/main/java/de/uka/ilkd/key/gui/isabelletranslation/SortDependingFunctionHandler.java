@@ -29,11 +29,11 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
         SortDependingFunction op = (SortDependingFunction) term.op();
         Sort dependentSort = op.getSortDependingOn();
 
-        if (!trans.isKnownSort(dependentSort)) {
+        if (trans.isNewSort(dependentSort)) {
             trans.addGenericSort(dependentSort);
         }
         StringBuilder name;
-        if (!trans.isKnownSymbol(term)) {
+        if (trans.isNewSymbol(term)) {
             name = LogicalVariableHandler.makeVarRef(trans, op.name().toString().split("::")[1], dependentSort);
             trans.addKnownSymbol(term, name);
         } else {

@@ -37,7 +37,7 @@ public class FieldHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
-        if (!trans.isKnownSymbol(term)) {
+        if (trans.isNewSymbol(term)) {
             Operator op = term.op();
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
             String fieldName = op.name().toString().replace("::$", "_");
