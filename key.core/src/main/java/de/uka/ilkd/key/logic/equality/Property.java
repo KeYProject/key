@@ -22,11 +22,11 @@ public interface Property<T> {
      * @param t2 the second element of the equality check
      * @return whether {@code t1} and {@code t2} are equal ignoring a certain property
      */
-    Boolean equalsModThisProperty(T t1, T t2);
+    boolean equalsModThisProperty(T t1, T t2);
 
     /**
-     * Computes the hash code of {@code t} in a context where {@link this#equalsModThisProperty(T,
-     * T)}
+     * Computes the hash code of {@code t} in a context where
+     * {@link this#equalsModThisProperty(Object, Object)}
      * is used as an equality check, so that it can be used in, e.g., a HashMap.
      *
      * @param t the object to compute the hash code for

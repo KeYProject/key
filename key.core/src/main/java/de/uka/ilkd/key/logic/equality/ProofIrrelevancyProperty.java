@@ -27,17 +27,15 @@ public class ProofIrrelevancyProperty implements Property<Term> {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is used as a
-     * parameter for
+     * can be accessed through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is
+     * used as a parameter for
      * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private ProofIrrelevancyProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
-     * that
-     * are not relevant for the purpose of these terms in the proof.
+     * that are not relevant for the purpose of these terms in the proof.
      * <p>
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
@@ -49,7 +47,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      *         proof-irrelevant attributes.
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public boolean equalsModThisProperty(Term term1, Term term2) {
         if (term2 == term1) {
             return true;
         }

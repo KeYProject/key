@@ -28,9 +28,8 @@ public class RenamingTermProperty implements Property<Term> {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
+     * can be accessed through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a
+     * parameter for {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private RenamingTermProperty() {}
 
@@ -43,7 +42,7 @@ public class RenamingTermProperty implements Property<Term> {
      *         and javaBlock as {@code term1} modulo bound renaming
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public boolean equalsModThisProperty(Term term1, Term term2) {
         if (term2 == term1) {
             return true;
         }

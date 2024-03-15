@@ -20,16 +20,14 @@ public class TermLabelsProperty implements Property<Term> {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
+     * can be accessed through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a
+     * parameter for {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private TermLabelsProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, ignoring <b>all</b>
-     * term
-     * labels.
+     * term labels.
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
@@ -38,7 +36,7 @@ public class TermLabelsProperty implements Property<Term> {
      *         term labels
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public boolean equalsModThisProperty(Term term1, Term term2) {
         if (term2 == term1) {
             return true;
         }

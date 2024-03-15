@@ -22,9 +22,8 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY} and is used as a
-     * parameter for
+     * can be accessed through {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY}
+     * and is used as a parameter for
      * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private IrrelevantTermLabelsProperty() {}
@@ -40,7 +39,7 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public boolean equalsModThisProperty(Term term1, Term term2) {
         if (term2 == term1) {
             return true;
         }
