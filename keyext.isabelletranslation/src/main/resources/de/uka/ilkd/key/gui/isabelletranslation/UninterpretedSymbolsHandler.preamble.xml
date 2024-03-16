@@ -302,5 +302,56 @@ axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
 
 axiomatization where wellFormedStoreArray:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; (select h x created \&lt;and&gt; (typeof x (element_type obj))))
       \&lt;Longrightarrow&gt; wellFormed (store h (cast (to_any (obj::'a::{array, any}))) (arr idx) x)"
+
+lemma int_SUM_0[simp]:
+  fixes f::"int\&lt;Rightarrow&gt;int"
+  fixes lower::int
+  fixes upper::int
+  assumes "lower\&lt;ge&gt;0"
+  shows "(\&lt;Sum&gt;(i::int) = lower..&lt;upper. f i) = (\&lt;Sum&gt;(j::nat) = (nat lower)..&lt;(nat upper). f (int j))"
+proof -
+  consider (baseCase) "lower \&lt;ge&gt; upper" | (complex) "lower &lt; upper" by linarith
+  then show ?thesis
+  proof cases
+    case baseCase
+    then show ?thesis
+      by simp
+  next
+    case complex
+    then have "image int {(nat lower)..&lt;(nat upper)} = {lower..&lt;upper}"
+      using assms
+      by (simp add: image_int_atLeastLessThan)
+    then show ?thesis
+    proof -
+      have "\&lt;forall&gt;n f na. (\&lt;Sum&gt;n = n..&lt;na. (f (int n)::int)) = sum f {int n..&lt;int na}"
+        by (simp add: sum.atLeast_int_lessThan_int_shift)
+      then show ?thesis
+        by (metis (no_types) \&lt;open&gt;int ` {nat lower..&lt;nat upper} = {lower..&lt;upper}\&lt;close&gt; image_int_atLeastLessThan)
+    qed
+  qed
+qed
+
+lemma int_SUM_neg[simp]:
+  fixes f::"int\&lt;Rightarrow&gt;int"
+  fixes lower::int
+  fixes upper::int
+  assumes "lower&lt;0"
+  shows "(\&lt;Sum&gt;(i::int) = lower..&lt;upper. f i) = (\&lt;Sum&gt;(j::nat) = (nat (lower-lower))..&lt;(nat (upper - lower)). f (int j + lower))"
+proof -
+  have "(\&lt;Sum&gt;(i::int) = lower..&lt;upper. f i) = (\&lt;Sum&gt;(i::int) = lower..&lt;upper. (f \&lt;circ&gt; (\&lt;lambda&gt;x. x + lower) \&lt;circ&gt; (\&lt;lambda&gt;x. x - lower)) i)"
+    by simp
+  also have "... = sum (f\&lt;circ&gt;(\&lt;lambda&gt;x. x + lower)) (image (\&lt;lambda&gt;x. x - lower) {lower..&lt;upper})"
+    by (simp add: sum.reindex)
+  finally have "(\&lt;Sum&gt;(i::int) = lower..&lt;upper. f i) = (\&lt;Sum&gt;(j::int) = (0)..&lt; (upper - lower). f (j + lower))"
+  proof -
+    have "sum (f \&lt;circ&gt; (\&lt;lambda&gt;i. i + lower)) {0..&lt;upper - lower} = sum f {lower..&lt;upper}"
+      by (metis (no_types) image_add_int_atLeastLessThan inj_on_add' sum.reindex)
+    then have "(\&lt;Sum&gt;i = 0..&lt;upper - lower. f (i + lower)) = sum f {lower..&lt;upper}"
+      by simp
+    then show ?thesis
+      by simp
+  qed
+  then show ?thesis by simp
+qed
     </entry>
 </properties>
