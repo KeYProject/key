@@ -102,8 +102,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term updates = TB.parallel(localAnon,
             getUpdates(po.modifiable(), vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.modifiable(), po.rest(), uPost,
-            services);
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.modifiable(), po.rest(),
+            uPost, services);
     }
 
     /**

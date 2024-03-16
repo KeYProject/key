@@ -198,7 +198,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Term getPre(List<LocationVariable> modifiableHeaps, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        final Term freePre = contract.getFreePre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
+        final Term freePre =
+            contract.getFreePre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
         final Term pre = contract.getPre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
         return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
@@ -211,7 +212,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
-        return contract.getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
+        return contract.getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar,
+            atPreVars,
             services);
     }
 
@@ -225,7 +227,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps, Map<Term, Term> heapToAtPre,
+    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps,
+            Map<Term, Term> heapToAtPre,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
         Term frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {

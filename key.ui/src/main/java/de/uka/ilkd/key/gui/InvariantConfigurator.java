@@ -37,7 +37,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import static java.lang.String.format;
 
 /**
- * This class creates a dialog to input a user-defined invariant, variant and modifiable formula for a
+ * This class creates a dialog to input a user-defined invariant, variant and modifiable formula for
+ * a
  * selected loop.
  *
  * @author Dreiner, bruns
@@ -78,8 +79,9 @@ public class InvariantConfigurator {
     }
 
     /**
-     * Creates a Dialog. User can enter Invariant, Variant and Modifiable clause. The input is parsed
-     * and a new loop invariant is returned. In case of a ParserException an error-message is shown.
+     * Creates a Dialog. User can enter Invariant, Variant and Modifiable clause. The input is
+     * parsed and a new loop invariant is returned. In case of a ParserException an error-message
+     * is shown.
      *
      * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
      *        edited in the dialog
@@ -263,7 +265,8 @@ public class InvariantConfigurator {
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
                     final Term modifiable =
-                        loopInv.getModifiable(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                        loopInv.getModifiable(heap, loopInv.getInternalSelfTerm(), atPres,
+                            services);
 
                     if (modifiable == null) {
                         // FIXME check again and think what is the default for savedHeap
@@ -597,7 +600,8 @@ public class InvariantConfigurator {
                     Color invColor = invColors == null ? COLOR_SUCCESS : invColors.get(k);
                     JTextArea textArea = createErrorTextField(title, errorMessage, invColor);
                     invPane.add(k, textArea);
-                    title = format("Modifiable%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
+                    title =
+                        format("Modifiable%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
                     String errorMessage2 = modMsgs == null ? "OK" : modMsgs.get(k);
                     Color modColor = modColors == null ? COLOR_SUCCESS : modColors.get(k);
                     textArea = createErrorTextField(title, errorMessage2, modColor);

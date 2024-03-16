@@ -261,7 +261,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         Declaration fieldDecl;
         try {
             if (astParent instanceof TypeDeclaration) {
-                fieldDecl = services.getProgramFactory().parseFieldDeclaration(declWithModifiers.text);
+                fieldDecl =
+                    services.getProgramFactory().parseFieldDeclaration(declWithModifiers.text);
 
                 if (decl.getModifiers().contains(JMLModifier.INSTANCE)) {
                     var old = fieldDecl;
@@ -365,15 +366,18 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // parse declaration, attach to AST
         MethodDeclaration methodDecl;
         try {
-            methodDecl = services.getProgramFactory().parseMethodDeclaration(declWithModifiers.text);
-            if (declWithModifiers.location.getPosition() != de.uka.ilkd.key.java.Position.UNDEFINED) {
+            methodDecl =
+                services.getProgramFactory().parseMethodDeclaration(declWithModifiers.text);
+            if (declWithModifiers.location
+                    .getPosition() != de.uka.ilkd.key.java.Position.UNDEFINED) {
                 updatePositionInformation(methodDecl, declWithModifiers.location.getPosition());
             }
             attach(methodDecl, astParent, 0); // about the 0 see the comment in
             // transformFieldDecl() above
         } catch (Throwable e) {
             throw new SLTranslationException(
-                format("%s (%s)", e.getMessage(), e.getClass().getName()), declWithModifiers.location,
+                format("%s (%s)", e.getMessage(), e.getClass().getName()),
+                declWithModifiers.location,
                 e);
         }
 

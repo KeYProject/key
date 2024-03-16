@@ -683,7 +683,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 || (modalityKind != null && !modalityKind.equals(other.modalityKind))) {
             return false;
         } else if ((modifiableClauses == null && other.modifiableClauses != null)
-                || (modifiableClauses != null && !modifiableClauses.equals(other.modifiableClauses))) {
+                || (modifiableClauses != null
+                        && !modifiableClauses.equals(other.modifiableClauses))) {
             return false;
         } else if ((postconditions == null && other.postconditions != null)
                 || (postconditions != null && !postconditions.equals(other.postconditions))) {
@@ -798,7 +799,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         StringBuilder modifiables = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (modifiableClauses.get(heap) != null) {
-                modifiables.append("<br><b>modifiable").append(heap == baseHeap ? "" : "[" + heap + "]")
+                modifiables.append("<br><b>modifiable")
+                        .append(heap == baseHeap ? "" : "[" + heap + "]")
                         .append("</b> ").append(LogicPrinter.escapeHTML(
                             LogicPrinter.quickPrintTerm(modifiableClauses.get(heap), services),
                             false));
@@ -860,14 +862,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param services services.
      * @return a plain text representation of this contract's modifiable clauses.
      */
-    private String getPlainModifiables(Term self, final LocationVariable baseHeap, final HeapLDT heapLDT,
+    private String getPlainModifiables(Term self, final LocationVariable baseHeap,
+            final HeapLDT heapLDT,
             final Services services) {
         StringBuilder modifiables = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term modifiableClause =
                 getModifiableClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiableClause != null) {
-                modifiables.append("\nmodifiable").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                modifiables.append("\nmodifiable").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append(" ")
                         .append(LogicPrinter.quickPrintTerm(modifiableClause, services));
                 /*
                  * if (heap == baseHeap && !hasRealModifiableClause) { modifiables = modifiables +
@@ -1070,7 +1074,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param modifiables map from every heap to an modifiable term.
          * @param modifiablesFree map from every heap to a free modifiable term.
          * @param hasMod map specifying on which heaps this contract has a modifiable clause.
-         * @param hasFreeModifiable map specifying on which heaps this contract has a free modifiable clause.
+         * @param hasFreeModifiable map specifying on which heaps this contract has a free
+         *        modifiable clause.
          * @param services services.
          */
         public Creator(final String baseName, final StatementBlock block, final List<Label> labels,
@@ -1472,7 +1477,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     addNegatedDivergesConditionToPreconditions(preconditions), freePreconditions,
                     measuredBy, postconditions, freePostconditions,
                     modifiableClauses, freeModifiableClauses,
-                    infFlowSpecs, variables, transactionApplicable, hasModifiable, hasFreeModifiable));
+                    infFlowSpecs, variables, transactionApplicable, hasModifiable,
+                    hasFreeModifiable));
             }
             return result;
         }
@@ -1491,9 +1497,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param infFlowSpecs this contract's information flow specifications.
          * @param variables this contract's variables.
          * @param transactionApplicable whether this contract is applicable for transactions.
-         * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
-         * @param hasFreeModifiable a map specifying on which heaps this contract has a free modifiable
+         * @param hasModifiable a map specifying on which heaps this contract has a modifiable
          *        clause.
+         * @param hasFreeModifiable a map specifying on which heaps this contract has a free
+         *        modifiable clause.
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,

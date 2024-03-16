@@ -34,8 +34,8 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", modifiers=" + modifiers
-            + ", name='" + name + '\'' + '}';
+        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", modifiers="
+            + modifiers + ", name='" + name + '\'' + '}';
     }
 
     @Override

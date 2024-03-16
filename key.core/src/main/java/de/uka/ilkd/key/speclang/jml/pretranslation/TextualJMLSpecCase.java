@@ -195,8 +195,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", modifiers="
-            + modifiers + ", name='" + name + '\'' + '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
+            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 

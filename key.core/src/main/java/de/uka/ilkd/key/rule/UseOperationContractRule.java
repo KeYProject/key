@@ -782,7 +782,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB =
             replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Modality instantiatedModality = Modality.getModality(inst.modality.kind(), excJavaBlock);
+        final Modality instantiatedModality =
+            Modality.getModality(inst.modality.kind(), excJavaBlock);
         final Term originalExcPost = tb.apply(anonUpdate, tb.prog(instantiatedModality.kind(),
             instantiatedModality.program(), inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),

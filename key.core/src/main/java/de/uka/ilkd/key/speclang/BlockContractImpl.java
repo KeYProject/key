@@ -57,7 +57,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param variables this contract's variables.
      * @param transactionApplicable whether or not this contract is applicable for transactions.
      * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
-     * @param hasFreeModifiable a map specifying on which heaps this contract has a free modifiable clause.
+     * @param hasFreeModifiable a map specifying on which heaps this contract has a free modifiable
+     *        clause.
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
@@ -75,7 +76,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         super(baseName, block, labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-            modifiableClauses, freeModifiableClauses, infFlowSpecs, variables, transactionApplicable,
+            modifiableClauses, freeModifiableClauses, infFlowSpecs, variables,
+            transactionApplicable,
             hasModifiable, hasFreeModifiable, functionalContracts);
     }
 
@@ -156,7 +158,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifiableClauses = modifiableClauses.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreeModifiableClauses = freeModifiableClauses.entrySet().stream()
+        Map<LocationVariable, Term> newFreeModifiableClauses = freeModifiableClauses.entrySet()
+                .stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
 
@@ -179,7 +182,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses, newinfFlowSpecs,
-            newVariables, transactionApplicable, hasModifiable, hasFreeModifiable, getFunctionalContracts());
+            newVariables, transactionApplicable, hasModifiable, hasFreeModifiable,
+            getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }
@@ -197,8 +201,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         assert newKJT.equals(newPM.getContainerType());
         BlockContractImpl result = new BlockContractImpl(baseName, block, labels,
             (IProgramMethod) newPM, modalityKind, preconditions, freePreconditions, measuredBy,
-            postconditions, freePostconditions, modifiableClauses, freeModifiableClauses, infFlowSpecs,
-            variables, transactionApplicable, hasModifiable, hasFreeModifiable, getFunctionalContracts());
+            postconditions, freePostconditions, modifiableClauses, freeModifiableClauses,
+            infFlowSpecs,
+            variables, transactionApplicable, hasModifiable, hasFreeModifiable,
+            getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }
@@ -254,7 +260,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
                 Term signalsOnly, Term diverges, Map<LocationVariable, Term> modifiables,
                 Map<LocationVariable, Term> modifiablesFree,
-                Map<LocationVariable, Boolean> hasModifiable, Map<LocationVariable, Boolean> hasFreeModifiable,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable,
                 Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
@@ -277,7 +284,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             return new BlockContractImpl(baseName, block, labels, method, modalityKind,
                 preconditions, freePreconditions, measuredBy,
                 postconditions, freePostconditions, modifiableClauses, freeModifiableClauses,
-                infFlowSpecs, variables, transactionApplicable, hasModifiable, hasFreeModifiable, null);
+                infFlowSpecs, variables, transactionApplicable, hasModifiable, hasFreeModifiable,
+                null);
         }
     }
 
@@ -346,7 +354,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 preconditions, freePreconditions,
                 contracts[0].getMby(), postconditions, freePostconditions,
                 modifiableClauses, freeModifiableClauses, head.getInfFlowSpecs(),
-                placeholderVariables, head.isTransactionApplicable(), hasModifiable, hasFreeModifiable,
+                placeholderVariables, head.isTransactionApplicable(), hasModifiable,
+                hasFreeModifiable,
                 functionalContracts);
 
             return result;

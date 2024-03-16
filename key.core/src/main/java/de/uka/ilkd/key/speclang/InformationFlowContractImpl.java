@@ -70,7 +70,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             String baseName, String name, KeYJavaType forClass,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
             Term pre, Term freePre,
-            Term mby, Term modifiable, boolean hasRealModifiable, Term self, ImmutableList<Term> params,
+            Term mby, Term modifiable, boolean hasRealModifiable, Term self,
+            ImmutableList<Term> params,
             Term result, Term exc, Term heapAtPre, Term dep,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved, int id) {
         assert baseName != null;
@@ -279,7 +280,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     public String getHTMLBody(Services services) {
         return "<html>" + getHTMLSignature() + getHTMLFor(origPre, "pre", services)
-            + getHTMLFor(origFreePre, "free_pre", services) + getHTMLFor(origModifiable, "modifiable", services)
+            + getHTMLFor(origFreePre, "free_pre", services)
+            + getHTMLFor(origModifiable, "modifiable", services)
             + (hasRealModifiableClause ? "" : "<b>, creates no new objects</b>")
             + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> " + modality
             + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
@@ -380,7 +382,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String toString() {
         // TODO: all fields should be printed!!
         return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: " + modality + "; pre: "
-            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; modifiable: " + origModifiable
+            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; modifiable: "
+            + origModifiable
             + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
     }
 
@@ -444,7 +447,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf, origParams,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, newId);
     }
 
@@ -453,7 +457,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new InformationFlowContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
-            specifiedIn, modality, origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause,
+            specifiedIn, modality, origPre, origFreePre, origMby, origModifiable,
+            hasRealModifiableClause,
             origSelf, origParams, origResult, origExc, origAtPre, origDep, origInfFlowSpecs,
             toBeSaved, id);
     }
@@ -462,7 +467,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setName(String name) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf, origParams,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
@@ -471,7 +477,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public InformationFlowContract setModality(Modality.JavaModalityKind modalityKind) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn,
             modalityKind,
-            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf, origParams,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
@@ -479,7 +486,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setModifiable(Term modifiable) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, modifiable, hasRealModifiableClause, origSelf, origParams,
+            origPre, origFreePre, origMby, modifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 

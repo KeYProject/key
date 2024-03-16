@@ -231,15 +231,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifiables = originalModifiables.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreeModifiables = originalFreeModifiables.entrySet().stream().collect(
-            MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeModifiables =
+            originalFreeModifiables.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
 
         return new FunctionalOperationContractImpl(baseName, name, kjt, pm, specifiedIn,
             modalityKind,
-            newPres, newFreePres, newMby, newPosts, newFreePosts, newAxioms, newModifiables, newFreeModifiables,
+            newPres, newFreePres, newMby, newPosts, newFreePosts, newAxioms, newModifiables,
+            newFreeModifiables,
             newAccessibles, hasRealModifiable, hasRealFreeModifiable, originalSelfVar,
             originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, newGlobalDefs,
             id, toBeSaved, transaction, services);
@@ -673,7 +675,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         Map<LocationVariable, Term> originalModifiables = new HashMap<>();
         for (LocationVariable heap : heapContext) {
-            Term m = contract.getModifiable(heap, tb.var(heap), contractSelf, contractParams, services);
+            Term m =
+                contract.getModifiable(heap, tb.var(heap), contractSelf, contractParams, services);
             originalModifiables.put(heap, m);
         }
 
@@ -839,11 +842,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             final Term modifiableTerm = originalModifiables.get(h);
             if (modifiableTerm != null) {
-                modifiables = printClauseText("modifiable", includeHtmlMarkup, services, usePrettyPrinting,
-                    useUnicodeSymbols, modifiables, h, modifiableTerm);
+                modifiables =
+                    printClauseText("modifiable", includeHtmlMarkup, services, usePrettyPrinting,
+                        useUnicodeSymbols, modifiables, h, modifiableTerm);
                 if (!hasRealModifiable.get(h)) {
-                    modifiables = modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                        + (includeHtmlMarkup ? "</b>" : "");
+                    modifiables =
+                        modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
+                            + (includeHtmlMarkup ? "</b>" : "");
                 }
             }
         }
@@ -882,8 +887,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     useUnicodeSymbols)
                 : null;
 
-        final String modifiables = getModifiableText(originalModifiables, hasRealModifiable, includeHtmlMarkup,
-            services, usePrettyPrinting, useUnicodeSymbols);
+        final String modifiables =
+            getModifiableText(originalModifiables, hasRealModifiable, includeHtmlMarkup,
+                services, usePrettyPrinting, useUnicodeSymbols);
 
         final String globalUpdates = getGlobalUpdatesText(globalDefs, includeHtmlMarkup, services,
             usePrettyPrinting, useUnicodeSymbols);
@@ -1199,8 +1205,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public boolean isReadOnlyContract(Services services) {
-        return originalModifiables.get(services.getTypeConverter().getHeapLDT().getHeap()).op() == services
-                .getTypeConverter().getLocSetLDT().getEmpty();
+        return originalModifiables.get(services.getTypeConverter().getHeapLDT().getHeap())
+                .op() == services
+                        .getTypeConverter().getLocSetLDT().getEmpty();
     }
 
     public Term getAnyModifiable(Term modifiable, ProgramVariable selfVar,
@@ -1226,10 +1233,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getFreeModifiable(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
-        return getAnyModifiable(this.originalFreeModifiables.get(heap), selfVar, paramVars, services);
+        return getAnyModifiable(this.originalFreeModifiables.get(heap), selfVar, paramVars,
+            services);
     }
 
-    private Term getAnyModifiable(LocationVariable heap, Term modifiable, Term heapTerm, Term selfTerm,
+    private Term getAnyModifiable(LocationVariable heap, Term modifiable, Term heapTerm,
+            Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
@@ -1269,14 +1278,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getModifiable(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
-        return getAnyModifiable(heap, this.originalModifiables.get(heap), heapTerm, selfTerm, paramTerms,
+        return getAnyModifiable(heap, this.originalModifiables.get(heap), heapTerm, selfTerm,
+            paramTerms,
             services);
     }
 
     @Override
     public Term getFreeModifiable(LocationVariable heap, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
-        return getAnyModifiable(heap, this.originalFreeModifiables.get(heap), heapTerm, selfTerm, paramTerms,
+        return getAnyModifiable(heap, this.originalFreeModifiables.get(heap), heapTerm, selfTerm,
+            paramTerms,
             services);
     }
 
@@ -1426,7 +1437,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, specifiedIn,
             modalityKind,
             originalPres, originalFreePres, originalMby, originalPosts, originalFreePosts,
-            originalAxioms, originalModifiables, originalFreeModifiables, originalDeps, hasRealModifiable,
+            originalAxioms, originalModifiables, originalFreeModifiables, originalDeps,
+            hasRealModifiable,
             hasRealFreeModifiable, originalSelfVar, originalParamVars, originalResultVar,
             originalExcVar, originalAtPreVars, globalDefs, newId, toBeSaved, transaction, services);
     }
@@ -1436,7 +1448,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert newPM instanceof IProgramMethod;
         return new FunctionalOperationContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
             specifiedIn, modalityKind, originalPres, originalFreePres, originalMby, originalPosts,
-            originalFreePosts, originalAxioms, originalModifiables, originalFreeModifiables, originalDeps,
+            originalFreePosts, originalAxioms, originalModifiables, originalFreeModifiables,
+            originalDeps,
             hasRealModifiable, hasRealFreeModifiable, originalSelfVar, originalParamVars,
             originalResultVar, originalExcVar, originalAtPreVars, globalDefs, id,
             toBeSaved && newKJT.equals(kjt), transaction, services);

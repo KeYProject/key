@@ -393,7 +393,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         if (pm.isModel()) {
             // before resultVar
-            final List<LocationVariable> modifiableHeaps = HeapContext.getModifiableHeaps(proofServices, false);
+            final List<LocationVariable> modifiableHeaps =
+                HeapContext.getModifiableHeaps(proofServices, false);
             final Map<LocationVariable, LocationVariable> atPreVars =
                 HeapContext.getBeforeAtPreVars(modifiableHeaps, proofServices, "AtPre");
             collectHeapAtPres(modifiableHeaps, atPreVars, tb);
@@ -401,8 +402,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             register(paramVars, new ProgramVariable[] { selfVar, resultVar }, atPreVars.values(),
                 proofServices);
 
-            final Term poTerm = createModelPOTerm(pm, selfVar, paramVars, resultVar, modifiableHeaps,
-                atPreVars, proofServices);
+            final Term poTerm =
+                createModelPOTerm(pm, selfVar, paramVars, resultVar, modifiableHeaps,
+                    atPreVars, proofServices);
             termPOs.add(poTerm);
         } else {
             // This should be indented, but for now I want to make diffing a bit easier
@@ -425,7 +427,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                     atPreVars.values(), proofServices);
 
                 final Term applyGlobalUpdate = createNonModelPOTerm(pm, selfVar, paramVars,
-                    resultVar, exceptionVar, transactionFlag, modifiableHeaps, atPreVars, proofServices);
+                    resultVar, exceptionVar, transactionFlag, modifiableHeaps, atPreVars,
+                    proofServices);
                 termPOs.add(applyGlobalUpdate);
                 if (poNames != null) {
                     poNames[nameIndex] = buildPOName(transactionFlag);
@@ -1072,8 +1075,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final Map<LocationVariable, LocationVariable> atPreVars,
             final List<LocationVariable> heaps, final Map<Term, Term> heapToBefore,
             final Services proofServices) {
-        Term postTerm = getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
-            proofServices);
+        Term postTerm =
+            getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
+                proofServices);
         // Add uninterpreted predicate
         if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm, ensureUninterpretedPredicateExists(paramVars,
@@ -1104,7 +1108,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // build precondition
         Term pre = tb.and(
-            buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modifiableHeaps, proofServices),
+            buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modifiableHeaps,
+                proofServices),
             permsFor, getPre(modifiableHeaps, selfVar, paramVars, atPreVars, proofServices));
         pre = addTransactionPrecondition(pre, transactionFlag, isTransactionApplicable(),
             proofServices, tb);
@@ -1144,8 +1149,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
                 permsFor, getPre(modifiableHeaps, selfVar, paramVars, atPreVars, proofServices));
         // build program term
-        final Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, null, modifiableHeaps,
-            atPreVars, heaps, heapToBefore, proofServices);
+        final Term post =
+            createPost(selfVar, paramVars, formalParamVars, resultVar, null, modifiableHeaps,
+                atPreVars, heaps, heapToBefore, proofServices);
         final Term representsFromContract = getRepresentsFromContract(pm, selfVar, paramVars,
             resultVar, heaps, atPreVars, proofServices);
         final Term saveBeforeHeaps = saveBeforeHeaps(heapToBefore, tb);

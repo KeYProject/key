@@ -204,7 +204,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Modality modality = Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
+        Modality modality =
+            Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
         Term modalityTerm =
             tb.prog(modality.kind(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,

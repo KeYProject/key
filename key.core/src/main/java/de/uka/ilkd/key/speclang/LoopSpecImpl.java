@@ -252,7 +252,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
@@ -262,8 +263,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public Term getFreeModifiable(LocationVariable heap, Term selfTerm,
-            Map<LocationVariable, Term> atPres,
-            Services services) {
+            Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
@@ -365,8 +365,8 @@ public final class LoopSpecImpl implements LoopSpecification {
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres) {
-        return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, modifiable, freeModifiable,
-            infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
+        return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, modifiable,
+            freeModifiable, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
     @Override
@@ -429,8 +429,8 @@ public final class LoopSpecImpl implements LoopSpecification {
             newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
         return new LoopSpecImpl(loop, pm, kjt, newInvariants, newFreeInvariants, originalModifiable,
-            originalFreeModifiable, originalInfFlowSpecs, originalVariant, originalSelfTerm, localIns,
-            localOuts, originalAtPres);
+            originalFreeModifiable, originalInfFlowSpecs, originalVariant, originalSelfTerm,
+            localIns, localOuts, originalAtPres);
     }
 
     @Override

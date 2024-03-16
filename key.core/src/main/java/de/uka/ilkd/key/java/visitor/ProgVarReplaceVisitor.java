@@ -463,13 +463,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return oldContract;
         } else if (newStatement instanceof StatementBlock) {
             return oldContract.update((StatementBlock) newStatement, newPreconditions,
-                newFreePreconditions, newPostconditions, newFreePostconditions, newModifiableClauses,
+                newFreePreconditions, newPostconditions, newFreePostconditions,
+                newModifiableClauses,
                 newFreeModifiableClauses, newInfFlowSpecs, newVariables,
                 replacer.replace(oldContract.getMby()),
                 replacer.replace(oldContract.getDecreases()));
         } else {
             return oldContract.update((LoopStatement) newStatement, newPreconditions,
-                newFreePreconditions, newPostconditions, newFreePostconditions, newModifiableClauses,
+                newFreePreconditions, newPostconditions, newFreePostconditions,
+                newModifiableClauses,
                 newFreeModifiableClauses, newInfFlowSpecs, newVariables,
                 replacer.replace(oldContract.getMby()),
                 replacer.replace(oldContract.getDecreases()));

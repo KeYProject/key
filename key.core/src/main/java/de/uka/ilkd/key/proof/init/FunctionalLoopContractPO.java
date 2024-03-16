@@ -197,7 +197,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             createPostconditionsNext(
                 selfTerm, heaps, nextVariables, modifiableClauses, freeModifiableClauses, services);
         final Term[] postconditions =
-            createPostconditions(modifiableClauses, freeModifiableClauses, conditionsAndClausesBuilder);
+            createPostconditions(modifiableClauses, freeModifiableClauses,
+                conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
 
         final GoalsConfigurator configurator =

@@ -486,7 +486,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Map<LocationVariable, Term> freeModifiables = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
             modifiables.put(heap, inst.inv.getModifiable(heap, inst.selfTerm, atPres, services));
-            freeModifiables.put(heap, inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
+            freeModifiables.put(heap,
+                inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
         }
 
         ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
@@ -509,14 +510,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
-                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
+                    currentFrame =
+                        tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
                 if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(
-                        tb.var(heap), heapToBeforeLoop.get(heap), tb.union(modifiable, freeModifiable));
+                        tb.var(heap), heapToBeforeLoop.get(heap),
+                        tb.union(modifiable, freeModifiable));
                 }
             }
 

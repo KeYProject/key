@@ -245,7 +245,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term post = check.getPost(po.post(), vars.result, proofServices);
         final Term pre = preCond.term();
         final Term updates =
-            check.getUpdates(po.modifiable(), vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
+            check.getUpdates(po.modifiable(), vars.heap, vars.heapAtPre, vars.anonHeap,
+                proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost =
             check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));

@@ -17,8 +17,8 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
     private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv, String name,
-            boolean free) {
+    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv,
+            String name, boolean free) {
         super(modifiers, name);
         assert inv != null;
         this.inv = inv;

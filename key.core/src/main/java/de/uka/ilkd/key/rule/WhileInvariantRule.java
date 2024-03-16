@@ -724,7 +724,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Map<LocationVariable, Term> freeModifiables = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
             modifiables.put(heap, inst.inv.getModifiable(heap, inst.selfTerm, atPres, services));
-            freeModifiables.put(heap, inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
+            freeModifiables.put(heap,
+                inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
         }
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
@@ -807,7 +808,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term anonHeap = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
-            final AnonUpdateData tAnon = createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);
+            final AnonUpdateData tAnon =
+                createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
@@ -830,14 +832,16 @@ public final class WhileInvariantRule implements BuiltInRule {
                 if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
-                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
+                    currentFrame =
+                        tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
                 if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(
-                        tb.var(heap), heapToBeforeLoop.get(heap), tb.union(modifiable, freeModifiable));
+                        tb.var(heap), heapToBeforeLoop.get(heap),
+                        tb.union(modifiable, freeModifiable));
                 }
             }
             if (frameCondition == null) {

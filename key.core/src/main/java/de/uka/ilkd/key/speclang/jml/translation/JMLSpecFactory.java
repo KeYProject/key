@@ -360,7 +360,8 @@ public class JMLSpecFactory {
             Context outerContext, ProgramVariableCollection progVars, Behavior originalBehavior)
             throws SLTranslationException {
         var context =
-            outerContext.orWithSpecMathMode(specMathModeFromModifiers(textualSpecCase.getModifiers()));
+            outerContext
+                    .orWithSpecMathMode(specMathModeFromModifiers(textualSpecCase.getModifiers()));
         ContractClauses clauses = new ContractClauses();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
 
@@ -489,11 +490,13 @@ public class JMLSpecFactory {
             final ImmutableList<LabeledParserRuleContext> assignable,
             final ImmutableList<LabeledParserRuleContext> assignableFree, ContractClauses clauses)
             throws SLTranslationException {
-        clauses.hasAssignable.put(heap, !translateStrictlyPure(context, progVars.paramVars, assignable));
+        clauses.hasAssignable.put(heap,
+            !translateStrictlyPure(context, progVars.paramVars, assignable));
 
         // For the frame condition, the default if there is no _free term is strictly_nothing.
         clauses.hasFreeAssignable.put(heap,
-            !assignableFree.isEmpty() && !translateStrictlyPure(context, progVars.paramVars, assignableFree));
+            !assignableFree.isEmpty()
+                    && !translateStrictlyPure(context, progVars.paramVars, assignableFree));
 
         if (heap == savedHeap && assignable.isEmpty()) {
             clauses.assignables.put(heap, null);
@@ -940,16 +943,16 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
-                clauses.hasFreeAssignable, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles,
+                clauses.hasAssignable, clauses.hasFreeAssignable, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(tb.tt())) {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
-                clauses.hasFreeAssignable, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles,
+                clauses.hasAssignable, clauses.hasFreeAssignable, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -963,13 +966,13 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
-                clauses.hasFreeAssignable, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles,
+                clauses.hasAssignable, clauses.hasFreeAssignable, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
-                clauses.hasFreeAssignable, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles,
+                clauses.hasAssignable, clauses.hasFreeAssignable, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -1051,7 +1054,8 @@ public class JMLSpecFactory {
         // "static"
         // in an interface "static" is the default (see Sect. 2.5 of the
         // reference manual)
-                (services.getJavaInfo().isInterface(kjt) && !modifiers.contains(JMLModifier.INSTANCE)));
+                (services.getJavaInfo().isInterface(kjt)
+                        && !modifiers.contains(JMLModifier.INSTANCE)));
 
         // create variable for self
         var context = Context.inClass(kjt, isStatic, tb);
@@ -1597,8 +1601,9 @@ public class JMLSpecFactory {
         // create loop invariant annotation
         Term selfTerm = context.selfVar() == null ? null : tb.var(context.selfVar());
 
-        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, modifiables,
-            freeModifiables, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
+        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants,
+            modifiables, freeModifiables, infFlowSpecs, variant, selfTerm, localIns,
+            localOuts, atPres);
     }
 
     private Term translateToTermVariant(Context context, Map<LocationVariable, Term> atPres,

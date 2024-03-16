@@ -606,8 +606,8 @@ public final class AuxiliaryContractBuilders {
          * @param el a program element
          * @param anonymisationHeaps anonymization heaps.
          * @param modifiableClauses modifiable clauses for the specified heaps.
-         * @return an anonymization update for the specified modifiable clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
@@ -621,8 +621,8 @@ public final class AuxiliaryContractBuilders {
          * @param anonymisationHeaps anonymization heaps.
          * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifiable clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
@@ -640,8 +640,8 @@ public final class AuxiliaryContractBuilders {
          * @param anonymisationHeaps anonymization heaps.
          * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifiable clauses and for every variable
-         *         in the specified set.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         variable in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
@@ -849,7 +849,8 @@ public final class AuxiliaryContractBuilders {
         public Map<LocationVariable, Term> buildModifiableClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
-                result.put(heap, contract.getModifiableClause(heap, var(heap), terms.self, services));
+                result.put(heap,
+                    contract.getModifiableClause(heap, var(heap), terms.self, services));
             }
             return result;
         }

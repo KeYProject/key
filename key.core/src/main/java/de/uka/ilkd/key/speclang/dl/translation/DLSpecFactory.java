@@ -283,8 +283,8 @@ public final class DLSpecFactory {
         hasModifiable.put(heapLDT.getHeap(), modifiable.op() != tb.ff().op());
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (h != heapLDT.getHeap()) {
-                hasModifiable.put(heapLDT.getSavedHeap(), true); // different heaps not supported yet in DL
-                                                          // contracts
+                hasModifiable.put(heapLDT.getSavedHeap(), true); // different heaps not supported
+                                                                 // yet in DL contracts
             }
         }
 
@@ -298,7 +298,7 @@ public final class DLSpecFactory {
             modifiables, new LinkedHashMap<>(),
             new LinkedHashMap<>(),
             hasModifiable, new LinkedHashMap<>(), // TODO strictly pure in DL
-                                           // contracts not supported yet
+            // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

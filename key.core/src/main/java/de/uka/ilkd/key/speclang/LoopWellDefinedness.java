@@ -51,9 +51,11 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
 
     @Override
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
-        // wd(phi) & (phi & wf(anon) -> wd(modifiable) & wd(variant) & {anon^modifiable}(wd(phi) & wd(variant)))
+        // wd(phi) & (phi & wf(anon) -> wd(modifiable) & wd(variant) & {anon^modifiable}(wd(phi) &
+        // wd(variant)))
         final Term imp =
-            TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdModifiable, seq.wdRest, seq.anonWdPost));
+            TB.imp(TB.and(seq.pre, seq.wfAnon),
+                TB.and(seq.wdModifiable, seq.wdRest, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
     }

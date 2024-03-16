@@ -399,8 +399,9 @@ public abstract class WellDefinednessCheck implements Contract {
                         : printModifiables.trim());
         }
         if (getModifiable().equals(TB.strictlyNothing()) && showSig) {
-            modifiables = modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                + (includeHtmlMarkup ? "</b>" : "");
+            modifiables =
+                modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
+                    + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
         if (getGlobalDefs() != null) {
@@ -996,8 +997,9 @@ public abstract class WellDefinednessCheck implements Contract {
             Term anonHeap, TermServices services) {
         assert modifiable != null;
         assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable);
-        final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable) ? TB.skip()
-                : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
+        final Term havocUpd =
+            TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable) ? TB.skip()
+                    : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
@@ -1309,6 +1311,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record POTerms(Condition pre, Term modifiable, ImmutableList<Term> rest, Condition post) {
+    public record POTerms(Condition pre, Term modifiable, ImmutableList<Term> rest,
+            Condition post) {
     }
 }
