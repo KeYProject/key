@@ -91,7 +91,7 @@ public final class ContractAxiom extends ClassAxiom {
             Services services) {
 
         final boolean satisfiabilityGuard = true; // XXX
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
 
         Name tacletName = MiscTools.toValidTacletName(name);

@@ -74,11 +74,19 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-MODIFIABLE
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+ASSIGNABLE
     : ('assignable' | 'assigns'  | 'assigning' |
        'modifiable' | 'modifies' | 'modifying' |
        'writable'   | 'writes'   | 'writing') (Pfree|Pred) -> pushMode(expr);
-LOOP_MODIFIABLE
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+LOOP_ASSIGNABLE
     : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
        'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
        'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred) -> pushMode(expr);

@@ -45,15 +45,15 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         this.inv = inv;
         setMby(inv.getInternalVariant());
         setRequires(inv.getInternalInvariants().get(h));
-        setModifiable(inv.getInternalModifies().get(h), services);
+        setModifiable(inv.getInternalModifiable().get(h), services);
         setEnsures(inv.getInternalInvariants().get(h));
     }
 
     @Override
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
-        // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
+        // wd(phi) & (phi & wf(anon) -> wd(modifiable) & wd(variant) & {anon^modifiable}(wd(phi) & wd(variant)))
         final Term imp =
-            TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
+            TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdModifiable, seq.wdRest, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
     }

@@ -148,7 +148,7 @@ public final class RepresentsAxiom extends ClassAxiom {
             final Services services) {
         List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
-        for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
                 break;
             }

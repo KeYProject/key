@@ -73,20 +73,20 @@ public final class JMLInfoExtractor {
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
     }
 
-    private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {
+    private static ImmutableList<Comment> getJMLComments(TypeDeclaration decl) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the declaration itself ...
-        coms = coms.prepend(td.getComments());
+        // Either decl is attached to the declaration itself ...
+        coms = coms.prepend(decl.getComments());
 
         // ... or to a modifier ...
-        for (Modifier m : td.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : decl.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the name
-        if (td.getProgramElementName() != null) {
-            coms = coms.prepend(td.getProgramElementName().getComments());
+        if (decl.getProgramElementName() != null) {
+            coms = coms.prepend(decl.getProgramElementName().getComments());
         }
         return coms;
     }
@@ -94,15 +94,15 @@ public final class JMLInfoExtractor {
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the method itself ...
+        // Either method is attached to the method itself ...
         Comment[] methodComments = method.getComments();
         if (methodComments.length > 0) {
             coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
 
         // ... or to a modifier ...
-        for (Modifier m : method.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : method.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the return type ...
@@ -151,8 +151,8 @@ public final class JMLInfoExtractor {
         FieldDeclaration fd = null;
         int position = 0;
 
-        for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration tmp) {
+        for (final MemberDeclaration decl : td.getMembers()) {
+            if (decl instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {
@@ -172,8 +172,8 @@ public final class JMLInfoExtractor {
         comments = comments.prepend(fd.getTypeReference().getComments());
         comments = comments.prepend(fd.getFieldSpecifications().get(position).getComments());
 
-        for (Modifier mod : fd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        for (Modifier modifier : fd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
         return comments;
     }
@@ -183,21 +183,21 @@ public final class JMLInfoExtractor {
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
+    public static boolean hasJMLModifier(FieldDeclaration fd, String modifiers) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the declaration itself ...
+        // Either fd is attached to the declaration itself ...
         coms = coms.prepend(fd.getComments());
 
         // ... or to a modifier ...
-        for (Modifier m : fd.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : fd.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the type
         coms = coms.prepend(fd.getTypeReference().getComments());
 
-        return checkFor(mod, coms);
+        return checkFor(modifiers, coms);
     }
 
 
@@ -289,8 +289,8 @@ public final class JMLInfoExtractor {
      * (implicitly or explicitly).
      */
     public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
-        MethodDeclaration md = pm.getMethodDeclaration();
-        ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
+        MethodDeclaration decl = pm.getMethodDeclaration();
+        ParameterDeclaration pd = decl.getParameterDeclarationAt(pos);
 
         return parameterIsNullable(pm, pd);
     }
@@ -307,8 +307,8 @@ public final class JMLInfoExtractor {
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
-        for (Modifier mod : pd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        for (Modifier modifier : pd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
 
         boolean non_null = checkFor("non_null", comments);
@@ -323,16 +323,16 @@ public final class JMLInfoExtractor {
 
 
     public static boolean resultIsNullable(IProgramMethod pm) {
-        MethodDeclaration md = pm.getMethodDeclaration();
+        MethodDeclaration decl = pm.getMethodDeclaration();
 
         ImmutableList<Comment> comments = ImmutableSLList.nil();
-        for (Modifier mod : md.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        for (Modifier modifier : decl.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
         if (!pm.isVoid() && !pm.isConstructor()) {
-            comments = comments.prepend(md.getTypeReference().getComments());
+            comments = comments.prepend(decl.getTypeReference().getComments());
         }
-        Comment[] methodComments = md.getComments();
+        Comment[] methodComments = decl.getComments();
         if (methodComments.length > 0) {
             comments = comments.prepend(methodComments[methodComments.length - 1]);
         }

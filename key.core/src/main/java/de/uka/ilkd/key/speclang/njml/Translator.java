@@ -1078,7 +1078,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             Term p;
             if (atPres == null || atPres.get(heap) == null) {
                 p = tb.var(heap);
@@ -1998,28 +1998,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public SLExpression visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
+    public SLExpression visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.MODIFIABLE());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.ASSIGNABLE());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
             final Term storeRef = accept(ctx.storeRefUnion());
             assert storeRef != null;
-            t = termFactory.modifiable(storeRef);
+            t = termFactory.assignable(storeRef);
         }
         for (LocationVariable heap : heaps) {
-            contractClauses.add(ContractClauses.MODIFIABLE, heap, t);
+            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
         }
         return new SLExpression(t);
     }
 
     @Override
-    public SLExpression visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
+    public SLExpression visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
-        for (TerminalNode n : new TerminalNode[] { ctx.MODIFIABLE(), ctx.LOOP_MODIFIABLE() }) {
+        for (TerminalNode n : new TerminalNode[] { ctx.ASSIGNABLE(), ctx.LOOP_ASSIGNABLE() }) {
             warnPotentiallyUnintendedFramingSemantics(ctx, n);
         }
         if (ctx.STRICTLY_NOTHING() != null) {
@@ -2027,10 +2027,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         } else {
             final Term storeRef = accept(ctx.storeRefUnion());
             assert storeRef != null;
-            t = termFactory.modifiable(storeRef);
+            t = termFactory.assignable(storeRef);
         }
         for (LocationVariable heap : heaps) {
-            contractClauses.add(ContractClauses.MODIFIABLE, heap, t);
+            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
         }
         return new SLExpression(t);
     }

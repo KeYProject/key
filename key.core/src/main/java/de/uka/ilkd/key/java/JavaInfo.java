@@ -692,7 +692,7 @@ public final class JavaInfo {
         Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length
                 + (pm.isStatic() ? 0 : 1)];
         int offset = 0;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (offset >= pm.getHeapCount(services)) {
                 break;
             }
@@ -1378,13 +1378,13 @@ public final class JavaInfo {
         // proof environment have the same <inv> symbol.
         // TODO: Why is the initial check with the heaps needed?
         if (inv == null
-                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
+                || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false).size()) {
             inv = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
             if (inv == null) {
                 inv = new ObserverFunction("<inv>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    false, new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
                     1);
                 services.getNamespaces().functions().add(inv);
             }
@@ -1416,13 +1416,13 @@ public final class JavaInfo {
      */
     public IObserverFunction getInvFree() {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
-                .getModHeaps(services, false).size()) {
+                .getModifiableHeaps(services, false).size()) {
             invFree = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
             if (invFree == null) {
                 invFree = new ObserverFunction("<inv_free>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    false, new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
                     1);
                 services.getNamespaces().functions().add(invFree);
             }
@@ -1462,7 +1462,7 @@ public final class JavaInfo {
             if (inv == null) {
                 inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(), 1);
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
@@ -1482,7 +1482,7 @@ public final class JavaInfo {
             if (inv == null) {
                 inv = new ObserverFunction("<$inv_free>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(), 1);
                 services.getNamespaces().functions().add(inv);
             }
             staticFreeInvs.put(target, inv);

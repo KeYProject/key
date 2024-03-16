@@ -252,23 +252,23 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitModifiable_clause(JmlParser.Modifiable_clauseContext ctx) {
+    public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-            ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free");
+            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
-                    ? OriginTermLabel.SpecType.MODIFIABLE_FREE
-                    : OriginTermLabel.SpecType.MODIFIABLE,
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
                 attachOriginLabel);
         for (Name heap : heaps) {
             if (methodContract != null) {
-                methodContract.addClause(isFree ? MODIFIABLE_FREE : MODIFIABLE, heap, ctx2);
+                methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
             if (loopContract != null) {
                 loopContract.addClause(
-                    isFree ? TextualJMLLoopSpec.ClauseHd.MODIFIABLE_FREE
-                            : TextualJMLLoopSpec.ClauseHd.MODIFIABLE,
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
                     heap, ctx2);
             }
         }
@@ -276,21 +276,21 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitLoop_modifiable_clause(JmlParser.Loop_modifiable_clauseContext ctx) {
+    public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-            (ctx.LOOP_MODIFIABLE() != null && ctx.LOOP_MODIFIABLE().getText().endsWith("_free"))
-                    || (ctx.MODIFIABLE() != null && ctx.MODIFIABLE().getText().endsWith("_free"));
+            (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
+                    || (ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free"));
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
-                    ? OriginTermLabel.SpecType.MODIFIABLE_FREE
-                    : OriginTermLabel.SpecType.MODIFIABLE,
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
                 attachOriginLabel);
         for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(
-                    isFree ? TextualJMLLoopSpec.ClauseHd.MODIFIABLE_FREE
-                            : TextualJMLLoopSpec.ClauseHd.MODIFIABLE,
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
                     heap, ctx2);
             }
         }

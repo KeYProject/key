@@ -55,7 +55,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         final LocationVariable h = getHeap();
         this.block = block;
         setRequires(block.getPrecondition(h, variables, services));
-        setModifiable(block.hasModifiesClause(h) ? block.getModifiable(h) : TB.strictlyNothing(),
+        setModifiable(block.hasModifiableClause(h) ? block.getModifiable(h) : TB.strictlyNothing(),
             services);
         setEnsures(block.getPostcondition(h, variables, services));
     }
@@ -70,8 +70,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
 
     @Override
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
-        // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
-        final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdMod, seq.anonWdPost));
+        // wd(pre) & (pre & wf(anon) -> wd(modifiable) & {anon^modifiable}(wd(post)))
+        final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdModifiable, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
     }

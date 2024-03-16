@@ -61,7 +61,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
         setRequires(contract.getRequires(h));
         setModifiable(
-            contract.hasModifiesClause(h) ? contract.getModifiable(h) : TB.strictlyNothing(),
+            contract.hasModifiable(h) ? contract.getModifiable(h) : TB.strictlyNothing(),
             services);
         combineAccessible(contract.getAccessible(h),
             hPre != null ? contract.getAccessible(hPre) : null, services);
@@ -104,7 +104,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable, Term> deps = new LinkedHashMap<>();
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
         this.contract = new DependencyContractImpl("JML model field",

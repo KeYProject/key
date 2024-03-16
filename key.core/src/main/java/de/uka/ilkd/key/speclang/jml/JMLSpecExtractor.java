@@ -397,13 +397,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
             // add purity. Strict purity overrides purity.
             if (isStrictlyPure || pm.isModel()) {
-                for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-                    specCase.addClause(MODIFIABLE, heap.name(),
+                for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
+                    specCase.addClause(ASSIGNABLE, heap.name(),
                         JmlFacade.parseExpr("\\strictly_nothing"));
                 }
             } else if (isPure) {
-                for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-                    specCase.addClause(MODIFIABLE, heap.name(), JmlFacade.parseExpr("\\nothing"));
+                for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
+                    specCase.addClause(ASSIGNABLE, heap.name(), JmlFacade.parseExpr("\\nothing"));
                 }
             }
 

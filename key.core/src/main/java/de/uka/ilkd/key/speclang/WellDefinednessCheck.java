@@ -384,22 +384,22 @@ public abstract class WellDefinednessCheck implements Contract {
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
         }
-        String mods = "";
+        String modifiables = "";
         final boolean isInv = type().equals(Type.CLASS_INVARIANT);
         final boolean isLoop = type().equals(Type.LOOP_INVARIANT);
         final boolean showSig = !isInv && !modelField();
         if (getModifiable() != null && showSig) {
-            String printMods = LogicPrinter.quickPrintTerm(
+            String printModifiables = LogicPrinter.quickPrintTerm(
                 getModifiable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
                         : this.getModifiable(null),
                 services);
-            mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
+            modifiables = modifiables + (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
                 + (includeHtmlMarkup ? "</b> " : ": ")
-                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false)
-                        : printMods.trim());
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printModifiables, false)
+                        : printModifiables.trim());
         }
         if (getModifiable().equals(TB.strictlyNothing()) && showSig) {
-            mods = mods + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
+            modifiables = modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
                 + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
@@ -458,11 +458,11 @@ public abstract class WellDefinednessCheck implements Contract {
         if (includeHtmlMarkup) {
             return "<html>"
                 + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>") : "")
-                + globalUpdates + pres + deps + reps + posts + axioms + mods + mby
+                + globalUpdates + pres + deps + reps + posts + axioms + modifiables + mby
                 + transactionApplicable + "</html>";
         } else {
             return (showSig ? sig.toString() : "") + globalUpdates + pres + deps + reps + posts
-                    + axioms + mods + mby + transactionApplicable;
+                    + axioms + modifiables + mby + transactionApplicable;
         }
     }
 
@@ -913,10 +913,10 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final POTerms createPOTerms() {
         final Condition pre = this.getRequires();
-        final Term mod = this.getModifiable();
+        final Term modifiable = this.getModifiable();
         final ImmutableList<Term> rest = this.getRest();
         final Condition post = this.getEnsures();
-        return new POTerms(pre, mod, rest, post);
+        return new POTerms(pre, modifiable, rest, post);
     }
 
     public final WellDefinednessCheck addRepresents(Term rep) {
@@ -984,7 +984,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the necessary updates applicable to the post-condition
      *
-     * @param mod the modifiable-clause
+     * @param modifiable the modifiable-clause
      * @param heap the current heap variable
      * @param heapAtPre the current variable for the heap of the pre-state
      * @param anonHeap the anonymous heap term
@@ -992,12 +992,12 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the applicable update term including an update for old-expressions and the
      *         anonymisation update
      */
-    public final Term getUpdates(Term mod, LocationVariable heap, ProgramVariable heapAtPre,
+    public final Term getUpdates(Term modifiable, LocationVariable heap, ProgramVariable heapAtPre,
             Term anonHeap, TermServices services) {
-        assert mod != null;
-        assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(mod);
-        final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? TB.skip()
-                : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
+        assert modifiable != null;
+        assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable);
+        final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable) ? TB.skip()
+                : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
@@ -1010,10 +1010,10 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final POTerms replace(POTerms po, Variables vars) {
         final Condition pre = replace(po.pre, vars);
-        final Term mod = replace(po.mod, vars);
+        final Term modifiable = replace(po.modifiable, vars);
         final ImmutableList<Term> rest = replace(po.rest, vars);
         final Condition post = replace(po.post, vars);
-        return new POTerms(pre, mod, rest, post);
+        return new POTerms(pre, modifiable, rest, post);
     }
 
     public final LocationVariable getHeap() {
@@ -1309,6 +1309,6 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record POTerms(Condition pre, Term mod, ImmutableList<Term> rest, Condition post) {
+    public record POTerms(Condition pre, Term modifiable, ImmutableList<Term> rest, Condition post) {
     }
 }

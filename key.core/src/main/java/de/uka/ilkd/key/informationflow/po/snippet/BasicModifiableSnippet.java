@@ -11,17 +11,17 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class BasicModifiesSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
+class BasicModifiableSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.MODIFIES) == null) {
+        if (d.get(BasicSnippetData.Key.MODIFIABLE) == null) {
             throw new UnsupportedOperationException(
-                "Tried to produce a " + "modifies-term for a contract without modifies.");
+                "Tried to produce a " + "modifiable-term for a contract without modifiable.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.MODIFIES.getType());
-        Term origMod = (Term) d.get(BasicSnippetData.Key.MODIFIES);
-        return replace(origMod, d.origVars, poVars.pre, d.tb);
+        assert Term.class.equals(BasicSnippetData.Key.MODIFIABLE.getType());
+        Term origModifiable = (Term) d.get(BasicSnippetData.Key.MODIFIABLE);
+        return replace(origModifiable, d.origVars, poVars.pre, d.tb);
     }
 }

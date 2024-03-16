@@ -242,11 +242,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
-    private static void collectHeapAtPres(final List<LocationVariable> modHeaps,
+    private static void collectHeapAtPres(final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
             new LinkedHashMap<>();
-        for (LocationVariable heap : modHeaps) {
+        for (LocationVariable heap : modifiableHeaps) {
             heapToAtPre.put(heap, new LinkedHashMap<>());
             heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
@@ -254,11 +254,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private static Term[] createUpdateSubs(final IObserverFunction target,
             final ProgramVariable selfVar, final ImmutableList<ProgramVariable> paramVars,
-            final List<LocationVariable> modHeaps,
+            final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Term[] updateSubs = new Term[target.arity()];
         int i = 0;
-        for (LocationVariable heap : modHeaps) {
+        for (LocationVariable heap : modifiableHeaps) {
             if (target.getStateCount() >= 1) {
                 updateSubs[i] = tb.var(heap);
                 i++;
@@ -296,10 +296,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static List<LocationVariable> addPreHeaps(final IObserverFunction target,
-            final List<LocationVariable> modHeaps,
+            final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars) {
         final List<LocationVariable> heaps = new ArrayList<>();
-        for (LocationVariable heap : modHeaps) {
+        for (LocationVariable heap : modifiableHeaps) {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
                 if (target.getStateCount() == 2) {
@@ -323,10 +323,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return saveBeforeHeaps;
     }
 
-    private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modHeaps,
+    private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<Term, Term> heapToAtPre = new LinkedHashMap<>();
-        for (LocationVariable heap : modHeaps) {
+        for (LocationVariable heap : modifiableHeaps) {
             heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
         return heapToAtPre;
@@ -354,13 +354,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private static Term createProgPost(final IObserverFunction target,
             final ProgramVariable selfVar, final ImmutableList<ProgramVariable> paramVars,
-            final ProgramVariable resultVar, final List<LocationVariable> modHeaps,
+            final ProgramVariable resultVar, final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Term saveBeforeHeaps,
             final Term representsFromContract, final Term post, final TermBuilder tb) {
         final Term progPost;
         if (representsFromContract == null) {
             final Term[] updateSubs =
-                createUpdateSubs(target, selfVar, paramVars, modHeaps, atPreVars, tb);
+                createUpdateSubs(target, selfVar, paramVars, modifiableHeaps, atPreVars, tb);
             progPost = tb.apply(saveBeforeHeaps,
                 tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
         } else {
@@ -393,15 +393,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         if (pm.isModel()) {
             // before resultVar
-            final List<LocationVariable> modHeaps = HeapContext.getModHeaps(proofServices, false);
+            final List<LocationVariable> modifiableHeaps = HeapContext.getModifiableHeaps(proofServices, false);
             final Map<LocationVariable, LocationVariable> atPreVars =
-                HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
-            collectHeapAtPres(modHeaps, atPreVars, tb);
+                HeapContext.getBeforeAtPreVars(modifiableHeaps, proofServices, "AtPre");
+            collectHeapAtPres(modifiableHeaps, atPreVars, tb);
 
             register(paramVars, new ProgramVariable[] { selfVar, resultVar }, atPreVars.values(),
                 proofServices);
 
-            final Term poTerm = createModelPOTerm(pm, selfVar, paramVars, resultVar, modHeaps,
+            final Term poTerm = createModelPOTerm(pm, selfVar, paramVars, resultVar, modifiableHeaps,
                 atPreVars, proofServices);
             termPOs.add(poTerm);
         } else {
@@ -410,14 +410,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
             int nameIndex = 0;
             for (boolean transactionFlag : transactionFlags) {
                 // prepare heapAtPre
-                final List<LocationVariable> modHeaps =
-                    HeapContext.getModHeaps(proofServices, transactionFlag);
+                final List<LocationVariable> modifiableHeaps =
+                    HeapContext.getModifiableHeaps(proofServices, transactionFlag);
                 final Map<LocationVariable, LocationVariable> atPreVars =
-                    HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
+                    HeapContext.getBeforeAtPreVars(modifiableHeaps, proofServices, "AtPre");
 
                 // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
                 /*
-                 * if (modHeaps.contains(getSavedHeap())) { heapToAtPre.get(getSavedHeap())
+                 * if (modifiableHeaps.contains(getSavedHeap())) { heapToAtPre.get(getSavedHeap())
                  * .put(tb.getBaseHeap(), tb.var(atPreVars.get(getSavedHeap()))); }
                  */
 
@@ -425,7 +425,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                     atPreVars.values(), proofServices);
 
                 final Term applyGlobalUpdate = createNonModelPOTerm(pm, selfVar, paramVars,
-                    resultVar, exceptionVar, transactionFlag, modHeaps, atPreVars, proofServices);
+                    resultVar, exceptionVar, transactionFlag, modifiableHeaps, atPreVars, proofServices);
                 termPOs.add(applyGlobalUpdate);
                 if (poNames != null) {
                     poNames[nameIndex] = buildPOName(transactionFlag);
@@ -664,7 +664,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the precondition.
      *
-     * @param modHeaps The heaps.
+     * @param modifiableHeaps The heaps.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
@@ -672,14 +672,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link Term} representing the precondition.
      */
-    protected abstract Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
+    protected abstract Term getPre(List<LocationVariable> modifiableHeaps, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Creates the postcondition.
      *
-     * @param modHeaps The heaps.
+     * @param modifiableHeaps The heaps.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @param resultVar The result variable.
@@ -689,7 +689,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link Term} representing the postcondition.
      */
-    protected abstract Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
+    protected abstract Term getPost(List<LocationVariable> modifiableHeaps, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
@@ -780,16 +780,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     /**
-     * Builds the frame clause including the modifies clause.
+     * Builds the frame clause including the modifiable clause.
      *
-     * @param modHeaps The heaps.
+     * @param modifiableHeaps The heaps.
      * @param heapToAtPre The previous heap before execution.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @param services services instance
      * @return The created {@link Term} representing the frame clause.
      */
-    protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
+    protected abstract Term buildFrameClause(List<LocationVariable> modifiableHeaps,
             Map<Term, Term> heapToAtPre, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services);
 
@@ -1068,11 +1068,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private Term createPost(final ProgramVariable selfVar,
             final ImmutableList<ProgramVariable> paramVars,
             final ImmutableList<LocationVariable> formalParamVars, final ProgramVariable resultVar,
-            final ProgramVariable exceptionVar, final List<LocationVariable> modHeaps,
+            final ProgramVariable exceptionVar, final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars,
             final List<LocationVariable> heaps, final Map<Term, Term> heapToBefore,
             final Services proofServices) {
-        Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
+        Term postTerm = getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
             proofServices);
         // Add uninterpreted predicate
         if (isAddUninterpretedPredicate()) {
@@ -1087,7 +1087,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private Term createNonModelPOTerm(final IProgramMethod pm, final ProgramVariable selfVar,
             final ImmutableList<ProgramVariable> paramVars, final ProgramVariable resultVar,
             final ProgramVariable exceptionVar, final boolean transactionFlag,
-            final List<LocationVariable> modHeaps,
+            final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final ImmutableList<LocationVariable> formalParamVars =
             createFormalParamVars(paramVars, proofServices);
@@ -1097,20 +1097,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final ImmutableList<StatementBlock> sb =
             buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
 
-        Term permsFor = createPermsFor(pm, modHeaps, proofServices, tb);
+        Term permsFor = createPermsFor(pm, modifiableHeaps, proofServices, tb);
         // final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
         // new LinkedHashMap<LocationVariable, Map<Term, Term>>();
-        final Map<Term, Term> heapToAtPre = createHeapToAtPres(modHeaps, atPreVars, tb);
+        final Map<Term, Term> heapToAtPre = createHeapToAtPres(modifiableHeaps, atPreVars, tb);
 
         // build precondition
         Term pre = tb.and(
-            buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
-            permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+            buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modifiableHeaps, proofServices),
+            permsFor, getPre(modifiableHeaps, selfVar, paramVars, atPreVars, proofServices));
         pre = addTransactionPrecondition(pre, transactionFlag, isTransactionApplicable(),
             proofServices, tb);
         // build program term
         Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, exceptionVar,
-            modHeaps, atPreVars, modHeaps, heapToAtPre, proofServices);
+            modifiableHeaps, atPreVars, modifiableHeaps, heapToAtPre, proofServices);
         post = modifyPostTerm(proofServices, post);
 
         final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
@@ -1124,13 +1124,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private Term createModelPOTerm(final IProgramMethod pm, final ProgramVariable selfVar,
             final ImmutableList<ProgramVariable> paramVars, final ProgramVariable resultVar,
-            final List<LocationVariable> modHeaps,
+            final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final IObserverFunction target = javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
         final ImmutableList<LocationVariable> formalParamVars =
             createFormalParamVars(paramVars, proofServices);
 
-        final List<LocationVariable> heaps = addPreHeaps(target, modHeaps, atPreVars);
+        final List<LocationVariable> heaps = addPreHeaps(target, modifiableHeaps, atPreVars);
         final Map<LocationVariable, LocationVariable> atBeforeVars =
             HeapContext.getBeforeAtPreVars(heaps, proofServices, "Before");
 
@@ -1142,15 +1142,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         Term pre =
             tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
-                permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+                permsFor, getPre(modifiableHeaps, selfVar, paramVars, atPreVars, proofServices));
         // build program term
-        final Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, null, modHeaps,
+        final Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, null, modifiableHeaps,
             atPreVars, heaps, heapToBefore, proofServices);
         final Term representsFromContract = getRepresentsFromContract(pm, selfVar, paramVars,
             resultVar, heaps, atPreVars, proofServices);
         final Term saveBeforeHeaps = saveBeforeHeaps(heapToBefore, tb);
 
-        final Term progPost = createProgPost(target, selfVar, paramVars, resultVar, modHeaps,
+        final Term progPost = createProgPost(target, selfVar, paramVars, resultVar, modifiableHeaps,
             atPreVars, saveBeforeHeaps, representsFromContract, post, tb);
         final Term poTerm = tb.imp(pre, progPost);
         return poTerm;

@@ -786,14 +786,18 @@ public class OriginTermLabel implements TermLabel {
         ASSERT("assert"),
 
         /**
-         * modifiable
+         * assignable.
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
-        MODIFIABLE("modifiable"),
+        ASSIGNABLE("assignable"),
 
         /**
-         * modifiable_free
+         * assignable_free
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
-        MODIFIABLE_FREE("modifiable_free"),
+        ASSIGNABLE_FREE("assignable_free"),
 
         /**
          * assume

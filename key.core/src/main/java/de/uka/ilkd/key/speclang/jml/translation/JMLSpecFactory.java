@@ -169,14 +169,14 @@ public class JMLSpecFactory {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.DIA,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
-                    clauses.modifiables.get(heap), !clauses.hasMod.get(heap), progVars,
+                    clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
-                    clauses.modifiables.get(heap), !clauses.hasMod.get(heap), progVars,
+                    clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
             } else {
@@ -184,12 +184,12 @@ public class JMLSpecFactory {
                     pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.DIA,
                     tb.and(clauses.requires.get(heap), tb.not(clauses.diverges)),
                     clauses.requiresFree.get(heap), clauses.measuredBy,
-                    clauses.modifiables.get(heap), !clauses.hasMod.get(heap), progVars,
+                    clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
-                    clauses.modifiables.get(heap), !clauses.hasMod.get(heap), progVars,
+                    clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
             }
@@ -206,8 +206,16 @@ public class JMLSpecFactory {
         public final Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
         public Term measuredBy;
         public Term decreases;
-        public final Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
-        public final Map<LocationVariable, Term> modifiablesFree = new LinkedHashMap<>();
+        /**
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+         */
+        public final Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
+        /**
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+         */
+        public final Map<LocationVariable, Term> assignablesFree = new LinkedHashMap<>();
         public final Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
         public final Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
         public final Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
@@ -218,8 +226,8 @@ public class JMLSpecFactory {
         public Map<Label, Term> breaks;
         public Map<Label, Term> continues;
         public Term returns;
-        public final Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-        public final Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<>();
+        public final Map<LocationVariable, Boolean> hasAssignable = new LinkedHashMap<>();
+        public final Map<LocationVariable, Boolean> hasFreeAssignable = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
         public void clear() {
@@ -298,12 +306,12 @@ public class JMLSpecFactory {
     }
 
     private VisibilityModifier getVisibility(TextualJMLConstruct textualConstruct) {
-        for (JMLModifier mod : textualConstruct.getMods()) {
-            if (mod.equals(JMLModifier.PRIVATE)) {
+        for (JMLModifier modifier : textualConstruct.getModifiers()) {
+            if (modifier.equals(JMLModifier.PRIVATE)) {
                 return new Private();
-            } else if (mod.equals(JMLModifier.PROTECTED)) {
+            } else if (modifier.equals(JMLModifier.PROTECTED)) {
                 return new Protected();
-            } else if (mod.equals(JMLModifier.PUBLIC)) {
+            } else if (modifier.equals(JMLModifier.PUBLIC)) {
                 return new Public();
             }
         }
@@ -332,16 +340,16 @@ public class JMLSpecFactory {
     }
 
     private static @Nullable SpecMathMode specMathModeFromModifiers(
-            ImmutableList<JMLModifier> mods) {
-        for (var mod : mods) {
+            ImmutableList<JMLModifier> modifiers) {
+        for (var modifier : modifiers) {
             // Consistency: bigint > safe > java
-            if (mod == JMLModifier.SPEC_BIGINT_MATH) {
+            if (modifier == JMLModifier.SPEC_BIGINT_MATH) {
                 return SpecMathMode.BIGINT;
             }
-            if (mod == JMLModifier.SPEC_SAFE_MATH) {
+            if (modifier == JMLModifier.SPEC_SAFE_MATH) {
                 return SpecMathMode.JAVA;
             }
-            if (mod == JMLModifier.SPEC_JAVA_MATH) {
+            if (modifier == JMLModifier.SPEC_JAVA_MATH) {
                 return SpecMathMode.JAVA;
             }
         }
@@ -352,7 +360,7 @@ public class JMLSpecFactory {
             Context outerContext, ProgramVariableCollection progVars, Behavior originalBehavior)
             throws SLTranslationException {
         var context =
-            outerContext.orWithSpecMathMode(specMathModeFromModifiers(textualSpecCase.getMods()));
+            outerContext.orWithSpecMathMode(specMathModeFromModifiers(textualSpecCase.getModifiers()));
         ContractClauses clauses = new ContractClauses();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
 
@@ -366,9 +374,9 @@ public class JMLSpecFactory {
             progVars.atBefores, textualSpecCase.getDecreases());
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            translateModifiable(context, progVars, heap, savedHeap,
-                textualSpecCase.getModifiable(heap.name()),
-                textualSpecCase.getModifiableFree(heap.name()), clauses);
+            translateAssignable(context, progVars, heap, savedHeap,
+                textualSpecCase.getAssignable(heap.name()),
+                textualSpecCase.getAssignableFree(heap.name()), clauses);
             translateRequires(context, progVars, heap, savedHeap,
                 textualSpecCase.getRequires(heap.name()),
                 textualSpecCase.getRequiresFree(heap.name()), clauses);
@@ -411,9 +419,9 @@ public class JMLSpecFactory {
             clauses.accessibles.put(heap, null);
             clauses.accessibles.put(heapAtPre, null);
         } else {
-            clauses.accessibles.put(heap, translateModifiable(context, progVars.paramVars,
+            clauses.accessibles.put(heap, translateAssignable(context, progVars.paramVars,
                 progVars.atPres, progVars.atBefores, accessible));
-            clauses.accessibles.put(heapAtPre, translateModifiable(context, progVars.paramVars,
+            clauses.accessibles.put(heapAtPre, translateAssignable(context, progVars.paramVars,
                 progVars.atPres, progVars.atBefores, accessiblePre));
         }
     }
@@ -476,60 +484,68 @@ public class JMLSpecFactory {
         }
     }
 
-    private void translateModifiable(Context context, ProgramVariableCollection progVars,
+    private void translateAssignable(Context context, ProgramVariableCollection progVars,
             LocationVariable heap, final LocationVariable savedHeap,
-            final ImmutableList<LabeledParserRuleContext> mod,
-            final ImmutableList<LabeledParserRuleContext> modFree, ContractClauses clauses)
+            final ImmutableList<LabeledParserRuleContext> assignable,
+            final ImmutableList<LabeledParserRuleContext> assignableFree, ContractClauses clauses)
             throws SLTranslationException {
-        clauses.hasMod.put(heap, !translateStrictlyPure(context, progVars.paramVars, mod));
+        clauses.hasAssignable.put(heap, !translateStrictlyPure(context, progVars.paramVars, assignable));
 
-        // For modifiable_free, the default if there is no modFree term is strictly_nothing.
-        clauses.hasFreeMod.put(heap,
-            !modFree.isEmpty() && !translateStrictlyPure(context, progVars.paramVars, modFree));
+        // For the frame condition, the default if there is no _free term is strictly_nothing.
+        clauses.hasFreeAssignable.put(heap,
+            !assignableFree.isEmpty() && !translateStrictlyPure(context, progVars.paramVars, assignableFree));
 
-        if (heap == savedHeap && mod.isEmpty()) {
-            clauses.modifiables.put(heap, null);
+        if (heap == savedHeap && assignable.isEmpty()) {
+            clauses.assignables.put(heap, null);
         } else {
-            final Boolean hasMod = clauses.hasMod.get(heap);
-            if (hasMod == null || !hasMod) {
-                final ImmutableList<LabeledParserRuleContext> modifiableNothing =
-                    ImmutableSLList.<LabeledParserRuleContext>nil().append(getModifiableNothing());
-                clauses.modifiables.put(heap, translateModifiable(context, progVars.paramVars,
-                    progVars.atPres, progVars.atBefores, modifiableNothing));
+            final Boolean hasAssignable = clauses.hasAssignable.get(heap);
+            if (hasAssignable == null || !hasAssignable) {
+                final ImmutableList<LabeledParserRuleContext> assignableNothing =
+                    ImmutableSLList.<LabeledParserRuleContext>nil().append(getAssignableNothing());
+                clauses.assignables.put(heap, translateAssignable(context, progVars.paramVars,
+                    progVars.atPres, progVars.atBefores, assignableNothing));
             } else {
-                clauses.modifiables.put(heap, translateModifiable(context, progVars.paramVars,
-                    progVars.atPres, progVars.atBefores, mod));
+                clauses.assignables.put(heap, translateAssignable(context, progVars.paramVars,
+                    progVars.atPres, progVars.atBefores, assignable));
             }
         }
 
-        if (heap == savedHeap && modFree.isEmpty()) {
-            clauses.modifiablesFree.put(heap, null);
+        if (heap == savedHeap && assignableFree.isEmpty()) {
+            clauses.assignablesFree.put(heap, null);
         } else {
-            final Boolean hasFreeMod = clauses.hasFreeMod.get(heap);
-            if (hasFreeMod == null || !hasFreeMod) {
-                final ImmutableList<LabeledParserRuleContext> modifiableFreeNothing =
+            final Boolean hasFreeAssignable = clauses.hasFreeAssignable.get(heap);
+            if (hasFreeAssignable == null || !hasFreeAssignable) {
+                final ImmutableList<LabeledParserRuleContext> assignableFreeNothing =
                     ImmutableSLList
-                            .<LabeledParserRuleContext>nil().append(getModifiableFreeNothing());
-                clauses.modifiablesFree.put(heap,
-                    translateModifiableFree(context, progVars.paramVars,
-                        progVars.atPres, progVars.atBefores, modifiableFreeNothing));
+                            .<LabeledParserRuleContext>nil().append(getAssignableFreeNothing());
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
+                        progVars.atPres, progVars.atBefores, assignableFreeNothing));
             } else {
-                clauses.modifiablesFree.put(heap,
-                    translateModifiableFree(context, progVars.paramVars,
-                        progVars.atPres, progVars.atBefores, modFree));
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
+                        progVars.atPres, progVars.atBefores, assignableFree));
             }
         }
 
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     @NonNull
-    private LabeledParserRuleContext getModifiableNothing() {
+    private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     @NonNull
-    private LabeledParserRuleContext getModifiableFreeNothing() {
+    private LabeledParserRuleContext getAssignableFreeNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
@@ -738,7 +754,11 @@ public class JMLSpecFactory {
         }
     }
 
-    private Term translateModifiable(Context context, ImmutableList<ProgramVariable> paramVars,
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    private Term translateAssignable(Context context, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
             ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
 
@@ -746,24 +766,32 @@ public class JMLSpecFactory {
             return tb.allLocs();
         } else {
             return translateUnionClauses(context, paramVars, atPres, atBefores, originalClauses,
-                SpecType.MODIFIABLE);
+                SpecType.ASSIGNABLE);
         }
     }
 
-    private Term translateModifiableFree(Context context, ImmutableList<ProgramVariable> paramVars,
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    private Term translateAssignableFree(Context context, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
             ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
-        // If originalClauses.isEmpty, the default value for modifiable_free is strictly_nothing,
+        // If originalClauses.isEmpty, the default value for _free is strictly_nothing,
         // which cannot be represented by a LocSet term.
         assert !originalClauses.isEmpty();
         return translateUnionClauses(context, paramVars, atPres, atBefores, originalClauses,
-            SpecType.MODIFIABLE_FREE);
+            SpecType.ASSIGNABLE_FREE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     private boolean translateStrictlyPure(Context context, ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<LabeledParserRuleContext> modifiableClauses) {
+            ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
-        for (LabeledParserRuleContext expr : modifiableClauses) {
+        for (LabeledParserRuleContext expr : assignableClauses) {
             Term translated =
                 new JmlIO(services).context(context).parameters(paramVars).translateTerm(expr);
 
@@ -854,7 +882,7 @@ public class JMLSpecFactory {
 
                     result.put(heap, post);
                 } else {
-                    if (clauses.modifiables.get(heap) != null) {
+                    if (clauses.assignables.get(heap) != null) {
                         result.put(heap, tb.tt());
                     }
                 }
@@ -901,7 +929,7 @@ public class JMLSpecFactory {
                 Term pre = tb.convertToFormula(clauses.requires.get(heap));
                 pres.put(heap, pre);
             } else {
-                if (clauses.modifiables.get(heap) != null) {
+                if (clauses.assignables.get(heap) != null) {
                     pres.put(heap, tb.tt());
                 }
             }
@@ -912,16 +940,16 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.modifiables, clauses.modifiablesFree, clauses.accessibles, clauses.hasMod,
-                clauses.hasFreeMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
+                clauses.hasFreeAssignable, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(tb.tt())) {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.modifiables, clauses.modifiablesFree, clauses.accessibles, clauses.hasMod,
-                clauses.hasFreeMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
+                clauses.hasFreeAssignable, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -935,13 +963,13 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.modifiables, clauses.modifiablesFree, clauses.accessibles, clauses.hasMod,
-                clauses.hasFreeMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
+                clauses.hasFreeAssignable, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.modifiables, clauses.modifiablesFree, clauses.accessibles, clauses.hasMod,
-                clauses.hasFreeMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasAssignable,
+                clauses.hasFreeAssignable, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -967,7 +995,7 @@ public class JMLSpecFactory {
         }
 
         boolean createContract = true;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (clauses.accessibles.get(heap).equalsModRenaming(tb.allLocs())) {
                 createContract = false;
                 break;
@@ -1018,12 +1046,12 @@ public class JMLSpecFactory {
 
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, TextualJMLClassInv textualInv) {
         // check whether the invariant is static
-        final ImmutableList<JMLModifier> mods = textualInv.getMods();
-        final boolean isStatic = (mods.contains(JMLModifier.STATIC) || // modifier
+        final ImmutableList<JMLModifier> modifiers = textualInv.getModifiers();
+        final boolean isStatic = (modifiers.contains(JMLModifier.STATIC) || // modifier
         // "static"
         // in an interface "static" is the default (see Sect. 2.5 of the
         // reference manual)
-                (services.getJavaInfo().isInterface(kjt) && !mods.contains(JMLModifier.INSTANCE)));
+                (services.getJavaInfo().isInterface(kjt) && !modifiers.contains(JMLModifier.INSTANCE)));
 
         // create variable for self
         var context = Context.inClass(kjt, isStatic, tb);
@@ -1086,7 +1114,7 @@ public class JMLSpecFactory {
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
             throws SLTranslationException {
 
-        boolean isStatic = textualRep.getMods().contains(JMLModifier.STATIC);
+        boolean isStatic = textualRep.getModifiers().contains(JMLModifier.STATIC);
         var context = Context.inClass(kjt, isStatic, tb);
 
         // translateToTerm expression
@@ -1158,7 +1186,7 @@ public class JMLSpecFactory {
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             dep = textualDep.getDepends(heap.name()).head();
             if (dep != null) {
                 targetHeap = heap;
@@ -1309,8 +1337,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.modifiables, clauses.modifiablesFree,
-            clauses.hasMod, clauses.hasFreeMod, services).create();
+            clauses.diverges, clauses.assignables, clauses.assignablesFree,
+            clauses.hasAssignable, clauses.hasFreeAssignable, services).create();
     }
 
     /**
@@ -1342,8 +1370,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.modifiables, clauses.modifiablesFree, clauses.hasMod,
-            clauses.hasFreeMod, clauses.decreases, services)
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
+            clauses.hasFreeAssignable, clauses.decreases, services)
                     .create();
     }
 
@@ -1377,8 +1405,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.modifiables, clauses.modifiablesFree, clauses.hasMod,
-            clauses.hasFreeMod, clauses.decreases, services)
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
+            clauses.hasFreeAssignable, clauses.decreases, services)
                     .create();
     }
 
@@ -1549,9 +1577,9 @@ public class JMLSpecFactory {
             originalFreeInvariants, allVars, allHeaps, atPres, services, tb);
 
         // translateToTerm modifiable
-        Map<LocationVariable, Term> mods =
+        Map<LocationVariable, Term> modifiables =
             translateToTermModifiable(context, atPres, allVars, originalModifiables, false);
-        Map<LocationVariable, Term> freeMods =
+        Map<LocationVariable, Term> freeModifiables =
             translateToTermModifiable(context, atPres, allVars, originalFreeModifiables, true);
 
 
@@ -1569,8 +1597,8 @@ public class JMLSpecFactory {
         // create loop invariant annotation
         Term selfTerm = context.selfVar() == null ? null : tb.var(context.selfVar());
 
-        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, mods,
-            freeMods, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
+        return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, modifiables,
+            freeModifiables, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
     private Term translateToTermVariant(Context context, Map<LocationVariable, Term> atPres,
@@ -1608,7 +1636,7 @@ public class JMLSpecFactory {
             Map<LocationVariable, Term> atPres, ImmutableList<ProgramVariable> allVars,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalModifiables,
             boolean free) {
-        Map<LocationVariable, Term> mods = new LinkedHashMap<>();
+        Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
         for (String h : originalModifiables.keySet()) {
             LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h));
@@ -1629,13 +1657,13 @@ public class JMLSpecFactory {
                     Term translated =
                         new JmlIO(services).context(context).parameters(allVars).atPres(atPres)
                                 .atBefore(atPres).translateTerm(expr,
-                                    free ? SpecType.MODIFIABLE_FREE : SpecType.MODIFIABLE);
+                                    free ? SpecType.ASSIGNABLE_FREE : SpecType.ASSIGNABLE);
                     a = tb.union(a, translated);
                 }
             }
-            mods.put(heap, a);
+            modifiables.put(heap, a);
         }
-        return mods;
+        return modifiables;
     }
 
     // ImmutableList does not accept lists of subclasses to #append and cannot
@@ -1653,8 +1681,8 @@ public class JMLSpecFactory {
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
             TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
-            textualLoopSpec.getFreeInvariants(), textualLoopSpec.getModifiablesInit(),
-            textualLoopSpec.getModifiablesFreeInit(), textualLoopSpec.getInfFlowSpecs(),
+            textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
+            textualLoopSpec.getAssignablesFreeInit(), textualLoopSpec.getInfFlowSpecs(),
             textualLoopSpec.getVariant());
     }
 
@@ -1671,9 +1699,9 @@ public class JMLSpecFactory {
      */
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini,
             IProgramMethod pm) throws SLTranslationException {
-        final ImmutableList<JMLModifier> mods =
+        final ImmutableList<JMLModifier> modifiers =
             ImmutableSLList.<JMLModifier>nil().append(JMLModifier.PRIVATE);
-        final TextualJMLSpecCase specCase = new TextualJMLSpecCase(mods, Behavior.NONE);
+        final TextualJMLSpecCase specCase = new TextualJMLSpecCase(modifiers, Behavior.NONE);
         specCase.addName(ini.getName());
         for (LabeledParserRuleContext context : createPrecond(pm, ini.getOriginalSpec())) {
             specCase.addClause(REQUIRES, context);

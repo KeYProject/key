@@ -1151,7 +1151,7 @@ public final class SpecificationRepository {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
                     ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
                     Map<LocationVariable, ProgramVariable> atPreVars = new LinkedHashMap<>();
-                    List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+                    List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
                     for (LocationVariable heap : heaps) {
                         atPreVars.put(heap,
                             tb.atPreVar(heap.name().toString(), heap.sort(), false));

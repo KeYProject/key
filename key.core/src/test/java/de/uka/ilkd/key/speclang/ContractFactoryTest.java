@@ -148,10 +148,10 @@ public class ContractFactoryTest {
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
-     * returns the modifies term of the resulting combined contract (with origin labels removed).
+     * returns the modifiable term of the resulting combined contract (with origin labels removed).
      *
      * @param contractStr the string containing the contracts for method m
-     * @return the combined modifies term of the contracts in the input string, without origin
+     * @return the combined modifiable term of the contracts in the input string, without origin
      *         labels
      * @throws SLTranslationException should not be thrown
      */

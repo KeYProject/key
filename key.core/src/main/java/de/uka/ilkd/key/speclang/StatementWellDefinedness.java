@@ -100,9 +100,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term post = getPost(po.post(), vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,
-            getUpdates(po.mod(), vars.heap, vars.heap, vars.anonHeap, services));
+            getUpdates(po.modifiable(), vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod(), po.rest(), uPost,
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.modifiable(), po.rest(), uPost,
             services);
     }
 
@@ -196,16 +196,16 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term context;
         final Term pre;
         final Term wfAnon;
-        final Term wdMod;
+        final Term wdModifiable;
         final Term wdRest;
         final Term anonWdPost;
 
-        private SequentTerms(Term context, Term pre, Term anonHeap, Term mod,
+        private SequentTerms(Term context, Term pre, Term anonHeap, Term modifiable,
                 ImmutableList<Term> rest, Term anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
-            this.wdMod = TB.wd(mod);
+            this.wdModifiable = TB.wd(modifiable);
             this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }

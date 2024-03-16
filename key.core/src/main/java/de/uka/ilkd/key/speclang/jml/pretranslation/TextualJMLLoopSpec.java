@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A JML loop specification (invariant, modifiable clause, decreases clause, ...) in textual form.
+ * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
@@ -24,13 +24,15 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     /**
      * Heap-dependent clauses
+     * Note that the name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
     public enum ClauseHd {
-        INFORMATION_FLOW, MODIFIABLE, MODIFIABLE_FREE, INVARIANT, INVARIANT_FREE
+        INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
-    public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
-        super(mods);
+    public TextualJMLLoopSpec(ImmutableList<JMLModifier> modifiers) {
+        super(modifiers);
     }
 
     /*
@@ -67,28 +69,52 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getModifiable() {
-        return getList(ClauseHd.MODIFIABLE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public ImmutableList<LabeledParserRuleContext> getAssignable() {
+        return getList(ClauseHd.ASSIGNABLE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiables() {
-        return getMap(ClauseHd.MODIFIABLE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
+        return getMap(ClauseHd.ASSIGNABLE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesInit() {
-        return getMapInit(ClauseHd.MODIFIABLE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getModifiableFree() {
-        return getList(ClauseHd.MODIFIABLE_FREE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
+        return getList(ClauseHd.ASSIGNABLE_FREE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesFree() {
-        return getMap(ClauseHd.MODIFIABLE_FREE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
+        return getMap(ClauseHd.ASSIGNABLE_FREE);
     }
 
-    public Map<String, ImmutableList<LabeledParserRuleContext>> getModifiablesFreeInit() {
-        return getMapInit(ClauseHd.MODIFIABLE_FREE);
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
     }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {

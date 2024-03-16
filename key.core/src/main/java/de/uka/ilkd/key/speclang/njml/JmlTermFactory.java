@@ -1059,7 +1059,11 @@ public final class JmlTermFactory {
     }
 
 
-    public Term modifiable(@NonNull Term term) {
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public Term assignable(@NonNull Term term) {
         return accessible(term);
     }
 
