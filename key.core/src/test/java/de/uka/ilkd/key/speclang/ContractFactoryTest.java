@@ -88,7 +88,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
 
@@ -114,7 +114,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
 
@@ -140,7 +140,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
             + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
             + "allLocs))", woLabels.toString());
@@ -155,7 +155,8 @@ public class ContractFactoryTest {
      *         labels
      * @throws SLTranslationException should not be thrown
      */
-    private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
+    private Term calculateCombinedModifiableWOLabels(String contractStr)
+            throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
@@ -183,7 +184,7 @@ public class ContractFactoryTest {
         FunctionalOperationContract singleContract = cf.union(cs);
 
         // remove origin labels
-        Term combinedMod = singleContract.getMod();
-        return TermLabelManager.removeIrrelevantLabels(combinedMod, services);
+        Term combinedModifiable = singleContract.getModifiable();
+        return TermLabelManager.removeIrrelevantLabels(combinedModifiable, services);
     }
 }

@@ -148,7 +148,7 @@ public class TestJMLPreTranslator {
 
         Assertions.assertSame(Behavior.NORMAL_BEHAVIOR, specCase.getBehavior());
         Assertions.assertEquals(1, specCase.getRequires().size());
-        Assertions.assertEquals(0, specCase.getModifiable().size());
+        Assertions.assertEquals(0, specCase.getAssignable().size());
         Assertions.assertEquals(0, specCase.getEnsures().size());
         Assertions.assertEquals(0, specCase.getSignals().size());
         Assertions.assertEquals(0, specCase.getSignalsOnly().size());
@@ -177,7 +177,7 @@ public class TestJMLPreTranslator {
 
         Assertions.assertSame(Behavior.BEHAVIOR, specCase.getBehavior());
         Assertions.assertEquals(2, specCase.getRequires().size());
-        Assertions.assertEquals(1, specCase.getModifiable().size());
+        Assertions.assertEquals(1, specCase.getAssignable().size());
         Assertions.assertEquals(1, specCase.getEnsures().size());
         Assertions.assertEquals(1, specCase.getSignals().size());
         Assertions.assertEquals(1, specCase.getSignalsOnly().size());
@@ -187,7 +187,7 @@ public class TestJMLPreTranslator {
         Assertions.assertEquals("ensuresfalse;",
             specCase.getEnsures().head().first.getText().trim());
         Assertions.assertEquals("assignable\\nothing;",
-            specCase.getModifiable().head().first.getText().trim());
+            specCase.getAssignable().head().first.getText().trim());
         Assertions.assertEquals("signals(Exception)e;",
             specCase.getSignals().head().first.getText().trim());
         Assertions.assertEquals("signals_onlyonlythis;",
@@ -219,14 +219,14 @@ public class TestJMLPreTranslator {
 
         Assertions.assertSame(Behavior.NORMAL_BEHAVIOR, specCase1.getBehavior());
         Assertions.assertEquals(0, specCase1.getRequires().size());
-        Assertions.assertEquals(1, specCase1.getModifiable().size());
+        Assertions.assertEquals(1, specCase1.getAssignable().size());
         Assertions.assertEquals(1, specCase1.getEnsures().size());
         Assertions.assertEquals(0, specCase1.getSignals().size());
         Assertions.assertEquals(0, specCase1.getSignalsOnly().size());
 
         Assertions.assertSame(Behavior.EXCEPTIONAL_BEHAVIOR, specCase2.getBehavior());
         Assertions.assertEquals(1, specCase2.getRequires().size());
-        Assertions.assertEquals(0, specCase2.getModifiable().size());
+        Assertions.assertEquals(0, specCase2.getAssignable().size());
         Assertions.assertEquals(0, specCase2.getEnsures().size());
         Assertions.assertEquals(1, specCase2.getSignals().size());
         Assertions.assertEquals(0, specCase2.getSignalsOnly().size());
