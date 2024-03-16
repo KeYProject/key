@@ -134,7 +134,12 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             currentGoal.setSequent(currentSequent);
             PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - timeSetSequent);
 
-            currentGoal.setBranchLabel(gt.name());
+            var nfn = gt.getBranchNamingFunction();
+            if (nfn == null)
+                currentGoal.setBranchLabel(gt.name());
+            else
+                currentGoal.setBranchLabel(
+                    nfn.getName(services, currentSequent, tacletApp, mc));
 
             timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),

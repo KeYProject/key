@@ -3,12 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.logic.label.SpecNameLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -18,7 +25,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -138,4 +147,29 @@ public abstract class TextualJMLConstruct {
         setPosition(ps);
     }
 
+
+    /**
+     * Returns a list of term labels based on the specification type, the start position and a
+     * specification name.
+     */
+    public static List<TermLabel> createTermLabel(OriginTermLabel.@Nullable SpecType type,
+            @Nullable Token start, @Nullable String name) {
+        List<TermLabel> label = new ArrayList<>();
+        if (name != null) {
+            label.add(new SpecNameLabel(name));
+        }
+
+        final var factory = new OriginTermLabelFactory();
+        if (start != null && type != null) {
+            String filename = start.getTokenSource().getSourceName();
+            if (filename != null && filename.equals("<unknown>"))
+                filename = "unknown";
+            int line = start.getLine();
+            label.add(factory.createOriginTermLabel(
+                new OriginTermLabel.FileOrigin(type, URI.create("file://" + filename), line)));
+        } else if (type != null) {
+            label.add(factory.createOriginTermLabel(new OriginTermLabel.Origin(type)));
+        }
+        return label.isEmpty() ? Collections.emptyList() : label;
+    }
 }

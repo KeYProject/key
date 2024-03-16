@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
@@ -266,8 +265,10 @@ class EndToEndTests {
     private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
-        boolean oldValue = GeneralSettings.noPruningClosed;
-        GeneralSettings.noPruningClosed = false;
+        boolean oldValue =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
+
         // load proof
         Assertions.assertTrue(proofFile.exists());
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
@@ -316,7 +317,8 @@ class EndToEndTests {
             return new Pair<>(slicedProof, tempFile);
         } finally {
             environment.dispose();
-            GeneralSettings.noPruningClosed = oldValue;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setNoPruningClosed(oldValue);
         }
     }
 }

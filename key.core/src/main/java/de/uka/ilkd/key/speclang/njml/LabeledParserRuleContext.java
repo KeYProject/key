@@ -4,58 +4,70 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
  */
+@NullMarked
 public class LabeledParserRuleContext {
-    @NonNull
     public final ParserRuleContext first;
-    @Nullable
-    public final TermLabel second;
+    public final List<TermLabel> second;
 
-    public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
+    public LabeledParserRuleContext(ParserRuleContext first, @Nullable TermLabel second) {
+        this.first = Objects.requireNonNull(first);
+        if (second != null) {
+            this.second = Collections.singletonList(second);
+        } else {
+            this.second = Collections.emptyList();
         }
-        this.first = first;
-        this.second = second;
     }
-
 
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
-        }
-        this.first = first;
-        second = null;
+        this(first, (TermLabel) null);
     }
 
-    public static LabeledParserRuleContext createLabeledParserRuleContext(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType, boolean attachOriginLabel) {
+    public static LabeledParserRuleContext createLabeledParserRuleContext(
+            ParserRuleContext ctx, OriginTermLabel.SpecType specType, boolean attachOriginLabel,
+            JmlParser.@Nullable Entity_nameContext name) {
         return attachOriginLabel
-                ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType))
+                ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType, name))
                 : new LabeledParserRuleContext(ctx);
     }
 
-    private LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
-        this(ctx, constructTermLabel(ctx, specType));
+    public LabeledParserRuleContext(@NonNull ParserRuleContext first, List<TermLabel> labels) {
+        this.first = first;
+        if (labels != null) {
+            this.second = Collections.unmodifiableList(labels);
+        } else {
+            this.second = Collections.emptyList();
+        }
     }
 
-    private static TermLabel constructTermLabel(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType) {
+    private static List<TermLabel> constructTermLabel(ParserRuleContext ctx,
+            OriginTermLabel.SpecType specType, JmlParser.@Nullable Entity_nameContext name) {
         URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
-        return new OriginTermLabelFactory().createOriginTermLabel(origin);
+        var originLabel = new OriginTermLabelFactory().createOriginTermLabel(origin);
+        if (name != null) {
+            var nameLabel = new SpecNameLabel(name.ident().getText());
+            return List.of(originLabel, nameLabel);
+        }
+        return List.of(originLabel);
+
     }
 }

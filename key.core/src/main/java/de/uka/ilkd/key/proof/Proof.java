@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -520,7 +519,8 @@ public class Proof implements Named {
             goal = getOpenGoal(it.next());
             if (goal != null) {
                 b = true;
-                if (!GeneralSettings.noPruningClosed) {
+                if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                        .isNoPruningClosed()) {
                     closedGoals = closedGoals.prepend(goal);
                 }
                 remove(goal);
@@ -683,7 +683,8 @@ public class Proof implements Named {
             return null;
         }
         // abort pruning if the node is closed and pruning in closed branches is disabled
-        if (cuttingPoint.isClosed() && GeneralSettings.noPruningClosed) {
+        if (cuttingPoint.isClosed() && ProofIndependentSettings.DEFAULT_INSTANCE
+                .getGeneralSettings().isNoPruningClosed()) {
             return null;
         }
 

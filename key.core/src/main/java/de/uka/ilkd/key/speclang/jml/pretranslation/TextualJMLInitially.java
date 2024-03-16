@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
@@ -15,23 +19,25 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
 
-    private final LabeledParserRuleContext inv;
+    private final JmlParser.Initially_clauseContext inv;
 
 
-    public TextualJMLInitially(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
+    public TextualJMLInitially(ImmutableList<JMLModifier> mods,
+            JmlParser.Initially_clauseContext inv) {
         super(mods);
-        assert inv != null;
-        this.inv = inv;
+        this.inv = Objects.requireNonNull(inv);
         setPosition(inv);
     }
 
     public LabeledParserRuleContext getInv() {
-        return inv;
+        return new LabeledParserRuleContext(inv,
+            createTermLabel(OriginTermLabel.SpecType.INVARIANT, inv.start,
+                inv.entity_name() != null ? inv.entity_name().ident().getText() : null));
     }
 
     @Override
     public String toString() {
-        return inv.first.getText();
+        return inv.getText();
     }
 
 

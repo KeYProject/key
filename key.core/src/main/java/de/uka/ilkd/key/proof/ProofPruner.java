@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -50,14 +50,15 @@ class ProofPruner {
 
         final InitConfig initConfig = proof.getInitConfig();
 
-        // First, make a breadth first search, in order to find the leaf
+        // First, make a breadth-first search, in order to find the leaf
         // with the shortest distance to the cutting point and to remove
         // the rule applications from the proof management system.
         // Furthermore, store the residual leaves.
         proof.breadthFirstSearch(cuttingPoint, (proof, visitedNode) -> {
             if (visitedNode.leaf()) {
                 // pruning in closed branches (can be disabled via "--no-pruning-closed")
-                if (!visitedNode.isClosed() || !GeneralSettings.noPruningClosed) {
+                if (!visitedNode.isClosed() || !ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getGeneralSettings().isNoPruningClosed()) {
                     if (firstLeaf == null) {
                         firstLeaf = visitedNode;
                     } else {
