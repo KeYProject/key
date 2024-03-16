@@ -972,6 +972,8 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_color.proof");
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
+        // use for debugging purposes.
+        //c.keep("VSTTE10");
         return c;
     }
 

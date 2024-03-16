@@ -134,7 +134,7 @@ public final class JmlAssertRule implements BuiltInRule {
                 "No specification found for JmlAssert. Internal Error. Not your fault");
         }
 
-        Term condition = tb.convertToFormula(spec.getTerm(services, self, 0));
+        Term condition = tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
 
         condition = tb.addLabel(condition, new OriginTermLabel.Origin(
             kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT
