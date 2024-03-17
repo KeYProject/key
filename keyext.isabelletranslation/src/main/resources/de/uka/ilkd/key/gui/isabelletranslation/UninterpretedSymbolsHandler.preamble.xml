@@ -100,7 +100,7 @@ typedef LocSet = "UNIV::(java_lang_Object \&lt;times&gt; Field) set set"
 
 
 setup_lifting  type_definition_LocSet
-lift_definition elementOf::"(java_lang_Object \&lt;times&gt; Field)\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;bool" is Set.member.
+lift_definition elementOf::"java_lang_Object \&lt;Rightarrow&gt; Field \&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;bool" is "\&lt;lambda&gt;obj f s. (obj, f) \&lt;in&gt; s".
 lift_definition empty::"LocSet" is Set.empty.
 lift_definition allLocs::"LocSet" is Set.UNIV.
 lift_definition singleton::"java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;LocSet" is "\&lt;lambda&gt;obj f. {(obj, f)}".
@@ -271,7 +271,7 @@ fun select::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt
   "select h obj f = cast (h obj f)"
 
 fun anon::"Heap\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;Heap\&lt;Rightarrow&gt;Heap" where
-  "anon h1 s h2 = Abs_Heap (\&lt;lambda&gt;(obj::java_lang_Object) (f::Field). (if elementOf (obj, f) s \&lt;and&gt; f\&lt;noteq&gt;created \&lt;or&gt; elementOf (obj, f) (unusedLocs h1)
+  "anon h1 s h2 = Abs_Heap (\&lt;lambda&gt;(obj::java_lang_Object) (f::Field). (if elementOf obj f s \&lt;and&gt; f\&lt;noteq&gt;created \&lt;or&gt; elementOf obj f (unusedLocs h1)
     then select h2 obj f else select h1 obj f))"
 
 fun store::"Heap\&lt;Rightarrow&gt;java_lang_Object\&lt;Rightarrow&gt;Field\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;Heap" where
@@ -288,12 +288,12 @@ section \&lt;open&gt;wellFormed Axioms\&lt;close&gt;
 axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
   onlyCreatedjava_lang_ObjecteAreReferenced:"wellFormed h \&lt;Longrightarrow&gt; select h obj f = null \&lt;or&gt;
       ((select h (select h obj f) created)::bool)"
-  and onlyCreatedjava_lang_ObjectsAreInLocSets:"wellFormed h \&lt;and&gt; elementOf((o2::java_lang_Object), f2)((select
+  and onlyCreatedjava_lang_ObjectsAreInLocSets:"wellFormed h \&lt;and&gt; elementOf (o2::java_lang_Object) f2 ((select
       h obj f)::LocSet) \&lt;Longrightarrow&gt; Null2java_lang_Object null=o2 \&lt;or&gt; ((select h o2
       created)::bool)"
   and wellFormedStorejava_lang_Object:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; ((select
       h x created) \&lt;and&gt; instanceof (fieldType f) x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
-  and wellFormedStoreLocSet:"wellFormed h \&lt;and&gt; (\&lt;forall&gt;ov fv. (elementOf (ov,fv) y \&lt;longrightarrow&gt; ov = null \&lt;or&gt; select h ov created))
+  and wellFormedStoreLocSet:"wellFormed h \&lt;and&gt; (\&lt;forall&gt;ov fv. (elementOf ov fv y \&lt;longrightarrow&gt; ov = null \&lt;or&gt; select h ov created))
       \&lt;Longrightarrow&gt; wellFormed (store h obj f y)"
   and wellFormedStorePrimitive:"(typeof x (fieldType f) \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x java_lang_Object_type \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x LocSet_type  \&lt;Longrightarrow&gt;  wellFormed h 
     \&lt;Longrightarrow&gt; wellFormed (store h obj f x))"
