@@ -81,8 +81,10 @@ public class IsabelleTranslator {
 
             result.append("declare [[coercion ").append(repName).append("]]").append(LINE_ENDING).append(LINE_ENDING);
 
+
+            String IsabelleTypeUniverseOfSort = "(UNIV::" + sortName + " set)";
             result.append("lemma ").append(sortName).append("_type_specification[simp]:")
-                    .append(getUnivSpec(masterHandler, sortParentsMap.get(sort), "(UNIV::" + sortName + " set)"))
+                    .append(getUnivSpec(masterHandler, sortParentsMap.get(sort), IsabelleTypeUniverseOfSort))
                     .append(LINE_ENDING);
             result.append("  using ").append(UNIV_spec_lemma_name).append(" using type_definition.Rep_range type_definition_").append(sortName).append(" by blast").append(LINE_ENDING);
             result.append(LINE_ENDING).append(LINE_ENDING);
@@ -134,6 +136,9 @@ public class IsabelleTranslator {
                 result.append("instance by standard").append(LINE_ENDING);
                 result.append("end").append(LINE_ENDING).append(LINE_ENDING);
             }
+
+            String typeConstName = sortName + "_type";
+            result.append("definition \"").append(typeConstName).append(" = Abs_javaDL_type ").append(IsabelleTypeUniverseOfSort).append("\"");
 
             result.append(LINE_ENDING).append(LINE_ENDING);
         }

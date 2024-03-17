@@ -45,7 +45,7 @@ public class InstanceOperatorHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
         String functionName = supportedOperators.get(op);
-        String dependingSortTypeName = trans.translateSortName(op.getSortDependingOn()) + "type";
+        String dependingSortTypeName = trans.translateSortName(op.getSortDependingOn()) + "_type";
 
         StringBuilder result = new StringBuilder("(");
         result.append("(").append(functionName).append(") ");
