@@ -20,6 +20,7 @@ public interface EqualsModProperty<T> {
      * @param property the property to be ignored in the equality check
      * @param v the additional arguments needed for the equality check
      * @return whether this object is equal to <code>o</code>
+     * @param <V> the type of the additional parameters needed for the comparison
      */
 
     <V> boolean equalsModProperty(Object o, Property<T> property, V... v);

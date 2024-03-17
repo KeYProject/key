@@ -23,6 +23,7 @@ public interface Property<T> {
      * @param t2 the second element of the equality check
      * @param v the additional arguments needed for the equality check
      * @return whether {@code t1} and {@code t2} are equal ignoring a certain property
+     * @param <V> the type of the additional parameters needed for the comparison
      */
     <V> boolean equalsModThisProperty(T t1, T t2, V... v);
 
