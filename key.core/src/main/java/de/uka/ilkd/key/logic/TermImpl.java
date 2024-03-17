@@ -347,7 +347,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public boolean equalsModProperty(Object o, Property<Term> property, Void... v) {
+    public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
         if (!(o instanceof Term other)) {
             return false;
         }

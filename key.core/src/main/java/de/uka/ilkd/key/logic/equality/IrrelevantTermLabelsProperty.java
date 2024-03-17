@@ -34,12 +34,14 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
+     * @param v the additional parameters needed for the comparison
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
      *         for their irrelevant labels.
+     * @param <V> the type of the additional parameters needed for the comparison
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
-    public boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }

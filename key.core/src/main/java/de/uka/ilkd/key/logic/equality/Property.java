@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.equality;
  * properties.
  *
  * @param <T> the type of the objects that are checked for equality or hashed
+ *
  * @author Tobias Reinhold
  */
 public interface Property<T> {
@@ -20,13 +21,14 @@ public interface Property<T> {
      *
      * @param t1 the first element of the equality check
      * @param t2 the second element of the equality check
+     * @param v the additional arguments needed for the equality check
      * @return whether {@code t1} and {@code t2} are equal ignoring a certain property
      */
-    boolean equalsModThisProperty(T t1, T t2);
+    <V> boolean equalsModThisProperty(T t1, T t2, V... v);
 
     /**
      * Computes the hash code of {@code t} in a context where
-     * {@link this#equalsModThisProperty(Object, Object)}
+     * {@link this#equalsModThisProperty(Object, Object, Object[])}
      * is used as an equality check, so that it can be used in, e.g., a HashMap.
      *
      * @param t the object to compute the hash code for

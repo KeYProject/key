@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.JavaASTTreeWalker;
 
@@ -28,8 +29,21 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      */
     private RenamingSourceElementProperty() {}
 
+    /**
+     * Checks if {@code se2} is a source element syntactically equal to {@code se1} modulo renaming.
+     *
+     * @param se1 the first element of the equality check
+     * @param se2 the second element of the equality check
+     * @param v the additional arguments needed for the equality check
+     * @return {@code true} iff {@code se2} is a source element syntactically equal to {@code se1}
+     *         modulo renaming
+     * @param <V> the type of the additional parameters needed for the comparison
+     */
     @Override
-    public boolean equalsModThisProperty(SourceElement se1, SourceElement se2) {
+    public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
+        // For this equality check, v must be a single NameAbstractionTable
+        NameAbstractionTable nat = (NameAbstractionTable) v[0];
+
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
         JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
 

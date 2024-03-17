@@ -43,11 +43,13 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
+     * @param v the additional parameters needed for the comparison
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
+     * @param <V> the type of the additional parameters needed for the comparison
      */
     @Override
-    public boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }

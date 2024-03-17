@@ -35,11 +35,14 @@ public class RenamingTermProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
-     * @return true iff {@code term2} has the same values in operator, sort, arity, varsBoundHere
+     * @param v the additional parameters needed for the comparison
+     * @return {@code true} iff {@code term2} has the same values in operator, sort, arity,
+     *         varsBoundHere
      *         and javaBlock as {@code term1} modulo bound renaming
+     * @param <V> the type of the additional parameters needed for the comparison
      */
     @Override
-    public boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }

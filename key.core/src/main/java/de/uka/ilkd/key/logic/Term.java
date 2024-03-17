@@ -43,7 +43,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, EqualsModProperty<Term, Void>, org.key_project.logic.Term {
+        extends SVSubstitute, Sorted, EqualsModProperty<Term>, org.key_project.logic.Term {
     @Override
     Operator op();
 
