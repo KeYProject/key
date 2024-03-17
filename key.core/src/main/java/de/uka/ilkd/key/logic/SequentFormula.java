@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 
@@ -35,10 +35,11 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
     /**
      * creates a new SequentFormula
      *
-     * @param term a Term of sort {@link Sort#FORMULA}
+     * @param term a Term of sort {@link JavaDLTheory#FORMULA}
      */
     public SequentFormula(Term term) {
-        if (term.sort() != Sort.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
+        if (term.sort() != JavaDLTheory.FORMULA
+                && term.sort() != AbstractTermTransformer.METASORT) {
             throw new RuntimeException("A Term instead of a formula: " + term);
         }
         this.term = term;

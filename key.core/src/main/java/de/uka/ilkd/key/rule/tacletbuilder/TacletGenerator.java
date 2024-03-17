@@ -11,22 +11,26 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 
@@ -388,7 +392,7 @@ public class TacletGenerator {
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaRepresents.term,
                     services.getTermFactory()),
@@ -586,14 +590,19 @@ public class TacletGenerator {
             resultProgSV, new ImmutableArray<>(paramProgSVs));
         final JavaBlock findBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(mbs, null));
 
-        SchemaVariable modalitySV =
-            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"), Sort.FORMULA,
-                DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX)
-                        .add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
+        final var modalitySV =
+            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
+                JavaDLTheory.FORMULA,
+                DefaultImmutableSet.<Modality.JavaModalityKind>nil()
+                        .add(Modality.JavaModalityKind.DIA)
+                        .add(Modality.JavaModalityKind.BOX)
+                        .add(Modality.JavaModalityKind.DIA_TRANSACTION)
+                        .add(Modality.JavaModalityKind.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
         final Term findTerm =
-            TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, findBlock);
+            TB.tf().createTerm(Modality.getModality(modalitySV, findBlock),
+                new Term[] { TB.var(postSV) }, null, null);
 
         final JavaBlock replaceBlock =
             JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(), null));
@@ -613,7 +622,8 @@ public class TacletGenerator {
 
         final Term replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, replaceBlock));
+                TB.tf().createTerm(Modality.getModality(modalitySV, replaceBlock),
+                    new Term[] { TB.var(postSV) }, null, null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder =
             new RewriteTacletBuilder<>();
@@ -881,7 +891,7 @@ public class TacletGenerator {
             newTerm = t;
         } else {
             newTerm = services.getTermBuilder().tf().createTerm(t.op(), newSubs,
-                new ImmutableArray<>(newBoundVars), t.javaBlock());
+                new ImmutableArray<>(newBoundVars), null);
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -916,7 +926,7 @@ public class TacletGenerator {
 
         // reassemble, return
         final Term term =
-            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
+            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null);
         return new Pair<>(term, taclets);
     }
 
@@ -958,7 +968,7 @@ public class TacletGenerator {
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom, services.getTermFactory()),
                 OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom, services.getTermFactory()));

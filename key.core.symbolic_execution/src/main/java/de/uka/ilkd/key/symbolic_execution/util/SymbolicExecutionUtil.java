@@ -20,11 +20,11 @@ import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -61,11 +61,15 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 import org.slf4j.Logger;
@@ -311,7 +315,7 @@ public final class SymbolicExecutionUtil {
         if (subChanged) {
             term =
                 services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
-                    term.boundVars(), term.javaBlock(), term.getLabels());
+                    term.boundVars(), term.getLabels());
         }
         // Improve readability: a < 1 + b, a < b + 1
         final TermBuilder tb = services.getTermBuilder();
@@ -473,9 +477,9 @@ public final class SymbolicExecutionUtil {
             new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
         JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
         // Create predicate which will be used in formulas to store the value interested in.
-        Function newPredicate =
-            new Function(new Name(services.getTermBuilder().newName("ResultPredicate")),
-                Sort.FORMULA, variable.sort());
+        JFunction newPredicate =
+            new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
+                JavaDLTheory.FORMULA, variable.sort());
         // Create formula which contains the value interested in.
         Term newTerm = services.getTermBuilder().func(newPredicate,
             services.getTermBuilder().var((ProgramVariable) variable));
@@ -511,9 +515,9 @@ public final class SymbolicExecutionUtil {
         assert node != null;
         assert variable instanceof ProgramVariable;
         // Create predicate which will be used in formulas to store the value interested in.
-        Function newPredicate =
-            new Function(new Name(services.getTermBuilder().newName("ResultPredicate")),
-                Sort.FORMULA, variable.sort());
+        JFunction newPredicate =
+            new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
+                JavaDLTheory.FORMULA, variable.sort());
         // Create formula which contains the value interested in.
         Term newTerm = services.getTermBuilder().func(newPredicate,
             services.getTermBuilder().var((ProgramVariable) variable));
@@ -544,9 +548,10 @@ public final class SymbolicExecutionUtil {
         assert node != null;
         assert term != null;
         // Create predicate which will be used in formulas to store the value interested in.
-        Function newPredicate =
-            new Function(new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")),
-                Sort.FORMULA, term.sort());
+        JFunction newPredicate =
+            new JFunction(
+                new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")),
+                JavaDLTheory.FORMULA, term.sort());
         // Create formula which contains the value interested in.
         Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, term);
         // Create Sequent to prove with new succedent.
@@ -913,7 +918,7 @@ public final class SymbolicExecutionUtil {
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
             Term locationTerm) {
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function function) {
+        if (locationTerm.op() instanceof JFunction function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -1461,7 +1466,8 @@ public final class SymbolicExecutionUtil {
      *
      * @author Martin Hentschel
      */
-    private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
+    private static final class FindModalityWithSymbolicExecutionLabelId
+            implements DefaultVisitor {
         /**
          * The modality {@link PosInTerm} with the maximal ID.
          */
@@ -2265,7 +2271,10 @@ public final class SymbolicExecutionUtil {
                 }
                 loopConditionModalityTerm = loopConditionModalityTerm.sub(0);
             } else { // Use Case
-                if (loopConditionModalityTerm.op() != Modality.BOX) {
+                if (!(loopConditionModalityTerm.op() instanceof Modality mod)) {
+                    throw new ProofInputException(
+                        "Expected Box modality but is " + loopConditionModalityTerm);
+                } else if (mod.kind() != Modality.JavaModalityKind.BOX) {
                     throw new ProofInputException(
                         "Implementation of WhileInvariantRule has changed.");
                 }
@@ -2277,7 +2286,8 @@ public final class SymbolicExecutionUtil {
                 loopConditionModalityTerm = services.getTermBuilder()
                         .box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
             }
-            if (loopConditionModalityTerm.op() != Modality.BOX
+            if (!(loopConditionModalityTerm.op() instanceof Modality mod) ||
+                    mod.kind() != Modality.JavaModalityKind.BOX
                     || loopConditionModalityTerm.sub(0).op() != Equality.EQUALS
                     || !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable)
                     || loopConditionModalityTerm.sub(0).sub(1)
@@ -3071,7 +3081,7 @@ public final class SymbolicExecutionUtil {
                     newSubs.add(skolem);
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
-                            equality.boundVars(), equality.javaBlock(), equality.getLabels());
+                            equality.boundVars(), equality.getLabels());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
@@ -3087,7 +3097,7 @@ public final class SymbolicExecutionUtil {
                     newSubs.add(skolem);
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
-                            equality.boundVars(), equality.javaBlock(), equality.getLabels());
+                            equality.boundVars(), equality.getLabels());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
@@ -3112,7 +3122,7 @@ public final class SymbolicExecutionUtil {
         if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
             // Do not label skolem equality and skolem terms
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-                term.javaBlock(), term.getLabels());
+                term.getLabels());
         } else {
             /// Label term which is not a skolem equality and not a skolem term
             List<TermLabel> newLabels = new LinkedList<>();
@@ -3121,7 +3131,7 @@ public final class SymbolicExecutionUtil {
             }
             newLabels.add(label);
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-                term.javaBlock(), new ImmutableArray<>(newLabels));
+                new ImmutableArray<>(newLabels));
         }
     }
 
@@ -3149,7 +3159,7 @@ public final class SymbolicExecutionUtil {
             }
         }
         return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-            term.javaBlock(), new ImmutableArray<>(newLabels));
+            new ImmutableArray<>(newLabels));
     }
 
     /**
@@ -3396,7 +3406,7 @@ public final class SymbolicExecutionUtil {
                         // Create new term in general.
                         return services.getTermFactory().createTerm(term.op(),
                             new ImmutableArray<>(newChildren), term.boundVars(),
-                            term.javaBlock(), term.getLabels());
+                            term.getLabels());
                     }
                 } else {
                     return term;
@@ -3773,8 +3783,8 @@ public final class SymbolicExecutionUtil {
      *         else.
      */
     public static boolean isHeap(Operator op, HeapLDT heapLDT) {
-        if (op instanceof SortedOperator) {
-            final Sort opSort = ((SortedOperator) op).sort();
+        if (op instanceof final SortedOperator sortedOperator) {
+            final Sort opSort = sortedOperator.sort();
             return CollectionUtil.search(heapLDT.getAllHeaps(),
                 element -> opSort == element.sort()) != null;
         } else {
@@ -3818,7 +3828,7 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} is number, {@code false} is something else.
      */
     public static boolean isNumber(Operator op) {
-        if (op instanceof Function) {
+        if (op instanceof JFunction) {
             String[] numbers =
                 { "#", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Z", "neglit" };
             Arrays.sort(numbers);
@@ -4014,7 +4024,7 @@ public final class SymbolicExecutionUtil {
         final Services services = variable.getServices();
         if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
             // Static field access
-            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+            JFunction function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                 (LocationVariable) variable.getProgramVariable(), services);
             return services.getTermBuilder().staticDot(variable.getProgramVariable().sort(),
                 function);
@@ -4028,11 +4038,12 @@ public final class SymbolicExecutionUtil {
                 if (variable.getProgramVariable() != null) {
                     if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                         // Special handling for length attribute of arrays
-                        Function function = services.getTypeConverter().getHeapLDT().getLength();
+                        JFunction function =
+                            services.getTypeConverter().getHeapLDT().getLength();
                         return services.getTermBuilder().func(function, parentTerm);
                     } else {
                         // Field access on the parent variable
-                        Function function =
+                        JFunction function =
                             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) variable.getProgramVariable(), services);
                         return services.getTermBuilder().dot(variable.getProgramVariable().sort(),
@@ -4102,7 +4113,8 @@ public final class SymbolicExecutionUtil {
                         final Term toSearch = predicate;
                         SequentFormula topLevelPredicate = CollectionUtil
                                 .search(leaf.sequent().succedent(),
-                                    element -> toSearch.op() == element.formula().op());
+                                    element -> Operator.opEquals(toSearch.op(),
+                                        element.formula().op()));
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4310,4 +4322,5 @@ public final class SymbolicExecutionUtil {
             return false;
         }
     }
+
 }

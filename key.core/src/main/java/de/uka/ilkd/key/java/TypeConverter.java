@@ -17,14 +17,15 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -72,6 +73,10 @@ public final class TypeConverter {
 
     private LDT getLDT(Name ldtName) {
         return LDTs.get(ldtName);
+    }
+
+    public JavaDLTheory getJavaDLTheory() {
+        return (JavaDLTheory) getLDT(JavaDLTheory.NAME);
     }
 
     public IntegerLDT getIntegerLDT() {
@@ -162,7 +167,7 @@ public final class TypeConverter {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
         } else if (prefix instanceof MetaClassReference) {
-            LOGGER.warn("WARNING: metaclass-references not supported yet");
+            LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");
         } else if (prefix instanceof ProgramVariable) {
             // the base case: the leftmost item is a local variable
@@ -213,7 +218,7 @@ public final class TypeConverter {
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
                     .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
+            final JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
@@ -252,12 +257,12 @@ public final class TypeConverter {
         } else if (var == services.getJavaInfo().getArrayLength()) {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
-            final Function fieldSymbol =
+            final JFunction fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
-                final Function fieldSymbol =
+                final JFunction fieldSymbol =
                     heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
@@ -265,7 +270,7 @@ public final class TypeConverter {
                 return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
-            final Function fieldSymbol =
+            final JFunction fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
@@ -287,8 +292,8 @@ public final class TypeConverter {
     private Term convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
         final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-        final Sort s = type.getSort();
-        final Function instanceOfSymbol = s.getInstanceofSymbol(services);
+        final JFunction instanceOfSymbol =
+            getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
         // is null in opposite to Java
@@ -330,7 +335,7 @@ public final class TypeConverter {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
         throw new IllegalArgumentException(
-            "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
+            "TypeConverter: Unknown or not convertible ProgramElement " + pe + " of type "
                 + pe.getClass());
     }
 
@@ -480,7 +485,7 @@ public final class TypeConverter {
     /**
      * Retrieves the static type of the expression. This method may only be called if the
      * expressions type can be determined without knowledge of context information, i.e. it must not
-     * be a expression with an ex-/or implicit this reference like this.a or a methodcall whose
+     * be an expression with an ex-/or implicit this reference like this.a or a methodcall whose
      * value can only be determined when one knows the exact invocation context.
      * <p>
      * For these cases please use @link #getKeYJavaType(Expression, ExecutionContext)
@@ -513,14 +518,14 @@ public final class TypeConverter {
      * exception.
      *
      * @param term the Term to be converted
-     * @return the Term as an program AST node of type expression
+     * @return the Term as a program AST node of type expression
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
         if (term.op() == heapLDT.getNull()) {
             return NullLiteral.NULL;
-        } else if (term.op() instanceof Function function) {
+        } else if (term.op() instanceof JFunction function) {
             for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
@@ -555,7 +560,7 @@ public final class TypeConverter {
         if (term.op() instanceof Function function) {
             if (function instanceof SortDependingFunction sdf) {
                 SortDependingFunction castFunction =
-                    SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                    SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME, services);
                 if (sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
@@ -574,7 +579,7 @@ public final class TypeConverter {
         KeYJavaType result = null;
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
-        } else if (t.op() instanceof Function) {
+        } else if (t.op() instanceof JFunction) {
             for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
@@ -623,11 +628,11 @@ public final class TypeConverter {
         }
         // everything except \real and \bigint can be coerced to a double
         if (to == PrimitiveType.JAVA_DOUBLE) {
-            return from != PrimitiveType.JAVA_BIGINT;
+            return from != PrimitiveType.JAVA_BIGINT && from != PrimitiveType.JAVA_REAL;
         }
         // but a double cannot be coerced to anything else
         if (from == PrimitiveType.JAVA_DOUBLE) {
-            return from != PrimitiveType.JAVA_BIGINT;
+            return false; // real case already covered above
         }
         // everything except doubles can be coerced to a float
         if (to == PrimitiveType.JAVA_FLOAT) {

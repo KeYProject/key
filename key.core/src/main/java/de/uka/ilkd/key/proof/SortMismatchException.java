@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
 
 
 public class SortMismatchException extends SVInstantiationExceptionWithPosition {

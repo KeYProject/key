@@ -223,17 +223,29 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.ContextMenu.class);
     }
 
+    /**
+     * Create a context menu with extension-provided actions for the specified kind and underlying
+     * object.
+     * <p>
+     * If the underlying object is a proof, this will also include the usual actions.
+     * </p>
+     *
+     * @param kind what kind of object the context menu is built on
+     * @param underlyingObject the object the context menu is built on
+     * @param mediator the KeY mediator
+     * @return populated context menu
+     */
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
-        if (underlyingObject instanceof Proof) {
-            for (Component comp : MainWindow.getInstance().createProofMenu((Proof) underlyingObject)
+        if (underlyingObject instanceof Proof proof) {
+            for (Component comp : MainWindow.getInstance().createProofMenu(proof)
                     .getMenuComponents()) {
                 menu.add(comp);
             }
         }
         List<Action> content = getContextMenuItems(kind, underlyingObject, mediator);
-        content.forEach(menu::add);
+        content.forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
     }
 

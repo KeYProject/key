@@ -82,13 +82,6 @@ public class ProofIrrelevancyProperty implements Property<Term> {
             }
         }
 
-        // This would be the only new thing from LabeledTermImpl, but this doesn't seem right
-        if (term1.hasLabels() && term2.hasLabels()) {
-            if (term2.getLabels().size() != term1.getLabels().size()) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -104,28 +97,18 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        int hashcode2 = -1; // this line is just so the code compiles
-        // part from TermImpl
-        if (hashcode2 == -1) {
-            // compute into local variable first to be thread-safe.
-            hashcode2 = Objects.hash(term.op(), hashCodeIterable(term.subs()),
-                EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
-            if (hashcode2 == -1) {
-                hashcode2 = 0;
-            }
-        }
+        int hashcode = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+
         // part from LabeledTermImpl
         final ImmutableArray<TermLabel> labels = term.getLabels();
-        final int numOfLabels = labels.size();
-        for (int i = 0; i < numOfLabels; i++) {
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
             if (currentLabel.isProofRelevant()) {
-                hashcode2 += 7 * currentLabel.hashCode();
+                hashcode += 7 * currentLabel.hashCode();
             }
         }
-        return hashcode2;
-        // throw new UnsupportedOperationException(
-        // "Hashing of terms modulo term proof-irrelevancy not yet implemented!");
+        return hashcode;
     }
 
     // -------------------------- Utility methods --------------------------------- //

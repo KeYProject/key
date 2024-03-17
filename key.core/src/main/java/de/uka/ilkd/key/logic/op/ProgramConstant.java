@@ -5,8 +5,8 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
 
 /**
  * This class represents currently only static final fields initialised with a compile time
@@ -37,12 +37,5 @@ public final class ProgramConstant extends ProgramVariable {
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnProgramConstant(this);
-    }
-
-
-    @Override
-    public Operator rename(Name name) {
-        return new ProgramConstant(new ProgramElementName(name.toString()), getKeYJavaType(),
-            getContainerType(), isStatic(), compileTimeConstant);
     }
 }

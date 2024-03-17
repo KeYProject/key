@@ -7,10 +7,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -116,6 +113,10 @@ public class RenamingTermProperty implements Property<Term> {
             return true;
         }
 
+        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
+            return false;
+        }
+
         final Operator op0 = t0.op();
 
         if (op0 instanceof QuantifiableVariable) {
@@ -124,17 +125,27 @@ public class RenamingTermProperty implements Property<Term> {
 
         final Operator op1 = t1.op();
 
-        if (!(op0 instanceof ProgramVariable) && op0 != op1) {
+        if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
+            if (mod0.kind() != mod1.kind()) {
+                return false;
+            }
+            nat = handleJava(mod0.program(), mod1.program(), nat);
+            if (nat == FAILED) {
+                return false;
+            }
+        } else if (!(op0 instanceof ProgramVariable) && op0 != op1) {
             return false;
         }
 
-        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-            return false;
-        }
-
-        nat = handleJava(t0, t1, nat);
-        if (nat == FAILED) {
-            return false;
+        if (!(op0 instanceof SchemaVariable) && op0 instanceof ProgramVariable pv0) {
+            if (op1 instanceof ProgramVariable pv1) {
+                nat = checkNat(nat);
+                if (!pv0.equalsModRenaming(pv1, nat)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
@@ -154,32 +165,30 @@ public class RenamingTermProperty implements Property<Term> {
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(Term t0, Term t1, NameAbstractionTable nat) {
-
-        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
+    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
+            NameAbstractionTable nat) {
+        if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
-            if (javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(), nat)) {
+            if (javaBlocksNotEqualModRenaming(jb0, jb1, nat)) {
                 return FAILED;
             }
         }
-
-        if (!(t0.op() instanceof SchemaVariable) && t0.op() instanceof ProgramVariable) {
-            if (!(t1.op() instanceof ProgramVariable)) {
-                return FAILED;
-            }
-            nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
-                return FAILED;
-            }
-        }
-
         return nat;
     }
 
     /**
-     * TODO better doc
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
+     * Returns true if the given {@link JavaBlock}s are not equal modulo renaming.
+     * <p>
+     * Moved here from {@link JavaBlock} while refactoring equalsModRenaming in {@link Term}.
+     * As the implementation of equalsModRenaming in {@link JavaBlock} was only used in
+     * {@link RenamingProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
+     * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
+     * it is now only a helper method in {@link RenamingProperty}.
+     *
+     * @param jb1 the first {@link JavaBlock}
+     * @param jb2 the second {@link JavaBlock}
+     * @param nat the {@link NameAbstractionTable} used for the comparison
+     * @return true if the given {@link JavaBlock}s are NOT equal modulo renaming
      */
     public static boolean javaBlocksNotEqualModRenaming(JavaBlock jb1, JavaBlock jb2,
             NameAbstractionTable nat) {

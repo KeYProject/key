@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
@@ -18,14 +19,16 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
 import org.key_project.util.lookup.Lookup;
 
 /**
- * this is a collection of common services to the KeY prover. Services include information on the
+ * This is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, LogicServices {
     /**
      * the proof
      */
@@ -149,7 +152,6 @@ public class Services implements TermServices {
         return result;
     }
 
-
     /**
      * Returns the TypeConverter associated with this Services object.
      */
@@ -162,6 +164,9 @@ public class Services implements TermServices {
         typeconverter = tc;
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return typeconverter.getJavaDLTheory();
+    }
 
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
@@ -339,7 +344,6 @@ public class Services implements TermServices {
         return namespaces;
     }
 
-
     /**
      * sets the namespaces of known predicates, functions, variables
      *
@@ -466,6 +470,7 @@ public class Services implements TermServices {
     // =================================================================================================================
     // =================================================================================================================
 
+    // TODO: Ask weigl whether this is still needed
     public Lookup createLookup() {
         Lookup lookup = new Lookup();
         lookup.register(getJavaInfo());

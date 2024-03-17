@@ -70,7 +70,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private static class SubFormulaVisitor extends DefaultVisitor {
+    private static class SubFormulaVisitor implements DefaultVisitor {
 
         final Term potentialSub;
 
