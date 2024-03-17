@@ -181,9 +181,9 @@ public class RenamingTermProperty implements Property<Term> {
      * <p>
      * Moved here from {@link JavaBlock} while refactoring equalsModRenaming in {@link Term}.
      * As the implementation of equalsModRenaming in {@link JavaBlock} was only used in
-     * {@link RenamingProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
+     * {@link RenamingTermProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
      * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
-     * it is now only a helper method in {@link RenamingProperty}.
+     * it is now only a helper method in {@link RenamingTermProperty}.
      *
      * @param jb1 the first {@link JavaBlock}
      * @param jb2 the second {@link JavaBlock}
