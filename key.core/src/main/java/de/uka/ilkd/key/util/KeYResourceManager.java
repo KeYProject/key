@@ -4,9 +4,15 @@
 package de.uka.ilkd.key.util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -221,5 +227,24 @@ public class KeYResourceManager {
     public String getUserInterfaceTitle() {
         return String.format("KeY %s%s", this.getVersion(),
             visibleBranch() ? " [" + getBranch() + "]" : "");
+    }
+
+    static {
+        // Needed to be able to use Path.of(jar:jarFile/bla)
+        // see
+        // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
+        try {
+            var jar = KeYResourceManager.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI();
+            if (Files.isRegularFile(Path.of(jar))) {
+                var uri = new URI("jar:" + jar.toString());
+                FileSystems.newFileSystem(uri, Map.of("create", "true"));
+            }
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

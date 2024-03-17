@@ -7,18 +7,19 @@ import java.net.URI;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import org.key_project.util.collection.*;
+import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -82,6 +84,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     /**
      * Concatenates the passed comments in a position-preserving way. (see also
      * JMLTransformer::concatenate(), which does the same thing for Recoder ASTs)
+     *
+     * TODO weigl: The same functionality also exists in the jmlparser,
+     * hence this is not needed after the migration to jmlparser.
      */
     private String concatenate(Comment[] comments) {
         if (comments.length == 0) {
@@ -89,17 +94,25 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
+        Position last = comments[0].getEndPosition();
         for (int i = 1; i < comments.length; i++) {
-            var relativePos = comments[i].getRelativePosition();
-            for (int j = 0; j < relativePos.getLine(); j++) {
-                sb.append("\n");
+            var comment = comments[i];
+            int lineOffset;
+            int columnOffset;
+            var pos = comment.getPositionInfo().getStartPosition();
+            if (last.line() == pos.line()) {
+                lineOffset = 0;
+                columnOffset = pos.column() - last.column();
+            } else {
+                lineOffset = pos.line() - last.line();
+                columnOffset = pos.column();
             }
-            for (int j = 0; j < relativePos.getColumn(); j++) {
-                sb.append(" ");
-            }
-            sb.append(comments[i].getText());
+            StringUtil.appendRepeated(sb, '\n', Math.max(0, lineOffset));
+            StringUtil.appendRepeated(sb, ' ', Math.max(0, columnOffset));
+            sb.append(" ".repeat(Math.max(0, columnOffset)));
+            sb.append(comment.getText());
+            last = comment.getEndPosition();
         }
-
         return sb.toString();
     }
 
@@ -242,7 +255,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         ImmutableSet<LabeledParserRuleContext> nonNullInvs =
                             createNonNullPositionedString(field.getProgramName(),
                                 field.getProgramVariable().getKeYJavaType(),
-                                field instanceof ImplicitFieldSpecification,
+                                field.isImplicit(),
                                 new Location(fileName, member.getEndPosition()), services);
                         for (LabeledParserRuleContext classInv : nonNullInvs) {
                             final ClassInvariant jmlClassInvariant =
@@ -322,7 +335,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    public List<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
             throws SLTranslationException {
         return extractMethodSpecs(pm, true);
     }
@@ -334,9 +347,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+    public List<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
             boolean addInvariant) throws SLTranslationException {
-        ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
+        List<SpecificationElement> result = new ArrayList<>();
 
         // get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
@@ -498,7 +511,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             try {
                 ImmutableSet<Contract> contracts = jsf.createJMLOperationContracts(pm, specCase);
                 for (Contract contract : contracts) {
-                    result = result.add(contract);
+                    result.add(contract);
                 }
             } catch (SLWarningException e) {
                 warnings = warnings.append(e.getWarning());
@@ -569,16 +582,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
             MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
             throws SLTranslationException {
-        // In cases of specifications immediately following each other (like a
-        // merge_point and a block contract / loop invariant), it might happen
-        // that we're passed multiple constructs here. Therefore, we filter the
-        // merge point specific parts here
-        final TextualJMLConstruct[] constructs =
-            Arrays.stream(parseMethodLevelComments(mps.getComments(), getFileName(method)))
-                    .filter(c -> c instanceof TextualJMLMergePointDecl)
-                    .toArray(TextualJMLConstruct[]::new);
-
-        return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
+        return jsf.createJMLMergeContracts(method, mps);
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,

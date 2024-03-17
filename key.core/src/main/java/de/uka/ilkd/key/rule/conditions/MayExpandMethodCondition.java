@@ -5,17 +5,17 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -158,7 +158,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         } else {
             // no execution context
             method =
-                mr.method(services, prefixType, mr.getMethodSignature(services, ec), prefixType);
+                mr.method(services, prefixType, mr.getMethodSignature(services, ec));
         }
 
         if (method == null) {
@@ -176,7 +176,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         // bugfix (contributing to gitlab #1493)
         // see MethodCall.handleInstanceInvocation(...)
         if ((method.isImplicit() && method.getName()
-                .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+                .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             return true;
         }
 

@@ -12,7 +12,10 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -1392,7 +1395,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(javaFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile,
+            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled),
+            javaFile.toPath(),
             null, null, null, true);
         setupTacletOptions(environment);
         // Start proof
@@ -1460,7 +1464,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(javaFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
+            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile.toPath(), null, null, null,
+            true);
         setupTacletOptions(environment);
         // Search method to proof
         IProgramMethod pm =
@@ -1537,7 +1542,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(proofFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile,
+            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled),
+            proofFile.toPath(),
             null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
         setupTacletOptions(environment);
         Proof proof = environment.getLoadedProof();
@@ -1602,7 +1608,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(javaFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
+            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile.toPath(), null, null, null,
+            true);
         setupTacletOptions(environment);
         // Search method to proof
         IProgramMethod pm =
@@ -1683,7 +1690,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNull(saver.save());
             // Load proof from saved *.proof file
             reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(),
-                tempFile, null, null, null, true);
+                tempFile.toPath(), null, null, null, true);
             Proof reloadedProof = reloadedEnv.getLoadedProof();
             assertNotSame(env.getProof(), reloadedProof);
             // Recreate symbolic execution tree

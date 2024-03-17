@@ -5,9 +5,11 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -203,16 +205,15 @@ public class TestLegacyTacletMatch {
     @Test
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
-        de.uka.ilkd.key.java.Recoder2KeY c2k =
-            new de.uka.ilkd.key.java.Recoder2KeY(services, new NamespaceSet());
+        JavaService c2k = services.getJavaService();
         JavaBlock jb = c2k.readBlock("{ int i; int j; i=++j;" + " while(true) {break;}}",
-            c2k.createEmptyContext());
+            c2k.createEmptyContext(), null);
 
-        de.uka.ilkd.key.java.StatementBlock sb = (de.uka.ilkd.key.java.StatementBlock) jb.program();
+        StatementBlock sb = (StatementBlock) jb.program();
 
-        JavaBlock javaBlock = JavaBlock.createJavaBlock(new de.uka.ilkd.key.java.StatementBlock(
-            new ImmutableArray<>((de.uka.ilkd.key.java.Statement) sb.getChildAt(2),
-                (de.uka.ilkd.key.java.Statement) sb.getChildAt(3))));
+        JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(
+            new ImmutableArray<>((Statement) sb.getChildAt(2),
+                (Statement) sb.getChildAt(3))));
 
 
         Term match = TB.dia(javaBlock, TB.tt());

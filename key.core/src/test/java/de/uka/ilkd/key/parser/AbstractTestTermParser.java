@@ -6,7 +6,6 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -29,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AbstractTestTermParser {
 
+    private static Services SERVICES = null;
+
     protected final TermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
@@ -40,6 +41,7 @@ public class AbstractTestTermParser {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        // services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
@@ -63,7 +65,8 @@ public class AbstractTestTermParser {
 
     public Term parseProblem(String s) {
         try {
-            new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+            TacletForTests.services().getJavaService()
+                    .parseSpecialClasses();
             KeyIO io = new KeyIO(TacletForTests.services(), nss);
             KeyIO.Loader loader = io.load(s);
             return loader.getProblem();
@@ -171,9 +174,12 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "termParser" + File.separator + "parserTest.key");
-        return HelperClassForTests.createServices(keyFile);
+        if (SERVICES == null) {
+            File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+                + "termParser" + File.separator + "parserTest.key");
+            SERVICES = HelperClassForTests.createServices(keyFile);
+        }
+        return SERVICES.copy(false);
     }
 
 }

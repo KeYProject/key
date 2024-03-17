@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -205,8 +205,8 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
@@ -229,7 +229,7 @@ public abstract class AbstractUserInterfaceControl
             if (loader != null && loader.getProof() != null) {
                 loader.getProof().dispose();
             }
-            throw new ProblemLoaderException(loader, e);
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 

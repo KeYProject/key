@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -196,7 +196,7 @@ public abstract class AbstractProofReplayer {
         final ImmutableSet<IBuiltInRuleApp> ruleApps = IntermediateProofReplayer.collectAppsForRule(
             ruleName, currGoal, pos);
         if (ruleApps.size() != 1) {
-            if (ruleApps.size() < 1) {
+            if (ruleApps.isEmpty()) {
                 throw new IntermediateProofReplayer.BuiltInConstructionException(
                     ruleName + " is missing. Most probably the binary "
                         + "for this built-in rule is not in your path or "

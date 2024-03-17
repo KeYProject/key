@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -306,12 +306,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) {
+    public void performActionOnSingleton(Singleton x) {
         printDLFunctionOperator("\\singleton", x);
     }
 
     @Override
-    public void performActionOnSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) {
+    public void performActionOnSetUnion(SetUnion x) {
         printDLFunctionOperator("\\set_union", x);
     }
 
@@ -321,19 +321,19 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) {
+    public void performActionOnSetMinus(SetMinus x) {
         printDLFunctionOperator("\\set_minus", x);
     }
 
 
     @Override
-    public void performActionOnAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) {
+    public void performActionOnAllFields(AllFields x) {
         printDLFunctionOperator("\\all_fields", x);
     }
 
     @Override
     public void performActionOnAllObjects(
-            de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) {
+            AllObjects x) {
         printDLFunctionOperator("\\all_objects", x);
     }
 
@@ -358,29 +358,29 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSeqSingleton(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) {
+            SeqSingleton x) {
         printDLFunctionOperator("\\seq_singleton", x);
     }
 
     @Override
-    public void performActionOnSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) {
-        printDLFunctionOperator("\\singleton", x);
+    public void performActionOnSeqConcat(SeqConcat x) {
+        printDLFunctionOperator("\\seq_concat", x);
     }
 
     @Override
     public void performActionOnSeqIndexOf(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) {
+            SeqIndexOf x) {
         printDLFunctionOperator("\\indexOf", x);
     }
 
     @Override
-    public void performActionOnSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) {
+    public void performActionOnSeqSub(SeqSub x) {
         printDLFunctionOperator("\\seq_sub", x);
     }
 
     @Override
     public void performActionOnSeqReverse(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) {
+            SeqReverse x) {
         printDLFunctionOperator("\\seq_reverse", x);
     }
 
@@ -437,7 +437,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnPackageSpecification(PackageSpecification x) {
-        l.nl();
         l.keyWord("package");
         l.print(" ");
         performActionOnPackageReference(x.getPackageReference());
@@ -488,11 +487,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnFieldSpecification(FieldSpecification x) {
-        performActionOnVariableSpecification(x);
-    }
-
-    @Override
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         performActionOnVariableSpecification(x);
     }
 
@@ -575,16 +569,21 @@ public class PrettyPrinter implements Visitor {
         throw new UnsupportedOperationException();
     }
 
+    private void performActionOnType(Type type) {
+        if (type == null) {
+            l.print("unknown");
+        } else if (type instanceof ArrayDeclaration) {
+            var arr = (ArrayDeclaration) type;
+            performActionOnType(arr.getBaseType().getKeYJavaType().getJavaType());
+            l.print("[]");
+        } else {
+            l.print(type.getFullName());
+        }
+    }
+
     @Override
     public void performActionOnArrayDeclaration(ArrayDeclaration type) {
-        Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
-        assert baseType != null;
-        if (baseType instanceof ArrayDeclaration) {
-            performActionOnArrayDeclaration((ArrayDeclaration) baseType);
-        } else {
-            l.print(baseType.getFullName());
-        }
-        l.print("[]");
+        performActionOnType(type);
     }
 
     @Override
@@ -669,9 +668,12 @@ public class PrettyPrinter implements Visitor {
             if (hasImports || hasPackageSpec) {
                 l.nl();
             }
-            for (TypeDeclaration td : x.getDeclarations()) {
+            for (int i = 0; i < x.getDeclarations().size(); i++) {
+                if (i != 0) {
+                    l.nl();
+                }
                 l.nl();
-                td.visit(this);
+                x.getDeclarations().get(i).visit(this);
             }
         }
     }
@@ -679,6 +681,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnClassDeclaration(ClassDeclaration x) {
         l.beginC();
+        l.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -691,23 +694,34 @@ public class PrettyPrinter implements Visitor {
             l.keyWord("class").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
-            l.print(" ");
+        l.end();
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
+            l.brk().beginC(0);
             performActionOnExtends(x.getExtendedTypes());
+            l.end();
         }
-        if (x.getImplementedTypes() != null) {
-            l.print(" ");
+        if (x.getImplementedTypes() != null && x.getImplementedTypes().getChildCount() != 0) {
+            l.brk();
             performActionOnImplements(x.getImplementedTypes());
         }
         // not an anonymous class
         if (x.getProgramElementName() != null) {
             l.print(" ");
         }
-        if (x.getMembers() != null) {
+        l.end();
+
+        performActionOnMemberDeclarations(x.getMembers());
+    }
+
+    private void performActionOnMemberDeclarations(ImmutableArray<MemberDeclaration> members) {
+        if (members != null && !members.isEmpty()) {
             beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
+            for (int i = 0; i < members.size(); ++i) {
+                if (i != 0) {
+                    l.nl();
+                }
                 l.nl();
-                m.visit(this);
+                members.get(i).visit(this);
             }
             endBlock();
         } else {
@@ -730,22 +744,14 @@ public class PrettyPrinter implements Visitor {
             l.keyWord("interface").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
             l.print(" ");
             performActionOnExtends(x.getExtendedTypes());
         }
         l.print(" ");
+        l.end();
 
-        if (x.getMembers() != null) {
-            beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
-                l.nl();
-                m.visit(this);
-            }
-            endBlock();
-        } else {
-            l.print("{}");
-        }
+        performActionOnMemberDeclarations(x.getMembers());
     }
 
     @Override
@@ -777,7 +783,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        l.beginC();
+        l.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -792,7 +798,6 @@ public class PrettyPrinter implements Visitor {
             l.print(" ");
         }
         performActionOnProgramElementName(x.getProgramElementName());
-        l.print(" ");
 
         beginMultilineBracket();
         if (x.getParameters() != null) {
@@ -803,9 +808,10 @@ public class PrettyPrinter implements Visitor {
             performActionOnThrows(x.getThrown());
         }
         if (x.getBody() != null) {
+            l.print(" ").end();
             printStatementBlock(x.getBody());
         } else {
-            l.print(";");
+            l.print(";").end();
         }
     }
 
@@ -824,7 +830,8 @@ public class PrettyPrinter implements Visitor {
 
     protected void performActionOnStatement(SourceElement s) {
         l.beginRelativeC(0);
-        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix);
+        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix
+                || s instanceof TypeDeclarationContainer);
         if (validStatement) {
             markStart(s);
         }
@@ -832,7 +839,8 @@ public class PrettyPrinter implements Visitor {
         if (validStatement) {
             markEnd(s);
         }
-        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)) {
+        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)
+                && !(s instanceof TypeDeclarationContainer)) {
             l.print(";");
         }
         l.end();
@@ -874,18 +882,18 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnBreak(Break x) {
         l.keyWord("break");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             l.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
     @Override
     public void performActionOnContinue(Continue x) {
         l.keyWord("continue");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             l.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
@@ -1231,16 +1239,20 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnExtends(Extends x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("extends").print(" ");
+            l.beginC();
+            l.keyWord("extends").brk();
             writeCommaList(x.getSupertypes());
+            l.end();
         }
     }
 
     @Override
     public void performActionOnImplements(Implements x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("implements").print(" ");
+            l.beginC();
+            l.keyWord("implements").brk();
             writeCommaList(x.getSupertypes());
+            l.end();
         }
     }
 
@@ -1627,7 +1639,11 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnExecutionContext(ExecutionContext x) {
         l.beginRelativeC();
         l.print("source=");
-        writeFullMethodSignature(x.getMethodContext());
+        if (x.getMethodContext() == null) {
+            l.print("null");
+        } else {
+            writeFullMethodSignature(x.getMethodContext());
+        }
         l.print("@");
         x.getTypeReference().visit(this);
         if (x.getRuntimeInstance() != null) {
@@ -1894,7 +1910,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnCcatchContinueWildcardParameterDeclaration(
             CcatchContinueWildcardParameterDeclaration x) {
-        l.keyWord("\\Continue");
+        l.keyWord("\\Continue").brk().print("*");
     }
 
     /**

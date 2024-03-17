@@ -9,11 +9,12 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -167,7 +168,7 @@ public class TestCaseGenerator {
         services = proof.getServices();
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
-        modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
+        modDir = computeProjectSubPath(services.getJavaModel().getModelDir().toString());
         dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();
@@ -628,14 +629,13 @@ public class TestCaseGenerator {
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
             Function func = (Function) t.op();
-            String name = func.name().toString();
             Sort sort = func.sort();
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
             if (sort == hLDT.getFieldSort()) {
                 ProgramVariable pv = getProgramVariable(t);
 
                 if (pv != null) {
-                    name = name.replace("::$", "::");
+                    String name = JavaDLFieldNames.toJava(func.name());
 
                     if (map.containsKey(name)) {
                         if (map.get(name) != pv.sort()) {

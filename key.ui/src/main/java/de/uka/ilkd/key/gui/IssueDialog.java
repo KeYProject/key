@@ -35,6 +35,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -57,15 +58,13 @@ import org.slf4j.LoggerFactory;
  * <li>if the message contains a stacktrace, it is optionally displayed</li>
  * </ul>
  *
- * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
- *           since this conforms to 1) the line numbers shown in the dialog and 2) the usual
- *           representation in text editors.
- *
  * @author Alexander Weigl
  * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
  *         all parser error messages in KeY
- * @version 1 (6/8/21)
  * @version 2 (11/15/21)
+ * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
+ *           since this conforms to 1) the line numbers shown in the dialog and 2) the usual
+ *           representation in text editors.
  */
 public final class IssueDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
@@ -81,16 +80,24 @@ public final class IssueDialog extends JDialog {
         "The following non-fatal problems occurred when translating your %s specifications:",
         SLEnvInput.getLanguage());
 
-    /** regex to find web urls in string messages */
+    /**
+     * regex to find web urls in string messages
+     */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
 
-    /** warnings which have been marked to be ignored by the user (in this KeY run) */
+    /**
+     * warnings which have been marked to be ignored by the user (in this KeY run)
+     */
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
-    /** the single critical issue that is shown in this dialog */
+    /**
+     * the single critical issue that is shown in this dialog
+     */
     private final Throwable throwable;
 
-    /** the warnings that are shown in this dialog */
+    /**
+     * the warnings that are shown in this dialog
+     */
     private final List<PositionedIssueString> warnings;
 
     private final Map<URI, String> fileContentsCache = new HashMap<>();
@@ -557,6 +564,10 @@ public final class IssueDialog extends JDialog {
         MainWindow.getInstance().getMediator().startInterface(true);
 
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
+        if (exception instanceof BuildingExceptions) {
+            ((BuildingExceptions) exception).getErrors().forEach(
+                it -> LOGGER.info("Error", it));
+        }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
@@ -668,7 +679,7 @@ public final class IssueDialog extends JDialog {
                         }
                     }), "\n");
 
-                if (isJava(uri.getPath())) {
+                if (uri.toString().endsWith(".java")) {
                     showJavaSourceCode(source);
                 } else {
                     txtSource.setText(source);
@@ -727,10 +738,6 @@ public final class IssueDialog extends JDialog {
         } catch (BadLocationException ignore) {
             // ignore
         }
-    }
-
-    private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

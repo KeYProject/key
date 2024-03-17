@@ -110,11 +110,11 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             progressMonitor.setProgress(1);
         }
 
-        String bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
+        var bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
-            tmpFile.toFile(),
+            tmpFile,
             originalProof.getEnv().getJavaModel().getClassPathEntries(),
-            bootClassPath != null ? new File(bootClassPath) : null,
+            bootClassPath,
             null,
             originalProof.getEnv().getInitConfigForEnvironment().getProfile(),
             false,
@@ -224,7 +224,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
         if (currentProof.getProofFile() != null) {
-            filename = MiscTools.removeFileExtension(currentProof.getProofFile().getName());
+            filename = MiscTools.removeFileExtension(currentProof.getProofFile().toString());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
             // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet

@@ -106,27 +106,27 @@ public abstract class AbstractProblemLoader {
     /**
      * The file or folder to load.
      */
-    private final File file;
+    private final Path file;
 
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
      */
-    private File proofFilename;
+    private Path proofFilename;
 
     /**
      * The optional class path entries to use.
      */
-    private final List<File> classPath;
+    private final List<Path> classPath;
 
     /**
      * An optional boot class path.
      */
-    private final File bootClassPath;
+    private final Path bootClassPath;
 
     /**
      * The global includes to use.
      */
-    private final List<File> includes;
+    private final List<Path> includes;
 
     /**
      * The {@link ProblemLoaderControl} to use.
@@ -225,8 +225,8 @@ public abstract class AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
-            List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+    public AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {
@@ -437,22 +437,22 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      */
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
-
-        final String filename = file.getName();
+        final var filename = file.getFileName().toString();
 
         // set the root directory of the FileRepo (used for resolving paths)
-        fileRepo.setBaseDir(file.toPath());
+        fileRepo.setBaseDir(file);
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
-            SLEnvInput ret = null;
-            if (file.getParentFile() == null) {
-                ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
+            SLEnvInput ret;
+            if (file.getParent() == null) {
+                ret = new SLEnvInput(new File(".").getAbsoluteFile().toPath(), classPath,
+                    bootClassPath, profileOfNewProofs, includes);
             } else {
-                ret = new SLEnvInput(file.getParentFile().getAbsolutePath(), classPath,
+                ret = new SLEnvInput(file.getParent().toAbsolutePath(), classPath,
                     bootClassPath, profileOfNewProofs, includes);
             }
-            ret.setJavaFile(file.getAbsolutePath());
+            ret.setJavaFile(file.toAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
             return ret;
         } else if (filename.endsWith(".zproof")) { // zipped proof package
@@ -467,14 +467,14 @@ public abstract class AbstractProblemLoader {
             if (proofFilename == null) { // no proof to load given -> try to determine one
                 // create a list of all *.proof files (only top level in bundle)
                 List<Path> proofs;
-                try (ZipFile bundle = new ZipFile(file)) {
+                try (ZipFile bundle = new ZipFile(file.toFile())) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
                             .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
                 }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
-                    proofFilename = proofs.get(0).toFile();
+                    proofFilename = proofs.get(0);
                 } else {
                     // no proof found in bundle!
                     throw new IOException("The bundle contains no proof to load!");
@@ -486,7 +486,7 @@ public abstract class AbstractProblemLoader {
 
             // unzip to a temporary directory
             Path tmpDir = Files.createTempDirectory("KeYunzip");
-            IOUtil.extractZip(file.toPath(), tmpDir);
+            IOUtil.extractZip(file, tmpDir);
 
             // hook for deleting tmpDir + content at program exit
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -507,24 +507,26 @@ public abstract class AbstractProblemLoader {
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
 
             // construct the absolute path to the unzipped proof file
-            Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
+            Path unzippedProof = tmpDir.resolve(proofFilename);
 
-            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
+            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof,
                 fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
+            return new KeYUserProblemFile(filename.toString(), file, fileRepo, control,
+                profileOfNewProofs,
                 filename.endsWith(".proof.gz"));
-        } else if (file.isDirectory()) {
+        } else if (file.toFile().isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
+            return new SLEnvInput(file, classPath, bootClassPath, profileOfNewProofs,
                 includes);
         } else {
-            if (filename.lastIndexOf('.') != -1) {
+            if (filename.toString().lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension '"
-                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
+                    + filename.toString().substring(filename.toString().lastIndexOf('.'))
+                    + "' of read-in file "
                     + filename + ". Allowed extensions are: .key, .proof, .java or "
                     + "complete directories.");
             } else {
@@ -607,7 +609,8 @@ public abstract class AbstractProblemLoader {
             final Properties properties = new Properties();
             properties.load(
                 new ByteArrayInputStream(proofObligation.getBytes(StandardCharsets.UTF_8)));
-            properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+            properties.setProperty(IPersistablePO.PROPERTY_FILENAME,
+                file.toAbsolutePath().toString());
             if (poPropertiesToForce != null) {
                 properties.putAll(poPropertiesToForce);
             }
@@ -685,7 +688,7 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
         Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URI url = kupf.getInitialFile().toURI();
+        URI url = kupf.getInitialFile().toUri();
         Location location = new Location(url, Position.newOneBased(script.second, script.third));
 
         return new Pair<>(script.first, location);
@@ -696,7 +699,7 @@ public abstract class AbstractProblemLoader {
             try {
                 return readProofScript();
             } catch (ProofInputException e) {
-                throw new ProblemLoaderException(this, e);
+                throw new ProblemLoaderException(this, "Failed to read proof script", e);
             }
         } else {
             return null;
@@ -782,7 +785,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The file or folder to load.
      */
-    public File getFile() {
+    public Path getFile() {
         return file;
     }
 
@@ -791,7 +794,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The optional class path entries to use.
      */
-    public List<File> getClassPath() {
+    public List<Path> getClassPath() {
         return classPath;
     }
 
@@ -800,7 +803,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The optional boot class path.
      */
-    public File getBootClassPath() {
+    public Path getBootClassPath() {
         return bootClassPath;
     }
 
@@ -853,7 +856,7 @@ public abstract class AbstractProblemLoader {
         return result;
     }
 
-    public void setProofPath(File proofFilename) {
+    public void setProofPath(Path proofFilename) {
         this.proofFilename = proofFilename;
     }
 

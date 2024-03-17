@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -53,7 +53,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -66,7 +66,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile,
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
@@ -81,7 +81,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
+    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
@@ -108,7 +108,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
-        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
+        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(),
+            readBootClassPath(),
             getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());
@@ -162,7 +163,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
             new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
-                file.file()),
+                file.file().toFile()),
             name);
     }
 
@@ -205,13 +206,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             return false;
         }
         final KeYUserProblemFile kf = (KeYUserProblemFile) o;
-        return kf.file.file().getAbsolutePath().equals(file.file().getAbsolutePath());
+        return kf.file.file().toAbsolutePath().equals(file.file().toAbsolutePath());
     }
 
 
     @Override
     public int hashCode() {
-        return file.file().getAbsolutePath().hashCode();
+        return file.file().toAbsolutePath().hashCode();
     }
 
     /**

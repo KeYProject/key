@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -280,7 +277,7 @@ public class TestFile implements Serializable {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
             File keyFile) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
 
@@ -298,7 +295,7 @@ public class TestFile implements Serializable {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile);
+            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
 
             ReplayResult result = proofLoadEnvironment.getReplayResult();
 

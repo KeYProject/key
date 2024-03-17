@@ -13,8 +13,8 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -473,11 +473,17 @@ public class IntermediateProofReplayer {
                 }
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                if (ourApp == null) {
+                    throw new TacletAppConstructionException("Failed to match find: " + pos);
+                }
                 ourApp = ourApp.setPosInOccurrence(pos, services);
+                if (ourApp == null) {
+                    throw new TacletAppConstructionException("Failed to set position: " + pos);
+                }
             } catch (TacletAppConstructionException e) {
                 throw e;
             } catch (Exception e) {
-                throw new TacletAppConstructionException("Wrong position information: " + pos, e);
+                throw new TacletAppConstructionException("Unexpected exception", e);
             }
         }
 

@@ -8,14 +8,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -29,9 +34,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
     public static final Logger LOGGER = LoggerFactory.getLogger(TypeConverter.class);
@@ -123,7 +128,8 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
+    private Term translateOperator(
+            Operator op,
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -217,7 +223,7 @@ public final class TypeConverter {
         while (!exact && !context.getSort().extendsTrans(s)
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
-                    .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, context);
             final JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
@@ -326,11 +332,8 @@ public final class TypeConverter {
             return convertToLogicElement(((ParenthesizedExpression) pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof) pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-            return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
-        } else if (pe instanceof recoder.abstraction.PrimitiveType) {
-            throw new IllegalArgumentException(
-                "TypeConverter could not handle" + " this primitive type");
+        } else if (pe instanceof Operator) {
+            return translateOperator((Operator) pe, ec);
         } else {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
@@ -360,7 +363,7 @@ public final class TypeConverter {
         }
     }
 
-    public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
+    public static boolean isArithmeticOperator(Operator op) {
         return op instanceof Divide || op instanceof Times || op instanceof Plus
                 || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
@@ -372,6 +375,7 @@ public final class TypeConverter {
 
 
     // TODO Adapt for @Reals
+
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -730,7 +734,6 @@ public final class TypeConverter {
 
 
     public boolean isImplicitNarrowing(Expression expr, PrimitiveType to) {
-
         int minValue, maxValue;
         if (to == PrimitiveType.JAVA_BYTE) {
             minValue = Byte.MIN_VALUE;
@@ -746,15 +749,17 @@ public final class TypeConverter {
         }
 
         ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
-
-        ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
-
-        if (!cee.isCompileTimeConstant(expr, res)
-                || res.getTypeCode() != ConstantEvaluator.INT_TYPE) {
-            return false;
+        try {
+            var e = cee.evaluate(expr.toString());
+            if (e instanceof IntegerLiteralExpr) {
+                int value = ((IntegerLiteralExpr) e).asNumber().intValue();
+                return (minValue <= value) && (value <= maxValue);
+            } else {
+                return false;
+            }
+        } catch (EvaluationException e) {
+            throw new RuntimeException(e);
         }
-        int value = res.getInt();
-        return (minValue <= value) && (value <= maxValue);
     }
 
 
@@ -952,7 +957,8 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    private LDT getResponsibleLDT(
+            Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

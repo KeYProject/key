@@ -6,12 +6,12 @@ package de.uka.ilkd.key.symbolic_execution.testcase.slicing;
 import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
@@ -583,7 +583,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         File proofFile = new File(testCaseDirectory, proofFileInRepository);
         Assertions.assertTrue(proofFile.exists());
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, null, true);
+            SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile.toPath(), null, null, null,
+            true);
         try {
             // Get loaded proof
             Proof proof = environment.getLoadedProof();

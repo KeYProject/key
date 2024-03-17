@@ -4,15 +4,12 @@
 package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.Token;
-import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.NonNull;
@@ -52,10 +49,6 @@ public final class ExceptionTools {
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
             return Optional.ofNullable(((HasLocation) exc).getLocation());
-        } else if (exc instanceof ParseException) {
-            return Optional.ofNullable(getLocation((ParseException) exc));
-        } else if (exc instanceof TokenMgrError) {
-            return Optional.ofNullable(getLocation((TokenMgrError) exc));
         }
 
         if (exc.getCause() != null) {
@@ -65,22 +58,22 @@ public final class ExceptionTools {
         return Optional.empty();
     }
 
-    @Nullable
-    private static Location getLocation(ParseException exc) {
-        // JavaCC has 1-based column numbers
-        Token token = exc.currentToken;
-        return token == null ? null
-                : new Location(null, Position.fromToken(token.next));
+    private static URI parseFileName(String filename) throws MalformedURLException {
+        try {
+            return filename == null ? null : MiscTools.parseURL(filename).toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static Location getLocation(TokenMgrError exc) {
-        Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
-        if (m.find()) {
-            int line = Integer.parseInt(m.group(1));
-            int col = Integer.parseInt(m.group(2));
-            return new Location(null, Position.newOneBased(line, col));
+    // TODO javaparser this was not unused
+    @Nullable
+    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
+        // ANTLR 3 - Recognition Exception.
+        if (exc.input != null) {
+            // ANTLR has 0-based column numbers
+            return new Location(parseFileName(exc.input.getSourceName()), exc.position);
         }
         return null;
     }
-
 }

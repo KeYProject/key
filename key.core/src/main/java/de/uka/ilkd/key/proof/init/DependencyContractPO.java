@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -56,7 +56,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         final Term selfNotNull =
             selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
 
-        // "self.<created> = TRUE" for all heaps
+        // "self.$created = TRUE" for all heaps
 
         Term selfCreated = null;
         if (selfVar != null) {
@@ -78,7 +78,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
 
         // conjunction of...
-        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
+        // - "p_i = null | p_i.$created = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = tb.tt();
         for (ProgramVariable paramVar : paramVars) {

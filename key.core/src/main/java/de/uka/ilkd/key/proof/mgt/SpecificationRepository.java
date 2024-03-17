@@ -10,13 +10,13 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
@@ -222,7 +222,7 @@ public final class SpecificationRepository {
         // search through all locally available methods
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        final ImmutableList<IProgramMethod> candidatePMs =
+        final List<IProgramMethod> candidatePMs =
             services.getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
@@ -238,7 +238,10 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt).removeAll(kjt)) {
+        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt)) {
+            if (sup.equals(kjt)) {
+                continue;
+            }
             final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(obs, sup);
             if (result != null) {
                 return result;
@@ -807,7 +810,7 @@ public final class SpecificationRepository {
      * Returns a set encompassing the passed contract and all its versions inherited to overriding
      * methods.
      */
-    public ImmutableSet<Contract> getInheritedContracts(Contract contract) {
+    private ImmutableSet<Contract> getInheritedContracts(Contract contract) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil().add(contract);
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> subs =
             getOverridingTargets(contract.getKJT(), contract.getTarget());
@@ -845,7 +848,7 @@ public final class SpecificationRepository {
     /**
      * Registers the passed (atomic) contract, and inherits it to all overriding methods.
      */
-    public void addContract(Contract contract) {
+    private void addContract(Contract contract) {
         contract = prepareContract(contract);
 
         // register and inherit
@@ -863,7 +866,7 @@ public final class SpecificationRepository {
     /**
      * Registers the passed (atomic) contract without inheriting it.
      */
-    public void addContractNoInheritance(Contract contract) {
+    private void addContractNoInheritance(Contract contract) {
         registerContract(prepareContract(contract));
     }
 
@@ -923,7 +926,7 @@ public final class SpecificationRepository {
      * Registers the passed class invariant, and inherits it to all subclasses if it is public or
      * protected.
      */
-    public void addClassInvariant(ClassInvariant inv) {
+    private void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
         final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
                 : services.getJavaInfo().getInv();
@@ -1165,9 +1168,7 @@ public final class SpecificationRepository {
                     ImmutableList<FunctionalOperationContract> lookupContracts =
                         ImmutableSLList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
-                    ImmutableList<KeYJavaType> superTypes =
-                        services.getJavaInfo().getAllSupertypes(kjt);
-                    for (KeYJavaType superType : superTypes) {
+                    for (KeYJavaType superType : services.getJavaInfo().getAllSupertypes(kjt)) {
                         for (FunctionalOperationContract fop : cs) {
                             if (fop.getSpecifiedIn().equals(superType)) {
                                 lookupContracts = lookupContracts.append(fop);
@@ -1234,7 +1235,7 @@ public final class SpecificationRepository {
     /**
      * Registers the passed class axiom.
      */
-    public void addClassAxiom(ClassAxiom ax) {
+    private void addClassAxiom(ClassAxiom ax) {
         KeYJavaType kjt = ax.getKJT();
         ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
         if (currentAxioms == null) {
@@ -1727,7 +1728,7 @@ public final class SpecificationRepository {
         mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
-    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
+    public void addSpecs(Iterable<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
                 addContract((Contract) spec);

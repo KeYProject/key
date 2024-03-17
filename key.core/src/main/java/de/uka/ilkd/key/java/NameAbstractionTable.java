@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.ast.SourceElement;
+
 /**
  * This class is used for the equals modulo renaming method in SourceElement. The purpose of this
  * class is to abstract from names. Therefore it represents a mapping o1 x o2 -> abstractName where

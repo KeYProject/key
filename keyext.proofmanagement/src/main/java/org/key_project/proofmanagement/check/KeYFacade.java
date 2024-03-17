@@ -4,7 +4,6 @@
 package org.key_project.proofmanagement.check;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -12,26 +11,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
@@ -178,7 +166,7 @@ public final class KeYFacade {
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-            path.toFile(), fileRepo, control, profile, false);
+            path, fileRepo, control, profile, false);
         line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
         /////////////////// createEnvInput
@@ -224,7 +212,7 @@ public final class KeYFacade {
         }
         Contract contract = contractPO.getContract();
         line.contract = contract;
-        Type type = contract.getTarget().getContainerType().getJavaType();
+        var type = contract.getTarget().getContainerType().getJavaType();
         if (type instanceof JavaSourceElement jse) {
             line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
@@ -446,21 +434,20 @@ public final class KeYFacade {
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
-            File src = pbh.getPath("src").toFile();
-            List<File> cp = null;
+            var src = pbh.getPath("src");
+            List<Path> cp = null;
             if (!pbh.getClasspathFiles().isEmpty()) {
                 cp = pbh.getClasspathFiles().stream()
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
+                        .toList();
             }
-            File bcp = null;
+            Path bcp = null;
             if (pbh.getBootclasspath() != null) {
-                bcp = pbh.getBootclasspath().toFile();
+                bcp = pbh.getBootclasspath();
             }
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src.toString(), cp, bcp, profile, null);
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");

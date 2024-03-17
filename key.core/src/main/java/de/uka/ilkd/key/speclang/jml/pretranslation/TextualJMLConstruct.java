@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -27,7 +26,7 @@ import org.jspecify.annotations.NonNull;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> mods;
-    private Location location = new Location(null, Position.UNDEFINED);
+    private Location location = Location.UNDEFINED;
     private boolean loopContract;
 
     /**

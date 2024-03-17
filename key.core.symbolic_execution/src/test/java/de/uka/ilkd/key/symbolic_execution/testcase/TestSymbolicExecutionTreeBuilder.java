@@ -9,7 +9,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -651,7 +651,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             throws Exception {
         // Ensure that JavaProfile was used before
         KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-            new File(testCaseDirectory, proofFilePathInBaseDir), null, null, null, true);
+            new File(testCaseDirectory, proofFilePathInBaseDir).toPath(), null, null, null, true);
         env.dispose();
         // Test symbolic execution
         doSETTestAndDispose(testCaseDirectory, proofFilePathInBaseDir, oraclePathInBaseDirFile,

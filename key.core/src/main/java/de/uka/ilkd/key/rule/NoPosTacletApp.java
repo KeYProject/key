@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
@@ -20,6 +20,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -304,9 +305,9 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
+    @Nullable
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-        return result;
+        return matchFind(pos, services, null);
     }
 
 
@@ -315,6 +316,7 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
+    @Nullable
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
         if ((t == null) && (pos != null)) {
             t = pos.subTerm();

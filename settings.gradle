@@ -2,10 +2,11 @@ include "key.util"
 include "key.ui"
 include "key.ncore"
 include "key.core"
-include "key.core.rifl"
+//include "key.core:informationflow"
+//include "key.core.rifl"
 include "key.core.symbolic_execution"
 include "key.core.testgen"
-include "key.removegenerics"
+//include "key.removegenerics"
 include "key.core.proof_references"
 include "key.core.example"
 include "key.core.symbolic_execution.example"
@@ -15,3 +16,5 @@ include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
 include 'keyext.caching'
+include 'key.java'
+

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -291,12 +291,12 @@ public class TriggersSet {
         private boolean isAcceptableTrigger(Term term, Services services) {
             final Operator op = term.op();
 
-            // we do not want to match on expressions a.<created>
+            // we do not want to match on expressions a.$created
 
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
                 services)) {
                 if (term.sub(2).op().name().toString()
-                        .endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+                        .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
                     return false;
                 }
             }

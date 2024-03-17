@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 import de.uka.ilkd.key.java.Position;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -57,13 +57,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
         return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @NonNull Location getLocation() {
         if (offendingSymbol != null) {
             URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
             return new Location(uri, Position.fromToken(offendingSymbol));
         }
-        return null;
+        return Location.UNDEFINED;
     }
 }

@@ -7,8 +7,8 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -58,7 +58,7 @@ public class ContractFactoryTest {
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo =
-                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+                HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             services.setOriginFactory(new OriginTermLabelFactory());
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
@@ -142,7 +142,7 @@ public class ContractFactoryTest {
                 @*/""";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::#l),"
             + "allLocs))", woLabels.toString());
     }
 
@@ -161,7 +161,7 @@ public class ContractFactoryTest {
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {

@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
@@ -54,7 +58,7 @@ class FieldPrinter {
              *
              * Example syntax: object.(package.class::field)
              */
-            return "(" + fieldTerm.op().toString().replace("::$", "::") + ")";
+            return "(" + JavaDLFieldNames.toJava(fieldTerm.op().name()) + ")";
         }
     }
 
@@ -81,13 +85,11 @@ class FieldPrinter {
          * not find a better solution to this yet. But it seems to be standard, as it is done
          * similary in method HeapLDT.getPrettyFieldName(). (Kai Wallisch 09/2014)
          */
-        String[] originTypeAndName = fieldTerm.toString().split("::\\$");
-        assert originTypeAndName.length == 2;
-        String[] pvTypeAndName = pv.toString().split("::");
-        assert pvTypeAndName.length == 2;
+        var splitFieldTerm = JavaDLFieldNames.split(fieldTerm.toString());
+        var splitPV = JavaDLFieldNames.split(pv.toString());
 
-        return (pvTypeAndName[0].equals(originTypeAndName[0])
-                && pvTypeAndName[1].equals(originTypeAndName[1]));
+        return (Objects.equals(splitPV.scope(), splitFieldTerm.scope()) &&
+                splitPV.nameWithoutFieldPrefix().equals(splitFieldTerm.nameWithoutFieldPrefix()));
     }
 
     /*
@@ -107,9 +109,9 @@ class FieldPrinter {
      */
     protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
             Services services) {
-        String name = fieldTerm.op().name().toString();
-        if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
-            String pvName = name.replace("::$", "::");
+        Name name = fieldTerm.op().name();
+        if (JavaDLFieldNames.isField(name) && isFieldConstant(fieldTerm, heapLDT)) {
+            String pvName = JavaDLFieldNames.toJava(name);
             try {
                 return services.getJavaInfo().getAttribute(pvName) != null;
             } catch (UnknownJavaTypeException e) {
@@ -127,10 +129,10 @@ class FieldPrinter {
 
     /*
      * Determine whether the field constant is a generic object property. Those are surrounded by
-     * angle brackets, e.g. o.<created>
+     * angle brackets, e.g. o.$created
      */
     protected boolean isBuiltinObjectProperty(Term fieldTerm) {
-        return fieldTerm.op().name().toString().contains("::<")
+        return JavaDLFieldNames.isImplicitField(fieldTerm.op().name())
                 && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 

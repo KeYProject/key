@@ -7,11 +7,11 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
@@ -242,7 +242,7 @@ public final class IOUtil {
      *
      * Line 4
      * </pre>
-     *
+     * <p>
      * Computed line start indices:
      *
      * <pre>
@@ -282,7 +282,7 @@ public final class IOUtil {
      *
      * Line 4
      * </pre>
-     *
+     * <p>
      * Computed line start indices:
      *
      * <pre>
@@ -376,6 +376,41 @@ public final class IOUtil {
                 tabIndices.clear();
             }
             return result.toArray(new LineInformation[0]);
+        }
+    }
+
+    public static boolean isFolderInsideJar(Path sourcePath) {
+        return isFolderInsideJar(sourcePath.toString());
+    }
+
+    public static boolean isFolderInsideJar(String sourcePath) {
+        return URL_JAR_FILE.asMatchPredicate().test(sourcePath);
+    }
+
+    /**
+     * Opens a file inside a Jar using NIO. The given path is separated by using the bang "!" sign.
+     * The part before the bang is the path to the Jar. The part behind the bang is the path inside
+     * the Jar.
+     *
+     * @param sourcePath a non-null path to file inside a jar file
+     * @return a relative path inside a new "file system"
+     * @throws IOException
+     */
+    public static Path openFileInJar(Path sourcePath) throws IOException {
+        final Map<String, String> env = new HashMap<>();
+        final String[] array = sourcePath.toString().split("!");
+        var fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+        return fs.getPath(array[1]);
+    }
+
+    public static Path openFileInJar(URI location) throws IOException {
+        try {
+            return Paths.get(location); // Try to open the file, using known file systems.
+        } catch (FileSystemNotFoundException e) { // Open a file system if not found.
+            final Map<String, String> env = new HashMap<>();
+            final String[] array = location.toString().split("!");
+            var fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+            return fs.getPath(array[1]);
         }
     }
 
@@ -860,6 +895,8 @@ public final class IOUtil {
         }
         extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
+
+    public static final Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
 
     /**
      * Tries to open a stream with the given file name.

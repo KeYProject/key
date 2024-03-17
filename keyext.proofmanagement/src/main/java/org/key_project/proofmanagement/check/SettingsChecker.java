@@ -49,7 +49,7 @@ public class SettingsChecker implements Checker {
         // create a new KeYUserProblemFile for each path
         List<KeYUserProblemFile> problemFiles = new ArrayList<>();
         for (Path p : pbh.getProofFiles()) {
-            problemFiles.add(new KeYUserProblemFile(p.toString(), p.toFile(),
+            problemFiles.add(new KeYUserProblemFile(p.toString(), p,
                 new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(),
                 AbstractProfile.getDefaultProfile(), false));
         }

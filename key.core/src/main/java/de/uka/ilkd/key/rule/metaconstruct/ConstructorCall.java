@@ -6,17 +6,17 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -35,13 +35,6 @@ import org.key_project.util.collection.ImmutableArray;
 public class ConstructorCall extends ProgramTransformer {
 
     private static final String CONSTRUCTOR_CALL = "constructor-call";
-
-    /**
-     * The normal form identifier.
-     */
-    private static final String NORMALFORM_IDENTIFIER = //
-        de.uka.ilkd.key.java.recoderext. //
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;
@@ -80,7 +73,7 @@ public class ConstructorCall extends ProgramTransformer {
 
     /*
      * The method is optimized in the sense that instead of returning
-     * <code>newObject.<init>(args);</code> a statementblock is returned which evaluates the
+     * <code>newObject.$init(args);</code> a statementblock is returned which evaluates the
      * constructor's arguments and inserts a method body statement rather than the method call which
      * avoids unneccessary proof branches. As <code>newObject</code> can never be <code>null</code>
      * no null pointer check is necessary.
@@ -110,7 +103,8 @@ public class ConstructorCall extends ProgramTransformer {
             final KeYJavaType classType, SVInstantiations svInst, Services services) {
         assert (newObjectVar == null) != (newObjectSV == null);
 
-        final ProgramVariable newObject = newObjectSV == null ? newObjectVar
+        final ProgramVariable newObject = newObjectSV == null
+                ? newObjectVar
                 : (ProgramVariable) svInst.getInstantiation(newObjectSV);
         final ExecutionContext ec = svInst.getExecutionContext();
         final ImmutableArray<Expression> arguments = constructorReference.getArguments();
@@ -118,7 +112,7 @@ public class ConstructorCall extends ProgramTransformer {
         final ArrayList<Statement> evaluatedArgs = new ArrayList<>();
 
         int j = 0;
-        if (services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
+        if (services.getJavaInfo().getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS,
             classType) != null) {
             j = 1;
         }
@@ -131,7 +125,7 @@ public class ConstructorCall extends ProgramTransformer {
 
         if (j == 1) {
             Sort s = services.getJavaInfo()
-                    .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
+                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, classType).sort();
             Expression enclosingThis =
                 (Expression) (constructorReference.getReferencePrefix() instanceof Expression
                         ? constructorReference.getReferencePrefix()
@@ -145,7 +139,8 @@ public class ConstructorCall extends ProgramTransformer {
         // (deliberately using classType itself as the "context type", in order
         // to allow public calls to private init methods)
         final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(services.getJavaInfo(), null,
-            newObject, classType, NORMALFORM_IDENTIFIER, argumentVariables);
+            newObject, classType, PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+            argumentVariables);
 
         Debug.assertTrue(mbs != null, "Call to non-existent constructor.");
 

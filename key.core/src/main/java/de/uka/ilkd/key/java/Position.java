@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java;
 
 import org.antlr.v4.runtime.Token;
-import recoder.java.SourceElement;
 
 /**
  * The position of a source element, given by its line and column number. Depending on the
@@ -81,30 +80,11 @@ public class Position implements Comparable<Position> {
         return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
     }
 
-    /**
-     * Creates a new location from a token.
-     *
-     * @param token the token
-     */
-    public static Position fromToken(de.uka.ilkd.key.parser.proofjava.Token token) {
-        return new Position(token.beginLine, token.beginColumn);
-    }
-
-    /**
-     * Creates a new location from a SourceElement position.
-     *
-     * @param pos the position
-     */
-    public static Position fromSEPosition(SourceElement.Position pos) {
-        if (pos == SourceElement.Position.UNDEFINED) {
+    public static Position fromJPPosition(com.github.javaparser.Position p) {
+        if (p.invalid() || (p.line == -1 && p.column == -1)) {
             return UNDEFINED;
-        } else if (pos.getColumn() == 0) {
-            // This is a hack, some recoder positions have column 0 (not set)
-            // even though the column is 0-based *and* -1 is the unset value
-            // return new Position(pos.getLine(), 1);
-            throw new IllegalArgumentException("ProofJava produced column 0");
         } else {
-            return new Position(pos.getLine(), pos.getColumn());
+            return newOneBased(p.line, p.column);
         }
     }
 

@@ -113,7 +113,7 @@ public abstract class TestCommons {
 
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-        return KeYEnvironment.load(new File(filepath), null, null, null);
+        return KeYEnvironment.load(new File(filepath).toPath(), null, null, null);
     }
 
     /**
@@ -169,7 +169,8 @@ public abstract class TestCommons {
         assertTrue(file.exists());
         ProofAggregate result = null;
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
+            KeYUserProblemFile po =
+                new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

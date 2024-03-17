@@ -4,11 +4,7 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -31,6 +27,18 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     @SuppressWarnings("unchecked")
     public ImmutableArray() {
         content = (S[]) new Object[0];
+    }
+
+    public ImmutableArray(S s1) {
+        content = (S[]) new Object[] { s1 };
+    }
+
+    public ImmutableArray(S s1, S s2) {
+        content = (S[]) new Object[] { s1, s2 };
+    }
+
+    public ImmutableArray(S s1, S s2, S s3) {
+        content = (S[]) new Object[] { s1, s2, s3 };
     }
 
     /**
@@ -85,7 +93,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
 
-    /** @return size of the array */
+    /**
+     * @return size of the array
+     */
     public int size() {
         return content.length;
     }

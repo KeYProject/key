@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
@@ -103,8 +102,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
                         } else if (suspendOnSubclasses) {
                             JavaInfo info = proof.getServices().getJavaInfo();
                             KeYJavaType kjt = locVar.getKeYJavaType();
-                            ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
-                            for (KeYJavaType kjtloc : kjts) {
+                            for (KeYJavaType kjtloc : info.getAllSupertypes(kjt)) {
                                 if (kjtloc.getSort().toString().equals(exceptionName)
                                         && !exceptionParentNodes.contains(SETParent)) {
                                     exceptionNodes.add(node);

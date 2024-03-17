@@ -4,30 +4,40 @@
 package org.key_project.util;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
- * Extends java.util.LinkedList in order to collect elements according to their type.
- * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
+ * extends java.util.LinkedList in order to collect elements
+ * according to their type.
+ *
+ * @deprecated This class provides a bad coding style of exploiting reflection in the construction
+ *             of KeY-Java-AST.
+ *             Will be removed.
  */
-public class ExtList extends LinkedList<Object> {
-
-    private static final long serialVersionUID = 9182017368310263908L;
-
+@Deprecated
+public class ExtList extends ArrayList<Object> {
     public ExtList() {
         super();
     }
 
     public ExtList(Object[] a) {
-        super();
-        this.addAll(Arrays.asList(a));
+        addAll(Arrays.asList(a));
     }
 
-    /** copies list to array (array has type of cl) */
-    private static <T> T[] toArray(Class<T> cl, LinkedList<T> list) {
+    public ExtList(int size) {
+        super(size);
+    }
+
+    /**
+     * copies list to array (array has type of cl)
+     */
+    private static <T> T[] toArray(Class<T> cl, List<T> list) {
         @SuppressWarnings("unchecked")
         T[] array = (T[]) java.lang.reflect.Array.newInstance(cl, list.size());
         System.arraycopy(list.toArray(), 0, array, 0, list.size());
@@ -42,7 +52,7 @@ public class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> T[] collect(Class<T> cl) {
-        LinkedList<T> colls = new LinkedList<>();
+        List<T> colls = new ArrayList<>(size());
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 colls.add((T) next);
@@ -50,8 +60,18 @@ public class ExtList extends LinkedList<Object> {
         }
 
         return toArray(cl, colls);
-
     }
+
+    public <T> List<T> collectList(Class<T> cl) {
+        List<T> colls = new ArrayList<>(size());
+        for (Object next : this) {
+            if (cl.isInstance(next) && (next != null)) {
+                colls.add((T) next);
+            }
+        }
+        return colls;
+    }
+
 
     /**
      * returns first element in list of type cl
@@ -60,6 +80,7 @@ public class ExtList extends LinkedList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T get(Class<T> cl) {
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
@@ -71,8 +92,9 @@ public class ExtList extends LinkedList<Object> {
     }
 
     /**
-     * returns first element in list of type cl and removes the found element from the list if the
-     * elemnt has not been found <tt>null</tt> is returned
+     * returns first element in list of type cl and removes the found
+     * element from the list if the elemnt has not been found <tt>null</tt>
+     * is returned
      *
      * @param cl the type to be searched in list
      * @return the first element with type cl in list
@@ -91,5 +113,15 @@ public class ExtList extends LinkedList<Object> {
         return null;
     }
 
+    public Object getFirst() {
+        return get(0);
+    }
 
+    public void addFirst(Object o) {
+        add(0, o);
+    }
+
+    public Object removeFirst() {
+        return remove(0);
+    }
 }
