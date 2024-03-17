@@ -24,11 +24,13 @@ import java.util.Properties;
 public class IntegerOpHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
+    private IntegerLDT integerLDT;
+
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         supportedOperators.clear();
-        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        integerLDT = services.getTypeConverter().getIntegerLDT();
 
         supportedOperators.put(integerLDT.getAdd(), "+");
         supportedOperators.put(integerLDT.getMul(), "*");
@@ -37,8 +39,8 @@ public class IntegerOpHandler implements IsabelleHandler {
         supportedOperators.put(integerLDT.getMod(), "euclMod");
         supportedOperators.put(integerLDT.getNeg(), "-");
 
-        supportedOperators.put(integerLDT.getJDivision(), "jdiv");
-        supportedOperators.put(integerLDT.getJModulo(), "jmod");
+        supportedOperators.put(integerLDT.getJDivision(), "jDiv");
+        supportedOperators.put(integerLDT.getJModulo(), "jMod");
 
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
         supportedOperators.put(integerLDT.getLessThan(), "<");
@@ -58,6 +60,11 @@ public class IntegerOpHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         List<StringBuilder> children = trans.translate(term.subs());
         Operator op = term.op();
+
+        //negation has a special pattern in Isabelle and thus can't be translated like the other functions
+        if (op == integerLDT.getNeg()) {
+            return new StringBuilder("(-").append(children.get(0)).append(")");
+        }
 
         StringBuilder result = new StringBuilder();
         result.append("((");
