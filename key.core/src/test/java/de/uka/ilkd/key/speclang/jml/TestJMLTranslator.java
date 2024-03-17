@@ -448,7 +448,7 @@ public class TestJMLTranslator {
                     TB.not(TB.equals(TB.var(qv), TB.NULL()))), // implicit non null
                 TB.equals(TB.var(qv), TB.var(selfVar))));
 
-        final boolean condition = result.equalsModProperty(expected, RENAMING_PROPERTY);
+        final boolean condition = result.equalsModProperty(expected, RENAMING_TERM_PROPERTY);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
     }
