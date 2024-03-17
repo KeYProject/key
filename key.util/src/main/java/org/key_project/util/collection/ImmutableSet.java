@@ -107,7 +107,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @param <U> result type of the mapping
      * @return a new immutable list instance, not null.
      */
-    <U> ImmutableSet<U> map(Function<T,U> f);
+    <U> ImmutableSet<U> map(Function<T, U> f);
 
     /** @return true iff obj in set */
     boolean contains(T obj);

@@ -9,21 +9,20 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.Name;
+import org.key_project.logic.Visitor;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -153,10 +152,9 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor {
+    static class QuantifiableVariableVisitor implements Visitor<Term> {
 
-        private final LinkedList<QuantifiableVariable> vars =
-            new LinkedList<>();
+        private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 
         @Override
         public boolean visitSubtree(Term visited) {
@@ -165,9 +163,8 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
         @Override
         public void visit(Term visited) {
-            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
-            for (QuantifiableVariable var : boundVars) {
-                vars.add(var);
+            for (var boundVar : visited.boundVars()) {
+                vars.add(boundVar);
             }
         }
 

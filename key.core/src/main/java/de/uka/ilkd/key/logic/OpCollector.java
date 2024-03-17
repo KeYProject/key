@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 /**
  * Collects all operators occurring in the traversed term.
  */
-public class OpCollector extends DefaultVisitor {
+public class OpCollector implements DefaultVisitor {
     /** the found operators */
     protected final HashSet<Operator> ops;
 
@@ -26,8 +26,8 @@ public class OpCollector extends DefaultVisitor {
     @Override
     public void visit(Term t) {
         ops.add(t.op());
-        if (t.op() instanceof ElementaryUpdate) {
-            ops.add(((ElementaryUpdate) t.op()).lhs());
+        if (t.op() instanceof ElementaryUpdate update) {
+            ops.add(update.lhs());
         }
     }
 

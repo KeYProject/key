@@ -5,6 +5,9 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+/**
+ * Comment element of Java source code.
+ */
 public class Comment extends JavaSourceElement {
 
     private final String text;

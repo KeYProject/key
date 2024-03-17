@@ -9,8 +9,10 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
@@ -20,7 +22,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class KeYJavaType implements Type {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, Sort.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, JavaDLTheory.ANY);
 
     /** the AST type */
     private Type javaType = null;

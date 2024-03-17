@@ -26,18 +26,25 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Ccatch;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.ForUpdates;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -48,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
-public abstract class ProgramSVSort extends AbstractSort {
+public abstract class ProgramSVSort extends SortImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to
@@ -199,7 +206,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort SIMPLEJAVABIGINTEXPRESSION =
         new SimpleExpressionSpecialPrimitiveTypeSort("JavaBigintExpression",
-                    new PrimitiveType[]{PrimitiveType.JAVA_BIGINT});
+            new PrimitiveType[] { PrimitiveType.JAVA_BIGINT });
 
 
     public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION =
@@ -210,7 +217,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION =
         new SimpleExpressionSpecialPrimitiveTypeSort("SimpleJavaBooleanExpression",
-                    new PrimitiveType[]{PrimitiveType.JAVA_BOOLEAN});
+            new PrimitiveType[] { PrimitiveType.JAVA_BOOLEAN });
 
     public static final ProgramSVSort SIMPLESTRINGEXPRESSION =
         new SimpleExpressionStringSort("SimpleStringExpression");
@@ -249,12 +256,12 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 
     public static final ProgramSVSort VARIABLEINIT =
-            new ProgramSVSort(new Name("VariableInitializer")) {
-                @Override
+        new ProgramSVSort(new Name("VariableInitializer")) {
+            @Override
             public boolean canStandFor(ProgramElement pe, Services services) {
-                    return true;
-                }
-            };
+                return true;
+            }
+        };
 
     public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
     public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();

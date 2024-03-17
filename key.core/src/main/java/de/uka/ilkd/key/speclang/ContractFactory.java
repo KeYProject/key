@@ -99,7 +99,7 @@ public class ContractFactory {
 
         // create new contract
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
-            foci.specifiedIn, foci.modality, foci.originalPres, foci.originalFreePres,
+            foci.specifiedIn, foci.modalityKind, foci.originalPres, foci.originalFreePres,
             foci.originalMby, newPosts, foci.originalFreePosts, foci.originalAxioms,
             foci.originalMods, foci.originalFreeMods, foci.originalDeps, foci.hasRealModifiesClause,
             foci.hasRealFreeModifiesClause, foci.originalSelfVar, foci.originalParamVars,
@@ -150,7 +150,7 @@ public class ContractFactory {
 
         // create new contract
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
-            foci.specifiedIn, foci.modality, newPres, foci.originalFreePres, foci.originalMby,
+            foci.specifiedIn, foci.modalityKind, newPres, foci.originalFreePres, foci.originalMby,
             foci.originalPosts, foci.originalFreePosts, foci.originalAxioms, foci.originalMods,
             foci.originalFreeMods, foci.originalDeps, foci.hasRealModifiesClause,
             foci.hasRealFreeModifiesClause, foci.originalSelfVar, foci.originalParamVars,
@@ -172,7 +172,7 @@ public class ContractFactory {
         assert opc instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) opc;
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
-            foci.specifiedIn, foci.modality, foci.originalPres, foci.originalFreePres,
+            foci.specifiedIn, foci.modalityKind, foci.originalPres, foci.originalFreePres,
             foci.originalMby, foci.originalPosts, foci.originalFreePosts, foci.originalAxioms,
             foci.originalMods, foci.originalFreeMods, foci.originalDeps,
             foci.hasRealModifiesClause, foci.hasRealFreeModifiesClause, foci.originalSelfVar,
@@ -223,7 +223,8 @@ public class ContractFactory {
     }
 
     public InformationFlowContract createInformationFlowContract(KeYJavaType forClass,
-            IProgramMethod pm, KeYJavaType specifiedIn, Modality modality, Term requires,
+            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
+            Term requires,
             Term requiresFree, Term measuredBy, Term modifies, boolean hasMod,
             ProgramVariableCollection progVars, Term accessible,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
@@ -234,7 +235,7 @@ public class ContractFactory {
         final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
         final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
-            specifiedIn, modality, requires, requiresFree, measuredBy, modifies, hasMod, self,
+            specifiedIn, modalityKind, requires, requiresFree, measuredBy, modifies, hasMod, self,
             params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
     }
 
@@ -287,7 +288,7 @@ public class ContractFactory {
      * @param baseName base name of the contract (does not have to be unique)
      * @param kjt the KeYJavaType of the class
      * @param pm the IProgramMethod to which the contract belongs
-     * @param modality the modality of the contract
+     * @param modalityKind the modality of the contract
      * @param pres the precondition of the contract
      * @param freePres the free/unchecked precondition of the contract
      * @param mby the measured_by clause of the contract
@@ -308,7 +309,7 @@ public class ContractFactory {
      * @return the resulting functional operation contract
      */
     public FunctionalOperationContract func(String baseName, KeYJavaType kjt, IProgramMethod pm,
-            Modality modality, Map<LocationVariable, Term> pres,
+            Modality.JavaModalityKind modalityKind, Map<LocationVariable, Term> pres,
             Map<LocationVariable, Term> freePres, Term mby, Map<LocationVariable, Term> posts,
             Map<LocationVariable, Term> freePosts, Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods, Map<LocationVariable, Term> freeMods,
@@ -319,7 +320,8 @@ public class ContractFactory {
             ProgramVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
-            modality, pres, freePres, mby, posts, freePosts, axioms, mods, freeMods, accs, hasMod,
+            modalityKind, pres, freePres, mby, posts, freePosts, axioms, mods, freeMods, accs,
+            hasMod,
             hasFreeMod, selfVar, paramVars, resultVar, excVar, atPreVars, null, Contract.INVALID_ID,
             toBeSaved,
             mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null, services);
@@ -352,7 +354,9 @@ public class ContractFactory {
             Map<LocationVariable, Term> freeMods, Map<ProgramVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
             ProgramVariableCollection pv) {
-        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, freePres, mby,
+        return func(baseName, pm,
+            terminates ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, pres,
+            freePres, mby,
             posts, freePosts, axioms, mods, freeMods, accessibles, hasMod, hasFreeMod, pv, false,
             mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
@@ -362,7 +366,7 @@ public class ContractFactory {
      *
      * @param baseName base name of the contract (does not have to be unique)
      * @param pm the IProgramMethod to which the contract belongs
-     * @param modality the modality of the contract
+     * @param modalityKind the modality of the contract
      * @param pres the precondition of the contract
      * @param freePres the free/unchecked precondition of the contract
      * @param mby the measured_by clause of the contract
@@ -379,7 +383,8 @@ public class ContractFactory {
      * @param transaction TODO
      * @return the resulting functional operation contract
      */
-    public FunctionalOperationContract func(String baseName, IProgramMethod pm, Modality modality,
+    public FunctionalOperationContract func(String baseName, IProgramMethod pm,
+            Modality.JavaModalityKind modalityKind,
             Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres, Term mby,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> freePosts,
             Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> mods,
@@ -387,27 +392,30 @@ public class ContractFactory {
             Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
-            pm.getContainerType(), modality, pres, freePres, mby, posts, freePosts, axioms, mods,
+            pm.getContainerType(), modalityKind, pres, freePres, mby, posts, freePosts, axioms,
+            mods,
             freeMods, accessibles, hasMod, hasFreeMod, progVars.selfVar, progVars.paramVars,
             progVars.resultVar, progVars.excVar, progVars.atPreVars, null, Contract.INVALID_ID,
             toBeSaved, transaction, services);
     }
 
-    private static Modality combineModalities(Modality moda, Modality otherModality) {
-        if (moda != otherModality) {
+    private static Modality.JavaModalityKind combineModalityKinds(Modality.JavaModalityKind kind,
+            Modality.JavaModalityKind otherKind) {
+        if (kind != otherKind) {
             // TODO are there other modalities to appear in contracts?
             // I know that this is extremely ugly, but I don't know how to combine other kinds
             // of modalities.
-            if (moda == Modality.BOX) {
-                assert otherModality == Modality.DIA
-                        : "unknown modality " + otherModality + " in contract";
+            if (kind == Modality.JavaModalityKind.BOX) {
+                assert otherKind == Modality.JavaModalityKind.DIA
+                        : "unknown modality " + otherKind + " in contract";
                 // do nothing
             } else {
-                assert moda == Modality.DIA : "unknown modality " + moda + " in contract";
-                moda = Modality.BOX;
+                assert kind == Modality.JavaModalityKind.DIA
+                        : "unknown modality " + kind + " in contract";
+                kind = Modality.JavaModalityKind.BOX;
             }
         }
-        return moda;
+        return kind;
     }
 
     private static Term combineMeasuredBy(Term mby, Term otherMby, LocationVariable h,
@@ -565,7 +573,7 @@ public class ContractFactory {
      * @param mods the first contract's modifies clause
      * @param freeMods the first contract's free modifies clause
      * @param deps the first contract's dependency clause
-     * @param moda the first contract's modality
+     * @param modalityKind the first contract's modality
      * @return the joined contract
      */
     private FunctionalOperationContract joinWithOtherContracts(final String name,
@@ -580,9 +588,9 @@ public class ContractFactory {
             Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods,
             Map<LocationVariable, Term> freeMods,
-            Map<ProgramVariable, Term> deps, Modality moda) {
+            Map<ProgramVariable, Term> deps, Modality.JavaModalityKind modalityKind) {
         for (FunctionalOperationContract other : others) {
-            moda = combineModalities(moda, other.getModality());
+            modalityKind = combineModalityKinds(modalityKind, other.getModalityKind());
             Term otherMby =
                 other.hasMby() ? other.getMby(t.originalSelfVar, t.originalParamVars, services)
                         : null;
@@ -643,7 +651,7 @@ public class ContractFactory {
          * application and free preconditions are not used there. 2015, mu
          */
         return new FunctionalOperationContractImpl(INVALID_ID, name, t.kjt, t.pm, t.specifiedIn,
-            moda, pres, new LinkedHashMap<>(), // (*)
+            modalityKind, pres, new LinkedHashMap<>(), // (*)
             mby, posts, freePosts, axioms, mods, freeMods, deps, hasMod, hasFreeMod,
             t.originalSelfVar, t.originalParamVars, t.originalResultVar, t.originalExcVar,
             t.originalAtPreVars, t.globalDefs, Contract.INVALID_ID, t.toBeSaved, t.transaction,
@@ -717,7 +725,7 @@ public class ContractFactory {
                 }
             }
         }
-        Modality moda = t.modality;
+        Modality.JavaModalityKind moda = t.modalityKind;
         return joinWithOtherContracts(name, t, others, pres, mby,
             hasMod, hasFreeMod, uniformMod, uniformFreeMod,
             posts, freePosts, axioms, mods, freeMods, deps, moda);

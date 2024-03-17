@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(":key.core")
+    implementation project(":key.ui")
+
+    implementation project(":keyext.slicing")
+}

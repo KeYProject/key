@@ -85,7 +85,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         // }
     }
 
-    /** adds an element
+    /**
+     * adds an element
+     *
      * @param element of type <T> that has to be added to this set
      */
     @Override
@@ -97,7 +99,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return new DefaultImmutableSet<>(elementList.prepend(element));
     }
 
-    /** adds an element, barfs if the element is already present
+    /**
+     * adds an element, barfs if the element is already present
+     *
      * @param element of type <T> that has to be added to this set
      * @throws NotUniqueException if the element is already present
      */
@@ -209,10 +213,10 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return elementList.exists(predicate);
     }
 
-	@Override
-	public <U> ImmutableSet<U> map(Function<T, U> f) {
-		return new DefaultImmutableSet<>(elementList.map(f));
-	}
+    @Override
+    public <U> ImmutableSet<U> map(Function<T, U> f) {
+        return new DefaultImmutableSet<>(elementList.map(f));
+    }
 
     /** @return int the cardinality of the set */
     @Override

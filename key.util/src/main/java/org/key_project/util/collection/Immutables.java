@@ -114,7 +114,7 @@ public final class Immutables {
     }
 
     public static <T> ImmutableList<T> concatDuplicateFreeLists(ImmutableList<T> l1,
-                                                                ImmutableList<? extends T> l2) {
+            ImmutableList<? extends T> l2) {
 
         Set<T> lookup = new HashSet<>();
         for (T element : l1) {
@@ -142,7 +142,7 @@ public final class Immutables {
      * The iteration order of the result is identical to that of the argument.
      *
      * @param iterable the collection to iterate through to obtain the elements
-     *                 for the resulting list
+     *        for the resulting list
      * @returns the view onto the iterable as an immutable list
      */
     public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
@@ -157,10 +157,10 @@ public final class Immutables {
      * Returns an immutable list consisting of the elements of the list that match
      * the given predicate.
      *
-     * @param ts        non-null immutable list.
+     * @param ts non-null immutable list.
      * @param predicate a non-interfering, stateless
-     *                  predicate to apply to each element to determine if it
-     *                  should be included
+     *        predicate to apply to each element to determine if it
+     *        should be included
      * @returns the filtered list
      */
     public static <T> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<T> predicate) {
@@ -181,8 +181,8 @@ public final class Immutables {
      * Returns an immutable list consisting of the results of applying the given
      * function to the elements of the list.
      *
-     * @param <R>      The element type of the result list
-     * @param ts       ts non-null immutable list.
+     * @param <R> The element type of the result list
+     * @param ts ts non-null immutable list.
      * @param function a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */

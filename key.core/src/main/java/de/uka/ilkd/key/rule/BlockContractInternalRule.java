@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,7 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -112,7 +112,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
@@ -137,7 +137,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final BlockContract.Variables variables,
             final Map<LocationVariable, Term> modifiesClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
@@ -164,7 +164,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps, final Term contextUpdate,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Term contextUpdate,
             final Term remembranceUpdate, final ImmutableSet<ProgramVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
         final ImmutableList<Goal> result;
@@ -233,7 +234,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, Function> anonymisationHeaps =
+        final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
@@ -322,7 +323,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ImmutableSet<ProgramVariable> localInVariables,
             final ImmutableSet<ProgramVariable> localOutVariables,
             final BlockContract.Variables variables, final Term[] preconditions,

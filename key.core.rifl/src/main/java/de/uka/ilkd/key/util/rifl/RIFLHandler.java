@@ -7,9 +7,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.KeYCollections;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

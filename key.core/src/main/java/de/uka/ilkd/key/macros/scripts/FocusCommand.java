@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 /**

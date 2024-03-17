@@ -15,16 +15,24 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ParametricSort;
+import de.uka.ilkd.key.logic.sort.ParametricSort.Variance;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.util.Pair;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -117,7 +125,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
-            return Sort.FORMULA;
+            return JavaDLTheory.FORMULA;
         } else {
             return accept(ctx.sortId());
         }
@@ -178,10 +186,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return null;
     }
 
-    public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
+    public Sort toArraySort(Sort baseSort, Type t, int numOfDimensions) {
         if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
-            Sort sort = ArraySort.getArraySortForDim(p.first, p.second, numOfDimensions,
+            Sort sort = ArraySort.getArraySortForDim(baseSort, t, numOfDimensions,
                 ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
             Sort s = sort;
             do {
@@ -191,7 +199,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             } while (s instanceof ArraySort && sorts().lookup(s.name()) == null);
             return sort;
         } else {
-            return p.first;
+            return baseSort;
         }
     }
 
@@ -226,7 +234,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<Function> functions() {
+    protected Namespace<JFunction> functions() {
         return namespaces().functions();
     }
 
@@ -351,7 +359,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
 
-        //parametric sorts should be instantiated
+        // parametric sorts should be instantiated
         if (ctx.formal_sort_parameters() != null) {
             if (s instanceof ParametricSort ps) {
                 ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
@@ -361,43 +369,51 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-
         if (!ctx.EMPTYBRACKETS().isEmpty()) {
-            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
+            return toArraySort(s, t, ctx.EMPTYBRACKETS().size());
         }
         return s;
     }
 
+    public record FormalSortParameter(Variance first, Sort second) {}
+
+
     private ImmutableList<Sort> getSorts(KeYParser.Formal_sort_parametersContext ctx) {
-        List<Pair<ParametricSort.Variance, Sort>> seq = accept(ctx);
+        List<FormalSortParameter> seq = accept(ctx);
         assert seq != null;
-        for (Pair<ParametricSort.Variance, Sort> p : seq) {
-            if (p.first != ParametricSort.Variance.INVARIANT) {
+        for (var p : seq) {
+            if (p.first() != Variance.INVARIANT) {
                 addWarning(ctx, "Variance is ignored");
             }
         }
-        return seq.stream().map(it -> it.second).collect(ImmutableSLList.toImmutableList());
+        return seq.stream().map(FormalSortParameter::second)
+                .collect(ImmutableSLList.toImmutableList());
     }
 
     @Override
-    public List<Pair<ParametricSort.Variance, Sort>> visitFormal_sort_parameters(KeYParser.Formal_sort_parametersContext ctx) {
+    public List<FormalSortParameter> visitFormal_sort_parameters(
+            KeYParser.Formal_sort_parametersContext ctx) {
         return mapOf(ctx.formal_sort_parameter());
     }
 
     @Override
-    public Pair<ParametricSort.Variance, Sort> visitFormal_sort_parameter(KeYParser.Formal_sort_parameterContext ctx) {
+    public FormalSortParameter visitFormal_sort_parameter(
+            KeYParser.Formal_sort_parameterContext ctx) {
         Sort sort = sorts().lookup(ctx.id.getText());
         if (sort == null) {
-            semanticError(ctx.id, "Could not find sort '%s'. It was not previously defined.", ctx.id.getText());
+            semanticError(ctx.id, "Could not find sort '%s'. It was not previously defined.",
+                ctx.id.getText());
         }
-        return new Pair<>(accept(ctx.formal_sort_variance()), sort);
+        return new FormalSortParameter(accept(ctx.formal_sort_variance()), sort);
     }
 
     @Override
     public Object visitFormal_sort_variance(KeYParser.Formal_sort_varianceContext ctx) {
-        if (ctx.PLUS() != null) return ParametricSort.Variance.COVARIANT;
-        if (ctx.MINUS() != null) return ParametricSort.Variance.CONTRAVARIANT;
-        return ParametricSort.Variance.INVARIANT;
+        if (ctx.PLUS() != null)
+            return Variance.COVARIANT;
+        if (ctx.MINUS() != null)
+            return Variance.CONTRAVARIANT;
+        return Variance.INVARIANT;
     }
 
 

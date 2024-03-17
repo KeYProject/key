@@ -14,11 +14,11 @@ import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
@@ -28,21 +28,21 @@ public final class LocSetLDT extends LDT {
 
     public static final Name NAME = new Name("LocSet");
 
-    private final Function empty;
-    private final Function allLocs;
-    private final Function singleton;
-    private final Function union;
-    private final Function intersect;
-    private final Function setMinus;
-    private final Function infiniteUnion;
-    private final Function allFields;
-    private final Function allObjects;
-    private final Function arrayRange;
-    private final Function freshLocs;
-    private final Function elementOf;
-    private final Function subset;
-    private final Function disjoint;
-    private final Function createdInHeap;
+    private final JFunction empty;
+    private final JFunction allLocs;
+    private final JFunction singleton;
+    private final JFunction union;
+    private final JFunction intersect;
+    private final JFunction setMinus;
+    private final JFunction infiniteUnion;
+    private final JFunction allFields;
+    private final JFunction allObjects;
+    private final JFunction arrayRange;
+    private final JFunction freshLocs;
+    private final JFunction elementOf;
+    private final JFunction subset;
+    private final JFunction disjoint;
+    private final JFunction createdInHeap;
 
 
     public LocSetLDT(TermServices services) {
@@ -65,77 +65,77 @@ public final class LocSetLDT extends LDT {
     }
 
 
-    public Function getEmpty() {
+    public JFunction getEmpty() {
         return empty;
     }
 
 
-    public Function getAllLocs() {
+    public JFunction getAllLocs() {
         return allLocs;
     }
 
 
-    public Function getSingleton() {
+    public JFunction getSingleton() {
         return singleton;
     }
 
 
-    public Function getUnion() {
+    public JFunction getUnion() {
         return union;
     }
 
 
-    public Function getIntersect() {
+    public JFunction getIntersect() {
         return intersect;
     }
 
 
-    public Function getSetMinus() {
+    public JFunction getSetMinus() {
         return setMinus;
     }
 
 
-    public Function getInfiniteUnion() {
+    public JFunction getInfiniteUnion() {
         return infiniteUnion;
     }
 
 
-    public Function getAllFields() {
+    public JFunction getAllFields() {
         return allFields;
     }
 
 
-    public Function getAllObjects() {
+    public JFunction getAllObjects() {
         return allObjects;
     }
 
 
-    public Function getArrayRange() {
+    public JFunction getArrayRange() {
         return arrayRange;
     }
 
 
-    public Function getFreshLocs() {
+    public JFunction getFreshLocs() {
         return freshLocs;
     }
 
 
-    public Function getElementOf() {
+    public JFunction getElementOf() {
         return elementOf;
     }
 
 
-    public Function getSubset() {
+    public JFunction getSubset() {
         return subset;
     }
 
 
-    public Function getDisjoint() {
+    public JFunction getDisjoint() {
         return disjoint;
     }
 
 
-    public Function getCreatedInHeap() {
+    public JFunction getCreatedInHeap() {
         return createdInHeap;
     }
 
@@ -170,7 +170,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof Singleton) {
             return singleton;
@@ -189,7 +189,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return f.equals(empty);
     }
 
@@ -212,7 +212,7 @@ public final class LocSetLDT extends LDT {
 
     @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
+    public JFunction getFunctionFor(String operationName, Services services) {
         return switch (operationName) {
         case "add" -> getUnion();
         case "sub" -> getSetMinus();

@@ -203,8 +203,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return Modality.DIA;
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return Modality.JavaModalityKind.DIA;
     }
 
     /**
