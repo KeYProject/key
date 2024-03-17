@@ -20,7 +20,6 @@ public class IsabelleTranslator {
     public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
         List<Term> antecedents = sequent.antecedent().asList().stream().map(SequentFormula::formula).toList();
         List<Term> succedents = sequent.succedent().asList().stream().map(SequentFormula::formula).toList();
-        // TODO find correct values
         IsabelleMasterHandler masterHandler;
         try {
             masterHandler = new IsabelleMasterHandler(services, new String[0], new String[0]);

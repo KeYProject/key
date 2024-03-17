@@ -43,7 +43,6 @@ public class IsabelleMasterHandler {
      */
     public IsabelleMasterHandler(Services services, String[] handlerNames,
                                  String[] handlerOptions) throws IOException {
-        //TODO efficient loading of handlers. See MasterHandler in SMT
         List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
         predefinedSorts.put(Sort.ANY, new StringBuilder("any"));
         predefinedSorts.put(Sort.FORMULA, new StringBuilder("bool"));
