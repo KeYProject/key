@@ -5,6 +5,8 @@ package de.uka.ilkd.key.logic.equality;
 
 import java.util.Arrays;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -24,7 +26,7 @@ import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROP
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link TermEqualsModProperty}.
+ * Tests for {@link EqualsModProperty}.
  *
  * @author Tobias Reinhold
  */
@@ -283,5 +285,21 @@ public class TestEqualsModProperty {
             "Should be false as terms do not have the same relevant term labels");
         assertFalse(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be false as terms do not have the same relevant term labels");
+    }
+
+    @Test
+    public void renamingSourceElements() {
+        Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true");
+        Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true");
+        assertTrue(
+            match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Terms should be equalModRenaming (0).");
+
+        Comment testComment = new Comment("test");
+        StringLiteral stringLiteral = new StringLiteral("testStringLiteral");
+
+        // This seems very bad as equalsModRenaming is seemingly NOT symmetric!!!
+        assertTrue(testComment.equalsModRenaming(stringLiteral, null));
+        assertFalse(stringLiteral.equalsModRenaming(testComment, null));
     }
 }
