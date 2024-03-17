@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
@@ -71,7 +72,7 @@ public class TacletMatchProgram {
      */
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
             SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction = null;
+        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
         if (op instanceof ModalOperatorSV) {
             instruction = Instruction.matchModalOperatorSV((ModalOperatorSV) op);
@@ -105,16 +106,10 @@ public class TacletMatchProgram {
     private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final JavaProgramElement patternPrg = pattern.javaBlock().program();
-
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
 
         if (!boundVars.isEmpty()) {
             program.add(Instruction.matchAndBindVariables(boundVars));
-        }
-
-        if (pattern.op() instanceof Modality || pattern.op() instanceof ModalOperatorSV) {
-            program.add(Instruction.matchProgram(patternPrg));
         }
 
         if (pattern.hasLabels()) {
@@ -127,6 +122,32 @@ public class TacletMatchProgram {
             program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
         } else if (op instanceof ElementaryUpdate) {
             program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
+        } else if (op instanceof Modality mod) {
+            final var kind = mod.kind();
+            if (kind instanceof SchemaVariable sv) {
+                program.add((termPosition, matchConditions, services) -> {
+                    Term t = termPosition.getCurrentSubterm();
+                    if (t.op() instanceof Modality mod1
+                            && ((ModalOperatorSV) kind).getModalities().contains(mod1.kind())) {
+                        SVInstantiations inst = matchConditions.getInstantiations();
+                        return matchConditions.setInstantiations(
+                            inst.add(sv, mod1.<Modality.JavaModalityKind>kind(), services));
+                    } else {
+                        return null;
+                    }
+                });
+            } else {
+                program.add((termPosition, matchConditions, services) -> {
+                    Term t = termPosition.getCurrentSubterm();
+                    if (t.op() instanceof Modality mod1 && mod1.kind() == kind) {
+                        return matchConditions;
+                    } else {
+                        return null;
+                    }
+                });
+            }
+            final JavaProgramElement patternPrg = pattern.javaBlock().program();
+            program.add(Instruction.matchProgram(patternPrg));
         } else {
             program.add(Instruction.matchOp(op));
         }

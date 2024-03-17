@@ -9,11 +9,13 @@ import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms of the following
@@ -57,7 +59,7 @@ class SelectPrinter extends FieldPrinter {
                 } else {
                     lp.printFunctionTerm(t);
                 }
-            } else if (t.sort().equals(Sort.ANY)) {
+            } else if (t.sort().equals(JavaDLTheory.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar). Select-type is any.
                  */

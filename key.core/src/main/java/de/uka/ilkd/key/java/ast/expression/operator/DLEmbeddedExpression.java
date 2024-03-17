@@ -5,7 +5,9 @@ package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -17,31 +19,31 @@ import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
 public class DLEmbeddedExpression extends Operator {
-    private final Function functionSymbol;
+    private final JFunction functionSymbol;
 
     public DLEmbeddedExpression(
-            PositionInfo pi, List<Comment> comments, Function functionSymbol,
+            PositionInfo pi, List<Comment> comments, JFunction functionSymbol,
             @NonNull ImmutableArray<Expression> children) {
         super(pi, comments, children);
         this.functionSymbol = functionSymbol;
     }
 
-    public DLEmbeddedExpression(Function f, ExtList children) {
+    public DLEmbeddedExpression(JFunction f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }
 
-    public Function getFunctionSymbol() {
+    public JFunction getFunctionSymbol() {
         return functionSymbol;
     }
 
@@ -154,7 +156,7 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
-        Function f = getFunctionSymbol();
+        JFunction f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 
         if (f.arity() == subs.length) {

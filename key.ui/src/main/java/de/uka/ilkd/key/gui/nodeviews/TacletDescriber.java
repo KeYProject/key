@@ -49,7 +49,7 @@ class TacletDescriber {
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
-            for (final Operator op : modalOpSV.getModalities()) {
+            for (final var op : modalOpSV.getModalities()) {
                 out.append(sep);
                 out.append(op.name());
                 sep = ", ";

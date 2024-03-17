@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
-import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
@@ -34,17 +33,19 @@ import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLCommentTransformer;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import com.github.javaparser.ast.*;
@@ -452,7 +453,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             accept(n.getBody()), isInInterface);
         var containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
         var method =
             new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
@@ -815,7 +816,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         var containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerType = getKeYJavaType(new ReferenceTypeImpl(containing));
         // may be null for a void method
         var method = new ProgramMethod(md, containerType, returnType.getKeYJavaType(), pi,
@@ -1510,11 +1511,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case "\\seq_concat" -> new SeqConcat(pi, c, args.get(0), args.get(1));
             case "\\seq_get" -> new SeqGet(pi, c, args.get(0), args.get(1));
             default -> {
-                Function named = services.getNamespaces().functions().lookup(new de.uka.ilkd.key.logic.Name(name));
+                Function named = services.getNamespaces().functions().lookup(new org.key_project.logic.Name(name));
                 if (named == null) {
 
     yield reportError(n, format("In an embedded DL expression, %s is not a known DL function name.", name));
-                }yield new DLEmbeddedExpression(pi,c,named,new ImmutableArray<>());
+                }yield new DLEmbeddedExpression(pi,c,(JFunction)named,new ImmutableArray<>());
 
     }};}
 
@@ -1936,7 +1937,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @NonNull
     private SchemaVariable lookupSchemaVariable(String name, Node context) {
-        SchemaVariable n = schemaVariableNamespace.lookup(new de.uka.ilkd.key.logic.Name(name));
+        SchemaVariable n = schemaVariableNamespace.lookup(new org.key_project.logic.Name(name));
         if (n != null) {
             return n;
         } else {

@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
@@ -18,7 +19,10 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -26,13 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * this is a collection of common services to the KeY prover. Services include information on the
+ * This is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, LogicServices {
     private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
-
     /**
      * the proof
      */
@@ -158,7 +161,6 @@ public class Services implements TermServices {
         return result;
     }
 
-
     /**
      * Returns the TypeConverter associated with this Services object.
      */
@@ -171,6 +173,9 @@ public class Services implements TermServices {
         typeconverter = tc;
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return typeconverter.getJavaDLTheory();
+    }
 
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
@@ -333,7 +338,6 @@ public class Services implements TermServices {
         return namespaces;
     }
 
-
     /**
      * sets the namespaces of known predicates, functions, variables
      *
@@ -458,6 +462,20 @@ public class Services implements TermServices {
     }
     // =================================================================================================================
     // =================================================================================================================
+
+    // TODO: Ask weigl whether this is still needed
+    public Lookup createLookup() {
+        Lookup lookup = new Lookup();
+        lookup.register(getJavaInfo());
+        lookup.register(getJavaModel());
+        lookup.register(getProfile());
+        lookup.register(getProof());
+        lookup.register(getNamespaces());
+        lookup.register(getTermBuilder());
+        lookup.register(getNameRecorder());
+        lookup.register(getVariableNamer());
+        return lookup;
+    }
 
     @NonNull
     public JavaService getJavaService() {

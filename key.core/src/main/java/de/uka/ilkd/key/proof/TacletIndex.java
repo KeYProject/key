@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -102,6 +102,8 @@ public abstract class TacletIndex {
                 indexObj = ((SortDependingFunction) indexObj).getKind();
             } else if (indexObj instanceof ElementaryUpdate) {
                 indexObj = ElementaryUpdate.class;
+            } else if (indexObj instanceof Modality) {
+                indexObj = Modality.class;
             }
         }
 
@@ -306,9 +308,8 @@ public abstract class TacletIndex {
      *
      * @param map the map to select the NoPosTacletApps from
      * @param pe the program element that is used to retrieve the taclets
-     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occuring
-     *        prefix
-     *        elements
+     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occurring
+     *        prefix elements
      */
     private ImmutableList<NoPosTacletApp> getJavaTacletList(
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,
@@ -356,6 +357,8 @@ public abstract class TacletIndex {
             inMap = map.get(((SortDependingFunction) op).getKind());
         } else if (op instanceof ElementaryUpdate) {
             inMap = map.get(ElementaryUpdate.class);
+        } else if (op instanceof Modality) {
+            inMap = map.get(Modality.class);
         } else {
             inMap = map.get(op);
         }

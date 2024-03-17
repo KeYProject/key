@@ -23,6 +23,9 @@ public class MatchProgramInstruction implements MatchInstruction {
         final MatchConditions result = pe.match(
             new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
             matchConditions);
+        if (result != null) {
+            termPosition.gotoNext();
+        }
         return result;
     }
 }

@@ -8,6 +8,7 @@ configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
+    api project(':key.ncore')
     api project(':key.java')
     //api group: group, name: 'recoderkey', version: '1.0'
 //    api project(':recoder')

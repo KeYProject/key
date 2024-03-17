@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.Name;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +71,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
         super(q + "::" + n);
-        assert q.length() > 0 : "Tried to create qualified name with missing qualifier";
+        assert !q.isEmpty() : "Tried to create qualified name with missing qualifier";
 
         this.qualifierString = q.intern();
         this.shortName = n.intern();

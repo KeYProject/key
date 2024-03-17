@@ -17,10 +17,11 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.sort.Sort;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
@@ -68,8 +69,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
-            return fstActive instanceof Throw && blockedExceptions(
-                ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+            return fstActive instanceof Throw fstThrow && blockedExceptions(
+                fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }

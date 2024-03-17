@@ -253,7 +253,7 @@ public class TriggersSet {
             final HashSet<Term> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final Term res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
-                    boundVars, oriTerm.javaBlock());
+                    boundVars, null);
 
 
                 set.add(res);
@@ -273,7 +273,7 @@ public class TriggersSet {
          * Check whether a given term (or a subterm of the term) might be a trigger candidate
          */
         private boolean mightContainTriggers(Term term) {
-            if (term.freeVars().size() == 0) {
+            if (term.freeVars().isEmpty()) {
                 return false;
             }
             final Operator op = term.op();

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.jspecify.annotations.NonNull;
 

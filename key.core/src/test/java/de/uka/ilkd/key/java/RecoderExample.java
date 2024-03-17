@@ -4,15 +4,10 @@
 package de.uka.ilkd.key.java;
 
 
-
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.statement.Guard;
-import de.uka.ilkd.key.java.ast.statement.If;
-import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.java.ast.statement.Then;
-import de.uka.ilkd.key.java.ast.statement.While;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.TacletForTests;
 

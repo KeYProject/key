@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.Name;
+
 
 /**
  * Implements "inner renaming", i.e. renaming - if a new variable entering the globals causes a name

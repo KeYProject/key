@@ -6,13 +6,13 @@ package de.uka.ilkd.key.logic;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 /**
  * @author mihai
  *
  */
-public class SortCollector extends DefaultVisitor {
+public class SortCollector implements DefaultVisitor {
     /** the collected sorts */
     private final Set<Sort> sorts = new HashSet<>();
 

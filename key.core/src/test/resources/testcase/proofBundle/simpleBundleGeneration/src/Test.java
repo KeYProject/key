@@ -1,5 +1,5 @@
-import java.util.List;
 import java.io.InputStream;
+import java.util.List;
 
 public class Test {
     // check that all of these classes are correctly loaded:

@@ -262,8 +262,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return getContract().getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return getContract().getModalityKind();
     }
 
     /**

@@ -116,12 +116,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final Term valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);
 
         // set up replacement visitors
-        final class IndexTermReplacementVisitor extends DefaultVisitor {
+        final class IndexTermReplacementVisitor implements DefaultVisitor {
 
             private Term result;
 
             @Override
             public void visit(Term visited) {
+                // TODO: Remove cast when/if term builder is moved
                 result = replace(visited);
             }
 
@@ -143,11 +144,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                         newSubs[i] = replace(subs.get(i));
                     }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
-                        visited.boundVars(), visited.javaBlock(), visited.getLabels());
+                        visited.boundVars(), visited.getLabels());
                 }
             }
         }
-        final class ValuesTermReplacementVisitor extends DefaultVisitor {
+        final class ValuesTermReplacementVisitor implements DefaultVisitor {
 
             private Term result;
 
@@ -174,7 +175,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                         newSubs[i] = replace(subs.get(i));
                     }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
-                        visited.boundVars(), visited.javaBlock(), visited.getLabels());
+                        visited.boundVars(), visited.getLabels());
                 }
             }
         }
@@ -324,10 +325,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
-        Modality m = (Modality) programTerm().op();
-        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
+        var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
-            HeapContext.getModHeaps(services, transaction), services);
+            HeapContext.getModHeaps(services, m.transaction()), services);
     }
 
     public boolean variantAvailable() {
@@ -335,7 +335,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean variantRequired() {
-        return ((Modality) programTerm().op()).terminationSensitive();
+        return ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind()
+                .terminationSensitive();
     }
 
     @Override

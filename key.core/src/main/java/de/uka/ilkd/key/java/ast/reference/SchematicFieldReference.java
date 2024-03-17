@@ -8,12 +8,12 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 /**
@@ -25,7 +25,7 @@ public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
     private static final ProgramVariable SCHEMA_VARIABLE =
-        new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), Sort.ANY);
+        new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), JavaDLTheory.ANY);
     /**
      * Reference suffix
      */

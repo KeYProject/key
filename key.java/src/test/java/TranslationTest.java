@@ -5,11 +5,11 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.loader.JP2KeYConverter;
 import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.StaticJavaParser;
@@ -61,8 +61,7 @@ class TranslationTest {
         expr.setParentNode(parent);
         var converted = converter.process(expr);
         Assertions.assertNotEquals(null, converted);
-        Assertions.assertTrue(converted instanceof Expression,
-            "Unexpected type: " + converted.getClass());
+        Assertions.assertInstanceOf(Expression.class, converted, "Unexpected type: " + converted.getClass());
         System.out.println(converted);
     }
 }

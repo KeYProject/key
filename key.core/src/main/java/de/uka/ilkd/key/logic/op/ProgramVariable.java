@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -11,10 +13,14 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.ProgramInLogic;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
@@ -59,8 +65,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
         this.isFinal = isFinal;
 
-        assert sort() != Sort.FORMULA;
-        assert sort() != Sort.UPDATE;
+        assert sort() != JavaDLTheory.FORMULA;
+        assert sort() != JavaDLTheory.UPDATE;
     }
 
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
@@ -248,12 +254,4 @@ public abstract class ProgramVariable extends AbstractSortedOperator
             return null;
         }
     }
-
-    /**
-     * Returns an equivalent variable with the new name.
-     *
-     * @param name the new name
-     * @return equivalent operator with the new name
-     */
-    public abstract Operator rename(Name name);
 }

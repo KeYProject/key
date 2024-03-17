@@ -1,5 +1,6 @@
 include "key.util"
 include "key.ui"
+include "key.ncore"
 include "key.core"
 //include "key.core:informationflow"
 //include "key.core.rifl"

@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.logic;
 
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.Nullable;
 
 public class JavaDLFieldNames {
@@ -59,7 +61,7 @@ public class JavaDLFieldNames {
         return new ParsedFieldName(name.substring(0, index), name.substring(index + 2));
     }
 
-    public static final record ParsedFieldName(@Nullable String scope, String name) {
+    public record ParsedFieldName(@Nullable String scope, String name) {
         public String nameWithoutFieldPrefix() {
             if (!name.isEmpty() && name.charAt(0) == JavaDLFieldNames.FIELD_PREFIX) {
                 return name.substring(1);

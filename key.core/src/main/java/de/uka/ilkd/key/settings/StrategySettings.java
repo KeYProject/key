@@ -6,7 +6,6 @@ package de.uka.ilkd.key.settings;
 import java.util.Objects;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -14,6 +13,8 @@ import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.logic.Name;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

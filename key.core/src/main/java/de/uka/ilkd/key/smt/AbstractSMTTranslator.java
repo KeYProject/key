@@ -8,15 +8,19 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -160,7 +164,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * If the solver supports only simple multiplications, complex multiplications are translated
      * into a uninterpreted function. The name of the function is stored here.
      */
-    private Function multiplicationFunction = null;
+    private JFunction multiplicationFunction = null;
 
     private static final String BSUM_STRING = "bsum";
 
@@ -179,7 +183,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         // add one variable for each sort
         for (Sort s : this.usedRealSort.keySet()) {
-            if (!s.equals(Sort.FORMULA)) {
+            if (!s.equals(JavaDLTheory.FORMULA)) {
                 LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
                 this.addFunction(l, new ArrayList<>(), s, services);
                 this.translateFunc(l, new ArrayList<>());
@@ -199,12 +203,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return smtSettings;
     }
 
-    private Function getMultiplicationFunction(Services services) {
+    private JFunction getMultiplicationFunction(Services services) {
         if (multiplicationFunction == null) {
             Function reference = services.getTypeConverter().getIntegerLDT().getMul();
 
             TermBuilder tb = services.getTermBuilder();
-            multiplicationFunction = new Function(new Name(tb.newName("unin_mult")),
+            multiplicationFunction = new JFunction(new Name(tb.newName("unin_mult")),
                 reference.sort(), reference.argSorts());
         }
         return multiplicationFunction;
@@ -568,7 +572,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> element = new ArrayList<>();
             element.add(usedFunctionNames.get(op));
             for (Sort s : functionDecls.get(op)) {
-                if (s == Sort.FORMULA) {
+                if (s == JavaDLTheory.FORMULA) {
                     // This function was used with a formula as argument. Treat like a boolean sort
                     element.add(this.getBoolSort());
                 } else {
@@ -792,7 +796,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         ArrayList<StringBuilder> result = new ArrayList<>();
         Sort sort = services.getTypeConverter().getIntegerLDT().getMul().sort();
-        Function mult = getMultiplicationFunction(services);
+        JFunction mult = getMultiplicationFunction(services);
         TermBuilder tb = services.getTermBuilder();
         Term zero = tb.zero();
         Term one = tb.one();
@@ -846,7 +850,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (Sort sort : usedRealSort.keySet()) {
 
                 // Do not add Assumptions for Boolean or integer sorts
-                if (!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA) {
+                if (!isSomeIntegerSort(sort, services) && sort != JavaDLTheory.FORMULA) {
                     Term var = createLogicalVar(services, "x", sort);
                     StringBuilder sVar = translateVariable(var.op());
                     // StringBuilder var = this.makeUnique(new StringBuilder("x"));
@@ -1531,7 +1535,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // equal updates are translated with the same predicate.
             return this.getModalityPredicate(term, quantifiedVars, services);
         } else if (op == IfThenElse.IF_THEN_ELSE) {
-            if (term.sub(1).sort() == Sort.FORMULA) {
+            if (term.sub(1).sort() == JavaDLTheory.FORMULA) {
                 // a logical if then else was used
                 StringBuilder cond = translateTerm(term.sub(0), quantifiedVars, services);
                 StringBuilder ifterm = translateTerm(term.sub(1), quantifiedVars, services);
@@ -1591,7 +1595,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else if (op == Junctor.FALSE) {
             return this.translateLogicalFalse();
         } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-            Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+            JFunction nullOp = services.getTypeConverter().getHeapLDT().getNull();
 
             addFunction(nullOp, new ArrayList<>(), nullOp.sort(), services);
             translateSort(nullOp.sort(), services);
@@ -1615,8 +1619,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 return translateFunc(op, subterms);
             }
-        } else if (op instanceof Function fun) {
-            if (fun.sort() == Sort.FORMULA) {
+        } else if (op instanceof JFunction fun) {
+            if (fun.sort() == JavaDLTheory.FORMULA) {
                 // This Function is a predicate, so translate it
                 // as such
                 if (fun == services.getTypeConverter().getIntegerLDT().getLessThan()) {
@@ -1998,7 +2002,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
     }
 
-    private StringBuilder translateAsUninterpretedFunction(Function fun,
+    private StringBuilder translateAsUninterpretedFunction(JFunction fun,
             List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
@@ -2122,7 +2126,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
         }
         // invent a new predicate
-        Function fun = new Function(new Name("modConst"), t.sort(), argsorts);
+        JFunction fun = new JFunction(new Name("modConst"), t.sort(), argsorts);
 
         // Build the final predicate
         Term temp = tb.func(fun, subs);
@@ -2172,7 +2176,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         // translate the term as uninterpreted function/predicate
         Operator op = term.op();
-        if (term.sort() == Sort.FORMULA) {
+        if (term.sort() == JavaDLTheory.FORMULA) {
             // predicate
             LOGGER.debug("Translated as uninterpreted predicate: {}", term);
             ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -2195,10 +2199,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
             ArrayList<Sort> sorts = new ArrayList<>();
             for (int i = 0; i < op.arity(); i++) {
-                if (term.sub(i).sort() != Sort.FORMULA) {
+                if (term.sub(i).sort() != JavaDLTheory.FORMULA) {
                     sorts.add(term.sub(i).sort());
                 } else {
-                    sorts.add(Sort.FORMULA);
+                    sorts.add(JavaDLTheory.FORMULA);
                 }
             }
             this.addFunction(op, sorts, term.sort(), services);
@@ -2231,7 +2235,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else {
             name = translateFunctionName(new StringBuilder(o.name().toString()));
             usedFunctionNames.put(o, name);
-            if (o instanceof Function) {
+            if (o instanceof JFunction) {
                 usedFunctions.add(new FunctionWrapper(name, (Function) o));
             }
         }
@@ -2512,7 +2516,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             HeapLDT ldt = services.getTypeConverter().getHeapLDT();
             // Several special sorts should not be added to the collection
             if (ldt.getHeap().sort() != sort && ldt.getFieldSort() != sort
-                    && services.getJavaInfo().nullSort() != sort && Sort.FORMULA != sort) {
+                    && services.getJavaInfo().nullSort() != sort && JavaDLTheory.FORMULA != sort) {
                 sorts = sorts.add(sort);
             }
         }

@@ -9,21 +9,15 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
@@ -36,17 +30,17 @@ public final class SeqLDT extends LDT {
 
     // getters
     private final SortDependingFunction seqGet;
-    private final Function seqLen;
-    private final Function seqIndexOf;
+    private final JFunction seqLen;
+    private final JFunction seqIndexOf;
 
     // constructors
-    private final Function seqEmpty;
-    private final Function seqSingleton;
-    private final Function seqConcat;
-    private final Function seqSub;
-    private final Function seqReverse;
-    private final Function seqDef;
-    private final Function values;
+    private final JFunction seqEmpty;
+    private final JFunction seqSingleton;
+    private final JFunction seqConcat;
+    private final JFunction seqSub;
+    private final JFunction seqReverse;
+    private final JFunction seqDef;
+    private final JFunction values;
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
@@ -68,37 +62,37 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public Function getSeqLen() {
+    public JFunction getSeqLen() {
         return seqLen;
     }
 
 
-    public Function getSeqEmpty() {
+    public JFunction getSeqEmpty() {
         return seqEmpty;
     }
 
 
-    public Function getSeqSingleton() {
+    public JFunction getSeqSingleton() {
         return seqSingleton;
     }
 
 
-    public Function getSeqConcat() {
+    public JFunction getSeqConcat() {
         return seqConcat;
     }
 
 
-    public Function getSeqSub() {
+    public JFunction getSeqSub() {
         return seqSub;
     }
 
 
-    public Function getSeqReverse() {
+    public JFunction getSeqReverse() {
         return seqReverse;
     }
 
 
-    public Function getSeqDef() {
+    public JFunction getSeqDef() {
         return seqDef;
     }
 
@@ -106,7 +100,7 @@ public final class SeqLDT extends LDT {
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
      */
-    public Function getValues() {
+    public JFunction getValues() {
         return values;
     }
 
@@ -145,7 +139,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(
+    public JFunction getFunctionFor(
             Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof SeqSingleton) {
@@ -169,7 +163,7 @@ public final class SeqLDT extends LDT {
 
     @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
+    public JFunction getFunctionFor(String operationName, Services services) {
         if (operationName.equals("add")) {
             return getSeqConcat();
         }
@@ -178,7 +172,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return f.equals(seqEmpty);
     }
 
@@ -200,7 +194,7 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public Function getSeqIndexOf() {
+    public JFunction getSeqIndexOf() {
         return seqIndexOf;
     }
 }
