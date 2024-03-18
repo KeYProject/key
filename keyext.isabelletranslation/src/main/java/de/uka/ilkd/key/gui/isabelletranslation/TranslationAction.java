@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class TranslationAction extends MainWindowAction {
 
@@ -32,11 +32,12 @@ public class TranslationAction extends MainWindowAction {
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
         try {
             //TODO let user choose where to save file?
-            String path = System.getProperty("user.home") + "\\Translation.thy";
+            File translationFile = new File(System.getProperty("user.home") + "/.key/IsabelleTranslations/Translation.thy");
             StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent(), mediator.getServices());
             try {
-                Files.write(Paths.get(path), translation.toString().getBytes());
-                LOGGER.info("Saved to: " + path);
+                Files.createDirectories(translationFile.toPath().getParent());
+                Files.write(translationFile.toPath(), translation.toString().getBytes());
+                LOGGER.info("Saved to: " + translationFile.toPath());
             } catch (IOException e) {
                 //TODO handle exception
                 throw new RuntimeException(e);
