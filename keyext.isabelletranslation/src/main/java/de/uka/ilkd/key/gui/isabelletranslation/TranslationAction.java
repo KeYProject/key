@@ -33,7 +33,7 @@ public class TranslationAction extends MainWindowAction {
         try {
             //TODO let user choose where to save file?
             File translationFile = new File(System.getProperty("user.home") + "/.key/IsabelleTranslations/Translation.thy");
-            StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent(), mediator.getServices());
+            StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent());
             try {
                 Files.createDirectories(translationFile.toPath().getParent());
                 Files.write(translationFile.toPath(), translation.toString().getBytes());
