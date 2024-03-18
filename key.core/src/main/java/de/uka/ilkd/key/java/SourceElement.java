@@ -101,4 +101,9 @@ public interface SourceElement extends SVSubstitute, EqualsModProperty<SourceEle
         }
         return property.equalsModThisProperty(this, (SourceElement) o, v);
     }
+
+    @Override
+    default int hashCodeModProperty(Property<SourceElement> property) {
+        return property.hashCodeModThisProperty(this);
+    }
 }
