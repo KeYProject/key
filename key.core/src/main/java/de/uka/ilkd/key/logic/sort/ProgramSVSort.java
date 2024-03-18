@@ -225,9 +225,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
     public static final ProgramSVSort ARRAYPOSTDECL = new ArrayPostDeclarationSort();
 
-    public static final ProgramSVSort SWITCH = new SwitchSVSort();
-
-    public static final ProgramSVSort SWITCH_CASE = new SwitchBranchSVSort();
+    public static final ProgramSVSort SWITCH_BRANCH = new SwitchBranchSVSort();
 
     public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE =
         new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
@@ -1194,18 +1192,6 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof For);
-        }
-    }
-
-    private static final class SwitchSVSort extends ProgramSVSort {
-
-        public SwitchSVSort() {
-            super(new Name("Switch"));
-        }
-
-        @Override
-        protected boolean canStandFor(ProgramElement pe, Services services) {
-            return (pe instanceof Switch);
         }
     }
 

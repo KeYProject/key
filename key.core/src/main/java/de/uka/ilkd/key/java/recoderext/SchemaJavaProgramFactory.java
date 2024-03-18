@@ -249,7 +249,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "SwitchCase");
         }
-        return new SwitchBranchSVWrapper(sv);
+        return new SwitchBranchSVWrapper((ProgramSV) sv);
     }
 
     /**

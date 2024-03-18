@@ -3997,7 +3997,7 @@ Switch SwitchStatement() :
     "(" expr = Expression() ")" "{"
 
 	(
-	    { SwitchBranchSVWrapper sbsv; } sbsv=SwitchBranchSV()
+	    { SwitchBranchSVWrapper sbsv; } "case:" sbsv=SwitchBranchSV()
     	{ branches.add(sbsv); }
     |
 	( branch = SwitchLabel()

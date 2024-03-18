@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -12,9 +13,9 @@ import recoder.java.statement.SwitchBranch;
 
 public class SwitchBranchSVWrapper extends SwitchBranch implements KeYRecoderExtension, SVWrapper {
     private static final long serialVersionUID = -1;
-    protected SchemaVariable sv;
+    protected ProgramSV sv;
 
-    public SwitchBranchSVWrapper(SchemaVariable sv) {
+    public SwitchBranchSVWrapper(ProgramSV sv) {
         this.sv = sv;
     }
 
@@ -25,14 +26,14 @@ public class SwitchBranchSVWrapper extends SwitchBranch implements KeYRecoderExt
      */
     @Override
     public void setSV(SchemaVariable sv) {
-        this.sv = sv;
+        this.sv = (ProgramSV) sv;
     }
 
     /**
      * returns a String name of this meta construct.
      */
     @Override
-    public SchemaVariable getSV() {
+    public ProgramSV getSV() {
         return sv;
     }
 

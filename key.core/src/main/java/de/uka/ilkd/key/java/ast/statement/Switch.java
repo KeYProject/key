@@ -11,8 +11,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.LinkedList;
 
 /**
  * Switch.
@@ -218,6 +223,12 @@ public class Switch extends BranchStatement
         return branches;
     }
 
+    @Override
+    public SourceElement getFirstElement() {
+        if (branches.isEmpty()) return this;
+        return branches.get(0);
+    }
+
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -264,8 +275,22 @@ public class Switch extends BranchStatement
         return StatementBlock.computePrefixElements(this);
     }
 
+    /**
+     * The method checks whether the expression in the synchronized prefix is either a local
+     * variable or a meta class reference (as local variables of this type are not supported by KeY,
+     * see return value for {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     *
+     * @return true iff the above stated condition holds.
+     */
+    private boolean expressionWithoutSideffects() {
+        return (expression instanceof ProgramVariable && !((ProgramVariable) expression).isMember())
+                || (expression instanceof MetaClassReference);
+    }
+
     @Override
     public PosInProgram getFirstActiveChildPos() {
-        return branches.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
+        return branches.isEmpty() ? PosInProgram.TOP : (expressionWithoutSideffects()
+                ? PosInProgram.ONE
+                : PosInProgram.TOP);
     }
 }
