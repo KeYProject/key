@@ -16,10 +16,18 @@ public class FreeLiteral extends Literal {
 
     public final static FreeLiteral INSTANCE = new FreeLiteral();
 
+    private FreeLiteral() {
+        super();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
+    }
+
     @Override
     public void visit(Visitor v) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

@@ -25,6 +25,11 @@ public class NullLiteral extends Literal {
         super();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
+    }
+
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
