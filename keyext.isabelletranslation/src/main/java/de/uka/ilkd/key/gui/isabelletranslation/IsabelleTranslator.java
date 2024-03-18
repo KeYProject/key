@@ -14,10 +14,13 @@ public class IsabelleTranslator {
 
     private static final String LINE_ENDING = "\n";
 
+    private final Services services;
+
     public IsabelleTranslator(Services services) {
+        this.services = services;
     }
 
-    public final StringBuilder translateProblem(Sequent sequent, Services services) throws IllegalFormulaException {
+    public final StringBuilder translateProblem(Sequent sequent) throws IllegalFormulaException {
         List<Term> antecedents = sequent.antecedent().asList().stream().map(SequentFormula::formula).toList();
         List<Term> succedents = sequent.succedent().asList().stream().map(SequentFormula::formula).toList();
         IsabelleMasterHandler masterHandler;
