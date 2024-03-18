@@ -12,10 +12,9 @@ import org.key_project.util.collection.ImmutableSet;
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
  * also a continuation on sequents, traversing all of the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor {
+public class BoundVarsVisitor implements DefaultVisitor {
 
-    private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.nil();
+    private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();
 
 
     /**

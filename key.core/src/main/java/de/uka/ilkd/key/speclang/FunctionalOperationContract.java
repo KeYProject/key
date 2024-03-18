@@ -30,7 +30,7 @@ public interface FunctionalOperationContract extends OperationContract {
     /**
      * Returns the modality of the contract.
      */
-    Modality getModality();
+    Modality.JavaModalityKind getModalityKind();
 
     boolean isReadOnlyContract(Services services);
 

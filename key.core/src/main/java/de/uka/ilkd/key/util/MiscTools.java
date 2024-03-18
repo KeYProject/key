@@ -29,11 +29,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -43,6 +39,8 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -93,8 +91,7 @@ public final class MiscTools {
         assert pe instanceof StatementBlock;
         assert pe.getFirstElement() instanceof LoopStatement;
 
-        final LoopStatement loop = //
-            (LoopStatement) pe.getFirstElement();
+        final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
         return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
     }
@@ -110,31 +107,34 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether the given {@link Modality} is a transaction modality.
+     * Checks whether the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * transaction modality.
      *
-     * @param modality The modality to check.
-     * @return true iff the given {@link Modality} is a transaction modality.
+     * @param modalityKind The modality to check.
+     * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     *         transaction modality.
      */
-    public static boolean isTransaction(final Modality modality) {
-        return modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION;
+    public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
+        return modalityKind.transaction();
     }
 
     /**
      * Returns the applicable heap contexts out of the currently available set of three contexts:
      * The normal heap, the saved heap (transaction), and the permission heap.
      *
-     * @param modality The current modality (checked for transaction).
+     * @param modalityKind The current modality (checked for transaction).
      * @param services The {@link Services} object (for {@link HeapLDT} and for checking whether
      *        we're in the permissions profile).
      * @return The list of the applicable heaps for the given scenario.
      */
-    public static List<LocationVariable> applicableHeapContexts(Modality modality,
+    public static List<LocationVariable> applicableHeapContexts(
+            Modality.JavaModalityKind modalityKind,
             Services services) {
         final List<LocationVariable> result = new ArrayList<>();
 
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
 
-        if (isTransaction(modality)) {
+        if (isTransaction(modalityKind)) {
             result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
         }
 

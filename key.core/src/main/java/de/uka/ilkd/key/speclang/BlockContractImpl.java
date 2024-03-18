@@ -43,12 +43,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     private LoopContract loopContract = null;
 
     /**
-     *
      * @param baseName the base name.
      * @param block the block this contract belongs to.
      * @param labels all labels belonging to the block.
      * @param method the method containing the block.
-     * @param modality this contract's modality.
+     * @param modalityKind this contract's modality.
      * @param preconditions this contract's preconditions on every heap.
      * @param measuredBy this contract's measured-by term.
      * @param postconditions this contract's postconditions on every heap.
@@ -62,7 +61,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
-            final List<Label> labels, final IProgramMethod method, final Modality modality,
+            final List<Label> labels, final IProgramMethod method,
+            final Modality.JavaModalityKind modalityKind,
             final Map<LocationVariable, Term> preconditions,
             final Map<LocationVariable, Term> freePreconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -73,7 +73,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Map<LocationVariable, Boolean> hasFreeMod,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
-        super(baseName, block, labels, method, modality,
+        super(baseName, block, labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
             modifiesClauses, freeModifiesClauses, infFlowSpecs, variables, transactionApplicable,
             hasMod, hasFreeMod, functionalContracts);
@@ -177,7 +177,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
-            modality, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
+            modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
             newFreePostconditions, newModifiesClauses, newFreeModifiesClauses, newinfFlowSpecs,
             newVariables, transactionApplicable, hasMod, hasFreeMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
@@ -196,7 +196,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
         BlockContractImpl result = new BlockContractImpl(baseName, block, labels,
-            (IProgramMethod) newPM, modality, preconditions, freePreconditions, measuredBy,
+            (IProgramMethod) newPM, modalityKind, preconditions, freePreconditions, measuredBy,
             postconditions, freePostconditions, modifiesClauses, freeModifiesClauses, infFlowSpecs,
             variables, transactionApplicable, hasMod, hasFreeMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
@@ -206,7 +206,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String toString() {
         return "SimpleBlockContract [block=" + block + ", labels=" + labels + ", method=" + method
-            + ", modality=" + modality + ", instantiationSelf=" + instantiationSelf
+            + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
             + ", preconditions=" + preconditions + ", postconditions=" + postconditions
             + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
             + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
@@ -264,7 +264,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
         @Override
         protected BlockContract build(String baseName, StatementBlock block, List<Label> labels,
-                IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
+                IProgramMethod method, Modality.JavaModalityKind modalityKind,
+                Map<LocationVariable, Term> preconditions,
                 Map<LocationVariable, Term> freePreconditions, Term measuredBy,
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> freePostconditions,
@@ -273,7 +274,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod,
                 Map<LocationVariable, Boolean> hasFreeMod) {
-            return new BlockContractImpl(baseName, block, labels, method, modality,
+            return new BlockContractImpl(baseName, block, labels, method, modalityKind,
                 preconditions, freePreconditions, measuredBy,
                 postconditions, freePostconditions, modifiesClauses, freeModifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, null);
@@ -341,7 +342,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
 
             BlockContractImpl result = new BlockContractImpl(baseName.toString(), head.getBlock(),
-                head.getLabels(), head.getMethod(), head.getModality(),
+                head.getLabels(), head.getMethod(), head.getModalityKind(),
                 preconditions, freePreconditions,
                 contracts[0].getMby(), postconditions, freePostconditions,
                 modifiesClauses, freeModifiesClauses, head.getInfFlowSpecs(),

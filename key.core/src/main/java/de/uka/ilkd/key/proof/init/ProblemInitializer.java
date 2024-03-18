@@ -21,8 +21,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -41,6 +41,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -65,16 +66,16 @@ public final class ProblemInitializer {
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
     public ProblemInitializer(ProgressMonitor mon, Services services,
             ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
     }
-
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
 
     public ProblemInitializer(Profile profile) {
         if (profile == null) {
@@ -297,7 +298,7 @@ public final class ProblemInitializer {
     }
 
     /**
-     * Removes all schema variables, all generic sorts and all sort depending symbols for a generic
+     * Removes all schema variables, all generic sorts and all sort-depending symbols for a generic
      * sort out of the namespaces. Helper for readEnvInput().
      * <p>
      * See bug report #1185, #1189 (in Mantis)
@@ -305,13 +306,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<Function> newFuncNS = new Namespace<>();
+        Namespace<JFunction> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (Function n : initConfig.funcNS().allElements()) {
+        for (JFunction n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -344,8 +345,8 @@ public final class ProblemInitializer {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof Function) {
-            namespaces.functions().add((Function) term.op());
+        if (term.op() instanceof JFunction) {
+            namespaces.functions().add((JFunction) term.op());
         } else if (term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -430,7 +431,7 @@ public final class ProblemInitializer {
         // The synchronized statement is required for thread save parsing since all JavaCC parser
         // are generated static.
         // For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to
-        // generate them non static
+        // generate them non-static
         // which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static
         // methods and
         // the synchronized statement can not be avoided for this reason.
@@ -536,7 +537,8 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
+        final Namespace<JFunction> functions =
+            initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {

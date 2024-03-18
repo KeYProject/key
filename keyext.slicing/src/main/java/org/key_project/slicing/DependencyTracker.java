@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
@@ -46,6 +45,7 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Tracks proof steps as they are applied on the proof.
@@ -87,6 +87,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // skip further tracking if disabled
         if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
             return;
+        }
+        // exotic use case: registering a dependency tracker after the proof is loaded
+        if (proof.countNodes() > 1) {
+            graph.ensureProofIsTracked(proof);
         }
         proof.addRuleAppListener(this);
     }
@@ -428,10 +432,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * See {@link DotExporter}.
      *
      * @param abbreviateFormulas whether to shorten formula labels
+     * @param abbreviateChains whether to reduce long chains to one link
      * @return DOT string
      */
-    public String exportDot(boolean abbreviateFormulas) {
-        return DotExporter.exportDot(proof, graph, analysisResults, abbreviateFormulas);
+    public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
+        return DotExporter.exportDot(proof, abbreviateChains ? graph.removeChains() : graph,
+            analysisResults, abbreviateFormulas);
     }
 
     /**

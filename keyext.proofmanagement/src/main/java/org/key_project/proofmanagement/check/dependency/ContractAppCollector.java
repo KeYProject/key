@@ -191,15 +191,16 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         ImmutableSet<Contract> contracts = specRepo.splitContract(c);
 
         // load information about the modality under which the contract was applied
-        Modality modality = Modality.getModality(biApp.getModality());
+        Modality.JavaModalityKind modalityKind =
+            Modality.JavaModalityKind.getKind(biApp.getModality());
         DependencyGraph.EdgeType edgeType;
-        if (modality == null) {
+        if (modalityKind == null) {
             // in default case (e.g. legacy proofs without saved modality information)
             // we assume diamond modality but print a warning
             logger.print(LogLevel.WARNING, "No saved modality information was found!" +
                 " Assuming \"diamond\" (incomplete for box contracts)!");
             edgeType = TERMINATION_SENSITIVE;
-        } else if (modality.terminationSensitive()) {
+        } else if (modalityKind.terminationSensitive()) {
             edgeType = TERMINATION_SENSITIVE;
         } else {
             edgeType = TERMINATION_INSENSITIVE;

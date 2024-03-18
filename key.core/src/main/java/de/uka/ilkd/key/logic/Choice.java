@@ -7,6 +7,9 @@ package de.uka.ilkd.key.logic;
 import java.util.List;
 import java.util.Objects;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -972,6 +972,7 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_list_revrev.proof");
         g.loadable("standard_key/adt/dt_list_appnil.proof");
         g.loadable("standard_key/adt/dt_color.proof");
+        g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
         return c;
     }
