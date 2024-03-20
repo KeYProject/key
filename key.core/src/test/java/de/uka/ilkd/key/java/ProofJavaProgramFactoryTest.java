@@ -33,8 +33,6 @@ import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;

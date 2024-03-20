@@ -134,7 +134,8 @@ public final class JmlAssertRule implements BuiltInRule {
                 "No specification found for JmlAssert. Internal Error. Not your fault");
         }
 
-        Term condition = tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
+        Term condition =
+            tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
 
         condition = tb.addLabel(condition, new OriginTermLabel.Origin(
             kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT
@@ -155,7 +156,8 @@ public final class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update, Term condition, TermBuilder tb) {
+    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
+            Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }

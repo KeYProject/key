@@ -973,7 +973,7 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
         // use for debugging purposes.
-        //c.keep("VSTTE10");
+        // c.keep("VSTTE10");
         return c;
     }
 

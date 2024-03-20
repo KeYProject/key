@@ -87,13 +87,14 @@ public final class ProofCollection {
 
     /**
      * Removes all groups from this collection except the given names
+     *
      * @param groupNames a list of groups to be kept
      */
     public void keep(String... groupNames) {
         Arrays.sort(groupNames);
         Predicate<String> toBeKept = (String s) -> Arrays.binarySearch(groupNames, s) >= 0;
         Predicate<? super ProofCollectionUnit> pred =
-                c -> c instanceof GroupedProofCollectionUnit u && toBeKept.test(u.getName());
+            c -> c instanceof GroupedProofCollectionUnit u && toBeKept.test(u.getName());
         units.removeIf(pred.negate());
     }
 }
