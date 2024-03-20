@@ -22,8 +22,6 @@ plugins {
 
     // Code formatting
     id "com.diffplug.spotless" version "6.24.0"
-
-    id "scala"
 }
 
 // Configure this project for use inside IntelliJ:
