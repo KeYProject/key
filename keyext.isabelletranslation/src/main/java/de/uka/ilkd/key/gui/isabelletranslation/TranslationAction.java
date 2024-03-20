@@ -5,9 +5,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
-import de.unruh.isabelle.misc.Symbols;
-import de.unruh.isabelle.pure.Context;
-import de.unruh.isabelle.pure.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.collection.immutable.Seq;
@@ -49,11 +46,11 @@ public class TranslationAction extends MainWindowAction {
             Isabelle.Setup setup = JIsabelle.setup(Path.of("C:\\Users\\Nils\\Documents\\Isabelle2023"));
 
             //TODO automatically run try/sledgehammer instead of opening Isabelle
-            Isabelle isabelle = new Isabelle(setup);
-            Context context = Context.apply("Main", isabelle);
-            Term translationTerm = Term.apply(context, translation.toString(), Symbols.globalInstance(), isabelle);
-            
-            isabelle.destroy();
+            //Isabelle isabelle = new Isabelle(setup);
+            //Context context = Context.apply("Main", isabelle);
+            //Term translationTerm = Term.apply(context, translation.toString(), Symbols.globalInstance(), isabelle);
+
+            //isabelle.destroy();
 
             List<Path> filePaths = new ArrayList<>();
             filePaths.add(translationFile.toPath());
@@ -75,8 +72,15 @@ public class TranslationAction extends MainWindowAction {
 
 
             Seq<Path> pathSeq = builder.result();
+            //TODO improve concurrency?
+            Thread isabelleJEdit = new Thread() {
+                public void run() {
 
-            Isabelle.jedit(setup, pathSeq);
+                    Isabelle.jedit(setup, pathSeq);
+                }
+            };
+
+            isabelleJEdit.start();
         } catch (IllegalFormulaException e) {
             //TODO output alert to user
             throw new RuntimeException(e);
