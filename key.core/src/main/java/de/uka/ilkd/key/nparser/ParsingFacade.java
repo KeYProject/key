@@ -208,7 +208,7 @@ public final class ParsingFacade {
 
     // region configuration
     /**
-     * Parses a the configuration determined by the given {@code file}.
+     * Parses the configuration determined by the given {@code file}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
      * @param file non-null {@link Path} object
@@ -221,19 +221,20 @@ public final class ParsingFacade {
     }
 
     /**
+     * @param file non-null file to read as configuration
      * @see #parseConfigurationFile(Path)
+     * @throws IOException if the file is not found or not readable.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(File file) throws IOException {
         return parseConfigurationFile(file.toPath());
     }
 
     /**
-     * Parses a the configuration determined by the given {@code stream}.
+     * Parses the configuration determined by the given {@code stream}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
-     * @param file non-null {@link CharStream} object
+     * @param stream non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
@@ -244,20 +245,20 @@ public final class ParsingFacade {
     }
 
     /**
-     * Parses a the configuration determined by the given {@code stream}.
+     * Parses the configuration determined by the given {@code stream}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
-     * @param file non-null {@link CharStream} object
-     * @return a configration object with the data deserialize from the given file
-     * @throws IOException if the file is not found or not readable.
+     * @param input non-null {@link CharStream} object
+     * @return a configuration object with the data deserialize from the given file
      * @throws BuildingException if the file is syntactical broken.
      */
-    public static Configuration readConfigurationFile(CharStream input) throws IOException {
+    public static Configuration readConfigurationFile(CharStream input) {
         return parseConfigurationFile(input).asConfiguration();
     }
 
     /**
      * @see #readConfigurationFile(CharStream)
+     * @throws IOException if the file is not found or not readable.
      */
     public static Configuration readConfigurationFile(Path file) throws IOException {
         return readConfigurationFile(CharStreams.fromPath(file));
@@ -265,6 +266,7 @@ public final class ParsingFacade {
 
     /**
      * @see #readConfigurationFile(CharStream)
+     * @throws IOException if the file is not found or not readable.
      */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
