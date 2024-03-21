@@ -55,7 +55,7 @@ echo "::endgroup::"
 
 #################################################
 echo "::group::{install cvc5}"
-if -f cvc5-Linux; then 
+if -f cvc5-Linux-static/bin/cvc5; then
   echo "::notice::{Z3 found. Caching works! Skip installation}"
 else 
   echo "Install CVC5"
