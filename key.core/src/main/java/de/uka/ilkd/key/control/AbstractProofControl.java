@@ -253,8 +253,8 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * Prunes a proof to the given node.
      *
-     * @param node
-     * @see {@link Proof#pruneProof(Node)}
+     * @param node the node to prune to
+     * @see Proof#pruneProof(Node)
      */
     public void pruneTo(Node node) {
         node.proof().pruneProof(node);
