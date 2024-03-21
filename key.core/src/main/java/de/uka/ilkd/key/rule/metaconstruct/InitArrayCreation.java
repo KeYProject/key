@@ -95,7 +95,7 @@ public class InitArrayCreation extends InitArray {
             // first check for previously saved name
             Name proposedName = null;
             for (var name : nameRecorder.getSetProposals()) {
-                if (name.toString().startsWith("dim" + i + VariableNamer.TEMPORARY_VAR_SEPARATOR)) {
+                if (name.toString().startsWith("dim" + i + VariableNamer.TEMP_INDEX_SEPARATOR)) {
                     proposedName = name;
                     break;
                 }

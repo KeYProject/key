@@ -307,7 +307,7 @@ public abstract class KeYJavaASTFactory {
         // first check for a saved name for this variable
         final NameRecorder nameRecorder = services.getNameRecorder();
         for (var prop : nameRecorder.getSetProposals()) {
-            if (prop.toString().startsWith(name + VariableNamer.TEMPORARY_VAR_SEPARATOR)) {
+            if (prop.toString().startsWith(name + VariableNamer.TEMP_INDEX_SEPARATOR)) {
                 return KeYJavaASTFactory.localVariable(new ProgramElementName(prop.toString()),
                     type);
             }
