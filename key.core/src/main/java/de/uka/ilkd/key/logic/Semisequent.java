@@ -475,7 +475,7 @@ public class Semisequent implements Iterable<SequentFormula>, EqualsModProofIrre
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return 0;
+        return EqualsModProofIrrelevancyUtil.hashCodeImmutableList(seqList);
     }
 
     /** @return String representation of this Semisequent */
