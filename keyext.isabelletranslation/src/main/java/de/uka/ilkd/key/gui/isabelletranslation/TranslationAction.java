@@ -46,12 +46,6 @@ public class TranslationAction extends MainWindowAction {
             Isabelle.Setup setup = JIsabelle.setup(Path.of("C:\\Users\\Nils\\Documents\\Isabelle2023"));
 
             //TODO automatically run try/sledgehammer instead of opening Isabelle
-            //Isabelle isabelle = new Isabelle(setup);
-            //Context context = Context.apply("Main", isabelle);
-            //Term translationTerm = Term.apply(context, translation.toString(), Symbols.globalInstance(), isabelle);
-
-            //isabelle.destroy();
-
             List<Path> filePaths = new ArrayList<>();
             filePaths.add(translationFile.toPath());
 
@@ -73,12 +67,7 @@ public class TranslationAction extends MainWindowAction {
 
             Seq<Path> pathSeq = builder.result();
             //TODO improve concurrency?
-            Thread isabelleJEdit = new Thread() {
-                public void run() {
-
-                    Isabelle.jedit(setup, pathSeq);
-                }
-            };
+            Thread isabelleJEdit = new Thread(() -> Isabelle.jedit(setup, pathSeq));
 
             isabelleJEdit.start();
         } catch (IllegalFormulaException e) {
