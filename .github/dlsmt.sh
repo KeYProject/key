@@ -1,6 +1,6 @@
 # No shebang!
 
-## Weigl's little helper to download SMT-solvers. 
+## Weigl's little helper to download SMT-solvers.
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # This script is meant to be executed inside an Github Action to download the SMT-solver. 
@@ -27,6 +27,7 @@
 mkdir smt-solvers
 cd smt-solvers
 
+set -x # exit on error
 
 #################################################
 echo "::group::{install z3}"
