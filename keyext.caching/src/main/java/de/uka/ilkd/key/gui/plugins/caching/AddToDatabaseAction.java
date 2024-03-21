@@ -9,6 +9,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabase;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;

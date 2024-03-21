@@ -71,7 +71,8 @@ public class CachedProofBranch {
      * @param sequent sequent of that node
      * @param services services of that node's proof
      */
-    CachedProofBranch(Path proofFile, String proofName, Collection<CachedFile> referencedFiles,
+    public CachedProofBranch(Path proofFile, String proofName,
+            Collection<CachedFile> referencedFiles,
             String choiceSettings,
             String keyVersion,
             int stepIndex, Sequent sequent, Services services) {
@@ -114,7 +115,8 @@ public class CachedProofBranch {
      * @param typesFunctions types of the functions present in the sequent
      * @param typesLocVars types of the location variables present in the sequent
      */
-    CachedProofBranch(Path proofFile, String proofName, Collection<CachedFile> referencedFiles,
+    public CachedProofBranch(Path proofFile, String proofName,
+            Collection<CachedFile> referencedFiles,
             String choiceSettings,
             String keyVersion,
             int stepIndex, List<String> sequentAnte, List<String> sequentSucc,

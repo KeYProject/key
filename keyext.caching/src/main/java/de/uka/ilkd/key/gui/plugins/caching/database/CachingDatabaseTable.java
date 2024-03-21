@@ -1,15 +1,16 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.gui.plugins.caching.database;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 
 public class CachingDatabaseTable extends AbstractTableModel {
 

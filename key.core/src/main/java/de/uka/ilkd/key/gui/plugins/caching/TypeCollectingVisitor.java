@@ -8,11 +8,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-public class TypeCollectingVisitor implements Visitor {
+import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Function;
+
+public class TypeCollectingVisitor implements Visitor<Term> {
     private final Map<String, String> types = new HashMap<>();
     private final Map<String, String> typesLocVars = new HashMap<>();
 
@@ -21,11 +22,6 @@ public class TypeCollectingVisitor implements Visitor {
             var f = sequent.getFormulabyNr(i);
             f.formula().execPreOrder(this);
         }
-    }
-
-    @Override
-    public boolean visitSubtree(Term visited) {
-        return true;
     }
 
     @Override

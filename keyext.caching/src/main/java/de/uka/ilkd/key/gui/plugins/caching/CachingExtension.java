@@ -17,7 +17,11 @@ import de.uka.ilkd.key.gui.plugins.caching.actions.CloseAllByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
+import de.uka.ilkd.key.gui.plugins.caching.actions.RealizeFromDatabaseAction;
 import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
+import de.uka.ilkd.key.gui.plugins.caching.database.AutoAddClosedProofs;
+import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabase;
+import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabaseDialog;
 import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
 import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
@@ -80,6 +84,7 @@ public class CachingExtension
     private ReferenceSearchButton referenceSearchButton;
     private CachingToggleAction toggleAction = null;
     private CachingPruneHandler cachingPruneHandler = null;
+    private AutoAddClosedProofs autoAddClosedProofs = null;
     private CachingDatabase database = null;
 
     private void initActions(MainWindow mainWindow) {
@@ -127,6 +132,7 @@ public class CachingExtension
         p.addRuleAppListener(this);
         p.addProofDisposedListener(this);
         p.addProofTreeListener(cachingPruneHandler);
+        p.addProofTreeListener(autoAddClosedProofs);
     }
 
     @Override
@@ -189,6 +195,7 @@ public class CachingExtension
         database = new CachingDatabase(PathConfig.getCacheIndex(), PathConfig.getCacheDirectory());
         Runtime.getRuntime().addShutdownHook(new Thread(database::shutdown));
         cachingPruneHandler = new CachingPruneHandler(mediator);
+        autoAddClosedProofs = new AutoAddClosedProofs(database);
     }
 
     @Override
@@ -212,7 +219,7 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new SearchInDatabaseAction(this, node));
-            actions.add(new RealizeFromDatabaseAction(mediator, node, null));
+            actions.add(new RealizeFromDatabaseAction(node, null));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
         } else if (kind.getType() == Proof.class) {

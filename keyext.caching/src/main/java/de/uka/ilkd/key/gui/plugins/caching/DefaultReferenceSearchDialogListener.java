@@ -12,6 +12,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.plugins.caching.actions.RealizeFromDatabaseAction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 
@@ -51,7 +52,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                 for (var closedGoal : p.closedGoals()) {
                     var branch = closedGoal.node().lookup(CachedProofBranch.class);
                     if (branch != null) {
-                        new RealizeFromDatabaseAction(mediator, closedGoal.node(),
+                        new RealizeFromDatabaseAction(closedGoal.node(),
                             proof -> SwingUtilities.invokeLater(() -> {
                                 auxiliaryProofsToClose.add(proof);
                                 copyButtonClicked(dialog);

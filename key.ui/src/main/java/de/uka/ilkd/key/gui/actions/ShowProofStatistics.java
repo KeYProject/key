@@ -231,6 +231,7 @@ public class ShowProofStatistics extends MainWindowAction {
      */
     public static final class Window extends JDialog {
 
+        @Serial
         private static final long serialVersionUID = 1266280148508192284L;
         private final Proof proof;
 

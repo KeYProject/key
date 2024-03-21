@@ -5,6 +5,7 @@ package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -50,5 +51,17 @@ public abstract class Function extends org.key_project.logic.op.AbstractSortedOp
     @Override
     public final String toString() {
         return (name() + (whereToBind() == null ? "" : "{" + whereToBind() + "}"));
+    }
+
+    /**
+     * @return a string representation of the argument sorts to this function
+     */
+    public final String argsToString() {
+        StringBuilder s = new StringBuilder(sort().toString());
+        if (arity() > 0) {
+            s.append(" ");
+            s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));
+        }
+        return s.toString();
     }
 }

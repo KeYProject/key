@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.gui.plugins.caching.database;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.gui.plugins.caching.CachedFile;
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ParsingFacade;

@@ -1,18 +1,17 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.gui.plugins.caching;
+package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.function.Consumer;
-import javax.swing.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -27,7 +26,6 @@ public class RealizeFromDatabaseAction extends KeyAction {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(RealizeFromDatabaseAction.class);
 
-    private final KeYMediator mediator;
     private final Node node;
     private final CachedProofBranch cachedProofBranch;
     /**
@@ -36,8 +34,7 @@ public class RealizeFromDatabaseAction extends KeyAction {
     private final Consumer<Proof> callback;
     private boolean done = false;
 
-    public RealizeFromDatabaseAction(KeYMediator mediator, Node node, Consumer<Proof> callback) {
-        this.mediator = mediator;
+    public RealizeFromDatabaseAction(Node node, Consumer<Proof> callback) {
         this.node = node;
         this.callback = callback;
         this.cachedProofBranch = node.lookup(CachedProofBranch.class);
