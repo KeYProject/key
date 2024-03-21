@@ -28,10 +28,12 @@ public class ObserverFunctionHandler implements IsabelleHandler {
         if (trans.isNewSymbol(term)) {
             Operator op = term.op();
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
-            if (!m.find()) {
-                throw new SMTTranslationException("Couldn't translate ObserverFunction: " + op.name().toString());
+            String functionName;
+            if (m.find()) {
+                functionName = m.group(1);
+            } else {
+                functionName = op.name().toString().replace("::", "_");
             }
-            String functionName = m.group(1);
             trans.addKnownSymbol(term, new StringBuilder(functionName));
         }
         return UninterpretedSymbolsHandler.getFunctionRef(trans, term, (SortedOperator) term.op(), trans.getKnownSymbol(term).toString());
