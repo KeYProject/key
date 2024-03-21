@@ -36,7 +36,10 @@ if readlink -f */bin/z3; then
   echo "::notice::{Z3 found. Caching works! Skip installation}"
 else 
   echo "Download Z3"
-  gh release download --skip-existing -p 'z3-*-x64-glibc-*.zip' -R Z3Prover/z3
+  rm z3-*.zip
+  # gh release download --skip-existing -p 'z3-*-x64-glibc-2.35.zip' -R Z3Prover/z3
+  ## pin to a release
+  wget https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/z3-4.13.0-x64-glibc-2.35.zip
   unzip -n z3*.zip
   rm z3-*-x64-glibc-*.zip  
 fi
