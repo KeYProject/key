@@ -39,7 +39,7 @@ else
   rm z3-*.zip
   # gh release download --skip-existing -p 'z3-*-x64-glibc-2.35.zip' -R Z3Prover/z3
   ## pin to a release
-  wget https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/z3-4.13.0-x64-glibc-2.35.zip
+  wget -q https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/z3-4.13.0-x64-glibc-2.35.zip
   unzip -n z3*.zip
   rm z3-*-x64-glibc-*.zip  
 fi
@@ -58,10 +58,15 @@ if -f cvc5-Linux; then
   echo "::notice::{Z3 found. Caching works! Skip installation}"
 else 
   echo "Install CVC5"
-  gh release download --skip-existing -p 'cvc5-Linux' -R cvc5/cvc5  
+  # does not work anymore
+  # gh release download --skip-existing -p 'cvc5-Linux' -R cvc5/cvc5
+
+  wget -q https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-static.zip
+  unzip cvc5-Linux-static.zip
+  rm cvc5-Linux-static.zip
 fi 
 
-CVC5=$(readlink -f cvc5-Linux)
+CVC5=$(readlink -f cvc5-Linux-static/bin/cvc5)
 echo "CVC5 installed and added to path: CVC5"
 chmod u+x $CVC5
 echo $(dirname $CVC5) >> $GITHUB_PATH
