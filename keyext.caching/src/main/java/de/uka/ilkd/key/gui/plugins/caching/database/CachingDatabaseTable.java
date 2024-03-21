@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching.database;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.swing.table.AbstractTableModel;
@@ -40,23 +41,18 @@ public class CachingDatabaseTable extends AbstractTableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        switch (columnIndex) {
-        case 0:
-            return "Proof";
-        case 1:
-            return "Java source";
-        case 2:
-            return "Info";
-        default:
-            return "??";
-        }
+        return switch (columnIndex) {
+        case 0 -> "Proof";
+        case 1 -> "Java source";
+        case 2 -> "Info";
+        default -> "??";
+        };
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
-        case 0 -> File.class;
-        case 1, 2 -> String.class;
+        case 0, 1, 2 -> String.class;
         default -> null;
         };
     }
@@ -68,22 +64,30 @@ public class CachingDatabaseTable extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch (columnIndex) {
-        case 0:
-            return cache.get(cachedProofs.get(rowIndex)).get(0).proofName;
-        case 1:
-            return "?";
-        case 2:
-            var proof = cachedProofs.get(rowIndex);
-            var data = cache.get(proof);
-            return String.format("Branches: %d", data.size());
-        default:
-            return null;
+        var proofPath = cachedProofs.get(rowIndex);
+        return switch (columnIndex) {
+        case 0 -> cache.get(proofPath).get(0).proofName;
+        case 1 -> Arrays.toString(cache.get(proofPath).get(0).getJavaClasses().toArray());
+        case 2 -> {
+            var data = cache.get(proofPath);
+            yield String.format("Branches: %d", data.size());
         }
+        default -> null;
+        };
     }
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         throw new IllegalStateException();
+    }
+
+    /**
+     * Delete the proof at the specified row from the database.
+     *
+     * @param rowIndex row index of proof to remove
+     */
+    public void deleteProof(int rowIndex) throws IOException {
+        database.removeProof(cachedProofs.get(rowIndex));
+        refresh();
     }
 }

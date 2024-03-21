@@ -81,10 +81,25 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
+    /**
+     * The reference search button in the status bar.
+     */
     private ReferenceSearchButton referenceSearchButton;
+    /**
+     * The toggle action to quickly enable/disable proof caching.
+     */
     private CachingToggleAction toggleAction = null;
+    /**
+     * A handler for referenced proofs that get pruned.
+     */
     private CachingPruneHandler cachingPruneHandler = null;
+    /**
+     * A handler that automatically adds closed proofs to the database.
+     */
     private AutoAddClosedProofs autoAddClosedProofs = null;
+    /**
+     * The external caching database (singleton instance).
+     */
     private CachingDatabase database = null;
 
     private void initActions(MainWindow mainWindow) {
@@ -115,7 +130,7 @@ public class CachingExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         initActions(mainWindow);
-        return List.of(toggleAction, CachingDatabaseDialog.getOpenAction(database));
+        return List.of(toggleAction, CachingDatabaseDialog.getOpenAction(getDatabase()));
     }
 
     public boolean getProofCachingEnabled() {
@@ -165,9 +180,16 @@ public class CachingExtension
         }
         for (Goal goal : newGoals) {
             ClosedBy c = null;
+            CachedProofBranch cachedProofBranch = null;
             try {
                 c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                     goal.node());
+                if (c == null) {
+                    var cachedProofBranches = database.findMatching(p.getSettings().getChoiceSettings(), goal.sequent(), p.getServices());
+                    if (!cachedProofBranches.isEmpty()) {
+                        cachedProofBranch = cachedProofBranches.iterator().next();
+                    }
+                }
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search ", exception);
             }
@@ -179,6 +201,11 @@ public class CachingExtension
                 c.proof()
                         .addProofDisposedListenerFirst(
                             new CopyBeforeDispose(mediator, c.proof(), p));
+            }
+            if (cachedProofBranch != null) {
+                goal.setEnabled(false);
+
+                goal.node().register(cachedProofBranch, CachedProofBranch.class);
             }
         }
     }
@@ -192,8 +219,7 @@ public class CachingExtension
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        database = new CachingDatabase(PathConfig.getCacheIndex(), PathConfig.getCacheDirectory());
-        Runtime.getRuntime().addShutdownHook(new Thread(database::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(getDatabase()::shutdown));
         cachingPruneHandler = new CachingPruneHandler(mediator);
         autoAddClosedProofs = new AutoAddClosedProofs(database);
     }
@@ -262,11 +288,11 @@ public class CachingExtension
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }
-        // unmark interactive goals
+        // unmark interactive goals previously marked in ruleApplied above
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null || goal.node().lookup(CachedProofBranch.class) != null)) {
             // mark goals as automatic again
-            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
+            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null || goal.node().lookup(CachedProofBranch.class) != null)
                     .forEach(g -> {
                         g.setEnabled(true);
                         g.proof().closeGoal(g);
@@ -350,6 +376,10 @@ public class CachingExtension
     }
 
     public CachingDatabase getDatabase() {
+        if (database == null) {
+            database =
+                new CachingDatabase(PathConfig.getCacheIndex(), PathConfig.getCacheDirectory());
+        }
         return database;
     }
 }

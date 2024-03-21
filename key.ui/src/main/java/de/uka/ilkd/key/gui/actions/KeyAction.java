@@ -139,6 +139,11 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(PATH);
     }
 
+    /**
+     * Set the menu path of this action. Use '.' for sub-folders.
+     *
+     * @param path menu path of this action
+     */
     protected void setMenuPath(String path) {
         putValue(PATH, path);
     }

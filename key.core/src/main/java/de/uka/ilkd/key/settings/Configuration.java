@@ -465,7 +465,8 @@ public class Configuration {
             } else if (value == null) {
                 printValue("null");
             } else {
-                throw new IllegalArgumentException("Unexpected object: " + value);
+                throw new IllegalArgumentException(
+                    String.format("Unexpected object of type %s: %s", value.getClass(), value));
             }
             return this;
         }

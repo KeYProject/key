@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,13 +73,9 @@ public final class CachingDatabase {
      */
     private boolean dirty = false;
     /**
-     * The proof branches available in this cache.
+     * The proof branches available in this cache, sorted by the file they are stored in.
      */
-    private List<CachedProofBranch> cache;
-    /**
-     * The files of the proofs cached in this database.
-     */
-    private Set<Path> cacheProofs;
+    private Map<Path, List<CachedProofBranch>> cache;
     /**
      * The auxiliary files available in this cache.
      * Keyed based on the {@link String#hashCode()} of their contents.
@@ -105,9 +100,10 @@ public final class CachingDatabase {
      * @throws IOException if there is an error deleting the files
      */
     public void reset() throws IOException {
-        cache = new ArrayList<>();
-        cacheProofs = new LinkedHashSet<>();
+        cache = new HashMap<>();
         files = new HashMap<>();
+        dirty = true;
+        save();
         deleteUnusedFiles();
     }
 
@@ -116,8 +112,7 @@ public final class CachingDatabase {
      * This will read the previously saved metadata from disk.
      */
     private void init() {
-        cache = new ArrayList<>();
-        cacheProofs = new LinkedHashSet<>();
+        cache = new HashMap<>();
         files = new HashMap<>();
 
         // read candidates from ~/.key/cachedProofs.json
@@ -145,6 +140,7 @@ public final class CachingDatabase {
                 var name = entry.getString("name");
                 var choiceSettings = entry.getString("choiceSettings");
                 var keyVersion = entry.getString("keyVersion");
+                var javaClasses = entry.getStringList("javaClasses");
                 var references = entry.getSection("referencedFiles").getEntries().stream()
                         .map(x -> {
                             String id = (String) x.getValue();
@@ -165,13 +161,17 @@ public final class CachingDatabase {
                     }
                     var ante = branch.getStringList("sequentAnte");
                     var succ = branch.getStringList("sequentSucc");
-                    cacheProofs.add(file);
-                    cache.add(
+
+                    if (!cache.containsKey(file)) {
+                        cache.put(file, new ArrayList<>());
+                    }
+                    cache.get(file).add(
                         new CachedProofBranch(file, name, references, choiceSettings, keyVersion,
                             branch.getInt("stepIndex"),
                             ante, succ,
                             typesFunctionsMap,
-                            typesLocVarsMap));
+                            typesLocVarsMap,
+                            javaClasses));
                 }
             }
         } catch (Exception e) {
@@ -202,14 +202,14 @@ public final class CachingDatabase {
 
             var cachedProofsJson = docJson.getOrCreateSection("proofs");
             int i = 0;
-            var entries = cache.stream().collect(Collectors.groupingBy(w -> w.proofFile));
-            for (var entry : entries.values()) {
+            for (var entry : cache.values()) {
                 var entryElJson = cachedProofsJson.getOrCreateSection(Integer.toString(i));
                 i++;
                 entryElJson.set("name", entry.get(0).proofName);
-                entryElJson.set("file", entry.get(0).proofFile.toAbsolutePath());
+                entryElJson.set("file", entry.get(0).proofFile.toAbsolutePath().toString());
                 entryElJson.set("keyVersion", entry.get(0).keyVersion);
                 entryElJson.set("choiceSettings", entry.get(0).choiceSettings);
+                entryElJson.set("javaClasses", entry.get(0).getJavaClasses());
                 var referencedFilesJson = entryElJson.getOrCreateSection("referencedFiles");
                 int j = 0;
                 for (var ref : entry.get(0).getReferencedFiles()) {
@@ -254,10 +254,12 @@ public final class CachingDatabase {
      */
     private void deleteUnusedFiles() throws IOException {
         Set<String> usedFilenames = new HashSet<>();
-        for (var entry : cache) {
-            usedFilenames.add(entry.proofFile.getFileName().toString());
-            entry.getReferencedFiles().stream().map(x -> x.file().getFileName().toString())
-                    .forEach(usedFilenames::add);
+        for (var cacheFile : cache.values()) {
+            for (var entry : cacheFile) {
+                usedFilenames.add(entry.proofFile.getFileName().toString());
+                entry.getReferencedFiles().stream().map(x -> x.file().getFileName().toString())
+                        .forEach(usedFilenames::add);
+            }
         }
 
         var cacheDir = PathConfig.getCacheDirectory();
@@ -278,8 +280,16 @@ public final class CachingDatabase {
         // second pass: delete empty directories
         try (var walker = Files.walk(cacheDir)) {
             walker.forEach(path -> {
-                if (Files.isDirectory(path) && path.toFile().listFiles().length == 0) {
-                    toDelete.add(path);
+                try {
+                    if (Files.isDirectory(path) && !path.equals(cacheDir)) {
+                        try (var childrenFiles = Files.list(path)) {
+                            if (childrenFiles.findFirst().isEmpty()) {
+                                toDelete.add(path);
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    // ignore read I/O errors
                 }
             });
         }
@@ -314,6 +324,7 @@ public final class CachingDatabase {
         // save Java source files in ~/.key/cachedProofs/
         var sourceDir = proof.getServices().getJavaModel().getModelDir();
         List<CachedFile> sourceNew = new ArrayList<>();
+        List<String> referencedClasses = new ArrayList<>();
         Path virtualSrc = null;
         // mirror normal KeY behaviour: read all .java files in the directory
         if (sourceDir != null) {
@@ -324,6 +335,7 @@ public final class CachingDatabase {
                     }
                     try {
                         var content = Files.readString(path);
+                        referencedClasses.add(path.getFileName().toString());
                         sourceNew.add(getCached(content, "java"));
                     } catch (IOException e) {
                         LOGGER.error("failed to save java source ", e);
@@ -414,15 +426,29 @@ public final class CachingDatabase {
         var finalReferences = new ArrayList<CachedFile>();
         finalReferences.addAll(includedNew);
         finalReferences.addAll(sourceNew);
+        List<CachedProofBranch> cacheEntries = new ArrayList<>();
         for (var node : nodesToCheck) {
-            cache.add(
+            cacheEntries.add(
                 new CachedProofBranch(file, proof.name().toString(), finalReferences,
                     choiceSettings,
                     KeYConstants.VERSION, node.getStepIndex(), node.sequent(),
-                    proof.getServices()));
+                    proof.getServices(), referencedClasses));
         }
+        cache.put(file.toAbsolutePath(), cacheEntries);
 
         // always immediately save database
+        save();
+    }
+
+    /**
+     * Remove a proof from this database.
+     *
+     * @param pathToProof the (absolute) path to the proof
+     */
+    public void removeProof(Path pathToProof) throws IOException {
+        cache.remove(pathToProof);
+        Files.delete(pathToProof);
+        dirty = true;
         save();
     }
 
@@ -445,12 +471,17 @@ public final class CachingDatabase {
         sequent.succedent().forEach(x -> succFormulas
                 .add(LogicPrinter.quickPrintTerm(x.formula(), services, true, false, false)));
         List<CachedProofBranch> matching = new ArrayList<>();
-        cache.forEach(x -> {
-            if (!x.choiceSettings.equals(choiceSettingsString)) {
-                return;
-            }
-            if (x.isCacheHitFor(anteFormulas, succFormulas, sequent)) {
-                matching.add(x);
+        cache.values().forEach(x -> {
+            for (var cacheBranch : x) {
+                if (!cacheBranch.choiceSettings.equals(choiceSettingsString)) {
+                    return;
+                }
+                if (!cacheBranch.keyVersion.equals(KeYConstants.VERSION)) {
+                    return;
+                }
+                if (cacheBranch.isCacheHitFor(anteFormulas, succFormulas, sequent)) {
+                    matching.add(cacheBranch);
+                }
             }
         });
 
@@ -483,10 +514,10 @@ public final class CachingDatabase {
     }
 
     public Set<Path> getAllCachedProofs() {
-        return Collections.unmodifiableSet(cacheProofs);
+        return cache.keySet();
     }
 
     public Map<Path, List<CachedProofBranch>> getAllCachedProofBranches() {
-        return cache.stream().collect(Collectors.groupingBy(w -> w.proofFile));
+        return Collections.unmodifiableMap(cache);
     }
 }

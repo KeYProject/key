@@ -43,6 +43,10 @@ public class CachedProofBranch {
      */
     private final Collection<CachedFile> referencedFiles;
     /**
+     * Java classes the proof loaded.
+     */
+    private final List<String> javaClasses;
+    /**
      * Antecedent part of the sequent of the cached branch.
      */
     private final List<String> sequentAnte;
@@ -70,12 +74,13 @@ public class CachedProofBranch {
      * @param stepIndex step index of the referenced node
      * @param sequent sequent of that node
      * @param services services of that node's proof
+     * @param javaClasses java classes the proof loaded
      */
     public CachedProofBranch(Path proofFile, String proofName,
             Collection<CachedFile> referencedFiles,
             String choiceSettings,
             String keyVersion,
-            int stepIndex, Sequent sequent, Services services) {
+            int stepIndex, Sequent sequent, Services services, List<String> javaClasses) {
         this.proofFile = proofFile;
         this.proofName = proofName;
         this.referencedFiles = referencedFiles;
@@ -99,6 +104,7 @@ public class CachedProofBranch {
 
         this.typesFunctions = typeCollector.getTypes();
         this.typesLocVars = typeCollector.getTypesLocVars();
+        this.javaClasses = javaClasses;
     }
 
     /**
@@ -114,6 +120,7 @@ public class CachedProofBranch {
      * @param sequentSucc succedent part of the sequent of that node
      * @param typesFunctions types of the functions present in the sequent
      * @param typesLocVars types of the location variables present in the sequent
+     * @param javaClasses java classes the proof depends on
      */
     public CachedProofBranch(Path proofFile, String proofName,
             Collection<CachedFile> referencedFiles,
@@ -121,7 +128,8 @@ public class CachedProofBranch {
             String keyVersion,
             int stepIndex, List<String> sequentAnte, List<String> sequentSucc,
             Map<String, String> typesFunctions,
-            Map<String, String> typesLocVars) {
+            Map<String, String> typesLocVars,
+            List<String> javaClasses) {
         this.proofFile = proofFile;
         this.proofName = proofName;
         this.referencedFiles = referencedFiles;
@@ -132,6 +140,7 @@ public class CachedProofBranch {
         this.sequentSucc = sequentSucc;
         this.typesFunctions = typesFunctions;
         this.typesLocVars = typesLocVars;
+        this.javaClasses = javaClasses;
     }
 
     /**
@@ -196,5 +205,9 @@ public class CachedProofBranch {
 
     public List<String> getSequentSucc() {
         return Collections.unmodifiableList(sequentSucc);
+    }
+
+    public List<String> getJavaClasses() {
+        return Collections.unmodifiableList(javaClasses);
     }
 }

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.plugins.caching.database;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.*;
 
@@ -24,9 +26,20 @@ import org.slf4j.LoggerFactory;
 public class CachingDatabaseDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingDatabaseDialog.class);
 
-    private CachingDatabase database;
-    private JTable databaseTable;
+    /**
+     * The database to show in the dialog.
+     */
+    private final CachingDatabase database;
+    /**
+     * The table showing the entries in the database.
+     */
+    private final JTable databaseTable;
 
+    /**
+     * Create a new dialog.
+     *
+     * @param database the database to show
+     */
     public CachingDatabaseDialog(CachingDatabase database) {
         super(MainWindow.getInstance(), "Proof Caching Database");
 
@@ -50,6 +63,24 @@ public class CachingDatabaseDialog extends JDialog {
         databaseTable = new JTable(tableModel);
         databaseTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         SwingUtil.resizeTableColumns(databaseTable);
+
+        // popup menu for table entries
+        var tablePopupMenu = new JPopupMenu();
+        var deleteMenuItem = new JMenuItem("Delete");
+        deleteMenuItem.addActionListener(e -> {
+            int selectedRow = databaseTable.getSelectedRow();
+            try {
+                tableModel.deleteProof(selectedRow);
+            } catch (IOException ex) {
+                LOGGER.warn("failed to delete proof ", ex);
+                IssueDialog.showExceptionDialog(this, ex);
+            }
+            refreshUI();
+        });
+        tablePopupMenu.add(deleteMenuItem);
+        databaseTable.setComponentPopupMenu(tablePopupMenu);
+        databaseTable.addMouseListener(new OpenPopupMenu(tablePopupMenu));
+
         var scrollPane =
             new JScrollPane(databaseTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -71,6 +102,8 @@ public class CachingDatabaseDialog extends JDialog {
 
     private void refreshUI() {
         ((CachingDatabaseTable) databaseTable.getModel()).refresh();
+        ((CachingDatabaseTable) databaseTable.getModel()).fireTableDataChanged();
+        databaseTable.invalidate();
         invalidate();
     }
 
@@ -101,6 +134,32 @@ public class CachingDatabaseDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             new CachingDatabaseDialog(database);
+        }
+    }
+
+    private static class OpenPopupMenu extends MouseAdapter {
+        /**
+         * The popup menu to show if the relevant mouse button is pressed.
+         */
+        private final JPopupMenu tablePopupMenu;
+
+        public OpenPopupMenu(JPopupMenu tablePopupMenu) {
+            this.tablePopupMenu = tablePopupMenu;
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                JTable source = (JTable) e.getSource();
+                int row = source.rowAtPoint(e.getPoint());
+                int column = source.columnAtPoint(e.getPoint());
+
+                if (!source.isRowSelected(row)) {
+                    source.changeSelection(row, column, false, false);
+                }
+
+                tablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
     }
 }

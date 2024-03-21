@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 public class AddToDatabaseAction extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddToDatabaseAction.class);
 
-    private CachingDatabase cachingDatabase;
+    /**
+     * Database to add the proof to.
+     */
+    private final CachingDatabase cachingDatabase;
     /**
      * Proof to add.
      */
@@ -33,9 +36,11 @@ public class AddToDatabaseAction extends KeyAction {
     /**
      * Create a new action.
      *
+     * @param cachingDatabase caching database to add the proof to
      * @param proof proof to add
      */
     AddToDatabaseAction(CachingDatabase cachingDatabase, Proof proof) {
+        this.cachingDatabase = cachingDatabase;
         this.proof = proof;
 
         setName("Add to proof caching database");

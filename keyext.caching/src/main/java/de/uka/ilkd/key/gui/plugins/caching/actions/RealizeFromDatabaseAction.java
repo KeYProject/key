@@ -22,6 +22,13 @@ import org.key_project.util.GenericWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * KeY action to "realize" a cached branch from the external cache.
+ * This will load the referenced proof and store a {@link ClosedBy} reference
+ * in the node.
+ *
+ * @author Arne Keller
+ */
 public class RealizeFromDatabaseAction extends KeyAction {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(RealizeFromDatabaseAction.class);
@@ -32,7 +39,6 @@ public class RealizeFromDatabaseAction extends KeyAction {
      * Callback to call after realization is done. May be null.
      */
     private final Consumer<Proof> callback;
-    private boolean done = false;
 
     public RealizeFromDatabaseAction(Node node, Consumer<Proof> callback) {
         this.node = node;
@@ -41,16 +47,18 @@ public class RealizeFromDatabaseAction extends KeyAction {
 
         setName("Realize external proof reference");
         setMenuPath("Proof Caching");
-        setEnabled(node.lookup(CachedProofBranch.class) != null);
+        setEnabled(cachedProofBranch != null);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        node.deregister(cachedProofBranch, CachedProofBranch.class);
+        // reopen the goal immediately in case the replay fails
+        node.proof().reOpenGoal(node.proof().getClosedGoal(node));
         var worker = new GenericWorker<>(this::loadProof,
             this::proofLoaded,
             exc -> {
                 LOGGER.warn("failed to load proof ", exc);
-                node.deregister(node.lookup(CachedProofBranch.class), CachedProofBranch.class);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             });
         worker.execute();
@@ -62,10 +70,6 @@ public class RealizeFromDatabaseAction extends KeyAction {
     }
 
     private void proofLoaded(Proof proof) {
-        if (done) {
-            return;
-        }
-        done = true; // only run once
         node.deregister(cachedProofBranch, CachedProofBranch.class);
         proof.setStepIndices();
         var allNodes = proof.root().subtreeIterator();

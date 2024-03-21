@@ -30,9 +30,21 @@ import org.slf4j.LoggerFactory;
 public class DefaultReferenceSearchDialogListener implements ReferenceSearchDialogListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(DefaultReferenceSearchDialogListener.class);
-    private final KeYMediator mediator;
-    private final List<Proof> auxiliaryProofsToClose = new ArrayList<>();
 
+    /**
+     * The KeY mediator.
+     */
+    private final KeYMediator mediator;
+    /**
+     * Proofs to dispose once the copy is done.
+     */
+    private final List<Proof> auxiliaryProofsToDispose = new ArrayList<>();
+
+    /**
+     * Create a new listener object.
+     *
+     * @param mediator the KeY mediator
+     */
     public DefaultReferenceSearchDialogListener(KeYMediator mediator) {
         this.mediator = mediator;
     }
@@ -54,7 +66,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                     if (branch != null) {
                         new RealizeFromDatabaseAction(closedGoal.node(),
                             proof -> SwingUtilities.invokeLater(() -> {
-                                auxiliaryProofsToClose.add(proof);
+                                auxiliaryProofsToDispose.add(proof);
                                 copyButtonClicked(dialog);
                             })).actionPerformed(null);
                         // now return and wait for the callback
@@ -68,7 +80,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                         if (dialog.incrementProgress()) {
                             dialog.dispose();
                             // close auxiliary proofs
-                            auxiliaryProofsToClose.forEach(Proof::dispose);
+                            auxiliaryProofsToDispose.forEach(Proof::dispose);
                             new ShowProofStatistics.Window(MainWindow.getInstance(), p)
                                     .setVisible(true);
                         }
