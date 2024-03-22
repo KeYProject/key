@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
 import java.math.RoundingMode;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
 import java.math.RoundingMode;
+import java.nio.file.InvalidPathException;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -207,7 +208,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
             long timeout = (long) (((Number) solverTimeout.getValue()).doubleValue() * 1000.0);
-
+            
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);
             solverType.setSolverTimeout(timeout);
