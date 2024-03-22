@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -37,12 +38,14 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 
         Namespace<Sort> sorts = services.getNamespaces().sorts();
         masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")), "java_lang_Object");
         masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")), "Null");
         masterHandler.addPredefinedSort(heapLDT.targetSort(), "Heap");
         masterHandler.addPredefinedSort(locSetLDT.targetSort(), "LocSet");
+        masterHandler.addPredefinedSort(seqLDT.targetSort(), "Seq");
     }
 
     @Override
