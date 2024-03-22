@@ -123,6 +123,10 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
                 target = contract.getTarget();
             }
         }
+        if (target.getType() == KeYJavaType.VOID_TYPE) {
+            throw new ProofInputException(
+                "Dependency contracts are currently not supported for void methods");
+        }
 
         final Services proofServices = postInit();
 
