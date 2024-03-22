@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -19,18 +24,12 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
@@ -646,7 +645,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(
-                services.getSpecificationRepository().getStatementSpec(x));
+            services.getSpecificationRepository().getStatementSpec(x));
 
         ProgramVariableCollection vars = spec.vars();
         Map<LocationVariable, Term> atPres = vars.atPres;

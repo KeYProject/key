@@ -87,7 +87,8 @@ public class ProveTest {
             ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
         }
 
-        LOGGER.info("({}) Active Settings: {}", caseId, ProofSettings.DEFAULT_SETTINGS.settingsToString());
+        LOGGER.info("({}) Active Settings: {}", caseId,
+            ProofSettings.DEFAULT_SETTINGS.settingsToString());
 
         assertTrue(keyFile.exists(), "File " + keyFile + " does not exists");
 
@@ -102,7 +103,8 @@ public class ProveTest {
         try {
             LOGGER.info("({}) Start proving", caseId);
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+                load(keyFile);
             LOGGER.info("({}) Proving done", caseId);
 
             env = pair.first;
@@ -118,7 +120,8 @@ public class ProveTest {
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
-                assertTrue(replayResult.hasErrors(), "Loading problem file succeeded but it shouldn't");
+                assertTrue(replayResult.hasErrors(),
+                    "Loading problem file succeeded but it shouldn't");
                 success = true;
             } else {
                 assertFalse(replayResult.hasErrors(), "Loading problem file failed");
@@ -131,7 +134,8 @@ public class ProveTest {
                     autoMode(env, loadedProof, script);
                     boolean closed = loadedProof.closed();
                     success = (testProperty == TestProperty.PROVABLE) == closed;
-                    LOGGER.info("({}) Finished proof: {}", caseId, (closed ? "closed." : "open goal(s)"));
+                    LOGGER.info("({}) Finished proof: {}", caseId,
+                        (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
                     if (success) {
                         reload(proofFile, loadedProof);
