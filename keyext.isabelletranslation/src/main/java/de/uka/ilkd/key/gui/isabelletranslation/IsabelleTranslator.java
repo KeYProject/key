@@ -182,7 +182,12 @@ public class IsabelleTranslator {
             result.append(LINE_ENDING).append("assumes antecedent_").append(i).append(":\"").append(antecedentFormula).append("\"");
         }
         result.append(LINE_ENDING);
-        result.append("shows \"").append(succedentTranslations.get(0));
+        result.append("shows \"");
+        if (succedentTranslations.isEmpty()) {
+            result.append("False");
+        } else {
+            result.append(succedentTranslations.get(0));
+        }
         for (int i = 1; i < succedentTranslations.size(); i++) {
 
             StringBuilder succedentFormula = succedentTranslations.get(i);

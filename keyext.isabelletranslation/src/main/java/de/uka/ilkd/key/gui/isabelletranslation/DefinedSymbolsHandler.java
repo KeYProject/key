@@ -41,6 +41,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         definedFunctions.put("seqRemove", "seqRemove");
         definedFunctions.put("seqReverse", "seqReverse");
 
+
         //LocSet functions
         definedFunctions.put("elementOf", "elementOf");
         definedFunctions.put("subset", "subset");
