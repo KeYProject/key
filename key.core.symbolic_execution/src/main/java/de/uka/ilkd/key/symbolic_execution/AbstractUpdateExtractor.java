@@ -1265,7 +1265,7 @@ public abstract class AbstractUpdateExtractor {
                 originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
             } else {
                 Term originalModifiedFormula = pio.subTerm();
-                originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+                originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first();
             }
         }
         return originalUpdates;
@@ -1503,12 +1503,10 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(currentNode.serialNr());
-            sb.append(" starting from goals ");
-            sb.append(Strings.formatAsList(startingGoals, "", ", ", "",
-                ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr)));
-            return sb.toString();
+            return currentNode.serialNr() +
+                " starting from goals " +
+                Strings.formatAsList(startingGoals, "", ", ", "",
+                    ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr));
         }
     }
 

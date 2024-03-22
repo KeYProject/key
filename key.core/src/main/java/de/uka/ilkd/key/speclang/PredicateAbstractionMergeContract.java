@@ -96,9 +96,9 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
-            final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
+            final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second());
             return AbstractionPredicate.create(newPred,
-                pred.getPredicateFormWithPlaceholder().first, services);
+                pred.getPredicateFormWithPlaceholder().first(), services);
         }).collect(Collectors.toCollection(ArrayList::new));
     }
 

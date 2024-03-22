@@ -27,7 +27,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
@@ -823,7 +822,7 @@ public class Node implements Iterable<Node> {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
             if (parent != null && parent.children.size() > 1) {
-                prev = prev.append(new Pair<>(parent, siblingNr));
+                prev = prev.append(new BranchLocation.BranchChoice(parent, siblingNr));
             }
             this.branchLocation = prev;
         }

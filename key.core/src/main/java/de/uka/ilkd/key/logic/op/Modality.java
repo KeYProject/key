@@ -16,18 +16,18 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
 public class Modality extends org.key_project.logic.op.Modality implements Operator {
+    private record ModalityKey(JavaModalityKind first, JavaProgramElement second) {}
+
     /**
      * keeps track of created modalities
      */
-    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
-        new WeakHashMap<>();
+    private static final Map<ModalityKey, Modality> modalities = new WeakHashMap<>();
 
     /**
      * Retrieves the modality of the given kind and program.
@@ -37,7 +37,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * @return the modality of the given kind and program.
      */
     public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
-        var pair = new Pair<>(kind, jb.program());
+        var pair = new ModalityKey(kind, jb.program());
         Modality mod = modalities.get(pair);
         if (mod == null) {
             mod = new Modality(jb, kind);
@@ -153,7 +153,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
             new JavaModalityKind(new Name("box_transaction"));
         /**
          * The throughout operator of dynamic logic. A formula [[alpha;]]Phi can be read as during
-         * processing the program alpha Phi should hold at every step of execution.
+         * processing the program, alpha Phi should hold at every step of execution.
          */
         public static final JavaModalityKind TOUT = new JavaModalityKind(new Name("throughout"));
         /**
@@ -173,7 +173,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
         }
 
         /**
-         * Whether this modality is termination sensitive, i.e., it is a "diamond-kind" modality.
+         * Whether this modality is termination-sensitive, i.e., it is a "diamond-kind" modality.
          */
         public boolean terminationSensitive() {
             return (this == DIA || this == DIA_TRANSACTION);

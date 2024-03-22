@@ -9,10 +9,7 @@ import java.net.URISyntaxException;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.nparser.ChoiceInformation;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.ProblemInformation;
-import de.uka.ilkd.key.nparser.ProofReplayer;
+import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
@@ -22,14 +19,13 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -177,7 +173,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() {
+    public @Nullable ProofScriptEntry readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -238,7 +234,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      */
     private Profile readProfileFromFile() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

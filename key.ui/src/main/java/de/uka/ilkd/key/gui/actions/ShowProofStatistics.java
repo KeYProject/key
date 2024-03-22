@@ -32,8 +32,6 @@ import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.Pair;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +86,11 @@ public class ShowProofStatistics extends MainWindowAction {
 
         final Statistics s = proof.getStatistics();
 
-        for (Pair<String, String> x : s.getSummary()) {
-            if ("".equals(x.second)) {
-                stats.append(x.first).append("\n");
+        for (Statistics.SummaryEntry x : s.getSummary()) {
+            if ("".equals(x.second())) {
+                stats.append(x.first()).append("\n");
             } else {
-                stats.append(x.first).append(CSV_SEPERATOR).append(x.second).append("\n");
+                stats.append(x.first()).append(CSV_SEPERATOR).append(x.second()).append("\n");
             }
         }
 
@@ -177,21 +175,22 @@ public class ShowProofStatistics extends MainWindowAction {
         StringBuilder stats = new StringBuilder();
         stats.append("<table>");
 
-        for (Pair<String, String> x : s.getSummary()) {
-            if ("".equals(x.second)) {
-                stats.append("<tr><th colspan=\"2\">").append(x.first).append("</th></tr>");
+        for (Statistics.SummaryEntry x : s.getSummary()) {
+            if ("".equals(x.second())) {
+                stats.append("<tr><th colspan=\"2\">").append(x.first()).append("</th></tr>");
             } else {
-                if (x.first.contains("[tooltip: ")) {
-                    Matcher m = TOOLTIP_PATTERN.matcher(x.first);
+                if (x.first().contains("[tooltip: ")) {
+                    Matcher m = TOOLTIP_PATTERN.matcher(x.first());
                     m.find();
                     String tooltip = m.group(1);
                     stats.append("<tr><td class='tooltip' title='").append(tooltip).append("'>")
-                            .append(x.first, 0, x.first.indexOf('['))
+                            .append(x.first(), 0, x.first().indexOf('['))
                             .append("</td><td>")
-                            .append(x.second)
+                            .append(x.second())
                             .append("</td></tr>");
                 } else {
-                    stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
+                    stats.append("<tr><td>").append(x.first()).append("</td><td>")
+                            .append(x.second())
                             .append("</td></tr>");
                 }
             }

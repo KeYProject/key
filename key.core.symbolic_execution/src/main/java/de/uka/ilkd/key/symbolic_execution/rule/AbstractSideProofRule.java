@@ -6,30 +6,21 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
 
 /**
  * Provides the basic functionality of {@link BuiltInRule} which computes something in a side proof.
@@ -87,7 +78,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    protected List<SymbolicExecutionSideProofUtil.ConditionResults> computeResultsAndConditions(
+            Services services,
             Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
@@ -106,21 +98,22 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
     protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
+        record IndexNode(int next, Term root){}
         // Iterate along the PosInOccurrence and collect the parents and indices
-        Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
+        Deque<IndexNode> indexAndParents = new LinkedList<>();
         Term root = pio.sequentFormula().formula();
         final PosInTerm pit = pio.posInTerm();
         for (int i = 0, sz = pit.depth(); i < sz; i++) {
             int next = pit.getIndexAt(i);
-            indexAndParents.addFirst(new Pair<>(next, root));
+            indexAndParents.addFirst(new IndexNode(next, root));
             root = root.sub(next);
         }
         // Iterate over the collected parents and replace terms
         root = newTerm;
-        for (Pair<Integer, Term> pair : indexAndParents) {
-            Term parent = pair.second;
+        for (IndexNode pair : indexAndParents) {
+            Term parent = pair.root;
             Term[] newSubs = parent.subs().toArray(new Term[parent.arity()]);
-            newSubs[pair.first] = root;
+            newSubs[pair.next] = root;
             root = services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(),
                 parent.getLabels());
         }

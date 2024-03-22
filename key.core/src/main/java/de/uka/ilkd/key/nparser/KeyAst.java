@@ -13,7 +13,6 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.java.StringUtil;
 
@@ -73,11 +72,13 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable ProofScriptEntry findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
+                return new ProofScriptEntry(
+                    StringUtil.trim(text, '"'),
+                    pctx.ps.getLine(),
                     pctx.ps.getCharPositionInLine());
             }
             return null;

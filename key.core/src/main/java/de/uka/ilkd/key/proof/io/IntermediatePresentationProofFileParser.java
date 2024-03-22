@@ -17,7 +17,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
@@ -251,7 +250,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
             builtinInfo.builtinIfInsts =
-                builtinInfo.builtinIfInsts.append(new Pair<>(
+                builtinInfo.builtinIfInsts.append(new BuiltInAppIntermediate.PosInfo(
                     builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
         }
         default -> {
@@ -290,7 +289,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
-            new Pair<>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
+            new BuiltInAppIntermediate.PosInfo(tacletInfo.currFormula, tacletInfo.currPosInTerm),
             tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
             tacletInfo.currNewNames);
     }
@@ -303,19 +302,19 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         return switch (builtinInfo.currRuleName) {
         case "MergeRule" -> new MergeAppIntermediate(builtinInfo.currRuleName,
-            new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+            new BuiltInAppIntermediate.PosInfo(builtinInfo.currFormula, builtinInfo.currPosInTerm),
             builtinInfo.currMergeNodeId, builtinInfo.currMergeProc,
             builtinInfo.currNrPartners, builtinInfo.currNewNames,
             builtinInfo.currDistFormula, builtinInfo.currPredAbstraLatticeType,
             builtinInfo.currAbstractionPredicates, builtinInfo.currUserChoices);
         case "CloseAfterMerge" -> new MergePartnerAppIntermediate(builtinInfo.currRuleName,
-            new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+            new BuiltInAppIntermediate.PosInfo(builtinInfo.currFormula, builtinInfo.currPosInTerm),
             builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
         case "SMTRule" -> new SMTAppIntermediate(builtinInfo.currRuleName,
-            new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+            new BuiltInAppIntermediate.PosInfo(builtinInfo.currFormula, builtinInfo.currPosInTerm),
             builtinInfo.solver);
         default -> new BuiltInAppIntermediate(builtinInfo.currRuleName,
-            new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+            new BuiltInAppIntermediate.PosInfo(builtinInfo.currFormula, builtinInfo.currPosInTerm),
             builtinInfo.currContract, builtinInfo.currContractModality,
             builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         };
@@ -385,7 +384,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
-        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected ImmutableList<BuiltInAppIntermediate.PosInfo> builtinIfInsts;
         protected int currIfInstFormula;
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */

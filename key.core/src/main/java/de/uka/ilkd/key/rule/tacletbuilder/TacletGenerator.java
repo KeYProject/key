@@ -14,23 +14,16 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 
 
@@ -195,7 +188,7 @@ public class TacletGenerator {
             List<? extends ProgramVariable> heaps, ProgramVariable self,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ProgramVariable> atPreVars,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean satisfiability,
+            ImmutableSet<Limit> toLimit, boolean satisfiability,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
         TermBuilder TB = services.getTermBuilder();
@@ -233,9 +226,9 @@ public class TacletGenerator {
         final Term schemaRhs = schemaRepresents.term.sub(1);
 
         // limit observers
-        final Pair<Term, ImmutableSet<Taclet>> limited = limitTerm(schemaRhs, toLimit, services);
-        final Term limitedRhs = limited.first;
-        result = result.union(limited.second);
+        LimitTerm limited = limitTerm(schemaRhs, toLimit, services);
+        final Term limitedRhs = limited.term();
+        result = result.union(limited.taclets());
 
         // create if sequent
         final boolean finalClass = kjt.getJavaType() instanceof ClassDeclaration
@@ -431,7 +424,7 @@ public class TacletGenerator {
             ProgramVariable originalSelfVar, ProgramVariable originalResultVar,
             Map<LocationVariable, ProgramVariable> atPreVars,
             ImmutableList<ProgramVariable> originalParamVars,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean satisfiabilityGuard,
+            ImmutableSet<Limit> toLimit, boolean satisfiabilityGuard,
             TermServices services) {
 
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
@@ -641,7 +634,7 @@ public class TacletGenerator {
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name, List<SchemaVariable> heapSVs,
             SchemaVariable selfSV, SchemaVariable eqSV, Term term, KeYJavaType kjt,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic, boolean isFree,
+            ImmutableSet<Limit> toLimit, boolean isStatic, boolean isFree,
             boolean eqVersion, Services services) {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
@@ -657,10 +650,9 @@ public class TacletGenerator {
         final TermAndBoundVarPair schemaAxiom = replaceBoundLogicVars(rawAxiom, services);
 
         // limit observers
-        final Pair<Term, ImmutableSet<Taclet>> limited =
-            limitTerm(schemaAxiom.term, toLimit, services);
-        final Term limitedAxiom = limited.first;
-        result = result.union(limited.second);
+        final LimitTerm limited = limitTerm(schemaAxiom.term, toLimit, services);
+        final Term limitedAxiom = limited.term();
+        result = result.union(limited.taclets());
 
         // create added sequent
         final SequentFormula addedCf = new SequentFormula(limitedAxiom);
@@ -897,29 +889,27 @@ public class TacletGenerator {
         return new TermAndBoundVarPair(newTerm, svs);
     }
 
-
-    private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
+    private LimitTerm limitTerm(Term t, ImmutableSet<Limit> toLimit, Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
         // recurse to subterms
         Term[] subs = new Term[t.arity()];
         for (int i = 0; i < subs.length; i++) {
-            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit, services);
-            subs[i] = pair.first;
-            taclets = taclets.union(pair.second);
+            var pair = limitTerm(t.sub(i), toLimit, services);
+            subs[i] = pair.term();
+            taclets = taclets.union(pair.taclets());
         }
 
         // top level operator
         Operator newOp = t.op();
         if (t.op() instanceof IObserverFunction obs) {
-            for (Pair<Sort, IObserverFunction> pair : toLimit) {
-                if (pair.second.equals(t.op())
-                        && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first))) {
-                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited =
+            for (Limit pair : toLimit) {
+                if (pair.second().equals(t.op())
+                        && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first()))) {
+                    SpecificationRepository.LimitObservers limited =
                         services.getSpecificationRepository().limitObs(obs);
-                    newOp = limited.first;
-                    taclets = taclets.union(limited.second);
+                    newOp = limited.first();
+                    taclets = taclets.union(limited.taclets());
                 }
             }
         }
@@ -927,7 +917,7 @@ public class TacletGenerator {
         // reassemble, return
         final Term term =
             services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null);
-        return new Pair<>(term, taclets);
+        return new LimitTerm(term, taclets);
     }
 
 
@@ -1018,4 +1008,7 @@ public class TacletGenerator {
 
 
     private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {}
+
+    public record LimitTerm(Term term, ImmutableSet<Taclet> taclets) {
+    }
 }

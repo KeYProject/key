@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -24,38 +21,32 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
-import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implements the rule which translates the toplevel formula
  * {@code {U}[x = rec.query(params);]post} to
  * {@code {U}{ x := query(heap, rec, params) }post} for model methods.
- *
+ * <p>
  * For model fields, it turns
  * {@code {U}[x = rec.query;]post} into
  * {@code {U}{ x := query(heap, rec) }post}.
- *
+ * <p>
  * Currently this supports model methods and model fields which can only be
  * assigned to ghost entities.
- *
+ * <p>
  * For strictly pure methods this is generally possible, but more side
  * conditions would arise: Ensuring termination, strict purity, precondition, ...
- *
+ * <p>
  * TODO Extend this mechanism beyond model methods to strictly pure methods.
  *
  * @author Mattias Ulbrich
@@ -72,7 +63,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * caching matching results
      */
     private static Term lastFocusTerm;
-    private static Union<Instantiation, ModelFieldInstantiation> lastInstantiation;
+    private static InstEither lastInstantiation;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -129,37 +120,31 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // instantiation must succeed
-        Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(pio.subTerm(), goal.proof().getServices());
+        var inst = instantiate(pio.subTerm(), goal.proof().getServices());
         if (inst == null) {
             return false;
         }
 
-        if (inst.isFirst()) {
+        if (inst.first() != null) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) {
+            if (!inst.first().pm.isModel() || inst.first().pm.getStateCount() > 1) {
                 return false;
             }
-
-            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) {
-                return false;
-            }
+            return inst.first().actualResult instanceof ProgramVariable;
         }
-
         return true;
     }
 
     @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
-        Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(ruleApp.posInOccurrence().subTerm(), services);
+        var inst = instantiate(ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
-        if (inst.isFirst()) {
-            return applyForMethods(goal, inst.getFirst(), services, ruleApp);
+        if (inst.first() != null) {
+            return applyForMethods(goal, inst.first(), services, ruleApp);
         } else {
-            return applyForModelFields(goal, inst.getSecond(), services, ruleApp);
+            return applyForModelFields(goal, inst.second(), services, ruleApp);
         }
     }
 
@@ -400,8 +385,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     }
 
-    private static Union<Instantiation, ModelFieldInstantiation> instantiate(Term focusTerm,
-            Services services) {
+    @Nullable
+    private static InstEither instantiate(Term focusTerm, Services services) {
         // result cached?
         if (focusTerm == lastFocusTerm) {
             return lastInstantiation;
@@ -410,11 +395,11 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // compute
         Instantiation inst = UseOperationContractRule.computeInstantiation(focusTerm, services);
         if (inst != null) {
-            lastInstantiation = Union.fromFirst(inst);
+            lastInstantiation = new InstEither(inst, null);
         } else {
             ModelFieldInstantiation mfInst = matchModelField(focusTerm, services);
             if (mfInst != null) {
-                lastInstantiation = Union.fromSecond(mfInst);
+                lastInstantiation = new InstEither(null, mfInst);
             } else {
                 lastInstantiation = null;
             }
@@ -423,6 +408,10 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // cache and return
         lastFocusTerm = focusTerm;
         return lastInstantiation;
+    }
+
+    public record InstEither(@Nullable Instantiation first,
+            ObserverToUpdateRule.@Nullable ModelFieldInstantiation second) {
     }
     // endregion
 

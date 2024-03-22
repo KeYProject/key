@@ -8,36 +8,20 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
-import org.key_project.util.collection.Pair;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
  * condition in form of a JavaDL formula.
+ * @param symbolicState     The symbolic state (parallel update).
+ * @param pathCondition     The path condition (formula).
+ * @param correspondingNode The node corresponding to this SE state.
  *
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionState extends Pair<Term, Term> {
-
-    private Node correspondingNode = null;
-
-    /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     */
-    public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
-        super(symbolicState, pathCondition);
-    }
-
-    /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param correspondingNode The node corresponding to this SE state.
-     */
-    public SymbolicExecutionState(Term symbolicState, Term pathCondition, Node correspondingNode) {
-        this(symbolicState, pathCondition);
-        this.correspondingNode = correspondingNode;
-    }
-
+@NullMarked
+public record SymbolicExecutionState(Term first, Term second, @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */
@@ -59,20 +43,13 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
         return correspondingNode;
     }
 
-    /**
-     * @param correspondingNode The node corresponding to this SE state.
-     */
-    public void setCorrespondingNode(Node correspondingNode) {
-        this.correspondingNode = correspondingNode;
-    }
-
     @Override
     public String toString() {
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
     }
 
     /**
@@ -80,7 +57,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
      *
      * @param str The string to remove the newline char from.
      * @return The given string with the removed trailing \n char, or the original string if it does
-     *         not end with an \n.
+     * not end with an \n.
      */
     private String rmN(String str) {
         if (str.endsWith("\n") && str.length() > 1) {

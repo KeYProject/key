@@ -12,7 +12,6 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.util.Quadruple;
 
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -85,14 +84,41 @@ public class RuleStatisticsDialog extends JDialog {
                 + 100;
         setSize(w, h);
 
-        statisticsPane.setText(genTable(
-            statistics.sortBy(
-                Comparator
-                        .comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second())
-                        .reversed())));
+        final Comparator<RuleStatistics.RuleStatisticData> comp =
+            Comparator.comparing(RuleStatistics.RuleStatisticData::first)
+                    .reversed();
+
+        statisticsPane.setText(genTable(statistics.sortBy(comp)));
         statisticsPane.setCaretPosition(0);
         setLocationRelativeTo(window);
     }
+
+
+    final Comparator<RuleStatistics.RuleStatisticData> compareName =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::ruleName);
+    final Comparator<RuleStatistics.RuleStatisticData> compareFirst =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::first);
+    final Comparator<RuleStatistics.RuleStatisticData> compareSecond =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::second);
+    final Comparator<RuleStatistics.RuleStatisticData> compareThird =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::third);
+
+    final Comparator<? super RuleStatistics.RuleStatisticData> compareEntryByName =
+        compareName.thenComparing(compareFirst).thenComparing(compareSecond)
+                .thenComparing(compareThird);
+
+    final Comparator<RuleStatistics.RuleStatisticData> compareEntryByFirst =
+        compareFirst.thenComparing(compareName).thenComparing(compareSecond)
+                .thenComparing(compareThird);
+
+    final Comparator<RuleStatistics.RuleStatisticData> compareEntryBySecond =
+        compareSecond.thenComparing(compareName).thenComparing(compareFirst)
+                .thenComparing(compareThird);
+
+    final Comparator<RuleStatistics.RuleStatisticData> compareEntryByThird =
+        compareThird.thenComparing(compareName).thenComparing(compareFirst)
+                .thenComparing(compareSecond);
+
 
     /**
      * Construct the buttons panel. Should be added to the main panel after construction.
@@ -111,37 +137,27 @@ public class RuleStatisticsDialog extends JDialog {
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(Comparator.comparing(Quadruple::first))));
+                statistics.sortBy(compareEntryByName)));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton2 = new JButton("Sort by total");
         sortButton2.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.second())
-                            .reversed())));
+                statistics.sortBy(compareEntryByFirst)
+                        .reversed()));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.third())
-                            .reversed())));
+                    compareEntryBySecond.reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.fourth())
-                            .reversed())));
+                statistics.sortBy(compareEntryByThird).reversed()));
             statisticsPane.setCaretPosition(0);
         });
 
@@ -170,34 +186,39 @@ public class RuleStatisticsDialog extends JDialog {
      * @param rules statistics on rule apps (see {@link RuleStatistics})
      * @return HTML
      */
-    private String genTable(List<Quadruple<String, Integer, Integer, Integer>> rules) {
+    private String genTable(List<RuleStatistics.RuleStatisticData> rules) {
         List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
             "Initial useless applications");
 
         List<Collection<String>> rows = new ArrayList<>();
         // summary row
         int uniqueRules = rules.size();
-        int totalSteps = rules.stream().mapToInt(Quadruple::second).sum();
-        int uselessSteps = rules.stream().mapToInt(Quadruple::third).sum();
-        int initialUseless = rules.stream().mapToInt(Quadruple::fourth).sum();
+        int totalSteps = rules.stream().mapToInt(RuleStatistics.RuleStatisticData::first).sum();
+        int uselessSteps = rules.stream().mapToInt(RuleStatistics.RuleStatisticData::second).sum();
+        int initialUseless = rules.stream().mapToInt(RuleStatistics.RuleStatisticData::third).sum();
         rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps),
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
-        List<Quadruple<String, Integer, Integer, Integer>> rulesBranching =
-            rules.stream().filter(it -> statistics.branches(it.first())).toList();
+        List<RuleStatistics.RuleStatisticData> rulesBranching =
+            rules.stream().filter(it -> statistics.branches(it.ruleName()))
+                    .toList();
         int uniqueRules2 = rulesBranching.size();
-        totalSteps = rulesBranching.stream().mapToInt(Quadruple::second).sum();
-        uselessSteps = rulesBranching.stream().mapToInt(Quadruple::third).sum();
-        initialUseless = rulesBranching.stream().mapToInt(Quadruple::fourth).sum();
+        totalSteps =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::first).sum();
+        uselessSteps =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::second).sum();
+        initialUseless =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::third).sum();
         rows.add(List.of(String.format("(%d branching rules)", uniqueRules2),
             Integer.toString(totalSteps), Integer.toString(uselessSteps),
             Integer.toString(initialUseless)));
         rules.forEach(a -> {
-            String name = a.first();
-            Integer all = a.second();
-            Integer useless = a.third();
-            Integer iua = a.fourth();
-            rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
+            String name = a.ruleName();
+            int all = a.first();
+            int useless = a.second();
+            int iua = a.third();
+            rows.add(List.of(name, Integer.toString(all), Integer.toString(useless),
+                Integer.toString(iua)));
         });
 
         return HtmlFactory.generateTable(columns, new boolean[] { false, false, false, false },

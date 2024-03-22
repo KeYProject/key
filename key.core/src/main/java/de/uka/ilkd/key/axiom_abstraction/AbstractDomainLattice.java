@@ -66,8 +66,8 @@ public abstract class AbstractDomainLattice
         final TermBuilder tb = services.getTermBuilder();
 
         Term axiom = elem.getDefiningAxiom(term, services);
-        Term appl = tb.apply(state.first, axiom);
-        Term toProve = tb.imp(state.second, appl);
+        Term appl = tb.apply(state.first(), axiom);
+        Term toProve = tb.imp(state.second(), appl);
 
         return toProve;
     }

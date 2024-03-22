@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Term;
 
-import org.key_project.util.collection.Pair;
-
 public class AbbrevMap {
 
     /**
@@ -21,7 +19,7 @@ public class AbbrevMap {
     private final HashMap<String, AbbrevWrapper> stringterm;
 
     /**
-     * Enabled is set true if a abbreviation should be used when printing the term.
+     * Enabled is set true if an abbreviation should be used when printing the term.
      */
     private final HashMap<AbbrevWrapper, Boolean> termenabled;
 
@@ -153,8 +151,8 @@ public class AbbrevMap {
      * Exports the current abbreviation map as a sequence of pairs of the term and its abbreviation.
      * Note, this will allocate a new data structure each time.
      */
-    public Collection<Pair<Term, String>> export() {
-        return termstring.entrySet().stream().map(e -> new Pair<>(e.getKey().t, e.getValue()))
+    public Collection<Abbreviation> export() {
+        return termstring.entrySet().stream().map(e -> new Abbreviation(e.getKey().t, e.getValue()))
                 .collect(Collectors.toList());
 
     }
@@ -176,4 +174,7 @@ public class AbbrevMap {
                 return t;
             }
         }
+
+    public record Abbreviation(Term first, String second) {
+    }
 }

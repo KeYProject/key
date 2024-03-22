@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control.instantiation_model;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
@@ -18,8 +18,8 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.IdDeclaration;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
@@ -35,33 +35,48 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStreams;
 
 public class TacletFindModel extends AbstractTableModel {
+    record Instantiation(SchemaVariable first, String second) {
+    }
 
     /**
-     *
+     * the instantiations entries
      */
-    private static final long serialVersionUID = 5285420522875326156L;
-    /** the instantiations entries */
-    private final ArrayList<Pair<SchemaVariable, String>> entries;
-    /** the related rule application */
+    private final List<Instantiation> entries;
+    /**
+     * the related rule application
+     */
     private final TacletApp originalApp;
-    /** the integer defines the row until which no editing is possible */
+    /**
+     * the integer defines the row until which no editing is possible
+     */
     private int noEditRow;
-    /** universal namespace of variables, minimum for input in a row */
+    /**
+     * universal namespace of variables, minimum for input in a row
+     */
     private final NamespaceSet nss;
-    /** the java service object */
+    /**
+     * the java service object
+     */
     private final Services services;
-    /** the abbreviation map */
+    /**
+     * the abbreviation map
+     */
     private final AbbrevMap scm;
-    /** the current goal */
+    /**
+     * the current goal
+     */
     private final Goal goal;
-    /** variable namer */
+    /**
+     * variable namer
+     */
     private final VariableNamer varNamer;
-    /** proposers to ask when instantiating a schema variable */
+    /**
+     * proposers to ask when instantiating a schema variable
+     */
     private final InstantiationProposerCollection instantiationProposers;
 
     /**
@@ -100,15 +115,15 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
-        ArrayList<Pair<SchemaVariable, String>> rowVec = new ArrayList<>();
+    private ArrayList<Instantiation> createEntryArray(TacletApp tacletApp) {
+        ArrayList<Instantiation> rowVec = new ArrayList<>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             tacletApp.instantiations().pairIterator();
         int count = 0;
 
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            rowVec.add(new Pair<>(entry.key(),
+            rowVec.add(new Instantiation(entry.key(),
                 ProofSaver.printAnything(entry.value(), services)));
             count++;
         }
@@ -124,7 +139,7 @@ public class TacletFindModel extends AbstractTableModel {
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<SchemaVariable, String> pair = new Pair<>(var, proposal);
+                Instantiation pair = new Instantiation(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...
@@ -134,7 +149,6 @@ public class TacletFindModel extends AbstractTableModel {
                 rowVec.add(pair);
             }
         }
-
         return rowVec;
     }
 
@@ -181,7 +195,9 @@ public class TacletFindModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        return new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        return new KeyIO(services, copy)
+                .setAbbrevMap(scm)
+                .parseExpression(s);
     }
 
     /**
@@ -202,7 +218,6 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * throws an exception iff no input in indicated row, and no metavariable instantiation is
      * possible
-     *
      */
 
     private void checkNeededInputAvailable(int irow) throws MissingInstantiationException {
@@ -332,7 +347,6 @@ public class TacletFindModel extends AbstractTableModel {
 
     /**
      * @return new rule app with all inserted instantiations in the variable instantiations table
-     *
      * @throws SVInstantiationException if the instantiation is incorrect
      */
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
@@ -438,14 +452,17 @@ public class TacletFindModel extends AbstractTableModel {
 
     }
 
-    /** sets the value of the cell */
+    /**
+     * sets the value of the cell
+     */
     @Override
     public void setValueAt(Object instantiation, int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             entries.set(rowIndex,
-                new Pair<>((SchemaVariable) instantiation, entries.get(rowIndex).second));
+                new Instantiation((SchemaVariable) instantiation, entries.get(rowIndex).second));
         } else {
-            entries.set(rowIndex, new Pair<>(entries.get(rowIndex).first, (String) instantiation));
+            entries.set(rowIndex,
+                new Instantiation(entries.get(rowIndex).first, (String) instantiation));
         }
     }
 
@@ -466,7 +483,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;
-        for (Pair<SchemaVariable, String> pair : entries) {
+        for (Instantiation pair : entries) {
             if (pair.first.equals(sv)) {
                 return rowIndex;
             }

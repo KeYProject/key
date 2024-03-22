@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.speclang.*;
 
 import org.key_project.logic.sort.Sort;
@@ -52,9 +53,8 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     // fields used by Tarjan Algorithm
-    private final HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs =
-        new HashMap<>();
-    private final HashMap<Pair<Sort, IObserverFunction>, Vertex> vertices = new HashMap<>();
+    private final HashMap<Vertex, ImmutableList<Limit>> allSCCs = new HashMap<>();
+    private final HashMap<Limit, Vertex> vertices = new HashMap<>();
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 
 
@@ -79,11 +79,11 @@ public abstract class AbstractPO implements IPersistablePO {
     // -------------------------------------------------------------------------
     // methods for use in subclasses
     // -------------------------------------------------------------------------
-    private ImmutableSet<ClassAxiom> getAxiomsForObserver(Pair<Sort, IObserverFunction> usedObs,
+    private ImmutableSet<ClassAxiom> getAxiomsForObserver(Limit usedObs,
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
-            if (axiom.getTarget() == null || !(axiom.getTarget().equals(usedObs.second)
-                    && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
+            if (axiom.getTarget() == null || !(axiom.getTarget().equals(usedObs.second())
+                    && usedObs.first().extendsTrans(axiom.getKJT().getSort()))) {
                 axioms = axioms.remove(axiom);
             }
         }
@@ -268,9 +268,9 @@ public abstract class AbstractPO implements IPersistablePO {
         int lowLink;
 
         private final ClassAxiom axiom;
-        private final Pair<Sort, IObserverFunction> core;
+        private final Limit core;
 
-        public Vertex(Pair<Sort, IObserverFunction> vertexCore, ClassAxiom axiom, boolean onStack,
+        public Vertex(Limit vertexCore, ClassAxiom axiom, boolean onStack,
                 int index, int lowLink) {
             this.core = vertexCore;
             this.axiom = axiom;
@@ -297,7 +297,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
     private Vertex getVertexFor(Sort targetSort, IObserverFunction observer, ClassAxiom axiom) {
-        final Pair<Sort, IObserverFunction> vertexCore = new Pair<>(targetSort, observer);
+        final Limit vertexCore = new Limit(targetSort, observer);
         Vertex vertex = vertices.get(vertexCore);
         if (vertex == null) {
             vertex = new Vertex(vertexCore, axiom, false, -1, -1);
@@ -306,7 +306,7 @@ public abstract class AbstractPO implements IPersistablePO {
         return vertex;
     }
 
-    private Vertex getVertexFor(Pair<Sort, IObserverFunction> vertexCore, ClassAxiom axiom) {
+    private Vertex getVertexFor(Limit vertexCore, ClassAxiom axiom) {
         Vertex vertex = vertices.get(vertexCore);
         if (vertex == null) {
             vertex = new Vertex(vertexCore, axiom, false, -1, -1);
@@ -330,7 +330,7 @@ public abstract class AbstractPO implements IPersistablePO {
             if (node.index == -1) {
                 getSCCForNode(node, axioms, proofConfig);
             }
-            ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
+            ImmutableList<Limit> scc = allSCCs.get(node);
             for (Taclet axiomTaclet : axiom.getTaclets(
                 DefaultImmutableSet.fromImmutableList(
                     scc == null ? ImmutableSLList.nil() : scc),
@@ -367,9 +367,9 @@ public abstract class AbstractPO implements IPersistablePO {
         node.onStack = true;
 
         for (final ClassAxiom nodeAxiom : getAxiomsForObserver(node.core, axioms)) {
-            final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes =
+            final ImmutableSet<Limit> nextNodes =
                 nodeAxiom.getUsedObservers(services);
-            for (Pair<Sort, IObserverFunction> nextNodeCore : nextNodes) {
+            for (Limit nextNodeCore : nextNodes) {
                 final Vertex nextNode = getVertexFor(nextNodeCore, nodeAxiom);
                 if (nextNode.index == -1) {
                     getSCCForNode(nextNode, axioms, proofConfig);
@@ -385,7 +385,7 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         if (node.index == node.lowLink) {
-            ImmutableList<Pair<Sort, IObserverFunction>> scc =
+            ImmutableList<Limit> scc =
                 ImmutableSLList.nil();
             Vertex sccMember;
             do {

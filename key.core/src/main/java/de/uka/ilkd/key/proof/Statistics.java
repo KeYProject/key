@@ -17,8 +17,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 
-import org.key_project.util.collection.Pair;
-
 /**
  * Instances of this class encapsulate statistical information about proofs, such as the number of
  * nodes, or the number of interactions.
@@ -45,7 +43,7 @@ public class Statistics {
     public final long timeInMillis;
     public final float timePerStepInMillis;
 
-    private final List<Pair<String, String>> summaryList = new ArrayList<>(14);
+    private final List<SummaryEntry> summaryList = new ArrayList<>(14);
 
     private final HashMap<String, Integer> interactiveAppsDetails = new HashMap<>();
 
@@ -207,24 +205,26 @@ public class Statistics {
         }
 
         final String nodeString = EnhancedStringBuffer.format(stat.nodes).toString();
-        summaryList.add(new Pair<>("Nodes", nodeString));
-        summaryList.add(new Pair<>("Branches",
+        summaryList.add(new SummaryEntry("Nodes", nodeString));
+        summaryList.add(new SummaryEntry("Branches",
             EnhancedStringBuffer.format(stat.branches).toString()));
         if (stat.cachedBranches > 0) {
-            summaryList.add(new Pair<>(
+            summaryList.add(new SummaryEntry(
                 "Branches (cached) [tooltip: Number of goals resolved using the proof cache]",
                 EnhancedStringBuffer.format(stat.cachedBranches).toString()));
         }
-        summaryList.add(new Pair<>("Interactive steps", String.valueOf(stat.interactiveSteps)));
-        summaryList.add(new Pair<>("Symbolic execution steps", String.valueOf(stat.symbExApps)));
+        summaryList
+                .add(new SummaryEntry("Interactive steps", String.valueOf(stat.interactiveSteps)));
+        summaryList
+                .add(new SummaryEntry("Symbolic execution steps", String.valueOf(stat.symbExApps)));
 
 
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
 
-        summaryList.add(new Pair<>("Automode time",
+        summaryList.add(new SummaryEntry("Automode time",
             EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000L) {
-            summaryList.add(new Pair<>("Automode time", time + "ms"));
+            summaryList.add(new SummaryEntry("Automode time", time + "ms"));
         }
         if (stat.nodes > 0) {
             String avgTime = String.valueOf(stat.timePerStepInMillis);
@@ -234,28 +234,31 @@ public class Statistics {
                 i = avgTime.length();
             }
             avgTime = avgTime.substring(0, i);
-            summaryList.add(new Pair<>("Avg. time per step", avgTime + "ms"));
+            summaryList.add(new SummaryEntry("Avg. time per step", avgTime + "ms"));
         }
 
-        summaryList.add(new Pair<>("Rule applications", ""));
-        summaryList.add(new Pair<>("Quantifier instantiations",
+        summaryList.add(new SummaryEntry("Rule applications", ""));
+        summaryList.add(new SummaryEntry("Quantifier instantiations",
             String.valueOf(stat.quantifierInstantiations)));
-        summaryList.add(new Pair<>("One-step Simplifier apps", String.valueOf(stat.ossApps)));
-        summaryList.add(new Pair<>("SMT solver apps", String.valueOf(stat.smtSolverApps)));
+        summaryList.add(new SummaryEntry("One-step Simplifier apps", String.valueOf(stat.ossApps)));
+        summaryList.add(new SummaryEntry("SMT solver apps", String.valueOf(stat.smtSolverApps)));
         summaryList.add(
-            new Pair<>("Dependency Contract apps", String.valueOf(stat.dependencyContractApps)));
+            new SummaryEntry("Dependency Contract apps",
+                String.valueOf(stat.dependencyContractApps)));
         summaryList.add(
-            new Pair<>("Operation Contract apps", String.valueOf(stat.operationContractApps)));
+            new SummaryEntry("Operation Contract apps",
+                String.valueOf(stat.operationContractApps)));
         summaryList.add(
-            new Pair<>("Block/Loop Contract apps", String.valueOf(stat.blockLoopContractApps)));
-        summaryList.add(new Pair<>("Loop invariant apps", String.valueOf(stat.loopInvApps)));
-        summaryList.add(new Pair<>("Merge Rule apps", String.valueOf(stat.mergeRuleApps)));
-        summaryList.add(new Pair<>("Total rule apps",
+            new SummaryEntry("Block/Loop Contract apps",
+                String.valueOf(stat.blockLoopContractApps)));
+        summaryList.add(new SummaryEntry("Loop invariant apps", String.valueOf(stat.loopInvApps)));
+        summaryList.add(new SummaryEntry("Merge Rule apps", String.valueOf(stat.mergeRuleApps)));
+        summaryList.add(new SummaryEntry("Total rule apps",
             EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }
 
 
-    public List<Pair<String, String>> getSummary() {
+    public List<SummaryEntry> getSummary() {
         return summaryList;
     }
 
@@ -265,15 +268,15 @@ public class Statistics {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer("Proof Statistics:\n");
-        for (Pair<String, String> p : summaryList) {
+        StringBuilder sb = new StringBuilder("Proof Statistics:\n");
+        for (var p : summaryList) {
             final String c = p.first;
             final String s = p.second;
-            sb = sb.append(c);
+            sb.append(c);
             if (!"".equals(s)) {
-                sb = sb.append(": ").append(s);
+                sb.append(": ").append(s);
             }
-            sb = sb.append('\n');
+            sb.append('\n');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -443,5 +446,8 @@ public class Statistics {
             }
             return res;
         }
+    }
+
+    public record SummaryEntry(String first, String second) {
     }
 }

@@ -34,13 +34,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -105,7 +103,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    public static List<Pair<Term, Node>> computeResults(Services services, Proof proof,
+    public static List<ComputeResults> computeResults(Services services, Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
             String description, String methodTreatment, String loopTreatment, String queryTreatment,
             String splittingOption, boolean addNamesToServices) throws ProofInputException {
@@ -114,7 +112,7 @@ public final class SymbolicExecutionSideProofUtil {
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
-            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<>();
+            List<ComputeResults> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
@@ -140,7 +138,7 @@ public final class SymbolicExecutionSideProofUtil {
                 } else {
                     result = services.getTermBuilder().or(results);
                 }
-                conditionsAndResultsMap.add(new Pair<>(result, resultGoal.node()));
+                conditionsAndResultsMap.add(new ComputeResults(result, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -169,7 +167,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    public static List<ConditionResults> computeResultsAndConditions(Services services,
             Proof proof, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             Operator operator, String description, String methodTreatment, String loopTreatment,
             String queryTreatment, String splittingOption, boolean addNamesToServices)
@@ -182,8 +180,7 @@ public final class SymbolicExecutionSideProofUtil {
             Set<Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<>();
+            List<ConditionResults> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
@@ -246,7 +243,7 @@ public final class SymbolicExecutionSideProofUtil {
                     result = services.getTermBuilder().ff();
                 }
                 conditionsAndResultsMap.add(
-                    new Triple<>(result, resultConditions, resultGoal.node()));
+                    new ConditionResults(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -842,5 +839,11 @@ public final class SymbolicExecutionSideProofUtil {
                 info.getProof().dispose();
             }
         }
+    }
+
+    public record ConditionResults(Term first, Set<Term> second, Node third) {
+    }
+
+    public record ComputeResults(Term first, Node second) {
     }
 }

@@ -1200,7 +1200,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
-                        .limitObs((ObserverFunction) op).first;
+                        .limitObs((ObserverFunction) op).first();
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
@@ -1474,7 +1474,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
-                        .limitObs((ObserverFunction) op).first;
+                        .limitObs((ObserverFunction) op).first();
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }

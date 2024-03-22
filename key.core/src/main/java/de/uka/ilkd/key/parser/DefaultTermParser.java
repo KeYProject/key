@@ -9,7 +9,6 @@ import java.io.Reader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -30,7 +29,7 @@ import org.antlr.v4.runtime.RecognitionException;
  * @author weigl
  * @deprecated Use the facade new KeyIO(services).parseTerm directly
  */
-@Deprecated // java11:(forRemoval = true, since = "2.8.0")
+@Deprecated(forRemoval = true, since = "2.8.0")
 public final class DefaultTermParser {
 
     /**
@@ -79,32 +78,6 @@ public final class DefaultTermParser {
             throw new RuntimeException(re); // message, new Location(re)).initCause(re);
         } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null).initCause(tse);
-        }
-    }
-
-    /**
-     * The method reads the input and parses a sequent with the specified namespaces.
-     *
-     * @return the paresed String as Sequent Object
-     * @throws ParserException The method throws a ParserException, if the input could not be parsed
-     *         correctly
-     */
-    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm)
-            throws ParserException {
-        KeyIO keyIO = new KeyIO(services, nss);
-        keyIO.setAbbrevMap(scm);
-        try {
-            final Sequent seq = keyIO.parseSequent(CharStreams.fromReader(in));
-            // p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services,
-            // nss), services, nss, scm);
-            return seq;
-        } catch (RecognitionException re) {
-            // problemParser cannot be null since exception is thrown during parsing.
-            // String message = p.getErrorMessage(re);
-            // throw new ParserException(message, new Location(re));
-            throw new RuntimeException(re);
-        } catch (IOException tse) {
-            throw new ParserException(tse.getMessage(), null);
         }
     }
 

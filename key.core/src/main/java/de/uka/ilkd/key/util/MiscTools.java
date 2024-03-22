@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.Name;
@@ -237,11 +238,11 @@ public final class MiscTools {
      * @param t the term for which we want to collect the observer functions.
      * @return the observers as a set of pairs with sorts and according observers
      */
-    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
-        ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
+    public static ImmutableSet<Limit> collectObservers(Term t) {
+        ImmutableSet<Limit> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<>(s, obs));
+            result = result.add(new Limit(s, obs));
         }
         for (Term sub : t.subs()) {
             result = result.union(collectObservers(sub));

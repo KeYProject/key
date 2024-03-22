@@ -95,7 +95,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         final ArrayList<AbstractionPredicate> preds =
             pamc.getAbstractionPredicates(atPres, services);
-        preds.forEach(pred -> pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc));
+        preds.forEach(pred -> pred.getPredicateFormWithPlaceholder().second().execPostOrder(tpvc));
 
         result.addAll(tpvc.result());
     }

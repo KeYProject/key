@@ -13,7 +13,10 @@ import java.util.Set;
  *
  * @param <T1> type of first element
  * @param <T2> type of second element
+ * @deprecated Should be removed: In Java 17+, we have the possibility to declare records, which are
+ *             definitely a better solution.
  */
+@Deprecated(forRemoval = true)
 public class Pair<T1, T2> {
     /**
      * First element.

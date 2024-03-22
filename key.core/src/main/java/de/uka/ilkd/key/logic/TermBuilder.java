@@ -32,7 +32,6 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
-import org.key_project.util.collection.Pair;
 
 /**
  * <p>
@@ -2122,13 +2121,13 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public static Pair<ImmutableList<Term>, Term> goBelowUpdates2(Term term) {
+    public static BelowUpdates goBelowUpdates2(Term term) {
         ImmutableList<Term> updates = ImmutableSLList.nil();
         while (term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
             term = UpdateApplication.getTarget(term);
         }
-        return new Pair<>(updates, term);
+        return new BelowUpdates(updates, term);
     }
 
     public Term seqDef(QuantifiableVariable qv, Term a, Term b, Term t) {
@@ -2322,5 +2321,8 @@ public class TermBuilder {
      */
     public OriginTermLabelFactory getOriginFactory() {
         return services.getOriginFactory();
+    }
+
+    public record BelowUpdates(ImmutableList<Term> first, Term second) {
     }
 }

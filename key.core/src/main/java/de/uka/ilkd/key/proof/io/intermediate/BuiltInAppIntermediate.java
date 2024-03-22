@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.
@@ -16,15 +15,15 @@ import org.key_project.util.collection.Pair;
  */
 public class BuiltInAppIntermediate extends AppIntermediate {
 
-    private String ruleName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
-    private String contract = null;
-    private String modality = null;
-    private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
-    private ImmutableList<Name> newNames = null;
+    private String ruleName;
+    private PosInfo posInfo;
+    private String contract;
+    private String modality;
+    private ImmutableList<PosInfo> builtInIfInsts;
+    private ImmutableList<Name> newNames;
 
-    public BuiltInAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String contract,
-            String modality, ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
+    public BuiltInAppIntermediate(String ruleName, PosInfo pos, String contract,
+            String modality, ImmutableList<PosInfo> builtInIfInsts,
             ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
@@ -38,7 +37,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return ruleName;
     }
 
-    public Pair<Integer, PosInTerm> getPosInfo() {
+    public PosInfo getPosInfo() {
         return posInfo;
     }
 
@@ -48,7 +47,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
 
     public String getModality() { return modality; }
 
-    public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
+    public ImmutableList<PosInfo> getBuiltInIfInsts() {
         return builtInIfInsts;
     }
 
@@ -62,4 +61,6 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return newNames;
     }
 
+    public record PosInfo(Integer first, PosInTerm second) {
+    }
 }

@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -27,7 +26,6 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -35,7 +33,6 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.runtime.Token;
 import org.jspecify.annotations.NonNull;
@@ -873,13 +870,14 @@ public final class JmlTermFactory {
     }
 
     public SLExpression createUnionF(boolean nullable,
-            Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, Term expr, Term guard) {
+            QuantifierVariables declVars, Term expr, Term guard) {
         final JavaInfo javaInfo = services.getJavaInfo();
         final Term restr =
-            JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
+            JmlTermFactory.this.typerestrict(declVars.first(), nullable, declVars.second());
         guard = guard == null ? restr : tb.and(restr, guard);
         return createIntersect(tb.infiniteUnion(
-            declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), guard, expr),
+            declVars.second().toArray(new QuantifiableVariable[declVars.second().size()]), guard,
+            expr),
             javaInfo);
     }
 
@@ -985,14 +983,13 @@ public final class JmlTermFactory {
         return term == null ? tb.tt() : tb.convertToFormula(term);
     }
 
-    public @NonNull Pair<Label, Term> createContinues(Term term, String label) {
+    public @NonNull LabeledClause createContinues(Term term, String label) {
         return createBreaks(term, label);
     }
 
-    @NonNull
-    public Pair<Label, Term> createBreaks(Term term, String label) {
+    public @NonNull LabeledClause createBreaks(Term term, String label) {
         Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
-        return new Pair<>(label == null ? null : new ProgramElementName(label), formula);
+        return new LabeledClause(label == null ? null : new ProgramElementName(label), formula);
     }
 
 
@@ -1027,11 +1024,11 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Pair<IObserverFunction, Term> represents(SLExpression lhs, Term t) {
-        return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
+    public ObservableClauseData represents(SLExpression lhs, Term t) {
+        return new ObservableClauseData((IObserverFunction) lhs.getTerm().op(), t);
     }
 
-    public Triple<IObserverFunction, Term, Term> depends(SLExpression lhs, Term rhs,
+    public DependencyContractData depends(SLExpression lhs, Term rhs,
             SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
@@ -1051,7 +1048,7 @@ public final class JmlTermFactory {
                 + ", given" + lhs.getTerm().sub(0).op());
         }
 
-        return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
+        return new DependencyContractData((IObserverFunction) lhs.getTerm().op(), rhs,
             mby == null ? null : mby.getTerm());
     }
 

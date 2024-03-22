@@ -27,7 +27,6 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -1537,15 +1536,15 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
             Term newApplicationTerm) {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
-            Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
+            TermBuilder.BelowUpdates pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
             ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                pair.second, refactorings.belowUpdatesRefactorings());
-            if (newLabels != pair.second.getLabels()) {
-                Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
-                    pair.second.boundVars(), newLabels);
+                pair.second(), refactorings.belowUpdatesRefactorings());
+            if (newLabels != pair.second().getLabels()) {
+                Term newModality = tf.createTerm(pair.second().op(), pair.second().subs(),
+                    pair.second().boundVars(), newLabels);
                 newApplicationTerm =
-                    services.getTermBuilder().applyParallel(pair.first, newModality,
+                    services.getTermBuilder().applyParallel(pair.first(), newModality,
                         newApplicationTerm.getLabels());
             }
         }

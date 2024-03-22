@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -42,7 +41,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -1610,10 +1608,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls,
             JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
         Boolean nullable = accept(boundvarmodifiers);
-        Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(quantifiedvardecls);
+        QuantifierVariables declVars = accept(quantifiedvardecls);
         if (declVars != null) {
             resolverManager.pushLocalVariablesNamespace();
-            resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
+            resolverManager.putIntoTopLocalVariablesNamespace(declVars.second(), declVars.first());
         }
         SLExpression t2 = accept(predicate);
         Term t = accept(storeref);
@@ -1727,10 +1725,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitSpecquantifiedexpression(
             JmlParser.SpecquantifiedexpressionContext ctx) {
         boolean nullable = Boolean.TRUE == accept(ctx.boundvarmodifiers());
-        Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(ctx.quantifiedvardecls());
+        QuantifierVariables declVars = accept(ctx.quantifiedvardecls());
         resolverManager.pushLocalVariablesNamespace();
         assert declVars != null;
-        resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
+        resolverManager.putIntoTopLocalVariablesNamespace(declVars.second(), declVars.first());
 
         Term guard = tb.tt();
         if (ctx.expression().size() == 2) {
@@ -1747,23 +1745,23 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert expr != null;
         final Term body = expr.getTerm();
         return switch (ctx.quantifier().start.getType()) {
-            case JmlLexer.FORALL -> termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
+            case JmlLexer.FORALL -> termFactory.forall(guard, body, declVars.first(), declVars.second(), nullable,
                     expr.getType());
-            case JmlLexer.EXISTS -> termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
+            case JmlLexer.EXISTS -> termFactory.exists(guard, body, declVars.first(), declVars.second(), nullable,
                     expr.getType());
-            case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
-                    declVars.second);
-            case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
-                    declVars.second);
+            case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first(), nullable,
+                    declVars.second());
+            case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first(), nullable,
+                    declVars.second());
             case JmlLexer.NUM_OF -> {
                 KeYJavaType kjtInt =
                         services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-                yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
-                        declVars.second, kjtInt);
+                yield termFactory.quantifiedNumOf(guard, body, declVars.first(), nullable,
+                        declVars.second(), kjtInt);
             }
-            case JmlLexer.SUM -> termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
+            case JmlLexer.SUM -> termFactory.quantifiedSum(declVars.first(), nullable, declVars.second(), guard, body,
                     expr.getType());
-            case JmlLexer.PRODUCT -> termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
+            case JmlLexer.PRODUCT -> termFactory.quantifiedProduct(declVars.first(), nullable, declVars.second(), guard,
                     body, expr.getType());
             default -> {
                 raiseError(ctx, "Unexpected syntax case.");
@@ -1776,7 +1774,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitOldexpression(JmlParser.OldexpressionContext ctx) {
         KeYJavaType typ;
         SLExpression result = accept(ctx.expression());
-        @Nullable
         String id = accept(ctx.IDENT());
 
         if (atPres == null || atPres.get(getBaseHeap()) == null) {
@@ -1841,37 +1838,35 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitBsumterm(JmlParser.BsumtermContext ctx) {
-        @Nullable
-        Pair<KeYJavaType, ImmutableList<LogicVariable>> decls = accept(ctx.quantifiedvardecls());
+        QuantifierVariables decls = accept(ctx.quantifiedvardecls());
         resolverManager.pushLocalVariablesNamespace();
         assert decls != null;
-        resolverManager.putIntoTopLocalVariablesNamespace(decls.second, decls.first);
+        resolverManager.putIntoTopLocalVariablesNamespace(decls.second(), decls.first());
         SLExpression a = accept(ctx.expression(0));
         SLExpression b = accept(ctx.expression(1));
         SLExpression t = accept(ctx.expression(2));
         assert t != null;
-        SLExpression result = termFactory.bsum(a, b, t, decls.first, decls.second);
+        SLExpression result = termFactory.bsum(a, b, t, decls.first(), decls.second());
         resolverManager.popLocalVariablesNamespace();
         return result;
     }
 
     @Override
     public Object visitSeqdefterm(JmlParser.SeqdeftermContext ctx) {
-        @Nullable
-        Pair<KeYJavaType, ImmutableList<LogicVariable>> decls = accept(ctx.quantifiedvardecls());
+        QuantifierVariables decls = accept(ctx.quantifiedvardecls());
         resolverManager.pushLocalVariablesNamespace();
         assert decls != null;
-        resolverManager.putIntoTopLocalVariablesNamespace(decls.second, decls.first);
+        resolverManager.putIntoTopLocalVariablesNamespace(decls.second(), decls.first());
         SLExpression a = accept(ctx.expression(0));
         SLExpression b = accept(ctx.expression(1));
         SLExpression t = accept(ctx.expression(2));
-        SLExpression result = termFactory.createSeqDef(a, b, t, decls.first, decls.second);
+        SLExpression result = termFactory.createSeqDef(a, b, t, decls.first(), decls.second());
         resolverManager.popLocalVariablesNamespace();
         return result;
     }
 
     @Override
-    public Pair<KeYJavaType, ImmutableList<LogicVariable>> visitQuantifiedvardecls(
+    public QuantifierVariables visitQuantifiedvardecls(
             JmlParser.QuantifiedvardeclsContext ctx) {
         ImmutableList<LogicVariable> vars = ImmutableSLList.nil();
         KeYJavaType t = accept(ctx.typespec());
@@ -1880,7 +1875,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             LogicVariable v = visitQuantifiedvariabledeclarator(context, t);
             vars = vars.append(v);
         }
-        return new Pair<>(t, vars);
+        return new QuantifierVariables(t, vars);
     }
 
     @Override
@@ -2025,30 +2020,27 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Pair<Label, Term> visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
+    public LabeledClause visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @NonNull
-        Pair<Label, Term> t = termFactory.createBreaks(pred.getTerm(), label);
-        contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
+        var t = termFactory.createBreaks(pred.getTerm(), label);
+        contractClauses.add(ContractClauses.BREAKS, t.label(), t.term());
         return t;
     }
 
     @Override
-    public Pair<Label, Term> visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
+    public LabeledClause visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText();
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @NonNull
-        Pair<Label, Term> t = termFactory.createContinues(pred.getTerm(), label);
-        contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
+        var t = termFactory.createContinues(pred.getTerm(), label);
+        contractClauses.add(ContractClauses.CONTINUES, t.label(), t.term());
         return t;
     }
 
     @Override
     public SLExpression visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
-        @Nullable
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
         contractClauses.returns = termFactory.createReturns(pred.getTerm());
@@ -2203,7 +2195,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Pair<IObserverFunction, Term> visitRepresents_clause(
+    public ObservableClauseData visitRepresents_clause(
             JmlParser.Represents_clauseContext ctx) {
         SLExpression lhs = accept(ctx.lhs);
         SLExpression rhs = accept(ctx.rhs);
@@ -2280,7 +2272,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (ctx.byItself != null) {
             by = determined;
         } else {
-            @Nullable
             ImmutableList<Term> t = accept(ctx.by);
             assert t != null;
             by = by.append(t);
@@ -2550,6 +2541,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public static void raiseError(String message, ParserRuleContext ctx) {
         throw new BuildingException(ctx, message);
     }
-
     // endregion
+
 }

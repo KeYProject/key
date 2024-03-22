@@ -18,44 +18,47 @@ import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 
-import org.key_project.util.collection.Pair;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PerfScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerfScope.class);
-    private static final Pair<String, AtomicLong>[] PERF_COUNTERS = new Pair[] {
-        new Pair<>("JavaCardDLStrategy approve", JavaCardDLStrategy.PERF_APPROVE),
-        new Pair<>("JavaCardDLStrategy instantiate", JavaCardDLStrategy.PERF_INSTANTIATE),
-        new Pair<>("JavaCardDLStrategy compute", JavaCardDLStrategy.PERF_COMPUTE),
-        new Pair<>("QueueRuleApplicationManager peek", QueueRuleApplicationManager.PERF_PEEK),
-        new Pair<>("QueueRuleApplicationManager queue ops",
+
+    private record PerfCounter(String first, AtomicLong second) {}
+
+    private static final PerfCounter[] PERF_COUNTERS = new PerfCounter[] {
+        new PerfCounter("JavaCardDLStrategy approve", JavaCardDLStrategy.PERF_APPROVE),
+        new PerfCounter("JavaCardDLStrategy instantiate", JavaCardDLStrategy.PERF_INSTANTIATE),
+        new PerfCounter("JavaCardDLStrategy compute", JavaCardDLStrategy.PERF_COMPUTE),
+        new PerfCounter("QueueRuleApplicationManager peek", QueueRuleApplicationManager.PERF_PEEK),
+        new PerfCounter("QueueRuleApplicationManager queue ops",
             QueueRuleApplicationManager.PERF_QUEUE_OPS),
-        new Pair<>("QueueRuleApplicationManager create container",
+        new PerfCounter("QueueRuleApplicationManager create container",
             QueueRuleApplicationManager.PERF_CREATE_CONTAINER),
-        new Pair<>("Goal apply", ApplyStrategy.PERF_GOAL_APPLY),
-        new Pair<>("RuleApp execute", Goal.PERF_APP_EXECUTE),
-        new Pair<>("Goal setSequent", Goal.PERF_SET_SEQUENT),
-        new Pair<>("Goal update tag manager", Goal.PERF_UPDATE_TAG_MANAGER),
-        new Pair<>("Goal update rule app index", Goal.PERF_UPDATE_RULE_APP_INDEX),
-        new Pair<>("Taclet app index update", TacletAppIndex.PERF_UPDATE),
-        new Pair<>("Semi Taclet app index update remove", SemisequentTacletAppIndex.PERF_REMOVE),
-        new Pair<>("Semi Taclet app index update add", SemisequentTacletAppIndex.PERF_ADD),
-        new Pair<>("Semi Taclet app index update update", SemisequentTacletAppIndex.PERF_UPDATE),
-        new Pair<>("Taclet app index create all", TacletAppIndex.PERF_CREATE_ALL),
-        new Pair<>("Goal update listeners", Goal.PERF_UPDATE_LISTENERS),
-        new Pair<>("TacletApp execute", TacletApp.PERF_EXECUTE),
-        new Pair<>("TacletApp pre", TacletApp.PERF_PRE),
-        new Pair<>("TacletApp Goal setSequent", TacletApp.PERF_SET_SEQUENT),
-        new Pair<>("NoFindTacletExecutor apply", NoFindTacletExecutor.PERF_APPLY),
-        new Pair<>("NoFindTacletExecutor setSequent", NoFindTacletExecutor.PERF_SET_SEQUENT),
-        new Pair<>("NoFindTacletExecutor term labels", NoFindTacletExecutor.PERF_TERM_LABELS),
-        new Pair<>("FindTacletExecutor apply", FindTacletExecutor.PERF_APPLY),
-        new Pair<>("FindTacletExecutor setSequent", FindTacletExecutor.PERF_SET_SEQUENT),
-        new Pair<>("FindTacletExecutor term labels", FindTacletExecutor.PERF_TERM_LABELS),
-        new Pair<>("AbstractBuiltInRuleApp execute", AbstractBuiltInRuleApp.PERF_EXECUTE),
-        new Pair<>("AbstractBuiltInRuleApp Goal setSequent",
+        new PerfCounter("Goal apply", ApplyStrategy.PERF_GOAL_APPLY),
+        new PerfCounter("RuleApp execute", Goal.PERF_APP_EXECUTE),
+        new PerfCounter("Goal setSequent", Goal.PERF_SET_SEQUENT),
+        new PerfCounter("Goal update tag manager", Goal.PERF_UPDATE_TAG_MANAGER),
+        new PerfCounter("Goal update rule app index", Goal.PERF_UPDATE_RULE_APP_INDEX),
+        new PerfCounter("Taclet app index update", TacletAppIndex.PERF_UPDATE),
+        new PerfCounter("Semi Taclet app index update remove",
+            SemisequentTacletAppIndex.PERF_REMOVE),
+        new PerfCounter("Semi Taclet app index update add", SemisequentTacletAppIndex.PERF_ADD),
+        new PerfCounter("Semi Taclet app index update update",
+            SemisequentTacletAppIndex.PERF_UPDATE),
+        new PerfCounter("Taclet app index create all", TacletAppIndex.PERF_CREATE_ALL),
+        new PerfCounter("Goal update listeners", Goal.PERF_UPDATE_LISTENERS),
+        new PerfCounter("TacletApp execute", TacletApp.PERF_EXECUTE),
+        new PerfCounter("TacletApp pre", TacletApp.PERF_PRE),
+        new PerfCounter("TacletApp Goal setSequent", TacletApp.PERF_SET_SEQUENT),
+        new PerfCounter("NoFindTacletExecutor apply", NoFindTacletExecutor.PERF_APPLY),
+        new PerfCounter("NoFindTacletExecutor setSequent", NoFindTacletExecutor.PERF_SET_SEQUENT),
+        new PerfCounter("NoFindTacletExecutor term labels", NoFindTacletExecutor.PERF_TERM_LABELS),
+        new PerfCounter("FindTacletExecutor apply", FindTacletExecutor.PERF_APPLY),
+        new PerfCounter("FindTacletExecutor setSequent", FindTacletExecutor.PERF_SET_SEQUENT),
+        new PerfCounter("FindTacletExecutor term labels", FindTacletExecutor.PERF_TERM_LABELS),
+        new PerfCounter("AbstractBuiltInRuleApp execute", AbstractBuiltInRuleApp.PERF_EXECUTE),
+        new PerfCounter("AbstractBuiltInRuleApp Goal setSequent",
             AbstractBuiltInRuleApp.PERF_SET_SEQUENT),
     };
     private static final DecimalFormat DECIMAL_FORMAT =
@@ -95,7 +98,7 @@ public class PerfScope {
         displayTime("Total", System.nanoTime() - timeNs);
 
         for (int i = 0; i < PERF_COUNTERS.length; i++) {
-            Pair<String, AtomicLong> perf = PERF_COUNTERS[i];
+            var perf = PERF_COUNTERS[i];
             long timeBefore = timesBefore[i];
             var dt = perf.second.getAndSet(0) - timeBefore;
             displayTime(perf.first, dt);

@@ -69,7 +69,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 import org.slf4j.Logger;
@@ -486,7 +485,7 @@ public final class SymbolicExecutionUtil {
         Term originalModifiedFormula =
             methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
         ImmutableList<Term> originalUpdates =
-            TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+            TermBuilder.goBelowUpdates2(originalModifiedFormula).first();
         // Create Sequent to prove with new succedent.
         Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null,
             modalityTerm, originalUpdates, false);
@@ -1926,7 +1925,7 @@ public final class SymbolicExecutionUtil {
                 // Add updates (in the simplify branch the updates are added during side proof
                 // construction)
                 condition = services.getTermBuilder()
-                        .applyParallel(search.getUpdatesAndTerm().first, result);
+                        .applyParallel(search.getUpdatesAndTerm().first(), result);
             }
             if (improveReadability) {
                 condition = improveReadability(condition, services);
@@ -2072,8 +2071,8 @@ public final class SymbolicExecutionUtil {
         Semisequent antecedent = node.sequent().antecedent();
         SequentFormula sf = antecedent.get(antecedent.size() - 1);
         Term workingTerm = sf.formula();
-        Pair<ImmutableList<Term>, Term> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
-        workingTerm = updatesAndTerm.second;
+        TermBuilder.BelowUpdates updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
+        workingTerm = updatesAndTerm.second();
         if (workingTerm.op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of "
                 + "UseOperationContractRule might have changed!");
@@ -2137,7 +2136,7 @@ public final class SymbolicExecutionUtil {
         /**
          * The updates.
          */
-        private final Pair<ImmutableList<Term>, Term> updatesAndTerm;
+        private final TermBuilder.BelowUpdates updatesAndTerm;
 
         /**
          * The exception definition.
@@ -2158,7 +2157,7 @@ public final class SymbolicExecutionUtil {
          * @param exceptionEquality The equality which contains the equality.
          */
         public ContractPostOrExcPostExceptionVariableResult(Term workingTerm,
-                Pair<ImmutableList<Term>, Term> updatesAndTerm, Term exceptionDefinition,
+                TermBuilder.BelowUpdates updatesAndTerm, Term exceptionDefinition,
                 Term exceptionEquality) {
             this.workingTerm = workingTerm;
             this.updatesAndTerm = updatesAndTerm;
@@ -2180,7 +2179,7 @@ public final class SymbolicExecutionUtil {
          *
          * @return The updates.
          */
-        public Pair<ImmutableList<Term>, Term> getUpdatesAndTerm() {
+        public TermBuilder.BelowUpdates getUpdatesAndTerm() {
             return updatesAndTerm;
         }
 
@@ -2246,9 +2245,8 @@ public final class SymbolicExecutionUtil {
             // Extract loop condition from child
             Term loopConditionModalityTerm =
                 posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
-            Pair<ImmutableList<Term>, Term> pair =
-                TermBuilder.goBelowUpdates2(loopConditionModalityTerm);
-            loopConditionModalityTerm = pair.second;
+            TermBuilder.BelowUpdates pair = TermBuilder.goBelowUpdates2(loopConditionModalityTerm);
+            loopConditionModalityTerm = pair.second();
             if (childIndex == 1) { // Body Preserves Invariant
                 if (loopConditionModalityTerm.op() != Junctor.IMP) {
                     throw new ProofInputException(
@@ -2295,13 +2293,13 @@ public final class SymbolicExecutionUtil {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null,
-                    modalityTerm, pair.first, true);
+                    modalityTerm, pair.first(), true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Loop invariant branch condition computation on node "
                         + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             } else {
-                condition = services.getTermBuilder().applySequential(pair.first, modalityTerm);
+                condition = services.getTermBuilder().applySequential(pair.first(), modalityTerm);
             }
             if (improveReadability) {
                 condition = improveReadability(condition, services);
@@ -2737,19 +2735,20 @@ public final class SymbolicExecutionUtil {
     private static Term evaluateInSideProof(Services services, Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
             String description, String splittingOption) throws ProofInputException {
-        List<Pair<Term, Node>> resultValuesAndConditions =
+        List<SymbolicExecutionSideProofUtil.ComputeResults> resultValuesAndConditions =
             SymbolicExecutionSideProofUtil.computeResults(services, proof, sideProofEnvironment,
-                sequentToProve, label, description, StrategyProperties.METHOD_NONE, // Stop at
-                                                                                    // methods to
-                                                                                    // avoid endless
-                                                                                    // executions
-                                                                                    // and scenarios
-                                                                                    // in which a
-                                                                                    // precondition
-                                                                                    // or null
-                                                                                    // pointer check
-                                                                                    // can't be
-                                                                                    // shown
+                sequentToProve, label, description, StrategyProperties.METHOD_NONE,
+                // Stop at
+                // methods to
+                // avoid endless
+                // executions
+                // and scenarios
+                // in which a
+                // precondition
+                // or null
+                // pointer check
+                // can't be
+                // shown
                 StrategyProperties.LOOP_NONE, // Stop at loops to avoid endless executions and
                                               // scenarios in which the invariant can't be shown to
                                               // be initially valid or preserved.
@@ -2758,9 +2757,9 @@ public final class SymbolicExecutionUtil {
                                               // check can't be shown
                 splittingOption, false);
         ImmutableList<Term> goalCondtions = ImmutableSLList.nil();
-        for (Pair<Term, Node> pair : resultValuesAndConditions) {
-            Term goalCondition = pair.first;
-            goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(),
+        for (var pair : resultValuesAndConditions) {
+            Term goalCondition = pair.first();
+            goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second().sequent(),
                 goalCondition, services);
             goalCondition = removeLabelRecursive(services.getTermFactory(), goalCondition, label);
             goalCondtions = goalCondtions.append(goalCondition);
@@ -2917,7 +2916,7 @@ public final class SymbolicExecutionUtil {
                 originalUpdates = computeRootElementaryUpdates(node);
             } else {
                 Term originalModifiedFormula = pio.sequentFormula().formula();
-                originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+                originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first();
             }
             // Create new sequent
             return createSequentToProveWithNewSuccedent(node, pio, additionalAntecedent,
@@ -3908,7 +3907,7 @@ public final class SymbolicExecutionUtil {
      * @param ruleApp The {@link RuleApp}.
      * @return The computed call stack size and the second statement if available.
      */
-    public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
+    public static CallStackSize computeSecondStatement(RuleApp ruleApp) {
         if (ruleApp != null) {
             // Find inner most block
             SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
@@ -3937,9 +3936,9 @@ public final class SymbolicExecutionUtil {
                 block = blocks.removeFirst();
             }
             if (block != null && block.getChildCount() >= 2) {
-                return new Pair<>(methodFrameCount, block.getChildAt(1));
+                return new CallStackSize(methodFrameCount, block.getChildAt(1));
             } else {
-                return new Pair<>(methodFrameCount, null);
+                return new CallStackSize(methodFrameCount, null);
             }
         } else {
             return null;
@@ -4182,8 +4181,8 @@ public final class SymbolicExecutionUtil {
             // program terminates normally
             ImmutableArray<Term> value = null;
             for (SequentFormula f : node.sequent().succedent()) {
-                Pair<ImmutableList<Term>, Term> updates = TermBuilder.goBelowUpdates2(f.formula());
-                Iterator<Term> iter = updates.first.iterator();
+                TermBuilder.BelowUpdates updates = TermBuilder.goBelowUpdates2(f.formula());
+                Iterator<Term> iter = updates.first().iterator();
                 while (value == null && iter.hasNext()) {
                     value = extractValueFromUpdate(iter.next(), exceptionVariable);
                 }
@@ -4305,4 +4304,6 @@ public final class SymbolicExecutionUtil {
         }
     }
 
+    public record CallStackSize(int first, ProgramElement second) {
+    }
 }

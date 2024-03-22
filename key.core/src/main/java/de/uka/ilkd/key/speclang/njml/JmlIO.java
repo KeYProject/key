@@ -5,24 +5,20 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
@@ -106,10 +102,9 @@ public class JmlIO {
      *
      * @throws ClassCastException if unsuitable parser rule context is given
      */
-    @SuppressWarnings("unchecked")
-    public Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause) {
+    public ObservableClauseData translateRepresents(ParserRuleContext clause) {
         Object interpret = interpret(clause);
-        return (Pair<IObserverFunction, Term>) interpret;
+        return (ObservableClauseData) interpret;
     }
 
     /**
@@ -120,10 +115,9 @@ public class JmlIO {
      *
      * @throws ClassCastException if unsuitable parser rule context is given@param clause
      */
-    public @NonNull Pair<IObserverFunction, Term> translateRepresents(
+    public @NonNull ObservableClauseData translateRepresents(
             @NonNull LabeledParserRuleContext clause) {
-        Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
-        return new Pair<>(p.first, p.second);
+        return translateRepresents(clause.first);
     }
 
     /**
@@ -145,11 +139,11 @@ public class JmlIO {
     /**
      * Interpret a labeled term (breaks clauses, continue clauses).
      */
-    @SuppressWarnings("unchecked")
-    public Pair<Label, Term> translateLabeledClause(LabeledParserRuleContext parserRuleContext,
+    public LabeledClause translateLabeledClause(LabeledParserRuleContext parserRuleContext,
             OriginTermLabel.SpecType type) {
-        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext.first);
-        return new Pair<>(t.first, attachTermLabel(t.second, type));
+        var labeledClause = (LabeledClause) interpret(parserRuleContext.first);
+        return new LabeledClause(labeledClause.label(),
+            attachTermLabel(labeledClause.term(), type));
     }
 
 
@@ -159,7 +153,6 @@ public class JmlIO {
     public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
         return (MergeParamsSpec) interpret(ctx);
     }
-
 
 
     /**
@@ -289,10 +282,9 @@ public class JmlIO {
      * @return a dependency contract
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
-    @SuppressWarnings("unchecked")
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
+    public DependencyContractData translateDependencyContract(
             ParserRuleContext ctx) {
-        return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
+        return (DependencyContractData) interpret(ctx);
     }
 
     /**
@@ -302,7 +294,7 @@ public class JmlIO {
      *
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
+    public DependencyContractData translateDependencyContract(
             LabeledParserRuleContext ctx) {
         return translateDependencyContract(ctx.first);
     }

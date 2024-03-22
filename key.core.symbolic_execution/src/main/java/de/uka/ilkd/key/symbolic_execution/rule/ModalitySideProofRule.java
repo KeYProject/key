@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,21 +17,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -136,10 +130,9 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             // Extract required Terms from goal
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Term topLevelTerm = pio.subTerm();
-            Pair<ImmutableList<Term>, Term> updatesAndTerm =
-                TermBuilder.goBelowUpdates2(topLevelTerm);
-            Term modalityTerm = updatesAndTerm.second;
-            ImmutableList<Term> updates = updatesAndTerm.first;
+            TermBuilder.BelowUpdates updatesAndTerm = TermBuilder.goBelowUpdates2(topLevelTerm);
+            Term modalityTerm = updatesAndTerm.second();
+            ImmutableList<Term> updates = updatesAndTerm.first();
             boolean inImplication = false;
             Term equalityTerm = modalityTerm.sub(0);
             if (equalityTerm.op() == Junctor.IMP) {
@@ -182,7 +175,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
                     .sequent();
             // Compute results and their conditions
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
+            List<SymbolicExecutionSideProofUtil.ConditionResults> conditionsAndResultsMap =
                 computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
@@ -191,10 +184,11 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             resultGoal.removeFormula(pio);
             // Create results
             Set<Term> resultTerms = new LinkedHashSet<>();
-            for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-                Term conditionTerm = tb.and(conditionsAndResult.second);
-                Term resultEqualityTerm = varFirst ? tb.equals(conditionsAndResult.first, otherTerm)
-                        : tb.equals(otherTerm, conditionsAndResult.first);
+            for (var conditionsAndResult : conditionsAndResultsMap) {
+                Term conditionTerm = tb.and(conditionsAndResult.second());
+                Term resultEqualityTerm =
+                    varFirst ? tb.equals(conditionsAndResult.first(), otherTerm)
+                            : tb.equals(otherTerm, conditionsAndResult.first());
                 Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, resultEqualityTerm)
                         : tb.and(conditionTerm, resultEqualityTerm);
                 resultTerms.add(resultTerm);

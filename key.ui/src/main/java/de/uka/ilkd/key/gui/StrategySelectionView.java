@@ -25,7 +25,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
-import de.uka.ilkd.key.util.Triple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +52,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class StrategySelectionView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategySelectionView.class);
-
-    /**
-     * Generated UID.
-     */
-    private static final long serialVersionUID = -267867794853527874L;
 
     /**
      * The always used {@link StrategyFactory}.
@@ -405,9 +399,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         existingPredefs[0] = "Defaults";
 
         int i = 1;
-        for (Triple<String, Integer, IDefaultStrategyPropertiesFactory> furtherDefault : DEFINITION
-                .getFurtherDefaults()) {
-            existingPredefs[i] = furtherDefault.first;
+        for (var furtherDefault : DEFINITION.getFurtherDefaults()) {
+            existingPredefs[i] = furtherDefault.first();
             i++;
         }
 
@@ -425,10 +418,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 newProps =
                     DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
             } else {
-                Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
+                StrategySettingsDefinition.StdDefault chosenDefault =
                     DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                newMaxSteps = chosenDefault.second;
-                newProps = chosenDefault.third.createDefaultStrategyProperties();
+                newMaxSteps = chosenDefault.second();
+                newProps = chosenDefault.third().createDefaultStrategyProperties();
             }
 
             mediator.getSelectedProof().getSettings().getStrategySettings()

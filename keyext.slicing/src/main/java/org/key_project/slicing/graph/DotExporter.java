@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.util.collection.Pair;
 
 /**
  * Exports a {@link DependencyGraph} in DOT format.
@@ -101,17 +100,20 @@ public final class DotExporter {
             boolean abbreviateFormulas,
             boolean omitBranch,
             GraphNode graphNode) {
+
+        record P(GraphNode first, int second){}
+
         StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
         buf.append("edge [dir=\"back\"];\n");
         // queue of: (graph node, depth required to find graph node)
-        List<Pair<GraphNode, Integer>> queue = new ArrayList<>();
-        queue.add(new Pair<>(graphNode, 0));
+        List<P> queue = new ArrayList<>();
+        queue.add(new P(graphNode, 0));
 
         Set<GraphNode> visited = new HashSet<>();
         Set<Node> drawn = new HashSet<>();
         while (!queue.isEmpty()) {
-            Pair<GraphNode, Integer> nodePair = queue.remove(queue.size() - 1);
+            var nodePair = queue.remove(queue.size() - 1);
             if (visited.contains(nodePair.first)) {
                 continue;
             }
@@ -132,7 +134,7 @@ public final class DotExporter {
             });
             if (nodePair.second < 1) {
                 graph.neighborsOf(nodeB)
-                        .forEach(newNode -> queue.add(new Pair<>(newNode, nodePair.second + 1)));
+                        .forEach(newNode -> queue.add(new P(newNode, nodePair.second + 1)));
             }
         }
         buf.append('"').append(graphNode.toString(abbreviateFormulas, omitBranch))
@@ -155,8 +157,8 @@ public final class DotExporter {
      */
     private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
             boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
-        for (Pair<GraphNode, Boolean> in : data.inputs) {
-            String inString = in.first.toString(abbreviateFormulas, omitBranch);
+        for (var in : data.inputs) {
+            String inString = in.first().toString(abbreviateFormulas, omitBranch);
             for (GraphNode out : data.outputs) {
                 String outString = out.toString(abbreviateFormulas, omitBranch);
                 buf
@@ -174,7 +176,7 @@ public final class DotExporter {
                 buf
                         .append("\"]\n");
                 if (analysisResults != null) {
-                    if (!analysisResults.usefulNodes.contains(in.first)) {
+                    if (!analysisResults.usefulNodes.contains(in.first())) {
                         buf.append('"').append(inString).append('"')
                                 .append(" [color=\"red\"]\n");
                     }
@@ -184,7 +186,7 @@ public final class DotExporter {
                     }
                 }
                 // make sure the formulas are drawn with the correct shape
-                String shape = SHAPES.get(in.first.getClass());
+                String shape = SHAPES.get(in.first().getClass());
                 if (shape != null) {
                     buf.append('"').append(inString).append("\" [shape=\"").append(shape)
                             .append("\"]\n");

@@ -39,7 +39,6 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -96,7 +95,6 @@ import org.key_project.util.java.ArrayUtil;
  * </p>
  *
  * @author Martin Hentschel
- *
  * @see FunctionalOperationContractPO#isAddUninterpretedPredicate()
  * @see IExecutionNode
  * @see IExecutionStart
@@ -451,9 +449,9 @@ public class SymbolicExecutionTreeBuilder {
         while (iter.hasNext()) {
             Node node = iter.next();
             visitor.visit(proof, node); // This visitor pattern must be used because a recursive
-                                        // iteration causes StackOverflowErrors if the proof tree in
-                                        // KeY is to deep (e.g. simple list with 2000 elements
-                                        // during computation of fibonacci(7)
+            // iteration causes StackOverflowErrors if the proof tree in
+            // KeY is to deep (e.g. simple list with 2000 elements
+            // during computation of fibonacci(7)
         }
         visitor.completeTree();
         visitor.injectLinks(); // Needs to be execute after the completeTree() is called.
@@ -465,8 +463,8 @@ public class SymbolicExecutionTreeBuilder {
      * hierarchy of the given {@link Node} (including the Node itself).
      *
      * @param node {@link Node} to be pruned.
-     * @author Anna Filighera
      * @return The {@link AbstractExecutionNode}'s which where deleted.
+     * @author Anna Filighera
      */
     public Set<AbstractExecutionNode<?>> prune(Node node) {
         // search for the first node in the parent hierarchy (including the node itself) who is an
@@ -717,7 +715,7 @@ public class SymbolicExecutionTreeBuilder {
             // Check if the current node has branch conditions which should be added to the
             // execution tree model
             if (!(parentToAddTo instanceof IExecutionStart) && // Ignore branch conditions before
-                                                               // starting with code execution
+            // starting with code execution
                     hasBranchCondition(visitedNode)) {
                 Iterator<Node> iter = visitedNode.childrenIterator();
                 while (iter.hasNext()) {
@@ -779,8 +777,8 @@ public class SymbolicExecutionTreeBuilder {
                             IExecutionLink link = source.getOutgoingLink(target);
                             if (link == null) {
                                 link = new ExecutionLink(target, source); // Source and target needs
-                                                                          // to be swapped in the
-                                                                          // symbolic execution tree
+                                // to be swapped in the
+                                // symbolic execution tree
                                 ((AbstractExecutionNode<?>) link.getTarget()).addIncomingLink(link);
                                 ((AbstractExecutionNode<?>) link.getSource()).addOutgoingLink(link);
                             }
@@ -887,12 +885,12 @@ public class SymbolicExecutionTreeBuilder {
             // Update block map
             RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
             if (currentOrFutureRuleApplication == null && node != proof.root()) { // Executing
-                                                                                  // peekNext() on
-                                                                                  // the root
-                                                                                  // crashes the
-                                                                                  // tests for
-                                                                                  // unknown
-                                                                                  // reasons.
+                // peekNext() on
+                // the root
+                // crashes the
+                // tests for
+                // unknown
+                // reasons.
                 Goal goal = proof.getOpenGoal(node);
                 if (goal != null) {
                     currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext();
@@ -968,9 +966,10 @@ public class SymbolicExecutionTreeBuilder {
                     keyNodeLoopConditionMapping.put(node, condition);
                     // Set call stack on new created node
                     condition.setCallStack(createCallStack(node));
-                    Pair<Integer, SourceElement> secondPair =
+                    SymbolicExecutionUtil.CallStackSize secondPair =
                         SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
-                    addToBlockMap(node, condition, secondPair.first, secondPair.second, statement);
+                    addToBlockMap(node, condition, secondPair.first(), secondPair.second(),
+                        statement);
                 }
                 parentToAddTo = condition;
             }
@@ -1186,9 +1185,9 @@ public class SymbolicExecutionTreeBuilder {
      * @param blockStartNode The {@link AbstractExecutionNode} to add.
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode) {
-        Pair<Integer, SourceElement> secondPair =
+        SymbolicExecutionUtil.CallStackSize secondPair =
             SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
-        addToBlockMap(node, blockStartNode, secondPair.first, secondPair.second);
+        addToBlockMap(node, blockStartNode, secondPair.first(), secondPair.second());
     }
 
     /**
@@ -1264,7 +1263,7 @@ public class SymbolicExecutionTreeBuilder {
                         node = nextNode;
                     } else {
                         node = null; // Stop search because multiple open branches indicate that a
-                                     // block is required.
+                        // block is required.
                     }
                 } else if (node.childrenCount() == 1) {
                     node = node.child(0);
@@ -1381,8 +1380,8 @@ public class SymbolicExecutionTreeBuilder {
                     for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : oldBlockMap
                             .entrySet()) {
                         if (!isContained(entry.getValue(), node)) { // Ensure that with stepwise
-                                                                    // execution loops are not
-                                                                    // completed by their own.
+                            // execution loops are not
+                            // completed by their own.
                             boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame,
                                 activeStatement, entry.getKey());
                             if (done) {
@@ -1500,10 +1499,10 @@ public class SymbolicExecutionTreeBuilder {
                             // Find the call Node representation in SED, if not available ignore it.
                             IExecutionNode<?> callSEDNode = keyNodeMapping.get(callNode);
                             if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start
-                                                                              // node if the initial
-                                                                              // sequent already
-                                                                              // contains some
-                                                                              // method frames.
+                                // node if the initial
+                                // sequent already
+                                // contains some
+                                // method frames.
                                 if (methodReturn) {
                                     result = new ExecutionMethodReturn(settings, node,
                                         (ExecutionMethodCall) callSEDNode);
@@ -1679,7 +1678,7 @@ public class SymbolicExecutionTreeBuilder {
             for (int i = 0; i < size; i++) {
                 Node stackEntry = stackIter.next();
                 if (stackEntry != proof.root()) { // Ignore call stack entries provided by the
-                                                  // initial sequent
+                    // initial sequent
                     IExecutionNode<?> executionNode = getExecutionNode(stackEntry);
                     if (executionNode != null) { // It might be null in case of API methods.
                         callStack.add(executionNode);
@@ -1730,8 +1729,8 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected boolean hasBranchCondition(Node node) {
         if (node.childrenCount() >= 2) { // Check if it is a possible branch statement, otherwise
-                                         // there is no need for complex computation to filter out
-                                         // not relevant branches
+            // there is no need for complex computation to filter out
+            // not relevant branches
             int openChildrenCount = 0;
             Iterator<Node> childIter = node.childrenIterator();
             while (childIter.hasNext()) {
@@ -1833,49 +1832,35 @@ public class SymbolicExecutionTreeBuilder {
      * Utility class to group a call stack size with an {@link ImmutableList} of
      * {@link SourceElement} with the elements of interest.
      *
+     * @param stackSize          The call stack size.
+     * @param elementsOfInterest The {@link SourceElement}s of interest.
      * @author Martin Hentschel
      */
-    protected static class JavaPair extends Pair<Integer, ImmutableList<SourceElement>> {
-        /**
-         * Constructor.
-         *
-         * @param stackSize The call stack size.
-         * @param elementsOfInterest The {@link SourceElement}s of interest.
-         */
-        public JavaPair(Integer stackSize, ImmutableList<SourceElement> elementsOfInterest) {
-            super(stackSize, elementsOfInterest);
-        }
+    public record JavaPair(int first, ImmutableList<SourceElement> second) {
 
         /**
          * {@inheritDoc}
          */
         @Override
         public boolean equals(Object o) {
-            if (super.equals(o)) {
-                if (o instanceof JavaPair other) {
-                    if (second.size() == other.second.size()) {
-                        Iterator<SourceElement> iter = second.iterator();
-                        Iterator<SourceElement> otherIter = other.second.iterator();
-                        boolean equals = true;
-                        while (equals && iter.hasNext()) {
-                            SourceElement next = iter.next();
-                            SourceElement otherNext = otherIter.next();
-                            // Comparison by == is not possible since loops are recreated
-                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) {
-                                equals = false;
-                            }
+            if (o instanceof JavaPair other) {
+                if (second.size() == other.second.size()) {
+                    Iterator<SourceElement> iter = second.iterator();
+                    Iterator<SourceElement> otherIter = other.second.iterator();
+                    boolean equals = true;
+                    while (equals && iter.hasNext()) {
+                        SourceElement next = iter.next();
+                        SourceElement otherNext = otherIter.next();
+                        // Comparison by == is not possible since loops are recreated
+                        if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) {
+                            equals = false;
                         }
-                        assert !otherIter.hasNext();
-                        return equals;
-                    } else {
-                        return false;
                     }
-                } else {
-                    return false;
+                    assert !otherIter.hasNext();
+                    return equals;
                 }
-            } else {
-                return false;
             }
+            return false;
         }
     }
 }

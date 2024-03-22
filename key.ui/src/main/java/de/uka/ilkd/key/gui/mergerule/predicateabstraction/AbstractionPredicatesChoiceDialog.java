@@ -35,9 +35,7 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +61,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private Goal goal = null;
 
-    private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
+    private ArrayList<MergeRuleUtils.Placeholder> registeredPlaceholders = new ArrayList<>();
     private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
     private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
@@ -297,12 +295,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 placeholdersLstModel.addElement(currInput);
                 txtPlaceholderInput.setText("");
 
-                final Pair<Sort, Name> parsed = parsePlaceholder(currInput);
+                MergeRuleUtils.Placeholder parsed = parsePlaceholder(currInput);
                 registeredPlaceholders.add(parsed);
                 final Namespace<IProgramVariable> pvs =
                     goal.proof().getServices().getNamespaces().programVariables();
-                pvs.add(new LocationVariable(new ProgramElementName(parsed.second.toString()),
-                    parsed.first));
+                pvs.add(new LocationVariable(new ProgramElementName(parsed.name().toString()),
+                    parsed.sort()));
             }
         });
 
@@ -313,11 +311,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !placeholdersLstModel.isEmpty()
                         && selectedIndex >= 0) {
                     placeholdersLstModel.remove(selectedIndex);
-                    final Pair<Sort, Name> removedPlaceholder =
+                    MergeRuleUtils.Placeholder removedPlaceholder =
                         registeredPlaceholders.remove(selectedIndex);
                     final Namespace<IProgramVariable> pvs =
                         goal.proof().getServices().getNamespaces().programVariables();
-                    pvs.remove(removedPlaceholder.second);
+                    pvs.remove(removedPlaceholder.name());
                 }
             }
         });
@@ -475,7 +473,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param input The input to parse.
      * @return The parsed placeholder (sort and name).
      */
-    private Pair<Sort, Name> parsePlaceholder(String input) {
+    private MergeRuleUtils.Placeholder parsePlaceholder(String input) {
         return MergeRuleUtils.parsePlaceholder(input, goal.proof().getServices());
     }
 
@@ -541,10 +539,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToString(AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
-        final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
+        AbstractionPredicate.PredicateFormWithPlaceholder predFormWithPh =
+            pred.getPredicateFormWithPlaceholder();
 
-        return "(" + predFormWithPh.first.toString() + ","
-            + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
+        return "(" + predFormWithPh.first().toString() + ","
+            + OutputStreamProofSaver.printAnything(predFormWithPh.second(), services) + ")";
     }
 
     // ///////////////////////////// //

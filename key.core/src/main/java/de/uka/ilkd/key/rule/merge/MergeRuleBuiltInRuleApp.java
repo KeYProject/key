@@ -141,8 +141,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             for (SymbolicExecutionState state1 : allStates) {
                 for (SymbolicExecutionState state2 : allStates) {
                     if (state1 != state2) {
-                        if (!MergeRuleUtils.pathConditionsAreDistinguishable(state1.second,
-                            state2.second, services)) {
+                        if (!MergeRuleUtils.pathConditionsAreDistinguishable(state1.second(),
+                            state2.second(), services)) {
                             return false;
                         }
                     }

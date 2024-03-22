@@ -11,12 +11,10 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,15 +84,15 @@ public class DependencyGraph {
      *        (pairs of graph node + whether the rule app consumes the node)
      * @param output outputs produced by this proof step
      */
-    public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input,
+    public void addRuleApplication(Node node, List<DependencyTracker.ConsumedNode> input,
             Collection<GraphNode> output) {
-        for (Pair<GraphNode, Boolean> in : input) {
+        for (DependencyTracker.ConsumedNode in : input) {
             for (GraphNode out : output) {
-                AnnotatedEdge edge = new AnnotatedEdge(node, in.second);
+                AnnotatedEdge edge = new AnnotatedEdge(node, in.second());
 
-                graph.addVertex(in.first);
+                graph.addVertex(in.first());
                 graph.addVertex(out);
-                graph.addEdge(in.first, out, edge);
+                graph.addEdge(in.first(), out, edge);
 
                 edgeDataReversed.computeIfAbsent(node, n -> new ArrayList<>()).add(edge);
             }
@@ -124,12 +122,12 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
+    public Stream<NodeData> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.incomingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeSource(edge), edge));
+                .map(edge -> new NodeData(edge.getProofStep(), graph.getEdgeSource(edge), edge));
     }
 
     /**
@@ -147,12 +145,12 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
+    public Stream<NodeData> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
+                .map(edge -> new NodeData(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
     /**
@@ -444,4 +442,10 @@ public class DependencyGraph {
     public Proof proof() {
         return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
+
+    // Triple<Node, GraphNode, AnnotatedEdge>
+    public record NodeData(Node /* proofStep */ first, GraphNode /* edgeSource */ second,
+            AnnotatedEdge /* edge */ third) {
+    }
+
 }

@@ -15,16 +15,15 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 /**
  * Represents an axiom specified in a class.
@@ -129,8 +128,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Limit> toLimit, Services services) {
         ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
@@ -149,7 +147,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+    public ImmutableSet<Limit> getUsedObservers(Services services) {
         return DefaultImmutableSet.nil();
     }
 

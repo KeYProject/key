@@ -33,7 +33,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 /**
  * A contract for checking the well-definedness of a jml specification element (i.e. a class
@@ -102,6 +101,8 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     // -------------------------------------------------------------------------
 
+    record SplitSpecificationParts(ImmutableList<Term> first, ImmutableList<Term> second) {}
+
     /**
      * Splits and sorts a (specification) term in such a way that implicit parts are in the first
      * and explicit parts in the second list.
@@ -109,7 +110,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param spec specification term
      * @return two lists for implicit and explicit specification parts
      */
-    private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
+    private SplitSpecificationParts sort(Term spec) {
         assert spec != null;
         ImmutableList<Term> implicit = ImmutableSLList.nil();
         ImmutableList<Term> explicit = ImmutableSLList.nil();
@@ -122,12 +123,12 @@ public abstract class WellDefinednessCheck implements Contract {
                     if (sub.hasLabels() // Found implicit subterms
                             && sub.containsLabel(
                                 ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
-                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
-                        implicit = implicit.append(p.first).append(p.second);
+                        SplitSpecificationParts p = sort(sub);
+                        implicit = implicit.append(p.first()).append(p.second());
                     } else { // Subterm not labeled as implicit
-                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
-                        implicit = implicit.append(p.first);
-                        explicit = explicit.append(p.second);
+                        SplitSpecificationParts p = sort(sub);
+                        implicit = implicit.append(p.first());
+                        explicit = explicit.append(p.second());
                     }
                 }
             } else { // Specification conjuncted with symmetric operator
@@ -173,7 +174,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 explicit = explicit.append(spec);
             }
         }
-        return new Pair<>(implicit, explicit);
+        return new SplitSpecificationParts(implicit, explicit);
     }
 
     private Term replaceSV(Term t, SchemaVariable self, ImmutableList<ParsableVariable> params) {
@@ -306,9 +307,9 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return sorted and short-circuit conjuncted specification term
      */
     private Condition split(Term spec) {
-        Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(spec);
-        ImmutableList<Term> implicit = p.first;
-        ImmutableList<Term> explicit = p.second;
+        SplitSpecificationParts p = sort(spec);
+        ImmutableList<Term> implicit = p.first();
+        ImmutableList<Term> explicit = p.second();
         return new Condition(TB.andSC(implicit), TB.andSC(explicit));
     }
 

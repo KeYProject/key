@@ -5,12 +5,13 @@ package org.key_project.slicing;
 
 import java.util.List;
 
+import org.key_project.slicing.DependencyTracker.ConsumedNode;
 import org.key_project.slicing.graph.DependencyGraph;
-import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the {@link DependencyGraph}.
@@ -41,15 +42,16 @@ class DependencyGraphTest {
 
         // Step 1
         graph.addRuleApplication(null,
-            List.of(new Pair<>(formA, true), new Pair<>(formC, true)),
+            List.of(new ConsumedNode(formA, true),
+                new ConsumedNode(formC, true)),
             List.of(formB));
         // Step 2
         graph.addRuleApplication(null,
-            List.of(new Pair<>(formD, true)),
+            List.of(new ConsumedNode(formD, true)),
             List.of(formE));
         // Step 3
         graph.addRuleApplication(null,
-            List.of(new Pair<>(formB, true)),
+            List.of(new ConsumedNode(formB, true)),
             List.of(closedGoal));
 
         assertEquals(6, graph.countNodes());
@@ -58,14 +60,14 @@ class DependencyGraphTest {
         var incomingClosedGoal =
             graph.incomingGraphEdgesOf(closedGoal).toList();
         assertEquals(1, incomingClosedGoal.size());
-        assertEquals(formB, incomingClosedGoal.get(0).second);
+        assertEquals(formB, incomingClosedGoal.get(0).second());
 
         var incomingFormB = graph.incomingGraphEdgesOf(formB).toList();
         assertEquals(2, incomingFormB.size());
-        if (incomingFormB.get(0).second.equals(formA)) {
-            assertEquals(formC, incomingFormB.get(1).second);
+        if (incomingFormB.get(0).second().equals(formA)) {
+            assertEquals(formC, incomingFormB.get(1).second());
         } else {
-            assertEquals(formA, incomingFormB.get(1).second);
+            assertEquals(formA, incomingFormB.get(1).second());
         }
 
         assertTrue(graph.containsNode(formA));

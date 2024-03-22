@@ -32,18 +32,17 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 
 /**
@@ -121,8 +120,7 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Limit> toLimit, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -258,7 +256,7 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+    public ImmutableSet<Limit> getUsedObservers(Services services) {
         return DefaultImmutableSet.nil();
     }
 

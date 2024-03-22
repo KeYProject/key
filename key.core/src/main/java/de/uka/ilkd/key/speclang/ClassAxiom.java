@@ -7,10 +7,9 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 
 /**
@@ -33,14 +32,13 @@ public abstract class ClassAxiom implements SpecificationElement {
      * Returns the pairs (kjt, obs) for which there is an occurrence of o.obs in the axiom, where
      * kjt is the type of o (excluding the defining occurrence of the axiom target).
      */
-    public abstract ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services);
+    public abstract ImmutableSet<Limit> getUsedObservers(Services services);
 
     /**
      * The axiom as one or many taclets, where the non-defining occurrences of the passed observers
      * are replaced by their "limited" counterparts.
      */
-    public abstract ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services);
+    public abstract ImmutableSet<Taclet> getTaclets(ImmutableSet<Limit> toLimit, Services services);
 
     @Override
     public String getDisplayName() {

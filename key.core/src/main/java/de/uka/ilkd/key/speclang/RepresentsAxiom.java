@@ -16,19 +16,17 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 /**
  * A class axiom corresponding to a JML* represents clause.
@@ -144,8 +142,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            final Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Limit> toLimit, final Services services) {
         List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
@@ -187,7 +184,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+    public ImmutableSet<Limit> getUsedObservers(Services services) {
         if (!isFunctional(services)) {
             return DefaultImmutableSet.nil();
         } else {

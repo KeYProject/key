@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
@@ -28,7 +26,7 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
      */
-    public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+    public MergePartnerAppIntermediate(String ruleName, PosInfo pos,
             int mergeNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, null, newNames);
 

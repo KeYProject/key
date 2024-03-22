@@ -195,8 +195,9 @@ public class KeyIO {
         schemaNamespace = ns;
     }
 
-    public void setAbbrevMap(AbbrevMap abbrevMap) {
+    public KeyIO setAbbrevMap(AbbrevMap abbrevMap) {
         this.abbrevMap = abbrevMap;
+        return this;
     }
 
     public AbbrevMap getAbbrevMap() {

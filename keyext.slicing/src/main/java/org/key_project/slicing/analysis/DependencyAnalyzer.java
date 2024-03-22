@@ -38,6 +38,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.slicing.DependencyNodeData;
+import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.graph.AnnotatedEdge;
@@ -48,7 +49,6 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +215,8 @@ public final class DependencyAnalyzer {
                 if (data == null) {
                     return;
                 }
-                data.inputs.stream().map(it -> it.first).forEach(usefulFormulas::add);
+                data.inputs.stream().map(DependencyTracker.ConsumedNode::first)
+                        .forEach(usefulFormulas::add);
                 usefulFormulas.addAll(data.outputs);
             }));
             executionTime.stop(DUPLICATE_ANALYSIS_SETUP);
@@ -271,7 +272,8 @@ public final class DependencyAnalyzer {
             if (usefulSteps.contains(node)) {
                 rules.addApplication(rule, branches);
             } else {
-                if (node.lookup(DependencyNodeData.class).inputs.stream().map(it -> it.first)
+                if (node.lookup(DependencyNodeData.class).inputs.stream()
+                        .map(DependencyTracker.ConsumedNode::first)
                         .anyMatch(usefulFormulas::contains)) {
                     rules.addInitialUselessApplication(rule, branches);
                 } else {
@@ -307,12 +309,12 @@ public final class DependencyAnalyzer {
             }
             usefulSteps.add(node);
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
-            data.inputs.forEach(it -> usefulFormulas.add(it.first));
+            data.inputs.forEach(it -> usefulFormulas.add(it.first()));
 
-            for (Pair<GraphNode, Boolean> in : data.inputs) {
+            for (DependencyTracker.ConsumedNode in : data.inputs) {
                 Node thisProofStep = node;
                 graph
-                        .incomingEdgesOf(in.first)
+                        .incomingEdgesOf(in.first())
                         // we don't care about steps done to derive the same formula again!
                         .filter(step -> step.getStepIndex() < thisProofStep.getStepIndex())
                         .forEach(queue::add);
@@ -444,7 +446,7 @@ public final class DependencyAnalyzer {
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
-                Node proofNode = t.first;
+                Node proofNode = t.first();
 
                 // this analysis algorithm does not support proofs with State Merging
                 if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
@@ -465,7 +467,7 @@ public final class DependencyAnalyzer {
                 }
                 // Only try to deduplicate the addition of new formulas.
                 // It is unlikely that two closed goals are derived using the same formula.
-                GraphNode produced = t.second;
+                GraphNode produced = t.second();
                 if (!(produced instanceof TrackedFormula)) {
                     return;
                 }
@@ -473,7 +475,7 @@ public final class DependencyAnalyzer {
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
                             _a -> new LinkedHashSet<>())
-                        .add(t.third.getProofStep());
+                        .add(t.third().getProofStep());
             });
 
             // scan dupes, try to find a set of mergable rule applications
@@ -662,21 +664,21 @@ public final class DependencyAnalyzer {
                     consumers = Stream.concat(consumers, Stream.of(lastConsumer.get()));
                 }
                 // list of (step index, produces / consumes)
-                Comparator<Pair<Integer, Boolean>> byStepIndex =
+                Comparator<StepIndex> byStepIndex =
                     Comparator.comparingInt(x -> x.first);
-                List<Pair<Integer, Boolean>> list = Stream.concat(
-                    producers.map(x -> new Pair<>(x.getProofStep().getStepIndex(), true)),
+                List<StepIndex> list = Stream.concat(
+                    producers.map(x -> new StepIndex(x.getProofStep().getStepIndex(), true)),
                     consumers
-                            .map(x -> new Pair<>(x.getProofStep().getStepIndex(), false)))
+                            .map(x -> new StepIndex(x.getProofStep().getStepIndex(), false)))
                         .distinct()
                         .sorted(byStepIndex)
                         .collect(Collectors.toList());
                 // verify that the list satisfies the correctness criteria
-                Predicate<List<Pair<Integer, Boolean>>> isCorrect = l -> {
+                Predicate<List<StepIndex>> isCorrect = l -> {
                     // the list is correct if there is at least one "produce" entry
                     // before each "consume" entry
                     boolean formulaAvailable = false;
-                    for (Pair<Integer, Boolean> pair : l) {
+                    for (var pair : l) {
                         if (pair.second) {
                             formulaAvailable = true;
                         } else if (!formulaAvailable) {
@@ -693,8 +695,8 @@ public final class DependencyAnalyzer {
                         "analyzer failed to gather correct proof step list");
                 }
                 // reorder one proof step to simulate the merged proof
-                list.remove(new Pair<>(stepAB.getStepIndex(), true));
-                list.add(new Pair<>(newStepIdx, true));
+                list.remove(new StepIndex(stepAB.getStepIndex(), true));
+                list.add(new StepIndex(newStepIdx, true));
                 list.sort(byStepIndex);
                 // if the new list is not correct: merge would break one of the listed steps
                 if (!isCorrect.test(list)) {
@@ -732,5 +734,8 @@ public final class DependencyAnalyzer {
                                     && edgeX.getProofStep() != stepB));
         }
         return false;
+    }
+
+    private record StepIndex(int first, boolean second) {
     }
 }

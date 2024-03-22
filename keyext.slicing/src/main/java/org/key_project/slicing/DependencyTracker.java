@@ -3,30 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.BranchLocation;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
@@ -35,17 +24,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
-import org.key_project.slicing.graph.AddedRule;
-import org.key_project.slicing.graph.ClosedGoal;
-import org.key_project.slicing.graph.DependencyGraph;
-import org.key_project.slicing.graph.DotExporter;
-import org.key_project.slicing.graph.GraphNode;
-import org.key_project.slicing.graph.PseudoInput;
-import org.key_project.slicing.graph.PseudoOutput;
-import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.slicing.graph.*;
 import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Tracks proof steps as they are applied on the proof.
@@ -121,9 +102,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param removed formulas removed by this node
      * @return pairs of graph nodes and whether the graph node was removed
      */
-    private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n, Set<PosInOccurrence> removed) {
+    private List<ConsumedNode> inputsOfNode(Node n, Set<PosInOccurrence> removed) {
         RuleApp ruleApp = n.getAppliedRuleApp();
-        List<Pair<GraphNode, Boolean>> input = new ArrayList<>();
+        var input = new ArrayList<ConsumedNode>();
 
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
@@ -132,7 +113,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             final var justification =
                 n.proof().getInitConfig().getJustifInfo().getJustification(taclet);
             if (justification instanceof RuleJustificationByAddRules) {
-                input.add(new Pair<>(dynamicRules.get(taclet), false));
+                input.add(new ConsumedNode(dynamicRules.get(taclet), false));
             }
         }
 
@@ -149,7 +130,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
                 if (graph.containsNode(formula)) {
-                    input.add(new Pair<>(formula, removed.contains(in)));
+                    input.add(new ConsumedNode(formula, removed.contains(in)));
                     added = true;
                     break;
                 }
@@ -166,7 +147,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 TrackedFormula formula =
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
-                input.add(new Pair<>(formula, removed.contains(in)));
+                input.add(new ConsumedNode(formula, removed.contains(in)));
             }
         }
 
@@ -219,14 +200,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param ruleAppInfo rule application info
      * @return formulas added
      */
-    private List<Pair<PosInOccurrence, Integer>> outputsOfNode(RuleAppInfo ruleAppInfo) {
-        List<Pair<PosInOccurrence, Integer>> outputs = new ArrayList<>();
+    private List<OutputOfNode> outputsOfNode(RuleAppInfo ruleAppInfo) {
+        List<OutputOfNode> outputs = new ArrayList<>();
         int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
         for (NodeReplacement b : ruleAppInfo.getReplacementNodes()) {
             int id = ruleAppInfo.getReplacementNodes().size() > 1 ? sibling : -1;
             b.getNodeChanges().forEachRemaining(c -> {
                 if (c instanceof NodeChangeAddFormula) {
-                    outputs.add(new Pair<>(c.getPos(), id));
+                    outputs.add(new OutputOfNode(c.getPos(), id));
                 }
             });
             sibling--;
@@ -234,8 +215,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return outputs;
     }
 
-    private List<Pair<PosInOccurrence, Integer>> outputsOfNode(Node node) {
-        List<Pair<PosInOccurrence, Integer>> outputs = new ArrayList<>();
+    private List<OutputOfNode> outputsOfNode(Node node) {
+        List<OutputOfNode> outputs = new ArrayList<>();
         int sibling = 0;
         for (Node b : node.children()) {
             // compare sequents
@@ -246,7 +227,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 if (!oldSeq.contains(f)) {
                     var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(),
                         newSeq.numberInAntec(index));
-                    outputs.add(new Pair<>(pio, node.childrenCount() > 1 ? sibling : -1));
+                    outputs.add(new OutputOfNode(pio, node.childrenCount() > 1 ? sibling : -1));
                 }
                 index++;
             }
@@ -289,17 +270,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         Set<PosInOccurrence> removed = formulasRemovedBy(ruleAppInfo);
 
         // inputs: (graph node, whether that graph node was replaced)
-        List<Pair<GraphNode, Boolean>> input = inputsOfNode(n, removed);
+        List<ConsumedNode> input = inputsOfNode(n, removed);
 
         // Newly created sequent formulas and the index of the branch they are created in.
         // If no new branches are created, use index -1.
-        List<Pair<PosInOccurrence, Integer>> outputs = outputsOfNode(ruleAppInfo);
+        List<OutputOfNode> outputs = outputsOfNode(ruleAppInfo);
 
-        for (Pair<PosInOccurrence, Integer> out : outputs) {
+        for (var out : outputs) {
             BranchLocation loc = n.getBranchLocation();
             if (out.second != -1) {
                 // this is a branching proof step: set correct branch location of new formulas
-                loc = loc.append(new Pair<>(n, out.second));
+                loc = loc.append(new BranchLocation.BranchChoice(n, out.second));
             }
             TrackedFormula formula = new TrackedFormula(
                 out.first.sequentFormula(),
@@ -326,7 +307,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // add pseudo nodes so the rule application is always included in the graph
         if (input.isEmpty()) {
-            input.add(new Pair<>(new PseudoInput(), true));
+            input.add(new ConsumedNode(new PseudoInput(), true));
         }
         if (output.isEmpty()) {
             output.add(new PseudoOutput());
@@ -373,17 +354,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         Set<PosInOccurrence> removed = formulasRemovedBy(n);
 
         // inputs: (graph node, whether that graph node was replaced)
-        List<Pair<GraphNode, Boolean>> input = inputsOfNode(n, removed);
+        List<ConsumedNode> input = inputsOfNode(n, removed);
 
         // Newly created sequent formulas and the index of the branch they are created in.
         // If no new branches are created, use index -1.
-        List<Pair<PosInOccurrence, Integer>> outputs = outputsOfNode(n);
+        List<OutputOfNode> outputs = outputsOfNode(n);
 
-        for (Pair<PosInOccurrence, Integer> out : outputs) {
+        for (var out : outputs) {
             BranchLocation loc = n.getBranchLocation();
             if (out.second != -1) {
                 // this is a branching proof step: set correct branch location of new formulas
-                loc = loc.append(new Pair<>(n, out.second));
+                loc = loc.append(new BranchLocation.BranchChoice(n, out.second));
             }
             TrackedFormula formula = new TrackedFormula(
                 out.first.sequentFormula(),
@@ -410,7 +391,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // add pseudo nodes so the rule application is always included in the graph
         if (input.isEmpty()) {
-            input.add(new Pair<>(new PseudoInput(), true));
+            input.add(new ConsumedNode(new PseudoInput(), true));
         }
         if (output.isEmpty()) {
             output.add(new PseudoOutput());
@@ -504,5 +485,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      */
     public DependencyGraph getDependencyGraph() {
         return graph;
+    }
+
+    public record ConsumedNode(GraphNode first, boolean second) {
+    }
+
+    public record OutputOfNode(PosInOccurrence first, int second) {
     }
 }

@@ -15,11 +15,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -29,6 +25,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -52,14 +49,12 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -79,7 +74,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final Name NAME = new Name("Loop Invariant");
 
     public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
-
 
 
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
@@ -148,7 +142,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // generate information flow invariant application predicate
         // and associated taclet
-        final Pair<Term, Term> updates = new Pair<>(inst.u, anonUpdate);
+        final var updates = new UpdateData(inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
             new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(spec);
@@ -161,10 +155,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Taclet informationFlowInvariantApp = ifInvariantBuilder.buildTaclet(infFlowGoal);
 
         // return information flow data
-        InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre, guardAtPost,
+        return new InfFlowData(instantiationVars, guardAtPre, guardAtPost,
             guardJb, guardTerm, localOutTerms, localOutsAtPre, localOutsAtPost, updates,
             loopInvApplPredTerm, informationFlowInvariantApp);
-        return infFlowData;
     }
 
 
@@ -186,7 +179,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
         // leading update?
-        final Pair<Term, Term> update = applyUpdates(focusTerm, services);
+        final var update = applyUpdates(focusTerm, services);
         final Term u = update.first;
         final Term progPost = update.second;
 
@@ -219,9 +212,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         services.getSpecificationRepository().addLoopInvariant(spec);
 
         // cache and return result
-        final Instantiation result =
-            new Instantiation(u, progPost, loop, spec, selfTerm, innermostExecutionContext);
-        return result;
+        return new Instantiation(u, progPost, loop, spec, selfTerm, innermostExecutionContext);
     }
 
     private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
@@ -292,8 +283,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
-        final Term varAtPost = tb.var(varAtPostVar);
-        return varAtPost;
+        return tb.var(varAtPostVar);
     }
 
     private static Term buildBeforeVar(Term varTerm, Services services) {
@@ -308,8 +298,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPreVar, services);
-        final Term varAtPre = tb.var(varAtPreVar);
-        return varAtPre;
+        return tb.var(varAtPreVar);
     }
 
     private static Term buildAfterVar(Term varTerm, Services services) {
@@ -324,8 +313,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
-        final Term varAtPost = tb.var(varAtPostVar);
-        return varAtPost;
+        return tb.var(varAtPostVar);
     }
 
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
@@ -505,7 +493,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return freeInvTerm;
     }
 
-    private Pair<Term, Term> prepareVariant(Instantiation inst, Term variant,
+    private UpdateData prepareVariant(Instantiation inst, Term variant,
             TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(tb.newName("variant"));
@@ -516,7 +504,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final boolean dia = modality.<Modality.JavaModalityKind>kind().terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
-        return new Pair<>(variantUpdate, variantPO);
+        return new UpdateData(variantUpdate, variantPO);
     }
 
 
@@ -538,8 +526,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             this, bodyGoal, FULL_INVARIANT_TERM_HINT, null);
         Term bodyTerm = wir.transform(termLabelState, this, ruleApp, bodyGoal, applicationSequent,
             ruleApp.posInOccurrence(), inst.progPost, fullInvariant, svInst, services);
-        final Term guardTrueBody = tb.imp(tb.box(guardJb, guardTrueTerm), bodyTerm);
-        return guardTrueBody;
+        return tb.imp(tb.box(guardJb, guardTrueTerm), bodyTerm);
     }
 
 
@@ -567,11 +554,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term restPsi =
             tb.prog(mod.kind(), useJavaBlock, inst.progPost.sub(0),
                 instantiateLabels);
-        Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
-        return guardFalseRestPsi;
+        return tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
     }
 
-    private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
+    private PrepareGuard prepareGuard(final Instantiation inst,
             final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp loopRuleApp,
             final TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -590,7 +576,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
         final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<>(guardJb, guardTrueTerm, guardFalseTerm);
+        return new PrepareGuard(guardJb, guardTrueTerm, guardFalseTerm);
     }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
@@ -659,7 +645,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (Transformer.inTransformer(pio)) {
             return false;
         }
-        Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());
+        var up = applyUpdates(pio.subTerm(), g.proof().getServices());
         final Term progPost = up.second;
         if (!checkFocus(progPost)) {
             return false;
@@ -669,12 +655,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         return activeStatement instanceof While;
     }
 
-    static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {
+    static UpdateData applyUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<>(UpdateApplication.getUpdate(focusTerm),
+            return new UpdateData(UpdateApplication.getUpdate(focusTerm),
                 UpdateApplication.getTarget(focusTerm));
         } else {
-            return new Pair<>(services.getTermBuilder().skip(), focusTerm);
+            return new UpdateData(services.getTermBuilder().skip(), focusTerm);
         }
     }
 
@@ -744,13 +730,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         // prepare variant
-        final Pair<Term, Term> variantPair = prepareVariant(inst, variant, services);
+        final var variantPair = prepareVariant(inst, variant, services);
         final Term variantUpdate = variantPair.first;
         final Term variantPO = variantPair.second;
 
         // prepare guard
-        final Triple<JavaBlock, Term, Term> guardStuff =
-            prepareGuard(inst, booleanKJT, loopRuleApp, services);
+        final var guardStuff = prepareGuard(inst, booleanKJT, loopRuleApp, services);
         final JavaBlock guardJb = guardStuff.first;
         final Term guardTrueTerm = guardStuff.second;
         final Term guardFalseTerm = guardStuff.third;
@@ -945,17 +930,29 @@ public final class WhileInvariantRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     private static final class Instantiation {
-        /** The update term. */
+        /**
+         * The update term.
+         */
         public final Term u;
-        /** The program's post condition. */
+        /**
+         * The program's post condition.
+         */
         public final Term progPost;
-        /** The while loop. */
+        /**
+         * The while loop.
+         */
         public final While loop;
-        /** The invariant's loop specification. */
+        /**
+         * The invariant's loop specification.
+         */
         public final LoopSpecification inv;
-        /** The term for the self variable. */
+        /**
+         * The term for the self variable.
+         */
         public final Term selfTerm;
-        /** The innermost execution context. */
+        /**
+         * The innermost execution context.
+         */
         public final ExecutionContext innermostExecutionContext;
 
         public Instantiation(Term u, Term progPost, While loop, LoopSpecification inv,
@@ -995,14 +992,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final ImmutableList<Term> localOuts;
         public final ImmutableList<Term> localOutsAtPre;
         public final ImmutableList<Term> localOutsAtPost;
-        public final Pair<Term, Term> updates;
+        public final UpdateData updates;
         public final Term applPredTerm;
         public final Taclet infFlowApp;
 
         private InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
                 JavaBlock guardJb, Term guardTerm, ImmutableList<Term> localOuts,
                 ImmutableList<Term> localOutsAtPre, ImmutableList<Term> localOutsAtPost,
-                Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
+                UpdateData updates, Term applPredTerm, Taclet infFlowApp) {
             this.symbExecVars = symbExecVars;
             this.guardAtPre = guardAtPre;
             this.guardAtPost = guardAtPost;
@@ -1035,5 +1032,11 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
+    }
+
+    private record UpdateData(Term first, Term second) {
+    }
+
+    private record PrepareGuard(JavaBlock first, Term second, Term third) {
     }
 }

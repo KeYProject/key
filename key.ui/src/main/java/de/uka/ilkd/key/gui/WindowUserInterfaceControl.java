@@ -24,7 +24,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -49,7 +48,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
@@ -233,11 +231,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 if (problemLoader.hasProofScript()) {
-                    Pair<String, Location> scriptAndLoc;
+                    AbstractProblemLoader.ProofScript scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
                         ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.first, scriptAndLoc.second);
+                            scriptAndLoc.first(), scriptAndLoc.location());
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {
@@ -392,8 +390,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
-        Pair<File, String> f = fileName(proof, fileExtension);
-        final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
+        FileName f = fileName(proof, fileExtension);
+        final int result = fc.showSaveDialog(mainWindow, f.first(), f.second());
         File file = null;
         if (result == JFileChooser.APPROVE_OPTION) { // saved
             file = fc.getSelectedFile();
@@ -434,8 +432,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             KeYFileChooser.getFileChooser("Choose filename to save proof");
         fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-        Pair<File, String> f = fileName(proof, ".zproof");
-        final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+        var f = fileName(proof, ".zproof");
+        final int result = fileChooser.showSaveDialog(mainWindow, f.first(), f.second());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
             final ProofSaver saver = new ProofBundleSaver(proof, file);
@@ -450,7 +448,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
     }
 
-    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+    protected static FileName fileName(Proof proof, String fileExtension) {
         // TODO: why do we use GUI components here?
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
@@ -481,7 +479,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
             selectedFile = new File(selectedFile.getParentFile(), defaultName);
         }
-        return new Pair<>(selectedFile, defaultName);
+        return new FileName(selectedFile, defaultName);
     }
 
     /**
@@ -539,7 +537,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
     }
-
 
 
     /**
@@ -623,5 +620,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 .collect(Collectors.toSet());
         var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);
+    }
+
+    private record FileName(File first, String second) {
     }
 }

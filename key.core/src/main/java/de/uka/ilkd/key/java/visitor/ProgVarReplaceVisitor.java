@@ -333,8 +333,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 pamc.getLatticeTypeName(),
                 pamc.getAbstractionPredicates(saveCopy, services).stream()
                         .map(pred -> AbstractionPredicate.create(
-                            replaceVariablesInTerm(pred.getPredicateFormWithPlaceholder().second),
-                            pred.getPredicateFormWithPlaceholder().first, services))
+                            replaceVariablesInTerm(pred.getPredicateFormWithPlaceholder().second()),
+                            pred.getPredicateFormWithPlaceholder().first(), services))
                         .collect(
                             Collectors.toCollection(ArrayList::new)));
 
@@ -355,18 +355,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final StatementBlock newBlock, final boolean blockChanged) {
         final BlockContract.Variables newVariables =
             replaceBlockContractVariables(oldContract.getPlaceholderVariables());
-        final Map<LocationVariable, Term> newPreconditions =
-            new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreePreconditions =
-            new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newPostconditions =
-            new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreePostconditions =
-            new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newModifiesClauses =
-            new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreeModifiesClauses =
-            new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreeModifiesClauses = new LinkedHashMap<>();
         boolean changed = blockChanged;
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -554,7 +548,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
         Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
         Map<LocationVariable, Term> newMods = new LinkedHashMap<>();
-        Map<LocationVariable, Term> newFreeMods = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newFreeMods = new LinkedHashMap<>();
         Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
             new LinkedHashMap<>();
 

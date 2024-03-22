@@ -17,14 +17,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.Limit;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 /**
  * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
@@ -122,8 +121,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            Services services) {
+    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Limit> toLimit, Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
         for (int i = 0; i < 2; i++) {
@@ -162,7 +160,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
+    public ImmutableSet<Limit> getUsedObservers(Services services) {
         final ProgramVariable dummySelfVar = services.getTermBuilder().selfVar(inv.getKJT(), false);
         return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }

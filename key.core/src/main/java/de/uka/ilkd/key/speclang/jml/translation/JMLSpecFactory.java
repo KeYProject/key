@@ -40,12 +40,10 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.*;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
@@ -77,7 +75,7 @@ public class JMLSpecFactory {
     /**
      * Used to check that there is only one represents clause per type and field.
      */
-    private final Set<Pair<KeYJavaType, IObserverFunction>> modelFields;
+    private final Set<ModelFieldData> modelFields;
 
 
     // -------------------------------------------------------------------------
@@ -420,7 +418,7 @@ public class JMLSpecFactory {
 
     private void translateAxioms(Context context, ProgramVariableCollection progVars,
             LocationVariable heap, ImmutableList<LabeledParserRuleContext> axioms,
-            ContractClauses clauses, Behavior originalBehavior) throws SLTranslationException {
+            ContractClauses clauses, Behavior originalBehavior) {
         boolean empty = axioms.isEmpty() // either the list is empty
                 || (axioms.size() == 1 // or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
@@ -439,7 +437,7 @@ public class JMLSpecFactory {
             LocationVariable heap, final LocationVariable savedHeap,
             ImmutableList<LabeledParserRuleContext> ensures,
             ImmutableList<LabeledParserRuleContext> ensuresFree, ContractClauses clauses,
-            Behavior originalBehavior) throws SLTranslationException {
+            Behavior originalBehavior) {
         if (heap == savedHeap && ensures.isEmpty()) {
             clauses.ensures.put(heap, null);
         } else {
@@ -539,12 +537,11 @@ public class JMLSpecFactory {
      */
     private ImmutableList<Term> registerAbbreviationVariables(TextualJMLSpecCase textualSpecCase,
             Context context, ProgramVariableCollection progVars, ContractClauses clauses) {
-        for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase
-                .getAbbreviations()) {
+        for (var abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT =
-                services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
+                services.getJavaInfo().getKeYJavaType(abbrv.first().first.getText());
             final ProgramElementName abbrVarName =
-                new ProgramElementName(abbrv.second.first.getText());
+                new ProgramElementName(abbrv.second().first.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -553,7 +550,7 @@ public class JMLSpecFactory {
             // parameter
             Term rhs = new JmlIO(services).context(context).parameters(progVars.paramVars)
                     .atPres(progVars.atPres).atBefore(progVars.atBefores)
-                    .translateTerm(abbrv.third);
+                    .translateTerm(abbrv.third());
             clauses.abbreviations =
                 clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -650,11 +647,11 @@ public class JMLSpecFactory {
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<>();
         for (int i = array.length - 1; i >= 0; i--) {
-            Pair<Label, Term> translation =
+            LabeledClause translation =
                 new JmlIO(services).context(context).parameters(paramVars).resultVariable(resultVar)
                         .exceptionVariable(excVar).atPres(atPres).atBefore(atBefores)
                         .translateLabeledClause(array[i], SpecType.BREAKS);
-            result.put(translation.first, translation.second);
+            result.put(translation.label(), translation.term());
         }
         return result;
     }
@@ -668,11 +665,11 @@ public class JMLSpecFactory {
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<>();
         for (int i = array.length - 1; i >= 0; i--) {
-            Pair<Label, Term> translation =
+            LabeledClause translation =
                 new JmlIO(services).context(context).parameters(paramVars).resultVariable(resultVar)
                         .exceptionVariable(excVar).atPres(atPres).atBefore(atBefores)
                         .translateLabeledClause(array[i], SpecType.CONTINUES);
-            result.put(translation.first, translation.second);
+            result.put(translation.label(), translation.term());
         }
         return result;
     }
@@ -704,8 +701,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateSignalsOnly(Context context, ProgramVariable excVar,
-            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses)
-            throws SLTranslationException {
+            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses) {
         return translateSignals(context, null, null, excVar, null, null, originalBehavior,
             originalClauses);
     }
@@ -818,7 +814,7 @@ public class JMLSpecFactory {
     }
 
     public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
-        return ((!(customName == null) && customName.length() > 0) ? customName
+        return ((!(customName == null) && !customName.isEmpty()) ? customName
                 : getContractName(pm, originalBehavior));
     }
 
@@ -1066,20 +1062,21 @@ public class JMLSpecFactory {
         var context = Context.inClass(kjt, isStatic, tb);
 
         // translateToTerm expression
-        final Pair<IObserverFunction, Term> rep =
+        final ObservableClauseData rep =
             new JmlIO(services).context(context).translateRepresents(originalRep);
         // represents clauses must be unique per type
-        for (Pair<KeYJavaType, IObserverFunction> p : modelFields) {
-            if (p.first.equals(kjt) && p.second.equals(rep.first)) {
+        for (ModelFieldData p : modelFields) {
+            if (p.first.equals(kjt) && p.second.equals(rep.first())) {
                 throw new SLTranslationException(
                     "JML represents clauses must occur uniquely per type and target.",
                     Location.fromToken(originalRep.first.start));
             }
         }
-        modelFields.add(new Pair<>(kjt, rep.first));
-        Term repFormula = tb.convertToFormula(rep.second);
+        modelFields.add(new ModelFieldData(kjt, rep.first()));
+        Term repFormula = tb.convertToFormula(rep.second());
         // create class axiom
-        return new RepresentsAxiom("JML represents clause for " + rep.first.name(), rep.first, kjt,
+        return new RepresentsAxiom("JML represents clause for " + rep.first().name(), rep.first(),
+            kjt,
             visibility, null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
@@ -1091,11 +1088,10 @@ public class JMLSpecFactory {
 
         // translateToTerm expression
         final LabeledParserRuleContext clause = textualRep.getRepresents();
-        final Pair<IObserverFunction, Term> rep =
-            new JmlIO(services).context(context).translateRepresents(clause);
+        ObservableClauseData rep = new JmlIO(services).context(context).translateRepresents(clause);
 
         // check whether there already is a represents clause
-        if (!modelFields.add(new Pair<>(kjt, rep.first))) {
+        if (!modelFields.add(new ModelFieldData(kjt, rep.first()))) {
             Token start = clause.first.start;
             throw new SLWarningException(
                 "JML represents clauses must occur uniquely per " + "type and target."
@@ -1103,11 +1099,12 @@ public class JMLSpecFactory {
                 Location.fromToken(start));
         }
         // create class axiom
-        String name = "JML represents clause for " + rep.first.name();
+        String name = "JML represents clause for " + rep.first().name();
         String displayName = textualRep.getName() == null ? name
-                : "JML represents clause \"" + textualRep.getName() + "\" for " + rep.first.name();
-        Term repFormula = tb.convertToFormula(rep.second);
-        return new RepresentsAxiom(name, displayName, rep.first, kjt, getVisibility(textualRep),
+                : "JML represents clause \"" + textualRep.getName() + "\" for "
+                    + rep.first().name();
+        Term repFormula = tb.convertToFormula(rep.second());
+        return new RepresentsAxiom(name, displayName, rep.first(), kjt, getVisibility(textualRep),
             null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
@@ -1150,9 +1147,8 @@ public class JMLSpecFactory {
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
-        Triple<IObserverFunction, Term, Term> dep =
-            new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
+        var dep = new JmlIO(services).context(context).translateDependencyContract(originalDep);
+        return cf.dep(kjt, targetHeap, dep, dep.first().isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1422,7 +1418,6 @@ public class JMLSpecFactory {
      * @param method the method containing the block.
      * @param block the block.
      * @param variables an instance of {@link AuxiliaryContract.Variables} for the block.
-     * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
             final JavaStatement block, final AuxiliaryContract.Variables variables) {
@@ -1714,5 +1709,8 @@ public class JMLSpecFactory {
             }
         }
         return res;
+    }
+
+    public record ModelFieldData(KeYJavaType first, IObserverFunction second) {
     }
 }

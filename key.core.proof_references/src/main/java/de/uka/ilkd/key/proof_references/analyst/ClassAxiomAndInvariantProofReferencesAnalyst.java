@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
@@ -21,10 +20,8 @@ import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 /**
  * Extracts used {@link ClassAxiom} and {@link ClassInvariant}s.
@@ -55,7 +52,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                 Iterator<ClassAxiom> axiomsIterator = axioms.iterator();
                 while (found == null && axiomsIterator.hasNext()) {
                     ClassAxiom ca = axiomsIterator.next();
-                    ImmutableSet<Pair<Sort, IObserverFunction>> toLimit = DefaultImmutableSet.nil();
+                    ImmutableSet<Limit> toLimit = DefaultImmutableSet.nil();
                     ImmutableSet<Taclet> taclets = ca.getTaclets(toLimit, services);
                     Iterator<Taclet> tacletIterator = taclets.iterator();
                     while (found == null && tacletIterator.hasNext()) {

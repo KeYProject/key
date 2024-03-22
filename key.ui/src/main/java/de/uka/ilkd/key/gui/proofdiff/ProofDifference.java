@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * @author Alexander Weigl
@@ -88,27 +87,27 @@ public class ProofDifference {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
             Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
-        PriorityQueue<Triple<Integer, Integer, Integer>> queue =
-            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
+        PriorityQueue<DistanceNode> queue =
+            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.distance));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
-                queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
+                queue.add(new DistanceNode(i, j, Levensthein.calculate(left.get(i), right.get(j))));
             }
         }
 
         boolean[] matchedLeft = new boolean[left.size()];
         boolean[] matchedRight = new boolean[right.size()];
         while (!queue.isEmpty()) {
-            Triple<Integer, Integer, Integer> t = queue.poll();
+            var t = queue.poll();
             /*
              * if(t.third>=THRESHOLD) { break; }
              */
-            if (!matchedLeft[t.first] && !matchedRight[t.second]) {
-                String l = left.get(t.first);
-                String r = right.get(t.second);
-                pairs.add(new Matching(l, r, t.third));
-                matchedLeft[t.first] = true;
-                matchedRight[t.second] = true;
+            if (!matchedLeft[t.posFirst] && !matchedRight[t.posSecond]) {
+                String l = left.get(t.posFirst);
+                String r = right.get(t.posSecond);
+                pairs.add(new Matching(l, r, t.distance));
+                matchedLeft[t.posFirst] = true;
+                matchedRight[t.posSecond] = true;
             }
         }
 
@@ -206,8 +205,11 @@ public class ProofDifference {
     record Matching(String left, String right, int distance) {
 
         @Override
-            public String toString() {
-                return String.format("(%s, %s)", left, right);
-            }
+        public String toString() {
+            return String.format("(%s, %s)", left, right);
         }
+    }
+
+    public record DistanceNode(int posFirst, int posSecond, int distance) {
+    }
 }

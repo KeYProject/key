@@ -312,7 +312,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Term sf = sequent.succedent().get(0).formula();
         assert sf.op() == Junctor.IMP;
         Term modality = sf.sub(1);
-        return TermBuilder.goBelowUpdates2(modality).first;
+        return TermBuilder.goBelowUpdates2(modality).first();
     }
 
     /**
@@ -338,10 +338,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param objectsToIgnore The {@link Set} with the objects to filter out.
      * @return A new {@link Set} which contains all objects of the first {@link Set} which are not
      *         contained in the second {@link Set}.
-     * @throws ProofInputException
      */
     protected Set<Term> filterOutObjectsToIgnore(Set<Term> objectsToFilter,
-            Set<Term> objectsToIgnore) throws ProofInputException {
+            Set<Term> objectsToIgnore) {
         Set<Term> result = new LinkedHashSet<>();
         for (Term symbolicObject : objectsToFilter) {
             if (!objectsToIgnore.contains(symbolicObject)) {
@@ -675,10 +674,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param sequent The {@link Sequent} which provides the conditions to collect objects from.
      * @param objectsToIgnore Objects which should be excluded in the result.
      * @return The found objects.
-     * @throws ProofInputException Occurred Exception.
      */
-    protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
-            throws ProofInputException {
+    protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore) {
         Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
@@ -694,10 +691,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param term The {@link Term} to collect objects in.
      * @param objectsToIgnore Objects which should be excluded in the result.
      * @return The found objects.
-     * @throws ProofInputException Occurred Exception.
      */
-    protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore)
-            throws ProofInputException {
+    protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore) {
         final Set<Term> result = new LinkedHashSet<>();
         term.execPreOrder(new DefaultVisitor() {
             @Override

@@ -10,9 +10,7 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.mergerule.MergeProcedureCompletion;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
@@ -20,7 +18,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.
@@ -38,21 +35,22 @@ public class PredicateAbstractionCompletion
      */
     @Override
     public MergeWithPredicateAbstraction complete(MergeWithPredicateAbstraction proc,
-            Pair<Goal, PosInOccurrence> joinGoalPio, Collection<MergePartner> partners) {
-        final Services services = joinGoalPio.first.proof().getServices();
+            MergeGoalPio joinGoalPio, Collection<MergePartner> partners) {
+        final Services services = joinGoalPio.first().proof().getServices();
 
         // Compute the program variables that are different in the
         // respective states.
 
         final SymbolicExecutionState joinState =
-            MergeRuleUtils.sequentToSEPair(joinGoalPio.first.node(), joinGoalPio.second, services);
+            MergeRuleUtils.sequentToSEPair(joinGoalPio.first().node(), joinGoalPio.second(),
+                services);
 
         final ImmutableList<SymbolicExecutionState> partnerStates =
             MergeRuleUtils.sequentsToSEPairs(partners);
 
         final ArrayList<LocationVariable> differingLocVars = new ArrayList<>();
 
-        MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
+        MergeRuleUtils.getUpdateLeftSideLocations(joinState.first()).forEach(v -> {
             // The meaning of the following statement corresponds to
             // partnerStates.fold("right value for v differs", false)
             final boolean isDifferent = StreamSupport
@@ -68,7 +66,7 @@ public class PredicateAbstractionCompletion
         });
 
         final AbstractionPredicatesChoiceDialog dialog =
-            new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
+            new AbstractionPredicatesChoiceDialog(joinGoalPio.first(), differingLocVars);
 
         assert proc instanceof MergeWithPredicateAbstractionFactory
                 : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";

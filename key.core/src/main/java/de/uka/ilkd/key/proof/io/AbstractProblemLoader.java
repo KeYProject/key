@@ -14,13 +14,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -38,9 +38,7 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.Triple;
 
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -193,13 +191,16 @@ public abstract class AbstractProblemLoader {
      * common MismatchedTokenExceptions, where one token is expected and another is found. Both are
      * usually only referred to by their internal code.
      */
-    private final static Map<Pair<Integer, Integer>, String> mismatchErrors;
+    private final static Map<Pos, String> mismatchErrors;
+
+    public record Pos(int x, int y) {}
+
     private final static Map<Integer, String> missedErrors;
 
     static {
         // format: (expected, found)
         mismatchErrors = new HashMap<>();
-        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors.put(new Pos(KeYLexer.SEMI, KeYLexer.COMMA),
             "there may be only one declaration per line");
 
         missedErrors = new HashMap<>();
@@ -399,7 +400,7 @@ public abstract class AbstractProblemLoader {
                         (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
-                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
+                        mismatchErrors.get(new Pos(mte.expecting, mte.c));
                     final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
                         + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
@@ -445,7 +446,7 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
-            SLEnvInput ret = null;
+            SLEnvInput ret;
             if (file.getParentFile() == null) {
                 ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
@@ -470,7 +471,7 @@ public abstract class AbstractProblemLoader {
                 try (ZipFile bundle = new ZipFile(file)) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
-                            .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                            .map(e -> Paths.get(e.getName())).toList();
                 }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
@@ -578,7 +579,7 @@ public abstract class AbstractProblemLoader {
         if (envInput instanceof ProofOblInput && chooseContract == null
                 && proofObligation == null) {
             return new LoadedPOContainer((ProofOblInput) envInput);
-        } else if (chooseContract != null && chooseContract.length() > 0) {
+        } else if (chooseContract != null && !chooseContract.isEmpty()) {
             int proofNum = 0;
             String baseContractName;
             int ind = -1;
@@ -602,7 +603,7 @@ public abstract class AbstractProblemLoader {
             } else {
                 return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
             }
-        } else if (proofObligation != null && proofObligation.length() > 0) {
+        } else if (proofObligation != null && !proofObligation.isEmpty()) {
             // Load proof obligation settings
             final Properties properties = new Properties();
             properties.load(
@@ -680,18 +681,19 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public Pair<String, Location> readProofScript() throws ProofInputException {
+    public ProofScript readProofScript() throws ProofInputException {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
-        Triple<String, Integer, Integer> script = kupf.readProofScript();
+        ProofScriptEntry script = kupf.readProofScript();
         URI url = kupf.getInitialFile().toURI();
-        Location location = new Location(url, Position.newOneBased(script.second, script.third));
+        Location location =
+            new Location(url, Position.newOneBased(script.second(), script.third()));
 
-        return new Pair<>(script.first, location);
+        return new ProofScript(script.first(), location);
     }
 
-    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
+    public ProofScript getProofScript() throws ProblemLoaderException {
         if (hasProofScript()) {
             try {
                 return readProofScript();
@@ -867,5 +869,8 @@ public abstract class AbstractProblemLoader {
 
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
+    }
+
+    public record ProofScript(String first, Location location) {
     }
 }

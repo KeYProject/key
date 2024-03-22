@@ -4,12 +4,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -19,9 +14,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
@@ -39,7 +32,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * defining taclets have been registered.
  *
  * <h2>Adding new function symbols</h2>
- *
+ * <p>
  * New functions can be registered in a file {@code XXX.DefinedSymbolsHandler.preamble.xml} for some
  * prefix {@code XXX}. This file must be located in the resources for the package in which this
  * class resides.
@@ -47,7 +40,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * <p>
  * Such an xml file is not an actual xml file but rather an xml fragment consisting of a set of
  * entries to be used as axiomatisation when the SMT translation is triggered.
- *
+ * <p>
  * Three kind of entries are possible for a function symbol f:
  * <ol>
  * <li><tt>f.axioms</tt>: Specify SMTLib code that will be added as an assertion to the resulting
@@ -62,7 +55,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * </ol>
  *
  * <h2>Triggers in DL formulae</h2>
- *
+ * <p>
  * When specifying DL formulae, you can use the {@code <<Trigger>>} term label to specify the
  * subterm which should be used as a trigger (:pattern) in SMTLib to help Z3 (and other solvers) to
  * instantiate the quantified variables suitably.
@@ -70,7 +63,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * <pre>
  *     \forall Seq s; seqLen(s)&lt;&lt;Trigger&gt;&gt; &gt;= 0
  * </pre>
- *
+ * <p>
  * is the axiom for seqLen (hence stored in <tt>seqLen.dl</tt>). The trigger pattern to be used for
  * instantiation is <tt>seqLen(s)</tt> matching against any ground instance of seqLen.
  */
@@ -239,21 +232,19 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String snipName = name + DL_SUFFIX;
         String dl = snippets.getProperty(snipName);
         do {
-            DefaultTermParser tp = new DefaultTermParser();
-            try {
-                NamespaceSet nss = services.getNamespaces().copy();
-                Services localServices = services.getOverlay(nss);
-                // The parser may add new symbols (instantiations of sort-dep symbols).
-                // Since the SMT machines run in parallel, this may cause
-                // ConcurrentModificationExceptions. To avoid such exceptions,
-                // a wrapper services object is used.
-                Term axiom =
-                    tp.parse(new StringReader(dl), JavaDLTheory.FORMULA, localServices, nss,
-                        new AbbrevMap());
-                trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
-            } catch (ParserException e) {
-                throw new SMTTranslationException("Error while translating snippet " + snipName, e);
+            NamespaceSet nss = services.getNamespaces().copy();
+            Services localServices = services.getOverlay(nss);
+            // The parser may add new symbols (instantiations of sort-dep symbols).
+            // Since the SMT machines run in parallel, this may cause
+            // ConcurrentModificationExceptions. To avoid such exceptions,
+            // a wrapper services object is used.
+            var tp = new KeyIO(localServices, nss);
+            Term axiom = tp.parseExpression(dl);
+            if (!axiom.sort().equals(JavaDLTheory.FORMULA)) {
+                throw new SMTTranslationException("Unexpected sort of term. Formula expected."
+                    + "Error while translating snippet " + snipName);
             }
+            trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             snipName = name + DL_SUFFIX + "." + cnt;
             dl = snippets.getProperty(snipName);
             cnt++;

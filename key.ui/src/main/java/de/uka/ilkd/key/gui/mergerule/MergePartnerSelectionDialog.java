@@ -29,7 +29,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -70,7 +69,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     private LinkedList<MergePartner> candidates = null;
     private Services services = null;
-    private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
+    private MergeProcedureCompletion.MergeGoalPio mergeGoalPio = null;
 
     /** The chosen goals. */
     private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
@@ -306,7 +305,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         this.services = services;
 
         this.candidates = new LinkedList<>();
-        this.mergeGoalPio = new Pair<>(mergeGoal, pio);
+        this.mergeGoalPio = new MergeProcedureCompletion.MergeGoalPio(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
             int insPos = Collections.binarySearch(this.candidates, candidate, GOAL_COMPARATOR);
@@ -364,9 +363,9 @@ public class MergePartnerSelectionDialog extends JDialog {
     private boolean isApplicableForCandidates(ImmutableList<MergePartner> theCandidates) {
         if (mergeGoalPio != null && candidates != null && chosenRule != null) {
             MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) MergeRule.INSTANCE
-                    .createApp(mergeGoalPio.second, services);
+                    .createApp(mergeGoalPio.second(), services);
 
-            mergeRuleApp.setMergeNode(mergeGoalPio.first.node());
+            mergeRuleApp.setMergeNode(mergeGoalPio.first().node());
             mergeRuleApp.setConcreteRule(chosenRule);
             mergeRuleApp.setMergePartners(theCandidates);
 
@@ -415,7 +414,7 @@ public class MergePartnerSelectionDialog extends JDialog {
             return false;
         }
 
-        return checkProvability(mergeGoalPio.first.sequent(), chosenDistForm, services)
+        return checkProvability(mergeGoalPio.first().sequent(), chosenDistForm, services)
                 && checkProvability(partnerGoal.sequent(), tb.not(chosenDistForm), services);
     }
 
