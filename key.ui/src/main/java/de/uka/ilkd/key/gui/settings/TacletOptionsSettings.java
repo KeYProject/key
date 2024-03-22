@@ -43,6 +43,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private ChoiceSettings settings;
     private boolean warnNoProof = true;
 
+    // to make the "No Proof Loaded" header invisible when a proof is loaded
+    private JLabel lblHead2;
+
+
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
         pCenter.setLayout(new MigLayout(new LC().fillX(), new AC().fill().grow().gap("3mm")));
@@ -174,7 +178,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     protected void layoutHead() {
         if (warnNoProof) {
-            JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
+            this.lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
             lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
             lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
             pNorth.add(lblHead2);
@@ -271,7 +275,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             b.add(lbl);
         }
         if (c.information != null) {
-            JLabel lbl = SettingsPanel.createHelpLabel(c.information);
+            JLabel lbl = SettingsPanel.createHelpTextLabel(c.information);
             b.add(lbl);
         }
         pCenter.add(b, new CC().newline());
@@ -292,6 +296,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     @Override
     public JPanel getPanel(MainWindow window) {
         warnNoProof = window.getMediator().getSelectedProof() == null;
+        // this makes the wrong lblhead2 invisible
+        this.lblHead2.setVisible(warnNoProof);
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;
     }
