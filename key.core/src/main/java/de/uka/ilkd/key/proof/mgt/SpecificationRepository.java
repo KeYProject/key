@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -32,13 +31,15 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,11 +198,13 @@ public final class SpecificationRepository {
         return tacletBuilder.getTaclet();
     }
 
-    private static Modality getMatchModality(final Modality modality) {
-        if (modality.transaction()) {
-            return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
+    private static Modality.JavaModalityKind getMatchModalityKind(
+            final Modality.JavaModalityKind kind) {
+        if (kind.transaction()) {
+            return kind == Modality.JavaModalityKind.DIA_TRANSACTION ? Modality.JavaModalityKind.DIA
+                    : Modality.JavaModalityKind.BOX;
         } else {
-            return modality;
+            return kind;
         }
     }
 
@@ -756,15 +759,17 @@ public final class SpecificationRepository {
      * the passed modality.
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
-            IProgramMethod pm, Modality modality) {
+            IProgramMethod pm, Modality.JavaModalityKind modalityKind) {
         ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
         final boolean transactionModality =
-            (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-        final Modality matchModality = transactionModality
-                ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
-                : modality;
+            modalityKind.transaction();
+        final Modality.JavaModalityKind matchModality = transactionModality
+                ? ((modalityKind == Modality.JavaModalityKind.DIA_TRANSACTION)
+                        ? Modality.JavaModalityKind.DIA
+                        : Modality.JavaModalityKind.BOX)
+                : modalityKind;
         for (FunctionalOperationContract contract : result) {
-            if (!contract.getModality().equals(matchModality)
+            if (!contract.getModalityKind().equals(matchModality)
                     || (transactionModality && !contract.transactionApplicableContract())) {
                 result = result.remove(contract);
             }
@@ -1540,15 +1545,15 @@ public final class SpecificationRepository {
      * Returns block contracts for according block statement and modality.
      *
      * @param block the given block.
-     * @param modality the given modality.
+     * @param modalityKind the given modality.
      * @return
      */
     public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (BlockContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
@@ -1557,11 +1562,11 @@ public final class SpecificationRepository {
     }
 
     public ImmutableSet<LoopContract> getLoopContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<LoopContract> result = getLoopContracts(block);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
@@ -1573,15 +1578,15 @@ public final class SpecificationRepository {
      * Returns loop contracts for according loop statement and modality.
      *
      * @param loop the given loop.
-     * @param modality the given modality.
+     * @param modalityKind the given modality.
      * @return the set of resulting loop statements.
      */
     public ImmutableSet<LoopContract> getLoopContracts(final LoopStatement loop,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<LoopContract> result = getLoopContracts(loop);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }

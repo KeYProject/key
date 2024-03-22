@@ -7,17 +7,13 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -60,7 +56,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
         Term anonUpdate = tb.skip();
         for (ProgramVariable pv : localOuts) {
-            final Function anonFunc = anonConstForPV(pv, services);
+            final JFunction anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
                 tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);
@@ -69,10 +65,10 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         return anonUpdate;
     }
 
-    private static Function anonConstForPV(ProgramVariable pv, Services services) {
+    private static JFunction anonConstForPV(ProgramVariable pv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-        final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+        final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
         services.getNamespaces().functions().addSafely(anonFunc);
 
         return anonFunc;

@@ -661,7 +661,7 @@ public class SolverListener implements SolverLauncherListener {
      *
      * @author jschiffl
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor implements DefaultVisitor {
         /**
          * The result.
          */

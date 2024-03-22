@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -39,7 +39,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
     private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
-        final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
+        final JFunction add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
             final Term left = quotient(monoCoeff, rightPoly.sub(0), services);
             final Term right = quotient(monoCoeff, rightPoly.sub(1), services);

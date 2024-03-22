@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.*;
@@ -62,6 +63,10 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Term t) {
+        if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
+            // TODO: Is false correct?
+            prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
+        }
         if (t.op() instanceof SchemaVariable && t.arity() == 0 && !(t.op() instanceof VariableSV)
                 && !(t.op() instanceof ProgramSV) && !(t.op() instanceof SkolemTermSV)) {
             SchemaVariable sv = (SchemaVariable) t.op();

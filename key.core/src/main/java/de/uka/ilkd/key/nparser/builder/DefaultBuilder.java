@@ -15,14 +15,20 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -117,7 +123,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
-            return Sort.FORMULA;
+            return JavaDLTheory.FORMULA;
         } else {
             return accept(ctx.sortId());
         }
@@ -226,7 +232,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<Function> functions() {
+    protected Namespace<JFunction> functions() {
         return namespaces().functions();
     }
 

@@ -7,8 +7,8 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 /**

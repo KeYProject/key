@@ -256,7 +256,7 @@ public class OpReplacer {
         final Term result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
             result =
-                tf.createTerm(newOp, newSubTerms, newBoundVars, term.javaBlock(), term.getLabels());
+                tf.createTerm(newOp, newSubTerms, newBoundVars, term.getLabels());
         } else {
             result = term;
         }

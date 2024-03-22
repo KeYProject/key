@@ -9,9 +9,11 @@ import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
@@ -92,7 +94,7 @@ class FieldPrinter {
      * Determine whether a term is a constant function symbol of type field.
      */
     protected static boolean isFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
-        return fieldTerm.op() instanceof Function && ((Function) fieldTerm.op()).isUnique()
+        return fieldTerm.op() instanceof JFunction && ((Function) fieldTerm.op()).isUnique()
                 && fieldTerm.sort() == heapLDT.getFieldSort() && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }

@@ -5,11 +5,15 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.TermCreationException;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -36,18 +40,18 @@ public class TestTermFactory {
     private final Sort osort4 = new SortImpl(new Name("os4"),
         DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
 
-    final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    final JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
-    final Function q =
-        new Function(new Name("q"), Sort.FORMULA, new SortImpl(new Name("Whatever")));
+    final JFunction q =
+        new JFunction(new Name("q"), JavaDLTheory.FORMULA, new SortImpl(new Name("Whatever")));
     // q(:Whatever):BOOL
     final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
-    final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    final JFunction r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    final Function f = new Function(new Name("f"), sort1, sort3);
+    final JFunction f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
     final LogicVariable v1 = new LogicVariable(new Name("v1"), osort1);
@@ -55,7 +59,7 @@ public class TestTermFactory {
     final LogicVariable v3 = new LogicVariable(new Name("v3"), osort3);
     final LogicVariable v4 = new LogicVariable(new Name("v4"), osort4);
 
-    final Function g = new Function(new Name("g"), osort3, osort2, osort1);
+    final JFunction g = new JFunction(new Name("g"), osort3, osort2, osort1);
     private TermBuilder TB;
     private TermFactory tf;
 
@@ -163,15 +167,21 @@ public class TestTermFactory {
     @Test
     public void testDiamondTerm() {
         JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
-        Term t_dia_ryw = tf.createTerm(Modality.DIA, new Term[] { t2() }, null, jb);
-        assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ImmutableArray<>(t2()), null, jb));
+        Term t_dia_ryw = tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, jb),
+            new Term[] { t2() }, null, null);
+        assertEquals(t_dia_ryw,
+            new TermImpl(Modality.getModality(Modality.JavaModalityKind.DIA, jb),
+                new ImmutableArray<>(t2()), null));
     }
 
     @Test
     public void testBoxTerm() {
         JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
-        Term t_dia_ryw = tf.createTerm(Modality.BOX, new ImmutableArray<>(t2()), null, jb);
-        assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ImmutableArray<>(t2()), null, jb));
+        Term t_dia_ryw = tf.createTerm(Modality.getModality(Modality.JavaModalityKind.BOX, jb),
+            new ImmutableArray<>(t2()), null, null);
+        assertEquals(t_dia_ryw,
+            new TermImpl(Modality.getModality(Modality.JavaModalityKind.BOX, jb),
+                new ImmutableArray<>(t2()), null));
     }
 
     @Test
@@ -280,15 +290,15 @@ public class TestTermFactory {
     @Test
     public void testSubSortsSubst() {
         Term t = tf.createTerm(g, tf.createTerm(v2), tf.createTerm(v1));
-        Function c = new Function(new Name("c"), osort2, new Sort[0]);
+        JFunction c = new JFunction(new Name("c"), osort2, new Sort[0]);
         Term st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);
-        c = new Function(new Name("c"), osort4, new Sort[0]);
+        c = new JFunction(new Name("c"), osort4, new Sort[0]);
         st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);
-        c = new Function(new Name("c"), osort3, new Sort[0]);
+        c = new JFunction(new Name("c"), osort3, new Sort[0]);
         st = TB.subst(WarySubstOp.SUBST, v1, tf.createTerm(c), t);
         Exception exc = new Exception();
         try {
-            c = new Function(new Name("c"), osort1, new Sort[0]);
+            c = new JFunction(new Name("c"), osort1, new Sort[0]);
             st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);
         } catch (TermCreationException e) {
             exc = e;
@@ -296,7 +306,7 @@ public class TestTermFactory {
         assertTrue(exc instanceof TermCreationException);
         exc = new Exception();
         try {
-            c = new Function(new Name("c"), osort3, new Sort[0]);
+            c = new JFunction(new Name("c"), osort3, new Sort[0]);
             st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);
 
         } catch (TermCreationException e) {
@@ -316,7 +326,9 @@ public class TestTermFactory {
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
+        Term withJB =
+            tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, javaBlock),
+                new ImmutableArray<>(noJB), null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         // Create Same terms again
@@ -325,7 +337,8 @@ public class TestTermFactory {
         JavaBlock javaBlockAgain =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
         Term withJBAgain =
-            tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlockAgain);
+            tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, javaBlockAgain),
+                new ImmutableArray<>(noJB), null);
         Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
         // Test caching

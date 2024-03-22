@@ -14,10 +14,10 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
@@ -68,7 +68,7 @@ public class ClasslevelTranslatorTest {
 
     public void parseAndInterpret(String expr) {
         Assertions.assertNotEquals("", expr);
-        KeYJavaType kjt = new KeYJavaType(Sort.ANY);
+        KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         ProgramVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
         ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);

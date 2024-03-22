@@ -8,14 +8,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
@@ -152,7 +150,7 @@ public class HandleArith {
             }
             return problem;
         }
-        Function addfun = integerLDT.getAdd();
+        JFunction addfun = integerLDT.getAdd();
         Term arithTerm =
             tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), cd.sub(1)));
         Term res = provedByArith(arithTerm, services);

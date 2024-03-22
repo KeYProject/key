@@ -21,7 +21,7 @@ public class MatchModalOperatorSVInstruction
     @Override
     public MatchConditions match(Term subst, MatchConditions mc, Services services) {
         if (subst.op() instanceof Modality modality) {
-            if (op.getModalities().contains(modality)) {
+            if (op.getModalities().contains(modality.kind())) {
                 final SVInstantiations instantiations = mc.getInstantiations();
                 final Object o = instantiations.getInstantiation(op);
                 if (o == null) {
