@@ -70,4 +70,9 @@ public class SetStatement extends JavaStatement {
     public ProgramElement getChildAt(int index) {
         throw new IndexOutOfBoundsException("SetStatement has no program children");
     }
+
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
 }

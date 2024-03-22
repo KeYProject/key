@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -20,22 +15,22 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
@@ -650,8 +645,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
-        var spec =
-            Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        var spec = Objects.requireNonNull(
+                services.getSpecificationRepository().getStatementSpec(x));
+
         ProgramVariableCollection vars = spec.vars();
         Map<LocationVariable, Term> atPres = vars.atPres;
         Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
@@ -664,6 +660,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             if (t == null) {
                 continue;
             }
+
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);
                 pv = (LocationVariable) replaceMap.get(pv);
@@ -688,6 +685,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
          * }
          */
         doDefaultAction(c);
+        changed();
     }
 
 }

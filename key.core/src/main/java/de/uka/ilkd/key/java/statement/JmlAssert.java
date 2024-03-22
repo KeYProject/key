@@ -145,7 +145,7 @@ public class JmlAssert extends JavaStatement {
     // so override that instead of hashCode which is final
     @Override
     protected int computeHashCode() {
-        return Objects.hash(super.computeHashCode(), kind, condition);
+        return System.identityHashCode(this);
     }
 
     @Override
@@ -162,28 +162,4 @@ public class JmlAssert extends JavaStatement {
     public void visit(Visitor v) {
         v.performActionOnJmlAssert(this);
     }
-
-    /*
-     * public ProgramVariableCollection getVars() {
-     * return vars;
-     * }
-     */
-
-    /*
-     * updates this statement with prestate renaming
-     *
-     * @param atPres prestate renaming
-     *
-     * @param services services
-     * public void updateVars(final Map<LocationVariable, Term> atPres, final Services services) {
-     * final TermFactory termFactory = services.getTermFactory();
-     * final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
-     * replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
-     * final OpReplacer replacer =
-     * new OpReplacer(replacementMap, termFactory, services.getProof());
-     * cond = replacer.replace(cond);
-     * vars.atPres = atPres;
-     *
-     * }
-     */
 }
