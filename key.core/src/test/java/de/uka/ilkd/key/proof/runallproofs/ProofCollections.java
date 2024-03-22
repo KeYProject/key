@@ -237,10 +237,13 @@ public class ProofCollections {
 
 
         // Other tests:
+        g = c.group("other");
         g.provable("heap/coincidence_count/project.key");
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+
+        g = c.group("simple_SIF");
         g.provable("heap/information_flow/ArrayList_contains.key");
         g.provable("heap/information_flow/ArrayList_get.key");
         g.provable("heap/information_flow/ArrayList_size.key");
