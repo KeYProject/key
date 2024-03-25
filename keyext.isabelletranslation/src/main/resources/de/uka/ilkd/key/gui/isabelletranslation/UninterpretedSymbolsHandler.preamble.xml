@@ -228,15 +228,15 @@ consts
 
 setup_lifting type_definition_Seq
 lift_definition seqLen::"Seq\&lt;Rightarrow&gt;int" is "int \&lt;circ&gt; List.length".
-lift_definition seqGet::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a::any" is "\&lt;lambda&gt;s i. (if (0::int)\&lt;le&gt;i\&lt;and&gt;i&lt;(int (length s)) then cast (s ! (nat i)) else cast getSeqOutside)".
+lift_definition seqGet::"int\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;'a::any" is "\&lt;lambda&gt;i s. (if (0::int)\&lt;le&gt;i\&lt;and&gt;i&lt;(int (length s)) then cast (s ! (nat i)) else cast getSeqOutside)".
 lift_definition seqDef::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;(int\&lt;Rightarrow&gt;any)\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;le ri e. map e [le..ri - 1]".
 lift_definition seqEmpty::"Seq" is "[]".
 lift_definition seqSingleton::"any\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;x. [x]".
 lift_definition seqConcat::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" is List.append.
 lift_definition seqReverse::"Seq\&lt;Rightarrow&gt;Seq" is List.rev.
 
-fun seqSub::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" where
-  "seqSub i j s = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
+fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
+  "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
 
 primrec listIndexOf::"any list\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" where
   "listIndexOf [] a = undefined" |
@@ -260,7 +260,7 @@ instance by standard
 end
 
 
-fun instanceof::"javaDL_type\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;bool"
+fun instanceof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
   where "instanceof x type = typeof type x"
 
 axiomatization obj_length::"java_lang_Object\&lt;Rightarrow&gt;int" where length_nonneg[simp]:"obj_length obj \&lt;ge&gt; 0"
