@@ -95,6 +95,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
                                                                       // about position info and
                                                                       // nowhere else?
+                                                                      // We also care in
+                                                                      // LoopStatement
                 jnte.getStartPosition().equals(Position.UNDEFINED)
                 || this.getStartPosition().line() == jnte.getStartPosition().line());
     }
