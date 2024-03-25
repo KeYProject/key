@@ -730,7 +730,8 @@ public final class IssueDialog extends JDialog {
     }
 
     private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
+        // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
+        return fileName != null && fileName.endsWith(".java");
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

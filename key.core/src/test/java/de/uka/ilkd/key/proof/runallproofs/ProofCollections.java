@@ -20,6 +20,9 @@ import org.junit.jupiter.api.Assertions;
  * @version 1 (08.02.23)
  */
 public class ProofCollections {
+
+    public static final String ENV_KEY_RAP_FUN_KEEP = "KEY_RAP_FUN_KEEP";
+
     public static ProofCollection automaticJavaDL() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         /*
@@ -236,11 +239,14 @@ public class ProofCollections {
         g.provable("heap/javacard/arrayFillNonAtomic.key");
 
 
+        g = c.group("other");
         // Other tests:
         g.provable("heap/coincidence_count/project.key");
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+
+        g = c.group("funOfIF");
         g.provable("heap/information_flow/ArrayList_contains.key");
         g.provable("heap/information_flow/ArrayList_get.key");
         g.provable("heap/information_flow/ArrayList_size.key");
@@ -972,6 +978,12 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_color.proof");
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
+        // use for debugging purposes.
+        // c.keep("VSTTE10");
+        String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
+        if (s != null) {
+            c.keep(s.split(","));
+        }
         return c;
     }
 
