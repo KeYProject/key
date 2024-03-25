@@ -21,9 +21,9 @@ import org.jspecify.annotations.NonNull;
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     private final JmlParser.@NonNull Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(@NonNull ImmutableList<JMLModifier> mods,
+    public TextualJMLMergePointDecl(@NonNull ImmutableList<JMLModifier> modifiers,
             JmlParser.@NonNull Merge_point_statementContext mergeProc) {
-        super(mods);
+        super(modifiers);
         this.mergeProc = mergeProc;
         setPosition(mergeProc);
     }
@@ -34,8 +34,8 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-            + ", name='" + name + '\'' + '}';
+        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", modifiers="
+            + modifiers + ", name='" + name + '\'' + '}';
     }
 
     @Override

@@ -102,12 +102,12 @@ class RIFLHandler extends DefaultHandler {
         categories2domains.put(p, domain);
     }
 
-    private void setAssignable(Attributes attributes) {
+    private void setModifiable(Attributes attributes) {
         assert tmpHandle == null;
         tmpHandle = attributes.getValue("handle");
     }
 
-    private void unsetAssignable() {
+    private void unsetModifiable() {
         assert tmpHandle != null;
         tmpHandle = null;
     }
@@ -214,7 +214,7 @@ class RIFLHandler extends DefaultHandler {
         // case "domainassignment":
         case "domains" -> startDomains();
         case "domain" -> putDomain(attributes);
-        case "assignable" -> setAssignable(attributes);
+        case "modifiable" -> setModifiable(attributes);
         case "field" -> putField(attributes);
         case "parameter" -> putParam(attributes);
         case "returnvalue" -> putReturn(attributes);
@@ -240,7 +240,7 @@ class RIFLHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) {
         switch (localName) {
-        case "assignable" -> unsetAssignable();
+        case "modifiable" -> unsetModifiable();
         case "category" -> unsetCategory();
         case "domains" -> checkDomains();
         case "domainassignment" -> checkDomainAssignmentsWithFlows();

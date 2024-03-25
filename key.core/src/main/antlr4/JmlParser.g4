@@ -87,7 +87,11 @@ accessible_clause
                     (lhs=expression COLON)? rhs=storeRefUnion
                     (MEASURED_BY mby=expression)?
     SEMI_TOPLEVEL;
-assignable_clause: (ASSIGNABLE|MODIFIES|MODIFIABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
@@ -174,10 +178,15 @@ loop_specification
     | determines_clause
     | loop_separates_clause
     | loop_determines_clause
-    | assignable_clause
+    | loop_assignable_clause
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;

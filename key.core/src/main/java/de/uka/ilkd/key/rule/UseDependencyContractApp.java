@@ -91,7 +91,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiate(Goal goal) {
         if (heapContext == null) {
-            heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
+            heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
         }
         if (complete()) {
             return this;
@@ -125,7 +125,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
             kjt = target.getContainerType();
         } else {
             if (getHeapContext() == null) {
-                heapContext = HeapContext.getModHeaps(services, false);
+                heapContext = HeapContext.getModifiableHeaps(services, false);
             }
             selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
             kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
@@ -136,7 +136,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         if (contracts.size() > 0) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());
             if (r.getHeapContext() == null) {
-                r.heapContext = HeapContext.getModHeaps(services, false);
+                r.heapContext = HeapContext.getModifiableHeaps(services, false);
             }
             return r;
         }

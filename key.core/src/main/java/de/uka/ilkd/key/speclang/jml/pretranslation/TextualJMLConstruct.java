@@ -26,7 +26,7 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<JMLModifier> mods;
+    protected final ImmutableList<JMLModifier> modifiers;
     private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
@@ -35,13 +35,13 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods) {
-        assert mods != null;
-        this.mods = mods;
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+        assert specModifiers != null;
+        this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods, String name) {
-        this(mods);
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+        this(specModifiers);
         this.name = name;
     }
 
@@ -61,8 +61,8 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<JMLModifier> getMods() {
-        return mods;
+    public final ImmutableList<JMLModifier> getModifiers() {
+        return modifiers;
     }
 
     /**

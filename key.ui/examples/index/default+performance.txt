@@ -162,8 +162,8 @@ provable: ./heap/simple/invariant_preservation.key
 provable: ./heap/simple/locsets.key
 provable: ./heap/simple/loop1.key
 provable: ./heap/simple/loop2.key
-provable: ./heap/simple/modifies_datagroup.key
-provable: ./heap/simple/modifies.key
+provable: ./heap/simple/modifiable_datagroup.key
+provable: ./heap/simple/modifiable.key
 provable: ./heap/simple/object_creation.key
 provable: ./heap/simple/operation_contracts.key
 provable: ./heap/simple/select_store.key
