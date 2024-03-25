@@ -393,14 +393,14 @@ public abstract class WellDefinednessCheck implements Contract {
                 getModifiable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
                         : this.getModifiable(null),
                 services);
-            modifiables = modifiables + (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
+            modifiables += (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printModifiables, false)
                         : printModifiables.trim());
         }
-        if (getModifiable().equals(TB.strictlyNothing()) && showSig) {
-            modifiables =
-                modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
+        if (getModifiable() != null && getModifiable().equals(TB.strictlyNothing()) && showSig) {
+            modifiables +=
+                (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
                     + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
@@ -414,7 +414,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String pres = "";
         if (getRequires(null) != null) {
             String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
-            pres = pres + (includeHtmlMarkup ? "<br><b>" : "\n")
+            pres += (includeHtmlMarkup ? "<br><b>" : "\n")
                     + ((!isInv && !isLoop) ? "pre" : "inv") + (includeHtmlMarkup ? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false)
                             : printPres);
@@ -422,7 +422,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String deps = "";
         if (getAccessible() != null) {
             String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
-            deps = deps + (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
+            deps += (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
                         : printDeps);
@@ -430,7 +430,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String reps = "";
         if (getRepresents() != null) {
             String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
-            reps = reps + (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
+            reps += (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
                         : printReps);
@@ -438,7 +438,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String posts = "";
         if (getEnsures(null) != null && showSig && !isLoop) {
             String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
-            posts = posts + (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
+            posts += (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
                         : printPosts);
@@ -446,7 +446,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String axioms = "";
         if (getAxiom() != null) {
             String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
-            axioms = axioms + (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
+            axioms += (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
                         : printAxioms);
