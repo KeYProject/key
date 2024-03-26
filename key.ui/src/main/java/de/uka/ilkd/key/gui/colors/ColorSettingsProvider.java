@@ -32,7 +32,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         super();
         setHeaderText(getDescription());
         setSubHeaderText(
-            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
+            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE_NEW.getAbsolutePath());
         add(new JScrollPane(tblColors));
     }
 

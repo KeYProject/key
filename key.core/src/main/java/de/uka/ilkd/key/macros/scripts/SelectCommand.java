@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
         super(Parameters.class);
@@ -133,7 +135,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModRenaming(formula)) {
+            if (sf.formula().equalsModProperty(formula, RENAMING_PROPERTY)) {
                 return true;
             }
         }

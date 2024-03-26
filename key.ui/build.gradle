@@ -23,12 +23,13 @@ dependencies {
     api 'com.miglayout:miglayout-swing:11.3'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.4.14'
+    implementation 'ch.qos.logback:logback-classic:1.5.3'
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
+    runtimeOnly project(":keyext.caching")
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")
@@ -63,7 +64,7 @@ run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
     //systemProperties["KeyDebugFlag"] = "on"
-    args "--experimental"
+    //args "--experimental"
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)

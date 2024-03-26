@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
+import org.key_project.logic.sort.Sort;
+
 /**
  * this exception is thrown if a generic sort has been declared with an illegal supersort
  */

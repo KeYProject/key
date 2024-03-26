@@ -10,11 +10,12 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {
@@ -23,39 +24,39 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public static final Name FLOATLIT_NAME = new Name("FP");
     public static final Name NEGATIVE_LITERAL = new Name("javaUnaryMinusFloat");
 
-    private final Function floatLit;
-    private final Function lessThan;
-    private final Function greaterThan;
-    private final Function greaterOrEquals;
-    private final Function lessOrEquals;
+    private final JFunction floatLit;
+    private final JFunction lessThan;
+    private final JFunction greaterThan;
+    private final JFunction greaterOrEquals;
+    private final JFunction lessOrEquals;
 
-    private final Function eqFloat;
+    private final JFunction eqFloat;
 
-    private final Function javaUnaryMinusFloat;
-    private final Function javaAddFloat;
-    private final Function javaSubFloat;
-    private final Function javaMulFloat;
-    private final Function javaDivFloat;
-    private final Function javaModFloat;
+    private final JFunction javaUnaryMinusFloat;
+    private final JFunction javaAddFloat;
+    private final JFunction javaSubFloat;
+    private final JFunction javaMulFloat;
+    private final JFunction javaDivFloat;
+    private final JFunction javaModFloat;
 
-    private final Function javaMinFloat;
-    private final Function javaMaxFloat;
+    private final JFunction javaMinFloat;
+    private final JFunction javaMaxFloat;
 
-    private final Function addFloatIEEE;
-    private final Function subFloatIEEE;
-    private final Function mulFloatIEEE;
-    private final Function divFloatIEEE;
-    private final Function absFloat;
-    private final Function negFloat;
+    private final JFunction addFloatIEEE;
+    private final JFunction subFloatIEEE;
+    private final JFunction mulFloatIEEE;
+    private final JFunction divFloatIEEE;
+    private final JFunction absFloat;
+    private final JFunction negFloat;
 
-    private final Function isNormal;
-    private final Function isSubnormal;
-    private final Function isNaN;
-    private final Function isZero;
-    private final Function isNice;
-    private final Function isInfinite;
-    private final Function isNegative;
-    private final Function isPositive;
+    private final JFunction isNormal;
+    private final JFunction isSubnormal;
+    private final JFunction isNaN;
+    private final JFunction isZero;
+    private final JFunction isNice;
+    private final JFunction isInfinite;
+    private final JFunction isNegative;
+    private final JFunction isPositive;
 
     public FloatLDT(TermServices services) {
         super(NAME, services);
@@ -127,7 +128,8 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+            Services services,
             ExecutionContext ec) {
         if (op instanceof GreaterThan) {
             return getGreaterThan();
@@ -155,7 +157,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
+    public JFunction getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();
@@ -181,7 +183,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return containsFunction(f) && (f.arity() == 0);
     }
 
@@ -215,116 +217,116 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         }
     }
 
-    public Function getFloatSymbol() {
+    public JFunction getFloatSymbol() {
         return floatLit;
     }
 
-    public Function getLessThan() {
+    public JFunction getLessThan() {
         return lessThan;
     }
 
-    public Function getGreaterThan() {
+    public JFunction getGreaterThan() {
         return greaterThan;
     }
 
-    public Function getLessOrEquals() {
+    public JFunction getLessOrEquals() {
         return lessOrEquals;
     }
 
-    public Function getGreaterOrEquals() {
+    public JFunction getGreaterOrEquals() {
         return greaterOrEquals;
     }
 
-    public Function getEquals() {
+    public JFunction getEquals() {
         return eqFloat;
     }
 
-    public Function getJavaUnaryMinus() {
+    public JFunction getJavaUnaryMinus() {
         return javaUnaryMinusFloat;
     }
 
-    public Function getJavaAdd() {
+    public JFunction getJavaAdd() {
         return javaAddFloat;
     }
 
-    public Function getJavaSub() {
+    public JFunction getJavaSub() {
         return javaSubFloat;
     }
 
-    public Function getJavaMul() {
+    public JFunction getJavaMul() {
         return javaMulFloat;
     }
 
-    public Function getJavaDiv() {
+    public JFunction getJavaDiv() {
         return javaDivFloat;
     }
 
-    public Function getJavaMod() {
+    public JFunction getJavaMod() {
         return javaModFloat;
     }
 
-    public Function getJavaMin() {
+    public JFunction getJavaMin() {
         return javaMinFloat;
     }
 
-    public Function getJavaMax() {
+    public JFunction getJavaMax() {
         return javaMaxFloat;
     }
 
-    public Function getIsNormal() {
+    public JFunction getIsNormal() {
         return isNormal;
     }
 
-    public Function getIsSubnormal() {
+    public JFunction getIsSubnormal() {
         return isSubnormal;
     }
 
-    public Function getIsNaN() {
+    public JFunction getIsNaN() {
         return isNaN;
     }
 
-    public Function getIsZero() {
+    public JFunction getIsZero() {
         return isZero;
     }
 
     @Override
-    public Function getIsNice() {
+    public JFunction getIsNice() {
         return isNice;
     }
 
-    public Function getIsInfinite() {
+    public JFunction getIsInfinite() {
         return isInfinite;
     }
 
-    public Function getIsPositive() {
+    public JFunction getIsPositive() {
         return isPositive;
     }
 
-    public Function getIsNegative() {
+    public JFunction getIsNegative() {
         return isNegative;
     }
 
-    public Function getAdd() {
+    public JFunction getAdd() {
         return addFloatIEEE;
     }
 
-    public Function getSub() {
+    public JFunction getSub() {
         return subFloatIEEE;
     }
 
-    public Function getMul() {
+    public JFunction getMul() {
         return mulFloatIEEE;
     }
 
-    public Function getDiv() {
+    public JFunction getDiv() {
         return divFloatIEEE;
     }
 
-    public Function getAbs() {
+    public JFunction getAbs() {
         return absFloat;
     }
 
-    public Function getNeg() {
+    public JFunction getNeg() {
         return negFloat;
     }
 

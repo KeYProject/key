@@ -132,8 +132,8 @@ final class LinkedList implements List {
             if(first == null) {
                 last = null;
             }
-            //@ set seq = \seq_sub(seq, 1, \seq_length(seq)-1);
-            //@ set nodeseq = \seq_sub(nodeseq, 1, \seq_length(nodeseq)-1);
+            //@ set seq = \seq_sub(seq, 1, seq.length-1);
+            //@ set nodeseq = \seq_sub(nodeseq, 1, nodeseq.length-1);
             size--;
             return;
         }
@@ -152,8 +152,8 @@ final class LinkedList implements List {
                 if(n == last) {
                     last = m;
                 }
-                //@ set seq = \seq_concat(\seq_sub(seq,0,i-1), \seq_sub(seq,i+1,\seq_length(seq)-1));
-                //@ set nodeseq = \seq_concat(\seq_sub(nodeseq,0,i-1), \seq_sub(nodeseq,i+1,\seq_length(nodeseq)-1));
+                //@ set seq = \seq_concat(\seq_sub(seq,0,i-1), \seq_sub(seq,i+1,seq.length-1));
+                //@ set nodeseq = \seq_concat(\seq_sub(nodeseq,0,i-1), \seq_sub(nodeseq,i+1,nodeseq.length-1));
                 //@ set footprint = \set_minus(footprint, \all_fields(n));
                 size --;
                 return;

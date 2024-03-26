@@ -6,8 +6,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.op.Function;
 
 
 public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
@@ -24,8 +26,8 @@ public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term t, MutableState mState, Services services) {
-        if (t.op() instanceof Function) {
-            Function op = t.op(Function.class);
+        if (t.op() instanceof JFunction) {
+            Function op = t.op(JFunction.class);
             return op.arity() == 0 && op.sort() == heapLDT.targetSort();
         } else {
             return false;

@@ -117,7 +117,7 @@ public class ArrayList implements List {
                     array[j] = array[j+1];
                 }
                 size--;
-                //@ set seq = \seq_concat(\seq_sub(seq, 0, i), \seq_sub(seq,i+1, \seq_length(seq)));
+                //@ set seq = \seq_concat(\seq_sub(seq, 0, i), \seq_sub(seq,i+1, seq.length));
                 return;
             }
         }

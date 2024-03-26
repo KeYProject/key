@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed
@@ -23,7 +24,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();
         final Term oldFocus = oldPio.subTerm();
-        if (!newFocus.equalsModIrrelevantTermLabels(oldFocus)) {
+        if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return false;
         }
 
