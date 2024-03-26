@@ -23,6 +23,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * Transformer that introduces concrete prestate variables
  */
@@ -214,7 +216,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final Term freeTerm = spec.getInternalFreeModifies().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
-                        || !tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
+                        || !tb.strictlyNothing().equalsModProperty(term,
+                            IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     final Term m = spec.getModifies(heap, self, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
@@ -228,7 +231,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
-                        || !tb.strictlyNothing().equalsModIrrelevantTermLabels(freeTerm)) {
+                        || !tb.strictlyNothing().equalsModProperty(
+                            freeTerm, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     final Term m = spec.getFreeModifies(heap, selfTerm, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);

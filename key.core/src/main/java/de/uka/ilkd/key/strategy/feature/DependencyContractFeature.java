@@ -17,12 +17,15 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 public final class DependencyContractFeature extends BinaryFeature {
 
     private void removePreviouslyUsedSteps(Term focus, Goal goal, List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
             if (app.rule() instanceof UseDependencyContractRule
-                    && app.posInOccurrence().subTerm().equalsModRenaming(focus)) {
+                    && app.posInOccurrence().subTerm().equalsModProperty(focus,
+                        RENAMING_PROPERTY)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
                 for (PosInOccurrence ifInst : bapp.ifInsts()) {
                     steps.remove(ifInst);
