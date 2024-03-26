@@ -69,7 +69,7 @@ final class LinkedList implements List {
         }
 
         node.data = o;
-        //@ set seq = \seq_put(seq, index, o);
+        //@ set seq = \seq_upd(seq, index, o);
     }
 
     public boolean contains(Object o) {

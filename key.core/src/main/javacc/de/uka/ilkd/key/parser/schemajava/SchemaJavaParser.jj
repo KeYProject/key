@@ -5284,7 +5284,7 @@ Expression ADTConstructor() :
         setPrefixInfo(result);
     }
     |
-    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    "\\seq_upd" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
     {
         // desugaring
         result = new SeqPut(expr, expr2, result);

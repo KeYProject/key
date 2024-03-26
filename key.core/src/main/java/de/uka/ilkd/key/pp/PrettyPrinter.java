@@ -404,7 +404,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnSeqPut(
             de.uka.ilkd.key.java.expression.operator.adt.SeqPut x) {
-        printDLFunctionOperator("\\seq_put", x);
+        printDLFunctionOperator("\\seq_upd", x);
     }
 
     @Override

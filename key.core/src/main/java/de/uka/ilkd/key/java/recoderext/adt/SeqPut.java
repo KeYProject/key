@@ -43,7 +43,7 @@ public class SeqPut extends ADTPrefixConstruct {
 
     @Override
     public String toSource() {
-        return "\\seq_put(" + children.get(0).toSource() + ", " + children.get(1).toSource() + ", "
+        return "\\seq_upd(" + children.get(0).toSource() + ", " + children.get(1).toSource() + ", "
             + children.get(2).toSource() + ")";
     }
 }
