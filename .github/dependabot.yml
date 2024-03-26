@@ -8,16 +8,16 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "montly"
+      interval: "monthly"
     groups:
-      all:
+      gradle-deps:
         patterns:
           - "*"      
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "montly"
+      interval: "monthly"
     groups:
-      all:
+      github-actions-deps:
         patterns:
           - "*"
