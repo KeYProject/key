@@ -81,6 +81,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             KeYJavaType kjt = accept(ctx.keyjavatype(i));
             assert varNames != null;
             for (String varName : varNames) {
+                if (varName.equals("null")) {
+                    semanticError(ctx.simple_ident_comma_list(i),
+                        "Function '" + varName + "' is already defined!");
+                }
                 ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
                 if (name != null) {

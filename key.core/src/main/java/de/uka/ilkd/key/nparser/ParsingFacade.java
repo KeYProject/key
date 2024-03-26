@@ -130,7 +130,6 @@ public final class ParsingFacade {
         KeYParser p = createParser(stream);
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
-        // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
         KeYParser.FileContext ctx;
@@ -138,8 +137,13 @@ public final class ParsingFacade {
             ctx = p.file();
         } catch (ParseCancellationException ex) {
             LOGGER.warn("SLL was not enough");
+            stream.seek(0);
             p = createParser(stream);
+            p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
+            if (p.getErrorReporter().hasErrors()) {
+                throw ex;
+            }
         }
 
         p.getErrorReporter().throwException();
