@@ -94,11 +94,9 @@ public final class SeqLDT extends LDT {
         return seqSub;
     }
 
-
     public JFunction getSeqUpd() {
         return seqUpd;
     }
-
 
     public JFunction getSeqReverse() {
         return seqReverse;
