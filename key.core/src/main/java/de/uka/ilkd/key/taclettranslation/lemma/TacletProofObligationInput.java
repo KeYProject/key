@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author mattias ulbrich
  */
 public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
@@ -113,25 +114,27 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * Fill in only the necessary info.
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        properties.setProperty(IPersistablePO.PROPERTY_NAME, name());
+    public Configuration createLoaderConfig() throws IOException {
+        var c = new Configuration();
+        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(IPersistablePO.PROPERTY_NAME, name());
 
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
 
         if (tacletFile != null) {
-            properties.setProperty("tacletFile", tacletFile);
+            c.set("tacletFile", tacletFile);
         }
         if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile);
+            c.set("definitionFile", definitionFile);
         }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
                 String name = AXIOM_FILE + (i == 0 ? "" : (i + 1));
-                properties.setProperty(name, axiomFiles[i]);
+                c.set(name, axiomFiles[i]);
             }
         }
+        return c;
     }
 
     @Override
@@ -197,30 +200,19 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         return this == po;
     }
 
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
-        String tacletName = properties.getProperty(PROPERTY_NAME);
-        // This string is parsed by "proveRules.pl"
-        if (java.awt.GraphicsEnvironment.isHeadless()) {
-            LOGGER.info("Proof obligation for taclet: {}", tacletName);
-        }
-        TacletProofObligationInput proofOblInput =
-            new TacletProofObligationInput(tacletName, initConfig);
-        proofOblInput.setLoadInfo(properties);
-        return new LoadedPOContainer(proofOblInput);
-    }
-
-    private void setLoadInfo(Properties properties) {
-        this.baseDir =
-            new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
-        this.tacletFile = properties.getProperty("tacletFile");
-        this.definitionFile = properties.getProperty("definitionFile");
+    void setLoadInfo(Configuration properties) {
+        final var pathname =
+            Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
+        this.baseDir = new File(pathname).getParent();
+        this.tacletFile = properties.getString("tacletFile");
+        this.definitionFile = properties.getString("definitionFile");
         List<String> axioms = new ArrayList<>();
         String name = AXIOM_FILE;
-        String axFile = properties.getProperty(name);
+        String axFile = properties.getString(name);
         while (axFile != null) {
             axioms.add(axFile);
             name = AXIOM_FILE + (axioms.size() + 1);
-            axFile = properties.getProperty(name);
+            axFile = properties.getString(name);
         }
         this.axiomFiles = axioms.toArray(new String[0]);
     }

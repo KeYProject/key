@@ -41,12 +41,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Mon Jul 18 11:01:14 CEST 2016
-name=ExceptinalAssignableNothingTest[ExceptinalAssignableNothingTest\\:\\:main()].JML exceptional_behavior operation contract.0
-contract=ExceptinalAssignableNothingTest[ExceptinalAssignableNothingTest\\:\\:main()].JML exceptional_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "ExceptinalAssignableNothingTest[ExceptinalAssignableNothingTest::main()].JML exceptional_behavior operation contract.0",
+	"contract": "ExceptinalAssignableNothingTest[ExceptinalAssignableNothingTest::main()].JML exceptional_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

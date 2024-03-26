@@ -41,12 +41,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Jul 08 11:07:54 CEST 2016
-name=OneBranch[OneBranch\\:\\:magic()].JML normal_behavior operation contract.0
-contract=OneBranch[OneBranch\\:\\:magic()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "OneBranch[OneBranch::magic()].JML normal_behavior operation contract.0",
+	"contract": "OneBranch[OneBranch::magic()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

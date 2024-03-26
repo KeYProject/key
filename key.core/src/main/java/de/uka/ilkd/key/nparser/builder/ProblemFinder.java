@@ -3,12 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.settings.Configuration;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,28 +23,29 @@ import org.jspecify.annotations.Nullable;
  *
  * @author weigl
  */
+@NullMarked
 public class ProblemFinder extends ExpressionBuilder {
     private @Nullable Sequent problem;
     private @Nullable String chooseContract;
-    private @Nullable String proofObligation;
+    private @Nullable Configuration proofObligation;
 
     public ProblemFinder(Services services, NamespaceSet nss) {
         super(services, nss);
     }
 
     @Override
-    public Object visitFile(KeYParser.FileContext ctx) {
+    public @Nullable Object visitFile(KeYParser.FileContext ctx) {
         each(ctx.problem());
         return null;
     }
 
     @Override
-    public KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
+    public @Nullable KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
         return accept(ctx.keyjavatype());
     }
 
     @Override
-    public Term visitProblem(KeYParser.ProblemContext ctx) {
+    public @Nullable Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
                 chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
@@ -49,12 +56,23 @@ public class ProblemFinder extends ExpressionBuilder {
             }
         }
         if (ctx.PROOFOBLIGATION() != null) {
-            if (ctx.proofObligation != null) {
-                proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
-            }
-            // .replace("\\\\:", ":");
-            else {
-                proofObligation = "";
+            if (ctx.oldProofObligation != null) {
+                try {
+                    Properties p = new Properties();
+                    p.load(new StringReader((String) ctx.oldProofObligation.accept(this)));
+                    proofObligation = new Configuration();
+                    p.forEach((k, v) -> proofObligation.set(k.toString(), v.toString()));
+                } catch (IOException e) {
+                    throw new RuntimeException(
+                        "Could not load the proof obligation given as a property file @ "
+                            + BuilderHelpers.getPosition(ctx.oldProofObligation),
+                        e);
+                }
+            } else if (ctx.proofObligation != null) {
+                proofObligation =
+                    ParsingFacade.getConfiguration((KeYParser.TableContext) ctx.proofObligation);
+            } else {
+                proofObligation = null;
             }
         }
         if (ctx.PROBLEM() != null) {
@@ -64,7 +82,7 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Override
-    public Sequent visitTermorseq(KeYParser.TermorseqContext ctx) {
+    public @Nullable Sequent visitTermorseq(KeYParser.TermorseqContext ctx) {
         var obj = super.visitTermorseq(ctx);
         if (obj instanceof Sequent s)
             return s;
@@ -79,7 +97,7 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Nullable
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return proofObligation;
     }
 
@@ -87,4 +105,5 @@ public class ProblemFinder extends ExpressionBuilder {
     public Sequent getProblem() {
         return problem;
     }
+
 }

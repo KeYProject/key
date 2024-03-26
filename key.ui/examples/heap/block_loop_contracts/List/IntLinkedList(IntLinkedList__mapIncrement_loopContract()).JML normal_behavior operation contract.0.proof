@@ -43,12 +43,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Mar 30 18:40:36 CEST 2018
-name=IntLinkedList[IntLinkedList\\:\\:mapIncrement_loopContract()].JML normal_behavior operation contract.0
-contract=IntLinkedList[IntLinkedList\\:\\:mapIncrement_loopContract()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "IntLinkedList[IntLinkedList::mapIncrement_loopContract()].JML normal_behavior operation contract.0",
+	"contract": "IntLinkedList[IntLinkedList::mapIncrement_loopContract()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Flo" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

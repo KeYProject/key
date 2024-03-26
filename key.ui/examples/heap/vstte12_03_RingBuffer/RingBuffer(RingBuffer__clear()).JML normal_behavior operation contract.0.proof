@@ -39,12 +39,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Apr 24 10:27:41 CEST 2014
-name=RingBuffer[RingBuffer\\:\\:clear()].JML normal_behavior operation contract.0
-contract=RingBuffer[RingBuffer\\:\\:clear()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "RingBuffer[RingBuffer::clear()].JML normal_behavior operation contract.0",
+	"contract": "RingBuffer[RingBuffer::clear()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "mattias" ) (keyVersion "e5095ad740f809525e4c4689dcc12514a0ca06cc"))

@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Mon Jul 18 10:57:38 CEST 2016
-name=LoopInvArrayExample[LoopInvArrayExample\\:\\:setAllToOne()].JML normal_behavior operation contract.0
-addSymbolicExecutionLabel=true
-contract=LoopInvArrayExample[LoopInvArrayExample\\:\\:setAllToOne()].JML normal_behavior operation contract.0
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "LoopInvArrayExample[LoopInvArrayExample::setAllToOne()].JML normal_behavior operation contract.0",
+	"addSymbolicExecutionLabel": true,
+	"contract": "LoopInvArrayExample[LoopInvArrayExample::setAllToOne()].JML normal_behavior operation contract.0",
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
