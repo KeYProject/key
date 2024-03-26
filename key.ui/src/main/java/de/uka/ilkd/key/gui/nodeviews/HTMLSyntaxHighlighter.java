@@ -123,10 +123,16 @@ public class HTMLSyntaxHighlighter {
 
     private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//[^@].*?)<br>");
 
+    private static final Pattern MULTI_LINE_COMMENT_PATTERN = Pattern.compile("(/\\*.*?\\*/)",
+            Pattern.DOTALL | Pattern.MULTILINE);
+
     private static final Pattern SINGLE_LINE_JML_PATTERN = Pattern.compile("(//@.*?)<br>");
 
     private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
-        "<span class=\"comment_highlight\">$1</span><br>";
+            "<span class=\"comment_highlight\">$1</span><br>";
+
+    private static final String MULTI_LINE_COMMENT_REPLACEMENT =
+            "<span class=\"comment_highlight\">$1</span>";
 
     private static final String SINGLE_LINE_JML_REPLACEMENT =
         "<span class=\"jml_highlight\">$1</span><br>";
@@ -232,6 +238,9 @@ public class HTMLSyntaxHighlighter {
 
             modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
                     .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
+
+            modality = MULTI_LINE_COMMENT_PATTERN.matcher(modality)
+                    .replaceAll(MULTI_LINE_COMMENT_REPLACEMENT);
 
             modality = SINGLE_LINE_JML_PATTERN.matcher(modality)
                     .replaceAll(SINGLE_LINE_JML_REPLACEMENT);
