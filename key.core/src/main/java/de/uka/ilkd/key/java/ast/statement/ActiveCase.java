@@ -105,7 +105,8 @@ public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
 
     @Override
     public SourceElement getFirstElement() {
-        if (body.isEmpty()) return this;
+        if (body.isEmpty())
+            return this;
         return body.get(0);
     }
 
@@ -154,7 +155,7 @@ public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
 
     @Override
     public boolean isPrefix() {
-        return body !=null&& !body.isEmpty();
+        return body != null && !body.isEmpty();
     }
 
     @Override

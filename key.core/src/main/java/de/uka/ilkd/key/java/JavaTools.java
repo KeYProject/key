@@ -36,14 +36,16 @@ public final class JavaTools {
         assert jb.program() != null;
 
         SourceElement result = jb.program().getFirstElement();
-        while ((result instanceof PossibleProgramPrefix pre && pre.isPrefix()) || result instanceof CatchAllStatement) {
+        while ((result instanceof PossibleProgramPrefix pre && pre.isPrefix())
+                || result instanceof CatchAllStatement) {
             if (result instanceof LabeledStatement) {
                 result = ((LabeledStatement) result).getChildAt(1);
             } else if (result instanceof CatchAllStatement) {
                 result = ((CatchAllStatement) result).getBody();
-            } else if (result == result.getFirstElement() && ((PossibleProgramPrefix) result).isPrefix()) {
+            } else if (result == result.getFirstElement()
+                    && ((PossibleProgramPrefix) result).isPrefix()) {
                 System.out.println(result);
-            }else {
+            } else {
                 result = result.getFirstElement();
             }
         }

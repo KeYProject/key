@@ -7,8 +7,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
+import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -102,7 +102,8 @@ public class LabeledStatement extends JavaStatement
         if (body instanceof PossibleProgramPrefix) {
             if (body instanceof StatementBlock) {
                 return !((StatementBlock) body).isEmpty()
-                        && ((StatementBlock) body).getStatementAt(0) instanceof PossibleProgramPrefix;
+                        && ((StatementBlock) body)
+                                .getStatementAt(0) instanceof PossibleProgramPrefix;
             }
             return true;
         }

@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.ProgramSV;
-
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;

@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public interface PossibleProgramPrefix extends NonTerminalProgramElement {
 
-    default boolean isPrefix() {return true;}
+    default boolean isPrefix() { return true; }
 
     /** return true if there is a next prefix element */
     boolean hasNextPrefixElement();

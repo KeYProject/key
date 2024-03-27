@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
-
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -238,7 +238,8 @@ public class Switch extends BranchStatement
 
     @Override
     public SourceElement getFirstElement() {
-        if (branches.isEmpty()) return this;
+        if (branches.isEmpty())
+            return this;
         return branches.get(0);
     }
 
@@ -255,8 +256,6 @@ public class Switch extends BranchStatement
 
     @Override
     public boolean isPrefix() {
-        if (branches.isEmpty())
-            System.err.println("Error: empty switch " + expression);
         return !branches.isEmpty() && expressionWithoutSideffects();
     }
 
@@ -276,7 +275,8 @@ public class Switch extends BranchStatement
 
     @Override
     public PossibleProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? ((PossibleProgramPrefix) branches.get(0)).getLastPrefixElement()
+        return hasNextPrefixElement()
+                ? ((PossibleProgramPrefix) branches.get(0)).getLastPrefixElement()
                 : this;
     }
 
@@ -309,8 +309,9 @@ public class Switch extends BranchStatement
 
     @Override
     public PosInProgram getFirstActiveChildPos() {
-        return branches.isEmpty() ? PosInProgram.TOP : (expressionWithoutSideffects()
-                ? PosInProgram.ONE
-                : PosInProgram.TOP);
+        return branches.isEmpty() ? PosInProgram.TOP
+                : (expressionWithoutSideffects()
+                        ? PosInProgram.ONE
+                        : PosInProgram.TOP);
     }
 }

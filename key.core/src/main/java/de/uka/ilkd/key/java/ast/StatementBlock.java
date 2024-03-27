@@ -310,7 +310,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Override
     public PossibleProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? ((PossibleProgramPrefix) body.get(0)).getLastPrefixElement() : this;
+        return hasNextPrefixElement() ? ((PossibleProgramPrefix) body.get(0)).getLastPrefixElement()
+                : this;
     }
 
     @Override

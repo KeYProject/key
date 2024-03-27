@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
@@ -1782,10 +1783,12 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnActiveCase(ActiveCase x) {
-        if (!x.isPrefix()) markStart(x);
+        if (!x.isPrefix())
+            markStart(x);
         l.keyWord("active-case").print(":");
         printCaseBody(x.getBody());
-        if (!x.isPrefix()) markEnd(x);
+        if (!x.isPrefix())
+            markEnd(x);
     }
 
     @Override
