@@ -28,8 +28,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -85,11 +87,27 @@ public class InitArrayCreation extends InitArray {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
+        final NameRecorder nameRecorder = services.getNameRecorder();
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 
         for (int i = 0; i < pvars.length; i++) {
-            final ProgramElementName name = varNamer.getTemporaryNameProposal("dim" + i);
+            // first check for previously saved name
+            Name proposedName = null;
+            for (var name : nameRecorder.getSetProposals()) {
+                if (name.toString().startsWith("dim" + i + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                    proposedName = name;
+                    break;
+                }
+            }
+            final ProgramElementName name;
+            if (proposedName != null) {
+                name = new ProgramElementName(proposedName.toString());
+            } else {
+                // if there is no previous name, create a new one
+                name = varNamer.getTemporaryNameProposal("dim" + i);
+                nameRecorder.addProposal(new Name(name.getProgramName()));
+            }
 
             final LocalVariableDeclaration argDecl =
                 KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
