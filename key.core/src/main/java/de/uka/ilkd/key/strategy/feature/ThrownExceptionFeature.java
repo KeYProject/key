@@ -14,8 +14,11 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;
@@ -97,8 +100,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;
 
-        if (jb instanceof ProgramPrefix prefix) {
-            final ProgramPrefix pp = prefix.getLastPrefixElement();
+        if (jb instanceof PossibleProgramPrefix prefix) {
+            final PossibleProgramPrefix pp = prefix.getLastPrefixElement();
             fstActive = PosInProgram.getProgramAt(pp.getFirstActiveChildPos(), pp);
         } else {
             fstActive = jb;

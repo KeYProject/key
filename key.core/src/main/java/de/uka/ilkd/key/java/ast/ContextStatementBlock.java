@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -144,12 +144,12 @@ public class ContextStatementBlock extends StatementBlock {
 
         ExecutionContext lastExecutionContext = null;
 
-        final ProgramPrefix prefix;
+        final PossibleProgramPrefix prefix;
         int pos = -1;
         PosInProgram relPos = PosInProgram.TOP;
 
-        if (src instanceof ProgramPrefix) {
-            prefix = (ProgramPrefix) src;
+        if (src instanceof PossibleProgramPrefix) {
+            prefix = (PossibleProgramPrefix) src;
             final int srcPrefixLength = prefix.getPrefixLength();
 
             if (getPrefixLength() > srcPrefixLength) {
@@ -158,7 +158,7 @@ public class ContextStatementBlock extends StatementBlock {
 
             pos = srcPrefixLength - getPrefixLength();
 
-            ProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
+            PossibleProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
 
             relPos = firstActiveStatement.getFirstActiveChildPos();
 
@@ -177,7 +177,7 @@ public class ContextStatementBlock extends StatementBlock {
 
                 start = relPos.get(relPos.depth() - 1);
                 if (relPos.depth() > 1) {
-                    firstActiveStatement = (ProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
+                    firstActiveStatement = (PossibleProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
                         firstActiveStatement);
                 }
             }
@@ -210,8 +210,8 @@ public class ContextStatementBlock extends StatementBlock {
      * position
      */
     private MatchConditions makeContextInfoComplete(MatchConditions matchCond, SourceData newSource,
-            ProgramPrefix prefix, int pos, PosInProgram relPos, ProgramElement src,
-            Services services) {
+                                                    PossibleProgramPrefix prefix, int pos, PosInProgram relPos, ProgramElement src,
+                                                    Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
         final ExecutionContext lastExecutionContext = instantiations.getExecutionContext();
@@ -247,8 +247,8 @@ public class ContextStatementBlock extends StatementBlock {
      * @return the inner most execution context
      */
     private MatchConditions matchInnerExecutionContext(MatchConditions matchCond,
-            final Services services, ExecutionContext lastExecutionContext,
-            final ProgramPrefix prefix, int pos, final ProgramElement src) {
+                                                       final Services services, ExecutionContext lastExecutionContext,
+                                                       final PossibleProgramPrefix prefix, int pos, final ProgramElement src) {
 
         // partial context instantiation
 
@@ -289,10 +289,10 @@ public class ContextStatementBlock extends StatementBlock {
      *        prefix.getPrefixElementAt(pos);
      * @return the PosInProgram of the first element, which is not part of the prefix
      */
-    private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
+    private PosInProgram matchPrefixEnd(final PossibleProgramPrefix prefix, int pos, PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {
-            ProgramPrefix currentPrefix = prefix;
+            PossibleProgramPrefix currentPrefix = prefix;
             int i = 0;
             while (i <= pos) {
                 final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator();
@@ -315,8 +315,8 @@ public class ContextStatementBlock extends StatementBlock {
         return prefixEnd;
     }
 
-    private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
-        ProgramPrefix current = prefix;
+    private static PossibleProgramPrefix getPrefixElementAt(PossibleProgramPrefix prefix, int i) {
+        PossibleProgramPrefix current = prefix;
         for (int pos = 0; pos < i; pos++) {
             current = current.getNextPrefixElement();
         }

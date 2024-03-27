@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.MetaClassReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 
 public class SynchronizedBlock extends JavaStatement
-        implements StatementContainer, ExpressionContainer, ProgramPrefix {
+        implements StatementContainer, ExpressionContainer, PossibleProgramPrefix {
 
     /**
      * Expression.
@@ -104,21 +104,26 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     @Override
-    public boolean hasNextPrefixElement() {
-        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
+    public boolean isPrefix() {
+        return expressionWithoutSideffects();
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public boolean hasNextPrefixElement() {
+        return !body.isEmpty() && body.getStatementAt(0) instanceof PossibleProgramPrefix;
+    }
+
+    @Override
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.getStatementAt(0);
+            return (PossibleProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
@@ -133,7 +138,7 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(this);
     }
 

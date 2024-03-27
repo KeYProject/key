@@ -73,6 +73,11 @@ public class Default extends SwitchBranch {
         return result;
     }
 
+    @Override
+    public SourceElement getFirstElement() {
+        return body.get(0);
+    }
+
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *

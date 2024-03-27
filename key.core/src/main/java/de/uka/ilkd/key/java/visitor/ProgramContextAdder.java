@@ -58,10 +58,12 @@ public class ProgramContextAdder {
 
         if (!prefixPos.hasNext()) {
             body = createWrapperBody(context, putIn, suffix);
-            // special case labeled statement as a label must not be
+            // special case labeled statement as a label need not be
             // succeeded by a statement block
             if (context instanceof LabeledStatement) {
                 body = createLabeledStatementWrapper((LabeledStatement) context, body);
+            } else if (context instanceof ActiveCase ac) {
+                body = createActiveCaseWrapper(ac, (StatementBlock) body);
             }
             return body;
         } else {
@@ -70,7 +72,7 @@ public class ProgramContextAdder {
             if (context instanceof StatementBlock block) {
                 return createStatementBlockWrapper(block, body);
             } else if (context instanceof Try t) {
-                return createTryStatementWrapper((StatementBlock) body, t);
+                return createTryStatementWrapper(t, (StatementBlock) body);
             } else if (context instanceof MethodFrame mf) {
                 return createMethodFrameWrapper(mf, (StatementBlock) body);
             } else if (context instanceof LabeledStatement ls) {
@@ -80,9 +82,14 @@ public class ProgramContextAdder {
             } else if (context instanceof SynchronizedBlock sb) {
                 return createSynchronizedBlockWrapper(sb,
                     (StatementBlock) body);
-            } else if (context instanceof Exec) {
-                return createExecStatementWrapper((StatementBlock) body, (Exec) context);
-            } else {
+            } else if (context instanceof Exec e) {
+                return createExecStatementWrapper(e, (StatementBlock) body);
+            } else if (context instanceof Switch sw) {
+                return createSwitchWrapper(sw, (ActiveCase) body);
+            } else if (context instanceof ActiveCase ac) {
+                return createActiveCaseWrapper(ac, (Statement) body);
+            }
+            else {
                 throw new RuntimeException(
                     new UnexpectedException("Unexpected block type: " + context.getClass()));
             }
@@ -91,7 +98,7 @@ public class ProgramContextAdder {
 
     /**
      * inserts the content of the statement block <code>putIn</code> and adds succeeding children of
-     * the innermost non terminal element (usually statement block) in the context.
+     * the innermost non-terminal element (usually statement block) in the context.
      *
      * @param wrapper
      *        the JavaNonTerminalProgramElement with the context that has to be wrapped
@@ -170,11 +177,31 @@ public class ProgramContextAdder {
         }
     }
 
-    protected Try createTryStatementWrapper(StatementBlock body, Try old) {
+    protected Try createTryStatementWrapper(Try old, StatementBlock body) {
         return new Try(body, old.getBranchList());
     }
 
-    protected Exec createExecStatementWrapper(StatementBlock body, Exec old) {
+    protected ActiveCase createActiveCaseWrapper(ActiveCase old, Statement body) {
+        var stmts = old.getBody().toArray(new Statement[0]);
+        if (body instanceof StatementBlock bodyBlock) {
+            if (stmts[0] instanceof StatementBlock sb && !sb.isEmpty()) {
+                stmts[0] = bodyBlock;
+            } else {
+                stmts = bodyBlock.getBody().toArray(new Statement[0]);
+            }
+        } else {
+            stmts[0] = body;
+        }
+        return new ActiveCase(stmts);
+    }
+
+    protected Switch createSwitchWrapper(Switch old, ActiveCase body) {
+        var branches = old.getBranchList().toArray(new Branch[0]);
+        branches[0] = body;
+        return new Switch(old.getExpression(), branches);
+    }
+
+    protected Exec createExecStatementWrapper(Exec old, StatementBlock body) {
         return new Exec(body, old.getBranchList());
     }
 

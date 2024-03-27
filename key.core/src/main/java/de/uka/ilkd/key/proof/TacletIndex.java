@@ -318,7 +318,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,
             PrefixOccurrences prefixOccurrences) {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        if (pe instanceof ProgramPrefix nt) {
+        if (pe instanceof PossibleProgramPrefix nt) {
             int next = prefixOccurrences.occurred(pe);
             if (next < nt.getChildCount()) {
                 return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);

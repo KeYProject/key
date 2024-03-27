@@ -6,16 +6,16 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-public class ActiveCase extends SwitchBranch implements ProgramPrefix {
+public class ActiveCase extends SwitchBranch implements PossibleProgramPrefix {
     /**
      * Body.
      */
-    protected final ImmutableArray<Statement> body;
+    protected final ImmutableArray<? extends Statement> body;
 
     private final MethodFrame innerMostMethodFrame;
 
@@ -29,6 +29,13 @@ public class ActiveCase extends SwitchBranch implements ProgramPrefix {
 
     public ActiveCase(Statement[] body) {
         this.body = new ImmutableArray<>(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+    }
+
+    public ActiveCase(ImmutableArray<? extends Statement> body) {
+        this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -96,6 +103,12 @@ public class ActiveCase extends SwitchBranch implements ProgramPrefix {
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    @Override
+    public SourceElement getFirstElement() {
+        if (body.isEmpty()) return this;
+        return body.get(0);
+    }
+
     /**
      * Get the number of statements in this container.
      *
@@ -125,7 +138,7 @@ public class ActiveCase extends SwitchBranch implements ProgramPrefix {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public ImmutableArray<Statement> getBody() {
+    public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
 
@@ -140,26 +153,31 @@ public class ActiveCase extends SwitchBranch implements ProgramPrefix {
     }
 
     @Override
-    public boolean hasNextPrefixElement() {
-        return body != null && !body.isEmpty() && body.get(0) instanceof ProgramPrefix;
+    public boolean isPrefix() {
+        return body !=null&& !body.isEmpty();
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public boolean hasNextPrefixElement() {
+        return body != null && !body.isEmpty() && body.get(0) instanceof PossibleProgramPrefix;
+    }
+
+    @Override
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.get(0);
+            return (PossibleProgramPrefix) body.get(0);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(this);
     }
 

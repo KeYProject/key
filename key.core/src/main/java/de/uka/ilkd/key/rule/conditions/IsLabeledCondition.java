@@ -42,8 +42,8 @@ public class IsLabeledCondition implements VariableCondition {
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
-        ProgramPrefix prefix = //
-            (ProgramPrefix) svInst.getContextInstantiation().program();
+        PossibleProgramPrefix prefix = //
+            (PossibleProgramPrefix) svInst.getContextInstantiation().program();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {

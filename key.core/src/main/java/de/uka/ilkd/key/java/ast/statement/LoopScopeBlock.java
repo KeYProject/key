@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
  * @author Dominic Scheurer
  */
 public final class LoopScopeBlock extends JavaStatement
-        implements StatementContainer, ExpressionContainer, ProgramPrefix {
+        implements StatementContainer, ExpressionContainer, PossibleProgramPrefix {
 
     @Nullable
     private final IProgramVariable indexPV;
@@ -105,14 +105,13 @@ public final class LoopScopeBlock extends JavaStatement
 
     @Override
     public boolean hasNextPrefixElement() {
-        return !body.isEmpty()
-                && body.getStatementAt(0) instanceof ProgramPrefix;
+        return !body.isEmpty() && body.getStatementAt(0) instanceof PossibleProgramPrefix;
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) body.getStatementAt(0);
+            return (PossibleProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException(
                 "No next prefix element " + this);
@@ -120,10 +119,8 @@ public final class LoopScopeBlock extends JavaStatement
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement()
-                ? getNextPrefixElement().getLastPrefixElement()
-                : this;
+    public PossibleProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
     @Override
@@ -137,7 +134,7 @@ public final class LoopScopeBlock extends JavaStatement
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(this);
     }
 

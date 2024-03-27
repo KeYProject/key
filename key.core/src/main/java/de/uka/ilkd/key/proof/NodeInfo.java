@@ -192,7 +192,7 @@ public class NodeInfo {
         // TODO: unify with MiscTools getActiveStatement
         if (firstStatement != null) {
             activeStatement = firstStatement;
-            while ((activeStatement instanceof ProgramPrefix)
+            while ((activeStatement instanceof PossibleProgramPrefix pre && pre.isPrefix())
                     && !(activeStatement instanceof StatementBlock)) {
                 activeStatement = activeStatement.getFirstElement();
             }
