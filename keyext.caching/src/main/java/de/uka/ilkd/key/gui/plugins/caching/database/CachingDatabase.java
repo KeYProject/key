@@ -66,7 +66,13 @@ public final class CachingDatabase {
     private static final Pattern PROOF_HEADER_CLEANER =
         Pattern.compile("(\\\\include|\\\\javaSource) \"[^\"]+\";");
 
+    /**
+     * Path to metadata file.
+     */
     private final Path metadataIndex;
+    /**
+     * Path to storage directory for proof/java/key files.
+     */
     private final Path cacheIndex;
     /**
      * Whether the index needs to be written to disk due to changes.
@@ -507,6 +513,7 @@ public final class CachingDatabase {
             var filename = extension + (RAND.nextInt(1000000)) + "." + extension;
             file = cacheIndex.resolve(filename);
         } while (file.toFile().exists());
+        LOGGER.info("creating new file {}", file);
         Files.writeString(file, content);
         var cachedFile = new CachedFile(file, hash);
         files.put(hash, cachedFile);
