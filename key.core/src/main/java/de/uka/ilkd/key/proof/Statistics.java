@@ -363,7 +363,8 @@ public class Statistics {
          */
         private int cachedBranches(final Node node) {
             // node has to be an open goal and needs to have cache info
-            return node.getAppliedRuleApp() == null && (node.lookup(ClosedBy.class) != null || node.lookup(CachedProofBranch.class) != null) ? 1 : 0;
+            return node.getAppliedRuleApp() == null && (node.lookup(ClosedBy.class) != null
+                    || node.lookup(CachedProofBranch.class) != null) ? 1 : 0;
         }
 
         /**

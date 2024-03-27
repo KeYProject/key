@@ -143,6 +143,10 @@ public class ReferenceSearchDialog extends JDialog {
         return closeDialog;
     }
 
+    public void setProgressBarString(String title) {
+        progressBar.setString(title);
+    }
+
     /**
      * Set the maximum value of the progress bar.
      * Also resets progress to zero.
@@ -152,7 +156,6 @@ public class ReferenceSearchDialog extends JDialog {
     public void setMaximum(int total) {
         progressBar.setMaximum(total);
         progressBar.setValue(0);
-        progressBar.setString("Working...");
     }
 
     /**

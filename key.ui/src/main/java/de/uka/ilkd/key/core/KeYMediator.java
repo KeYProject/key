@@ -565,7 +565,7 @@ public class KeYMediator {
      *
      * @param proof the {@link Proof} to be worked on
      * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactove or automatic use
+     * @param interactive whether the needed taclet index is for interactive or automatic use
      *        (normally false)
      */
     public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {

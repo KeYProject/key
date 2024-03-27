@@ -78,7 +78,7 @@ class TestReferenceSearcher {
         p.closeGoal(p.getOpenGoal(foundReference));
         assertTrue(p.closed());
         Proof proof = foundReference.proof();
-        CopyReferenceResolver.copyCachedGoals(proof, p2, null, null);
+        proof.copyCachedGoals(p2, null, null);
         assertTrue(p.closed());
 
         assertNotEquals(55, foundReference.serialNr());

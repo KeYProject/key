@@ -17,7 +17,6 @@ import de.uka.ilkd.key.gui.plugins.caching.actions.CloseAllByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
-import de.uka.ilkd.key.gui.plugins.caching.actions.RealizeFromDatabaseAction;
 import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
 import de.uka.ilkd.key.gui.plugins.caching.database.AutoAddClosedProofs;
 import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabase;
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -108,15 +106,6 @@ public class CachingExtension
         }
     }
 
-    /**
-     * Update the GUI state of the status line button.
-     *
-     * @param proof the currently open proof
-     */
-    public void updateGUIState(Proof proof) {
-        referenceSearchButton.updateState(proof);
-    }
-
     @Override
     public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         initActions(mainWindow);
@@ -185,7 +174,8 @@ public class CachingExtension
                 c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                     goal.node());
                 if (c == null) {
-                    var cachedProofBranches = database.findMatching(p.getSettings().getChoiceSettings(), goal.sequent(), p.getServices());
+                    var cachedProofBranches = database.findMatching(
+                        p.getSettings().getChoiceSettings(), goal.sequent(), p.getServices());
                     if (!cachedProofBranches.isEmpty()) {
                         cachedProofBranch = cachedProofBranches.iterator().next();
                     }
@@ -245,7 +235,6 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             actions.add(new SearchInDatabaseAction(this, node));
-            actions.add(new RealizeFromDatabaseAction(node, null));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
         } else if (kind.getType() == Proof.class) {
@@ -260,7 +249,7 @@ public class CachingExtension
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        referenceSearchButton = new ReferenceSearchButton(mediator);
+        referenceSearchButton = new ReferenceSearchButton(this, mediator);
         return List.of(referenceSearchButton);
     }
 
@@ -290,9 +279,12 @@ public class CachingExtension
         }
         // unmark interactive goals previously marked in ruleApplied above
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null || goal.node().lookup(CachedProofBranch.class) != null)) {
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null
+                        || goal.node().lookup(CachedProofBranch.class) != null)) {
             // mark goals as automatic again
-            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null || goal.node().lookup(CachedProofBranch.class) != null)
+            p.openGoals().stream()
+                    .filter(goal -> goal.node().lookup(ClosedBy.class) != null
+                            || goal.node().lookup(CachedProofBranch.class) != null)
                     .forEach(g -> {
                         g.setEnabled(true);
                         g.proof().closeGoal(g);
@@ -343,7 +335,7 @@ public class CachingExtension
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.initiateAutoMode(newProof, true, false);
                 try {
-                    CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
+                    newProof.copyCachedGoals(referencedProof, null, null);
                 } finally {
                     mediator.finishAutoMode(newProof, true, true,
                         /* do not select a different node */ () -> {
@@ -366,6 +358,10 @@ public class CachingExtension
         }
     }
 
+    /**
+     * Update the GUI state of this extension.
+     * This will update the button in the status bar.
+     */
     public void updateGUIState() {
         referenceSearchButton.updateState(mediator.getSelectedProof());
     }

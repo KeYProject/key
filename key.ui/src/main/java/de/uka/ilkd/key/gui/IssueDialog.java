@@ -557,7 +557,7 @@ public final class IssueDialog extends JDialog {
         MainWindow.getInstance().getMediator().startInterface(true);
 
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
-        IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
+        IssueDialog dlg = new IssueDialog(parent, "Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();
     }
