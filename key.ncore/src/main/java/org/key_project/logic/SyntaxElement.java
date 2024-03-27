@@ -8,4 +8,7 @@ package org.key_project.logic;
  * AST nodes.
  */
 public interface SyntaxElement {
+    SyntaxElement getChild(int child);
+
+    int getChildCount();
 }
