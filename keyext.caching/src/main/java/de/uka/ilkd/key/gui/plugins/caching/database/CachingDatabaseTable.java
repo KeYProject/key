@@ -13,11 +13,36 @@ import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 
+import org.key_project.util.java.NumberUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Table model to display information on the caching database.
+ * Has four columns: name, java source, info and size on disk.
+ *
+ * @author Arne Keller
+ */
 public class CachingDatabaseTable extends AbstractTableModel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachingDatabaseTable.class);
+
+    /**
+     * The caching database.
+     */
     private final CachingDatabase database;
+    /**
+     * Cached proofs to show in this table.
+     * The order of this list determines the order of the table.
+     */
     private List<Path> cachedProofs;
     private Map<Path, List<CachedProofBranch>> cache;
+    /**
+     * For each proof in {@link #cachedProofs}: the size on disk, formatted as human-readable
+     * number.
+     */
+    private List<String> sizeOnDisk;
 
     CachingDatabaseTable(CachingDatabase database) {
         this.database = database;
@@ -27,6 +52,17 @@ public class CachingDatabaseTable extends AbstractTableModel {
     public void refresh() {
         cachedProofs = new ArrayList<>(database.getAllCachedProofs());
         cache = database.getAllCachedProofBranches();
+        // for each proof, compute the size on disk
+        sizeOnDisk = new ArrayList<>();
+        for (var cachedProof : cachedProofs) {
+            try {
+                sizeOnDisk.add(NumberUtil.formatAsHumanReadableSize(
+                    database.sizeOfCachedProof(cache.get(cachedProof).get(0))));
+            } catch (IOException e) {
+                LOGGER.warn("failed to determine proof size ", e);
+                sizeOnDisk.add("???");
+            }
+        }
     }
 
     @Override
@@ -36,7 +72,7 @@ public class CachingDatabaseTable extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -45,6 +81,7 @@ public class CachingDatabaseTable extends AbstractTableModel {
         case 0 -> "Proof";
         case 1 -> "Java source";
         case 2 -> "Info";
+        case 3 -> "Size on disk";
         default -> "??";
         };
     }
@@ -52,7 +89,7 @@ public class CachingDatabaseTable extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
-        case 0, 1, 2 -> String.class;
+        case 0, 1, 2, 3 -> String.class;
         default -> null;
         };
     }
@@ -72,6 +109,7 @@ public class CachingDatabaseTable extends AbstractTableModel {
             var data = cache.get(proofPath);
             yield String.format("Branches: %d", data.size());
         }
+        case 3 -> sizeOnDisk.get(rowIndex);
         default -> null;
         };
     }

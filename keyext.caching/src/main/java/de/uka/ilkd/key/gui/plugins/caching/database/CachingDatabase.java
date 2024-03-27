@@ -134,9 +134,9 @@ public final class CachingDatabase {
             for (int i = 0; i < otherFiles.getEntries().size(); i++) {
                 var entry = otherFiles.getSection(Integer.toString(i));
                 var name = entry.getString("file");
-                var hash = entry.getString("hash");
-                files.put(Integer.parseInt(hash),
-                    new CachedFile(new File(name).toPath(), Integer.parseInt(hash)));
+                var hash = entry.getInt("hash");
+                files.put(hash,
+                    new CachedFile(new File(name).toPath(), hash));
             }
 
             var cachedProofsJson = document.getSection("proofs");
@@ -149,8 +149,8 @@ public final class CachingDatabase {
                 var javaClasses = entry.getStringList("javaClasses");
                 var references = entry.getSection("referencedFiles").getEntries().stream()
                         .map(x -> {
-                            String id = (String) x.getValue();
-                            return Objects.requireNonNull(files.get(Integer.parseInt(id)));
+                            Long id = (Long) x.getValue();
+                            return files.get(id.intValue());
                         }).toList();
                 var branches = entry.getSection("cachedSequents");
                 for (int j = 0; j < branches.getEntries().size(); j++) {
@@ -242,7 +242,7 @@ public final class CachingDatabase {
                 var entryElJson = cachedFilesJson.getOrCreateSection(Integer.toString(i));
                 i++;
                 entryElJson.set("file", entry.file().toAbsolutePath().toString());
-                entryElJson.set("hash", Integer.toString(entry.hash()));
+                entryElJson.set("hash", entry.hash());
             }
             // save to file
             var writer = new FileWriter(metadataIndex.toFile());
@@ -280,6 +280,7 @@ public final class CachingDatabase {
             });
         }
         for (Path f : toDelete) {
+            LOGGER.info("deleting unused file {}", f);
             Files.delete(f);
         }
         toDelete.clear();
@@ -300,6 +301,7 @@ public final class CachingDatabase {
             });
         }
         for (Path f : toDelete) {
+            LOGGER.info("deleting empty directory {}", f);
             Files.delete(f);
         }
     }
@@ -526,5 +528,52 @@ public final class CachingDatabase {
 
     public Map<Path, List<CachedProofBranch>> getAllCachedProofBranches() {
         return Collections.unmodifiableMap(cache);
+    }
+
+    /**
+     * @return the size of the metadata file
+     * @throws IOException on I/O error
+     */
+    public long sizeOfMetadata() throws IOException {
+        if (!Files.exists(metadataIndex)) {
+            return 0;
+        }
+        return Files.size(metadataIndex);
+    }
+
+    /**
+     * @return size of all proof/java/key files in the cache
+     * @throws IOException on I/O error
+     */
+    public long sizeOfCacheFiles() throws IOException {
+        if (!Files.exists(cacheIndex)) {
+            return 0;
+        }
+        // simple: sum the size of all files in ~/.key/cachedProofs
+        try (var entries = Files.list(cacheIndex)) {
+            var filesToSum = entries.filter(x -> !Files.isDirectory(x)).toList();
+            long total = 0;
+            for (var file : filesToSum) {
+                total += Files.size(file);
+            }
+            return total;
+        }
+    }
+
+    /**
+     * Get the size of the proof that is referenced in the cached proof branch.
+     *
+     * @param cachedProofBranch some cached proof branch
+     * @return size of proof + size of referenced files
+     * @throws IOException on I/O error
+     */
+    public long sizeOfCachedProof(CachedProofBranch cachedProofBranch) throws IOException {
+        // size is determined by proof file size + referenced file size
+        long sum = 0;
+        sum += Files.size(cachedProofBranch.proofFile);
+        for (var referencedFile : cachedProofBranch.getReferencedFiles()) {
+            sum += Files.size(referencedFile.file());
+        }
+        return sum;
     }
 }

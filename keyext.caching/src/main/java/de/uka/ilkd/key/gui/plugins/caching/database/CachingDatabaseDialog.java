@@ -9,12 +9,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
+import org.key_project.util.java.NumberUtil;
 import org.key_project.util.java.SwingUtil;
 
 import net.miginfocom.layout.AC;
@@ -34,6 +36,14 @@ public class CachingDatabaseDialog extends JDialog {
      * The table showing the entries in the database.
      */
     private final JTable databaseTable;
+    /**
+     * Button to delete selected rows in the database.
+     */
+    private final JButton deletedSelected;
+    /**
+     * Data model of the {@link #databaseTable}.
+     */
+    private final CachingDatabaseTable tableModel;
 
     /**
      * Create a new dialog.
@@ -53,13 +63,30 @@ public class CachingDatabaseDialog extends JDialog {
         var statusPane = new JLabel("Database status: OK");
         contentPane.add(statusPane);
 
+        try {
+            var metadataSizePane = new JLabel(String.format("Size of database metadata: %s",
+                NumberUtil.formatAsHumanReadableSize(database.sizeOfMetadata())));
+            contentPane.add(metadataSizePane);
+
+            var totalSizePane = new JLabel(String.format("Size of database: %s",
+                NumberUtil.formatAsHumanReadableSize(database.sizeOfCacheFiles())));
+            contentPane.add(totalSizePane);
+        } catch (IOException e) {
+            // this is hardly critical functionality, so don't bother creating fallback labels
+            LOGGER.warn("failed to determine database size ", e);
+        }
+
         var buttonPane = new JPanel();
         var deleteAllButton = new JButton("Reset database");
         deleteAllButton.addActionListener(e -> resetDatabase());
         buttonPane.add(deleteAllButton);
         contentPane.add(buttonPane);
 
-        var tableModel = new CachingDatabaseTable(database);
+        deletedSelected = new JButton("Deleted selected proof(s)");
+        deletedSelected.addActionListener(e -> deletedSelected());
+        contentPane.add(deletedSelected);
+
+        tableModel = new CachingDatabaseTable(database);
         databaseTable = new JTable(tableModel);
         databaseTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         SwingUtil.resizeTableColumns(databaseTable);
@@ -67,16 +94,7 @@ public class CachingDatabaseDialog extends JDialog {
         // popup menu for table entries
         var tablePopupMenu = new JPopupMenu();
         var deleteMenuItem = new JMenuItem("Delete");
-        deleteMenuItem.addActionListener(e -> {
-            int selectedRow = databaseTable.getSelectedRow();
-            try {
-                tableModel.deleteProof(selectedRow);
-            } catch (IOException ex) {
-                LOGGER.warn("failed to delete proof ", ex);
-                IssueDialog.showExceptionDialog(this, ex);
-            }
-            refreshUI();
-        });
+        deleteMenuItem.addActionListener(e -> deletedSelected());
         tablePopupMenu.add(deleteMenuItem);
         databaseTable.setComponentPopupMenu(tablePopupMenu);
         databaseTable.addMouseListener(new OpenPopupMenu(tablePopupMenu));
@@ -117,6 +135,20 @@ public class CachingDatabaseDialog extends JDialog {
         }
     }
 
+    private void deletedSelected() {
+        int[] toDelete = databaseTable.getSelectedRows();
+        Arrays.sort(toDelete);
+        for (int i = toDelete.length - 1; i >= 0; i--) {
+            try {
+                tableModel.deleteProof(toDelete[i]);
+            } catch (IOException ex) {
+                LOGGER.warn("failed to delete proof ", ex);
+                IssueDialog.showExceptionDialog(this, ex);
+            }
+        }
+        refreshUI();
+    }
+
     public static KeyAction getOpenAction(CachingDatabase database) {
         return new CachingDatabaseOpenAction(database);
     }
@@ -126,8 +158,8 @@ public class CachingDatabaseDialog extends JDialog {
 
         CachingDatabaseOpenAction(CachingDatabase database) {
             this.database = database;
-            setName("Open proof caching database");
-            setMenuPath("Proof.Proof Caching");
+            setName("Show Proof Caching Database");
+            setMenuPath("Options");
             setAcceleratorLetter(KeyEvent.VK_D);
         }
 
