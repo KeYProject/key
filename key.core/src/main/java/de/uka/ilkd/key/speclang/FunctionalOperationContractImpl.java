@@ -34,6 +34,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.util.Assert.assertEqualSort;
 import static de.uka.ilkd.key.util.Assert.assertSubSort;
 
@@ -1367,14 +1368,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ((Services) services).getTypeConverter().getHeapLDT().getHeap();
         return (globalDefs == null ? "" : "defs: " + globalDefs + "; ") + "pre: " + originalPres
             + (originalFreePres.get(heap) != null
-                    && !originalFreePres.get(heap).equalsModRenaming(tb.tt())
-                            ? "free pre: " + originalFreePres
-                            : "")
+                    && !originalFreePres.get(heap).equalsModProperty(tb.tt(),
+                        RENAMING_PROPERTY)
+                                ? "free pre: " + originalFreePres
+                                : "")
             + "; mby: " + originalMby + "; post: " + originalPosts
             + (originalFreePosts.get(heap) != null
-                    && !originalFreePosts.get(heap).equalsModRenaming(tb.tt())
-                            ? "free post: " + originalFreePosts
-                            : "")
+                    && !originalFreePosts.get(heap).equalsModProperty(tb.tt(),
+                        RENAMING_PROPERTY)
+                                ? "free post: " + originalFreePosts
+                                : "")
             + "; mods: " + originalMods + "; hasMod: " + hasRealModifiesClause
             + (originalAxioms != null && originalAxioms.size() > 0 ? ("; axioms: " + originalAxioms)
                     : "")

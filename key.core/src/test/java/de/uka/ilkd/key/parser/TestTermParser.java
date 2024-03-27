@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTermParser extends AbstractTestTermParser {
@@ -257,7 +258,8 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
-        assertTrue(t3.equalsModRenaming(t4), "Terms should be equalModRenaming");
+        assertTrue(t3.equalsModProperty(t4, RENAMING_PROPERTY),
+            "Terms should be equalModRenaming");
     }
 
     @Test

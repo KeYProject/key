@@ -8,14 +8,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -33,20 +30,10 @@ import org.slf4j.LoggerFactory;
  * @version 1 (10.05.19)
  */
 public class ColorSettings extends AbstractPropertiesSettings {
-    public static final String SETTINGS_FILENAME = "colors.properties";
-    public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
-
     public static final File SETTINGS_FILE_NEW =
         new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
-
-    private ColorSettings(Properties settings) {
-        super("");
-        readSettings(settings);
-        Runtime.getRuntime().addShutdownHook(new Thread(this::save));
-    }
 
     public ColorSettings(Configuration load) {
         super("");
@@ -56,15 +43,17 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     public static ColorSettings getInstance() {
         if (INSTANCE == null) {
-            if (SETTINGS_FILE.exists()) {
+            if (SETTINGS_FILE_NEW.exists()) {
                 try {
-                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
-                    return INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
+                    LOGGER.info("Load color settings from file {}", SETTINGS_FILE_NEW);
+                    INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
+                    return INSTANCE;
                 } catch (IOException e) {
                     LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
                 }
             }
-            return INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+            INSTANCE = new ColorSettings(new Configuration());
+            return INSTANCE;
         }
         return INSTANCE;
     }
@@ -94,22 +83,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
     /**
      * Writes the current settings to default location.
      *
-     * @see #SETTINGS_FILE
+     * @see #SETTINGS_FILE_NEW
      */
     public void save() {
-        LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-            Properties props = new Properties();
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                props.setProperty(entry.getKey(), entry.getValue().toString());
-            }
-            props.store(writer, "KeY's Colors");
-            writer.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        LOGGER.info("Save color settings to: " + SETTINGS_FILE_NEW.getAbsolutePath());
+        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's Colors");

@@ -18,6 +18,10 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -25,7 +29,9 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -51,6 +57,8 @@ import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES;
@@ -147,7 +155,7 @@ public class JMLSpecFactory {
             } else {
                 freeInvariant = tb.tt();
                 for (LabeledParserRuleContext expr : originalFreeInvariant) {
-                    Term translated = new JmlIO().services(services).context(context)
+                    Term translated = new JmlIO(services).context(context)
                             .parameters(allVars).atPres(atPres).atBefore(atPres)
                             .translateTerm(expr, SpecType.LOOP_INVARIANT_FREE);
                     freeInvariant = tb.andSC(freeInvariant, tb.convertToFormula(translated));
@@ -420,7 +428,7 @@ public class JMLSpecFactory {
 
     private void translateAxioms(Context context, ProgramVariableCollection progVars,
             LocationVariable heap, ImmutableList<LabeledParserRuleContext> axioms,
-            ContractClauses clauses, Behavior originalBehavior) throws SLTranslationException {
+            ContractClauses clauses, Behavior originalBehavior) {
         boolean empty = axioms.isEmpty() // either the list is empty
                 || (axioms.size() == 1 // or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
@@ -439,7 +447,7 @@ public class JMLSpecFactory {
             LocationVariable heap, final LocationVariable savedHeap,
             ImmutableList<LabeledParserRuleContext> ensures,
             ImmutableList<LabeledParserRuleContext> ensuresFree, ContractClauses clauses,
-            Behavior originalBehavior) throws SLTranslationException {
+            Behavior originalBehavior) {
         if (heap == savedHeap && ensures.isEmpty()) {
             clauses.ensures.put(heap, null);
         } else {
@@ -625,7 +633,8 @@ public class JMLSpecFactory {
                     .atPres(atPres).atBefore(atBefores).translateTerm(expr, specType);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                         "\"assignable \\less_than_nothing\" does not go with other "
@@ -704,8 +713,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateSignalsOnly(Context context, ProgramVariable excVar,
-            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses)
-            throws SLTranslationException {
+            Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses) {
         return translateSignals(context, null, null, excVar, null, null, originalBehavior,
             originalClauses);
     }
@@ -768,7 +776,8 @@ public class JMLSpecFactory {
                 new JmlIO(services).context(context).parameters(paramVars).translateTerm(expr);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return true;
             }
         }
@@ -968,13 +977,14 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModRenaming(tb.allLocs())) {
+            if (clauses.accessibles.get(heap).equalsModProperty(tb.allLocs(),
+                RENAMING_PROPERTY)) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
                 if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModRenaming(tb.allLocs())) {
+                        .equalsModProperty(tb.allLocs(), RENAMING_PROPERTY)) {
                     createContract = false;
                     break;
                 }
@@ -1382,13 +1392,8 @@ public class JMLSpecFactory {
                     .create();
     }
 
-    /**
-     * Translates the condition Term of a JmlAssert statement.
-     *
-     * @param jmlAssert the statement to create the condition for
-     * @param pm the enclosing method
-     */
-    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+    private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
+            IProgramMethod pm) {
         final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
@@ -1399,19 +1404,94 @@ public class JMLSpecFactory {
                 tb.atPreVar(parameter.toString(), parameter.getKeYJavaType(), true));
         }
         final ImmutableList<ProgramVariable> paramVars =
-            append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
-        final ProgramVariableCollection pv = new ProgramVariableCollection(
-            tb.selfVar(pm, pm.getContainerType(), false), paramVars, tb.resultVar(pm, false),
-            tb.excVar(pm, false), atPreVars, termify(atPreVars), Collections.emptyMap(), // should
-                                                                                         // be the
-                                                                                         // pre-state
-                                                                                         // of the
-                                                                                         // enclosing
-                                                                                         // contract
+            append(collectLocalVariablesVisibleTo(statement, pm), parameters);
+        return new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false),
+            paramVars, tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
+            Collections.emptyMap(), // should be the pre-state of the enclosing contract
             Collections.emptyMap() // ignore for now
         );
-        var io = new JmlIO(services).context(Context.inMethodWithSelfVar(pm, pv.selfVar));
-        jmlAssert.translateCondition(io, pv);
+    }
+
+    /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final var pv = createProgramVariablesForStatement(jmlAssert, pm);
+        var io = new JmlIO(services).context(Context.inMethod(pm, tb))
+                .selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar)
+                .exceptionVariable(pv.excVar)
+                .atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        Term expr = io.translateTerm(jmlAssert.getCondition());
+        services.getSpecificationRepository().addStatementSpec(
+            jmlAssert,
+            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(expr)));
+    }
+
+    public @Nullable String checkSetStatementAssignee(Term assignee) {
+        if (assignee.op() instanceof LocationVariable) {
+            var variable = (LocationVariable) assignee.op();
+            if (variable.isGhost()) {
+                return null;
+            } else {
+                return variable + " is not a ghost variable";
+            }
+        } else if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
+            Term field = assignee.subs().last();
+            Operator op = field.op();
+            SplitFieldName split = HeapLDT.trySplitFieldName(op);
+            if (split != null) {
+                ProgramVariable attribute =
+                    services.getJavaInfo().getAttribute(split.attributeName(), split.className());
+                if (attribute.isGhost()) {
+                    return null;
+                } else {
+                    return op + " is not a ghost field";
+                }
+            } else if (op.equals(services.getTypeConverter().getHeapLDT().getArr())) {
+                return "Arrays are not writeable using set statements";
+            } else {
+                return op + " is not a class field";
+            }
+        } else {
+            return "Neither a field access nor a local variable access";
+        }
+    }
+
+    /**
+     * Translates a set statement.
+     *
+     * @param statement the set statement
+     * @param pm the enclosing method
+     */
+    public void translateSetStatement(final SetStatement statement, final IProgramMethod pm)
+            throws SLTranslationException {
+        final var pv = createProgramVariablesForStatement(statement, pm);
+        KeyAst.SetStatementContext setStatementContext = statement.getParserContext();
+        var io = new JmlIO(services).context(Context.inMethod(pm, tb)).selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        Term assignee = io.translateTerm(setStatementContext.getAssignee());
+        Term value = io.translateTerm(setStatementContext.getValue());
+        if (value.sort() == JavaDLTheory.FORMULA) {
+            value = tb.convertToBoolean(value);
+        }
+        String error = checkSetStatementAssignee(assignee);
+        if (error != null) {
+            throw new SLTranslationException(
+                "Invalid assignment target for set statement: " + error,
+                setStatementContext.getStartLocation());
+        }
+
+        services.getSpecificationRepository().addStatementSpec(
+            statement,
+            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
     }
 
     /**
@@ -1422,7 +1502,6 @@ public class JMLSpecFactory {
      * @param method the method containing the block.
      * @param block the block.
      * @param variables an instance of {@link AuxiliaryContract.Variables} for the block.
-     * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
             final JavaStatement block, final AuxiliaryContract.Variables variables) {

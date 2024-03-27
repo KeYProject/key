@@ -3,37 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -108,9 +95,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         /*
          * if(pv.isFinal()){ return pv; }
          */
-        return new LocationVariable(
-            VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo()),
-            pv.getKeYJavaType(), pv.isFinal());
+        return LocationVariable.fromProgramVariable(pv,
+            VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo()));
     }
 
     @Override
@@ -610,30 +596,70 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    public void performActionOnJmlAssertCondition(final Term x) {
-        if (x == null) {
-            throw new IllegalStateException("JML assert is incomplete");
-        }
-        Term newCond = replaceVariablesInTerm(x);
-        stack.peek().add(newCond);
-        if (!x.equals(newCond)) {
-            changed();
-        }
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        handleJmlStatements(x, JmlAssert::new);
     }
 
     @Override
-    public void performActionOnJmlAssert(final JmlAssert x) {
-        final ProgramVariableCollection vars = x.getVars();
-        final Map<LocationVariable, Term> atPres = vars.atPres;
-        final Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
-        final Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
-        final Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+    public void performActionOnSetStatement(final SetStatement x) {
+        /*
+         * var spec =
+         * Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+         * ProgramVariableCollection vars = spec.vars();
+         * Map<LocationVariable, Term> atPres = vars.atPres;
+         * Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
+         * Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
+         * Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+         *
+         * for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
+         * LocationVariable pv = e.getKey();
+         * final Term t = e.getValue();
+         * if (t == null) {
+         * continue;
+         * }
+         * if (replaceMap.containsKey(pv)) {
+         * newAtPres.remove(pv);
+         * pv = (LocationVariable) replaceMap.get(pv);
+         * newAtPreVars.put(pv, atPreVars.get(e.getKey()));
+         * }
+         * newAtPres.put(pv, replaceVariablesInTerm(t));
+         * }
+         * final ProgramVariableCollection newVars =
+         * new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
+         * newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
+         *
+         *
+         * var newTerms = spec.terms().map(this::replaceVariablesInTerm);
+         * var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
+         *
+         * services.getSpecificationRepository().addStatementSpec(x, newSpec);
+         *
+         * /*
+         * if (!newAtPres.equals(vars.atPres)) {
+         * changed();
+         * }
+         * doDefaultAction(x);
+         */
+        handleJmlStatements(x, SetStatement::new);
+    }
+
+    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
+        var spec = Objects.requireNonNull(
+            services.getSpecificationRepository().getStatementSpec(x));
+
+        ProgramVariableCollection vars = spec.vars();
+        Map<LocationVariable, Term> atPres = vars.atPres;
+        Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
+        Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
+        Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
+
         for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
             LocationVariable pv = e.getKey();
             final Term t = e.getValue();
             if (t == null) {
                 continue;
             }
+
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);
                 pv = (LocationVariable) replaceMap.get(pv);
@@ -644,10 +670,21 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ProgramVariableCollection newVars =
             new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
                 newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
-        stack.peek().add(newVars);
-        if (!newAtPres.equals(vars.atPres)) {
-            changed();
-        }
-        super.performActionOnJmlAssert(x);
+
+
+        var newTerms = spec.terms().map(this::replaceVariablesInTerm);
+        var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
+
+        var c = cloner.apply(x);
+        services.getSpecificationRepository().addStatementSpec(c, newSpec);
+
+        /*
+         * if (!newAtPres.equals(vars.atPres)) {
+         * changed();
+         * }
+         */
+        doDefaultAction(c);
+        changed();
     }
+
 }
