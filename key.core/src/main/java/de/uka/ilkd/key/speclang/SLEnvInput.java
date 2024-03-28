@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -257,18 +258,32 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
-    private void transformJmlAsserts(final IProgramMethod pm) {
+    private void transformProgramElements(final IProgramMethod pm) throws ProofInputException {
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {
+        var walker = new JavaASTWalker(pm.getBody()) {
+            public ProofInputException exception = null;
+
             @Override
             protected void doAction(final ProgramElement node) {
-                if (node instanceof JmlAssert) {
-                    jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                try {
+                    if (node instanceof JmlAssert) {
+                        jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                    } else if (node instanceof SetStatement) {
+                        jsf.translateSetStatement((SetStatement) node, pm);
+                    }
+                } catch (ProofInputException e) {
+                    // Store the first exception that occurred
+                    if (this.exception == null) {
+                        this.exception = e;
+                    }
                 }
             }
         };
         walker.start();
+        if (walker.exception != null) {
+            throw walker.exception;
+        }
     }
 
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
@@ -323,7 +338,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
-                transformJmlAsserts(pm);
+                transformProgramElements(pm);
             }
 
             // constructor contracts

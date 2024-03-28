@@ -15,6 +15,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
  * {@code a<=b}; Besides it can be used to prove that {@code a>=b} or {@code a<=b} by
@@ -50,7 +52,7 @@ public class HandleArith {
         final Term falseT = tb.ff();
 
         final Term arithTerm = formatArithTerm(problem, tb, integerLDT, services.getCaches());
-        if (arithTerm.equalsModIrrelevantTermLabels(falseT)) {
+        if (arithTerm.equalsModProperty(falseT, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             result = provedArithEqual(problem, tb, services);
             putInTermCache(provedByArithCache, problem, result);
             return result;

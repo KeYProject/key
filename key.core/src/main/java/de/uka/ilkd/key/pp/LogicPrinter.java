@@ -17,7 +17,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.*;
@@ -600,7 +599,9 @@ public class LogicPrinter {
     }
 
     private void printSourceElement(SourceElement element) {
-        new PrettyPrinter(layouter, instantiations).print(element);
+        new PrettyPrinter(layouter, instantiations, services,
+            notationInfo.isPrettySyntax(),
+            notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**

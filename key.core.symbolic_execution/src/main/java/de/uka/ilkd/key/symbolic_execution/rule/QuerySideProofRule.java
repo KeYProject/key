@@ -31,6 +31,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * A {@link BuiltInRule} which evaluates a query in a side proof.
@@ -187,6 +189,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

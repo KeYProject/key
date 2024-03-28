@@ -14,6 +14,8 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Visitor;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 
 /**
  * Feature for checking if the term of the first projection contains the term of the second
@@ -82,9 +84,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            // TODO: Fix with better equalsModRenaming handling
-            var t = (Term) visited;
-            found = found || t.equalsModRenaming(term);
+            found = found || visited.equalsModProperty(term, RENAMING_PROPERTY);
         }
 
         @Override
