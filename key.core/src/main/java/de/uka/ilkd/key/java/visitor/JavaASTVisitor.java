@@ -227,6 +227,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         doDefaultAction(x);
     }

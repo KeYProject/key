@@ -80,6 +80,8 @@ public interface Visitor {
 
     void performActionOnSeqReverse(SeqReverse x);
 
+    void performActionOnSeqPut(SeqPut seqPut);
+
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
     void performActionOnStringLiteral(StringLiteral x);

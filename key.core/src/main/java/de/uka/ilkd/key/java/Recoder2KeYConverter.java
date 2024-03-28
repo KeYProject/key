@@ -718,6 +718,11 @@ public class Recoder2KeYConverter {
         return new SeqReverse(children);
     }
 
+    public SeqPut convert(de.uka.ilkd.key.java.recoderext.adt.SeqPut e) {
+        ExtList children = collectChildren(e);
+        return new SeqPut(children);
+    }
+
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
