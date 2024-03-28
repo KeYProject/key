@@ -17,6 +17,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * TODO: rewrite, this seems pretty inefficient ...
  */
@@ -102,7 +105,7 @@ public class PredictCostProver {
             op = pro.op();
         }
         if ((op == Equality.EQUALS || op == Equality.EQV)
-                && pro.sub(0).equalsModRenaming(pro.sub(1))) {
+                && pro.sub(0).equalsModProperty(pro.sub(1), RENAMING_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         Term arithRes = HandleArith.provedByArith(pro, services);
@@ -130,7 +133,7 @@ public class PredictCostProver {
             ax = ax.sub(0);
             negated = !negated;
         }
-        if (pro.equalsModRenaming(ax)) {
+        if (pro.equalsModProperty(ax, RENAMING_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         return problem;
@@ -343,7 +346,8 @@ public class PredictCostProver {
                 if (op == Junctor.TRUE) {
                     return true;
                 }
-                if (op == Junctor.FALSE && terms[0].equalsModIrrelevantTermLabels(terms[j])) {
+                if (op == Junctor.FALSE
+                        && terms[0].equalsModProperty(terms[j], IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     next = next.remove(terms[j]);
                     literals = literals.remove(terms[j]);
                 }

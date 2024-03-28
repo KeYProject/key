@@ -24,6 +24,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 
 /**
  *
@@ -78,7 +80,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
-        return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
+        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_PROPERTY);
     }
 
     @Override

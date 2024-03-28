@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
 /**
@@ -1820,12 +1821,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int i = 0; i < t.arity(); i++) {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
-                    termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
+                    termsMatch = termsMatch
+                            && t.sub(i).equalsModProperty(term.sub(i), RENAMING_PROPERTY);
                 }
             }
 
             // the terms also match, if the entire sequence matches
-            termsMatch = (termsMatch || t.equalsModRenaming(term));
+            termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_PROPERTY));
 
             if (termsMatch) {
                 used = t;
@@ -1929,12 +1931,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int i = 0; i < t.arity(); i++) {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
-                    termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
+                    termsMatch = termsMatch
+                            && t.sub(i).equalsModProperty(term.sub(i), RENAMING_PROPERTY);
                 }
             }
 
             // the terms also match, if the entire terms match
-            termsMatch = (termsMatch || t.equalsModRenaming(term));
+            termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_PROPERTY));
 
             if (termsMatch) {
                 used = t;
@@ -2103,7 +2106,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (Term toMatch : modalityPredicates.keySet()) {
-            if (toMatch.equalsModRenaming(t)) {
+            if (toMatch.equalsModProperty(t, RENAMING_PROPERTY)) {
                 return modalityPredicates.get(toMatch);
             }
         }
@@ -2253,7 +2256,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBsumTerms.keySet()) {
-            if (t.equalsModRenaming(bsumterm)) {
+            if (t.equalsModProperty(bsumterm, RENAMING_PROPERTY)) {
                 name = usedBsumTerms.get(t);
             }
         }
@@ -2291,7 +2294,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBprodTerms.keySet()) {
-            if (t.equalsModRenaming(bprodterm)) {
+            if (t.equalsModProperty(bprodterm, RENAMING_PROPERTY)) {
                 name = usedBprodTerms.get(t);
             }
         }

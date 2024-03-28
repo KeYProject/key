@@ -19,6 +19,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
+
 /**
  * Proof script command to hide a formula from the sequent.
  *
@@ -79,7 +81,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
     private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if (s.formula().equalsModTermLabels(sf.formula())) {
+            if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
                 return s;
             }
         }

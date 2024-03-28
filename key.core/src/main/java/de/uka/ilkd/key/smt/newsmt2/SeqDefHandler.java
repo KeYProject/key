@@ -29,6 +29,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * This handler handles the seqDef binder function specially.
  *
@@ -78,7 +80,7 @@ public class SeqDefHandler implements SMTHandler {
             (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP", x -> new LinkedHashMap<>());
 
         for (Entry<Term, SExpr> entry : seqDefMap.entrySet()) {
-            if (entry.getKey().equalsModRenaming(term)) {
+            if (entry.getKey().equalsModProperty(term, RENAMING_PROPERTY)) {
                 return entry.getValue();
             }
         }

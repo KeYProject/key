@@ -48,6 +48,7 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
@@ -355,7 +356,7 @@ public class MergeRule implements BuiltInRule {
             // Check if location v is set to different value in both states.
 
             // Easy check: Term equality
-            boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
+            boolean proofClosed = rightSide1.equalsModProperty(rightSide2, RENAMING_PROPERTY);
 
             // We skip the check for equal valuation of this variable if
             // the depth threshold is exceeded by one of the right sides.

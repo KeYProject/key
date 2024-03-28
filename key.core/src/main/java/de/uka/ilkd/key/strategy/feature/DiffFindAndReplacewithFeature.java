@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * Binary feature that returns zero iff the replacewith- and find-parts of a Taclet are matched to
  * different terms.
@@ -29,7 +31,8 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
         for (TacletGoalTemplate temp : ((Taclet) app.rule()).goalTemplates()) {
             RewriteTacletGoalTemplate rwtemp = (RewriteTacletGoalTemplate) temp;
-            if (rwtemp.replaceWith().equalsModIrrelevantTermLabels(pos.subTerm())) {
+            if (rwtemp.replaceWith().equalsModProperty(pos.subTerm(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return false;
             }
         }
