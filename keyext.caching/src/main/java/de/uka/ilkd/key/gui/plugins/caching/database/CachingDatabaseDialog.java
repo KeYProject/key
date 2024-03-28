@@ -126,6 +126,12 @@ public class CachingDatabaseDialog extends JDialog {
     }
 
     private void resetDatabase() {
+        final int option = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
+            "Really delete all proofs from the database?", "Proof Caching Database",
+            JOptionPane.YES_NO_OPTION);
+        if (option != JOptionPane.YES_OPTION) {
+            return;
+        }
         try {
             database.reset();
             refreshUI();

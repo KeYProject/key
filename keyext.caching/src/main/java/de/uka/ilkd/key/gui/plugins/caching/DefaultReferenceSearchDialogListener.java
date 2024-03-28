@@ -48,6 +48,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
     /**
      * Create a new listener object.
      *
+     * @param extension the caching extension
      * @param mediator the KeY mediator
      */
     public DefaultReferenceSearchDialogListener(CachingExtension extension, KeYMediator mediator) {

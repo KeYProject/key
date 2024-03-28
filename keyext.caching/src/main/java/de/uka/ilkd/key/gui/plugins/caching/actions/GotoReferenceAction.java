@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -17,7 +19,13 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  */
 public final class GotoReferenceAction extends KeyAction {
 
+    /**
+     * The KeY mediator.
+     */
     private final KeYMediator mediator;
+    /**
+     * The node which references another proof.
+     */
     private final Node node;
 
     /**
@@ -31,7 +39,8 @@ public final class GotoReferenceAction extends KeyAction {
         this.node = node;
 
         setMenuPath("Proof Caching");
-        setEnabled(node.lookup(ClosedBy.class) != null);
+        var closedBy = node.lookup(ClosedBy.class);
+        setEnabled(closedBy != null);
 
         setName("Go to referenced proof");
         putValue(SHORT_DESCRIPTION, "Select the equivalent node in the other proof.");
@@ -40,6 +49,13 @@ public final class GotoReferenceAction extends KeyAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Node ref = node.lookup(ClosedBy.class).node();
-        mediator.getSelectionModel().setSelectedNode(ref);
+        if (mediator.getCurrentlyOpenedProofs().contains(ref.proof())) {
+            mediator.getSelectionModel().setSelectedNode(ref);
+        } else {
+            JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                "Cannot go to referenced proof:" +
+                    "\nit is an auxiliary proof loaded from the caching database",
+                "Proof Caching", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

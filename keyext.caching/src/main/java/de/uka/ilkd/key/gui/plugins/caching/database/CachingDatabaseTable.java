@@ -37,6 +37,9 @@ public class CachingDatabaseTable extends AbstractTableModel {
      * The order of this list determines the order of the table.
      */
     private List<Path> cachedProofs;
+    /**
+     * Cached branches to display in the table. These will only be shown as a total for each proof.
+     */
     private Map<Path, List<CachedProofBranch>> cache;
     /**
      * For each proof in {@link #cachedProofs}: the size on disk, formatted as human-readable
@@ -44,11 +47,19 @@ public class CachingDatabaseTable extends AbstractTableModel {
      */
     private List<String> sizeOnDisk;
 
+    /**
+     * Construct a new table model for the specified database.
+     *
+     * @param database caching database to show
+     */
     CachingDatabaseTable(CachingDatabase database) {
         this.database = database;
         refresh();
     }
 
+    /**
+     * Refresh this model's data based on the current state of the database.
+     */
     public void refresh() {
         cachedProofs = new ArrayList<>(database.getAllCachedProofs());
         cache = database.getAllCachedProofBranches();
@@ -120,7 +131,8 @@ public class CachingDatabaseTable extends AbstractTableModel {
     }
 
     /**
-     * Delete the proof at the specified row from the database.
+     * Delete the proof at the specified row from the database,
+     * and refresh the model afterward.
      *
      * @param rowIndex row index of proof to remove
      */
