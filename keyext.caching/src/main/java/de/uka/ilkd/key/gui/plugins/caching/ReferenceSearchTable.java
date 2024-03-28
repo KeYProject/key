@@ -41,7 +41,8 @@ class ReferenceSearchTable extends JTable implements TableModel {
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
         this.goals = proof.allGoals().stream()
-                .filter(g -> !g.node().isClosed() || g.node().lookup(ClosedBy.class) != null)
+                .filter(g -> !g.node().isClosed() || g.node().lookup(ClosedBy.class) != null
+                        || g.node().lookup(CachedProofBranch.class) != null)
                 .collect(Collectors.toList());
         Collections.reverse(this.goals);
         this.mediator = mediator;
@@ -94,6 +95,11 @@ class ReferenceSearchTable extends JTable implements TableModel {
             return String.valueOf(goals.get(row).node().serialNr());
         } else {
             Goal g = goals.get(row);
+            CachedProofBranch c2 = g.node().lookup(CachedProofBranch.class);
+            if (c2 != null) {
+                return String.format("reference available to ext. cache (proof %s)",
+                    c2.proofFile.getFileName().toString());
+            }
             ClosedBy c = g.node().lookup(ClosedBy.class);
             if (c == null) {
                 return "no reference found";

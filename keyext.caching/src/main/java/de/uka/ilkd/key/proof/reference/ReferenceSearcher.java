@@ -19,12 +19,17 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility class for proof caching.
  *
  * @author Arne Keller
  */
 public final class ReferenceSearcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearcher.class);
+
     private ReferenceSearcher() {
 
     }
@@ -42,6 +47,7 @@ public final class ReferenceSearcher {
         if (!suitableForCloseByReference(newNode)) {
             return null;
         }
+        LOGGER.trace("searching in {} previous proofs", previousProofs.size());
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
@@ -93,6 +99,7 @@ public final class ReferenceSearcher {
                     results = depTracker.analyze(true, false);
                 } catch (Exception ignored) {
                     // if the analysis for some reason fails, we simply proceed as usual
+                    LOGGER.debug("failed to analyze proof ", ignored);
                 }
             }
             while (!nodesToCheck.isEmpty()) {
@@ -122,6 +129,7 @@ public final class ReferenceSearcher {
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
                     continue;
                 }
+                LOGGER.debug("found caching candidate in proof {} node {}", p.name(), n.serialNr());
                 Set<Node> toSkip = new HashSet<>();
                 if (results != null) {
                     // computed skipped nodes by iterating through all nodes
@@ -134,7 +142,9 @@ public final class ReferenceSearcher {
                 }
                 return new ClosedBy(p, n, toSkip);
             }
+            // dependency graph caching search
         }
+        LOGGER.trace("found no caching candidate");
         return null;
     }
 

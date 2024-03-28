@@ -470,7 +470,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         for (LocationVariable h : heapContext) {
             if (originalModifies.get(h) != null) {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
-                    usePrettyPrinting, useUnicodeSymbols);
+                    usePrettyPrinting, useUnicodeSymbols, true);
                 mods.append("\n").append("mod").append(h == baseHeap ? "" : "[" + h + "]")
                         .append(": ").append(printMods);
             }
@@ -480,7 +480,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         for (LocationVariable h : heapContext) {
             if (originalInvariants.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
-                    usePrettyPrinting, useUnicodeSymbols);
+                    usePrettyPrinting, useUnicodeSymbols, true);
                 invariants.append("\n").append("invariant")
                         .append(h == baseHeap ? "" : "[" + h + "]").append(": ").append(printPosts);
             }
@@ -488,7 +488,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols)
+                    usePrettyPrinting, useUnicodeSymbols, true)
                 : ";") + mods;
     }
 

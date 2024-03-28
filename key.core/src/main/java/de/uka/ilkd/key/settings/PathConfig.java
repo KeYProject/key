@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.key_project.util.java.IOUtil;
 
@@ -51,6 +52,15 @@ public final class PathConfig {
      * Directory in which the log files are stored.
      */
     private static File logDirectory;
+    /**
+     * In which file to store the proof cache database index.
+     * Usually: ~/.key/cachedProofs.json
+     */
+    private static Path cacheIndex;
+    /**
+     * Directory in which cached proofs are stored.
+     */
+    private static Path cacheDirectory;
 
     private PathConfig() {
     }
@@ -82,6 +92,8 @@ public final class PathConfig {
         PathConfig.proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
         PathConfig.logDirectory = new File(keyConfigDir, "logs");
+        PathConfig.cacheIndex = Path.of(keyConfigDir, "cachedProofs.json");
+        PathConfig.cacheDirectory = Path.of(keyConfigDir, "cachedProofs");
     }
 
     /**
@@ -94,7 +106,7 @@ public final class PathConfig {
     }
 
     /**
-     *
+     * @return path to the directory for log files
      */
     public static File getLogDirectory() {
         return PathConfig.logDirectory;
@@ -109,4 +121,11 @@ public final class PathConfig {
         return proofIndependentSettings;
     }
 
+    public static Path getCacheIndex() {
+        return cacheIndex;
+    }
+
+    public static Path getCacheDirectory() {
+        return cacheDirectory;
+    }
 }

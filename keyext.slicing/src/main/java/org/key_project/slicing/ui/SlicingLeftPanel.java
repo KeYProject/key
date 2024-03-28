@@ -40,8 +40,8 @@ import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
+import org.key_project.util.GenericWorker;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;

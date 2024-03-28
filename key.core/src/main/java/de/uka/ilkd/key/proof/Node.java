@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -606,8 +607,9 @@ public class Node implements Iterable<Node> {
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
                 final Goal goal = proof().getOpenGoal(this);
-                if (this.isClosed() && lookup(ClosedBy.class) != null) {
-                    cachedName = CACHED_GOAL;
+                if (this.isClosed() && (lookup(ClosedBy.class) != null
+                        || lookup(CachedProofBranch.class) != null)) {
+                    return CACHED_GOAL;
                 } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
@@ -785,21 +787,22 @@ public class Node implements Iterable<Node> {
 
     /**
      * Register a user-defined data in this node info.
+     * It can be retrieved using {@link #lookup(Class)}.
      *
      * @param obj an object to be registered
      * @param service the key under it should be registered
-     * @param <T>
+     * @param <T> arbitrary object type
      */
     public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
     }
 
     /**
-     * Remove a previous registered user-defined data.
+     * Remove a previously registered user-defined data.
      *
      * @param obj registered object
      * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param <T> arbitrary object type
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -808,17 +811,22 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Get the assocated lookup of user-defined data.
+     * Get the associated lookup of user-defined data.
      *
-     * @return
+     * @return Lookup instance for user-defined data
      */
-    public @NonNull Lookup getUserData() {
+    private @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }
         return userData;
     }
 
+    /**
+     * Get the branch location of this node.
+     *
+     * @return this node's branch location
+     */
     public BranchLocation getBranchLocation() {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
@@ -830,10 +838,23 @@ public class Node implements Iterable<Node> {
         return branchLocation;
     }
 
+    /**
+     * Get the step index of this node. This is an identifier for the node. It is different for
+     * each node and increases monotonically in a proof tree depth-first order.
+     * This value is only valid after calling {@link Proof#setStepIndices()}!
+     *
+     * @return this node's step index
+     */
     public int getStepIndex() {
         return stepIndex;
     }
 
+    /**
+     * Set this node's step index to the specified value.
+     * Do not use this method unless you are {@link Proof#setStepIndices()}.
+     *
+     * @param stepIndex the step index to set
+     */
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
     }

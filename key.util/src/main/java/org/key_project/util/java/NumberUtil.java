@@ -166,4 +166,26 @@ public class NumberUtil {
             throw new NumberFormatException("Text not defined.");
         }
     }
+
+    private static final long KB_THRESHOLD = 1024;
+    private static final long MB_THRESHOLD = 1024 * KB_THRESHOLD;
+    private static final long GB_THRESHOLD = 1024 * MB_THRESHOLD;
+
+    /**
+     * Format the specified number of bytes as a human-readable string.
+     *
+     * @param value number of bytes
+     * @return human-readable representation of the byte count
+     */
+    public static String formatAsHumanReadableSize(long value) {
+        if (value < KB_THRESHOLD) {
+            return String.format("%d B", value);
+        } else if (value < MB_THRESHOLD) {
+            return String.format("%d KB", value / 1024);
+        } else if (value < GB_THRESHOLD) {
+            return String.format("%d MB", value / (1024 * 1024));
+        } else {
+            return String.format("%d GB", value / (1024 * 1024 * 1024));
+        }
+    }
 }

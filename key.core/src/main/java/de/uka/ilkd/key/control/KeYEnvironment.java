@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -298,7 +299,19 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     }
 
     /**
-     * Disposes this {@link KeYEnvironment}.
+     * Load a proof from the specified file.
+     *
+     * @param keyFile file to load
+     * @return environment with loaded proof
+     * @throws ProblemLoaderException on error during proof loading
+     */
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path keyFile)
+            throws ProblemLoaderException {
+        return load(keyFile.toFile());
+    }
+
+    /**
+     * Disposes this {@link KeYEnvironment} by disposing the loaded proof.
      */
     public void dispose() {
         if (loadedProof != null && !loadedProof.isDisposed()) {

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -362,7 +363,8 @@ public class Statistics {
          */
         private int cachedBranches(final Node node) {
             // node has to be an open goal and needs to have cache info
-            return node.getAppliedRuleApp() == null && node.lookup(ClosedBy.class) != null ? 1 : 0;
+            return node.getAppliedRuleApp() == null && (node.lookup(ClosedBy.class) != null
+                    || node.lookup(CachedProofBranch.class) != null) ? 1 : 0;
         }
 
         /**

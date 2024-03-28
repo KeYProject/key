@@ -13,6 +13,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
@@ -31,7 +32,11 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             new Color(80, 120, 0));
 
     /**
-     * The mediator.
+     * The caching extension.
+     */
+    private final CachingExtension extension;
+    /**
+     * The KeY mediator.
      */
     private final KeYMediator mediator;
 
@@ -40,8 +45,9 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      *
      * @param mediator the mediator
      */
-    public ReferenceSearchButton(KeYMediator mediator) {
+    public ReferenceSearchButton(CachingExtension extension, KeYMediator mediator) {
         super("Proof Caching");
+        this.extension = extension;
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
         addActionListener(this);
@@ -65,12 +71,13 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             }
         }
         var dialog =
-            new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
+            new ReferenceSearchDialog(p,
+                new DefaultReferenceSearchDialogListener(extension, mediator));
         dialog.setVisible(true);
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         Proof p = e.getSource().getSelectedProof();
         updateState(p);
     }
@@ -88,7 +95,8 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             return;
         }
         long foundRefs =
-            p.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+            p.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null
+                    || g.node().lookup(CachedProofBranch.class) != null).count();
         if (foundRefs > 0) {
             setText(String.format("Proof Caching (%d)", foundRefs));
             setForeground(COLOR_FINE.get());

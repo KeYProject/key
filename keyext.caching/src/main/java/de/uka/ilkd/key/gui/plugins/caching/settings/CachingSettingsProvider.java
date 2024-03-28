@@ -31,7 +31,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     /**
      * Text for introductory explanation
      */
-    private static final String INTRO_LABEL = "Adjust proof caching algorithm options here.";
+    private static final String INTRO_LABEL = "Adjust proof caching options here.";
     /**
      * Label for first option.
      */
@@ -47,6 +47,11 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
      */
     private static final String PRUNE_TITLE =
         "Behaviour when pruning into referenced proof";
+    /**
+     * Label for fourth option.
+     */
+    private static final String AUTO_ADD_CLOSED_TITLE =
+        "Automatically add closed proofs to database";
 
     /**
      * Checkbox for first option.
@@ -60,6 +65,10 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
      * Combobox for third option (prune behaviour).
      */
     private final JComboBox<String> pruneOption;
+    /**
+     * Checkbox for auto add closed option.
+     */
+    private final JCheckBox autoAddClosed;
 
     /**
      * Construct a new settings provider.
@@ -81,6 +90,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
                  all cached branches that reference it.""",
             0, x -> {
             }, PRUNE_REOPEN, PRUNE_COPY);
+        autoAddClosed = addCheckBox(AUTO_ADD_CLOSED_TITLE, "", false, emptyValidator());
     }
 
     @Override
@@ -102,6 +112,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         strategySearch.setSelected(ss.getEnabled());
         disposeOption.setSelectedItem(ss.getDispose());
         pruneOption.setSelectedItem(ss.getPrune());
+        autoAddClosed.setSelected(ss.getAutoAddClosedProofs());
         return this;
     }
 
@@ -111,6 +122,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         ss.setEnabled(strategySearch.isEnabled());
         ss.setDispose(disposeOption.getSelectedItem().toString());
         ss.setPrune(pruneOption.getSelectedItem().toString());
+        ss.setAutoAddClosedProofs(autoAddClosed.isEnabled());
     }
 
 
