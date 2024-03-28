@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
+import java.util.Objects;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract sorted operator class offering some common functionality.
@@ -21,14 +25,11 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
 
-    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+    protected AbstractSortedOperator(Name name, @Nullable ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, modifier);
-        if (sort == null) {
-            throw new NullPointerException("Given sort is null");
-        }
         this.argSorts = argSorts == null ? getEmptySortList() : argSorts;
-        this.sort = sort;
+        this.sort = Objects.requireNonNull(sort);
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,

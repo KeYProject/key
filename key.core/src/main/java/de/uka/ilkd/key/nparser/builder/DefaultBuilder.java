@@ -18,17 +18,19 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ParametricSort;
+import de.uka.ilkd.key.logic.sort.ParametricSort.Variance;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -96,7 +98,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             if (lookup != null && (l = lookup.lookup(n)) != null) {
                 try {
                     return (T) l;
-                } catch (ClassCastException e) {
+                } catch (ClassCastException ignored) {
                 }
             }
         }
@@ -184,10 +186,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return null;
     }
 
-    public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
+    public Sort toArraySort(Sort baseSort, Type t, int numOfDimensions) {
         if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
-            Sort sort = ArraySort.getArraySortForDim(p.first, p.second, numOfDimensions,
+            Sort sort = ArraySort.getArraySortForDim(baseSort, t, numOfDimensions,
                 ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
             Sort s = sort;
             do {
@@ -197,7 +199,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             } while (s instanceof ArraySort && sorts().lookup(s.name()) == null);
             return sort;
         } else {
-            return p.first;
+            return baseSort;
         }
     }
 
@@ -345,16 +347,75 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             t = PrimitiveType.JAVA_BIGINT;
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
+
+        if (t != null
+                && ctx.formal_sort_parameters() != null
+                && !ctx.formal_sort_parameters().formal_sort_parameter().isEmpty()) {
+            semanticError(ctx, "Combination of primitive type and type parameters.");
+        }
+
         Sort s = lookupSort(primitiveName);
         if (s == null) {
             semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
 
+        // parametric sorts should be instantiated
+        if (ctx.formal_sort_parameters() != null) {
+            if (s instanceof ParametricSort ps) {
+                ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
+                s = ParametricSortInstance.get(ps, parameters, null, null);
+            } else {
+                semanticError(ctx, "Not a polymorphic sort: %s", s);
+            }
+        }
+
         if (!ctx.EMPTYBRACKETS().isEmpty()) {
-            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
+            return toArraySort(s, t, ctx.EMPTYBRACKETS().size());
         }
         return s;
     }
+
+    public record FormalSortParameter(Variance first, Sort second) {}
+
+
+    private ImmutableList<Sort> getSorts(KeYParser.Formal_sort_parametersContext ctx) {
+        List<FormalSortParameter> seq = accept(ctx);
+        assert seq != null;
+        for (var p : seq) {
+            if (p.first() != Variance.INVARIANT) {
+                addWarning(ctx, "Variance is ignored");
+            }
+        }
+        return seq.stream().map(FormalSortParameter::second)
+                .collect(ImmutableSLList.toImmutableList());
+    }
+
+    @Override
+    public List<FormalSortParameter> visitFormal_sort_parameters(
+            KeYParser.Formal_sort_parametersContext ctx) {
+        return mapOf(ctx.formal_sort_parameter());
+    }
+
+    @Override
+    public FormalSortParameter visitFormal_sort_parameter(
+            KeYParser.Formal_sort_parameterContext ctx) {
+        Sort sort = sorts().lookup(ctx.id.getText());
+        if (sort == null) {
+            semanticError(ctx.id, "Could not find sort '%s'. It was not previously defined.",
+                ctx.id.getText());
+        }
+        return new FormalSortParameter(accept(ctx.formal_sort_variance()), sort);
+    }
+
+    @Override
+    public Object visitFormal_sort_variance(KeYParser.Formal_sort_varianceContext ctx) {
+        if (ctx.PLUS() != null)
+            return Variance.COVARIANT;
+        if (ctx.MINUS() != null)
+            return Variance.CONTRAVARIANT;
+        return Variance.INVARIANT;
+    }
+
 
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {

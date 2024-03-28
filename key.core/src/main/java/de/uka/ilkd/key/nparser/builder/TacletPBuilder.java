@@ -31,7 +31,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -416,7 +415,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var argSort =
             context.argSort.stream()
-                    .map(it -> sorts().lookup(it.getText()))
+                    .map(it -> (Sort) accept(it))
                     .toList();
         var argNames =
             context.argName.stream()
@@ -608,7 +607,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         if (text.contains("[")) {
             var num = text.indexOf('[') - text.lastIndexOf(']') / 2 + 1;
-            return toArraySort(new Pair<>(s, t), num);
+            return toArraySort(s, t, num);
         }
         return s;
     }

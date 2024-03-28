@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ParametricSort.SortParameter;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -23,6 +23,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.Token;
@@ -63,14 +65,26 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        // boolean freeAdt = ctx.FREE() != null;
         var name = ctx.name.getText();
+        List<FormalSortParameter> typeParameters = accept(ctx.formal_sort_parameters());
         var doc = ctx.DOC_COMMENT() != null
                 ? ctx.DOC_COMMENT().getText()
                 : null;
         var origin = BuilderHelpers.getPosition(ctx);
-        var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
-        sorts().addSafely(s);
+        if (typeParameters == null) {
+            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+            sorts().addSafely(s);
+        } else {
+            var tp = typeParameters.stream().map(it -> (GenericSort) it.second())
+                    .collect(ImmutableList.collector());
+            var variance =
+                typeParameters.stream().map(FormalSortParameter::first)
+                        .collect(ImmutableList.collector());
+            var s = new ParametricSort(
+                new Name(name), ImmutableSet.empty(), false, tp, variance,
+                doc, origin);
+            sorts().add(s);
+        }
         return null;
     }
 
@@ -129,18 +143,43 @@ public class DeclarationBuilder extends DefaultBuilder {
         return null;
     }
 
+
+    public record NamedFormalSortParameter(String name, List<FormalSortParameter> parameters) {}
+
+    @Override
+    public List<NamedFormalSortParameter> visitSortList(KeYParser.SortListContext ctx) {
+        List<NamedFormalSortParameter> seq = new ArrayList<>();
+        for (KeYParser.SortIdContext context : ctx.sortId()) {
+            String sortName = context.simple_ident_dots().getText();
+            // String brackets = StringUtil.repeat("[]", context.EMPTYBRACKETS().size());
+            List<FormalSortParameter> typeParams = accept(context.formal_sort_parameters());
+            seq.add(new NamedFormalSortParameter(sortName,
+                typeParams != null ? typeParams : Collections.emptyList()));
+        }
+        return seq;
+    }
+
+
     @Override
     public Object visitOne_sort_decl(KeYParser.One_sort_declContext ctx) {
+        // List<Pair<String, List<Pair<ParametricSort.Variance, Sort>>>> sortIds =
+        // accept(ctx.sortIds);
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
         List<Sort> sortExt = accept(ctx.sortExt);
         boolean isGenericSort = ctx.GENERIC() != null;
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
+        // assert sortIds != null;
+
         var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
-        for (var idCtx : ctx.sortIds.simple_ident_dots()) {
-            String sortId = accept(idCtx);
-            Name sortName = new Name(sortId);
+        for (var idCtx : ctx.sortIds.sortId()) {
+            // for (Pair<String, List<Pair<ParametricSort.Variance, Sort>>> sortId : sortIds) {
+            var name = idCtx.simple_ident_dots().getText();
+            // var brackets = StringUtil.repeat("[]", idCtx.EMPTYBRACKETS().size());
+            List<FormalSortParameter> typeParams = accept(idCtx.formal_sort_parameters());
+            Name sortName = new Name(name);
+            boolean isParametricSort = typeParams != null && !typeParams.isEmpty();
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                     : DefaultImmutableSet.fromCollection(sortExt);
@@ -150,11 +189,29 @@ public class DeclarationBuilder extends DefaultBuilder {
             // attention: no expand to java.lang here!
             if (sorts().lookup(sortName) == null) {
                 Sort s = null;
-                if (isGenericSort) {
+                if (isParametricSort) {
+                    if (isGenericSort) {
+                        semanticError(ctx,
+                            "Generic sorts are not allowed to have type parameters.");
+                    }
+
+                    for (FormalSortParameter param : typeParams) {
+                        if (!(param.second() instanceof GenericSort)) {
+                            semanticError(ctx,
+                                "Type parameters must be generic sorts. Given type '%s' is %s",
+                                param.second().name(), param.second().getClass().getName());
+                        }
+                    }
+
+                    ImmutableList<SortParameter> params =
+                        typeParams.stream()
+                                .map(it -> new SortParameter((GenericSort) it.second(), it.first()))
+                                .collect(ImmutableSLList.toImmutableList());
+                    s = new ParametricSort(sortName, ext, isAbstractSort, params);
+                } else if (isGenericSort) {
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf, documentation,
-                            BuilderHelpers.getPosition(idCtx));
-                        s = gs;
+                        s = new GenericSort(sortName, ext, oneOf, documentation,
+                            BuilderHelpers.getPosition(ctx));
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
                     }
@@ -162,13 +219,11 @@ public class DeclarationBuilder extends DefaultBuilder {
                     s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
-                        var ps = new ProxySort(sortName, ext, documentation,
+                        s = new ProxySort(sortName, ext, documentation,
                             BuilderHelpers.getPosition(idCtx));
-                        s = ps;
                     } else {
-                        var si = new SortImpl(sortName, ext, isAbstractSort,
+                        s = new SortImpl(sortName, ext, isAbstractSort,
                             documentation, BuilderHelpers.getPosition(idCtx));
-                        s = si;
                     }
                 }
                 assert s != null;

@@ -8,12 +8,10 @@ package org.key_project.logic;
  * their name.
  */
 public interface Named {
-
     /**
      * returns the name of this element
      *
      * @return the name of the element
      */
     Name name();
-
 }

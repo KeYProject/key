@@ -367,4 +367,14 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return take(idx).head();
     }
 
+    /**
+     * Replace the element at position {@code pos} in the list
+     * by the value {@code t}.
+     *
+     * @param pos the position within the list {@code 0 <= pos && pos < size()}
+     * @param t the element to set, may be {@code null}.
+     * @return an immutable list in which only the element at pos has been replaced.
+     * @throws IndexOutOfBoundsException if pos is not a valid index in the list.
+     */
+    ImmutableList<T> replace(int pos, T t);
 }

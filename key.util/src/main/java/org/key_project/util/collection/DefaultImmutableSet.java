@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -210,6 +211,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public boolean exists(Predicate<T> predicate) {
         return elementList.exists(predicate);
+    }
+
+    @Override
+    public <U> ImmutableSet<U> map(Function<T, U> f) {
+        return new DefaultImmutableSet<>(elementList.map(f));
     }
 
     /** @return int the cardinality of the set */

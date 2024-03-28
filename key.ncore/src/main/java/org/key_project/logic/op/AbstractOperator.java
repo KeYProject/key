@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
+import java.util.Objects;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract operator class offering some common functionality.
@@ -14,21 +18,24 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
-    private final ImmutableArray<Boolean> whereToBind;
+
+    // weigl: should rather be a bit field (int)
+    private final @Nullable ImmutableArray<Boolean> whereToBind;
     private final Modifier modifier;
 
-    protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
+    protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
             Modifier modifier) {
-        assert name != null;
-        assert arity >= 0;
-        assert whereToBind == null || whereToBind.size() == arity;
-        this.name = name;
+        if (arity < 0)
+            throw new IllegalArgumentException("arity is negative");
+        if (whereToBind != null && whereToBind.size() != arity)
+            throw new AssertionError();
+        this.name = Objects.requireNonNull(name);
         this.arity = arity;
         this.whereToBind = whereToBind;
         this.modifier = modifier;
     }
 
-    protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
+    protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
             boolean isRigid) {
         this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
@@ -41,7 +48,7 @@ public abstract class AbstractOperator implements Operator {
         this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
 
-    public final ImmutableArray<Boolean> whereToBind() {
+    public final @Nullable ImmutableArray<Boolean> whereToBind() {
         return whereToBind;
     }
 

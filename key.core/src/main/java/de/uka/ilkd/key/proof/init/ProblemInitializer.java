@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -307,16 +306,22 @@ public final class ProblemInitializer {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
         Namespace<JFunction> newFuncNS = new Namespace<>();
+
+        // FIXME ulbrich. This is a temporary fix --
+        // https://git.key-project.org/key/key/issues/720
+        // It does not really work like this.
         for (Sort n : initConfig.sortNS().allElements()) {
-            if (!(n instanceof GenericSort)) {
-                newSortNS.addSafely(n);
-            }
+            // if(!(n instanceof GenericSort)) {
+            newSortNS.addSafely(n);
+            // }
         }
         for (JFunction n : initConfig.funcNS().allElements()) {
-            if (!(n instanceof SortDependingFunction
-                    && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
-                newFuncNS.addSafely(n);
-            }
+            /*
+             * if(!(n instanceof SortDependingFunction
+             * && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
+             */
+            newFuncNS.addSafely(n);
+            // }
         }
         initConfig.getServices().getNamespaces().setVariables(newVarNS);
         initConfig.getServices().getNamespaces().setSorts(newSortNS);

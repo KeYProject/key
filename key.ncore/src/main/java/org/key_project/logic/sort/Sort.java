@@ -21,10 +21,10 @@ public interface Sort extends Named, HasOrigin {
     }
 
     /**
-     * @param s some sort.
+     * @param sort some sort.
      * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
-    boolean extendsTrans(Sort s);
+    boolean extendsTrans(Sort sort);
 
     /**
      * @return whether this sort has no exact elements.
@@ -34,7 +34,8 @@ public interface Sort extends Named, HasOrigin {
     String declarationString();
 
     /**
-     * Returns a human explainable text describing this sort. This field is typical set by the
+     * Returns a human explainable text describing this sort.
+     * This field is typically set by the
      * parser, who captures the documentation comments.
      */
     @Nullable

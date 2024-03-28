@@ -15,15 +15,26 @@ public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 
+    @Nullable
+    private final String origin;
+
     /**
      * Documentation for this sort given by the associated documentation comment.
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
+    @Nullable
     private String documentation;
 
     public AbstractSort(Name name, boolean isAbstract) {
+        this(name, isAbstract, null, null);
+    }
+
+    public AbstractSort(Name name, boolean isAbstract, @Nullable String origin,
+            @Nullable String documentation) {
         this.name = name;
         this.isAbstract = isAbstract;
+        this.origin = origin;
+        this.documentation = documentation;
     }
 
     // @Override
@@ -88,5 +99,10 @@ public abstract class AbstractSort implements Sort {
     @Override
     public String getDocumentation() {
         return documentation;
+    }
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
     }
 }

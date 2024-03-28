@@ -23,12 +23,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -720,7 +715,6 @@ public abstract class ProgramSVSort extends SortImpl {
     }
 
 
-
     // ----------- Types of Statement Program SVs -----------------------------
 
     /**
@@ -969,7 +963,7 @@ public abstract class ProgramSVSort extends SortImpl {
     /**
      * This sort represents a type of program schema variables that match on names of method
      * references, i.e. the "m" of o.m(p1,pn).
-     *
+     * <p>
      * It can also be made to match only specific method names defined by the parameter "name".
      */
     private static class MethodNameSort extends ProgramSVSort {
