@@ -10,6 +10,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
+
 description "User interface for the deductive verification of Java programs"
 
 dependencies {

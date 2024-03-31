@@ -10,6 +10,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
@@ -88,11 +89,12 @@ public class InformationWindow extends JDialog {
         if (solver.getType() != SolverTypes.Z3_CE_SOLVER) {
             return;
         }
-        if (solver.getSocket().getQuery() == null) {
+        AbstractSolverSocket socket = solver.getSocket();
+        if (socket.getQuery() == null) {
             return;
         }
 
-        Model m = solver.getSocket().getQuery().getModel();
+        Model m = socket.getQuery().getModel();
         this.model = m;
         this.setTitle("Counterexample " + this.getTitle());
         getTabbedPane().addTab("Counterexample", createModelTab());

@@ -8,13 +8,13 @@ import java.util.Collections;
 import java.util.Objects;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.StrategySelectionView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * Adapter for {@link KeYGuiExtension.KeyboardShortcuts} interface.

@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * The Class ProofScriptInputAction.
@@ -27,9 +25,7 @@ public class ProofScriptInputAction extends AbstractAction {
 
     private static final long serialVersionUID = -1193756128644859298L;
 
-    /**
-     * The mediator.
-     */
+    /** The mediator. */
     private final KeYMediator mediator;
 
     /**

@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
+import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearcher;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * Proof context menu action to perform proof caching for all open goals on that proof.

@@ -12,13 +12,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.util.CommandLine;
-import de.uka.ilkd.key.util.CommandLineException;
+import de.uka.ilkd.key.ui.core.Log;
+import de.uka.ilkd.key.ui.util.CommandLine;
+import de.uka.ilkd.key.ui.util.CommandLineException;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
