@@ -5,7 +5,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;

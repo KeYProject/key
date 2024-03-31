@@ -17,8 +17,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -44,18 +43,19 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-import org.key_project.util.java.SwingUtil;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Signal;
+//import sun.misc.Signal;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
@@ -80,7 +80,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new BlockContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
         try {
-            Signal.handle(new Signal("INT"), sig -> {
+            /* requires module dep to jdk.unsupported.
+              Signal.handle(new Signal("INT"), sig -> {
                 if (getMediator().isInAutoMode()) {
                     LOGGER.warn("Caught SIGINT, stopping automode...");
                     getMediator().getUI().getProofControl().stopAutoMode();
@@ -88,7 +89,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     LOGGER.warn("Caught SIGINT, exiting...");
                     new ExitMainAction(mainWindow).exitMainWithoutInteraction();
                 }
-            });
+            });*/
         } catch (Exception e) {
             // the above is optional functionality and may not work on every OS
         }

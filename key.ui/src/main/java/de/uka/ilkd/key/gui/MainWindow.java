@@ -28,9 +28,9 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -66,6 +66,8 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.util.PreferenceSaver;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.*;
 
 import org.key_project.logic.Name;

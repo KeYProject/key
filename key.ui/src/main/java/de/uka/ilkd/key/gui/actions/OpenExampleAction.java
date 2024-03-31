@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.ui.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;

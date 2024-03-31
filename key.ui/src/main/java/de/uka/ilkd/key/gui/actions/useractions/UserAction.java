@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
 /**

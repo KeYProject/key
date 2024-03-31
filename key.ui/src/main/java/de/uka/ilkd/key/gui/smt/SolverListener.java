@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.Timer;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;

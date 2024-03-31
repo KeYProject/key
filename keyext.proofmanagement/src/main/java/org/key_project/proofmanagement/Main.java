@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import de.uka.ilkd.key.util.CommandLine;
-import de.uka.ilkd.key.util.CommandLineException;
+import de.uka.ilkd.key.ui.util.CommandLine;
+import de.uka.ilkd.key.ui.util.CommandLineException;
 
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;

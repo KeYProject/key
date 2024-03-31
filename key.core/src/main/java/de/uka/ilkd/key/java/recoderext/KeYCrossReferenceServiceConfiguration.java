@@ -9,7 +9,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.io.SourceFileRepository;
-import recoder.service.KeYCrossReferenceSourceInfo;
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 

@@ -11,9 +11,9 @@ import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;

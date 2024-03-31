@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Objects;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.StrategySelectionView;

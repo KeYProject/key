@@ -11,10 +11,10 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
@@ -25,8 +25,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.util.ThreadUtilities;
-import de.uka.ilkd.key.util.XMLResources;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
+import de.uka.ilkd.key.ui.util.XMLResources;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.

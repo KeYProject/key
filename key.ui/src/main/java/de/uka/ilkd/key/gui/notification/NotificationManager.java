@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 

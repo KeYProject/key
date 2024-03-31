@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.plugins.caching;
 import java.util.function.Consumer;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
