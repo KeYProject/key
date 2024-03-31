@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -22,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * This class holds the data and the state of proof exploration.
  * <p>
- * For every {@link de.uka.ilkd.key.core.KeYMediator} or {@link MainWindow} should only exists one
+ * For every {@link KeYMediator} or {@link MainWindow} should only exists one
  * instance.
  *
  * @see ExplorationExtension

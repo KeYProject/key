@@ -5,8 +5,8 @@ package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 

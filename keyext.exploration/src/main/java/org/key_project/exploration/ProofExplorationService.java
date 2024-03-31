@@ -5,7 +5,7 @@ package org.key_project.exploration;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

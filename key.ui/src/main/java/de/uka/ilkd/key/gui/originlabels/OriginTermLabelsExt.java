@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.Action;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.NodeInfoVisualizer;
 import de.uka.ilkd.key.gui.actions.KeyAction;

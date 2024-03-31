@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;

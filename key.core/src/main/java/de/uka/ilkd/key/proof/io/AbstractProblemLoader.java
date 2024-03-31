@@ -44,7 +44,6 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
-import org.antlr.runtime.MismatchedTokenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -379,6 +378,8 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
+        
+        /* weigl These are exception from antlr3, these should not happen anymore
         final Throwable c0 = unwrap(e);
         if (c0 instanceof org.antlr.runtime.RecognitionException re) {
             final org.antlr.runtime.Token occurrence = re.token; // may be null
@@ -386,14 +387,12 @@ public abstract class AbstractProblemLoader {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
                     final org.antlr.runtime.MissingTokenException mte =
                         (org.antlr.runtime.MissingTokenException) c0;
-                    // TODO: other commonly missed tokens
                     final String readable = missedErrors.get(mte.expecting);
                     final String token = readable == null ? "token id " + mte.expecting : readable;
                     final String msg = "Syntax error: missing " + token
                         + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
                         + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
-                    // TODO other ANTLR exceptions
                 } else {
                     final org.antlr.runtime.MismatchedTokenException mte =
                         (MismatchedTokenException) c0;
@@ -405,7 +404,7 @@ public abstract class AbstractProblemLoader {
                     return new ProblemLoaderException(this, msg, mte);
                 }
             }
-        }
+        }*/
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
     }

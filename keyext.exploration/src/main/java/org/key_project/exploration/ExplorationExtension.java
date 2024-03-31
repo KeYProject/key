@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;

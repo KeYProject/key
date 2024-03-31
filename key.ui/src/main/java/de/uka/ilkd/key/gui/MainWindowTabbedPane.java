@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import java.util.stream.Stream;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;

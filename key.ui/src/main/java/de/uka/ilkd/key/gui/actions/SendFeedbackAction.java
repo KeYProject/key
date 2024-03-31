@@ -21,7 +21,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.html.HTMLEditorKit;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;

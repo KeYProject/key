@@ -19,9 +19,9 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 
 import org.key_project.slicing.DependencyTracker;

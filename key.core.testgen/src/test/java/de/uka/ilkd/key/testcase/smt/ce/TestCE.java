@@ -8,7 +8,7 @@ import java.io.File;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;

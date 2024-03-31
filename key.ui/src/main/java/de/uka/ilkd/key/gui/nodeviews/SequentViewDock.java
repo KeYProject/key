@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;

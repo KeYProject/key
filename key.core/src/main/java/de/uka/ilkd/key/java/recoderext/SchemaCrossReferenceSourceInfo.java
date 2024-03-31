@@ -10,7 +10,7 @@ import recoder.java.Reference;
 import recoder.java.declaration.VariableSpecification;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.UncollatedReferenceQualifier;
-import recoder.service.KeYCrossReferenceSourceInfo;
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 
 public class SchemaCrossReferenceSourceInfo extends KeYCrossReferenceSourceInfo {
 

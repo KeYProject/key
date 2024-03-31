@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

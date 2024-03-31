@@ -29,7 +29,7 @@ import recoder.bytecode.ClassFile;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to manufacture

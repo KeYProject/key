@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;

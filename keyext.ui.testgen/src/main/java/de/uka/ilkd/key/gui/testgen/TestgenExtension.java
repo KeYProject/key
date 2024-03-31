@@ -10,13 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.macros.TestGenMacro;
+import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 
 import org.jspecify.annotations.NonNull;
 

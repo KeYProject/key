@@ -21,7 +21,7 @@ import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;

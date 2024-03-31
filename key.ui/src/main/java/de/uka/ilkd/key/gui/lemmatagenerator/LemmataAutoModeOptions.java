@@ -7,10 +7,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.ui.core.Main;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.CommandLine;
-import de.uka.ilkd.key.util.CommandLineException;
+import de.uka.ilkd.key.ui.util.CommandLine;
+import de.uka.ilkd.key.ui.util.CommandLineException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -14,7 +13,7 @@ import java.net.URL;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-import org.key_project.util.java.SwingUtil;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop

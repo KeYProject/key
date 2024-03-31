@@ -16,9 +16,9 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;

@@ -33,7 +33,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
-import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -796,7 +795,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                throwEx(new RecognitionException(""));
+                throwEx(new RuntimeException("there is a replacewith without a find"));
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);

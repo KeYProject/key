@@ -8,8 +8,8 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.InteractionListener;
-import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;

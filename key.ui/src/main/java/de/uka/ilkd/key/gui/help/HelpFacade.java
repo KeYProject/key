@@ -14,7 +14,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-import org.key_project.util.java.SwingUtil;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;

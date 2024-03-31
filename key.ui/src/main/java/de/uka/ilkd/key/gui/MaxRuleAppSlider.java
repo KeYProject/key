@@ -7,7 +7,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 public class MaxRuleAppSlider extends JSlider {
     /**
