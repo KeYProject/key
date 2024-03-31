@@ -1,0 +1,34 @@
+/**
+ *
+ * @author Alexander Weigl 
+ * @version 1 (31.03.24)
+ */
+module org.key_project.ui {
+    requires org.slf4j;
+    requires java.desktop;
+    requires org.key_project.core;
+    requires java.prefs;
+    requires org.jspecify;
+    requires org.key_project.util;
+    requires org.key_project.ncore;
+    requires com.miglayout.core;
+    requires com.miglayout.swing;
+    requires ch.qos.logback.core;
+    requires ch.qos.logback.classic;
+    requires key.recoder;
+    requires org.key_project.core.rifl;
+    requires java.compiler;
+
+    provides de.uka.ilkd.key.gui.extension.api.KeYGuiExtension with
+            de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt,
+            de.uka.ilkd.key.gui.extension.impl.HeatmapExt,
+            de.uka.ilkd.key.gui.extension.impl.TestExtension,
+            de.uka.ilkd.key.gui.docking.DockingLayout,
+            de.uka.ilkd.key.gui.KeyboardTacletExtension,
+            de.uka.ilkd.key.gui.nodeviews.ShowHashcodesExtension,
+            de.uka.ilkd.key.gui.LogView,
+            de.uka.ilkd.key.gui.plugins.javac.JavacExtension,
+            de.uka.ilkd.key.gui.utilities.HeapStatusExt,
+            de.uka.ilkd.key.gui.JmlEnabledKeysIndicator;
+
+}
