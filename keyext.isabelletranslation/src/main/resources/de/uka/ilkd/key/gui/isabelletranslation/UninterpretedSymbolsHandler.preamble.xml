@@ -236,7 +236,7 @@ lift_definition seqConcat::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" is 
 lift_definition seqReverse::"Seq\&lt;Rightarrow&gt;Seq" is List.rev.
 
 fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
-  "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
+  "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet x s)"
 
 primrec listIndexOf::"any list\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" where
   "listIndexOf [] a = undefined" |
@@ -261,7 +261,7 @@ end
 
 
 fun instanceof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
-  where "instanceof x type = typeof type x"
+  where "instanceof x type = typeof x type"
 
 axiomatization obj_length::"java_lang_Object\&lt;Rightarrow&gt;int" where length_nonneg[simp]:"obj_length obj \&lt;ge&gt; 0"
 
@@ -292,7 +292,7 @@ axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
       h obj f)::LocSet) \&lt;Longrightarrow&gt; Null2java_lang_Object null=o2 \&lt;or&gt; ((select h o2
       created)::bool)"
   and wellFormedStorejava_lang_Object:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; ((select
-      h x created) \&lt;and&gt; instanceof (fieldType f) x)) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
+      h x created) \&lt;and&gt; instanceof x (fieldType f))) \&lt;Longrightarrow&gt; wellFormed (store h obj f x)"
   and wellFormedStoreLocSet:"wellFormed h \&lt;and&gt; (\&lt;forall&gt;ov fv. (elementOf ov fv y \&lt;longrightarrow&gt; ov = null \&lt;or&gt; select h ov created))
       \&lt;Longrightarrow&gt; wellFormed (store h obj f y)"
   and wellFormedStorePrimitive:"(typeof x (fieldType f) \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x java_lang_Object_type \&lt;Longrightarrow&gt; \&lt;not&gt;typeof x LocSet_type  \&lt;Longrightarrow&gt;  wellFormed h 
