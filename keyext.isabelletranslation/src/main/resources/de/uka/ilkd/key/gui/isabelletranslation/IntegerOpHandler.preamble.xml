@@ -13,9 +13,6 @@ else ((a div b) + 1))"
 fixes euclMod::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
 assumes eucl_Mod_def [simp]: "l\&lt;noteq&gt;0 \&lt;Longrightarrow&gt; euclMod k l = (if (k mod l &lt; 0) then ((k mod l) + abs(l))
 else (k mod l))"
-
-fixes div_nonzero::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
-assumes div_nonzero_def [simp]: "b\&lt;noteq&gt;0 \&lt;Longrightarrow&gt; div_nonzero a b = a div b"
 begin
 
 definition int_HALFRANGE::int where [simp, intro]:"int_HALFRANGE=2^31"
