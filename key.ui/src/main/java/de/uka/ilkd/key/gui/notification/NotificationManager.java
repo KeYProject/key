@@ -8,9 +8,9 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * The notificatin manager controls the list of active notification tasks. It receives KeY System

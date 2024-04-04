@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
@@ -15,10 +14,12 @@ import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import org.key_project.dockingframes.common.common.CLocation;
+import org.key_project.dockingframes.common.common.DefaultMultipleCDockable;
+import org.key_project.dockingframes.common.common.NullMultipleCDockableFactory;
+
 
 /**
  * @author Alexander Weigl

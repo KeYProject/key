@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
@@ -24,10 +23,12 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.util.IconManager;
-import bibliothek.gui.dock.util.Priority;
+import org.key_project.dockingframes.common.common.CControl;
+import org.key_project.dockingframes.core.gui.dock.util.IconManager;
+import org.key_project.dockingframes.core.gui.dock.util.Priority;
+
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

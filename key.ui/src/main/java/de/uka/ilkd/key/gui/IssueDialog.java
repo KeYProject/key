@@ -34,12 +34,12 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 import de.uka.ilkd.key.util.ExceptionTools;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
-import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.NoViableAltException;

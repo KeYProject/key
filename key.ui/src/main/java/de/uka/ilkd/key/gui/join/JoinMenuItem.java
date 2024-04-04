@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.key_project.util.collection.ImmutableList;
 

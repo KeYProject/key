@@ -28,9 +28,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.ui.core.KeYMediator;
-import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
-import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -66,17 +63,20 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.ui.util.PreferenceSaver;
 import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.*;
 
+import org.key_project.dockingframes.common.common.CControl;
+import org.key_project.dockingframes.common.common.SingleCDockable;
+import org.key_project.dockingframes.common.common.intern.CDockable;
+import org.key_project.dockingframes.core.gui.dock.StackDockStation;
+import org.key_project.dockingframes.core.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.key_project.logic.Name;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -8,10 +8,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
-import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

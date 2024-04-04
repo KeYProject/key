@@ -378,33 +378,35 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
-        
-        /* weigl These are exception from antlr3, these should not happen anymore
-        final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
-            final org.antlr.runtime.Token occurrence = re.token; // may be null
-            if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
-                if (c0 instanceof org.antlr.runtime.MissingTokenException) {
-                    final org.antlr.runtime.MissingTokenException mte =
-                        (org.antlr.runtime.MissingTokenException) c0;
-                    final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token
-                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                        + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                } else {
-                    final org.antlr.runtime.MismatchedTokenException mte =
-                        (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
-                    final String readable =
-                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                }
-            }
-        }*/
+
+        /*
+         * weigl These are exception from antlr3, these should not happen anymore
+         * final Throwable c0 = unwrap(e);
+         * if (c0 instanceof org.antlr.runtime.RecognitionException re) {
+         * final org.antlr.runtime.Token occurrence = re.token; // may be null
+         * if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
+         * if (c0 instanceof org.antlr.runtime.MissingTokenException) {
+         * final org.antlr.runtime.MissingTokenException mte =
+         * (org.antlr.runtime.MissingTokenException) c0;
+         * final String readable = missedErrors.get(mte.expecting);
+         * final String token = readable == null ? "token id " + mte.expecting : readable;
+         * final String msg = "Syntax error: missing " + token
+         * + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
+         * + mte.input.getSourceName() + ":" + mte.line + ")";
+         * return new ProblemLoaderException(this, msg, mte);
+         * } else {
+         * final org.antlr.runtime.MismatchedTokenException mte =
+         * (MismatchedTokenException) c0;
+         * final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
+         * final String readable =
+         * mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
+         * final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
+         * + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
+         * return new ProblemLoaderException(this, msg, mte);
+         * }
+         * }
+         * }
+         */
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
     }

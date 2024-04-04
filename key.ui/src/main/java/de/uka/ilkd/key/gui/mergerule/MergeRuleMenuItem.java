@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.mergerule;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * The menu item for the state merging rule.

@@ -8,8 +8,6 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.InteractionListener;
-import de.uka.ilkd.key.ui.core.InterruptListener;
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -20,6 +18,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

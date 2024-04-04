@@ -11,11 +11,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * The Class ProofScriptInputAction.

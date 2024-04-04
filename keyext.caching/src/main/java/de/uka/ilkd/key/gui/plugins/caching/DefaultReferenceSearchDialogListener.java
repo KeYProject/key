@@ -6,12 +6,12 @@ package de.uka.ilkd.key.gui.plugins.caching;
 import java.util.function.Consumer;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

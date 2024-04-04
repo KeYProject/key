@@ -18,11 +18,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import de.uka.ilkd.key.ui.core.Log;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.ui.core.Log;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;

@@ -1,9 +1,28 @@
 /**
  *
- * @author Alexander Weigl 
+ * @author Alexander Weigl
  * @version 1 (31.03.24)
  */
 module org.key_project.ui {
+    exports de.uka.ilkd.key.gui.extension.api;
+    exports de.uka.ilkd.key.gui.help;
+    exports de.uka.ilkd.key.ui.core;
+    exports de.uka.ilkd.key.gui;
+    exports de.uka.ilkd.key.gui.settings;
+    exports de.uka.ilkd.key.gui.colors;
+    exports de.uka.ilkd.key.ui.util;
+    exports de.uka.ilkd.key.gui.actions;
+    exports de.uka.ilkd.key.gui.fonticons;
+    exports de.uka.ilkd.key.gui.prooftree;
+    exports de.uka.ilkd.key.gui.configuration;
+    exports de.uka.ilkd.key.gui.smt;
+    exports de.uka.ilkd.key.gui.keyshortcuts;
+    exports de.uka.ilkd.key.ui;
+    exports de.uka.ilkd.key.ui.proof.io;
+
+    requires dockingframes.core;
+    requires dockingframes.common;
+
     requires org.slf4j;
     requires java.desktop;
     requires org.key_project.core;

@@ -11,13 +11,13 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
-import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
-import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
+import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 
 /**
  * Traces the proof nodes selected by the user. Allows navigating forwards and backwards to

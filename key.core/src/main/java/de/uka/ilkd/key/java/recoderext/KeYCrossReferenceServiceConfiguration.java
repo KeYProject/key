@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.KeYProgModelInfo;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.io.SourceFileRepository;
-import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 

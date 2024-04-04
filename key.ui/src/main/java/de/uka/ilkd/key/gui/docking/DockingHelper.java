@@ -20,18 +20,13 @@ import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.MultipleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
-import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
-import bibliothek.gui.dock.control.focus.FocusRequest;
+import org.key_project.dockingframes.common.common.*;
+import org.key_project.dockingframes.common.common.action.*;
+import org.key_project.dockingframes.common.common.action.core.*;
+import org.key_project.dockingframes.common.common.intern.*;
+import org.key_project.dockingframes.common.common.intern.action.*;
+import org.key_project.dockingframes.core.gui.dock.control.focus.*;
+
 import org.jspecify.annotations.NonNull;
 
 public class DockingHelper {

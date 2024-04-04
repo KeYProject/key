@@ -11,13 +11,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
-import de.uka.ilkd.key.ui.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+import de.uka.ilkd.key.ui.core.KeYMediator;
+import de.uka.ilkd.key.ui.core.Main;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

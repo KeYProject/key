@@ -12,9 +12,9 @@ import javax.swing.*;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
 import de.uka.ilkd.key.ui.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
 
 import org.key_project.logic.Name;
 
