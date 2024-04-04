@@ -7,8 +7,6 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.ui.core.InterruptListener;
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -20,6 +18,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
+import de.uka.ilkd.key.ui.core.InterruptListener;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * <strong>The worker must be started using method {@link TGWorker#start()} and not

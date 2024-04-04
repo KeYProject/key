@@ -5,7 +5,6 @@ package org.key_project.exploration;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;

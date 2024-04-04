@@ -21,7 +21,6 @@ import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Services;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

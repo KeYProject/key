@@ -6,8 +6,8 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * Abstract concept of an action performed by the user.

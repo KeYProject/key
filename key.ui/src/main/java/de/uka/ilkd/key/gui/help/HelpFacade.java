@@ -13,11 +13,11 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
 import de.uka.ilkd.key.ui.util.SwingUtil;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
+import org.key_project.dockingframes.common.common.action.CAction;
+import org.key_project.dockingframes.common.common.action.CButton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

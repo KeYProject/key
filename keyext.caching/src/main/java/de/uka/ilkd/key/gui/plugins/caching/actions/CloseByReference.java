@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
+import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearcher;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * Action to search for suitable references on a single node.

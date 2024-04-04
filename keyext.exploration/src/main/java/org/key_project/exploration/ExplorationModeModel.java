@@ -14,8 +14,8 @@ import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
 import de.uka.ilkd.key.ui.core.KeYMediator;
+
 import org.jspecify.annotations.NonNull;
 
 /**

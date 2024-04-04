@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.Timer;
 import javax.swing.*;
 
-import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
