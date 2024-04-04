@@ -363,14 +363,4 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             return false;
         }
     }
-
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return super.equalsModRenaming(se, nat);
-    }
-
-    @Override
-    public ProgramElement getChildAt(int index) {
-        return null;
-    }
 }

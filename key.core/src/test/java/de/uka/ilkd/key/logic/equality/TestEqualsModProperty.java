@@ -289,7 +289,7 @@ public class TestEqualsModProperty {
 
     @Test
     public void renamingSourceElements() {
-        Term match1 = TacletForTests.parseTerm("\\<{ int i; int j; }\\>true");
+        Term match1 = TacletForTests.parseTerm("\\<{ int i; int j; /*Test*/ }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; int k; }\\>true");
         assertTrue(
             match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
