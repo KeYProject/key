@@ -76,4 +76,18 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
             argSorts(), name().toString(), arity(),
             whereToBind(), isRigid());
     }
+
+    /**
+     * Constructs a location variable from a program variable.
+     * This should not be done manually since it is important to keep *all* modifiers.
+     *
+     * @param variable the variable
+     * @param name the name of the variable
+     * @return a new location variable
+     */
+    public static LocationVariable fromProgramVariable(ProgramVariable variable,
+            ProgramElementName name) {
+        return new LocationVariable(name, variable.getKeYJavaType(), variable.getContainerType(),
+            variable.isStatic(), variable.isModel(), variable.isGhost(), variable.isFinal());
+    }
 }

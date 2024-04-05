@@ -31,7 +31,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self =
             services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+        JmlIO io = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
         return io.parseExpression(p);
     }

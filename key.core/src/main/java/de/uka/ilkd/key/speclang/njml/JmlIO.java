@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -26,6 +28,7 @@ import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -43,25 +46,28 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (7/1/20)
  * @see Translator
  */
+@NullMarked
 public class JmlIO {
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
-    private Services services;
-    private KeYJavaType specInClass;
-    private ProgramVariable selfVar;
-    private SpecMathMode specMathMode;
-    private ImmutableList<ProgramVariable> paramVars;
-    private ProgramVariable resultVar;
-    private ProgramVariable excVar;
-    private Map<LocationVariable, Term> atPres;
-    private Map<LocationVariable, Term> atBefores;
+    private final Services services;
 
-    /**
-     * Generate an empty jml i/o instance. No very useful until a {@link #services(Services)} is
-     * provided.
-     */
-    public JmlIO() {
-    }
+    @Nullable
+    private KeYJavaType specInClass;
+    @Nullable
+    private ProgramVariable selfVar;
+    @Nullable
+    private SpecMathMode specMathMode;
+    @Nullable
+    private ImmutableList<ProgramVariable> paramVars;
+    @Nullable
+    private ProgramVariable resultVar;
+    @Nullable
+    private ProgramVariable excVar;
+    @Nullable
+    private Map<LocationVariable, Term> atPres;
+    @Nullable
+    private Map<LocationVariable, Term> atBefores;
 
     /**
      * Generate an empty jml i/o instance.
@@ -84,7 +90,7 @@ public class JmlIO {
      * @param atPres i do not know
      * @param atBefores i do not know
      */
-    public JmlIO(@NonNull Services services, @Nullable KeYJavaType specInClass,
+    public JmlIO(Services services, @Nullable KeYJavaType specInClass,
             @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
             @Nullable ProgramVariable resultVar, @Nullable ProgramVariable excVar,
             @Nullable Map<LocationVariable, Term> atPres,
@@ -186,7 +192,14 @@ public class JmlIO {
     /**
      * Interpret the given parse tree as an JML expression in the current context.
      */
-    public @NonNull Term translateTerm(@NonNull ParserRuleContext expr) {
+    public Term translateTerm(KeyAst.Expression expr) {
+        return translateTerm(ParsingFacade.getParseRuleContext(expr));
+    }
+
+    /**
+     * Interpret the given parse tree as an JML expression in the current context.
+     */
+    public Term translateTerm(ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
@@ -313,7 +326,7 @@ public class JmlIO {
     /**
      * Sets the variable representing the {@code this} reference.
      */
-    public JmlIO selfVar(ProgramVariable selfVar) {
+    public JmlIO selfVar(@Nullable ProgramVariable selfVar) {
         this.selfVar = selfVar;
         return this;
     }
@@ -337,12 +350,12 @@ public class JmlIO {
     /**
      * Sets the variable that is used to store exceptions.
      */
-    public JmlIO exceptionVariable(ProgramVariable excVar) {
+    public JmlIO exceptionVariable(@Nullable ProgramVariable excVar) {
         this.excVar = excVar;
         return this;
     }
 
-    public JmlIO atPres(Map<LocationVariable, Term> atPres) {
+    public JmlIO atPres(@Nullable Map<LocationVariable, Term> atPres) {
         this.atPres = atPres;
         return this;
     }
@@ -350,34 +363,26 @@ public class JmlIO {
     /**
      * Sets the variable representing {@code \result}.
      */
-    public JmlIO resultVariable(ProgramVariable resultVar) {
+    public JmlIO resultVariable(@Nullable ProgramVariable resultVar) {
         this.resultVar = resultVar;
-        return this;
-    }
-
-    /**
-     * Sets the current services
-     */
-    public JmlIO services(Services services) {
-        this.services = services;
         return this;
     }
 
     /**
      * Sets the sort/type of the class containing the interpreted JML.
      */
-    public JmlIO classType(KeYJavaType classType) {
+    public JmlIO classType(@Nullable KeYJavaType classType) {
         this.specInClass = classType;
         return this;
     }
 
-    public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {
+    public JmlIO atBefore(@Nullable Map<LocationVariable, Term> atBefores) {
         this.atBefores = atBefores;
         return this;
     }
 
     /**
-     * Sets class type, spec math mode and self var.
+     * Sets class type, spec math mode and selfVar.
      */
     public JmlIO context(Context context) {
         this.classType(context.classType());

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqPut;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -39,6 +41,7 @@ public final class SeqLDT extends LDT {
     private final JFunction seqConcat;
     private final JFunction seqSub;
     private final JFunction seqReverse;
+    private final JFunction seqUpd;
     private final JFunction seqDef;
     private final JFunction values;
 
@@ -51,6 +54,7 @@ public final class SeqLDT extends LDT {
         seqConcat = addFunction(services, "seqConcat");
         seqSub = addFunction(services, "seqSub");
         seqReverse = addFunction(services, "seqReverse");
+        seqUpd = addFunction(services, "seqUpd");
         seqIndexOf = addFunction(services, "seqIndexOf");
         seqDef = addFunction(services, "seqDef");
         values = addFunction(services, "values");
@@ -86,6 +90,9 @@ public final class SeqLDT extends LDT {
         return seqSub;
     }
 
+    public JFunction getSeqUpd() {
+        return seqUpd;
+    }
 
     public JFunction getSeqReverse() {
         return seqReverse;
@@ -127,7 +134,7 @@ public final class SeqLDT extends LDT {
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
-                || op instanceof SeqLength;
+                || op instanceof SeqLength || op instanceof SeqPut;
     }
 
 
@@ -150,6 +157,8 @@ public final class SeqLDT extends LDT {
             return seqSub;
         } else if (op instanceof SeqReverse) {
             return seqReverse;
+        } else if (op instanceof SeqPut) {
+            return seqUpd;
         } else if (op instanceof SeqIndexOf) {
             return seqIndexOf;
         } else if (op instanceof SeqGet) {

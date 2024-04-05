@@ -153,7 +153,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     public TestIntLiteralParsing() {
         containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        jio = new JmlIO().services(getServices()).classType(containerType)
+        jio = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
     }
 

@@ -27,6 +27,7 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
 
 /**
@@ -461,7 +462,7 @@ public class ContractFactory {
                     // check if the other mod is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
                     if (uniformMod.containsKey(h)) {
-                        if (!uniformMod.get(h).equalsModTermLabels(m2)) {
+                        if (!uniformMod.get(h).equalsModProperty(m2, TERM_LABELS_PROPERTY)) {
                             uniformMod.remove(h);
                         } else {
                             // merge term labels (in particular origin labels) of both modifies

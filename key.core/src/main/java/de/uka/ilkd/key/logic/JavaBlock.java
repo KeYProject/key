@@ -92,31 +92,6 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    public boolean equalsModRenaming(Object o, NameAbstractionTable nat) {
-        if (!(o instanceof JavaBlock)) {
-            return false;
-        }
-        return equalsModRenaming(((JavaBlock) o).program(), nat);
-    }
-
-
-    /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    private boolean equalsModRenaming(JavaProgramElement pe, NameAbstractionTable nat) {
-        if (pe == null && program() == null) {
-            return true;
-        } else if (pe != null && program() != null) {
-            return program().equalsModRenaming(pe, nat);
-        }
-        return false;
-    }
-
-    /**
      * returns the java program
      *
      * @return the stored JavaProgramElement

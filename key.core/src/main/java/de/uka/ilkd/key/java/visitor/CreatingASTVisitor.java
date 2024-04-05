@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -601,6 +600,19 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return new CopyAssignment(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                // there are no AST elements below the set statement, so we can use the copy
+                // constructor.
+                return new SetStatement(x);
             }
         };
         def.doAction(x);
@@ -1453,6 +1465,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqPut(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -1491,18 +1514,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 changeList.add(x.getKind());
-                changeList.add(x.getVars());
-                return new JmlAssert(changeList, services);
+                changeList.add(x.getCondition());
+                return new JmlAssert(changeList);
             }
         };
         def.doAction(x);
-    }
-
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // should only be called by walk(), which puts an ExtList on the stack
-        assert stack.peek() != null;
-        stack.peek().add(cond);
     }
 
     /**

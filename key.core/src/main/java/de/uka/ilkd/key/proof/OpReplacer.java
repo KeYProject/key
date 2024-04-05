@@ -19,6 +19,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
+
 
 /**
  * Replaces operators in a term by other operators with the same signature, or subterms of the term
@@ -233,7 +235,7 @@ public class OpReplacer {
         }
 
         for (SVSubstitute svs : map.keySet()) {
-            if (term.equalsModTermLabels(svs)) {
+            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) {
                 return (Term) map.get(svs);
             }
         }

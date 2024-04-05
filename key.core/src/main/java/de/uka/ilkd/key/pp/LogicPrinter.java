@@ -119,7 +119,7 @@ public class LogicPrinter {
         return layouter;
     }
 
-    private static SequentViewLogicPrinter quickPrinter(Services services,
+    public static SequentViewLogicPrinter quickPrinter(Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
@@ -596,7 +596,9 @@ public class LogicPrinter {
     }
 
     private void printSourceElement(SourceElement element) {
-        new PrettyPrinter(layouter, instantiations).print(element);
+        new PrettyPrinter(layouter, instantiations, services,
+            notationInfo.isPrettySyntax(),
+            notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**

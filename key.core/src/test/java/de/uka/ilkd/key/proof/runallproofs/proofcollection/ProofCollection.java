@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
@@ -85,5 +86,18 @@ public final class ProofCollection {
         var unit = new GroupedProofCollectionUnit(name, settings);
         units.add(unit);
         return unit;
+    }
+
+    /**
+     * Removes all groups from this collection except the given names
+     *
+     * @param groupNames a list of groups to be kept
+     */
+    public void keep(String... groupNames) {
+        Arrays.sort(groupNames);
+        Predicate<String> toBeKept = (String s) -> Arrays.binarySearch(groupNames, s) >= 0;
+        Predicate<? super ProofCollectionUnit> pred =
+            c -> c instanceof GroupedProofCollectionUnit u && toBeKept.test(u.getName());
+        units.removeIf(pred.negate());
     }
 }

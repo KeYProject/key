@@ -3289,14 +3289,9 @@ Expression ADTConstructor() :
         setPrefixInfo(result);
     }
     |
-    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    "\\seq_upd" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
     {
-        // desugaring
-        final Expression one = factory.createIntLiteral(1);
-        final Expression first = new SeqSub(expr, factory.createIntLiteral(0), factory.createMinus(expr2, one));
-        final Expression second = new SeqSingleton(result);
-        final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
-        result = new SeqConcat(first, new SeqConcat(second, third));
+        result = new SeqPut(expr, expr2, result);
         setPrefixInfo(result);
     }
     )

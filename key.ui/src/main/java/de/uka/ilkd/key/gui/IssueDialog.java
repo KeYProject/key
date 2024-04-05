@@ -740,6 +740,11 @@ public final class IssueDialog extends JDialog {
         }
     }
 
+    private boolean isJava(String fileName) {
+        // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
+        return fileName != null && fileName.endsWith(".java");
+    }
+
     public static int getOffsetFromLineColumn(String source, Position pos) {
         // Position has 1-based line and column, we need them 0-based
         return getOffsetFromLineColumn(source, pos.line() - 1, pos.column() - 1);
