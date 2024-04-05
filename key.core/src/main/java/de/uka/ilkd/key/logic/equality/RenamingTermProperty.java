@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
@@ -143,7 +145,7 @@ public class RenamingTermProperty implements Property<Term> {
         if (!(op0 instanceof SchemaVariable) && op0 instanceof ProgramVariable pv0) {
             if (op1 instanceof ProgramVariable pv1) {
                 nat = checkNat(nat);
-                if (!pv0.equalsModRenaming(pv1, nat)) {
+                if (!pv0.equalsModProperty(pv1, RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) {
                     return false;
                 }
             } else {
@@ -200,7 +202,7 @@ public class RenamingTermProperty implements Property<Term> {
         if (pe1 == null && pe2 == null) {
             return false;
         } else if (pe1 != null && pe2 != null) {
-            return !pe1.equalsModRenaming(pe2, nat);
+            return !pe1.equalsModProperty(pe2, RENAMING_SOURCE_ELEMENT_PROPERTY, nat);
         }
         return true;
     }

@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+
 
 /**
  * This class implements a persistent constraint. The constraint contains pairs of Metavariables X
@@ -425,7 +427,8 @@ public class EqualityConstraint implements Constraint {
                 return FAILED;
             }
             nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
+            if (!((ProgramVariable) t0.op()).equalsModProperty(t1.op(),
+                RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) {
                 return FAILED;
             }
         }

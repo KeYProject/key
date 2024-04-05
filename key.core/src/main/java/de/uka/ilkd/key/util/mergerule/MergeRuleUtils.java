@@ -45,6 +45,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -821,7 +822,8 @@ public class MergeRuleUtils {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
-        if (se1.equalsModRenaming(se2, new NameAbstractionTable())) {
+        if (se1.equalsModProperty(se2, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable())) {
             return true;
         }
 
@@ -836,7 +838,8 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModRenaming(replVisitor2.result(),
+        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
+            RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
