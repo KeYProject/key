@@ -1687,13 +1687,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term minusOne = tb.zTerm("-1");
         assert e2 != null;
         assert e1 != null;
-        final Term ante = tb.seqSub(e1.getTerm(), tb.zero(), tb.add(e2.getTerm(), minusOne));
-        assert e3 != null;
-        final Term insert = tb.seqSingleton(e3.getTerm());
-        final Term post = tb.seqSub(e1.getTerm(), tb.add(e2.getTerm(), tb.one()),
-            tb.add(tb.seqLen(e1.getTerm()), minusOne));
-        final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
-        return new SLExpression(put);
+        Term updated = tb.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
+        return new SLExpression(updated);
     }
 
     @Override

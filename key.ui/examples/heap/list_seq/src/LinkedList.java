@@ -53,7 +53,24 @@ final class LinkedList implements List {
 
         return node.data;
     }
+    
+    public void set(int index, Object o) {
+        if(index < 0 || size <= index) {
+            throw new IndexOutOfBoundsException();
+        }
 
+        Node node = first;
+        /*@ loop_invariant 0 <= i && i <= index && node == (Node)nodeseq[i];
+          @ assignable \strictly_nothing;
+          @ decreases index - i;
+          @*/
+        for(int i = 0; i < index; i++) {
+            node = node.next;
+        }
+
+        node.data = o;
+        //@ set seq = \seq_upd(seq, index, o);
+    }
 
     public boolean contains(Object o) {
         if(size == 0) {
