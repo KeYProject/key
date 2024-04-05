@@ -18,6 +18,8 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * Instances of this class are immutable
  */
@@ -125,12 +127,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // program does not change. this is a pretty common situation
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
-                if (beforeChangeOp instanceof Modality) {
+                if (beforeChangeOp instanceof Modality beforeChangeMod) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
-                    return beforeChangeOp == afterChangeTerm.op() && beforeChangeTerm.sub(0)
-                            .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));
+                    if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
+                        return beforeChangeMod.kind() == afterChangeMod.kind()
+                                && beforeChangeTerm.sub(0)
+                                        .equalsModProperty(afterChangeTerm.sub(0),
+                                            IRRELEVANT_TERM_LABELS_PROPERTY);
+                    } else {
+                        return false;
+                    }
                 }
 
                 return false;

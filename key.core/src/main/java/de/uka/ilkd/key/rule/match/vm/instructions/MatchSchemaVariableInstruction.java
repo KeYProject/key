@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
         extends Instruction<SV> {
     private static final Logger LOGGER =
@@ -40,7 +42,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
-            if (!t.equalsModRenaming(term)) {
+            if (!t.equalsModProperty(term, RENAMING_PROPERTY)) {
                 return null;
             } else {
                 return matchCond;

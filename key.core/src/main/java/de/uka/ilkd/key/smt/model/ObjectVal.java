@@ -5,7 +5,7 @@ package de.uka.ilkd.key.smt.model;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 
 /**

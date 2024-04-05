@@ -6,13 +6,14 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 
 
@@ -55,9 +56,9 @@ public final class MetaDiv extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         if (bigIntArg2.compareTo(new BigInteger("0")) == 0) {
             Name undefName = new Name("undef(" + term + ")");
-            Function undef = services.getNamespaces().functions().lookup(undefName);
+            JFunction undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
-                undef = new Function(undefName,
+                undef = new JFunction(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }
