@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -71,7 +71,7 @@ public final class DLSpecFactory {
     private LocationVariable extractHeapAtPre(Term fma) throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
-            assert update.sort() == Sort.UPDATE;
+            assert update.sort() == JavaDLTheory.UPDATE;
             if (!(update.op() instanceof ElementaryUpdate eu)) {
                 throw new ProofInputException(
                     "Elementary update expected, " + "but found: " + update);
@@ -121,9 +121,10 @@ public final class DLSpecFactory {
     }
 
 
-    private Modality extractModality(UseOperationContractRule.Instantiation inst)
+    private Modality.JavaModalityKind extractModalityKind(
+            UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.mod;
+        return inst.mod.kind();
     }
 
 
@@ -219,7 +220,7 @@ public final class DLSpecFactory {
         ProgramVariable excVar = extractExcVar(fma);
         final UseOperationContractRule.Instantiation inst = extractInst(fma);
         final IProgramMethod pm = extractProgramMethod(inst);
-        final Modality modality = extractModality(inst);
+        final Modality.JavaModalityKind modalityKind = extractModalityKind(inst);
         final ProgramVariable selfVar =
             pm.isConstructor() ? extractResultVar(inst) : extractSelfVar(inst);
         final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
@@ -262,13 +263,13 @@ public final class DLSpecFactory {
         if (excVar == null) {
             excVar = tb.excVar(pm, false);
             Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
-            if (modality == Modality.DIA) {
+            if (modalityKind == Modality.JavaModalityKind.DIA) {
                 post = tb.and(post, excNullTerm);
-            } else if (modality == Modality.BOX) {
+            } else if (modalityKind == Modality.JavaModalityKind.BOX) {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "
-                    + modality + "; please use #catchAll block");
+                    + modalityKind.name() + "; please use #catchAll block");
             }
         }
 
@@ -289,7 +290,7 @@ public final class DLSpecFactory {
 
         final boolean isLibraryClass =
             ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
-        return cf.func(name, pm.getContainerType(), pm, modality, pres,
+        return cf.func(name, pm.getContainerType(), pm, modalityKind, pres,
             new LinkedHashMap<>(), null, // TODO measured_by in DL contracts
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL

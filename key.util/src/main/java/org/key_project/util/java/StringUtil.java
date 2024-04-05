@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-
 /**
  * Provides static methods to work with strings.
  *

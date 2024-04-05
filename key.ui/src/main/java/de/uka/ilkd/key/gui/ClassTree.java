@@ -19,9 +19,9 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 public class ClassTree extends JTree {

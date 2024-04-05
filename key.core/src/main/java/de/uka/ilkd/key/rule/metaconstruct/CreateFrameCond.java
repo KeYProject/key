@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -21,6 +20,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Creates the frame condition (aka "assignable clause") for the given loop. Also accepts the
@@ -50,7 +53,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final Optional<LoopSpecification> loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
-        final boolean isTransaction = MiscTools.isTransaction((Modality) loopFormula.op());
+        final boolean isTransaction = MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //
@@ -91,7 +94,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             final Term mod = mods.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+            if (tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);

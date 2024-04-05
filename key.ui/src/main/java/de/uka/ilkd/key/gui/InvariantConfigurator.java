@@ -16,11 +16,11 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -965,8 +966,8 @@ public class InvariantConfigurator {
                 index = inputPane.getSelectedIndex();
                 Term result =
                     parser.parseExpression(invariants.get(index)[INV_IDX].get(heap.toString()));
-                if (result.sort() != Sort.FORMULA) {
-                    throw newUnexpectedTypeException(Sort.FORMULA, result.sort());
+                if (result.sort() != JavaDLTheory.FORMULA) {
+                    throw newUnexpectedTypeException(JavaDLTheory.FORMULA, result.sort());
                 }
                 return result;
             }

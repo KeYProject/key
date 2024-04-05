@@ -17,10 +17,10 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
@@ -33,6 +33,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -345,36 +348,38 @@ public abstract class VariableNamer implements InstantiationProposer {
             ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 
-        Sort svSort = sv.sort();
-        if (svSort == ProgramSVSort.VARIABLE) {
-            if (basename == null || basename.isEmpty()) {
-                basename = DEFAULT_BASENAME;
-            }
-            int cnt =
-                getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                        + 1;
+        if (sv instanceof ProgramSV psv) {
+            Sort svSort = psv.sort();
+            if (svSort == ProgramSVSort.VARIABLE) {
+                if (basename == null || basename.isEmpty()) {
+                    basename = DEFAULT_BASENAME;
+                }
+                int cnt =
+                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                            + 1;
 
-            Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
-            while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
-                cnt++;
-                tmpName = new Name(basename + "_" + cnt);
-            }
+                Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
+                while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
+                    cnt++;
+                    tmpName = new Name(basename + "_" + cnt);
+                }
 
-            result = createName(basename, cnt, null);
+                result = createName(basename, cnt, null);
 
-            // avoid using a previous proposal again
-            if (previousProposals != null) {
-                boolean collision;
-                do {
-                    collision = false;
-                    for (String previousProposal : previousProposals) {
-                        if (previousProposal.equals(result.toString())) {
-                            result = createName(basename, ++cnt, null);
-                            collision = true;
-                            break;
+                // avoid using a previous proposal again
+                if (previousProposals != null) {
+                    boolean collision;
+                    do {
+                        collision = false;
+                        for (String previousProposal : previousProposals) {
+                            if (previousProposal.equals(result.toString())) {
+                                result = createName(basename, ++cnt, null);
+                                collision = true;
+                                break;
+                            }
                         }
-                    }
-                } while (collision);
+                    } while (collision);
+                }
             }
         }
 

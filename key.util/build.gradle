@@ -1,6 +1,7 @@
 description "Utility library of the key-project"
 
-dependencies{
+dependencies {
+    implementation("org.jspecify:jspecify:0.3.0")
 }
 
 checkerFramework {

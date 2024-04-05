@@ -9,9 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.

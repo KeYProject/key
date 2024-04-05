@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -18,6 +19,10 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
@@ -66,7 +71,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 : null;
         var origin = BuilderHelpers.getPosition(ctx);
         var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
-        sorts().add(s);
+        sorts().addSafely(s);
         return null;
     }
 
@@ -144,7 +149,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                     : Immutables.createSetFrom(sortOneOf);
 
             // attention: no expand to java.lang here!
-            if (sorts().lookup(sortName) == null) {
+            Sort existingSort = sorts().lookup(sortName);
+            if (existingSort == null) {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
@@ -155,7 +161,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                         semanticError(ctx, "Illegal sort given");
                     }
                 } else if (new Name("any").equals(sortName)) {
-                    s = Sort.ANY;
+                    s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
                         var ps = new ProxySort(sortName, ext, documentation,
@@ -172,11 +178,11 @@ public class DeclarationBuilder extends DefaultBuilder {
                 createdSorts.add(s);
             } else {
                 // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
-                // local namespaces
-                // for generic sorts
+                // local namespaces for generic sorts
                 // addWarning(ctx, "Sort declaration is ignored, due to collision.");
-                LOGGER.info("Sort declaration is ignored, due to collision in {}",
-                    BuilderHelpers.getPosition(ctx));
+                LOGGER.info("Sort declaration of {} in {} is ignored due to collision (already "
+                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                    existingSort.getOrigin());
             }
         }
         return createdSorts;

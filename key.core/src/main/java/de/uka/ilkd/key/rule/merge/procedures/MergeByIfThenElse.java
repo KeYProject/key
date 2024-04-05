@@ -12,11 +12,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;

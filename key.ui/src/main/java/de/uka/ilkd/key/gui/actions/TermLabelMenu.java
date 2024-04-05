@@ -15,7 +15,8 @@ import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.

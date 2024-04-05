@@ -6,10 +6,11 @@ package de.uka.ilkd.key.smt.model;
 import java.util.*;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.lang.SMTSort;
+
+import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
