@@ -10,7 +10,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
@@ -1878,12 +1878,12 @@ public final class SpecificationRepository {
      * <p>
      * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable {@link Map}
      * <p>
-     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
-     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value terms.
+     * For {@link de.uka.ilkd.key.java.ast.statement.JmlAssert} this is the formula behind the assert.
+     * For {@link de.uka.ilkd.key.java.ast.statement.SetStatement} this is the target and the value terms.
      * You may want to use the index constant for accessing them:
-     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_TARGET},
-     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_VALUE},
-     * {@link de.uka.ilkd.key.java.statement.JmlAssert#INDEX_CONDITION}
+     * {@link de.uka.ilkd.key.java.ast.statement.SetStatement#INDEX_TARGET},
+     * {@link de.uka.ilkd.key.java.ast.statement.SetStatement#INDEX_VALUE},
+     * {@link de.uka.ilkd.key.java.ast.statement.JmlAssert#INDEX_CONDITION}
      *
      * @param vars
      * @param terms

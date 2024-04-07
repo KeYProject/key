@@ -10,7 +10,7 @@ include "key.core.testgen"
 include "key.core.proof_references"
 include "key.core.example"
 include "key.core.symbolic_execution.example"
-include 'recoder'
+//include 'recoder'
 include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'

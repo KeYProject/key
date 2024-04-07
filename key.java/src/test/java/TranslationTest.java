@@ -61,7 +61,8 @@ class TranslationTest {
         expr.setParentNode(parent);
         var converted = converter.process(expr);
         Assertions.assertNotEquals(null, converted);
-        Assertions.assertInstanceOf(Expression.class, converted, "Unexpected type: " + converted.getClass());
+        Assertions.assertInstanceOf(Expression.class, converted,
+            "Unexpected type: " + converted.getClass());
         System.out.println(converted);
     }
 }

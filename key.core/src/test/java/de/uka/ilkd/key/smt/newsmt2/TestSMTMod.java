@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -59,7 +57,7 @@ public class TestSMTMod {
     @Test
     public void testModSpec() throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(testCaseDirectory.resolve("smt/modSpec.key"));
+            KeYEnvironment.load(testCaseDirectory.resolve("smt/modSpec.key"));
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);

@@ -12,13 +12,11 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.java.ast.statement.JmlAssert;
-import de.uka.ilkd.key.java.ast.statement.LoopStatement;
-import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -608,44 +606,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnSetStatement(final SetStatement x) {
-        /*
-         * var spec =
-         * Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-         * ProgramVariableCollection vars = spec.vars();
-         * Map<LocationVariable, Term> atPres = vars.atPres;
-         * Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
-         * Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
-         * Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
-         *
-         * for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
-         * LocationVariable pv = e.getKey();
-         * final Term t = e.getValue();
-         * if (t == null) {
-         * continue;
-         * }
-         * if (replaceMap.containsKey(pv)) {
-         * newAtPres.remove(pv);
-         * pv = (LocationVariable) replaceMap.get(pv);
-         * newAtPreVars.put(pv, atPreVars.get(e.getKey()));
-         * }
-         * newAtPres.put(pv, replaceVariablesInTerm(t));
-         * }
-         * final ProgramVariableCollection newVars =
-         * new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-         * newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
-         *
-         *
-         * var newTerms = spec.terms().map(this::replaceVariablesInTerm);
-         * var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
-         *
-         * services.getSpecificationRepository().addStatementSpec(x, newSpec);
-         *
-         * /*
-         * if (!newAtPres.equals(vars.atPres)) {
-         * changed();
-         * }
-         * doDefaultAction(x);
-         */
         handleJmlStatements(x, SetStatement::new);
     }
 

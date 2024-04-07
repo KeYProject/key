@@ -12,7 +12,9 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.statement.JmlAssert;
+import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;

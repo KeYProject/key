@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -81,7 +80,7 @@ public interface Visitor {
 
     void performActionOnSeqReverse(SeqReverse x);
 
-    //void performActionOnSeqPut(SeqPut seqPut);
+    void performActionOnSeqPut(SeqPut seqPut);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
@@ -185,7 +184,7 @@ public interface Visitor {
 
     void performActionOnCopyAssignment(CopyAssignment x);
 
-    //void performActionOnSetStatement(SetStatement x);
+    void performActionOnSetStatement(SetStatement x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 

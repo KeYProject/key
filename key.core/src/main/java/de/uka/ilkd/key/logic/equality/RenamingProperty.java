@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;

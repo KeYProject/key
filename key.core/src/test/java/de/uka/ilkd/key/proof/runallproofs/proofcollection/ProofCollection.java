@@ -4,10 +4,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;

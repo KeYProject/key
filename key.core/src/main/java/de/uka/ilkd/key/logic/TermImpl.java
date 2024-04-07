@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.equality.TermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;

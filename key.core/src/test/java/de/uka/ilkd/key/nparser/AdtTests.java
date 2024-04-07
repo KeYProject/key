@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 

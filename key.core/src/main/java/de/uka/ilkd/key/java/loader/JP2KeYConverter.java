@@ -514,7 +514,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
             if (construct instanceof TextualJMLAssertStatement) {
                 var a = (TextualJMLAssertStatement) construct;
-                return new JmlAssert(a.getKind(), a.getContext(), pi, services);
+                return new JmlAssert(a.getKind(), a.getContext(), pi);
             }
             if (construct instanceof TextualJMLMergePointDecl) {
                 var a = (TextualJMLMergePointDecl) construct;

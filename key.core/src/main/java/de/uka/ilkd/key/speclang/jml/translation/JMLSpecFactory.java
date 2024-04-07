@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;

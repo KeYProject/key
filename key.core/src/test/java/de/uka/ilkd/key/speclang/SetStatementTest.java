@@ -8,8 +8,8 @@ import java.io.File;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -69,7 +69,7 @@ public class SetStatementTest {
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo =
-                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+                HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
