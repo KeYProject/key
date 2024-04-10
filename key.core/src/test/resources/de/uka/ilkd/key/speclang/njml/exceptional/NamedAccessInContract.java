@@ -3,7 +3,7 @@
 // broken: true
 // noException: false
 
-// currently does not report an exception
+// Originally, the problem was: currently does not report an exception
 
 class NamedAccessInContract {
 
