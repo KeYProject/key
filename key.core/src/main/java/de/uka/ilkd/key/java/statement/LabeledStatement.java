@@ -269,10 +269,6 @@ public class LabeledStatement extends JavaStatement
             return false;
         }
 
-        // TODO: do this in the treewalker:
-        // final LabeledStatement lSt = (LabeledStatement) se;
-        // nat.add(name, lSt.name);
-
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
         if (jnte.getChildCount() != getChildCount()) {
             return false;

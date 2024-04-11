@@ -281,9 +281,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
             }
         }
 
-        // TODO: add this in treewalker:
-        // nat.add(var, vs.getProgramVariable());
-
         if (vs.getChildCount() != getChildCount()) {
             return false;
         }

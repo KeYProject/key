@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTTreeWalker;
 
 /**
@@ -42,6 +43,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     @Override
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
         // For this equality check, v must be a single NameAbstractionTable
+        if (v.length != 1 || !(v[0] instanceof NameAbstractionTable)) {
+            throw new IllegalArgumentException(
+                "Expected a single NameAbstractionTable as argument.");
+        }
         NameAbstractionTable nat = (NameAbstractionTable) v[0];
 
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
@@ -51,9 +56,22 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         SourceElement next2 = tw2.getCurrentNode();
 
         while (next1 != null && next2 != null) {
-            if (!next1.equals(next2)) {
-                return false;
+            // TODO: check all the different cases...
+            if (next1 instanceof LabeledStatement) {
+                if (!handleLabeledStatement((LabeledStatement) next1, next2, nat)) {
+                    return false;
+                }
+            } else if (next1 instanceof VariableSpecification) {
+                if (!handleVariableSpecification((VariableSpecification) next1, next2, nat)) {
+                    return false;
+                }
+            } else {
+                if (!handleStandard(next1, next2)) {
+                    return false;
+                }
             }
+
+            // pass onto the next nodes in the tree
             next1 = tw1.nextNode();
             next2 = tw2.nextNode();
         }
@@ -63,14 +81,66 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     @Override
     public int hashCodeModThisProperty(SourceElement sourceElement) {
-        return 0;
+        throw new UnsupportedOperationException(
+            "Hashing of SourceElements modulo renaming not yet implemented!");
     }
 
-    private boolean comparison(SourceElement se1, SourceElement se2) {
+    /* --------------------- Helper methods for special cases ---------------------- */
+
+    // TODO: maybe delete this method or document it to show design choices
+    private boolean handleStandard(SourceElement se1, SourceElement se2) {
         return se1.equals(se2);
     }
 
-    private boolean comparison(Comment comment, SourceElement se) {
+    private boolean handleLabeledStatement(LabeledStatement ls, SourceElement se,
+            NameAbstractionTable nat) {
+        if (se.getClass() != ls.getClass()) {
+            return false;
+        }
+        final LabeledStatement other = (LabeledStatement) se;
+        if (ls.getChildCount() != other.getChildCount()) {
+            return false;
+        }
+        nat.add(ls.getLabel(), ((LabeledStatement) se).getLabel());
         return true;
     }
+
+    private boolean handleVariableSpecification(VariableSpecification vs, SourceElement se,
+            NameAbstractionTable nat) {
+        // TODO: Checking for exact class might be too strict as the original implementation was
+        // only using instanceof
+        if (se.getClass() != vs.getClass()) {
+            return false;
+        }
+        final VariableSpecification other = (VariableSpecification) se;
+        if (vs.getChildCount() != other.getChildCount()) {
+            return false;
+        }
+        if (vs.getDimensions() != other.getDimensions()) {
+            return false;
+        }
+        if (vs.getType() != null) {
+            if (!vs.getType().equals(other.getType())) {
+                return false;
+            }
+        } else {
+            if (other.getType() != null) {
+                return false;
+            }
+        }
+        nat.add(vs.getProgramVariable(), other.getProgramVariable());
+        return true;
+    }
+
+    // This follows the (probably incorrect) prior implementation of the comparison on comments that
+    // is not symmetrical.
+    // Might not be needed for equalsModRenaming to be correct as comments seem to be filtered out
+    // of JavaBlocks.
+    /*
+     * private boolean handleComment(Comment comment, SourceElement se) {
+     * return true;
+     * }
+     */
+
+    /* ------------------ End of helper methods for special cases ------------------ */
 }
