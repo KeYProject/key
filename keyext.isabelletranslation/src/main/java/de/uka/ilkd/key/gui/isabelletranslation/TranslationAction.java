@@ -38,6 +38,20 @@ public class TranslationAction extends MainWindowAction {
         generateTranslation();
     }
 
+    private Theory beginTheory(String thyText, Path source, Isabelle isabelle) {
+        MLFunction3<Path, TheoryHeader, scala.collection.immutable.List<Theory>, Theory> begin_theory =
+                MLValue.compileFunction("fn (path, header, parents) => Resources.begin_theory path header parents", isabelle,
+                        Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()), Implicits.theoryConverter());
+        MLFunction2<String, Position, TheoryHeader> header_read = MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle,
+                de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter(), Implicits.theoryHeaderConverter());
+        TheoryHeader header = header_read.apply(thyText, Position.none(isabelle), isabelle, de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter())
+                .retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
+        Path topDir = source.getParent();
+        return begin_theory.apply(topDir, header, header.imports(isabelle).map((name) -> Theory.apply(name, isabelle)), isabelle,
+                        Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()))
+                .retrieveNow(Implicits.theoryConverter(), isabelle);
+    }
+
     private void generateTranslation() {
         KeYMediator mediator = getMediator();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
@@ -53,33 +67,36 @@ public class TranslationAction extends MainWindowAction {
             List<Path> filePaths = new ArrayList<>();
 
 
-            MLFunction2<String, Position, TheoryHeader> getHeader = MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle, new StringConverter(), Implicits.positionConverter(), Implicits.theoryHeaderConverter());
-            TheoryHeader theoryHeader = getHeader.apply(translation.toString(), Position.none(isabelle), isabelle, new StringConverter(), Implicits.positionConverter()).retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
-            MLFunction3<Path, TheoryHeader, scala.collection.immutable.List<Theory>, Theory> begin_theory = MLValue.compileFunction("fn (path, header, parents) => Resources.begin_theory path header parents", isabelle, Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()), Implicits.theoryConverter());
-            Theory thy0 = Theory.apply(translationFile.toPath(), isabelle);
-            MLFunction0<ToplevelState> init_toplevel = MLValue.compileFunction0("Toplevel.init_toplevel", isabelle, Implicits.toplevelStateConverter());
-            ToplevelState toplevel = init_toplevel.apply(isabelle).retrieveNow(Implicits.toplevelStateConverter(), isabelle);
+            Theory thy0 = beginTheory(translation.toString(), translationFile.toPath(), isabelle);
+            ToplevelState toplevel = ToplevelState.apply(isabelle);
 
-            MLFunction2<Theory, String, scala.collection.immutable.List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction(
-                    """
+            MLFunction2<Theory, String, scala.collection.immutable.List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
                             fn (thy, text) => let
-                              val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
-                              fun addtext symbols [tr] =
-                                    [(tr, implode symbols)]
-                                | addtext _ [] = []
-                                | addtext symbols (tr::nextTr::trs) = let
-                                    val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
-                                    in (tr, implode this) :: addtext rest (nextTr::trs) end
-                              in addtext (Symbol.explode text) transitions end
-                            """, isabelle, Implicits.theoryConverter(), new StringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), new StringConverter())));
+                            val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
+                            fun addtext symbols [tr] =
+                                  [(tr, implode symbols)]
+                              | addtext _ [] = []
+                              | addtext symbols (tr::nextTr::trs) = let
+                                  val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
+                                  in (tr, implode this) :: addtext rest (nextTr::trs) end
+                            in addtext (Symbol.explode text) transitions end""", isabelle,
+                    Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())));
 
-            //MLFunction3<Boolean, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction(
-            //        "fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle, new BooleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
+            MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
+                    de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
-            /*for ((transition, text) <- parse_text(thy0, theorySource.text).force.retrieveNow) {
-                println(s"""Transition: "${text.strip}"""")
-                toplevel = command_exception(true, transition, toplevel).retrieveNow.force
-            }*/
+            List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
+            parse_text.apply(thy0, translation.toString(), isabelle,
+                            Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
+                    .retrieveNow(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle)
+                    .foreach(transitionsAndTexts::add);
+
+            for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
+                //println(s"""Transition: "${text.strip}"""")
+                toplevel = command_exception.apply(Boolean.TRUE, transitionAndText._1(), toplevel, isabelle,
+                                de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
+                        .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
+            }
 
             String sledgehammer = thy0.importMLStructureNow("Sledgehammer", isabelle);
             String Sledgehammer_Commands = thy0.importMLStructureNow("Sledgehammer_Commands", isabelle);
@@ -95,12 +112,12 @@ public class TranslationAction extends MainWindowAction {
                                             let
                                                val p_state = Toplevel.proof_of state;
                                                val ctxt = Proof.context_of p_state;
-                                               val params = """ + Sledgehammer_Commands + """
+                                               val params =\s""" + Sledgehammer_Commands + """
                                     .default_params thy
                                                     [("provers", "e"),("timeout","30"),("verbose","true")];
-                                                 val results = """
+                                                 val results =\s"""
                                     + sledgehammer + """
-                                    .run_sledgehammer params """ + Sledgehammer_Prover + """
+                                    .run_sledgehammer params\s""" + Sledgehammer_Prover + """
                                     .Normal NONE 1 override p_state;
                                                  val (result, (outcome, step)) = results;
                                                in
@@ -116,10 +133,16 @@ public class TranslationAction extends MainWindowAction {
 
             Builder<String, scala.collection.immutable.List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
             scala.collection.immutable.List<String> list = listBuilder.result();
-            var test = normal_with_Sledgehammer.apply(toplevel, thy0, list, list, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
-                    new ListConverter<>(new StringConverter()),
-                    new ListConverter<>(new StringConverter())).retrieveNow((new Tuple2Converter<>(new BooleanConverter(), new Tuple2Converter<>(new StringConverter(), new ListConverter<>(new StringConverter())))), isabelle);
 
+            Boolean result;
+            try {
+                result = (Boolean) normal_with_Sledgehammer.apply(toplevel, thy0, list, list, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+                        new ListConverter<>(new StringConverter()),
+                        new ListConverter<>(new StringConverter())).retrieveNow((new Tuple2Converter<>(new BooleanConverter(), new Tuple2Converter<>(new StringConverter(), new ListConverter<>(new StringConverter())))), isabelle)._1();
+            } catch (Exception exception) {
+                result = Boolean.FALSE;
+            }
+            LOGGER.info("Sledgehammer result: " + result);
             filePaths.add(translationFile.toPath());
 
 
