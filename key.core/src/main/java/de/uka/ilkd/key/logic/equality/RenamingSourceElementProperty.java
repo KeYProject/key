@@ -59,7 +59,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         SourceElement next2 = tw2.getCurrentNode();
 
         while (next1 != null && next2 != null) {
-            // TODO: check all the different cases...
+            // Handle special cases of prior equalsModRenaming implementation
             if (next1 instanceof LabeledStatement) {
                 if (!handleLabeledStatement((LabeledStatement) next1, next2, nat)) {
                     return false;
@@ -98,14 +98,66 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     }
 
     /* --------------------- Helper methods for special cases ---------------------- */
-
-    // TODO: maybe delete this method or document it to show design choices
+    /**
+     * Handles the standard case of comparing two {@link SourceElement}s modulo renaming.
+     *
+     * @param se1 the first {@link SourceElement} to be compared
+     * @param se2 the second {@link SourceElement} to be compared
+     * @return {@code true} iff the two source elements are equal under the standard {@code equals}
+     *         method
+     */
     private boolean handleStandard(SourceElement se1, SourceElement se2) {
+        /*
+         * As the prior implementations of equalsModRenaming for SourceElements were mostly the same
+         * as the normal equals method, we decided to move equalsModRenaming completely into the
+         * equals method and handle the special cases separately while walking through the tree that
+         * is a SourceElement.
+         */
         return se1.equals(se2);
     }
 
+    /**
+     * Handles the special case of comparing a {@link JavaNonTerminalProgramElement} to a
+     * {@link SourceElement}.
+     *
+     * @param jnte the {@link JavaNonTerminalProgramElement} to be compared
+     * @param se the {@link SourceElement} to be compared
+     * @return {@code true} iff {@code se} is of the same class and has the same number of children
+     *         as {@code jnte}
+     */
+    private boolean handleJavaNonTerminalProgramElements(JavaNonTerminalProgramElement jnte,
+            SourceElement se) {
+        /*
+         * A JavaNonTerminalProgramElement is a special case of a SourceElement, as we must not
+         * traverse the children recursively. This is the case as we might have to add some entries
+         * of children nodes to a NameAbstractionTable so that they can be compared later on by the
+         * TreeWalker.
+         */
+        if (se == jnte) {
+            return true;
+        }
+        if (se.getClass() != jnte.getClass()) {
+            return false;
+        }
+        final JavaNonTerminalProgramElement other = (JavaNonTerminalProgramElement) se;
+        return jnte.getChildCount() == other.getChildCount();
+    }
+
+    /**
+     * Handles the special case of comparing a {@link LabeledStatement} to a {@link SourceElement}.
+     *
+     * @param ls the {@link LabeledStatement} to be compared
+     * @param se the {@link SourceElement} to be compared
+     * @param nat the {@link NameAbstractionTable} the label of {@code ls} should be added to
+     * @return {@code true} iff {@code se} is also a {@link LabeledStatement} and has the same
+     *         number of children as {@code ls}
+     */
     private boolean handleLabeledStatement(LabeledStatement ls, SourceElement se,
             NameAbstractionTable nat) {
+        /*
+         * A LabeledStatement is a special case of a JavaNonTerminalProgramElement, as we must also
+         * not traverse the children recursively but also additionally add the label to a NAT.
+         */
         if (se == ls) {
             return true;
         }
@@ -120,8 +172,23 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return true;
     }
 
+    /**
+     * Handles the special case of comparing a {@link VariableSpecification} to a
+     * {@link SourceElement}.
+     *
+     * @param vs the {@link VariableSpecification} to be compared
+     * @param se the {@link SourceElement} to be compared
+     * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
+     * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
+     *         number of children, dimensions and type
+     */
     private boolean handleVariableSpecification(VariableSpecification vs, SourceElement se,
             NameAbstractionTable nat) {
+        /*
+         * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
+         * LabeledStatement, but we also need to check the dimensions and type of the
+         * VariableSpecification.
+         */
         if (se == vs) {
             return true;
         }
@@ -150,38 +217,27 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return true;
     }
 
+    /**
+     * Handles the special case of comparing a {@link ProgramVariable} or a
+     * {@link ProgramElementName} to a {@link SourceElement}.
+     *
+     * @param se1 the first {@link SourceElement} which is either a {@link ProgramVariable} or a
+     *        {@link ProgramElementName}
+     * @param se2 the second {@link SourceElement} to be compared
+     * @param nat the {@link NameAbstractionTable} that should be used to check whether {@code se1}
+     *        and {@code se2} have the same abstract name
+     * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
+     */
     private boolean handleProgramVariableOrElementName(SourceElement se1, SourceElement se2,
             NameAbstractionTable nat) {
         // TODO: Checking for exact class might be too strict as the original implementation was
-        // only using instanceof
-        // or no check at all. Could be more efficient to check for classes first though.
+        // only using instanceof or no check at all.
         if (se1.getClass() != se2.getClass()) {
             return false;
         }
         return nat.sameAbstractName(se1, se2);
     }
 
-    // This follows the (probably incorrect) prior implementation of the comparison on comments that
-    // is not symmetrical.
-    // Might not be needed for equalsModRenaming to be correct as comments seem to be filtered out
-    // of JavaBlocks.
-    /*
-     * private boolean handleComment(Comment comment, SourceElement se) {
-     * return true;
-     * }
-     */
-
-    private boolean handleJavaNonTerminalProgramElements(JavaNonTerminalProgramElement jnte,
-            SourceElement se) {
-        if (se == jnte) {
-            return true;
-        }
-        if (se.getClass() != jnte.getClass()) {
-            return false;
-        }
-        final JavaNonTerminalProgramElement other = (JavaNonTerminalProgramElement) se;
-        return jnte.getChildCount() == other.getChildCount();
-    }
 
     /* ------------------ End of helper methods for special cases ------------------ */
 }
