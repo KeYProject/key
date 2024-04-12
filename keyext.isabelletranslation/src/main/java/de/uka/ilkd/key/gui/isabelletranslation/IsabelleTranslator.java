@@ -192,7 +192,7 @@ public class IsabelleTranslator {
         result.append(LINE_ENDING).append(LINE_ENDING);
         result.append("(* Solve here *)").append(LINE_ENDING);
 
-        return result.append("end").append(LINE_ENDING).append("end");
+        return result;
     }
 
     private static String getUnivSpec(IsabelleMasterHandler masterHandler, Set<Sort> parents, String insert) {
