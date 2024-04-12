@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Assertions;
 
 /**
  * This class configuress the "runAllProofs" test runs.
- * 
- * The ProofCollection objects are created and configured in the two methods 
+ *
+ * The ProofCollection objects are created and configured in the two methods
  * #automaticJavaDL() and #automaticInfFlow(). You can add new files
  * to existing groups to be run by CI or you can add new groups. Follow the
  * example set by the other test cases.
@@ -355,11 +355,15 @@ public class ProofCollections {
         g.provable("heap/removeDups/contains.key");
         g.provable("heap/removeDups/removeDup.key");
         g.provable("heap/saddleback_search/Saddleback_search.key");
-        // TODO: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for that.
+        // TODO: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
+        // that.
         g.loadable("heap/BoyerMoore/BM(BM__bm((I)).JML normal_behavior operation contract.0.proof");
-        g.loadable("heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML accessible clause.0.proof");
-        g.loadable("heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML model_behavior operation contract.0.proof");
-        g.loadable("heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML accessible clause.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML model_behavior operation contract.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
 
         g = c.group("quicksort");
         g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
