@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTTreeWalker;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * A property that can be used in
@@ -65,13 +68,22 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
                 if (!handleVariableSpecification((VariableSpecification) next1, next2, nat)) {
                     return false;
                 }
+            } else if (next1 instanceof ProgramVariable || next1 instanceof ProgramElementName) {
+                if (!handleProgramVariableOrElementName(next1, next2, nat)) {
+                    return false;
+                }
+            } else if (next1 instanceof JavaNonTerminalProgramElement) {
+                if (!handleJavaNonTerminalProgramElements((JavaNonTerminalProgramElement) next1,
+                    next2)) {
+                    return false;
+                }
             } else {
                 if (!handleStandard(next1, next2)) {
                     return false;
                 }
             }
 
-            // pass onto the next nodes in the tree
+            // walk to the next nodes in the tree
             next1 = tw1.nextNode();
             next2 = tw2.nextNode();
         }
@@ -94,6 +106,9 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     private boolean handleLabeledStatement(LabeledStatement ls, SourceElement se,
             NameAbstractionTable nat) {
+        if (se == ls) {
+            return true;
+        }
         if (se.getClass() != ls.getClass()) {
             return false;
         }
@@ -107,6 +122,9 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     private boolean handleVariableSpecification(VariableSpecification vs, SourceElement se,
             NameAbstractionTable nat) {
+        if (se == vs) {
+            return true;
+        }
         // TODO: Checking for exact class might be too strict as the original implementation was
         // only using instanceof
         if (se.getClass() != vs.getClass()) {
@@ -132,6 +150,17 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return true;
     }
 
+    private boolean handleProgramVariableOrElementName(SourceElement se1, SourceElement se2,
+            NameAbstractionTable nat) {
+        // TODO: Checking for exact class might be too strict as the original implementation was
+        // only using instanceof
+        // or no check at all. Could be more efficient to check for classes first though.
+        if (se1.getClass() != se2.getClass()) {
+            return false;
+        }
+        return nat.sameAbstractName(se1, se2);
+    }
+
     // This follows the (probably incorrect) prior implementation of the comparison on comments that
     // is not symmetrical.
     // Might not be needed for equalsModRenaming to be correct as comments seem to be filtered out
@@ -141,6 +170,18 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * return true;
      * }
      */
+
+    private boolean handleJavaNonTerminalProgramElements(JavaNonTerminalProgramElement jnte,
+            SourceElement se) {
+        if (se == jnte) {
+            return true;
+        }
+        if (se.getClass() != jnte.getClass()) {
+            return false;
+        }
+        final JavaNonTerminalProgramElement other = (JavaNonTerminalProgramElement) se;
+        return jnte.getChildCount() == other.getChildCount();
+    }
 
     /* ------------------ End of helper methods for special cases ------------------ */
 }
