@@ -115,7 +115,7 @@ public class TranslationAction extends MainWindowAction {
                                                val ctxt = Proof.context_of p_state;
                                                val params =\s""" + Sledgehammer_Commands + """
                                     .default_params thy
-                                                    [("provers", "e"),("timeout","30"),("verbose","true")];
+                                                    [("timeout","30"),("verbose","true")];
                                                  val results =\s"""
                                     + sledgehammer + """
                                     .run_sledgehammer params\s""" + Sledgehammer_Prover + """
