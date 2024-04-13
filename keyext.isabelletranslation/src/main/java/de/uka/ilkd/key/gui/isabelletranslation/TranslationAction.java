@@ -3,6 +3,8 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.*;
@@ -11,7 +13,6 @@ import de.unruh.isabelle.pure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import scala.collection.immutable.Seq;
 import scala.collection.mutable.Builder;
 
 import java.awt.event.ActionEvent;
@@ -132,18 +133,27 @@ public class TranslationAction extends MainWindowAction {
                             (new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())))));
 
             Builder<String, scala.collection.immutable.List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
-            scala.collection.immutable.List<String> list = listBuilder.result();
+            scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
-            Boolean result;
+            Tuple2<Object, Tuple2<String, scala.collection.immutable.List<String>>> result;
+            LOGGER.info("Sledgehammering...");
             try {
-                result = (Boolean) normal_with_Sledgehammer.apply(toplevel, thy0, list, list, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+                result = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                                 new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                                 new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
-                        .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle)._1();
+                        .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
             } catch (Exception exception) {
-                result = Boolean.FALSE;
+                result = new Tuple2<>(Boolean.FALSE, new Tuple2<>("", emptyList));
             }
             LOGGER.info("Sledgehammer result: " + result);
+
+            //TODO needs its own action to enable undo, etc. and naming reworks
+            if ((Boolean) result._1()) {
+                IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("Isabelle " + result._2()._2().head());
+                app.tryToInstantiate(mediator.getSelectedGoal());
+                mediator.getSelectedGoal().apply(app);
+            }
+
             filePaths.add(translationFile.toPath());
 
 
@@ -155,7 +165,7 @@ public class TranslationAction extends MainWindowAction {
                 //TODO handle exception
                 throw new RuntimeException(e);
             }
-
+            /*
             Builder<Path, Seq<Path>> builder = Seq.newBuilder();
             for (Path path : filePaths) {
                 builder.addOne(path);
@@ -166,7 +176,7 @@ public class TranslationAction extends MainWindowAction {
             //TODO improve concurrency?
             Thread isabelleJEdit = new Thread(() -> Isabelle.jedit(setup, pathSeq));
 
-            isabelleJEdit.start();
+            isabelleJEdit.start();*/
         } catch (IllegalFormulaException e) {
             //TODO output alert to user
             throw new RuntimeException(e);
