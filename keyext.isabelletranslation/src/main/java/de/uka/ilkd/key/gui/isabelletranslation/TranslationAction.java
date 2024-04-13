@@ -127,9 +127,9 @@ public class TranslationAction extends MainWindowAction {
                                         in
                                           Timeout.apply (Time.fromSeconds 35) go_run (state, thy) end
                                     """, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
-                            new ListConverter<>(new StringConverter()),
-                            new ListConverter<>(new StringConverter()),
-                            (new Tuple2Converter<>(new BooleanConverter(), new Tuple2Converter<>(new StringConverter(), new ListConverter<>(new StringConverter())))));
+                            new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
+                            new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
+                            (new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())))));
 
             Builder<String, scala.collection.immutable.List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
             scala.collection.immutable.List<String> list = listBuilder.result();
@@ -137,8 +137,9 @@ public class TranslationAction extends MainWindowAction {
             Boolean result;
             try {
                 result = (Boolean) normal_with_Sledgehammer.apply(toplevel, thy0, list, list, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
-                        new ListConverter<>(new StringConverter()),
-                        new ListConverter<>(new StringConverter())).retrieveNow((new Tuple2Converter<>(new BooleanConverter(), new Tuple2Converter<>(new StringConverter(), new ListConverter<>(new StringConverter())))), isabelle)._1();
+                                new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
+                                new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
+                        .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle)._1();
             } catch (Exception exception) {
                 result = Boolean.FALSE;
             }
