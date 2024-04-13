@@ -47,7 +47,7 @@ public class TranslationAction extends MainWindowAction {
         TheoryHeader header = header_read.apply(thyText, Position.none(isabelle), isabelle, de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter())
                 .retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
         Path topDir = source.getParent();
-        return begin_theory.apply(topDir, header, header.imports(isabelle).map((name) -> Theory.apply(name, isabelle)), isabelle,
+        return begin_theory.apply(topDir, header, header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
                         Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()))
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
     }
