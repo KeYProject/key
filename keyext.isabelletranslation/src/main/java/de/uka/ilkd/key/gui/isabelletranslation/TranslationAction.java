@@ -26,15 +26,17 @@ import java.util.List;
 public class TranslationAction extends MainWindowAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslationAction.class);
+    private final Path isabelle_path;
 
     public TranslationAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate to Isabelle");
+        this.isabelle_path = IsabelleTranslationSettings.getInstance().getIsabellePath();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        LOGGER.info("Translation Action");
+        LOGGER.info("Translating...");
 
         generateTranslation();
     }
@@ -57,16 +59,17 @@ public class TranslationAction extends MainWindowAction {
         KeYMediator mediator = getMediator();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
         try {
-            //TODO let user choose where to save file?
-            File translationFile = new File(System.getProperty("user.home") + "/.key/IsabelleTranslations/Translation.thy");
+            File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "Translation.thy");
             StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent());
 
-            //TODO find Isabelle path
-            Isabelle.Setup setup = JIsabelle.setup(Path.of("C:\\Users\\Nils\\Documents\\Isabelle2023"));
-            Isabelle isabelle = new Isabelle(setup);
-            //TODO automatically run try/sledgehammer instead of opening Isabelle
-            List<Path> filePaths = new ArrayList<>();
-
+            Isabelle isabelle;
+            try {
+                Isabelle.Setup setup = JIsabelle.setup(isabelle_path);
+                isabelle = new Isabelle(setup);
+            } catch (Exception e) {
+                LOGGER.error("Can't find Isabelle at {}", isabelle_path);
+                return;
+            }
 
             Theory thy0 = beginTheory(translation.toString(), translationFile.toPath(), isabelle);
             ToplevelState toplevel = ToplevelState.apply(isabelle);
@@ -86,6 +89,7 @@ public class TranslationAction extends MainWindowAction {
             MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
                     de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
+            LOGGER.info("Parsing theory...");
             List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
             parse_text.apply(thy0, translation.toString(), isabelle,
                             Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
@@ -98,6 +102,7 @@ public class TranslationAction extends MainWindowAction {
                                 de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
                         .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
             }
+            LOGGER.info("Finished Parsing");
 
             String sledgehammer = thy0.importMLStructureNow("Sledgehammer", isabelle);
             String Sledgehammer_Commands = thy0.importMLStructureNow("Sledgehammer_Commands", isabelle);
@@ -154,6 +159,7 @@ public class TranslationAction extends MainWindowAction {
                 mediator.getSelectedGoal().apply(app);
             }
 
+            List<Path> filePaths = new ArrayList<>();
             filePaths.add(translationFile.toPath());
 
 
