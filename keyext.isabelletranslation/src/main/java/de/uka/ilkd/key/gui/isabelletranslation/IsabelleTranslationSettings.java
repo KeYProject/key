@@ -94,8 +94,12 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     @Override
     public void readSettings(@NonNull Configuration props) {
-        isabellePath = Path.of(props.get(isabellePathKey, DEFAULT_ISABELLE_PATH.toString()));
-        translationPath = Path.of(props.get(translationPathKey, DEFAULT_TRANSLATION_PATH.toString()));
+        if (INSTANCE == null) {
+            isabellePath = DEFAULT_ISABELLE_PATH;
+            translationPath = DEFAULT_TRANSLATION_PATH;
+        }
+        isabellePath = Path.of(props.get(isabellePathKey, isabellePath.toString()));
+        translationPath = Path.of(props.get(translationPathKey, translationPath.toString()));
     }
 
     @Override
