@@ -59,7 +59,7 @@ public class TranslationAction extends MainWindowAction {
         KeYMediator mediator = getMediator();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
         try {
-            File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "Translation.thy");
+            File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() +  "\\Translation.thy");
             StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent());
 
             Isabelle isabelle;
@@ -71,6 +71,7 @@ public class TranslationAction extends MainWindowAction {
                 return;
             }
 
+            LOGGER.info("Parsing theory...");
             Theory thy0 = beginTheory(translation.toString(), translationFile.toPath(), isabelle);
             ToplevelState toplevel = ToplevelState.apply(isabelle);
 
@@ -89,7 +90,7 @@ public class TranslationAction extends MainWindowAction {
             MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
                     de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
-            LOGGER.info("Parsing theory...");
+
             List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
             parse_text.apply(thy0, translation.toString(), isabelle,
                             Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
@@ -159,8 +160,7 @@ public class TranslationAction extends MainWindowAction {
                 mediator.getSelectedGoal().apply(app);
             }
 
-            List<Path> filePaths = new ArrayList<>();
-            filePaths.add(translationFile.toPath());
+
 
 
             try {
@@ -172,6 +172,9 @@ public class TranslationAction extends MainWindowAction {
                 throw new RuntimeException(e);
             }
             /*
+            List<Path> filePaths = new ArrayList<>();
+            filePaths.add(translationFile.toPath());
+
             Builder<Path, Seq<Path>> builder = Seq.newBuilder();
             for (Path path : filePaths) {
                 builder.addOne(path);
