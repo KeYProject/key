@@ -62,6 +62,7 @@ public class TranslationAction extends MainWindowAction {
             File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() +  "\\Translation.thy");
             StringBuilder translation = translator.translateProblem(mediator.getSelectedGoal().sequent());
 
+            LOGGER.info("Starting isabelle...");
             Isabelle isabelle;
             try {
                 Isabelle.Setup setup = JIsabelle.setup(isabelle_path);
@@ -72,6 +73,7 @@ public class TranslationAction extends MainWindowAction {
             }
 
             LOGGER.info("Parsing theory...");
+
             Theory thy0 = beginTheory(translation.toString(), translationFile.toPath(), isabelle);
             ToplevelState toplevel = ToplevelState.apply(isabelle);
 
@@ -151,6 +153,8 @@ public class TranslationAction extends MainWindowAction {
             } catch (Exception exception) {
                 result = new Tuple2<>(Boolean.FALSE, new Tuple2<>("", emptyList));
             }
+            isabelle.destroy();
+
             LOGGER.info("Sledgehammer result: " + result);
 
             //TODO needs its own action to enable undo, etc. and naming reworks
