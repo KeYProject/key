@@ -24,8 +24,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationSettings.class);
     private static IsabelleTranslationSettings INSTANCE;
 
-    private static final String isabellePathKey = "Path";
-    private static final String translationPathKey = "TranslationPath";
+    protected static final String isabellePathKey = "Path";
+    protected static final String translationPathKey = "TranslationPath";
     private Path isabellePath;
     private Path translationPath;
     private static final Path DEFAULT_ISABELLE_PATH = Path.of(System.getProperty("user.home"), "Isabelle2023");
