@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.isabelletranslation;
 
+import de.uka.ilkd.key.settings.AbstractSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Properties;
-
-import de.uka.ilkd.key.settings.AbstractSettings;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IsabelleTranslationSettings extends AbstractSettings {
     protected static final File SETTINGS_FILE_NEW =
@@ -29,7 +28,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     private Path isabellePath;
     private Path translationPath;
     private static final Path DEFAULT_ISABELLE_PATH = Path.of(System.getProperty("user.home"), "Isabelle2023");
-    private static final Path DEFAULT_TRANSLATION_PATH = Path.of(PathConfig.getKeyConfigDir(), "isabelleTranslations");
+    private static final Path DEFAULT_TRANSLATION_PATH = Path.of(PathConfig.getKeyConfigDir(), "IsabelleTranslations");
 
     private static Configuration getDefaultConfig() {
         Configuration config = new Configuration();
@@ -70,15 +69,15 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     }
 
     public void save() {
-            LOGGER.info("Save Isabelle settings to: " + SETTINGS_FILE_NEW.getAbsolutePath());
-            try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
-                var config = new Configuration();
-                writeSettings(config);
-                config.save(writer, "Isabelle settings");
-                writer.flush();
-            } catch (IOException ex) {
-                LOGGER.error("Failed to save Isabelle settings", ex);
-            }
+        LOGGER.info("Save Isabelle settings to: " + SETTINGS_FILE_NEW.getAbsolutePath());
+        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+            var config = new Configuration();
+            writeSettings(config);
+            config.save(writer, "Isabelle settings");
+            writer.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Failed to save Isabelle settings", ex);
+        }
     }
 
     @Override
