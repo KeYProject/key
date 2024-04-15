@@ -14,4 +14,9 @@ public record SledgehammerResult(Tuple2<Object, Tuple2<String, List<String>>> re
         }
         return result._2()._2().head();
     }
+
+    @Override
+    public String toString() {
+        return result.toString();
+    }
 }

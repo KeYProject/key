@@ -4,8 +4,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.*;
-import de.unruh.isabelle.pure.*;
 import de.unruh.isabelle.pure.Implicits;
+import de.unruh.isabelle.pure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -57,27 +57,28 @@ public class IsabelleProblem {
             return null;
         }
 
-        LOGGER.info("Parsing theory...");
+        LOGGER.info("Opening theory...");
 
         Theory thy0 = beginTheory(getSequentTranslation(), Path.of((settings.getTranslationPath() + "\\Translation.thy")), isabelle);
         ToplevelState toplevel = ToplevelState.apply(isabelle);
 
         MLFunction2<Theory, String, List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
-                            fn (thy, text) => let
-                            val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
-                            fun addtext symbols [tr] =
-                                  [(tr, implode symbols)]
-                              | addtext _ [] = []
-                              | addtext symbols (tr::nextTr::trs) = let
-                                  val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
-                                  in (tr, implode this) :: addtext rest (nextTr::trs) end
-                            in addtext (Symbol.explode text) transitions end""", isabelle,
+                        fn (thy, text) => let
+                        val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
+                        fun addtext symbols [tr] =
+                              [(tr, implode symbols)]
+                          | addtext _ [] = []
+                          | addtext symbols (tr::nextTr::trs) = let
+                              val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
+                              in (tr, implode this) :: addtext rest (nextTr::trs) end
+                        in addtext (Symbol.explode text) transitions end""", isabelle,
                 Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())));
 
         MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
                 de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
 
+        LOGGER.info("Parsing theory...");
         java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
         parse_text.apply(thy0, getSequentTranslation(), isabelle,
                         Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
@@ -107,20 +108,20 @@ public class IsabelleProblem {
                                            val p_state = Toplevel.proof_of state;
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
-                                    .default_params thy
-                                                    [("timeout","30"),("verbose","true")];
-                                                 val results =\s"""
+                                .default_params thy
+                                                [("timeout","30"),("verbose","true")];
+                                             val results =\s"""
                                 + sledgehammer + """
-                                    .run_sledgehammer params\s""" + Sledgehammer_Prover + """
-                                    .Normal NONE 1 override p_state;
-                                                 val (result, (outcome, step)) = results;
-                                               in
-                                                 (result, (""" + sledgehammer + """
-                                    .short_string_of_sledgehammer_outcome outcome, [YXML.content_of step]))
-                                               end;
-                                        in
-                                          Timeout.apply (Time.fromSeconds 35) go_run (state, thy) end
-                                    """, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+                                .run_sledgehammer params\s""" + Sledgehammer_Prover + """
+                                .Normal NONE 1 override p_state;
+                                             val (result, (outcome, step)) = results;
+                                           in
+                                             (result, (""" + sledgehammer + """
+                                .short_string_of_sledgehammer_outcome outcome, [YXML.content_of step]))
+                                           end;
+                                    in
+                                      Timeout.apply (Time.fromSeconds 35) go_run (state, thy) end
+                                """, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                         new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                         new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                         (new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())))));
