@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.equality;
 import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
@@ -290,7 +292,7 @@ public class TestEqualsModProperty {
     @Test
     public void renamingSourceElements() {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; int j; /*Test*/ }\\>true");
-        Term match2 = TacletForTests.parseTerm("\\<{ int i; int k; }\\>true");
+        Term match2 = TacletForTests.parseTerm("\\<{ int i; /*Another test*/ int k; }\\>true");
         assertTrue(
             match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming (0).");
@@ -298,9 +300,9 @@ public class TestEqualsModProperty {
         Comment testComment = new Comment("test");
         StringLiteral stringLiteral = new StringLiteral("testStringLiteral");
 
-        // This seems very bad as equalsModRenaming is seemingly NOT symmetric!!!
-        // assertTrue(testComment.equalsModRenaming(stringLiteral, null));
-        // assertFalse(stringLiteral.equalsModRenaming(testComment, null));
-        // Currently,
+        assertFalse(testComment.equalsModProperty(stringLiteral, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
+        assertFalse(stringLiteral.equalsModProperty(testComment, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
     }
 }
