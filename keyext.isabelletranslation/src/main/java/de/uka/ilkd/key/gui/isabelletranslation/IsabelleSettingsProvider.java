@@ -2,8 +2,8 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.Configuration;
 
 import javax.swing.*;
@@ -32,7 +32,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     @Override
     public String getDescription() {
-        return "Settings for Isabelle translation";
+        return "Isabelle translation";
     }
 
     @Override
@@ -50,8 +50,8 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     protected JTextField createIsabellePathPanel() {
         return addFileChooserPanel("Isabelle folder:", "", infoIsabellePathPanel,
-            true, e -> {
-            });
+                true, e -> {
+                });
     }
 
     @Override
