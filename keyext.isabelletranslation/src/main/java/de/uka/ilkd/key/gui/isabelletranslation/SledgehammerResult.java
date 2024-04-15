@@ -8,7 +8,10 @@ public record SledgehammerResult(Tuple2<Object, Tuple2<String, List<String>>> re
         return (Boolean) result._1();
     }
 
-    public Tuple2<String, List<String>> getTactic() {
-        return result._2();
+    public String getSuccessfulTactic() {
+        if (!isSuccessful()) {
+            return null;
+        }
+        return result._2()._2().head();
     }
 }
