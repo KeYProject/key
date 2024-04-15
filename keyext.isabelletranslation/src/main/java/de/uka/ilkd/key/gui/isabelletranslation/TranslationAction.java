@@ -46,8 +46,8 @@ public class TranslationAction extends MainWindowAction {
 
         try {
             Files.createDirectories(translationFile.toPath().getParent());
-            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
             Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
+            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
             LOGGER.info("Saved to: " + translationFile.toPath() + " and " + translationPreambleFile.toPath());
         } catch (IOException e) {
             LOGGER.error("Failed to save translation", e);
