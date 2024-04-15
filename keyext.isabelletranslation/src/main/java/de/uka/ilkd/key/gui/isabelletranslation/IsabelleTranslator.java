@@ -149,7 +149,7 @@ public class IsabelleTranslator {
         }
         translationPreamble.append("end");
 
-        StringBuilder sequentTranslation = new StringBuilder("theory Translation imports Main TranslationPreamble begin").append(LINE_ENDING);
+        StringBuilder sequentTranslation = new StringBuilder("theory Translation imports Main Draft.TranslationPreamble begin").append(LINE_ENDING);
         sequentTranslation.append("locale varsAndFunctions");
         List<StringBuilder> locales = masterHandler.getLocales();
 
