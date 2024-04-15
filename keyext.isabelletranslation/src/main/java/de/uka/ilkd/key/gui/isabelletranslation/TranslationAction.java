@@ -58,7 +58,7 @@ public class TranslationAction extends MainWindowAction {
 
         //TODO needs its own action to enable undo, etc. and naming reworks
         if (result != null && result.isSuccessful()) {
-            IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("Isabelle " + result.getTactic());
+            IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("Isabelle " + result.getSuccessfulTactic());
             app.tryToInstantiate(mediator.getSelectedGoal());
             mediator.getSelectedGoal().apply(app);
         }
