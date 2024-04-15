@@ -59,7 +59,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
                     LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
                     return INSTANCE = new IsabelleTranslationSettings(Configuration.load(SETTINGS_FILE_NEW));
                 } catch (IOException e) {
-                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                    LOGGER.error("Could not read {}, resorting to default", SETTINGS_FILE_NEW, e);
+                    return INSTANCE = new IsabelleTranslationSettings(getDefaultConfig());
                 }
             }
             LOGGER.info("Resorting to default Isabelle settings");
