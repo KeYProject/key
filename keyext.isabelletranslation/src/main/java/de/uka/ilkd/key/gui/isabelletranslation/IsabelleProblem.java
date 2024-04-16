@@ -45,12 +45,17 @@ public class IsabelleProblem {
     }
 
     public SledgehammerResult sledgehammer() {
-        LOGGER.info("Starting isabelle...");
+        LOGGER.info("Starting Isabelle...");
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
 
         Isabelle isabelle;
+        ArrayList<Path> sessionRoots = new ArrayList<>();
+        sessionRoots.add(settings.getTranslationPath());
         try {
-            Isabelle.Setup setup = JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(), JIsabelle.setup(settings.getIsabellePath()));
+            Isabelle.Setup setup = JIsabelle.setupSetLogic("IsabelleTranslations",
+                    JIsabelle.setupSetSessionRoots(sessionRoots,
+                            JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
+                                    JIsabelle.setup(settings.getIsabellePath()))));
             isabelle = new Isabelle(setup);
         } catch (Exception e) {
             LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
