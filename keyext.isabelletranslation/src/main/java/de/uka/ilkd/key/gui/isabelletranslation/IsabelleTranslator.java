@@ -44,7 +44,7 @@ public class IsabelleTranslator {
         }
 
         StringBuilder translationPreamble = new StringBuilder();
-        translationPreamble.append("theory TranslationPreamble imports Main begin").append(LINE_ENDING);
+        translationPreamble.append("theory TranslationPreamble imports Main \"HOL-Combinatorics.List_Permutation\" begin").append(LINE_ENDING);
 
         for (StringBuilder preamble : masterHandler.getPreambles()) {
             translationPreamble.append(LINE_ENDING).append(preamble).append(LINE_ENDING);
