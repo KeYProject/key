@@ -28,9 +28,6 @@ consts
 axiomatization where int_sub_any[simp]:"type_definition int2any any2int (int_Image)"
 declare [[coercion int2any]]
 
-interpretation int: type_definition int2any any2int int_Image
-  using int_sub_any by simp
-
 definition int_type::"javaDL_type" where "int_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::int set)"
 
 consts
@@ -40,9 +37,6 @@ consts
 
 axiomatization where bool_sub_any[simp]:"type_definition bool2any any2bool (bool_Image)"
 declare [[coercion bool2any]]
-
-interpretation bool: type_definition bool2any any2bool bool_Image
-  using bool_sub_any by simp
 
 definition bool_type::"javaDL_type" where "bool_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::bool set)"
 
@@ -120,9 +114,6 @@ consts
 
 axiomatization where LocSet_sub_any:"type_definition LocSet2any any2LocSet LocSet_Image"
 
-interpretation LocSet:type_definition LocSet2any any2LocSet LocSet_Image
-  using LocSet_sub_any by simp
-
 declare [[coercion LocSet2any]]
 
 definition LocSet_type::"javaDL_type" where "LocSet_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::LocSet set)"
@@ -140,9 +131,6 @@ consts
   any2Heap::"any\&lt;Rightarrow&gt;Heap"
 
 axiomatization where Heap_sub_any:"type_definition Heap2any any2Heap Heap_Image"
-
-interpretation Heap:type_definition Heap2any any2Heap Heap_Image
-  using Heap_sub_any by simp
 
 declare [[coercion Heap2any]]
 
@@ -247,9 +235,6 @@ lift_definition seqIndexOf::"Seq\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" is
 
 axiomatization Seq2any any2Seq Seq_UNIV
   where Seq_sub_any:"type_definition (Seq2any::Seq\&lt;Rightarrow&gt;any) (any2Seq::any\&lt;Rightarrow&gt;Seq) (Seq_UNIV::any set)"
-
-interpretation Seq: type_definition Seq2any any2Seq Seq_UNIV
-  using Seq_sub_any by simp
 
 declare [[coercion Seq2any]]
 
