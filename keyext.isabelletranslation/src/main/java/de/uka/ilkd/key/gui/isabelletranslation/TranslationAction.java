@@ -34,8 +34,8 @@ public class TranslationAction extends MainWindowAction {
         KeYMediator mediator = getMediator();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
-        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "\\Translation.thy");
-        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "\\TranslationPreamble.thy");
+        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/Translation.thy");
+        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/TranslationPreamble.thy");
         IsabelleProblem translation;
         try {
             translation = translator.translateProblem(mediator.getSelectedGoal());
