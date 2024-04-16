@@ -38,19 +38,21 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      *
      * @param se1 the first element of the equality check
      * @param se2 the second element of the equality check
-     * @param v the additional arguments needed for the equality check
+     * @param v the additional arguments needed for the equality check (a single
+     *        {@link NameAbstractionTable} in this case)
      * @return {@code true} iff {@code se2} is a source element syntactically equal to {@code se1}
      *         modulo renaming
      * @param <V> the type of the additional parameters needed for the comparison
+     *        ({@link NameAbstractionTable} in this case)
      */
     @Override
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
         // For this equality check, v must be a single NameAbstractionTable
-        if (v.length != 1 || !(v[0] instanceof NameAbstractionTable)) {
+        if (v.length != 1 || !(v[0] instanceof NameAbstractionTable nat)) {
             throw new IllegalArgumentException(
                 "Expected a single NameAbstractionTable as argument.");
         }
-        NameAbstractionTable nat = (NameAbstractionTable) v[0];
+        // NameAbstractionTable nat = (NameAbstractionTable) v[0];
 
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
         JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
@@ -60,20 +62,20 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
         while (next1 != null && next2 != null) {
             // Handle special cases of prior equalsModRenaming implementation
-            if (next1 instanceof LabeledStatement) {
-                if (!handleLabeledStatement((LabeledStatement) next1, next2, nat)) {
+            if (next1 instanceof LabeledStatement ls) {
+                if (!handleLabeledStatement(ls, next2, nat)) {
                     return false;
                 }
-            } else if (next1 instanceof VariableSpecification) {
-                if (!handleVariableSpecification((VariableSpecification) next1, next2, nat)) {
+            } else if (next1 instanceof VariableSpecification vs) {
+                if (!handleVariableSpecification(vs, next2, nat)) {
                     return false;
                 }
             } else if (next1 instanceof ProgramVariable || next1 instanceof ProgramElementName) {
                 if (!handleProgramVariableOrElementName(next1, next2, nat)) {
                     return false;
                 }
-            } else if (next1 instanceof JavaNonTerminalProgramElement) {
-                if (!handleJavaNonTerminalProgramElements((JavaNonTerminalProgramElement) next1,
+            } else if (next1 instanceof JavaNonTerminalProgramElement jnte) {
+                if (!handleJavaNonTerminalProgramElements(jnte,
                     next2)) {
                     return false;
                 }
@@ -109,7 +111,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     private boolean handleStandard(SourceElement se1, SourceElement se2) {
         /*
          * As the prior implementations of equalsModRenaming for SourceElements were mostly the same
-         * as the normal equals method, we decided to move equalsModRenaming completely into the
+         * as their normal equals methods, we decided to move equalsModRenaming completely into the
          * equals method and handle the special cases separately while walking through the tree that
          * is a SourceElement.
          */
@@ -129,9 +131,9 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
             SourceElement se) {
         /*
          * A JavaNonTerminalProgramElement is a special case of a SourceElement, as we must not
-         * traverse the children recursively. This is the case as we might have to add some entries
-         * of children nodes to a NameAbstractionTable so that they can be compared later on by the
-         * TreeWalker.
+         * traverse the children recursively through the normal equals method. This is the case
+         * as we might have to add some entries of children nodes to a NameAbstractionTable so
+         * that they can be compared later on by the TreeWalker.
          */
         if (se == jnte) {
             return true;
@@ -230,6 +232,11 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      */
     private boolean handleProgramVariableOrElementName(SourceElement se1, SourceElement se2,
             NameAbstractionTable nat) {
+        /*
+         * A ProgramVariable or a ProgramElementName is a special case of a SourceElement and one
+         * of the main reasons for equalsModRenaming. Equality here comes down to checking the
+         * abstract name of the elements in a NAT.
+         */
         // TODO: Checking for exact class might be too strict as the original implementation was
         // only using instanceof or no check at all.
         if (se1.getClass() != se2.getClass()) {
