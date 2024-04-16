@@ -52,11 +52,6 @@ public class Main {
         long z3TranslationLines;
         long translationAndZ3Time;
         long z3ProofLines;
-        long replayTime;
-        long replayAutoModeTime;
-        int replayAutoModeNodes;
-        int replayNodes;
-        ProofState replayState = ProofState.UNKNOWN;
 
         StatEntry(Path p) {
             this.p = p;
@@ -118,16 +113,6 @@ public class Main {
         sb.append("transl_+_Z3_time");
         sb.append(",");
         sb.append("Z3_proof_lines");
-        sb.append(",");
-        sb.append("replay_time");
-        sb.append(",");
-        sb.append("replay_automode_time");
-        sb.append(",");
-        sb.append("replayed_proof_nodes");
-        sb.append(",");
-        sb.append("replayed_proof_automode_nodes");
-        sb.append(",");
-        sb.append("replay_result");
         sb.append(System.lineSeparator());
 
         for (StatEntry statEntry : STATS.values()) {
@@ -144,16 +129,6 @@ public class Main {
             sb.append(statEntry.translationAndZ3Time);
             sb.append(",");
             sb.append(statEntry.z3ProofLines);
-            sb.append(",");
-            sb.append(statEntry.replayTime);
-            sb.append(",");
-            sb.append(statEntry.replayAutoModeTime);
-            sb.append(",");
-            sb.append(statEntry.replayNodes);
-            sb.append(",");
-            sb.append(statEntry.replayAutoModeNodes);
-            sb.append(",");
-            sb.append(statEntry.replayState);
             sb.append(System.lineSeparator());
         }
 
