@@ -50,6 +50,6 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        IsabelleTranslationSettings.getInstance().createSessionFiles();
+        IsabelleTranslationSettings.getInstance();
     }
 }

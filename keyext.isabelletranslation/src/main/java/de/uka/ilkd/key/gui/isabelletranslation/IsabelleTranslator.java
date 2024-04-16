@@ -150,7 +150,6 @@ public class IsabelleTranslator {
 
             sequentTranslation.append(LINE_ENDING).append(LINE_ENDING);
         }
-        sequentTranslation.append("end");
 
         sequentTranslation.append("locale varsAndFunctions");
         List<StringBuilder> locales = masterHandler.getLocales();

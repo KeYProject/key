@@ -29,7 +29,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     private static final Path DEFAULT_ISABELLE_PATH = Path.of(System.getProperty("user.home"), "Isabelle2023");
     private static final Path DEFAULT_TRANSLATION_PATH = Path.of(PathConfig.getKeyConfigDir(), "IsabelleTranslations");
 
-    private boolean sessionFilesPresent;
+    private boolean sessionFilesPresent = false;
 
     private static Configuration getDefaultConfig() {
         Configuration config = new Configuration();
@@ -62,37 +62,37 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         if (INSTANCE == null) {
             if (SETTINGS_FILE_NEW.exists()) {
                 try {
-                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
+                    LOGGER.info("Load Isabelle settings at {}", SETTINGS_FILE_NEW);
                     return INSTANCE = new IsabelleTranslationSettings(Configuration.load(SETTINGS_FILE_NEW));
                 } catch (IOException e) {
-                    LOGGER.error("Could not read {}, resorting to default", SETTINGS_FILE_NEW, e);
+                    LOGGER.error("Could not read {}, resorting to default settings", SETTINGS_FILE_NEW, e);
                     return INSTANCE = new IsabelleTranslationSettings(getDefaultConfig());
                 }
             }
-            LOGGER.info("Resorting to default Isabelle settings");
+            LOGGER.info("No settings present, resorting to default Isabelle settings");
             return INSTANCE = new IsabelleTranslationSettings(getDefaultConfig());
         }
         return INSTANCE;
     }
 
-    protected void createSessionFiles() {
-        IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
-        Path sessionRootPath = Path.of(settings.getTranslationPath() + "/ROOT");
-        BufferedReader sessionReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("ROOT")));
-        String sessionRoot = sessionReader.lines().collect(Collectors.joining());
+    protected boolean createSessionFiles() {
+        Path sessionRootPath = Path.of(translationPath + "/ROOT");
+        BufferedReader sessionReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("ROOT")));
+        String sessionRoot = sessionReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
-        Path sessionDocumentPath = Path.of(settings.getTranslationPath() + "/document/root.tex");
-        BufferedReader sessionDocumentReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("document/root.tex")));
-        String sessionDocument = sessionDocumentReader.lines().collect(Collectors.joining());
+        Path sessionDocumentPath = Path.of(translationPath + "/document/root.tex");
+        BufferedReader sessionDocumentReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("root.tex")));
+        String sessionDocument = sessionDocumentReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
         try {
             Files.write(sessionRootPath, sessionRoot.getBytes());
+            Files.createDirectories(sessionDocumentPath.getParent());
             Files.write(sessionDocumentPath, sessionDocument.getBytes());
-            LOGGER.info("Created Isabelle session files at: {}", settings.getTranslationPath());
-            sessionFilesPresent = true;
+            LOGGER.info("Created Isabelle session files at: {}", translationPath);
+            return sessionFilesPresent = true;
         } catch (IOException e) {
-            LOGGER.error("Failed to create ROOT file for Isabelle Translation");
-            sessionFilesPresent = false;
+            LOGGER.error("Failed to create ROOT file for Isabelle Translation, because: {}", e.toString());
+            return sessionFilesPresent = false;
         }
     }
 
@@ -113,9 +113,9 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         isabellePath = Path.of(props.getProperty(isabellePathKey));
         Path newTranslationPath = Path.of(props.getProperty(translationPathKey));
         if (newTranslationPath != translationPath) {
-            sessionFilesPresent = false;
+            translationPath = newTranslationPath;
+            sessionFilesPresent = createSessionFiles();
         }
-        translationPath = newTranslationPath;
     }
 
     @Override
@@ -134,9 +134,9 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
         Path newTranslationPath = Path.of(props.get(translationPathKey, translationPath.toString()));
         if (newTranslationPath != translationPath) {
-            sessionFilesPresent = false;
+            translationPath = newTranslationPath;
+            sessionFilesPresent = createSessionFiles();
         }
-        translationPath = newTranslationPath;
     }
 
     @Override

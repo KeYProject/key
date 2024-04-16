@@ -52,7 +52,7 @@ public class IsabelleProblem {
         ArrayList<Path> sessionRoots = new ArrayList<>();
         sessionRoots.add(settings.getTranslationPath());
         try {
-            Isabelle.Setup setup = JIsabelle.setupSetLogic("IsabelleTranslations",
+            Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
                     JIsabelle.setupSetSessionRoots(sessionRoots,
                             JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
                                     JIsabelle.setup(settings.getIsabellePath()))));
