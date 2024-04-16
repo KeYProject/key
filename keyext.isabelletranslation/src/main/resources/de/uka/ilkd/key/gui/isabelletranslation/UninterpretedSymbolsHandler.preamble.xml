@@ -234,6 +234,7 @@ lift_definition seqEmpty::"Seq" is "[]".
 lift_definition seqSingleton::"any\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;x. [x]".
 lift_definition seqConcat::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" is List.append.
 lift_definition seqReverse::"Seq\&lt;Rightarrow&gt;Seq" is List.rev.
+lift_definition seqPerm::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;bool" is List_Permutation.perm.
 
 fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
   "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
