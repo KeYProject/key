@@ -99,64 +99,68 @@ public class Main {
             VALID_SET.add(p);
             processFile(p, true, true, true);
         }
-        printStatisticsCSV();
+        saveStatisticsCSV();
     }
 
-    private static void printStatisticsCSV() {
-        // print to console
-        System.setOut(STDOUT);
-        System.setErr(STDERR);
+    private static void saveStatisticsCSV() {
+        StringBuilder sb = new StringBuilder();
 
-        System.out.print("input_file");
-        System.out.print(",");
-        System.out.print("KeY_state");
-        System.out.print(",");
-        System.out.print("KeY_time");
-        System.out.print(",");
-        System.out.print("KeY_proof_nodes");
-        System.out.print(",");
-        System.out.print("SMT_translation_lines");
-        System.out.print(",");
-        System.out.print("transl_+_Z3_time");
-        System.out.print(",");
-        System.out.print("Z3_proof_lines");
-        System.out.print(",");
-        System.out.print("replay_time");
-        System.out.print(",");
-        System.out.print("replay_automode_time");
-        System.out.print(",");
-        System.out.print("replayed_proof_nodes");
-        System.out.print(",");
-        System.out.print("replayed_proof_automode_nodes");
-        System.out.print(",");
-        System.out.print("replay_result");
-        System.out.println();
+        sb.append("input_file");
+        sb.append(",");
+        sb.append("KeY_state");
+        sb.append(",");
+        sb.append("KeY_time");
+        sb.append(",");
+        sb.append("KeY_proof_nodes");
+        sb.append(",");
+        sb.append("SMT_translation_lines");
+        sb.append(",");
+        sb.append("transl_+_Z3_time");
+        sb.append(",");
+        sb.append("Z3_proof_lines");
+        sb.append(",");
+        sb.append("replay_time");
+        sb.append(",");
+        sb.append("replay_automode_time");
+        sb.append(",");
+        sb.append("replayed_proof_nodes");
+        sb.append(",");
+        sb.append("replayed_proof_automode_nodes");
+        sb.append(",");
+        sb.append("replay_result");
+        sb.append(System.lineSeparator());
 
         for (StatEntry statEntry : STATS.values()) {
-            System.out.print(statEntry.p);
-            System.out.print(",");
-            System.out.print(statEntry.keyState);
-            System.out.print(",");
-            System.out.print(statEntry.keyTime);
-            System.out.print(",");
-            System.out.print(statEntry.keyNodes);
-            System.out.print(",");
-            System.out.print(statEntry.z3TranslationLines);
-            System.out.print(",");
-            System.out.print(statEntry.translationAndZ3Time);
-            System.out.print(",");
-            System.out.print(statEntry.z3ProofLines);
-            System.out.print(",");
-            System.out.print(statEntry.replayTime);
-            System.out.print(",");
-            System.out.print(statEntry.replayAutoModeTime);
-            System.out.print(",");
-            System.out.print(statEntry.replayNodes);
-            System.out.print(",");
-            System.out.print(statEntry.replayAutoModeNodes);
-            System.out.print(",");
-            System.out.print(statEntry.replayState);
-            System.out.println();
+            sb.append(statEntry.p);
+            sb.append(",");
+            sb.append(statEntry.keyState);
+            sb.append(",");
+            sb.append(statEntry.keyTime);
+            sb.append(",");
+            sb.append(statEntry.keyNodes);
+            sb.append(",");
+            sb.append(statEntry.z3TranslationLines);
+            sb.append(",");
+            sb.append(statEntry.translationAndZ3Time);
+            sb.append(",");
+            sb.append(statEntry.z3ProofLines);
+            sb.append(",");
+            sb.append(statEntry.replayTime);
+            sb.append(",");
+            sb.append(statEntry.replayAutoModeTime);
+            sb.append(",");
+            sb.append(statEntry.replayNodes);
+            sb.append(",");
+            sb.append(statEntry.replayAutoModeNodes);
+            sb.append(",");
+            sb.append(statEntry.replayState);
+            sb.append(System.lineSeparator());
+        }
+
+        try {
+            Files.write(Path.of(outDir + "/statistics.csv"), sb.toString().getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -173,9 +177,9 @@ public class Main {
             List<Path> dirs = new ArrayList<>();
             //dirs.add(exampleDir);
             dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/newBook/Using_KeY"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/smt"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/standard_key"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/firstTouch/"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/smt"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/standard_key"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/firstTouch/"));
 
             Files.createDirectories(VALID_LIST_PATH.getParent());
             if (!Files.exists(VALID_LIST_PATH)) {
