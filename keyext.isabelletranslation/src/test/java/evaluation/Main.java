@@ -9,7 +9,12 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -23,6 +28,11 @@ import java.util.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 public class Main {
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                    && it.getName().equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
+
     private static final Path VALID_LIST_PATH = Paths.get("/tmp/valid_list.txt");
 
     private static final Set<Path> VALID_SET = new HashSet<>();
@@ -36,7 +46,7 @@ public class Main {
 
     private static class StatEntry {
         final Path p;
-        ProofState keyState = ProofState.UNKOWN;
+        ProofState keyState = ProofState.UNKNOWN;
         long keyTime;
         int keyNodes;
         long z3TranslationLines;
@@ -46,7 +56,7 @@ public class Main {
         long replayAutoModeTime;
         int replayAutoModeNodes;
         int replayNodes;
-        ProofState replayState = ProofState.UNKOWN;
+        ProofState replayState = ProofState.UNKNOWN;
 
         StatEntry(Path p) {
             this.p = p;
@@ -54,7 +64,7 @@ public class Main {
     }
 
     private enum ProofState {
-        UNKOWN,
+        UNKNOWN,
         ERROR,
         OPEN,
         CLOSED
@@ -162,11 +172,10 @@ public class Main {
             loadValidSet();
             List<Path> dirs = new ArrayList<>();
             //dirs.add(exampleDir);
-            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/newBook/Using_KeY"));
-            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/smt"));
-            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/standard_key"));
-            //dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/firstTouch"));
-            dirs.add(Paths.get("/home/wolfram/Desktop/key/key/key.ui/examples/firstTouch/01-Agatha"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/newBook/Using_KeY"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/smt"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/standard_key"));
+            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeitkey/key/key.ui/examples/firstTouch/"));
 
             Files.createDirectories(VALID_LIST_PATH.getParent());
             if (!Files.exists(VALID_LIST_PATH)) {
@@ -285,8 +294,8 @@ public class Main {
         //SMTProblem problem = new SMTProblem(n.sequent(), proof.getServices());
         SMTProblem problem = new SMTProblem(proof.openGoals().head());
 
-        SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+        SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
         SolverLauncher launcher = new SolverLauncher(settings);
 
         launcher.addListener(new SolverLauncherListener() {
@@ -314,7 +323,7 @@ public class Main {
                     e.printStackTrace();
                 }
 
-                String z3Proof = z3.getSolverOutput();
+                String z3Proof = z3.getRawSolverOutput();
 
                 if (z3.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                     try {
@@ -323,10 +332,6 @@ public class Main {
                         Path outPath = getOutPath(input, "_proof.smt2");
                         updateZ3ProofLines(input, countLines(z3Proof));
                         Files.write(outPath, z3Proof.getBytes());
-
-                        if (tryReplay) {
-                            tryReplay(problem, input);
-                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
@@ -346,7 +351,7 @@ public class Main {
                 translationAndZ3Time = System.currentTimeMillis();
             }
         });
-        launcher.launch(problem, proof.getServices(), SolverType.Z3_NEW_TL_SOLVER);
+        launcher.launch(problem, proof.getServices(), Z3_SOLVER);
     }
 
     private static void appendValid(Path keyPath) {
@@ -372,91 +377,6 @@ public class Main {
                 + "_" + name;
         String newName = prefixedName + newExt;
         return outDir.resolve(newName);
-    }
-
-    private static void tryReplay(SMTProblem problem, Path inPath) {
-        try {
-            SMTReplayer replayer = new SMTReplayer(problem);
-
-            // prepare logging stdout to file
-            Path log = getOutPath(inPath, ".log");
-            Path proofPath = getOutPath(inPath, ".proof");
-
-            PrintStream printStream = new PrintStream(log.toFile());
-            System.setOut(printStream);
-            System.setErr(printStream);
-
-            long time = System.currentTimeMillis();
-            replayer.replay();
-            Proof proof = replayer.getProof();
-            long replayTime = System.currentTimeMillis() - time;
-            updateReplayTime(inPath, replayTime);
-            updateReplayNodes(inPath, proof.getStatistics().nodes);
-            long replayAutoModeTime = proof.getAutoModeTime();
-            updateReplayAutoModeTime(inPath, replayAutoModeTime);
-            updateReplayAutoModeNodes(inPath, proof.getStatistics().interactiveSteps);
-
-            if (proof.closed()) {
-                System.out.println("Proof is closed!");
-
-                ProofSaver saver = new ProofSaver(proof, proofPath.toFile());
-                saver.save();
-
-                updateReplayState(inPath, ProofState.CLOSED);
-            } else {
-                System.out.println("Proof is still open (" + proof.openGoals().size() + " goals)!");
-                updateReplayState(inPath, ProofState.OPEN);
-            }
-        } catch (Throwable e) {
-            // error in replay -> log to file
-            e.printStackTrace();
-            updateReplayState(inPath, ProofState.ERROR);
-        }
-    }
-
-    private static void updateReplayTime(Path p, long replayTime) {
-        StatEntry stats = STATS.get(p);
-        if (stats == null) {
-            stats = new StatEntry(p);
-        }
-        stats.replayTime = replayTime;
-        STATS.put(p, stats);
-    }
-
-    private static void updateReplayAutoModeTime(Path p, long replayAutoModeTime) {
-        StatEntry stats = STATS.get(p);
-        if (stats == null) {
-            stats = new StatEntry(p);
-        }
-        stats.replayAutoModeTime = replayAutoModeTime;
-        STATS.put(p, stats);
-    }
-
-    private static void updateReplayNodes(Path p, int replayNodes) {
-        StatEntry stats = STATS.get(p);
-        if (stats == null) {
-            stats = new StatEntry(p);
-        }
-        stats.replayNodes = replayNodes;
-        STATS.put(p, stats);
-    }
-
-    private static void updateReplayAutoModeNodes(Path p, int replayAutoModeNodes) {
-        StatEntry stats = STATS.get(p);
-        if (stats == null) {
-            stats = new StatEntry(p);
-        }
-        stats.replayAutoModeNodes = replayAutoModeNodes;
-        STATS.put(p, stats);
-    }
-
-    private static void updateReplayState(Path p, ProofState replayState) {
-        StatEntry stats = STATS.get(p);
-        if (stats == null) {
-            stats = new StatEntry(p);
-        }
-        stats.replayState = replayState;
-        STATS.put(p, stats);
     }
 
     private static void updateZ3Time(Path p, long z3Time) {
