@@ -10,12 +10,11 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class IsabelleTranslationSettings extends AbstractSettings {
     protected static final File SETTINGS_FILE_NEW =
@@ -30,6 +29,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     private static final Path DEFAULT_ISABELLE_PATH = Path.of(System.getProperty("user.home"), "Isabelle2023");
     private static final Path DEFAULT_TRANSLATION_PATH = Path.of(PathConfig.getKeyConfigDir(), "IsabelleTranslations");
 
+    private boolean sessionFilesPresent;
+
     private static Configuration getDefaultConfig() {
         Configuration config = new Configuration();
         config.set(isabellePathKey, DEFAULT_ISABELLE_PATH);
@@ -39,6 +40,12 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     private IsabelleTranslationSettings(Configuration load) {
         readSettings(load);
+        Path rootPath = Path.of(translationPath + "/ROOT");
+        Path documentPath = Path.of(translationPath + "/documents/root.tex");
+
+        if (!rootPath.toFile().exists() || !documentPath.toFile().exists()) {
+            sessionFilesPresent = false;
+        }
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
@@ -68,6 +75,27 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         return INSTANCE;
     }
 
+    protected void createSessionFiles() {
+        IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
+        Path sessionRootPath = Path.of(settings.getTranslationPath() + "/ROOT");
+        BufferedReader sessionReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("ROOT")));
+        String sessionRoot = sessionReader.lines().collect(Collectors.joining());
+
+        Path sessionDocumentPath = Path.of(settings.getTranslationPath() + "/document/root.tex");
+        BufferedReader sessionDocumentReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("document/root.tex")));
+        String sessionDocument = sessionDocumentReader.lines().collect(Collectors.joining());
+
+        try {
+            Files.write(sessionRootPath, sessionRoot.getBytes());
+            Files.write(sessionDocumentPath, sessionDocument.getBytes());
+            LOGGER.info("Created Isabelle session files at: {}", settings.getTranslationPath());
+            sessionFilesPresent = true;
+        } catch (IOException e) {
+            LOGGER.error("Failed to create ROOT file for Isabelle Translation");
+            sessionFilesPresent = false;
+        }
+    }
+
     public void save() {
         LOGGER.info("Save Isabelle settings to: " + SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
@@ -83,7 +111,11 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     @Override
     public void readSettings(Properties props) {
         isabellePath = Path.of(props.getProperty(isabellePathKey));
-        translationPath = Path.of(props.getProperty(translationPathKey));
+        Path newTranslationPath = Path.of(props.getProperty(translationPathKey));
+        if (newTranslationPath != translationPath) {
+            sessionFilesPresent = false;
+        }
+        translationPath = newTranslationPath;
     }
 
     @Override
@@ -94,12 +126,17 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     @Override
     public void readSettings(@NonNull Configuration props) {
-        if (INSTANCE == null) {
+        if (isabellePath == null || translationPath == null) {
             isabellePath = DEFAULT_ISABELLE_PATH;
             translationPath = DEFAULT_TRANSLATION_PATH;
         }
         isabellePath = Path.of(props.get(isabellePathKey, isabellePath.toString()));
-        translationPath = Path.of(props.get(translationPathKey, translationPath.toString()));
+
+        Path newTranslationPath = Path.of(props.get(translationPathKey, translationPath.toString()));
+        if (newTranslationPath != translationPath) {
+            sessionFilesPresent = false;
+        }
+        translationPath = newTranslationPath;
     }
 
     @Override
