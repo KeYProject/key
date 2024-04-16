@@ -1,4 +1,5 @@
 session KeYTranslations = HOL +
+  options [document=false]
   sessions "HOL-Combinatorics"
   theories
     TranslationPreamble
