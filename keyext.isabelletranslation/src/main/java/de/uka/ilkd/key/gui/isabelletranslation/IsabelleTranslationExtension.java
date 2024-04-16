@@ -8,6 +8,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
 @KeYGuiExtension.Info(name = "Translation", optional = true,
         experimental = true)
 public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings, KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationExtension.class);
 
     @Override
     public SettingsProvider getSettings() {
@@ -46,6 +50,6 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        IsabelleTranslationSettings.getInstance();
+        IsabelleTranslationSettings.getInstance().createSessionFiles();
     }
 }
