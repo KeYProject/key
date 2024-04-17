@@ -44,6 +44,8 @@ public class Main {
 
     private static Path outDir;
 
+    private static boolean skipProvable = false;
+
     private static class StatEntry {
         final Path p;
         ProofState keyState = ProofState.UNKNOWN;
@@ -75,6 +77,9 @@ public class Main {
         }
 
         if (args.length > 0 && args[0].equals("--create-provable-list")) {
+            if (args.length > 1) {
+                skipProvable = Boolean.parseBoolean(args[1]);
+            }
             updateZ3ProvableList();
         } else {
             run();
@@ -92,7 +97,7 @@ public class Main {
         for (String s : pathStrings) {
             Path p = Paths.get(s);
             VALID_SET.add(p);
-            processFile(p, true, true, true);
+            processFile(p, true, true, false);
         }
         saveStatisticsCSV();
     }
@@ -161,6 +166,8 @@ public class Main {
                 Files.createFile(VALID_LIST_PATH);
             }
 
+            StringBuilder sb = new StringBuilder();
+
             for (Path dir : dirs) {
                 Files.walkFileTree(dir, new FileVisitor<Path>() {
 
@@ -173,7 +180,12 @@ public class Main {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                         System.out.println("Visiting " + file.toString());
-                        processFile(file, false, true, false);
+                        if (file.toString().endsWith(".key")) {
+                            sb.append(System.lineSeparator()).append(file.toAbsolutePath());
+                        }
+                        if (!skipProvable) {
+                            processFile(file, false, true, false);
+                        }
                         return FileVisitResult.CONTINUE;
                     }
 
@@ -189,6 +201,7 @@ public class Main {
                         return FileVisitResult.CONTINUE;
                     }
                 });
+                Files.write(VALID_LIST_PATH, sb.toString().getBytes());
             }
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
@@ -259,11 +272,6 @@ public class Main {
         ProofApi papi = pm.getLoadedProof();
 
         if (papi == null || papi.getProof() == null || papi.getProof().closed() || papi.getFirstOpenGoal() == null) {
-            return;
-        }
-
-        // currently we do not support files with Java programs
-        if (pm.getProofContracts() == null || !pm.getProofContracts().isEmpty()) {
             return;
         }
 
