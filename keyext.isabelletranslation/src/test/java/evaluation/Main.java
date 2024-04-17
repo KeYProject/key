@@ -5,7 +5,9 @@ import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.SMTPreparationMacro;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -26,6 +28,7 @@ import java.io.PrintStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 
@@ -39,7 +42,7 @@ public class Main {
 
     private static final Set<Path> VALID_SET = new HashSet<>();
 
-    private static final Map<Path, StatEntry> STATS = new HashMap<>();
+    private static final Map<Path, Map<Goal, StatEntry>> STATS = new HashMap<>();
 
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
@@ -122,21 +125,23 @@ public class Main {
         sb.append("Z3_proof_lines");
         sb.append(System.lineSeparator());
 
-        for (StatEntry statEntry : STATS.values()) {
-            sb.append(statEntry.p);
-            sb.append(",");
-            sb.append(statEntry.keyState);
-            sb.append(",");
-            sb.append(statEntry.keyTime);
-            sb.append(",");
-            sb.append(statEntry.keyNodes);
-            sb.append(",");
-            sb.append(statEntry.z3TranslationLines);
-            sb.append(",");
-            sb.append(statEntry.translationAndZ3Time);
-            sb.append(",");
-            sb.append(statEntry.z3ProofLines);
-            sb.append(System.lineSeparator());
+        for (Map<Goal, StatEntry> entryMap : STATS.values()) {
+            entryMap.forEach((Goal goal, StatEntry entry) -> {
+                sb.append(entry.p).append(goal.node().name());
+                sb.append(",");
+                sb.append(entry.keyState);
+                sb.append(",");
+                sb.append(entry.keyTime);
+                sb.append(",");
+                sb.append(entry.keyNodes);
+                sb.append(",");
+                sb.append(entry.z3TranslationLines);
+                sb.append(",");
+                sb.append(entry.translationAndZ3Time);
+                sb.append(",");
+                sb.append(entry.z3ProofLines);
+                sb.append(System.lineSeparator());
+            });
         }
 
         try {
@@ -279,24 +284,41 @@ public class Main {
         proof.getSettings().getStrategySettings().setMaxSteps(1000000);
         proof.getSettings().getStrategySettings().setTimeout(300000);
 
-        long manualTime = System.currentTimeMillis();
-        uic.getProofControl().startAndWaitForAutoMode(proof);
-        manualTime = System.currentTimeMillis() - manualTime;
+        SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+        if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
+            try {
+                smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        if (proof.openGoals().isEmpty()) {
+            System.out.println("No open goals found after Preparation");
+            return;
+        }
+        ImmutableList<Goal> goals = proof.openGoals();
 
-        int nodes = proof.getStatistics().nodes;
-        updateKeYNodes(input, nodes);
+        for (Goal g : goals) {
+            long manualTime = System.currentTimeMillis();
+            uic.getProofControl().startAndWaitForAutoMode(proof, ImmutableList.of(g));
+            manualTime = System.currentTimeMillis() - manualTime;
 
-        long keyTime = proof.getStatistics().autoModeTimeInMillis;
-        System.out.println("   KeY statistics: " + keyTime);
-        System.out.println("   Manual logging: " + manualTime);
+            int nodes = proof.getStatistics().nodes;
+            updateKeYNodes(input, g, nodes);
 
-        updateKeYState(input, proof.closed() ? ProofState.CLOSED : ProofState.OPEN);
-        updateKeYTime(input, manualTime);
-        Path proofPath = getOutPath(input, "_key.proof");
-        ProofSaver saver = new ProofSaver(proof, proofPath.toFile());
-        saver.save();
+            long keyTime = proof.getStatistics().autoModeTimeInMillis;
+            System.out.println("   KeY statistics: " + keyTime);
+            System.out.println("   Manual logging: " + manualTime);
 
-        papi.getEnv().dispose();
+            updateKeYState(input, g, (proof.isOpenGoal(g.node())) ? ProofState.CLOSED : ProofState.OPEN);
+            updateKeYTime(input, g, manualTime);
+            Path proofPath = getOutPath(input, "_key.proof");
+            ProofSaver saver = new ProofSaver(proof, proofPath.toFile());
+            saver.save();
+
+            papi.getEnv().dispose();
+        }
     }
 
     private static void runZ3ToFile(Path input, boolean tryReplay)
@@ -312,10 +334,12 @@ public class Main {
         Node n = papi.getFirstOpenGoal().getProofNode();
         Proof proof = n.proof();
 
+        UserInterfaceControl uic = new DefaultUserInterfaceControl();
+
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
         if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
             try {
-                smtMacro.applyTo(null, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+                smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -326,15 +350,18 @@ public class Main {
             return;
         }
 
-        //SMTProblem problem = new SMTProblem(n.sequent(), proof.getServices());
-        SMTProblem problem = new SMTProblem(proof.openGoals().head());
-
         SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
         SolverLauncher launcher = new SolverLauncher(settings);
 
-        launcher.addListener(new SolverLauncherListener() {
+
+        class TimedListener implements SolverLauncherListener {
             long translationAndZ3Time = 0;
+            Goal goal;
+
+            public TimedListener(Goal g) {
+                goal = g;
+            }
 
             @Override
             public void launcherStopped(SolverLauncher launcher,
@@ -342,7 +369,10 @@ public class Main {
                 System.out.println("Z3 finished (" + finishedSolvers.size() + " solvers).");
 
                 translationAndZ3Time = System.currentTimeMillis() - translationAndZ3Time;
-                updateZ3Time(input, translationAndZ3Time);
+                for (SMTSolver solver : finishedSolvers) {
+                    SMTProblem solverProblem = solver.getProblem();
+                    updateZ3Time(input, goal, translationAndZ3Time);
+                }
 
                 // we exactly have that single solver
                 if (finishedSolvers.size() != 1) {
@@ -351,7 +381,7 @@ public class Main {
                 SMTSolver z3 = finishedSolvers.iterator().next();
 
                 String smtTranslation = z3.getTranslation();
-                updateZ3TranslationLines(input, countLines(smtTranslation));
+                updateZ3TranslationLines(input, goal, countLines(smtTranslation));
                 try {
                     Files.write(getOutPath(input, "_translation.smt2"), smtTranslation.getBytes());
                 } catch (IOException e) {
@@ -365,7 +395,7 @@ public class Main {
                         appendValid(input);
 
                         Path outPath = getOutPath(input, "_proof.smt2");
-                        updateZ3ProofLines(input, countLines(z3Proof));
+                        updateZ3ProofLines(input, goal, countLines(z3Proof));
                         Files.write(outPath, z3Proof.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -376,6 +406,7 @@ public class Main {
                     System.setOut(STDOUT);
                     System.setErr(STDERR);
                 }
+                launcher.removeListener(this);
             }
 
             @Override
@@ -385,11 +416,15 @@ public class Main {
                 System.out.println("Running Z3 ...");
                 translationAndZ3Time = System.currentTimeMillis();
             }
-        });
-        List<SMTProblem> problems = proof.openGoals().stream().map(SMTProblem::new).toList();
-        List<SolverType> solverTypes = problems.stream().map((SMTProblem smtProblem) -> Z3_SOLVER).toList();
+        }
 
-        launcher.launch(solverTypes, problems, proof.getServices());
+        Stream<SMTProblem> problems = proof.openGoals().stream().map(SMTProblem::new);
+        Services services = proof.getServices();
+
+        problems.forEach((SMTProblem problem) -> {
+            launcher.addListener(new TimedListener(problem.getGoal()));
+            launcher.launch(problem, services, Z3_SOLVER);
+        });
     }
 
     private static void appendValid(Path keyPath) {
@@ -417,58 +452,58 @@ public class Main {
         return outDir.resolve(newName);
     }
 
-    private static void updateZ3Time(Path p, long z3Time) {
-        StatEntry stats = STATS.get(p);
+    private static void updateZ3Time(Path p, Goal g, long z3Time) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.translationAndZ3Time = z3Time;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 
-    private static void updateZ3TranslationLines(Path p, long z3TranslationLines) {
-        StatEntry stats = STATS.get(p);
+    private static void updateZ3TranslationLines(Path p, Goal g, long z3TranslationLines) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.z3TranslationLines = z3TranslationLines;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 
-    private static void updateZ3ProofLines(Path p, long z3ProofLines) {
-        StatEntry stats = STATS.get(p);
+    private static void updateZ3ProofLines(Path p, Goal g, long z3ProofLines) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.z3ProofLines = z3ProofLines;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 
-    private static void updateKeYNodes(Path p, int keyNodes) {
-        StatEntry stats = STATS.get(p);
+    private static void updateKeYNodes(Path p, Goal g, int keyNodes) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.keyNodes = keyNodes;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 
 
-    private static void updateKeYTime(Path p, long keyTime) {
-        StatEntry stats = STATS.get(p);
+    private static void updateKeYTime(Path p, Goal g, long keyTime) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.keyTime = keyTime;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 
-    private static void updateKeYState(Path p, ProofState keyState) {
-        StatEntry stats = STATS.get(p);
+    private static void updateKeYState(Path p, Goal g, ProofState keyState) {
+        StatEntry stats = STATS.get(p).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
         stats.keyState = keyState;
-        STATS.put(p, stats);
+        STATS.get(p).put(g, stats);
     }
 }
