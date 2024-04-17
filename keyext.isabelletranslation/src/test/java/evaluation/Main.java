@@ -5,6 +5,7 @@ import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -157,7 +159,6 @@ public class Main {
             List<Path> dirs = new ArrayList<>();
             //dirs.add(exampleDir);
             dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/newBook/Using_KeY"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/smt"));
             dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/standard_key"));
             dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/firstTouch/"));
 
@@ -180,7 +181,7 @@ public class Main {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                         System.out.println("Visiting " + file.toString());
-                        if (file.toString().endsWith(".key")) {
+                        if (file.toString().endsWith(".key") && checkNonTrivialNoError(file)) {
                             sb.append(System.lineSeparator()).append(file.toAbsolutePath());
                         }
                         if (!skipProvable) {
@@ -212,6 +213,39 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    private static boolean checkNonTrivialNoError(Path file) {
+        ProofManagementApi pm = null;
+        try {
+            pm = KeYApi.loadFromKeyFile(file.toFile());
+        } catch (ProblemLoaderException e) {
+            return false;
+        }
+        ProofApi papi = pm.getLoadedProof();
+
+        if (papi == null || papi.getProof() == null || papi.getProof().closed() || papi.getFirstOpenGoal() == null) {
+            return false;
+        }
+
+        Node n = papi.getFirstOpenGoal().getProofNode();
+        Proof proof = n.proof();
+
+        SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+        if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
+            try {
+                smtMacro.applyTo(null, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        if (proof.openGoals().isEmpty()) {
+            System.out.println("No open goals found after Preparation");
+            return false;
+        }
+        return true;
+    }
+
 
     private static void processFile(Path input, boolean runKeY, boolean runZ3, boolean tryReplay) {
         if (input.toString().endsWith(".key")) {
@@ -278,6 +312,20 @@ public class Main {
         Node n = papi.getFirstOpenGoal().getProofNode();
         Proof proof = n.proof();
 
+        SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+        if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
+            try {
+                smtMacro.applyTo(null, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        if (proof.openGoals().isEmpty()) {
+            System.out.println("No open goals found after Preparation");
+            return;
+        }
+
         //SMTProblem problem = new SMTProblem(n.sequent(), proof.getServices());
         SMTProblem problem = new SMTProblem(proof.openGoals().head());
 
@@ -338,7 +386,10 @@ public class Main {
                 translationAndZ3Time = System.currentTimeMillis();
             }
         });
-        launcher.launch(problem, proof.getServices(), Z3_SOLVER);
+        List<SMTProblem> problems = proof.openGoals().stream().map(SMTProblem::new).toList();
+        List<SolverType> solverTypes = problems.stream().map((SMTProblem smtProblem) -> Z3_SOLVER).toList();
+
+        launcher.launch(solverTypes, problems, proof.getServices());
     }
 
     private static void appendValid(Path keyPath) {
