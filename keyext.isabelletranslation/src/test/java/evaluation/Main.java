@@ -1,5 +1,7 @@
 package evaluation;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
@@ -22,12 +24,18 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.Int;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -50,6 +58,8 @@ public class Main {
     private static Path outDir;
 
     private static boolean skipProvable = false;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static class StatEntry {
         final Path p;
@@ -112,6 +122,8 @@ public class Main {
 
         sb.append("input_file");
         sb.append(",");
+        sb.append("goalNodeName");
+        sb.append(",");
         sb.append("KeY_state");
         sb.append(",");
         sb.append("KeY_time");
@@ -127,7 +139,9 @@ public class Main {
 
         for (Map<Goal, StatEntry> entryMap : STATS.values()) {
             entryMap.forEach((Goal goal, StatEntry entry) -> {
-                sb.append(entry.p).append(goal.node().name());
+                sb.append(entry.p);
+                sb.append(",");
+                sb.append(goal.node().name());
                 sb.append(",");
                 sb.append(entry.keyState);
                 sb.append(",");
@@ -163,16 +177,12 @@ public class Main {
             loadValidSet();
             List<Path> dirs = new ArrayList<>();
             //dirs.add(exampleDir);
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/newBook/Using_KeY"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/standard_key"));
-            dirs.add(Paths.get("D:/Uni/Bachelor-Arbeit/key/key.ui/examples/firstTouch/"));
+            dirs.add(Paths.get("C:/Users/nilsb/Documents/Uni/Bachelor-Arbeit/key/key.ui/examples"));
 
             Files.createDirectories(VALID_LIST_PATH.getParent());
             if (!Files.exists(VALID_LIST_PATH)) {
                 Files.createFile(VALID_LIST_PATH);
             }
-
-            StringBuilder sb = new StringBuilder();
 
             for (Path dir : dirs) {
                 Files.walkFileTree(dir, new FileVisitor<Path>() {
@@ -186,8 +196,8 @@ public class Main {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                         System.out.println("Visiting " + file.toString());
-                        if (file.toString().endsWith(".key") && checkNonTrivialNoError(file)) {
-                            sb.append(System.lineSeparator()).append(file.toAbsolutePath());
+                        if (file.toString().endsWith(".key") && checkNonTrivialNoErrorQuickLoad(file)) {
+                            appendValid(file.toAbsolutePath());
                         }
                         if (!skipProvable) {
                             processFile(file, false, true, false);
@@ -207,7 +217,6 @@ public class Main {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-                Files.write(VALID_LIST_PATH, sb.toString().getBytes());
             }
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
@@ -219,14 +228,34 @@ public class Main {
         }
     }
 
-    private static boolean checkNonTrivialNoError(Path file) {
-        ProofManagementApi pm = null;
+    private static boolean checkNonTrivialNoErrorQuickLoad(Path file) {
+        AtomicReference<ProofManagementApi> pm = new AtomicReference<>();
+        AtomicBoolean success = new AtomicBoolean(false);
+        Runnable task = () -> {
+            try {
+                pm.set(KeYApi.loadFromKeyFile(file.toFile()));
+                success.set(true);
+            } catch (ProblemLoaderException e) {
+                success.set(false);
+            }
+        };
+        ExecutorService executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+
+        TimeLimiter tl = SimpleTimeLimiter.create(executorService);
         try {
-            pm = KeYApi.loadFromKeyFile(file.toFile());
-        } catch (ProblemLoaderException e) {
+            tl.runWithTimeout(task, 60000, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException | InterruptedException e) {
+            LOGGER.error("Load timeout {}", file);
             return false;
         }
-        ProofApi papi = pm.getLoadedProof();
+        if (!success.get()) {
+            LOGGER.error("Load failed {}", file);
+            return false;
+        }
+
+
+        LOGGER.info("Loaded {}", file);
+        ProofApi papi = pm.get().getLoadedProof();
 
         if (papi == null || papi.getProof() == null || papi.getProof().closed() || papi.getFirstOpenGoal() == null) {
             return false;
@@ -235,17 +264,37 @@ public class Main {
         Node n = papi.getFirstOpenGoal().getProofNode();
         Proof proof = n.proof();
 
-        SMTPreparationMacro smtMacro = new SMTPreparationMacro();
-        if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
-            try {
-                smtMacro.applyTo(null, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
+
+        Runnable prep = () -> {
+            SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+            if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
+                try {
+                    smtMacro.applyTo(null, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+                    LOGGER.info("Prep done {}", file);
+                    success.set(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    success.set(false);
+                }
+            } else {
+                LOGGER.error("Prep failed {}", file);
+                success.set(false);
             }
+        };
+
+        try {
+            tl.runWithTimeout(prep, 60, TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException e) {
+            LOGGER.error("Prep timeout {}", file);
+            return false;
         }
+        if (!success.get()) {
+            LOGGER.error("Prep failed {}", file);
+            return false;
+        }
+
         if (proof.openGoals().isEmpty()) {
-            System.out.println("No open goals found after Preparation");
+            LOGGER.error("No open goals found after Preparation {}", file);
             return false;
         }
         return true;
