@@ -142,7 +142,7 @@ public class IsabelleProblem {
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle));
         } catch (Exception exception) {
-            result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>("", emptyList)));
+            result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
         }
         isabelle.destroy();
 
