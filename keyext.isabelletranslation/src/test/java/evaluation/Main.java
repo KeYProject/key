@@ -51,7 +51,7 @@ public class Main {
 
     private static final Set<Path> VALID_SET = new HashSet<>();
 
-    private static final Map<Path, Map<Contract, Map<Goal, StatEntry>>> STATS = new HashMap<>();
+    private static final Map<Path, Map<String, Map<Goal, StatEntry>>> STATS = new HashMap<>();
 
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
@@ -104,7 +104,7 @@ public class Main {
     }
 
     private static void run() {
-        List<String> pathStrings = null;
+        List<String> pathStrings;
         try {
             pathStrings = Files.readAllLines(VALID_LIST_PATH);
         } catch (IOException e) {
@@ -115,6 +115,7 @@ public class Main {
             Path p = Paths.get(s);
             VALID_SET.add(p);
             processFile(p, true, true, false);
+            saveStatisticsCSV();
         }
         saveStatisticsCSV();
     }
@@ -143,31 +144,29 @@ public class Main {
         sb.append("Z3_State");
         sb.append(System.lineSeparator());
 
-        for (Map<Contract, Map<Goal, StatEntry>> contractMap : STATS.values()) {
-            contractMap.forEach((Contract c, Map<Goal, StatEntry> entryMap) -> {
-                entryMap.forEach((Goal goal, StatEntry entry) -> {
-                    sb.append(entry.p);
-                    sb.append(",");
-                    sb.append(c.getDisplayName());
-                    sb.append(",");
-                    sb.append(goal.getTime());
-                    sb.append(",");
-                    sb.append(entry.keyState);
-                    sb.append(",");
-                    sb.append(entry.keyTime);
-                    sb.append(",");
-                    sb.append(entry.keyNodes);
-                    sb.append(",");
-                    sb.append(entry.z3TranslationLines);
-                    sb.append(",");
-                    sb.append(entry.translationAndZ3Time);
-                    sb.append(",");
-                    sb.append(entry.z3ProofLines);
-                    sb.append(",");
-                    sb.append(entry.z3State);
-                    sb.append(System.lineSeparator());
-                });
-            });
+        for (Map<String, Map<Goal, StatEntry>> contractMap : STATS.values()) {
+            contractMap.forEach((String c, Map<Goal, StatEntry> entryMap) -> entryMap.forEach((Goal goal, StatEntry entry) -> {
+                sb.append(entry.p);
+                sb.append(",");
+                sb.append(c);
+                sb.append(",");
+                sb.append(goal.getTime());
+                sb.append(",");
+                sb.append(entry.keyState);
+                sb.append(",");
+                sb.append(entry.keyTime);
+                sb.append(",");
+                sb.append(entry.keyNodes);
+                sb.append(",");
+                sb.append(entry.z3TranslationLines);
+                sb.append(",");
+                sb.append(entry.translationAndZ3Time);
+                sb.append(",");
+                sb.append(entry.z3ProofLines);
+                sb.append(",");
+                sb.append(entry.z3State);
+                sb.append(System.lineSeparator());
+            }));
         }
 
         try {
@@ -197,7 +196,7 @@ public class Main {
             }
 
             for (Path dir : dirs) {
-                Files.walkFileTree(dir, new FileVisitor<Path>() {
+                Files.walkFileTree(dir, new FileVisitor<>() {
 
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
@@ -369,7 +368,7 @@ public class Main {
         if (input.toString().endsWith(".key")) {
             ProofApi papi = null;
             try {
-                System.out.println("Processing " + input.toString());
+                System.out.println("Processing " + input);
                 ProofManagementApi pm = KeYApi.loadFromKeyFile(input.toFile());
                 papi = pm.getLoadedProof();
 
@@ -410,12 +409,11 @@ public class Main {
                 STATS.put(input, new HashMap<>());
                 STATS.get(input).put(null, new HashMap<>());
 
-
-                if (runKeY) {
-                    runWithKeYAuto(input, null, goals);
-                }
                 if (runZ3) {
                     runZ3ToFile(input, null, goals, false);
+                }
+                if (runKeY) {
+                    runWithKeYAuto(input, null, goals);
                 }
                 papi.getEnv().dispose();
             } catch (ProblemLoaderException | IOException e) {
@@ -429,7 +427,8 @@ public class Main {
     }
 
     private static void processContract(ProofManagementApi pm, Contract contract, Path input, boolean runKeY, boolean runZ3) throws IOException, ProblemLoaderException {
-        System.out.println("Processing contract " + contract.getDisplayName() + " of " + input);
+        String contractName = (contract != null) ? contract.getDisplayName() : "";
+        System.out.println("Processing contract " + contractName + " of " + input);
 
         ProofApi papi = null;
         try {
@@ -468,7 +467,7 @@ public class Main {
 
 
         STATS.put(input, new HashMap<>());
-        STATS.get(input).put(contract, new HashMap<>());
+        STATS.get(input).put(contract.getDisplayName(), new HashMap<>());
 
 
         if (runZ3) {
@@ -483,6 +482,7 @@ public class Main {
     private static void runWithKeYAuto(Path input, Contract contract, ImmutableList<Goal> goals) throws ProblemLoaderException, IOException {
         Proof proof = goals.stream().findFirst().get().proof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
+        String contractName = (contract != null) ? contract.getDisplayName() : "";
 
         // this should initialize with the default properties,
         // necessary to enable quantifier instantiation
@@ -501,14 +501,14 @@ public class Main {
             manualTime = System.currentTimeMillis() - manualTime;
 
             int nodes = g.proof().getStatistics().nodes;
-            updateKeYNodes(input, contract, g, nodes);
+            updateKeYNodes(input, contractName, g, nodes);
 
             long keyTime = g.proof().getStatistics().autoModeTimeInMillis;
             System.out.println("   KeY statistics: " + keyTime);
             System.out.println("   Manual logging: " + manualTime);
 
-            updateKeYState(input, contract, g, !(g.proof().isOpenGoal(g.node())) ? ProofState.CLOSED : ProofState.OPEN);
-            updateKeYTime(input, contract, g, manualTime);
+            updateKeYState(input, contractName, g, !(g.proof().isOpenGoal(g.node())) ? ProofState.CLOSED : ProofState.OPEN);
+            updateKeYTime(input, contractName, g, manualTime);
             Path proofPath = getOutPath(input, goalTime + "_key.proof");
             ProofSaver saver = new ProofSaver(g.proof(), proofPath.toFile());
             saver.save();
@@ -522,6 +522,8 @@ public class Main {
 
         SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
+
+        String contractName = (contract != null) ? contract.getDisplayName() : "";
 
 
         class TimedListener implements SolverLauncherListener {
@@ -542,7 +544,7 @@ public class Main {
                 translationAndZ3Time = System.currentTimeMillis() - translationAndZ3Time;
                 for (SMTSolver solver : finishedSolvers) {
                     SMTProblem solverProblem = solver.getProblem();
-                    updateZ3Time(input, contract, goal, translationAndZ3Time);
+                    updateZ3Time(input, contractName, goal, translationAndZ3Time);
                 }
 
                 // we exactly have that single solver
@@ -552,7 +554,7 @@ public class Main {
                 SMTSolver z3 = finishedSolvers.iterator().next();
 
                 String smtTranslation = z3.getTranslation();
-                updateZ3TranslationLines(input, contract, goal, countLines(smtTranslation));
+                updateZ3TranslationLines(input, contractName, goal, countLines(smtTranslation));
                 try {
                     Files.write(getOutPath(input, goalNumber + "_translation.smt"), smtTranslation.getBytes());
                 } catch (IOException e) {
@@ -562,11 +564,11 @@ public class Main {
                 String z3Proof = z3.getRawSolverOutput();
 
 
-                updateZ3State(input, contract, goal, z3.getFinalResult().isValid());
+                updateZ3State(input, contractName, goal, z3.getFinalResult().isValid());
                 if (z3.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                     try {
                         Path outPath = getOutPath(input, goalNumber + "_proof.smt2");
-                        updateZ3ProofLines(input, contract, goal, countLines(z3Proof));
+                        updateZ3ProofLines(input, contract.getDisplayName(), goal, countLines(z3Proof));
                         Files.write(outPath, z3Proof.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -626,7 +628,7 @@ public class Main {
         return outDir.resolve(newName);
     }
 
-    private static void updateZ3Time(Path p, Contract c, Goal g, long z3Time) {
+    private static void updateZ3Time(Path p, String c, Goal g, long z3Time) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -636,7 +638,7 @@ public class Main {
     }
 
 
-    private static void updateZ3State(Path p, Contract c, Goal g, SMTSolverResult.ThreeValuedTruth valid) {
+    private static void updateZ3State(Path p, String c, Goal g, SMTSolverResult.ThreeValuedTruth valid) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -645,7 +647,7 @@ public class Main {
         STATS.get(p).get(c).put(g, stats);
     }
 
-    private static void updateZ3TranslationLines(Path p, Contract c, Goal g, long z3TranslationLines) {
+    private static void updateZ3TranslationLines(Path p, String c, Goal g, long z3TranslationLines) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -654,7 +656,7 @@ public class Main {
         STATS.get(p).get(c).put(g, stats);
     }
 
-    private static void updateZ3ProofLines(Path p, Contract c, Goal g, long z3ProofLines) {
+    private static void updateZ3ProofLines(Path p, String c, Goal g, long z3ProofLines) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -663,7 +665,7 @@ public class Main {
         STATS.get(p).get(c).put(g, stats);
     }
 
-    private static void updateKeYNodes(Path p, Contract c, Goal g, int keyNodes) {
+    private static void updateKeYNodes(Path p, String c, Goal g, int keyNodes) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -673,7 +675,7 @@ public class Main {
     }
 
 
-    private static void updateKeYTime(Path p, Contract c, Goal g, long keyTime) {
+    private static void updateKeYTime(Path p, String c, Goal g, long keyTime) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
@@ -682,7 +684,7 @@ public class Main {
         STATS.get(p).get(c).put(g, stats);
     }
 
-    private static void updateKeYState(Path p, Contract c, Goal g, ProofState keyState) {
+    private static void updateKeYState(Path p, String c, Goal g, ProofState keyState) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
