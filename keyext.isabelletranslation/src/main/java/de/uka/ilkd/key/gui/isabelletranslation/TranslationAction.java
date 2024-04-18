@@ -54,7 +54,7 @@ public class TranslationAction extends MainWindowAction {
             return;
         }
 
-        SledgehammerResult result = translation.sledgehammer();
+        SledgehammerResult result = translation.sledgehammer(30);
 
         //TODO needs its own action to enable undo, etc. and naming reworks
         if (result != null && result.isSuccessful()) {
