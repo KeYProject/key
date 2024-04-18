@@ -15,7 +15,7 @@ public class InfiniteUnionHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
-        supportedOperators.put(services.getTypeConverter().getLocSetLDT().getInfiniteUnion(), "SeqDef");
+        supportedOperators.put(services.getTypeConverter().getLocSetLDT().getInfiniteUnion(), "infiniteUnion");
     }
 
     @Override
@@ -26,9 +26,8 @@ public class InfiniteUnionHandler implements IsabelleHandler {
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
-        String arg1 = "(\\<lambda>" + LogicalVariableHandler.makeVarRef(trans, term.boundVars().get(0).name().toString(), term.boundVars().get(0).sort()) + ". " +
-                " to_any (" + trans.translate(term.sub(0)) + "))";
+        String arg1 = "{" + trans.translate(term.sub(0)) + "| " + LogicalVariableHandler.makeVarRef(trans, term.boundVars().get(0).name().toString(), term.boundVars().get(0).sort()) + ". True }";
 
-        return new StringBuilder("(\\<Union>").append(arg1).append(")");
+        return new StringBuilder("(").append(supportedOperators.get(op)).append(arg1).append(")");
     }
 }
