@@ -250,6 +250,9 @@ end
 fun instanceof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
   where "instanceof x type = typeof x type"
 
+consts
+  exactInstance::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
+
 axiomatization obj_length::"java_lang_Object\&lt;Rightarrow&gt;int" where length_nonneg[simp]:"obj_length obj \&lt;ge&gt; 0"
 
 fun unusedLocs where "unusedLocs (h::Heap) = Abs_LocSet {((obj::java_lang_Object), (f::Field)). (h obj created=False)\&lt;and&gt; obj\&lt;noteq&gt;null}"
