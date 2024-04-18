@@ -126,7 +126,7 @@ public class Main {
         for (String s : pathStrings) {
             Path p = Paths.get(s);
             VALID_SET.add(p);
-            processFile(p, true, true, false);
+            processFile(p, true, true, true);
             saveStatisticsCSV();
         }
         saveStatisticsCSV();
@@ -486,7 +486,7 @@ public class Main {
         STATS.get(input).put(proof.name().toString(), new HashMap<>());
 
         if (runIsabelle) {
-            runIsabelleToFile(input, "", goals);
+            runIsabelleToFile(input, proof.name().toString(), goals);
         }
         if (runZ3) {
             runZ3ToFile(input, proof.name().toString(), goals, false);
@@ -730,7 +730,7 @@ public class Main {
                 return;
             }
             problem.addListener(new TimedListener(goal, goal.getTime()));
-            problem.sledgehammer(60);
+            problem.sledgehammer(10);
             totalTime = System.currentTimeMillis() - totalTime;
             updateIsabelleTime(input, contractName, goal, totalTime);
         });
