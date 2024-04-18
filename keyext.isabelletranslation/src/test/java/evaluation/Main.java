@@ -679,6 +679,7 @@ public class Main {
             @Override
             public void parsingFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+                updateIsabelleProof(input, contractName, goal, e.getMessage());
             }
 
             @Override
@@ -695,6 +696,7 @@ public class Main {
             @Override
             public void buildingFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+                updateIsabelleProof(input, contractName, goal, e.getMessage());
             }
 
             @Override
@@ -716,6 +718,7 @@ public class Main {
                 if (problem.getResult().isSuccessful()) {
                     updateIsabelleState(input, contractName, goal, ProofState.CLOSED);
                     String isabelleProof = problem.getResult().getSuccessfulTactic();
+                    updateIsabelleProof(input, contractName, goal, isabelleProof);
                 }
             }
 
@@ -738,6 +741,7 @@ public class Main {
             @Override
             public void sledgehammerFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+                updateIsabelleProof(input, contractName, goal, e.getMessage());
             }
 
             @Override
@@ -762,6 +766,15 @@ public class Main {
             totalTime = System.currentTimeMillis() - totalTime;
             updateIsabelleTime(input, contractName, goal, totalTime);
         });
+    }
+
+    private static void updateIsabelleProof(Path input, String contractName, Goal goal, String isabelleProof) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleProofTactic = isabelleProof;
+        STATS.get(input).get(contractName).put(goal, stats);
     }
 
     private static void updateIsabelleTime(Path input, String contractName, Goal goal, long totalTime) {
