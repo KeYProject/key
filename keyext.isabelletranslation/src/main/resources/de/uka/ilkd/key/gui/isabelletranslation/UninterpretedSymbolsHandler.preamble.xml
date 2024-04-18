@@ -106,6 +106,7 @@ lift_definition allFields::"java_lang_Object\&lt;Rightarrow&gt;LocSet" is "\&lt;
 lift_definition allObjects::"Field\&lt;Rightarrow&gt;LocSet" is "\&lt;lambda&gt;x. (UNIV::java_lang_Object set) \&lt;times&gt; {x}".
 lift_definition arrayRange::"java_lang_Object\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;LocSet" is "\&lt;lambda&gt;obj x y. {obj} \&lt;times&gt; (image arr {x..y})".
 lift_definition subset::"LocSet\&lt;Rightarrow&gt;LocSet\&lt;Rightarrow&gt;bool" is Set.subset.
+lift_definition infiniteUnion::"LocSet set\&lt;Rightarrow&gt;LocSet" is Complete_Lattices.Union.
 
 consts
   LocSet_Image::"any set"
