@@ -166,12 +166,10 @@ public class IsabelleProblem {
             if (exception.getMessage().equals("timeout")) {
                 this.result = result;
                 notifyProcessTimeout();
-                return this.result;
             } else {
                 this.result = result;
                 notifySledgehammerError(exception);
                 notifyProcessError(exception);
-                return this.result;
             }
         } finally {
             isabelle.destroy();
