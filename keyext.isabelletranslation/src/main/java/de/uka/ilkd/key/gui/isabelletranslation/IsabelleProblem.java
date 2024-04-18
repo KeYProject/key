@@ -164,19 +164,24 @@ public class IsabelleProblem {
         } catch (Exception exception) {
             result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
             if (exception.getMessage().equals("timeout")) {
+                this.result = result;
                 notifyProcessTimeout();
+                return this.result;
             } else {
+                this.result = result;
                 notifySledgehammerError(exception);
                 notifyProcessError(exception);
+                return this.result;
             }
         } finally {
-            notifySledgehammerFinished();
-            notifyProcessFinished();
             isabelle.destroy();
         }
+        this.result = result;
+        notifySledgehammerFinished();
+        notifyProcessFinished();
 
         LOGGER.info("Sledgehammer result: " + result);
-        return this.result = result;
+        return this.result;
     }
 
     private Theory beginTheory(String thyText, Path source, Isabelle isabelle) {
