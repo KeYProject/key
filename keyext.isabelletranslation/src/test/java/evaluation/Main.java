@@ -7,6 +7,10 @@ import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.gui.isabelletranslation.IllegalFormulaException;
+import de.uka.ilkd.key.gui.isabelletranslation.IsabelleProblem;
+import de.uka.ilkd.key.gui.isabelletranslation.IsabelleSolverListener;
+import de.uka.ilkd.key.gui.isabelletranslation.IsabelleTranslator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -72,6 +76,13 @@ public class Main {
         long translationAndZ3Time;
         long z3ProofLines;
         SMTSolverResult.ThreeValuedTruth z3State;
+        long isabelleBuildTime;
+        long isabelleParseTime;
+        long isabelleSledgehammerTime;
+        long isabelleTotalTime;
+        long isabelleTranslationLines;
+        String isabelleProofTactic;
+        ProofState isabelleState = ProofState.UNKNOWN;
 
         StatEntry(Path p) {
             this.p = p;
@@ -366,7 +377,7 @@ public class Main {
     }
 
 
-    private static void processFile(Path input, boolean runKeY, boolean runZ3, boolean tryReplay) {
+    private static void processFile(Path input, boolean runKeY, boolean runZ3, boolean runIsabelle) {
         if (input.toString().endsWith(".key")) {
             ProofApi papi = null;
             try {
@@ -376,7 +387,7 @@ public class Main {
 
                 if (papi.getProof() == null) {
                     for (Contract contract : pm.getProofContracts()) {
-                        processContract(pm, contract, input, runKeY, runZ3);
+                        processContract(pm, contract, input, runKeY, runZ3, runIsabelle);
                     }
                     return;
                 }
@@ -411,6 +422,9 @@ public class Main {
                 STATS.put(input, new HashMap<>());
                 STATS.get(input).put("", new HashMap<>());
 
+                if (runIsabelle) {
+                    runIsabelleToFile(input, "", goals);
+                }
                 if (runZ3) {
                     runZ3ToFile(input, "", goals, false);
                 }
@@ -428,7 +442,7 @@ public class Main {
         }
     }
 
-    private static void processContract(ProofManagementApi pm, Contract contract, Path input, boolean runKeY, boolean runZ3) throws IOException, ProblemLoaderException {
+    private static void processContract(ProofManagementApi pm, Contract contract, Path input, boolean runKeY, boolean runZ3, boolean runIsabelle) throws IOException, ProblemLoaderException {
         ProofApi papi = null;
         try {
             papi = pm.startProof(contract);
@@ -471,7 +485,9 @@ public class Main {
         STATS.put(input, new HashMap<>());
         STATS.get(input).put(proof.name().toString(), new HashMap<>());
 
-
+        if (runIsabelle) {
+            runIsabelleToFile(input, "", goals);
+        }
         if (runZ3) {
             runZ3ToFile(input, proof.name().toString(), goals, false);
         }
@@ -598,6 +614,180 @@ public class Main {
             launcher.addListener(new TimedListener(problem.getGoal(), problem.getGoal().getTime()));
             launcher.launch(problem, services, Z3_SOLVER);
         });
+    }
+
+    private static void runIsabelleToFile(Path input, String contractName, ImmutableList<Goal> goals)
+            throws ProblemLoaderException, IOException {
+
+        Proof proof = goals.stream().findFirst().get().proof();
+
+        SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
+
+
+        class TimedListener implements IsabelleSolverListener {
+            long sledgehammerTime = 0L;
+            long parsingTime = 0L;
+            long buildingTime = 0L;
+            Goal goal;
+            long goalNumber;
+
+            public TimedListener(Goal g, long goalNumber) {
+                goal = g;
+                this.goalNumber = goalNumber;
+            }
+
+            @Override
+            public void parsingStarted(IsabelleProblem problem) {
+                parsingTime = System.currentTimeMillis();
+            }
+
+            @Override
+            public void parsingFinished(IsabelleProblem problem) {
+                parsingTime = System.currentTimeMillis() - parsingTime;
+                updateIsabelleParseTime(input, contractName, goal, parsingTime);
+            }
+
+            @Override
+            public void parsingFailed(IsabelleProblem problem, Exception e) {
+                updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+            }
+
+            @Override
+            public void buildingStarted(IsabelleProblem problem) {
+                buildingTime = System.currentTimeMillis();
+            }
+
+            @Override
+            public void buildingFinished(IsabelleProblem problem) {
+                buildingTime = System.currentTimeMillis() - buildingTime;
+                updateIsabelleBuildTime(input, contractName, goal, buildingTime);
+            }
+
+            @Override
+            public void buildingFailed(IsabelleProblem problem, Exception e) {
+                updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+            }
+
+            @Override
+            public void processStarted(IsabelleProblem problem) {
+                System.out.println("Starting Isabelle...");
+            }
+
+            @Override
+            public void processStopped(IsabelleProblem problem) {
+                String isabelleTranslation = problem.getSequentTranslation();
+                updateIsabelleTranslationLines(input, contractName, goal, countLines(isabelleTranslation + problem.getPreamble()));
+                try {
+                    Files.write(getOutPath(input, goalNumber + "_translation.thy"), isabelleTranslation.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                if (problem.getResult().isSuccessful()) {
+                    updateIsabelleState(input, contractName, goal, ProofState.CLOSED);
+                    String isabelleProof = problem.getResult().getSuccessfulTactic();
+                }
+            }
+
+            @Override
+            public void processTimeout(IsabelleProblem problem) {
+                updateIsabelleState(input, contractName, goal, ProofState.OPEN);
+            }
+
+            @Override
+            public void sledgehammerStarted(IsabelleProblem problem) {
+                sledgehammerTime = System.currentTimeMillis();
+            }
+
+            @Override
+            public void sledgehammerFinished(IsabelleProblem problem) {
+                sledgehammerTime = System.currentTimeMillis() - sledgehammerTime;
+                updateIsabelleSledgehammerTime(input, contractName, goal, sledgehammerTime);
+            }
+
+            @Override
+            public void sledgehammerFailed(IsabelleProblem problem, Exception e) {
+                updateIsabelleState(input, contractName, goal, ProofState.ERROR);
+            }
+
+            @Override
+            public void processInterrupted(IsabelleProblem problem, Exception e) {
+
+            }
+        }
+        Services services = proof.getServices();
+        IsabelleTranslator translator = new IsabelleTranslator(services);
+
+        goals.forEach((Goal goal) -> {
+            long totalTime = System.currentTimeMillis();
+            IsabelleProblem problem;
+            try {
+                problem = translator.translateProblem(goal);
+            } catch (IllegalFormulaException e) {
+                LOGGER.error("Translation failed: {}", e.getMessage());
+                return;
+            }
+            problem.addListener(new TimedListener(goal, goal.getTime()));
+            problem.sledgehammer(60);
+            totalTime = System.currentTimeMillis() - totalTime;
+            updateIsabelleTime(input, contractName, goal, totalTime);
+        });
+    }
+
+    private static void updateIsabelleTime(Path input, String contractName, Goal goal, long totalTime) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleTotalTime = totalTime;
+        STATS.get(input).get(contractName).put(goal, stats);
+    }
+
+    private static void updateIsabelleState(Path input, String contractName, Goal goal, ProofState state) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleState = state;
+        STATS.get(input).get(contractName).put(goal, stats);
+    }
+
+    private static void updateIsabelleSledgehammerTime(Path input, String contractName, Goal goal, long sledgehammerTime) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleSledgehammerTime = sledgehammerTime;
+        STATS.get(input).get(contractName).put(goal, stats);
+    }
+
+    private static void updateIsabelleBuildTime(Path input, String contractName, Goal goal, long buildTime) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleBuildTime = buildTime;
+        STATS.get(input).get(contractName).put(goal, stats);
+    }
+
+    private static void updateIsabelleParseTime(Path input, String contractName, Goal goal, long parseTime) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleParseTime = parseTime;
+        STATS.get(input).get(contractName).put(goal, stats);
+    }
+
+    private static void updateIsabelleTranslationLines(Path input, String contractName, Goal goal, long lineCount) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.isabelleTranslationLines = lineCount;
+        STATS.get(input).get(contractName).put(goal, stats);
     }
 
     private static void appendValid(Path keyPath) {

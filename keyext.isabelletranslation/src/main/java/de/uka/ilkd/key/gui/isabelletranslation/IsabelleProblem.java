@@ -269,7 +269,11 @@ public class IsabelleProblem {
 
     private void notifySledgehammerError(Exception e) {
         for (IsabelleSolverListener listener : listeners) {
-            listener.sledgeHammerFailed(this, e);
+            listener.sledgehammerFailed(this, e);
         }
+    }
+
+    public void removeListener(IsabelleSolverListener listener) {
+        listeners.remove(listener);
     }
 }

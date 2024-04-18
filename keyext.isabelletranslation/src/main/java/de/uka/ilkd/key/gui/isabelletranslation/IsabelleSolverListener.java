@@ -25,5 +25,5 @@ public interface IsabelleSolverListener {
 
     void sledgehammerFinished(IsabelleProblem problem);
 
-    void sledgeHammerFailed(IsabelleProblem problem, Exception e);
+    void sledgehammerFailed(IsabelleProblem problem, Exception e);
 }
