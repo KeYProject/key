@@ -11,11 +11,16 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import scala.collection.immutable.List;
 import scala.collection.mutable.Builder;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class IsabelleProblem {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProblem.class);
@@ -133,8 +138,10 @@ public class IsabelleProblem {
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
-                                                [("timeout","30"),("verbose","true")];
-                                             val results =\s"""
+                                                [("timeout",
+                                """ + timeout_seconds + """
+                                ),(verbose","true"),("falsify","false")];
+                                val results =\s"""
                                 + sledgehammer + """
                                 .run_sledgehammer params\s""" + Sledgehammer_Prover + """
                                 .Normal NONE 1 override p_state;
@@ -157,25 +164,27 @@ public class IsabelleProblem {
         LOGGER.info("Sledgehammering...");
         notifySledgehammerStarted();
         try {
-            result = new SledgehammerResult(normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+            Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
-                    .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle));
-        } catch (Exception exception) {
+                    .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
+            result = new SledgehammerResult(Await.result(resultFuture, Duration.create(timeout_seconds + 10, TimeUnit.SECONDS)));
+        } catch (TimeoutException exception) {
             result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
-            if (exception.getMessage().equals("timeout")) {
-                this.result = result;
-                notifyProcessTimeout();
-            } else {
-                this.result = result;
-                notifySledgehammerError(exception);
-                notifyProcessError(exception);
-            }
+            this.result = result;
+            notifyProcessTimeout();
+        } catch (InterruptedException exception) {
+            result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
+            this.result = result;
+            notifySledgehammerError(exception);
+            notifyProcessError(exception);
         } finally {
             isabelle.destroy();
         }
         this.result = result;
+
         notifySledgehammerFinished();
+
         notifyProcessFinished();
 
         LOGGER.info("Sledgehammer result: " + result);
