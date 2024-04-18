@@ -14,6 +14,8 @@ import scala.collection.mutable.Builder;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class IsabelleProblem {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProblem.class);
@@ -21,11 +23,16 @@ public class IsabelleProblem {
     private SledgehammerResult result = null;
     private final String preamble;
     private final String sequentTranslation;
+    private Collection<IsabelleSolverListener> listeners = new HashSet<>();
 
     public IsabelleProblem(Goal goal, String preamble, String sequentTranslation) {
         this.goal = goal;
         this.preamble = preamble;
         this.sequentTranslation = sequentTranslation;
+    }
+
+    public void addListener(IsabelleSolverListener listener) {
+        listeners.add(listener);
     }
 
     public Goal getGoal() {
@@ -44,13 +51,15 @@ public class IsabelleProblem {
         return result;
     }
 
-    public SledgehammerResult sledgehammer() {
+    public SledgehammerResult sledgehammer(int timeout_seconds) {
         LOGGER.info("Starting Isabelle...");
+        notifyProcessStarted();
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
 
         Isabelle isabelle;
         ArrayList<Path> sessionRoots = new ArrayList<>();
         sessionRoots.add(settings.getTranslationPath());
+        notifyBuildingStarted();
         try {
             Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
                     JIsabelle.setupSetSessionRoots(sessionRoots,
@@ -59,6 +68,8 @@ public class IsabelleProblem {
             isabelle = new Isabelle(setup);
         } catch (Exception e) {
             LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
+            notifyBuildingError(e);
+            notifyProcessError(e);
             return null;
         }
 
@@ -66,6 +77,7 @@ public class IsabelleProblem {
 
         Theory thy0 = beginTheory(getSequentTranslation(), Path.of((settings.getTranslationPath() + "\\Translation.thy")), isabelle);
         ToplevelState toplevel = ToplevelState.apply(isabelle);
+        notifyBuildingFinished();
 
         MLFunction2<Theory, String, List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
                         fn (thy, text) => let
@@ -84,18 +96,25 @@ public class IsabelleProblem {
 
 
         LOGGER.info("Parsing theory...");
-        java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
-        parse_text.apply(thy0, getSequentTranslation(), isabelle,
-                        Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
-                .retrieveNow(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle)
-                .foreach(transitionsAndTexts::add);
+        notifyParsingStarted();
+        try {
+            java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
+            parse_text.apply(thy0, getSequentTranslation(), isabelle,
+                            Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
+                    .retrieveNow(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle)
+                    .foreach(transitionsAndTexts::add);
 
-        for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
-            //println(s"""Transition: "${text.strip}"""")
-            toplevel = command_exception.apply(Boolean.TRUE, transitionAndText._1(), toplevel, isabelle,
-                            de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
-                    .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
+            for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
+                //println(s"""Transition: "${text.strip}"""")
+                toplevel = command_exception.apply(Boolean.TRUE, transitionAndText._1(), toplevel, isabelle,
+                                de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
+                        .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
+            }
+        } catch (Exception e) {
+            notifyParsingError(e);
+            return null;
         }
+        notifyParsingFinished();
         LOGGER.info("Finished Parsing");
 
         String sledgehammer = thy0.importMLStructureNow("Sledgehammer", isabelle);
@@ -125,8 +144,8 @@ public class IsabelleProblem {
                                 .short_string_of_sledgehammer_outcome outcome, [YXML.content_of step]))
                                            end;
                                     in
-                                      Timeout.apply (Time.fromSeconds 35) go_run (state, thy) end
-                                """, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+                                      Timeout.apply (Time.fromSeconds\s
+                                """ + timeout_seconds + ") go_run (state, thy) end", isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                         new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                         new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                         (new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())))));
@@ -136,6 +155,7 @@ public class IsabelleProblem {
 
         SledgehammerResult result;
         LOGGER.info("Sledgehammering...");
+        notifySledgehammerStarted();
         try {
             result = new SledgehammerResult(normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
@@ -143,8 +163,17 @@ public class IsabelleProblem {
                     .retrieveNow(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle));
         } catch (Exception exception) {
             result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
+            if (exception.getMessage().equals("timeout")) {
+                notifyProcessTimeout();
+            } else {
+                notifySledgehammerError(exception);
+                notifyProcessError(exception);
+            }
+        } finally {
+            notifySledgehammerFinished();
+            notifyProcessFinished();
+            isabelle.destroy();
         }
-        isabelle.destroy();
 
         LOGGER.info("Sledgehammer result: " + result);
         return this.result = result;
@@ -163,5 +192,84 @@ public class IsabelleProblem {
         return begin_theory.apply(topDir, header, header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
                         Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()))
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
+    }
+
+
+    private void notifyParsingStarted() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.parsingStarted(this);
+        }
+    }
+
+    private void notifyParsingFinished() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.parsingFinished(this);
+        }
+    }
+
+    private void notifyParsingError(Exception e) {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.parsingFailed(this, e);
+        }
+    }
+
+    private void notifyBuildingStarted() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.buildingStarted(this);
+        }
+    }
+
+    private void notifyBuildingFinished() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.buildingFinished(this);
+        }
+    }
+
+    private void notifyBuildingError(Exception e) {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.buildingFailed(this, e);
+        }
+    }
+
+    private void notifyProcessStarted() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.processStarted(this);
+        }
+    }
+
+    private void notifyProcessFinished() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.processStopped(this);
+        }
+    }
+
+    private void notifyProcessError(Exception e) {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.processInterrupted(this, e);
+        }
+    }
+
+    private void notifyProcessTimeout() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.processTimeout(this);
+        }
+    }
+
+    private void notifySledgehammerStarted() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.sledgehammerStarted(this);
+        }
+    }
+
+    private void notifySledgehammerFinished() {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.sledgehammerFinished(this);
+        }
+    }
+
+    private void notifySledgehammerError(Exception e) {
+        for (IsabelleSolverListener listener : listeners) {
+            listener.sledgeHammerFailed(this, e);
+        }
     }
 }
