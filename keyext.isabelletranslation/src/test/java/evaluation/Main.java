@@ -154,6 +154,20 @@ public class Main {
         sb.append("Z3_proof_lines");
         sb.append(",");
         sb.append("Z3_State");
+        sb.append(",");
+        sb.append("Isabelle_build_time");
+        sb.append(",");
+        sb.append("Isabelle_parse_time");
+        sb.append(",");
+        sb.append("Isabelle_sledgehammer_time");
+        sb.append(",");
+        sb.append("Isabelle_total_time");
+        sb.append(",");
+        sb.append("Isabelle_translation_lines");
+        sb.append(",");
+        sb.append("Isabelle_proof");
+        sb.append(",");
+        sb.append("Isabelle_state");
         sb.append(System.lineSeparator());
 
         for (Map<String, Map<Goal, StatEntry>> contractMap : STATS.values()) {
@@ -177,6 +191,20 @@ public class Main {
                 sb.append(entry.z3ProofLines);
                 sb.append(",");
                 sb.append(entry.z3State);
+                sb.append(",");
+                sb.append(entry.isabelleBuildTime);
+                sb.append(",");
+                sb.append(entry.isabelleParseTime);
+                sb.append(",");
+                sb.append(entry.isabelleSledgehammerTime);
+                sb.append(",");
+                sb.append(entry.isabelleTotalTime);
+                sb.append(",");
+                sb.append(entry.isabelleTranslationLines);
+                sb.append(",");
+                sb.append(entry.isabelleProofTactic);
+                sb.append(",");
+                sb.append(entry.isabelleState);
                 sb.append(System.lineSeparator());
             }));
         }
