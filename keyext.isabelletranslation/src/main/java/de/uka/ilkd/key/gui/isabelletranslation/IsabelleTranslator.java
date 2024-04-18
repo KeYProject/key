@@ -40,7 +40,7 @@ public class IsabelleTranslator {
             for (Throwable t : exceptions) {
                 message.append(t.getMessage()).append(System.lineSeparator());
             }
-            throw new RuntimeException(message.toString());
+            throw new IllegalFormulaException(message.toString());
         }
 
         StringBuilder translationPreamble = new StringBuilder();
