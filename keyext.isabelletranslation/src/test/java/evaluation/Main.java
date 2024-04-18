@@ -12,6 +12,7 @@ import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -148,7 +149,7 @@ public class Main {
             contractMap.forEach((String c, Map<Goal, StatEntry> entryMap) -> entryMap.forEach((Goal goal, StatEntry entry) -> {
                 sb.append(entry.p);
                 sb.append(",");
-                sb.append(c);
+                sb.append(c.replace(",", "_"));
                 sb.append(",");
                 sb.append(goal.getTime());
                 sb.append(",");
@@ -171,6 +172,7 @@ public class Main {
 
         try {
             Files.write(Path.of(outDir + "/statistics.csv"), sb.toString().getBytes());
+            LOGGER.info("Statistics CSV written to {}", outDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -407,13 +409,13 @@ public class Main {
 
 
                 STATS.put(input, new HashMap<>());
-                STATS.get(input).put(null, new HashMap<>());
+                STATS.get(input).put("", new HashMap<>());
 
                 if (runZ3) {
-                    runZ3ToFile(input, null, goals, false);
+                    runZ3ToFile(input, "", goals, false);
                 }
                 if (runKeY) {
-                    runWithKeYAuto(input, null, goals);
+                    runWithKeYAuto(input, "", goals);
                 }
                 papi.getEnv().dispose();
             } catch (ProblemLoaderException | IOException e) {
@@ -427,9 +429,6 @@ public class Main {
     }
 
     private static void processContract(ProofManagementApi pm, Contract contract, Path input, boolean runKeY, boolean runZ3) throws IOException, ProblemLoaderException {
-        String contractName = (contract != null) ? contract.getDisplayName() : "";
-        System.out.println("Processing contract " + contractName + " of " + input);
-
         ProofApi papi = null;
         try {
             papi = pm.startProof(contract);
@@ -441,6 +440,9 @@ public class Main {
 
         Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
+
+        String contractName = proof.name().toString();
+        System.out.println("Processing contract " + contractName + " of " + input);
 
         // this should initialize with the default properties,
         // necessary to enable quantifier instantiation
@@ -467,22 +469,21 @@ public class Main {
 
 
         STATS.put(input, new HashMap<>());
-        STATS.get(input).put(contract.getDisplayName(), new HashMap<>());
+        STATS.get(input).put(proof.name().toString(), new HashMap<>());
 
 
         if (runZ3) {
-            runZ3ToFile(input, contract, goals, false);
+            runZ3ToFile(input, proof.name().toString(), goals, false);
         }
         if (runKeY) {
-            runWithKeYAuto(input, contract, goals);
+            runWithKeYAuto(input, proof.name().toString(), goals);
         }
         papi.getEnv().dispose();
     }
 
-    private static void runWithKeYAuto(Path input, Contract contract, ImmutableList<Goal> goals) throws ProblemLoaderException, IOException {
+    private static void runWithKeYAuto(Path input, String contractName, ImmutableList<Goal> goals) throws ProblemLoaderException, IOException {
         Proof proof = goals.stream().findFirst().get().proof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
-        String contractName = (contract != null) ? contract.getDisplayName() : "";
 
         // this should initialize with the default properties,
         // necessary to enable quantifier instantiation
@@ -493,6 +494,7 @@ public class Main {
         proof.getSettings().getStrategySettings().setTimeout(1000);
 
         for (Goal g : goals) {
+            int nodes = -g.proof().getStatistics().nodes;
             long goalTime = g.getTime();
 
             long manualTime = System.currentTimeMillis();
@@ -500,10 +502,12 @@ public class Main {
             uic.getProofControl().waitWhileAutoMode();
             manualTime = System.currentTimeMillis() - manualTime;
 
-            int nodes = g.proof().getStatistics().nodes;
+            Statistics statistics = g.proof().getStatistics();
+
+            nodes += statistics.nodes;
             updateKeYNodes(input, contractName, g, nodes);
 
-            long keyTime = g.proof().getStatistics().autoModeTimeInMillis;
+            long keyTime = statistics.autoModeTimeInMillis;
             System.out.println("   KeY statistics: " + keyTime);
             System.out.println("   Manual logging: " + manualTime);
 
@@ -515,15 +519,13 @@ public class Main {
         }
     }
 
-    private static void runZ3ToFile(Path input, Contract contract, ImmutableList<Goal> goals, boolean tryReplay)
+    private static void runZ3ToFile(Path input, String contractName, ImmutableList<Goal> goals, boolean tryReplay)
             throws ProblemLoaderException, IOException {
 
         Proof proof = goals.stream().findFirst().get().proof();
 
         SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
-
-        String contractName = (contract != null) ? contract.getDisplayName() : "";
 
 
         class TimedListener implements SolverLauncherListener {
@@ -568,7 +570,7 @@ public class Main {
                 if (z3.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                     try {
                         Path outPath = getOutPath(input, goalNumber + "_proof.smt2");
-                        updateZ3ProofLines(input, contract.getDisplayName(), goal, countLines(z3Proof));
+                        updateZ3ProofLines(input, contractName, goal, countLines(z3Proof));
                         Files.write(outPath, z3Proof.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
