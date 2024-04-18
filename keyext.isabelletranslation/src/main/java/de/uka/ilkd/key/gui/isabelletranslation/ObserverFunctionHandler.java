@@ -30,7 +30,8 @@ public class ObserverFunctionHandler implements IsabelleHandler {
             Matcher m = Pattern.compile("<(.*?)>").matcher(op.name().toString());
             String functionName;
             if (m.find()) {
-                functionName = m.group(1);
+                functionName = op.name().toString().replace("<" + m.group(1) + ">", "_" + m.group(1))
+                        .replace("::", "_").replace("$", "").replace(".", "_");
             } else {
                 functionName = op.name().toString().replace("::", "_");
                 functionName = functionName.replace("$", "");
