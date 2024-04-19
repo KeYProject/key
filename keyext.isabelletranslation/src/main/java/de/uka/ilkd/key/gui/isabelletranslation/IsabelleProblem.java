@@ -173,7 +173,7 @@ public class IsabelleProblem {
         Builder<String, List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
         scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
-        SledgehammerResult result;
+        SledgehammerResult result = null;
         SledgehammerResult tryResult = null;
         LOGGER.info("Trying...");
         notifySledgehammerStarted();
