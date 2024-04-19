@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -49,7 +50,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
 public class Main {
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                    && it.getName().equals("Z3 (Legacy Translation)"))
+                    && it.getName().equals("Z3"))
             .findFirst().orElse(null);
 
     private static final Path VALID_LIST_PATH = Paths.get("/tmp/valid_list.txt");
@@ -61,11 +62,15 @@ public class Main {
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
 
+    private static final long timeoutSeconds = 60;
+
     private static Path outDir;
 
     private static boolean skipProvable = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+    private static final Collection<Path> flaggedTranslations = new HashSet<>();
 
     private static class StatEntry {
         final Path p;
@@ -75,7 +80,8 @@ public class Main {
         long z3TranslationLines;
         long translationAndZ3Time;
         long z3ProofLines;
-        SMTSolverResult.ThreeValuedTruth z3State;
+        ProofState z3State;
+        String z3ErrorMessage;
         long isabelleBuildTime;
         long isabelleParseTime;
         long isabelleSledgehammerTime;
@@ -127,9 +133,99 @@ public class Main {
             Path p = Paths.get(s);
             VALID_SET.add(p);
             processFile(p, true, true, true);
-            saveStatisticsCSV();
+            saveStatisticsCSVFile(p);
+            saveFlaggedTranslations();
         }
         saveStatisticsCSV();
+    }
+
+    private static void saveStatisticsCSVFile(Path input) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("input_file");
+        sb.append(",");
+        sb.append("contractName");
+        sb.append(",");
+        sb.append("goalNodeName");
+        sb.append(",");
+        sb.append("KeY_state");
+        sb.append(",");
+        sb.append("Isabelle_state");
+        sb.append(",");
+        sb.append("Z3_State");
+        sb.append(",");
+        sb.append("KeY_time");
+        sb.append(",");
+        sb.append("KeY_proof_nodes");
+        sb.append(",");
+        sb.append("SMT_translation_lines");
+        sb.append(",");
+        sb.append("transl_+_Z3_time");
+        sb.append(",");
+        sb.append("Z3_proof_lines");
+        sb.append(",");
+        sb.append("Z3_error_msg");
+        sb.append(",");
+        sb.append("Isabelle_build_time");
+        sb.append(",");
+        sb.append("Isabelle_parse_time");
+        sb.append(",");
+        sb.append("Isabelle_sledgehammer_time");
+        sb.append(",");
+        sb.append("Isabelle_total_time");
+        sb.append(",");
+        sb.append("Isabelle_translation_lines");
+        sb.append(",");
+        sb.append("Isabelle_proof");
+        sb.append(System.lineSeparator());
+
+        Map<String, Map<Goal, StatEntry>> contractMap = STATS.get(input);
+
+        contractMap.forEach((String c, Map<Goal, StatEntry> entryMap) -> entryMap.forEach((Goal goal, StatEntry entry) -> {
+            sb.append(entry.p);
+            sb.append(",");
+            sb.append(c.replace(",", "_"));
+            sb.append(",");
+            sb.append(goal.getTime());
+            sb.append(",");
+            sb.append(entry.keyState);
+            sb.append(",");
+            sb.append(entry.isabelleState);
+            sb.append(",");
+            sb.append(entry.z3State);
+            sb.append(",");
+            sb.append(entry.keyTime);
+            sb.append(",");
+            sb.append(entry.keyNodes);
+            sb.append(",");
+            sb.append(entry.z3TranslationLines);
+            sb.append(",");
+            sb.append(entry.translationAndZ3Time);
+            sb.append(",");
+            sb.append(entry.z3ProofLines);
+            sb.append(",");
+            sb.append(entry.z3ErrorMessage);
+            sb.append(",");
+            sb.append(entry.isabelleBuildTime);
+            sb.append(",");
+            sb.append(entry.isabelleParseTime);
+            sb.append(",");
+            sb.append(entry.isabelleSledgehammerTime);
+            sb.append(",");
+            sb.append(entry.isabelleTotalTime);
+            sb.append(",");
+            sb.append(entry.isabelleTranslationLines);
+            sb.append(",");
+            sb.append(entry.isabelleProofTactic);
+            sb.append(System.lineSeparator());
+        }));
+
+        try {
+            Files.write(Path.of(outDir + "/" + input.getParent().getFileName() + "_statistics.csv"), sb.toString().getBytes());
+            LOGGER.info("Statistics CSV written to {}", outDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void saveStatisticsCSV() {
@@ -180,6 +276,10 @@ public class Main {
                 sb.append(",");
                 sb.append(entry.keyState);
                 sb.append(",");
+                sb.append(entry.isabelleState);
+                sb.append(",");
+                sb.append(entry.z3State);
+                sb.append(",");
                 sb.append(entry.keyTime);
                 sb.append(",");
                 sb.append(entry.keyNodes);
@@ -189,8 +289,6 @@ public class Main {
                 sb.append(entry.translationAndZ3Time);
                 sb.append(",");
                 sb.append(entry.z3ProofLines);
-                sb.append(",");
-                sb.append(entry.z3State);
                 sb.append(",");
                 sb.append(entry.isabelleBuildTime);
                 sb.append(",");
@@ -203,8 +301,6 @@ public class Main {
                 sb.append(entry.isabelleTranslationLines);
                 sb.append(",");
                 sb.append(entry.isabelleProofTactic);
-                sb.append(",");
-                sb.append(entry.isabelleState);
                 sb.append(System.lineSeparator());
             }));
         }
@@ -295,7 +391,7 @@ public class Main {
 
         TimeLimiter tl = SimpleTimeLimiter.create(executorService);
         try {
-            tl.runWithTimeout(task, 60000, TimeUnit.MILLISECONDS);
+            tl.runWithTimeout(task, 30000, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException e) {
             LOGGER.error("Load timeout {}", file);
             return false;
@@ -392,7 +488,7 @@ public class Main {
         };
 
         try {
-            tl.runWithTimeout(prep, 60, TimeUnit.SECONDS);
+            tl.runWithTimeout(prep, timeoutSeconds, TimeUnit.SECONDS);
         } catch (TimeoutException | InterruptedException e) {
             LOGGER.error("Prep timeout {}", file);
             return false;
@@ -509,8 +605,7 @@ public class Main {
         }
         ImmutableList<Goal> goals = proof.openGoals();
 
-
-        STATS.put(input, new HashMap<>());
+        STATS.computeIfAbsent(input, k -> new HashMap<>());
         STATS.get(input).put(proof.name().toString(), new HashMap<>());
 
         if (runIsabelle) {
@@ -535,7 +630,7 @@ public class Main {
         Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
         proof.setActiveStrategy(strategy);
         proof.getSettings().getStrategySettings().setMaxSteps(1000000);
-        proof.getSettings().getStrategySettings().setTimeout(1000);
+        proof.getSettings().getStrategySettings().setTimeout(timeoutSeconds * 1000);
 
         for (Goal g : goals) {
             int nodes = -g.proof().getStatistics().nodes;
@@ -568,8 +663,10 @@ public class Main {
 
         Proof proof = goals.stream().findFirst().get().proof();
 
-        SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof.getSettings().getNewSMTSettings(), proof);
+        ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
+        piSettings.setTimeout(timeoutSeconds * 1000);
+        SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(), piSettings,
+                proof.getSettings().getNewSMTSettings(), proof);
 
 
         class TimedListener implements SolverLauncherListener {
@@ -610,8 +707,8 @@ public class Main {
                 String z3Proof = z3.getRawSolverOutput();
 
 
-                updateZ3State(input, contractName, goal, z3.getFinalResult().isValid());
                 if (z3.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
+                    updateZ3State(input, contractName, goal, ProofState.CLOSED);
                     try {
                         Path outPath = getOutPath(input, goalNumber + "_proof.smt2");
                         updateZ3ProofLines(input, contractName, goal, countLines(z3Proof));
@@ -621,6 +718,8 @@ public class Main {
                     }
                     System.setOut(STDOUT);
                     System.setErr(STDERR);
+                } else {
+                    updateZ3State(input, contractName, goal, ProofState.OPEN);
                 }
                 launcher.removeListener(this);
             }
@@ -640,7 +739,14 @@ public class Main {
         problems.forEach((SMTProblem problem) -> {
             SolverLauncher launcher = new SolverLauncher(settings);
             launcher.addListener(new TimedListener(problem.getGoal(), problem.getGoal().getTime()));
-            launcher.launch(problem, services, Z3_SOLVER);
+            try {
+                launcher.launch(problem, services, Z3_SOLVER);
+            } catch (Exception e) {
+                LOGGER.error("Exception during Z3... {}", e.getMessage());
+                e.printStackTrace();
+                updateZ3State(input, contractName, problem.getGoal(), ProofState.ERROR);
+                updateZ3State(input, contractName, problem.getGoal(), e.getMessage());
+            }
         });
     }
 
@@ -758,14 +864,26 @@ public class Main {
             try {
                 problem = translator.translateProblem(goal);
             } catch (IllegalFormulaException e) {
+                flaggedTranslations.add(input);
                 LOGGER.error("Translation failed: {}", e.getMessage());
                 return;
             }
             problem.addListener(new TimedListener(goal, goal.getTime()));
-            problem.sledgehammer(10);
+            problem.sledgehammer(timeoutSeconds);
             totalTime = System.currentTimeMillis() - totalTime;
             updateIsabelleTime(input, contractName, goal, totalTime);
         });
+    }
+
+    private static void saveFlaggedTranslations() {
+        StringBuilder sb = new StringBuilder();
+        flaggedTranslations.forEach(sb::append);
+
+        try {
+            Files.write(Path.of(outDir + "flagged.txt"), sb.toString().getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void updateIsabelleProof(Path input, String contractName, Goal goal, String isabelleProof) {
@@ -871,12 +989,21 @@ public class Main {
     }
 
 
-    private static void updateZ3State(Path p, String c, Goal g, SMTSolverResult.ThreeValuedTruth valid) {
+    private static void updateZ3State(Path p, String c, Goal g, ProofState state) {
         StatEntry stats = STATS.get(p).get(c).get(g);
         if (stats == null) {
             stats = new StatEntry(p);
         }
-        stats.z3State = valid;
+        stats.z3State = state;
+        STATS.get(p).get(c).put(g, stats);
+    }
+
+    private static void updateZ3State(Path p, String c, Goal g, String msg) {
+        StatEntry stats = STATS.get(p).get(c).get(g);
+        if (stats == null) {
+            stats = new StatEntry(p);
+        }
+        stats.z3ErrorMessage = msg;
         STATS.get(p).get(c).put(g, stats);
     }
 
