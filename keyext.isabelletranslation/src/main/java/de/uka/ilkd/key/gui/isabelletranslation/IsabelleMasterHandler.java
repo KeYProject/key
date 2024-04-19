@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
@@ -118,14 +119,26 @@ public class IsabelleMasterHandler {
         decl.append(unknownValues.get(term.op()));
         decl.append("::\"");
 
-        for (Term sub : term.subs()) {
-            if (isNewSort(sub.sort())) {
-                addGenericSort(sub.sort());
+        if (term.op() instanceof SortedOperator) {
+            SortedOperator op = (SortedOperator) term.op();
+            for (Sort argSort : op.argSorts()) {
+                if (isNewSort(argSort)) {
+                    addGenericSort(argSort);
+                }
+                decl.append(translateSortName(argSort)).append("=>");
             }
-            decl.append(translateSortName(sub.sort())).append("=>");
+            decl.append((translateSortName(op.sort())));
+            decl.append("\"");
+        } else {
+            for (Term sub : term.subs()) {
+                if (isNewSort(sub.sort())) {
+                    addGenericSort(sub.sort());
+                }
+                decl.append(translateSortName(sub.sort())).append("=>");
+            }
+            decl.append((translateSortName(term.sort())));
+            decl.append("\"");
         }
-        decl.append((translateSortName(term.sort())));
-        decl.append("\"");
         constDeclarations.add(decl);
     }
 
