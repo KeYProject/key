@@ -153,7 +153,7 @@ public class IsabelleProblem {
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
                                                 [("timeout",\"""" + timeout_seconds + """
-                                "),("verbose","true"),("falsify","false"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
+                                "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
                                 val results =\s"""
                                 + sledgehammer + """
                                 .run_sledgehammer params\s""" + Sledgehammer_Prover + """
