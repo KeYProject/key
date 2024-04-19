@@ -182,9 +182,9 @@ public class IsabelleProblem {
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
-            Future<Object> tryResultFuture = try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
-                    .retrieve(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
-            if ((boolean) Await.result(tryResultFuture, Duration.create(10, TimeUnit.SECONDS))) {
+            Boolean tryResultSuccess = (Boolean) try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
+                    .retrieveNow(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            if (tryResultSuccess) {
                 tryResult = new SledgehammerResult(Option.apply(new Tuple2<>("some", "try0")));
                 this.result = tryResult;
                 notifySledgehammerFinished();
