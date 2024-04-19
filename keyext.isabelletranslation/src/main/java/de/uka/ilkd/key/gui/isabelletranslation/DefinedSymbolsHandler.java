@@ -27,6 +27,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         definedFunctions.put("wellFormed", "wellFormed");
         definedFunctions.put("anon", "anon");
         definedFunctions.put("store", "store");
+        definedFunctions.put("create", "create");
 
         //Seq functions
         definedFunctions.put("seqLen", "seqLen");
