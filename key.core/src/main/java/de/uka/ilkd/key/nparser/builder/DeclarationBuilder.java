@@ -81,6 +81,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             KeYJavaType kjt = accept(ctx.keyjavatype(i));
             assert varNames != null;
             for (String varName : varNames) {
+                if (varName.equals("null")) {
+                    semanticError(ctx.simple_ident_comma_list(i),
+                        "Function '" + varName + "' is already defined!");
+                }
                 ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
                 if (name != null) {
@@ -148,7 +152,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                     : DefaultImmutableSet.fromCollection(sortOneOf);
 
             // attention: no expand to java.lang here!
-            if (sorts().lookup(sortName) == null) {
+            Sort existingSort = sorts().lookup(sortName);
+            if (existingSort == null) {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
@@ -176,11 +181,11 @@ public class DeclarationBuilder extends DefaultBuilder {
                 createdSorts.add(s);
             } else {
                 // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
-                // local namespaces
-                // for generic sorts
+                // local namespaces for generic sorts
                 // addWarning(ctx, "Sort declaration is ignored, due to collision.");
-                LOGGER.info("Sort declaration is ignored, due to collision in {}",
-                    BuilderHelpers.getPosition(ctx));
+                LOGGER.info("Sort declaration of {} in {} is ignored due to collision (already "
+                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                    existingSort.getOrigin());
             }
         }
         return createdSorts;

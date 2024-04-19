@@ -17,7 +17,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.*;
@@ -120,7 +119,7 @@ public class LogicPrinter {
         return layouter;
     }
 
-    private static SequentViewLogicPrinter quickPrinter(Services services,
+    public static SequentViewLogicPrinter quickPrinter(Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
@@ -597,7 +596,9 @@ public class LogicPrinter {
     }
 
     private void printSourceElement(SourceElement element) {
-        new PrettyPrinter(layouter, instantiations).print(element);
+        new PrettyPrinter(layouter, instantiations, services,
+            notationInfo.isPrettySyntax(),
+            notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**
@@ -1668,9 +1669,9 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    JavaBlock jb1 = mod.program();
-                    Modality m = Modality.getModality(mod.kind(), jb1);
-                    Term term = services.getTermFactory().createTerm(m, ta,
+                    final Modality m =
+                        Modality.getModality((Modality.JavaModalityKind) o, mod.program());
+                    final Term term = services.getTermFactory().createTerm(m, ta,
                         phi.boundVars(), null);
                     notationInfo.getNotation(m).print(term, this);
                     return;

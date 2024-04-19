@@ -59,7 +59,7 @@ public class TestJMLTranslator {
             atPres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
-        jmlIO = new JmlIO().services(services).classType(testClassType)
+        jmlIO = new JmlIO(services).classType(testClassType)
                 .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
                 .selfVar(buildSelfVarAsProgVar());
     }

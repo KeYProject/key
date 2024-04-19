@@ -10,12 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -30,7 +26,6 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * A rule for JML assert/assume statements.
- *
  * This implements the rules as:
  *
  * <p>
@@ -132,7 +127,19 @@ public final class JmlAssertRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final Term self = MiscTools.getSelfTerm(frame, services);
 
-        final Term condition = jmlAssert.getCond(self, services);
+        final var spec = services.getSpecificationRepository().getStatementSpec(jmlAssert);
+
+        if (spec == null) {
+            throw new RuleAbortException(
+                "No specification found for JmlAssert. Internal Error. Not your fault");
+        }
+
+        Term condition =
+            tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
+
+        condition = tb.addLabel(condition, new OriginTermLabel.Origin(
+            kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT
+                    : OriginTermLabel.SpecType.ASSUME));
 
         final ImmutableList<Goal> result;
         if (kind == Kind.ASSERT) {

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -55,9 +54,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     protected void walk(ProgramElement node) {
-        if (node instanceof JmlAssert) {
-            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
-        }
         super.walk(node);
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
@@ -231,6 +227,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         doDefaultAction(x);
     }
@@ -318,6 +319,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
         doDefaultAction(x);
     }
 
@@ -960,10 +966,5 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     public void performActionOnJmlAssert(JmlAssert x) {
         doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // empty
     }
 }

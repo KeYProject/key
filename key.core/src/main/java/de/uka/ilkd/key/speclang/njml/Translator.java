@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -233,14 +230,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (signature == null || signature.isEmpty()) {
             return "";
         }
-        StringBuilder sigString = new StringBuilder();
-
-        for (SLExpression expr : signature) {
-            final KeYJavaType t = expr.getType();
-            sigString.append(t == null ? "<unknown type>" : t.getFullName()).append(", ");
-        }
-
-        return sigString.substring(0, sigString.length() - 2);
+        return String.join(", ", signature
+                .map(SLExpression::getType)
+                .filter(Objects::nonNull)
+                .map(KeYJavaType::getFullName));
     }
 
     // region expression
@@ -1687,13 +1680,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term minusOne = tb.zTerm("-1");
         assert e2 != null;
         assert e1 != null;
-        final Term ante = tb.seqSub(e1.getTerm(), tb.zero(), tb.add(e2.getTerm(), minusOne));
-        assert e3 != null;
-        final Term insert = tb.seqSingleton(e3.getTerm());
-        final Term post = tb.seqSub(e1.getTerm(), tb.add(e2.getTerm(), tb.one()),
-            tb.add(tb.seqLen(e1.getTerm()), minusOne));
-        final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
-        return new SLExpression(put);
+        Term updated = tb.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
+        return new SLExpression(updated);
     }
 
     @Override
