@@ -519,14 +519,6 @@ public class Main {
                 Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
                 UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
-                // this should initialize with the default properties,
-                // necessary to enable quantifier instantiation
-                StrategyProperties properties = new StrategyProperties();
-                Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
-                proof.setActiveStrategy(strategy);
-                proof.getSettings().getStrategySettings().setMaxSteps(1000000);
-                proof.getSettings().getStrategySettings().setTimeout(100000);
-
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
                 if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
                     try {
@@ -582,13 +574,6 @@ public class Main {
         String contractName = proof.name().toString();
         System.out.println("Processing contract " + contractName + " of " + input);
 
-        // this should initialize with the default properties,
-        // necessary to enable quantifier instantiation
-        StrategyProperties properties = new StrategyProperties();
-        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
-        proof.setActiveStrategy(strategy);
-        proof.getSettings().getStrategySettings().setMaxSteps(1000000);
-        proof.getSettings().getStrategySettings().setTimeout(100000);
 
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
         if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
