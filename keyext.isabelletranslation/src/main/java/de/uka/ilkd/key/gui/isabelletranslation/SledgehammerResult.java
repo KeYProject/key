@@ -1,22 +1,26 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
+import scala.Option;
 import scala.Tuple2;
-import scala.collection.immutable.List;
 
-public record SledgehammerResult(Tuple2<Object, Tuple2<String, List<String>>> result) {
+public record SledgehammerResult(Option<Tuple2<String, String>> result) {
     public Boolean isSuccessful() {
-        return (Boolean) result._1();
+        return result.exists((Tuple2<String, String> tactic) -> !tactic._1().equals("timeout"));
     }
 
     public String getSuccessfulTactic() {
         if (!isSuccessful()) {
             return null;
         }
-        return result._2()._2().head();
+        return result.get()._2();
     }
 
     @Override
     public String toString() {
-        return result.toString();
+        return result.get().toString();
+    }
+
+    public boolean isTimeout() {
+        return result.exists((Tuple2<String, String> tactic) -> tactic._1().equals("timeout"));
     }
 }
