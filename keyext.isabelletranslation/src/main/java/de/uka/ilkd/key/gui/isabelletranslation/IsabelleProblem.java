@@ -8,6 +8,7 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Option;
 import scala.Tuple2;
 import scala.collection.immutable.List;
 import scala.collection.mutable.Builder;
@@ -28,7 +29,7 @@ public class IsabelleProblem {
     private SledgehammerResult result = null;
     private final String preamble;
     private final String sequentTranslation;
-    private Collection<IsabelleSolverListener> listeners = new HashSet<>();
+    private final Collection<IsabelleSolverListener> listeners = new HashSet<>();
 
     public IsabelleProblem(Goal goal, String preamble, String sequentTranslation) {
         this.goal = goal;
@@ -56,7 +57,7 @@ public class IsabelleProblem {
         return result;
     }
 
-    public SledgehammerResult sledgehammer(int timeout_seconds) {
+    public SledgehammerResult sledgehammer(long timeout_seconds) {
         LOGGER.info("Starting Isabelle...");
         notifyProcessStarted();
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
@@ -122,6 +123,19 @@ public class IsabelleProblem {
         notifyParsingFinished();
         LOGGER.info("Finished Parsing");
 
+        String Try = thy0.importMLStructureNow("Try0", isabelle);
+        MLFunction<ToplevelState, Object> try_function =
+                MLValue.compileFunction(
+                        """
+                                fn (state) =>
+                                        let
+                                            val p_state = Toplevel.proof_of state;
+                                        in
+                                           \s""" + Try + ".try0 (SOME (seconds 5.0)) ([], [], [], []) p_state" + """
+                                        end
+                                """, isabelle, Implicits.toplevelStateConverter(),
+                        de.unruh.isabelle.mlvalue.Implicits.booleanConverter());
+
         String sledgehammer = thy0.importMLStructureNow("Sledgehammer", isabelle);
         String Sledgehammer_Commands = thy0.importMLStructureNow("Sledgehammer_Commands", isabelle);
         String Sledgehammer_Prover = thy0.importMLStructureNow("Sledgehammer_Prover", isabelle);
@@ -138,9 +152,8 @@ public class IsabelleProblem {
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
-                                                [("timeout",
-                                """ + timeout_seconds + """
-                                ),(verbose","true"),("falsify","false")];
+                                                [("timeout",\"""" + timeout_seconds + """
+                                "),("verbose","true"),("falsify","false"),("provers", "e spass vampire cvc4 z3 zipperposition")];
                                 val results =\s"""
                                 + sledgehammer + """
                                 .run_sledgehammer params\s""" + Sledgehammer_Prover + """
@@ -161,33 +174,58 @@ public class IsabelleProblem {
         scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
         SledgehammerResult result;
-        LOGGER.info("Sledgehammering...");
+        SledgehammerResult tryResult = null;
+        LOGGER.info("Trying...");
         notifySledgehammerStarted();
         try {
             Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
-            result = new SledgehammerResult(Await.result(resultFuture, Duration.create(timeout_seconds + 10, TimeUnit.SECONDS)));
+            Future<Object> tryResultFuture = try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
+                    .retrieve(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            if ((boolean) Await.result(tryResultFuture, Duration.create(10, TimeUnit.SECONDS))) {
+                tryResult = new SledgehammerResult(Option.apply(new Tuple2<>("some", "try0")));
+                this.result = tryResult;
+                notifySledgehammerFinished();
+                notifyProcessFinished();
+                LOGGER.info("Sledgehammer result: " + this.result);
+                return this.result;
+            }
+            Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(timeout_seconds, TimeUnit.SECONDS));
+            result = new SledgehammerResult(Option.apply(new Tuple2<>(resultFutureCollect._2()._1(), resultFutureCollect._2()._2().head())));
+            this.result = result;
         } catch (TimeoutException exception) {
-            result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
+            result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
             this.result = result;
             notifyProcessTimeout();
         } catch (InterruptedException exception) {
-            result = new SledgehammerResult(new Tuple2<>(Boolean.FALSE, new Tuple2<>(exception.getMessage(), emptyList)));
+            result = new SledgehammerResult(Option.apply(null));
             this.result = result;
             notifySledgehammerError(exception);
             notifyProcessError(exception);
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Timeout after")) {
+                result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
+                this.result = result;
+                notifyProcessTimeout();
+            } else {
+                LOGGER.error("Exception during Sledgehammer {}", exception.getMessage());
+                exception.printStackTrace();
+                result = new SledgehammerResult(Option.apply(null));
+                this.result = result;
+                notifySledgehammerError(exception);
+                notifyProcessError(exception);
+            }
         } finally {
             isabelle.destroy();
         }
-        this.result = result;
 
         notifySledgehammerFinished();
 
         notifyProcessFinished();
 
-        LOGGER.info("Sledgehammer result: " + result);
+        LOGGER.info("Sledgehammer result: " + this.result);
         return this.result;
     }
 
