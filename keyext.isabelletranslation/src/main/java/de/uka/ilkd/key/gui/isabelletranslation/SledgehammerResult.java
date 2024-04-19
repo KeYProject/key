@@ -17,7 +17,7 @@ public record SledgehammerResult(Option<Tuple2<String, String>> result) {
 
     @Override
     public String toString() {
-        return result.get().toString();
+        return (result.exists((r) -> true)) ? result.get().toString() : null;
     }
 
     public boolean isTimeout() {
