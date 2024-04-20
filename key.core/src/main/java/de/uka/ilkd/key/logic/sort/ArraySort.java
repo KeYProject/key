@@ -8,8 +8,10 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the mathematical integers), but we have different array sorts int[], byte[], char[], short[] and
  * long[], all storing mathematical integers.
  */
-public final class ArraySort extends AbstractSort {
+public final class ArraySort extends SortImpl {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
         new WeakHashMap<>();
@@ -66,7 +68,7 @@ public final class ArraySort extends AbstractSort {
         ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
 
         if (elemDirectSuperSorts.size() == 1
-                && elemDirectSuperSorts.iterator().next().equals(Sort.ANY)) {
+                && elemDirectSuperSorts.iterator().next().equals(JavaDLTheory.ANY)) {
             if (objectSort != null) {
                 result = result.add(objectSort);
             }

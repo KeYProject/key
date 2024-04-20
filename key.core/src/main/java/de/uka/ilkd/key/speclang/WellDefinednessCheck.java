@@ -11,19 +11,11 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -37,10 +29,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * A contract for checking the well-definedness of a jml specification element (i.e. a class
@@ -397,8 +392,9 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods = LogicPrinter.quickPrintTerm(
-                getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
-                        : this.getAssignable(null),
+                getAssignable(null).equalsModProperty(TB.strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.empty()
+                            : this.getAssignable(null),
                 services);
             mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
                 + (includeHtmlMarkup ? "</b> " : ": ")
@@ -587,7 +583,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final Function mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
         if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
@@ -694,7 +690,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return tb.getTaclet();
     }
 
-    abstract Function generateMbyAtPreFunc(Services services);
+    abstract JFunction generateMbyAtPreFunc(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
@@ -729,19 +725,26 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, TermServices services) {
         this.assignable = ass;
-        if (ass == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass)
-                || TB.FALSE().equalsModIrrelevantTermLabels(ass)) {
+        if (ass == null
+                || TB.strictlyNothing().equalsModProperty(
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+                || TB.FALSE().equalsModProperty(
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.strictlyNothing();
-        } else if (TB.tt().equalsModIrrelevantTermLabels(ass)
-                || TB.TRUE().equalsModIrrelevantTermLabels(ass)) {
+        } else if (TB.tt().equalsModProperty(
+            ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+                || TB.TRUE().equalsModProperty(
+                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass1)) {
+        if (ass1 == null || TB.strictlyNothing().equalsModProperty(
+            ass1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass2, services);
-        } else if (ass2 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass2)) {
+        } else if (ass2 == null || TB.strictlyNothing().equalsModProperty(
+            ass2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);
@@ -1002,9 +1005,11 @@ public abstract class WellDefinednessCheck implements Contract {
     public final Term getUpdates(Term mod, LocationVariable heap, ProgramVariable heapAtPre,
             Term anonHeap, TermServices services) {
         assert mod != null;
-        assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(mod);
-        final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? TB.skip()
-                : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
+        assert anonHeap != null
+                || TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY);
+        final Term havocUpd =
+            TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.skip()
+                    : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
@@ -1274,10 +1279,10 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
-        private final Function func;
+        private final JFunction func;
 
 
-        private TermListAndFunc(ImmutableList<Term> ts, Function f) {
+        private TermListAndFunc(ImmutableList<Term> ts, JFunction f) {
             this.terms = ts;
             this.func = f;
         }
@@ -1307,7 +1312,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, Function func) {}
+    public record TermAndFunc(Term term, JFunction func) {}
 
     /**
      * A data structure for storing and passing all specifications of a specification element

@@ -10,19 +10,20 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 public final class ContractAxiom extends ClassAxiom {
@@ -58,8 +59,8 @@ public final class ContractAxiom extends ClassAxiom {
         assert name != null;
         assert kjt != null;
         assert target != null;
-        assert originalPre.sort() == Sort.FORMULA;
-        assert originalPost.sort() == Sort.FORMULA;
+        assert originalPre.sort() == JavaDLTheory.FORMULA;
+        assert originalPost.sort() == JavaDLTheory.FORMULA;
         assert (selfVar == null) == target.isStatic();
         this.name = name;
         this.target = target;

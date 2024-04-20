@@ -18,8 +18,8 @@ import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.DynamicTest;

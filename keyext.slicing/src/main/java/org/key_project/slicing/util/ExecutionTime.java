@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.Pair;
 
 /**
  * Simple class to measure the running time of various 'activities'.

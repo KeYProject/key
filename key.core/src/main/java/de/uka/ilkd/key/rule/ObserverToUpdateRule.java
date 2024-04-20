@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -204,12 +204,12 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        Modality mod = Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
         Term modTerm =
-            tb.prog((Modality) inst.modality.op(), postJavaBlock, inst.modality.sub(0),
+            tb.prog(mod.kind(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(inst.modality.op(), inst.modality.subs(), null,
-                        postJavaBlock,
+                    tb.tf().createTerm(mod, inst.modality.subs(), null,
                         inst.modality.getLabels())));
         Term lhs = tb.var(inst.assignmentTarget);
 
@@ -263,12 +263,13 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Assignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        Modality mod = Modality.getModality(inst.mod.kind(), postJavaBlock);
         Term modTerm =
-            tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
+            tb.prog(inst.mod.kind(), postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null,
-                        postJavaBlock, inst.progPost.getLabels())));
+                    tb.tf().createTerm(mod, new ImmutableArray<>(inst.progPost.sub(0)), null,
+                        inst.progPost.getLabels())));
         Term lhs = tb.var((ProgramVariable) inst.actualResult);
         Term update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
@@ -342,9 +343,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (mainFml.op() != Modality.BOX && mainFml.op() != Modality.DIA
-                && mainFml.op() != Modality.BOX_TRANSACTION
-                && mainFml.op() != Modality.DIA_TRANSACTION) {
+        if (!(mainFml.op() instanceof Modality)) {
             return null;
         }
         result.modality = mainFml;

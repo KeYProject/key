@@ -7,9 +7,10 @@ import java.io.File;
 import java.util.Collection;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.Name;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -29,11 +29,13 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 
 /**
  * <p>
@@ -165,7 +167,7 @@ public class VMTacletMatcher implements TacletMatcher {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
                 final UpdateLabelPair ulp = curContext.head();
-                if (ulp.update().equalsModRenaming(update)
+                if (ulp.update().equalsModProperty(update, RENAMING_PROPERTY)
                         && ulp.updateApplicationlabels().equals(update.getLabels())) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);

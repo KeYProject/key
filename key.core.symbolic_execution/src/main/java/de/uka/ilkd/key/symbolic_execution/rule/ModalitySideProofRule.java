@@ -8,20 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -32,11 +25,12 @@ import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -177,12 +171,12 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
-            Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
+            JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
             Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),
                 new ImmutableArray<>(newTerm), modalityTerm.boundVars(),
-                modalityTerm.javaBlock(), modalityTerm.getLabels());
+                modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)

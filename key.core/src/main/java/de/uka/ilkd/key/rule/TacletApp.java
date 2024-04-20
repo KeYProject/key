@@ -13,13 +13,15 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
@@ -485,7 +487,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         TacletApp app = this;
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
-        for (final SchemaVariable sv : uninstantiatedVars()) {
+        for (final SchemaVariable usv : uninstantiatedVars()) {
+            if (!(usv instanceof AbstractSV sv)) {
+                continue;
+            }
             if (sv.arity() != 0) {
                 continue;
             }
@@ -586,7 +591,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         TacletApp app = this;
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
-        for (final SchemaVariable sv : uninstantiatedVars()) {
+        for (final SchemaVariable usv : uninstantiatedVars()) {
+            if (!(usv instanceof AbstractSV sv)) {
+                continue;
+            }
             if (sv.arity() != 0) {
                 continue;
             }
@@ -757,7 +765,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
             boolean interesting, Services services) {
-        final Function c = new Function(new Name(instantiation), sort, true, new Sort[0]);
+        final JFunction c =
+            new JFunction(new Name(instantiation), sort, true, new Sort[0]);
         return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
 
@@ -769,12 +778,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             final SchemaVariable sv = svIt.next();
             if (sv instanceof SkolemTermSV) {
                 final Term inst = (Term) insts.getInstantiation(sv);
-                final Namespace<Function> functions = nss.functions();
+                final Namespace<JFunction> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely((Function) inst.op());
+                    functions.addSafely((JFunction) inst.op());
                 }
             }
         }
@@ -1118,18 +1127,18 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param func_ns the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
-        Namespace<Function> ns = new Namespace<>(func_ns);
+    public Namespace<JFunction> extendedFunctionNameSpace(Namespace<JFunction> func_ns) {
+        Namespace<JFunction> ns = new Namespace<>(func_ns);
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
             if (sv instanceof SkolemTermSV) {
                 Term inst = (Term) instantiations.getInstantiation(sv);
                 Operator op = inst.op();
-                assert op instanceof Function
+                assert op instanceof JFunction
                         : "At this point the skolem instantiation is expected to "
                             + "be a function symbol, not " + inst;
-                ns.addSafely((Function) op);
+                ns.addSafely((JFunction) op);
             }
         }
         return ns;

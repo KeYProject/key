@@ -9,12 +9,13 @@ import java.util.EnumMap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.logic.TermCreationException;
 
 import org.slf4j.LoggerFactory;
 

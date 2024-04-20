@@ -194,7 +194,8 @@ public class JavaDocument extends DefaultStyledDocument {
         "invariant_free", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
         "normal_behaviour", "readable", "writable",
         // ADT functions:
-        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put", "\\seq_reverse",
+        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_upd", "\\seq_upd",
+        "\\seq_reverse", "\\seq_sub",
         "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton", "\\set_union",
         "\\intersect", "\\set_minus", "\\all_fields", "\\infinite_union",
         "\\strictly_than_nothing" };

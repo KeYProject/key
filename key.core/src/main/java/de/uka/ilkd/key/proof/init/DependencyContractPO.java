@@ -7,7 +7,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -185,7 +185,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             // prepare anon heap
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
-            final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
+            final JFunction anonHeapFunc =
+                new JFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
             final Term anonHeap =
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);

@@ -4,14 +4,15 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Given two sort-depending functions f1 and f2 then from f1.isSimilar(f2) and
  * f1.getSortDependingOn() == f2.getSortDependingOn() follows f1 == f2
  */
-public final class SortDependingFunction extends Function {
+public final class SortDependingFunction extends JFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SortDependingFunction.class);
 
     private final SortDependingFunctionTemplate template;
@@ -83,13 +84,13 @@ public final class SortDependingFunction extends Function {
             Sort sort, Sort[] argSorts, boolean unique) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
             kind, sort, new ImmutableArray<>(argSorts), unique);
-        return new SortDependingFunction(template, Sort.ANY);
+        return new SortDependingFunction(template, JavaDLTheory.ANY);
     }
 
 
     public static SortDependingFunction getFirstInstance(Name kind, TermServices services) {
         return (SortDependingFunction) services.getNamespaces().functions()
-                .lookup(instantiateName(kind, Sort.ANY));
+                .lookup(instantiateName(kind, JavaDLTheory.ANY));
     }
 
     /**
@@ -116,7 +117,7 @@ public final class SortDependingFunction extends Function {
         }
 
         final NamespaceSet namespaces = services.getNamespaces();
-        Namespace<Function> functions = namespaces.functions();
+        Namespace<JFunction> functions = namespaces.functions();
 
         SortDependingFunction result;
         synchronized (namespaces) {
