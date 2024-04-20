@@ -352,6 +352,7 @@ public class KeYFile implements EnvInput {
      * initial configuration
      */
     public Collection<PositionedString> readSorts() {
+        LOGGER.debug("Activate Sorts of {}", file);
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
@@ -373,6 +374,7 @@ public class KeYFile implements EnvInput {
         if (file == null) {
             return null;
         }
+        LOGGER.debug("Activate functions and predicates of {}", file);
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
@@ -387,6 +389,7 @@ public class KeYFile implements EnvInput {
      * @return list of issues that occurred during parsing the taclets
      */
     public List<BuildingIssue> readRules() {
+        LOGGER.debug("Activate rules of {}", file);
         KeyAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
             initConfig.namespaces(), initConfig.getTaclet2Builder());

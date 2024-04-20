@@ -68,8 +68,7 @@ public class SetStatementTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo =
-                HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+            javaInfo = HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }

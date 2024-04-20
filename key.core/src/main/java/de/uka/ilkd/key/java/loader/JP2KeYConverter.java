@@ -1356,7 +1356,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(Modifier n, Void arg) {
-        var pi=createPositionInfo(n);var c=createComments(n);var k=n.getKeyword();return switch(k){case PUBLIC->new Public(pi,c);case PROTECTED->new Protected(pi,c);case PRIVATE->new Private(pi,c);case ABSTRACT->new Abstract(pi,c);case STATIC->new Static(pi,c);case FINAL->new Final(pi,c);case TRANSIENT->new Transient(pi,c);case VOLATILE->new Volatile(pi,c);case SYNCHRONIZED->new Synchronized(pi,c);case NATIVE->new Native(pi,c);case STRICTFP->new StrictFp(pi,c);case GHOST->new Ghost(pi,c);case MODEL->new Model(pi,c);case TWO_STATE->new TwoState(pi,c);case NO_STATE->new NoState(pi,c);default->{reportUnsupportedElement(n);yield null;}};
+        var pi=createPositionInfo(n);var c=createComments(n);var k=n.getKeyword();return switch(k){case PUBLIC->new Public(pi,c);case PROTECTED->new Protected(pi,c);case PRIVATE->new Private(pi,c);case ABSTRACT->new Abstract(pi,c);case STATIC->new Static(pi,c);case FINAL->new Final(pi,c);case TRANSIENT->new Transient(pi,c);case VOLATILE->new Volatile(pi,c);case SYNCHRONIZED->new Synchronized(pi,c);case NATIVE->new Native(pi,c);case STRICTFP->new StrictFp(pi,c);
+            case GHOST->new Ghost(pi,c);
+            case MODEL->new Model(pi,c);case TWO_STATE->new TwoState(pi,c);case NO_STATE->new NoState(pi,c);default->{reportUnsupportedElement(n);yield null;}};
     }
 
 

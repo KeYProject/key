@@ -163,8 +163,8 @@ public final class ProblemInitializer {
 
         int i = 0;
         reportStatus("Read LDT Includes", in.getIncludes().size());
-        for (String name : in.getLDTIncludes()) {
 
+        for (String name : in.getLDTIncludes()) {
             keyFile[i] =
                 new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
             i++;

@@ -98,13 +98,13 @@ public final class HeapLDT extends LDT {
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
         arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::<created>");
-        initialized = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        created = addFunction(services, "java.lang.Object::#$created");
+        initialized = addFunction(services, "java.lang.Object::#$initialized");
+        classPrepared = addSortDependingFunction(services, "#$classPrepared");
+        classInitialized = addSortDependingFunction(services, "#$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addSortDependingFunction(services, "#$classInitializationInProgress");
+        classErroneous = addSortDependingFunction(services, "#$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
