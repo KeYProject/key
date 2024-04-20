@@ -85,7 +85,7 @@ public class IsabelleTranslator {
             sequentTranslation.append(" = ");
             sequentTranslation.append(locales.remove(0));
             locale_empty = false;
-        } else if (!locale_empty) {
+        } else if (!constDecls.isEmpty()) {
             sequentTranslation.append(" + ").append(LINE_ENDING);
         }
         for (StringBuilder constDecl : constDecls) {

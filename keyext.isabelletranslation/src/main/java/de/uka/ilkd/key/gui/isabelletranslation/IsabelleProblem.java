@@ -117,6 +117,7 @@ public class IsabelleProblem {
                         .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
             }
         } catch (Exception e) {
+            isabelle.destroy();
             notifyParsingError(e);
             return null;
         }
