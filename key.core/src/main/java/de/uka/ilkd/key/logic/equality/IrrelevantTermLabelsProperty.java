@@ -12,6 +12,11 @@ import org.key_project.util.collection.ImmutableArray;
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All irrelevant term labels are ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link IrrelevantTermLabelsProperty#IRRELEVANT_TERM_LABELS_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
 public class IrrelevantTermLabelsProperty implements Property<Term> {
     /**
@@ -34,10 +39,10 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
-     * @param v the additional parameters needed for the comparison
+     * @param v should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
      *         for their irrelevant labels.
-     * @param <V> the type of the additional parameters needed for the comparison
+     * @param <V> is not needed for this equality check
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override

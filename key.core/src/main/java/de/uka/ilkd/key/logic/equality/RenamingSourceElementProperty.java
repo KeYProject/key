@@ -16,6 +16,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for
  * {@link SourceElement}s.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link RenamingSourceElementProperty#RENAMING_SOURCE_ELEMENT_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
 public class RenamingSourceElementProperty implements Property<SourceElement> {
     /**
@@ -38,12 +43,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      *
      * @param se1 the first element of the equality check
      * @param se2 the second element of the equality check
-     * @param v the additional arguments needed for the equality check (a single
-     *        {@link NameAbstractionTable} in this case)
+     * @param v should be a single {@link NameAbstractionTable} for this equality check
      * @return {@code true} iff {@code se2} is a source element syntactically equal to {@code se1}
      *         modulo renaming
-     * @param <V> the type of the additional parameters needed for the comparison
-     *        ({@link NameAbstractionTable} in this case)
+     * @param <V> is supposed to be {@link NameAbstractionTable} for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
@@ -52,7 +55,6 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
             throw new IllegalArgumentException(
                 "Expected a single NameAbstractionTable as argument.");
         }
-        // NameAbstractionTable nat = (NameAbstractionTable) v[0];
 
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
         JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
@@ -194,8 +196,6 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         if (se == vs) {
             return true;
         }
-        // TODO: Checking for exact class might be too strict as the original implementation was
-        // only using instanceof
         if (se.getClass() != vs.getClass()) {
             return false;
         }
@@ -237,8 +237,6 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * of the main reasons for equalsModRenaming. Equality here comes down to checking the
          * abstract name of the elements in a NAT.
          */
-        // TODO: Checking for exact class might be too strict as the original implementation was
-        // only using instanceof or no check at all.
         if (se1.getClass() != se2.getClass()) {
             return false;
         }

@@ -18,6 +18,11 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * Renaming of variables is ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
 public class RenamingTermProperty implements Property<Term> {
     /**
@@ -37,11 +42,10 @@ public class RenamingTermProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
-     * @param v the additional parameters needed for the comparison
+     * @param v should not be used for this equality check
      * @return {@code true} iff {@code term2} has the same values in operator, sort, arity,
-     *         varsBoundHere
-     *         and javaBlock as {@code term1} modulo bound renaming
-     * @param <V> the type of the additional parameters needed for the comparison
+     *         varsBoundHere and javaBlock as {@code term1} modulo bound renaming
+     * @param <V> is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {

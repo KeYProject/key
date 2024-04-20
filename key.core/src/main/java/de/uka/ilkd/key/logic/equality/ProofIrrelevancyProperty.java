@@ -17,6 +17,11 @@ import org.key_project.util.collection.ImmutableArray;
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All proof irrelevant attributes are ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
 public class ProofIrrelevancyProperty implements Property<Term> {
     /**
@@ -43,10 +48,10 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
-     * @param v the additional parameters needed for the comparison
+     * @param v should not be used for this equality check
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
-     * @param <V> the type of the additional parameters needed for the comparison
+     * @param <V> is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
