@@ -58,7 +58,7 @@ public class IsabelleProblem {
     }
 
     public SledgehammerResult sledgehammer(long timeout_seconds) {
-        LOGGER.info("Starting Isabelle...");
+        LOGGER.debug("Starting Isabelle...");
         notifyProcessStarted();
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
 
@@ -79,7 +79,7 @@ public class IsabelleProblem {
             return null;
         }
 
-        LOGGER.info("Opening theory...");
+        LOGGER.debug("Opening theory...");
 
         Theory thy0 = beginTheory(getSequentTranslation(), Path.of((settings.getTranslationPath() + "\\Translation.thy")), isabelle);
         ToplevelState toplevel = ToplevelState.apply(isabelle);
@@ -101,7 +101,7 @@ public class IsabelleProblem {
                 de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
 
-        LOGGER.info("Parsing theory...");
+        LOGGER.debug("Parsing theory...");
         notifyParsingStarted();
         try {
             java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
@@ -122,7 +122,7 @@ public class IsabelleProblem {
             return null;
         }
         notifyParsingFinished();
-        LOGGER.info("Finished Parsing");
+        LOGGER.debug("Finished Parsing");
 
         String Try = thy0.importMLStructureNow("Try0", isabelle);
         MLFunction<ToplevelState, Object> try_function =
@@ -176,7 +176,7 @@ public class IsabelleProblem {
 
         SledgehammerResult result = null;
         SledgehammerResult tryResult = null;
-        LOGGER.info("Trying...");
+        LOGGER.debug("Trying...");
         notifySledgehammerStarted();
         try {
             Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
@@ -190,7 +190,7 @@ public class IsabelleProblem {
                 this.result = tryResult;
                 notifySledgehammerFinished();
                 notifyProcessFinished();
-                LOGGER.info("Sledgehammer result: " + this.result);
+                LOGGER.debug("Sledgehammer result: " + this.result);
                 return this.result;
             }
             Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(timeout_seconds, TimeUnit.SECONDS));
@@ -226,7 +226,7 @@ public class IsabelleProblem {
 
         notifyProcessFinished();
 
-        LOGGER.info("Sledgehammer result: " + this.result);
+        LOGGER.debug("Sledgehammer result: " + this.result);
         return this.result;
     }
 
@@ -248,7 +248,7 @@ public class IsabelleProblem {
         MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle, de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
 
-        LOGGER.info("Parsing theory...");
+        LOGGER.debug("Parsing theory...");
         notifyParsingStarted();
         try {
             java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
@@ -263,7 +263,7 @@ public class IsabelleProblem {
             return null;
         }
         notifyParsingFinished();
-        LOGGER.info("Finished Parsing");
+        LOGGER.debug("Finished Parsing");
 
         String Try = thy0.importMLStructureNow("Try0", isabelle);
         MLFunction<ToplevelState, Object> try_function = MLValue.compileFunction("""
@@ -308,7 +308,7 @@ public class IsabelleProblem {
 
         SledgehammerResult result = null;
         SledgehammerResult tryResult = null;
-        LOGGER.info("Trying...");
+        LOGGER.debug("Trying...");
         notifySledgehammerStarted();
         try {
             Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())).retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
@@ -318,7 +318,7 @@ public class IsabelleProblem {
                 this.result = tryResult;
                 notifySledgehammerFinished();
                 notifyProcessFinished();
-                LOGGER.info("Sledgehammer result: " + this.result);
+                LOGGER.debug("Sledgehammer result: " + this.result);
                 return this.result;
             }
             Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(timeout_seconds, TimeUnit.SECONDS));
@@ -352,7 +352,7 @@ public class IsabelleProblem {
 
         notifyProcessFinished();
 
-        LOGGER.info("Sledgehammer result: " + this.result);
+        LOGGER.debug("Sledgehammer result: " + this.result);
         return this.result;
     }
 
