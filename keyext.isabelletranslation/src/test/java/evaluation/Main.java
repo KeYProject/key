@@ -8,10 +8,9 @@ import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.isabelletranslation.IllegalFormulaException;
-import de.uka.ilkd.key.gui.isabelletranslation.IsabelleProblem;
-import de.uka.ilkd.key.gui.isabelletranslation.IsabelleSolverListener;
-import de.uka.ilkd.key.gui.isabelletranslation.IsabelleTranslator;
+import de.uka.ilkd.key.gui.isabelletranslation.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -62,7 +61,7 @@ public class Main {
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
 
-    private static final long timeoutSeconds = 60;
+    private static final long timeoutSeconds = 30;
 
     private static Path outDir;
 
@@ -520,9 +519,13 @@ public class Main {
                 UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+                FullPropositionalExpansionMacro expansionMacro = new FullPropositionalExpansionMacro();
                 if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
                     try {
                         smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+                        LOGGER.info("Prep done, {} goals remaining", papi.getProof().openGoals().size());
+                        expansionMacro.applyTo(uic, papi.getProof(), papi.getProof().openGoals(), null, null);
+                        LOGGER.info("Expansion done, {} goals remaining", papi.getProof().openGoals().size());
                     } catch (Exception e) {
                         e.printStackTrace();
                         return;
@@ -576,9 +579,13 @@ public class Main {
 
 
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
+        FullPropositionalExpansionMacro expansionMacro = new FullPropositionalExpansionMacro();
         if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
             try {
                 smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
+                LOGGER.info("Prep done, {} goals remaining", papi.getProof().openGoals().size());
+                expansionMacro.applyTo(uic, papi.getProof(), papi.getProof().openGoals(), null, null);
+                LOGGER.info("Expansion done, {} goals remaining", papi.getProof().openGoals().size());
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -750,6 +757,7 @@ public class Main {
             long buildingTime = 0L;
             Goal goal;
             long goalNumber;
+            long totalTime;
 
             public TimedListener(Goal g, long goalNumber) {
                 goal = g;
@@ -792,11 +800,14 @@ public class Main {
 
             @Override
             public void processStarted(IsabelleProblem problem) {
-                System.out.println("Starting Isabelle...");
+                totalTime = System.currentTimeMillis();
             }
 
             @Override
             public void processStopped(IsabelleProblem problem) {
+                totalTime = System.currentTimeMillis() - totalTime;
+                updateIsabelleTime(input, contractName, goal, totalTime);
+
                 String isabelleTranslation = problem.getSequentTranslation();
                 updateIsabelleTranslationLines(input, contractName, goal, countLines(isabelleTranslation + problem.getPreamble()));
                 try {
@@ -842,9 +853,10 @@ public class Main {
         }
         Services services = proof.getServices();
         IsabelleTranslator translator = new IsabelleTranslator(services);
+        IsabelleLauncher launcher = new IsabelleLauncher(IsabelleTranslationSettings.getInstance());
+        List<IsabelleProblem> problems = new ArrayList<>();
 
         goals.forEach((Goal goal) -> {
-            long totalTime = System.currentTimeMillis();
             IsabelleProblem problem;
             try {
                 problem = translator.translateProblem(goal);
@@ -854,10 +866,10 @@ public class Main {
                 return;
             }
             problem.addListener(new TimedListener(goal, goal.getTime()));
-            problem.sledgehammer(timeoutSeconds);
-            totalTime = System.currentTimeMillis() - totalTime;
-            updateIsabelleTime(input, contractName, goal, totalTime);
+
+            problems.add(problem);
         });
+        launcher.try0ThenSledgehammerAll(problems, timeoutSeconds);
     }
 
     private static void saveFlaggedTranslations() {
