@@ -3,15 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -34,6 +40,68 @@ public final class ExceptionTools {
 
     private ExceptionTools() {
     }
+
+    /**
+     * Get the throwable's message. This will return a nicer error message for
+     * certain ANTLR exceptions.
+     *
+     * @param throwable a throwable
+     * @return message for the exception
+     */
+    public static String getMessage(Throwable throwable) {
+        if (throwable == null) {
+            return "";
+        } else if (throwable instanceof ParseCancellationException
+                || throwable instanceof ProblemLoaderException) {
+            return getMessage(throwable.getCause());
+        } else if (throwable instanceof InputMismatchException ime) {
+            return getNiceMessage(ime);
+        } else if (throwable instanceof NoViableAltException nvae) {
+            return getNiceMessage(nvae);
+        } else {
+            return throwable.getMessage();
+        }
+    }
+
+    public static String getNiceMessage(InputMismatchException ime) {
+        return getNiceMessageInternal(ime.getInputStream(), ime.getOffendingToken(),
+            ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
+    }
+
+    public static String getNiceMessage(NoViableAltException ime) {
+        return getNiceMessageInternal(ime.getInputStream(), ime.getOffendingToken(),
+            ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
+    }
+
+    private static String getNiceMessageInternal(IntStream inputStream,
+            org.antlr.v4.runtime.Token offendingToken, Vocabulary vocabulary,
+            IntervalSet expectedTokens) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Syntax error in input file ");
+        var inFile = new File(inputStream.getSourceName());
+        sb.append(inFile.getName());
+        sb.append("\n");
+        sb.append("Line: ");
+        sb.append(offendingToken.getLine());
+        sb.append(" Column: ");
+        sb.append(offendingToken.getCharPositionInLine() + 1);
+
+        sb.append("\n");
+        sb.append("Found token which was not expected: ");
+        sb.append(vocabulary.getDisplayName(offendingToken.getType()));
+        sb.append("\n");
+        sb.append("Expected token type(s): ");
+        for (var interval : expectedTokens.getIntervals()) {
+            for (int i = interval.a; i <= interval.b; i++) {
+                sb.append(vocabulary.getDisplayName(i));
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
 
     /**
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
