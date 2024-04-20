@@ -33,7 +33,7 @@ public class ObserverFunctionHandler implements IsabelleHandler {
                 functionName = op.name().toString().replace("<" + m.group(1) + ">", "_" + m.group(1))
                         .replace("::", "_").replace("$", "").replace(".", "_");
             } else {
-                functionName = op.name().toString().replace("::", "_").replace("$", "");
+                functionName = op.name().toString().replace("::", "_").replace("$", "").replace(".", "_");
             }
             trans.addKnownSymbol(term, new StringBuilder(functionName));
         }
