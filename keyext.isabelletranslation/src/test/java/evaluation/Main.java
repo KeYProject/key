@@ -185,7 +185,7 @@ public class Main {
             sb.append(",");
             sb.append(c.replace(",", "_"));
             sb.append(",");
-            sb.append(goal.getTime());
+            sb.append(goal.node().getStepIndex());
             sb.append(",");
             sb.append(entry.keyState);
             sb.append(",");
@@ -271,7 +271,7 @@ public class Main {
                 sb.append(",");
                 sb.append(c.replace(",", "_"));
                 sb.append(",");
-                sb.append(goal.getTime());
+                sb.append(goal.node().getStepIndex());
                 sb.append(",");
                 sb.append(entry.keyState);
                 sb.append(",");
@@ -342,7 +342,7 @@ public class Main {
 
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                        System.out.println("Visiting " + file.toString());
+                        LOGGER.info("Visiting " + file.toString());
                         if (file.toString().endsWith(".key") && checkNonTrivialNoErrorQuickLoad(file)) {
                             appendValid(file.toAbsolutePath());
                         }
@@ -439,17 +439,21 @@ public class Main {
             tl.runWithTimeout(prep, 60, TimeUnit.SECONDS);
         } catch (TimeoutException | InterruptedException e) {
             LOGGER.error("Prep timeout {}", file);
+            executorService.shutdown();
             return false;
         }
         if (!success.get()) {
             LOGGER.error("Prep failed {}", file);
+            executorService.shutdown();
             return false;
         }
 
         if (proof.openGoals().isEmpty()) {
             LOGGER.error("No open goals found after Preparation {}", file);
+            executorService.shutdown();
             return false;
         }
+        executorService.shutdown();
         return true;
     }
 
@@ -504,7 +508,7 @@ public class Main {
         if (input.toString().endsWith(".key")) {
             ProofApi papi = null;
             try {
-                System.out.println("Processing " + input);
+                LOGGER.info("Processing " + input);
                 ProofManagementApi pm = KeYApi.loadFromKeyFile(input.toFile());
                 papi = pm.getLoadedProof();
 
@@ -532,7 +536,7 @@ public class Main {
                     }
                 }
                 if (proof.openGoals().isEmpty()) {
-                    System.out.println("No open goals found after Preparation");
+                    LOGGER.info("No open goals found after Preparation");
                     return;
                 }
                 ImmutableList<Goal> goals = proof.openGoals();
@@ -575,7 +579,7 @@ public class Main {
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
         String contractName = proof.name().toString();
-        System.out.println("Processing contract " + contractName + " of " + input);
+        LOGGER.info("Processing contract " + contractName + " of " + input);
 
 
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
@@ -592,7 +596,7 @@ public class Main {
             }
         }
         if (proof.openGoals().isEmpty()) {
-            System.out.println("No open goals found after Preparation");
+            LOGGER.info("No open goals found after Preparation");
             return;
         }
         ImmutableList<Goal> goals = proof.openGoals();
@@ -626,7 +630,7 @@ public class Main {
 
         for (Goal g : goals) {
             int nodes = -g.proof().getStatistics().nodes;
-            long goalTime = g.getTime();
+            long goalTime = g.node().getStepIndex();
 
             long manualTime = System.currentTimeMillis();
             uic.getProofControl().startFocussedAutoMode(null, g);
@@ -639,8 +643,8 @@ public class Main {
             updateKeYNodes(input, contractName, g, nodes);
 
             long keyTime = statistics.autoModeTimeInMillis;
-            System.out.println("   KeY statistics: " + keyTime);
-            System.out.println("   Manual logging: " + manualTime);
+            LOGGER.info("   KeY statistics: " + keyTime);
+            LOGGER.info("   Manual logging: " + manualTime);
 
             updateKeYState(input, contractName, g, !(g.proof().isOpenGoal(g.node())) ? ProofState.CLOSED : ProofState.OPEN);
             updateKeYTime(input, contractName, g, manualTime);
@@ -674,7 +678,7 @@ public class Main {
             @Override
             public void launcherStopped(SolverLauncher launcher,
                                         Collection<SMTSolver> finishedSolvers) {
-                System.out.println("Z3 finished (" + finishedSolvers.size() + " solvers).");
+                LOGGER.info("Z3 finished ({} solvers).", finishedSolvers.size());
 
                 translationAndZ3Time = System.currentTimeMillis() - translationAndZ3Time;
                 for (SMTSolver solver : finishedSolvers) {
@@ -721,25 +725,37 @@ public class Main {
                                         Collection<SolverType> solverTypes,
                                         SolverLauncher launcher) {
                 translationAndZ3Time = System.currentTimeMillis();
-                System.out.println("Running Z3 ..." + translationAndZ3Time);
+                LOGGER.info("Running Z3 ...");
             }
         }
+
+        Collection<Callable<Object>> launcherRunnables = new LinkedBlockingQueue<>();
 
         Stream<SMTProblem> problems = goals.stream().map(SMTProblem::new);
         Services services = proof.getServices();
 
-        problems.forEach((SMTProblem problem) -> {
+
+        problems.forEach((SMTProblem problem) -> launcherRunnables.add(() -> {
             SolverLauncher launcher = new SolverLauncher(settings);
-            launcher.addListener(new TimedListener(problem.getGoal(), problem.getGoal().getTime()));
+            launcher.addListener(new TimedListener(problem.getGoal(), problem.getGoal().node().getStepIndex()));
             try {
                 launcher.launch(problem, services, Z3_SOLVER);
             } catch (Exception e) {
                 LOGGER.error("Exception during Z3... {}", e.getMessage());
                 e.printStackTrace();
                 updateZ3State(input, contractName, problem.getGoal(), ProofState.ERROR);
-                updateZ3State(input, contractName, problem.getGoal(), e.getMessage());
+                updateZ3State(input, contractName, problem.getGoal(), e.getMessage().replace(System.lineSeparator(), " ").replace(",", " "));
             }
-        });
+            return null;
+        }));
+
+        ExecutorService executorService = new ThreadPoolExecutor(3, 3, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        try {
+            executorService.invokeAll(launcherRunnables);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        executorService.shutdown();
     }
 
     private static void runIsabelleToFile(Path input, String contractName, ImmutableList<Goal> goals)
@@ -779,7 +795,7 @@ public class Main {
             @Override
             public void parsingFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
-                updateIsabelleProof(input, contractName, goal, e.getMessage());
+                updateIsabelleProof(input, contractName, goal, e.getMessage().replace(System.lineSeparator(), " ").replace(",", " "));
             }
 
             @Override
@@ -796,7 +812,7 @@ public class Main {
             @Override
             public void buildingFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
-                updateIsabelleProof(input, contractName, goal, e.getMessage());
+                updateIsabelleProof(input, contractName, goal, e.getMessage().replace(System.lineSeparator(), " ").replace(",", " "));
             }
 
             @Override
@@ -847,7 +863,7 @@ public class Main {
             @Override
             public void sledgehammerFailed(IsabelleProblem problem, Exception e) {
                 updateIsabelleState(input, contractName, goal, ProofState.ERROR);
-                updateIsabelleProof(input, contractName, goal, e.getMessage());
+                updateIsabelleProof(input, contractName, goal, e.getMessage().replace(System.lineSeparator(), " ").replace(",", " "));
             }
 
             @Override
@@ -869,7 +885,7 @@ public class Main {
                 LOGGER.error("Translation failed: {}", e.getMessage());
                 return;
             }
-            problem.addListener(new TimedListener(goal, goal.getTime()));
+            problem.addListener(new TimedListener(goal, goal.node().getStepIndex()));
 
             problems.add(problem);
         });
