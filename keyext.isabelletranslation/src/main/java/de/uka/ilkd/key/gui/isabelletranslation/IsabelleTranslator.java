@@ -80,7 +80,7 @@ public class IsabelleTranslator {
             sequentTranslation.append(" + ").append(locale);
         }
 
-        List<StringBuilder> constDecls = masterHandler.getConstDeclarations();
+        Collection<String> constDecls = masterHandler.getConstDeclarations();
         if (!constDecls.isEmpty() && locale_empty) {
             sequentTranslation.append(" = ");
             sequentTranslation.append(locales.remove(0));
@@ -88,11 +88,16 @@ public class IsabelleTranslator {
         } else if (!constDecls.isEmpty()) {
             sequentTranslation.append(" + ").append(LINE_ENDING);
         }
-        for (StringBuilder constDecl : constDecls) {
+        for (String constDecl : constDecls) {
             sequentTranslation.append(LINE_ENDING).append(constDecl);
         }
         sequentTranslation.append(LINE_ENDING);
 
+        if (!masterHandler.getNewFields().isEmpty()) {
+            sequentTranslation.append("assumes distinct_fields:");
+            sequentTranslation.append(getDistinctFieldLemma(masterHandler.getNewFields()));
+            sequentTranslation.append(LINE_ENDING);
+        }
 
         sequentTranslation.append("begin").append(LINE_ENDING);
 
@@ -116,6 +121,19 @@ public class IsabelleTranslator {
         sequentTranslation.append("\"");
 
         return new IsabelleProblem(goal, translationPreamble.toString(), sequentTranslation.toString());
+    }
+
+    private StringBuilder getDistinctFieldLemma(Collection<StringBuilder> newFields) {
+        if (newFields.isEmpty())
+            return new StringBuilder();
+        String commaSeparatedFields = String.join(",", newFields);
+        StringBuilder distinctFieldLemma = new StringBuilder();
+        distinctFieldLemma.append("\"(distinct [");
+        distinctFieldLemma.append(commaSeparatedFields);
+        distinctFieldLemma.append("]) \\<and> (({");
+        distinctFieldLemma.append(commaSeparatedFields);
+        distinctFieldLemma.append("} \\<inter> image arr (UNIV::int set)) = {})\"");
+        return distinctFieldLemma;
     }
 
     private void implementSorts(StringBuilder sequentTranslation, Queue<Sort> sortImplementationQueue, Map<Sort, Boolean> sortImplemented,
