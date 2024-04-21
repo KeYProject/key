@@ -230,7 +230,7 @@ public class IsabelleProblem {
         return this.result;
     }
 
-    protected SledgehammerResult try0ThenSledgehammer(Isabelle isabelle, Theory thy0, IsabelleTranslationSettings settings, long timeout_seconds) {
+    protected SledgehammerResult try0ThenSledgehammer(Isabelle isabelle, Theory thy0, long timeout_seconds) {
         notifyProcessStarted();
         ToplevelState toplevel = ToplevelState.apply(isabelle);
 
