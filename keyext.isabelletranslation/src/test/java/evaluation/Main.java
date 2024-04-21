@@ -745,6 +745,8 @@ public class Main {
                 e.printStackTrace();
                 updateZ3State(input, contractName, problem.getGoal(), ProofState.ERROR);
                 updateZ3State(input, contractName, problem.getGoal(), e.getMessage().replace(System.lineSeparator(), " ").replace(",", " "));
+            } finally {
+                launcher.stop();
             }
             return null;
         }));
