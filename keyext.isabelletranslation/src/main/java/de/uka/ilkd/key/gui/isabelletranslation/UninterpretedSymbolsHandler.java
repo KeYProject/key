@@ -70,7 +70,8 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
         SortedOperator op = (SortedOperator) term.op();
         if (trans.isNewSymbol(term)) {
             String name = PREFIX + op.name().toString();
-            trans.addKnownSymbol(term, new StringBuilder(name.replace("::", "_").replace(".", "_")));
+            trans.addKnownSymbol(term, new StringBuilder(name.replace("::", "_").replace(".", "_")
+                    .replace("$", "_").replace("#", "_")));
         }
 
         String name = trans.getKnownSymbol(term).toString();
