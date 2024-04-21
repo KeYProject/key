@@ -48,6 +48,7 @@ public class FieldHandler implements IsabelleHandler {
                 return new StringBuilder(fieldName);
             }
             trans.addKnownSymbol(term, new StringBuilder(fieldName));
+            trans.addField((Function) op);
         }
         return trans.getKnownSymbol(term);
     }

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class IsabelleMasterHandler {
+
+    private final Services services;
 
     private final List<Throwable> exceptions = new ArrayList<>();
 
@@ -31,7 +34,9 @@ public class IsabelleMasterHandler {
     private final Map<Operator, IsabelleHandler> handlerMap = new IdentityHashMap<>();
     private final List<StringBuilder> locales = new ArrayList<>();
 
-    private final List<StringBuilder> constDeclarations = new ArrayList<>();
+    private final Collection<String> constDeclarations = new HashSet<>();
+
+    private final Collection<StringBuilder> newFields = new HashSet<>();
 
     /**
      * Create a new handler with the default set of smt handlers.
@@ -44,6 +49,7 @@ public class IsabelleMasterHandler {
      */
     public IsabelleMasterHandler(Services services, String[] handlerNames,
                                  String[] handlerOptions) throws IOException {
+        this.services = services;
         List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
         predefinedSorts.put(Sort.ANY, new StringBuilder("any"));
         predefinedSorts.put(Sort.FORMULA, new StringBuilder("bool"));
@@ -112,6 +118,15 @@ public class IsabelleMasterHandler {
         return abbr;
     }
 
+    protected boolean addField(Function field) {
+        assert (field.sort() == services.getNamespaces().sorts().lookup("Field") && field.arity() == 0);
+        return newFields.add(unknownValues.get(field));
+    }
+
+    protected Collection<StringBuilder> getNewFields() {
+        return newFields;
+    }
+
     private void addConstDeclaration(Term term) {
         StringBuilder decl = new StringBuilder();
         assert unknownValues.get(term.op()) != null;
@@ -139,7 +154,7 @@ public class IsabelleMasterHandler {
             decl.append((translateSortName(term.sort())));
             decl.append("\"");
         }
-        constDeclarations.add(decl);
+        constDeclarations.add(decl.toString());
     }
 
     boolean isNewSymbol(Term term) {
@@ -215,7 +230,7 @@ public class IsabelleMasterHandler {
         return unknownValues.get(term.op());
     }
 
-    List<StringBuilder> getConstDeclarations() {
+    Collection<String> getConstDeclarations() {
         return constDeclarations;
     }
 
