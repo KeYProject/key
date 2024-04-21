@@ -18,14 +18,14 @@ public interface TreeWalker {
      *
      * @return the root of the tree that is being walked
      */
-    SourceElement getRoot();
+    SourceElement root();
 
     /**
      * Returns the node of the tree the walker is currently at.
      *
      * @return the node of the tree the walker is currently at
      */
-    SourceElement getCurrentNode();
+    SourceElement currentNode();
 
     /**
      * Walks to the first child of the current node, or stays in place if the current node has no

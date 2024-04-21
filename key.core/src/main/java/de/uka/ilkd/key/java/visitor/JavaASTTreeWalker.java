@@ -42,12 +42,12 @@ public class JavaASTTreeWalker implements TreeWalker {
     }
 
     @Override
-    public SourceElement getRoot() {
+    public SourceElement root() {
         return root;
     }
 
     @Override
-    public SourceElement getCurrentNode() {
+    public SourceElement currentNode() {
         return currentNode;
     }
 
@@ -187,8 +187,7 @@ public class JavaASTTreeWalker implements TreeWalker {
         final NonTerminalProgramElement nonTerminalProgramElement;
 
         /**
-         * The index of the next child of {@code nonTerminalProgramElement} that should to be
-         * visited.
+         * The index of the next child of {@code nonTerminalProgramElement} that should be visited.
          */
         int nextChildToVisitIndex;
 
@@ -310,14 +309,6 @@ public class JavaASTTreeWalker implements TreeWalker {
          */
         boolean empty() {
             return count == 0;
-        }
-
-        /**
-         * Empties the stack.
-         */
-        void clear() {
-            count = 0;
-            stack = new NonTerminalProgramElementChildIndexPair[stack.length];
         }
 
         /**

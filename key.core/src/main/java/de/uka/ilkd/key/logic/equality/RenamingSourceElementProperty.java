@@ -59,8 +59,8 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
         JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
 
-        SourceElement next1 = tw1.getCurrentNode();
-        SourceElement next2 = tw2.getCurrentNode();
+        SourceElement next1 = tw1.currentNode();
+        SourceElement next2 = tw2.currentNode();
 
         while (next1 != null && next2 != null) {
             // Handle special cases of prior equalsModRenaming implementation
