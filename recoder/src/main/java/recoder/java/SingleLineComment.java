@@ -26,7 +26,8 @@ public class SingleLineComment extends Comment {
     /**
      * Single line comment.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     public SingleLineComment(String text) {
@@ -36,7 +37,8 @@ public class SingleLineComment extends Comment {
     /**
      * Single line comment.
      *
-     * @param proto a single line comment.
+     * @param proto
+     *        a single line comment.
      */
 
     protected SingleLineComment(SingleLineComment proto) {

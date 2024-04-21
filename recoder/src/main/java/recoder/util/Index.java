@@ -38,15 +38,10 @@ public class Index implements Cloneable {
 
     public Index(HashCode hasher, int initialCapacity) {
         this.hasher = (hasher != null) ? hasher : HashCode.NATURAL;
-        if (initialCapacity < 4) {
-            initialCapacity = 4;
-        }
+        if (initialCapacity < 4) { initialCapacity = 4; }
         ld = 2;
         int cap = 4;
-        while (cap < initialCapacity) {
-            ld += 1;
-            cap += cap;
-        }
+        while (cap < initialCapacity) { ld += 1; cap += cap; }
         table = new Entry[cap];
         ld = 32 - ld;
     }
@@ -84,11 +79,7 @@ public class Index implements Cloneable {
     public boolean contains(long value) {
         Entry[] tab = table;
         for (int i = tab.length; i-- > 0;) {
-            for (Entry e = tab[i]; e != null; e = e.next) {
-                if (e.value == value) {
-                    return true;
-                }
-            }
+            for (Entry e = tab[i]; e != null; e = e.next) { if (e.value == value) { return true; } }
         }
         return false;
     }
@@ -97,9 +88,7 @@ public class Index implements Cloneable {
         int hash = hasher.hashCode(key);
         int index = (-1640531527 * hash) >>> ld;
         for (Entry e = table[index]; e != null; e = e.next) {
-            if (e.hash == hash && hasher.equals(e.key, key)) {
-                return true;
-            }
+            if (e.hash == hash && hasher.equals(e.key, key)) { return true; }
         }
         return false;
     }
@@ -107,16 +96,15 @@ public class Index implements Cloneable {
     /**
      * retrieves the assigne long value for the given object.
      *
-     * @param key the objct to look for
+     * @param key
+     *        the objct to look for
      * @return the assigned long value, or -1L if there is none.
      */
     public long get(Object key) {
         int hash = hasher.hashCode(key);
         int index = (-1640531527 * hash) >>> ld;
         for (Entry e = table[index]; e != null; e = e.next) {
-            if (e.hash == hash && hasher.equals(e.key, key)) {
-                return e.value;
-            }
+            if (e.hash == hash && hasher.equals(e.key, key)) { return e.value; }
         }
         return -1L;
     }
@@ -124,8 +112,10 @@ public class Index implements Cloneable {
     /**
      * assigns the given long value to the specified key.
      *
-     * @param key the object to assign a value to
-     * @param value the long value to be assigned. This value must be greater or equal to 0
+     * @param key
+     *        the object to assign a value to
+     * @param value
+     *        the long value to be assigned. This value must be greater or equal to 0
      */
     public long put(Object key, long value) {
         Debug.assertBoolean(value >= 0);
@@ -166,9 +156,7 @@ public class Index implements Cloneable {
 
     public void clear() {
         Entry[] tab = table;
-        for (int index = tab.length; --index >= 0;) {
-            tab[index] = null;
-        }
+        for (int index = tab.length; --index >= 0;) { tab[index] = null; }
         count = 0;
     }
 
@@ -176,9 +164,7 @@ public class Index implements Cloneable {
         try {
             Index t = (Index) super.clone();
             t.table = new Entry[table.length];
-            for (int i = table.length; i-- > 0;) {
-                t.table[i] = (table[i] != null) ? (Entry) table[i].clone() : null;
-            }
+            for (int i = table.length; i-- > 0;) { t.table[i] = (table[i] != null) ? (Entry) table[i].clone() : null; }
             return t;
         } catch (CloneNotSupportedException e) {
             throw new InternalError();
@@ -203,9 +189,7 @@ public class Index implements Cloneable {
         for (int i = 0; i <= max; i++) {
             Object key = k.nextElement();
             buf.append(key.toString()).append("=").append(get(key));
-            if (i < max) {
-                buf.append(", ");
-            }
+            if (i < max) { buf.append(", "); }
         }
         buf.append("}");
         return buf.toString();
@@ -245,14 +229,8 @@ public class Index implements Cloneable {
         }
 
         public boolean hasMoreElements() {
-            if (entry != null) {
-                return true;
-            }
-            while (index-- > 0) {
-                if ((entry = table[index]) != null) {
-                    return true;
-                }
-            }
+            if (entry != null) { return true; }
+            while (index-- > 0) { if ((entry = table[index]) != null) { return true; } }
             return false;
         }
 

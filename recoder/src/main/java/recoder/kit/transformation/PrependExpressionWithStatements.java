@@ -34,19 +34,18 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * Creates a new transformation object that inserts the given statements such that no state
      * changes take place between the statements and the evaluation of the expression.
      *
-     * @param sc the service configuration to use.
-     * @param x the expression that shall be prepended.
-     * @param statements the statements to prepend.
+     * @param sc
+     *        the service configuration to use.
+     * @param x
+     *        the expression that shall be prepended.
+     * @param statements
+     *        the statements to prepend.
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
             ASTList<Statement> statements) {
         super(sc);
-        if (x == null) {
-            throw new IllegalArgumentException("Missing expression");
-        }
-        if (statements == null) {
-            throw new IllegalArgumentException("Missing statements");
-        }
+        if (x == null) { throw new IllegalArgumentException("Missing expression"); }
+        if (statements == null) { throw new IllegalArgumentException("Missing statements"); }
         this.expression = x;
         this.statements = statements;
     }
@@ -55,9 +54,12 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * Creates a new transformation object that inserts the given statement such that no state
      * changes take place between the statement and the evaluation of the expression.
      *
-     * @param sc the service configuration to use.
-     * @param x the expression that shall be prepended.
-     * @param statement the statement to prepend.
+     * @param sc
+     *        the service configuration to use.
+     * @param x
+     *        the expression that shall be prepended.
+     * @param statement
+     *        the statement to prepend.
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
             Statement statement) {
@@ -69,22 +71,16 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      *         {@link recoder.kit.Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
-        if (statements.isEmpty()) {
-            return setProblemReport(IDENTITY);
-        }
+        if (statements.isEmpty()) { return setProblemReport(IDENTITY); }
         shifter = new ShiftPreceedingStatementExpressions(getServiceConfiguration(), expression);
         ProblemReport report = shifter.analyze();
-        if (report instanceof Problem) {
-            return setProblemReport(report);
-        }
+        if (report instanceof Problem) { return setProblemReport(report); }
         if (report == IDENTITY) {
             Statement parent = (Statement) shifter.getTopMostParent();
             StatementContainer grandpa = parent.getStatementContainer();
             int i = 0;
             for (int s = grandpa.getStatementCount(); i < s; i += 1) {
-                if (grandpa.getStatementAt(i) == parent) {
-                    break;
-                }
+                if (grandpa.getStatementAt(i) == parent) { break; }
             }
             int j = statements.size();
             if (i >= j) {
@@ -94,16 +90,15 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
                         break;
                     }
                 }
-                if (j < 0) {
-                    return setProblemReport(report);
-                }
+                if (j < 0) { return setProblemReport(report); }
             }
         }
         return setProblemReport(NO_PROBLEM);
     }
 
     /**
-     * @throws IllegalStateException if the analysis has not been called.
+     * @throws IllegalStateException
+     *         if the analysis has not been called.
      * @see #analyze()
      * @see recoder.kit.transformation.ShiftPreceedingStatementExpressions
      * @see recoder.kit.transformation.PrepareStatementList
@@ -123,11 +118,6 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         body.addAll(position, statements);
         ChangeHistory ch = getChangeHistory();
         StatementContainer parent = statement.getStatementContainer();
-        for (Statement s : statements) {
-            s.setStatementContainer(parent);
-            if (isVisible()) {
-                ch.attached(s);
-            }
-        }
+        for (Statement s : statements) { s.setStatementContainer(parent); if (isVisible()) { ch.attached(s); } }
     }
 }

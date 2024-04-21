@@ -182,8 +182,7 @@ public final class IconFactory {
 
     private static final HashMap<String, Icon> cache = new HashMap<>();
 
-    private IconFactory() {
-    }
+    private IconFactory() {}
 
     public static Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
@@ -193,7 +192,8 @@ public final class IconFactory {
     /**
      * Creates an icon from an image contained in a resource.
      *
-     * @param filename String the name of the file to search (only relative pathname to the path of
+     * @param filename
+     *        String the name of the file to search (only relative pathname to the path of
      *        this class)
      * @return the newly created image
      */
@@ -211,9 +211,7 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
-        if (im.getWidth(null) == x && im.getHeight(null) == y) {
-            return new ImageIcon(im);
-        }
+        if (im.getWidth(null) == x && im.getHeight(null) == y) { return new ImageIcon(im); }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
@@ -459,7 +457,8 @@ public final class IconFactory {
     }
 
     /**
-     * @param size desired icon size
+     * @param size
+     *        desired icon size
      * @return the icon to use for useless proof steps
      */
     public static Icon uselessAppLogo(int size) {
@@ -489,9 +488,7 @@ public final class IconFactory {
         Image original = keyLogo();
         int[] sizes = new int[] { 16, 20, 32, 40, 64, 128 };
         ArrayList<Image> images = new ArrayList<>(sizes.length);
-        for (int sz : sizes) {
-            images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH));
-        }
+        for (int sz : sizes) { images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH)); }
         return images;
     }
 }

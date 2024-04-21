@@ -115,9 +115,7 @@ public abstract class ParserExceptionTest {
             throw ae;
         } catch (Throwable e) {
             Throwable error = e;
-            if (error instanceof ProblemLoaderException) {
-                error = error.getCause();
-            }
+            if (error instanceof ProblemLoaderException) { error = error.getCause(); }
             if ("true".equals(props.getProperty("verbose"))) {
                 LOGGER.info("Exception raised while parsing {}", file.getFileName(), error);
             }
@@ -143,14 +141,14 @@ public abstract class ParserExceptionTest {
                 if (msg != null) {
                     assertTrue(actualMessage.contains(msg),
                         "Message must contain '" + msg + "', but message is: '" + actualMessage
-                            + "'");
+                                + "'");
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
                     assertTrue(actualMessage.matches(msg),
                         "Message must match regular expression '" + msg + "', but is '"
-                            + actualMessage + "'");
+                                + actualMessage + "'");
                 }
 
                 msg = props.getProperty("msgIs");

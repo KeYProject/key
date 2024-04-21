@@ -31,7 +31,8 @@ public class Abstract extends Modifier {
     /**
      * Abstract.
      *
-     * @param proto an abstract.
+     * @param proto
+     *        an abstract.
      */
 
     protected Abstract(Abstract proto) {

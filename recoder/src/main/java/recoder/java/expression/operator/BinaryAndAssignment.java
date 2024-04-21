@@ -32,8 +32,10 @@ public class BinaryAndAssignment extends Assignment {
     /**
      * Binary and assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public BinaryAndAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class BinaryAndAssignment extends Assignment {
     /**
      * Binary and assignment.
      *
-     * @param proto a binary and assignment.
+     * @param proto
+     *        a binary and assignment.
      */
 
     protected BinaryAndAssignment(BinaryAndAssignment proto) {

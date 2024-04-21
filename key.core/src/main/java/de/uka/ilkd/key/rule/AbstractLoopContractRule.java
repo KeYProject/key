@@ -40,25 +40,30 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param instantiation an instantiation.
-     * @param goal the current goal.
-     * @param services services.
+     * @param instantiation
+     *        an instantiation.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return all applicable loop contracts for the instantiation.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final Instantiation instantiation, final Goal goal, final Services services) {
-        if (instantiation == null) {
-            return DefaultImmutableSet.nil();
-        }
+        if (instantiation == null) { return DefaultImmutableSet.nil(); }
         return getApplicableContracts(services.getSpecificationRepository(),
             instantiation.statement(), instantiation.modality().kind(), goal);
     }
 
     /**
-     * @param specifications a specification repository.
-     * @param statement a statement.
-     * @param modalityKind the current goal's modality.
-     * @param goal the current goal.
+     * @param specifications
+     *        a specification repository.
+     * @param statement
+     *        a statement.
+     * @param modalityKind
+     *        the current goal's modality.
+     * @param goal
+     *        the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
@@ -98,25 +103,27 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param collectedContracts a set of loop contracts.
-     * @param goal the current goal.
+     * @param collectedContracts
+     *        a set of loop contracts.
+     * @param goal
+     *        the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
     protected static ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
-            if (!contractApplied(contract, goal)) {
-                result = result.add(contract);
-            }
+            if (!contractApplied(contract, goal)) { result = result.add(contract); }
         }
         return result;
     }
 
     /**
      *
-     * @param contract a loop contract.
-     * @param goal the current goal.
+     * @param contract
+     *        a loop contract.
+     * @param goal
+     *        the current goal.
      * @return {@code true} if the contract has already been applied.
      */
     protected static boolean contractApplied(final LoopContract contract, final Goal goal) {
@@ -153,21 +160,15 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     @Override
     public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) {
-            return false;
-        }
+        if (occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
-            return false;
-        }
+        if (Transformer.inTransformer(occurrence)) { return false; }
 
         final Instantiation instantiation =
             instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
-        if (instantiation == null) {
-            return false;
-        }
+        if (instantiation == null) { return false; }
 
         final ImmutableSet<LoopContract> contracts =
             getApplicableContracts(instantiation, goal, goal.proof().getServices());
@@ -177,18 +178,19 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             // (a) the block starts with a while loop or
             // (b) the block starts with a for loop whose head has already been applied
             // via the rule LoopContractApplyHead.
-            if (contract.getHead() == null) {
-                return true;
-            }
+            if (contract.getHead() == null) { return true; }
         }
         return false;
     }
 
     /**
      *
-     * @param formula the formula on which the rule is to be applied.
-     * @param goal the current goal.
-     * @param services services.
+     * @param formula
+     *        the formula on which the rule is to be applied.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return a new instantiation.
      */
     public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
@@ -204,9 +206,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param variables variables.
-     * @param contract a loop contract.
-     * @param services services.
+     * @param variables
+     *        variables.
+     * @param contract
+     *        a loop contract.
+     * @param services
+     *        services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
     protected Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
@@ -234,9 +239,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
         /**
          *
-         * @param formula the formula on which the rule is to be applied.
-         * @param goal the current goal.
-         * @param services services.
+         * @param formula
+         *        the formula on which the rule is to be applied.
+         * @param goal
+         *        the current goal.
+         * @param services
+         *        services.
          */
         public Instantiator(final Term formula, final Goal goal, final Services services) {
             super(formula, goal, services);

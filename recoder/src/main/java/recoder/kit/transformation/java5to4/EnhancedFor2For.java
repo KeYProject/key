@@ -46,11 +46,15 @@ public final class EnhancedFor2For extends TwoPassTransformation {
      * creates a new transformation. Note that if neither specifying iteratorName and
      * arrayReferenceName, this transformation will always work.
      *
-     * @param sc cross reference source configuration
-     * @param enhancedFor the EnhancedFor to be replaced
-     * @param iteratorName name for the iterator/int. if <code>null</code>, will find one
+     * @param sc
+     *        cross reference source configuration
+     * @param enhancedFor
+     *        the EnhancedFor to be replaced
+     * @param iteratorName
+     *        name for the iterator/int. if <code>null</code>, will find one
      *        automatically.
-     * @param arrayReferenceName name for the array reference (if neccessary). if <code>null</code>,
+     * @param arrayReferenceName
+     *        name for the array reference (if neccessary). if <code>null</code>,
      *        will find one automatically.
      */
     public EnhancedFor2For(CrossReferenceServiceConfiguration sc, EnhancedFor enhancedFor,
@@ -76,9 +80,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
     public ProblemReport analyze() {
         if (iteratorName != null) {
             Variable v = sc.getSourceInfo().getVariable(iteratorName, enhancedFor.getASTParent());
-            if (v != null) {
-                return setProblemReport(new NameConflict(v));
-            }
+            if (v != null) { return setProblemReport(new NameConflict(v)); }
         } else {
             // iteratorName = "i";
             // int i = 0;
@@ -91,9 +93,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         if (arrayReferenceName != null) {
             Variable v =
                 sc.getSourceInfo().getVariable(arrayReferenceName, enhancedFor.getASTParent());
-            if (v != null) {
-                return setProblemReport(new NameConflict(v));
-            }
+            if (v != null) { return setProblemReport(new NameConflict(v)); }
         } else {
             arrayReferenceName = VariableKit.createValidVariableName(sc.getSourceInfo(),
                 enhancedFor.getASTParent(), "a");
@@ -165,9 +165,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             // if statement block, go into it
             Statement s = enhancedFor.getStatementAt(0);
             if (s instanceof StatementBlock sb) {
-                for (int i = 0; i < sb.getStatementCount(); i++) {
-                    statements.add(sb.getStatementAt(i).deepClone());
-                }
+                for (int i = 0; i < sb.getStatementCount(); i++) { statements.add(sb.getStatementAt(i).deepClone()); }
             } else {
                 statements.add(s.deepClone());
             }

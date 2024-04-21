@@ -44,7 +44,8 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * This reference.
      *
-     * @param outer a type reference.
+     * @param outer
+     *        a type reference.
      */
 
     public ThisReference(TypeReference outer) {
@@ -55,14 +56,13 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * This reference.
      *
-     * @param proto a this reference.
+     * @param proto
+     *        a this reference.
      */
 
     protected ThisReference(ThisReference proto) {
         super(proto);
-        if (proto.prefix != null) {
-            prefix = proto.prefix.deepClone();
-        }
+        if (proto.prefix != null) { prefix = proto.prefix.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -82,9 +82,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (prefix != null) {
-            prefix.setReferenceSuffix(this);
-        }
+        if (prefix != null) { prefix.setReferenceSuffix(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -118,25 +116,21 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
-        }
+        if (prefix != null) { if (index == 0) { return prefix; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
-        if (prefix == child) {
-            return 0;
-        }
+        if (prefix == child) { return 0; }
         return -1;
     }
 
@@ -146,22 +140,21 @@ public class ThisReference extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (prefix == p) {
             TypeReference r = (TypeReference) q;
             prefix = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         return false;
@@ -180,7 +173,8 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * Set reference prefix.
      *
-     * @param x a reference prefix.
+     * @param x
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix x) {
@@ -200,7 +194,8 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -220,7 +215,8 @@ public class ThisReference extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -244,9 +240,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix != null && index == 0) {
-            return prefix;
-        }
+        if (prefix != null && index == 0) { return prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

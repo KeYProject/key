@@ -33,7 +33,8 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
     /**
      * Branch.
      *
-     * @param proto a branch.
+     * @param proto
+     *        a branch.
      */
 
     protected Branch(Branch proto) {

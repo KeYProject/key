@@ -37,7 +37,8 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param value a float value.
+     * @param value
+     *        a float value.
      */
 
     public FloatLiteral(float value) {
@@ -47,7 +48,8 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public FloatLiteral(String value) {
@@ -57,7 +59,8 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param proto a float literal.
+     * @param proto
+     *        a float literal.
      */
 
     protected FloatLiteral(FloatLiteral proto) {
@@ -88,7 +91,8 @@ public class FloatLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

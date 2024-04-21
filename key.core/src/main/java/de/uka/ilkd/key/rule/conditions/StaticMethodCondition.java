@@ -49,9 +49,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     private static ImmutableArray<Expression> toExpArray(
             ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
-        for (int i = 0; i < a.size(); i++) {
-            result[i] = (Expression) a.get(i);
-        }
+        for (int i = 0; i < a.size(); i++) { result[i] = (Expression) a.get(i); }
         return new ImmutableArray<>(result);
     }
 
@@ -69,9 +67,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         if (rp != null && mn != null && ape != null) {
             ImmutableArray<Expression> ar =
                 toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
-            if (var == args) {
-                ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
-            }
+            if (var == args) { ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst); }
             ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
             MethodReference mr = new MethodReference(ar, mn, rp);
             IProgramMethod method = null;
@@ -89,9 +85,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
                 method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
                     prefixType);
             }
-            if (method == null) {
-                return false;
-            }
+            if (method == null) { return false; }
             return negation ^ method.isStatic();
         }
         return true;
@@ -101,6 +95,6 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname
-            + ", " + args + ")";
+                + ", " + args + ")";
     }
 }

@@ -29,7 +29,8 @@ public final class ProgressListenerManager {
     /**
      * creates the manager for progress listeners
      *
-     * @param source the Object where the progress hopefull occurs
+     * @param source
+     *        the Object where the progress hopefull occurs
      */
     public ProgressListenerManager(Object source) {
         this.source = source;
@@ -43,9 +44,7 @@ public final class ProgressListenerManager {
     public void fireProgressEvent(int workCount) {
         if (!progressListeners.isEmpty()) {
             progressEvent.setWorkDoneCount(workCount);
-            for (var pl : progressListeners) {
-                pl.workProgressed(progressEvent);
-            }
+            for (var pl : progressListeners) { pl.workProgressed(progressEvent); }
         }
     }
 
@@ -53,9 +52,7 @@ public final class ProgressListenerManager {
         if (!progressListeners.isEmpty()) {
             progressEvent.setWorkDoneCount(workCount);
             progressEvent.setState(state);
-            for (var pl : progressListeners) {
-                pl.workProgressed(progressEvent);
-            }
+            for (var pl : progressListeners) { pl.workProgressed(progressEvent); }
         }
     }
 
@@ -63,18 +60,14 @@ public final class ProgressListenerManager {
         if (!progressListeners.isEmpty()) {
             progressEvent.setWorkDoneCount(workCount);
             progressEvent.setWorkToDoCount(newMaximum);
-            for (var pl : progressListeners) {
-                pl.workProgressed(progressEvent);
-            }
+            for (var pl : progressListeners) { pl.workProgressed(progressEvent); }
         }
     }
 
     public void fireProgressEvent(int workCount, int newMaximum, Object state) {
         if (!progressListeners.isEmpty()) {
             progressEvent.setWork(workCount, newMaximum, state);
-            for (var pl : progressListeners) {
-                pl.workProgressed(progressEvent);
-            }
+            for (var pl : progressListeners) { pl.workProgressed(progressEvent); }
         }
     }
 

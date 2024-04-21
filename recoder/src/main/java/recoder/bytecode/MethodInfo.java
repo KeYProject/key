@@ -27,18 +27,12 @@ public class MethodInfo extends MemberInfo implements Method {
     public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes,
             String[] exceptions, ClassFile cf) {
         super(accessFlags, name, cf);
-        if (returntype != null) {
-            this.returntype = returntype.intern();
-        }
+        if (returntype != null) { this.returntype = returntype.intern(); }
         this.paramtypes = paramtypes;
-        for (int i = 0; i < paramtypes.length; i++) {
-            paramtypes[i] = paramtypes[i].intern();
-        }
+        for (int i = 0; i < paramtypes.length; i++) { paramtypes[i] = paramtypes[i].intern(); }
         this.exceptions = exceptions;
         if (exceptions != null) {
-            for (int i = 0; i < exceptions.length; i++) {
-                exceptions[i] = exceptions[i].intern();
-            }
+            for (int i = 0; i < exceptions.length; i++) { exceptions[i] = exceptions[i].intern(); }
         }
     }
 
@@ -47,23 +41,17 @@ public class MethodInfo extends MemberInfo implements Method {
     }
 
     public final AnnotationUseInfo[] getAnnotationsForParam(int paramNum) {
-        if (paramAnnotations == null) {
-            return null;
-        }
+        if (paramAnnotations == null) { return null; }
         return paramAnnotations[paramNum];
     }
 
     public final List<TypeArgumentInfo> getTypeArgumentsForParam(int paramNum) {
-        if (paramTypeArgs == null) {
-            return null;
-        }
+        if (paramTypeArgs == null) { return null; }
         return paramTypeArgs[paramNum];
     }
 
     public final List<TypeArgumentInfo> getTypeArgumentsForReturnType() {
-        if (paramTypeArgs == null) {
-            return null;
-        }
+        if (paramTypeArgs == null) { return null; }
         return paramTypeArgs[paramTypeArgs.length - 1];
     }
 

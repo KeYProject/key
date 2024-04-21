@@ -41,7 +41,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     /**
      * Identifier.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     public Identifier(String text) {
@@ -51,7 +52,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     /**
      * Identifier.
      *
-     * @param proto an identifier.
+     * @param proto
+     *        an identifier.
      */
 
     protected Identifier(Identifier proto) {
@@ -92,7 +94,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     /**
      * Set parent.
      *
-     * @param p a named program element.
+     * @param p
+     *        a named program element.
      */
 
     public void setParent(NonTerminalProgramElement p) {
@@ -114,7 +117,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
      * Set text. The text becomes internalized such that x.getText().equals(y.getText()) is
      * equivalent to x.getText()==y.getText() except for null Strings.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     protected void setText(String text) {

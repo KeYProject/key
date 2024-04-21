@@ -32,7 +32,8 @@ public class PreIncrement extends Assignment {
     /**
      * Pre increment.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public PreIncrement(Expression child) {
@@ -43,7 +44,8 @@ public class PreIncrement extends Assignment {
     /**
      * Pre increment.
      *
-     * @param proto a pre increment.
+     * @param proto
+     *        a pre increment.
      */
 
     protected PreIncrement(PreIncrement proto) {

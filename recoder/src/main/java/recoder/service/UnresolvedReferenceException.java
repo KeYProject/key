@@ -23,7 +23,8 @@ public class UnresolvedReferenceException extends ModelException {
     /**
      * Empty constructor.
      *
-     * @param r the program element that could not be resolved.
+     * @param r
+     *        the program element that could not be resolved.
      */
     public UnresolvedReferenceException(ProgramElement r) {
         programElement = r;
@@ -32,8 +33,10 @@ public class UnresolvedReferenceException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param r the program element that could not be resolved.
+     * @param s
+     *        an explanation.
+     * @param r
+     *        the program element that could not be resolved.
      */
     public UnresolvedReferenceException(String s, ProgramElement r) {
         super(s);

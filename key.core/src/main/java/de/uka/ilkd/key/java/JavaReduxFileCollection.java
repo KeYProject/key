@@ -62,8 +62,10 @@ public class JavaReduxFileCollection implements FileCollection {
      * The list of resources is retreived and interpreted. The resources themselves are not yet
      * read.
      *
-     * @param profile the {@link Profile} to use
-     * @throws IOException if access to the resources fails
+     * @param profile
+     *        the {@link Profile} to use
+     * @throws IOException
+     *         if access to the resources fails
      */
     public JavaReduxFileCollection(Profile profile) throws IOException {
         resourceLocation = JAVA_SRC_DIR;
@@ -76,17 +78,13 @@ public class JavaReduxFileCollection implements FileCollection {
         URL jlURL =
             KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, resourceString);
 
-        if (jlURL == null) {
-            throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
-        }
+        if (jlURL == null) { throw new FileNotFoundException("Resource " + resourceString + " cannot be opened."); }
 
         try (final BufferedReader r =
             new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
-                if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
-                    continue;
-                }
+                if ((jl.length() == 0) || (jl.charAt(0) == '#')) { continue; }
                 resources.add(jl);
             }
         }
@@ -147,9 +145,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() throws NoSuchElementException {
-            if (currentURL == null) {
-                throw new NoSuchElementException("Location of " + current + " not found.");
-            }
+            if (currentURL == null) { throw new NoSuchElementException("Location of " + current + " not found."); }
 
             return new URLDataLocation(currentURL);
         }
@@ -163,9 +159,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public InputStream openCurrent() throws IOException, NoSuchElementException {
-            if (current == null) {
-                throw new NoSuchElementException();
-            }
+            if (current == null) { throw new NoSuchElementException(); }
 
             if (currentURL == null) {
                 throw new FileNotFoundException("cannot find " + resourceLocation + "/" + current);

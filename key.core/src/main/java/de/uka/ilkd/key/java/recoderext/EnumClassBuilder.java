@@ -41,8 +41,10 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * create a new instance that uses the given service configuration and works on the given list
      * of compilation units
      *
-     * @param services the cross referencing service configuration to be used
-     * @param cache a cache object that stores information which is needed by and common to many
+     * @param services
+     *        the cross referencing service configuration to be used
+     * @param cache
+     *        a cache object that stores information which is needed by and common to many
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
@@ -97,7 +99,8 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * Use the cross reference property and find all case usages of enum constants replace them by
      * their fully qualified name, if they are not qualified.
      *
-     * @param ed the EnumDeclaration to search for.
+     * @param ed
+     *        the EnumDeclaration to search for.
      */
     private void addCases(EnumDeclaration ed) {
 
@@ -148,8 +151,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
                 LOGGER.debug("There is no enum->class substitute for " + ed.getFullName());
             } else {
                 replace(ed, ecd);
-                assert ecd.getASTParent() != null
-                        : "No parent for " + ecd.getIdentifier().getText();
+                assert ecd.getASTParent() != null : "No parent for " + ecd.getIdentifier().getText();
             }
         }
 

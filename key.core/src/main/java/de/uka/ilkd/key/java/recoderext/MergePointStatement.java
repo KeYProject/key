@@ -27,7 +27,8 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
     }
 
     /**
-     * @param expr The index variable of the MergePointStatement
+     * @param expr
+     *        The index variable of the MergePointStatement
      */
     public MergePointStatement(Expression expr) {
         this.indexPV = expr;
@@ -92,15 +93,15 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (indexPV != null && index == 0) {
-            return indexPV;
-        }
+        if (indexPV != null && index == 0) { return indexPV; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -109,9 +110,7 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
         if (indexPV == p) {
             Expression r = (Expression) q;
             indexPV = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         return false;
@@ -127,9 +126,7 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
 
     @Override
     public int getChildPositionCode(ProgramElement child) {
-        if (indexPV != null && indexPV == child) {
-            return 0;
-        }
+        if (indexPV != null && indexPV == child) { return 0; }
         return -1;
     }
 
@@ -149,9 +146,7 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
 
     @Override
     public Expression getExpressionAt(int index) {
-        if (indexPV != null && index == 0) {
-            return indexPV;
-        }
+        if (indexPV != null && index == 0) { return indexPV; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

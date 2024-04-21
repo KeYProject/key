@@ -32,9 +32,7 @@ public class IntersectionType implements ClassType {
     public String getFullName() {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
-            if (i != 0) {
-                res.append(" & ");
-            }
+            if (i != 0) { res.append(" & "); }
             res.append(types.get(i).getFullName());
         }
         return res.toString();
@@ -67,9 +65,7 @@ public class IntersectionType implements ClassType {
     public String getName() {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
-            if (i != 0) {
-                res.append(" & ");
-            }
+            if (i != 0) { res.append(" & "); }
             res.append(types.get(i).getName());
         }
         return res.toString();
@@ -109,9 +105,7 @@ public class IntersectionType implements ClassType {
         for (Type t : types) {
             if (t instanceof ClassType) {
                 res.add((ClassType) t);
-                if (t.getFullName().equals("java.lang.Object")) {
-                    addedObject = true;
-                }
+                if (t.getFullName().equals("java.lang.Object")) { addedObject = true; }
             }
             if (t instanceof ArrayType && !addedObject) {
                 res.add(pmi.getServiceConfiguration().getNameInfo().getJavaLangObject());

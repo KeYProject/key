@@ -22,9 +22,12 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     private Node correspondingNode = null;
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param programCounter The program counter: Formula with non-empty Java block and post
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
+     * @param programCounter
+     *        The program counter: Formula with non-empty Java block and post
      *        condition as only sub term.
      */
     public SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
@@ -33,11 +36,15 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     }
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param programCounter The program counter: Formula with non-empty Java block and post
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
+     * @param programCounter
+     *        The program counter: Formula with non-empty Java block and post
      *        condition as only sub term.
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
             Term programCounter, Node correspondingNode) {
@@ -74,7 +81,8 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     }
 
     /**
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
@@ -92,23 +100,22 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
-            + "), Program Counter=("
-            + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
+                + "), Program Counter=("
+                + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
     }
 
     /**
      * Removes a trailing newline (\n) char from the given string.
      *
-     * @param str The string to remove the newline char from.
+     * @param str
+     *        The string to remove the newline char from.
      * @return The given string with the removed trailing \n char, or the original string if it does
      *         not end with an \n.
      */
     private String rmN(String str) {
-        if (str.endsWith("\n") && str.length() > 1) {
-            return str.substring(0, str.length() - 1);
-        }
+        if (str.endsWith("\n") && str.length() > 1) { return str.substring(0, str.length() - 1); }
 
         return str;
     }

@@ -22,10 +22,14 @@ public class ProofRuleUserAction extends ProofModifyingUserAction {
     /**
      * Construct a new user action of this kind.
      *
-     * @param mediator mediator
-     * @param proof proof
-     * @param goal node the rule was applied on
-     * @param name name of the rule
+     * @param mediator
+     *        mediator
+     * @param proof
+     *        proof
+     * @param goal
+     *        node the rule was applied on
+     * @param name
+     *        name of the rule
      */
     public ProofRuleUserAction(KeYMediator mediator, Proof proof, Node goal, String name) {
         super(mediator, proof, goal);

@@ -41,7 +41,8 @@ public class ContextStatementBlock extends StatementBlock {
     /**
      * creates a ContextStatementBlock
      *
-     * @param children the body of the context term
+     * @param children
+     *        the body of the context term
      */
     public ContextStatementBlock(ExtList children) {
         super(children);
@@ -52,8 +53,10 @@ public class ContextStatementBlock extends StatementBlock {
     /**
      * creates a ContextStatementBlock
      *
-     * @param children the body of the context term
-     * @param executionContext the required execution context
+     * @param children
+     *        the body of the context term
+     * @param executionContext
+     *        the required execution context
      */
     public ContextStatementBlock(ExtList children, IExecutionContext executionContext) {
         super(children);
@@ -90,9 +93,7 @@ public class ContextStatementBlock extends StatementBlock {
 
     public int getChildCount() {
         int count = 0;
-        if (executionContext != null) {
-            count++;
-        }
+        if (executionContext != null) { count++; }
         count += super.getChildCount();
         return count;
     }
@@ -100,15 +101,15 @@ public class ContextStatementBlock extends StatementBlock {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (executionContext != null) {
-            if (index == 0) {
-                return executionContext;
-            }
+            if (index == 0) { return executionContext; }
             index--;
         }
         return super.getChildAt(index);
@@ -118,7 +119,8 @@ public class ContextStatementBlock extends StatementBlock {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnContextStatementBlock(this);
@@ -127,9 +129,9 @@ public class ContextStatementBlock extends StatementBlock {
     /* toString */
     public String toString() {
         String result = ".." +
-            super.toString() +
-            "\n" +
-            "...";
+                super.toString() +
+                "\n" +
+                "...";
         return result;
     }
 
@@ -173,9 +175,7 @@ public class ContextStatementBlock extends StatementBlock {
             prefix = (ProgramPrefix) src;
             final int srcPrefixLength = prefix.getPrefixLength();
 
-            if (patternPrefixLength > srcPrefixLength) {
-                return null;
-            }
+            if (patternPrefixLength > srcPrefixLength) { return null; }
 
             pos = srcPrefixLength - patternPrefixLength;
 
@@ -209,23 +209,17 @@ public class ContextStatementBlock extends StatementBlock {
         matchCond =
             matchInnerExecutionContext(matchCond, services, lastExecutionContext, prefix, pos, src);
 
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         // matching children
         matchCond = matchChildren(newSource, matchCond, executionContext == null ? 0 : 1);
 
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         matchCond =
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
 
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         return matchCond;
     }
@@ -257,12 +251,18 @@ public class ContextStatementBlock extends StatementBlock {
      * matches the inner most execution context in prefix, used to resolve references in succeeding
      * matchings
      *
-     * @param matchCond the MatchCond the matchonditions already found
-     * @param services the Services
-     * @param lastExecutionContext the ExecutionContext if already found
-     * @param prefix the oute rmost prefixelement of the original source
-     * @param pos an int as the number of prefix elements to disappear in the context
-     * @param src the original source
+     * @param matchCond
+     *        the MatchCond the matchonditions already found
+     * @param services
+     *        the Services
+     * @param lastExecutionContext
+     *        the ExecutionContext if already found
+     * @param prefix
+     *        the oute rmost prefixelement of the original source
+     * @param pos
+     *        an int as the number of prefix elements to disappear in the context
+     * @param src
+     *        the original source
      * @return the inner most execution context
      */
     private MatchConditions matchInnerExecutionContext(MatchConditions matchCond,
@@ -285,9 +285,7 @@ public class ContextStatementBlock extends StatementBlock {
         if (executionContext != null) {
             matchCond =
                 executionContext.match(new SourceData(innerContext, -1, services), matchCond);
-            if (matchCond == null) {
-                return null;
-            }
+            if (matchCond == null) { return null; }
         }
 
         matchCond = matchCond.setInstantiations(
@@ -299,9 +297,12 @@ public class ContextStatementBlock extends StatementBlock {
     /**
      * computes the PosInProgram of the first element, which is not part of the prefix
      *
-     * @param prefix the ProgramPrefix the outer most prefix element of the source
-     * @param pos the number of elements to disappear in the context
-     * @param relPos the position of the first active statement of element
+     * @param prefix
+     *        the ProgramPrefix the outer most prefix element of the source
+     * @param pos
+     *        the number of elements to disappear in the context
+     * @param relPos
+     *        the position of the first active statement of element
      *        prefix.getPrefixElementAt(pos);
      * @return the PosInProgram of the first element, which is not part of the prefix
      */
@@ -312,9 +313,7 @@ public class ContextStatementBlock extends StatementBlock {
             int i = 0;
             while (i <= pos) {
                 final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator();
-                while (it.hasNext()) {
-                    prefixEnd = prefixEnd.down(it.next());
-                }
+                while (it.hasNext()) { prefixEnd = prefixEnd.down(it.next()); }
                 i++;
                 if (i <= pos) {
                     // as fail-fast measure I do not test here using
@@ -333,9 +332,7 @@ public class ContextStatementBlock extends StatementBlock {
 
     private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
         ProgramPrefix current = prefix;
-        for (int pos = 0; pos < i; pos++) {
-            current = current.getNextPrefixElement();
-        }
+        for (int pos = 0; pos < i; pos++) { current = current.getNextPrefixElement(); }
         return current;
     }
 }

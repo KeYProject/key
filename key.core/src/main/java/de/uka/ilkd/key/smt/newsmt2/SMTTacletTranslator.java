@@ -51,7 +51,7 @@ public class SMTTacletTranslator {
         if (!taclet.getVariableConditions().isEmpty()) {
             throw new SMTTranslationException(
                 "Only unconditional taclets without varconds can be used as SMT axioms: "
-                    + taclet.name());
+                        + taclet.name());
         }
 
         Term skeleton = tacletTranslator.translate(taclet, services);
@@ -64,9 +64,7 @@ public class SMTTacletTranslator {
     }
 
     private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables) {
-        if (variables.isEmpty()) {
-            return smt;
-        }
+        if (variables.isEmpty()) { return smt; }
 
         Term[] subs = { smt };
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
@@ -81,7 +79,7 @@ public class SMTTacletTranslator {
             SchemaVariable sv = (SchemaVariable) op;
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "
-                    + "This one cannot. Type " + sv.getClass());
+                        + "This one cannot. Type " + sv.getClass());
             }
             LogicVariable lv =
                 variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
@@ -94,9 +92,7 @@ public class SMTTacletTranslator {
             Term orgSub = term.sub(i);
             Term sub = variablify(orgSub, variables);
             subs[i] = sub;
-            if (sub != orgSub) {
-                changes = true;
-            }
+            if (sub != orgSub) { changes = true; }
         }
 
         List<QuantifiableVariable> qvars = new ArrayList<>();

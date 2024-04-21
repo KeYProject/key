@@ -9,8 +9,7 @@ public class ArrayProperties extends AbstractProperties {
 
     private Object[] data = null;
 
-    public ArrayProperties() {
-    }
+    public ArrayProperties() {}
 
     public ArrayProperties(int initialSize) {
         data = new Object[initialSize];
@@ -37,9 +36,7 @@ public class ArrayProperties extends AbstractProperties {
         int size = number + 1;
         if (data == null) {
             data = new Object[size];
-        } else if (data.length < size) {
-            data = Arrays.copyOf(data, size);
-        }
+        } else if (data.length < size) { data = Arrays.copyOf(data, size); }
     }
 
     @Override

@@ -56,7 +56,8 @@ public class DockingHelper {
     /**
      * Define that another panel should be in the lower left corner on factory reset.
      *
-     * @param className class name of that panel
+     * @param className
+     *        class name of that panel
      */
     public static void addLeftPanel(String className) {
         LEFT_PANEL.add(className);
@@ -122,14 +123,14 @@ public class DockingHelper {
     /**
      * Focus the specified panel.
      *
-     * @param mainWindow main window
-     * @param panel class name of the panel to show
+     * @param mainWindow
+     *        main window
+     * @param panel
+     *        class name of the panel to show
      */
     public static void focus(MainWindow mainWindow, Class<?> panel) {
         SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
-        if (dockable == null) {
-            return;
-        }
+        if (dockable == null) { return; }
         dockable.setVisible(true);
         FocusRequest request =
             new DefaultFocusRequest(dockable.intern(), null, false, true, false, true);
@@ -141,14 +142,13 @@ public class DockingHelper {
      * Dockables may be hidden if they are part of an extension that was disabled previously.
      * They are inserted in the left panels (more precisely, next to the goal list).
      *
-     * @param mainWindow the main window
+     * @param mainWindow
+     *        the main window
      */
     public static void restoreMissingPanels(MainWindow mainWindow) {
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
             final CDockable cur = mainWindow.getDockControl().getCDockable(i);
-            if (cur.isVisible()) {
-                continue;
-            }
+            if (cur.isVisible()) { continue; }
             cur.setLocationsAside(
                 mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
             cur.setVisible(true);
@@ -159,8 +159,10 @@ public class DockingHelper {
     /**
      * Constructs a dockable for the given component.
      *
-     * @param title a non-null, non-empty title for this dock
-     * @param component a non-null component to show
+     * @param title
+     *        a non-null, non-empty title for this dock
+     * @param component
+     *        a non-null component to show
      * @return a {@link DefaultSingleCDockable}
      * @see #createSingleDock(TabPanel)
      */

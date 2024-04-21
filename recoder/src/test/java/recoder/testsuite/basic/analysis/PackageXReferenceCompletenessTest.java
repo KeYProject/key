@@ -26,9 +26,7 @@ public class PackageXReferenceCompletenessTest extends XReferenceCompletenessTes
             List<TypeReference> list = xrsi.getReferences(x);
             for (TypeReference r : list) {
                 Type y = xrsi.getType(r);
-                if (x != y) {
-                    Assert.fail(makeResolutionError(r, x, y));
-                }
+                if (x != y) { Assert.fail(makeResolutionError(r, x, y)); }
             }
         }
     }

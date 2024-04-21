@@ -60,9 +60,7 @@ public class TypeArgumentInfo implements TypeArgument {
     }
 
     public MethodInfo getContainingMethodInfo() {
-        if (parent instanceof MethodInfo) {
-            return (MethodInfo) parent;
-        }
+        if (parent instanceof MethodInfo) { return (MethodInfo) parent; }
         return null;
     }
 

@@ -33,9 +33,7 @@ public class ModelRebuildTest extends AnalysisReportTest {
             public ProblemReport execute() {
                 getChangeHistory().begin(this);
                 List<CompilationUnit> units = getSourceFileRepository().getCompilationUnits();
-                for (CompilationUnit unit : units) {
-                    detach(unit);
-                }
+                for (CompilationUnit unit : units) { detach(unit); }
                 return NO_PROBLEM;
             }
         };

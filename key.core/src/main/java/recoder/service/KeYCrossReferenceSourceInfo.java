@@ -93,7 +93,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * start communicating or linking among their configuration partners. The service configuration
      * can be memorized if it has not been passed in by a constructor already.
      *
-     * @param cfg the service configuration this services has been assigned to.
+     * @param cfg
+     *        the service configuration this services has been assigned to.
      */
     public void initialize(ServiceConfiguration cfg) {
         super.initialize(cfg);
@@ -123,18 +124,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     @Override
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null) {
-            return false;
-        }
+        if (from == null || to == null) { return false; }
         // equal types can be coerced
-        if (from == to) {
-            return true;
-        }
+        if (from == to) { return true; }
 
         // These types cannot be coerced to anything else
-        if (from == locsetType || from == seqType || from == freeType || from == mapType) {
-            return false;
-        }
+        if (from == locsetType || from == seqType || from == freeType || from == mapType) { return false; }
 
         NameInfo ni = getNameInfo();
         // all smaller int types can be coerced to bigint
@@ -146,9 +141,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     || from == ni.getByteType();
         }
         // but a bigint cannot be coerced to anything else
-        if (from == bigintType) {
-            return false;
-        }
+        if (from == bigintType) { return false; }
 
         // all float and int types can be coerced to real
         if (to == realType) {
@@ -162,9 +155,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     || from == ni.getByteType();
         }
         // but a real cannot be coerced to anything else
-        if (from == realType) {
-            return false;
-        }
+        if (from == realType) { return false; }
 
         return super.isWidening(from, to);
     }
@@ -181,13 +172,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     /**
      * Returns the class type that contains the given program element.
      *
-     * @param context a program element.
+     * @param context
+     *        a program element.
      * @return the type to which the given program element belongs (may be <CODE>null</CODE>).
      */
     public ClassType getContainingClassType(ProgramElement context) {
-        if (context instanceof TypeDeclaration) {
-            context = context.getASTParent();
-        }
+        if (context instanceof TypeDeclaration) { context = context.getASTParent(); }
         do {
             if (context instanceof ClassType) {
                 return (ClassType) context;
@@ -212,9 +202,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     TypeDeclarationContainer tdc = pe;
                     for (int i = 0; i < tdc.getTypeDeclarationCount(); i++) {
                         ClassType ct = tdc.getTypeDeclarationAt(i);
-                        for (ClassType superType : ct.getSupertypes()) {
-                            registerSubtype(ct, superType);
-                        }
+                        for (ClassType superType : ct.getSupertypes()) { registerSubtype(ct, superType); }
                     }
                 }
             }
@@ -359,9 +347,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             }
             if (scope instanceof TypeDeclaration) {
                 result = getInheritedField(name, (TypeDeclaration) scope);
-                if (result != null) {
-                    break;
-                }
+                if (result != null) { break; }
                 // might want to check for ambiguity of outer class fields!!!
             }
             pe = scope.getASTParent();
@@ -379,9 +365,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             scope = (VariableScope) pe;
         } while (scope != null);
         // we were at the compilation unit scope, leave for good now
-        if (result == null && names2vars != null) {
-            return names2vars.get(name);
-        }
+        if (result == null && names2vars != null) { return names2vars.get(name); }
         return result;
     }
 
@@ -395,8 +379,10 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * <code>pe = redirectScopeNesting(pe);</code> instead of <code>s.getASTParent();</code> in
      * Recoder 0.84.
      *
-     * @param name the name for the type to be looked up; may or may not be qualified.
-     * @param context a program element defining the lookup context (scope).
+     * @param name
+     *        the name for the type to be looked up; may or may not be qualified.
+     * @param context
+     *        a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
     public Type getType(String name, ProgramElement context) {
@@ -406,9 +392,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         // check primitive types, array types of primitive types,
         // and void --- these happen often
         Type t = name2primitiveType.get(name);
-        if (t != null) {
-            return t;
-        }
+        if (t != null) { return t; }
 
         if (name.startsWith("\\dl_")) {
             var pt = new PrimitiveType(name, this);
@@ -416,17 +400,13 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             return pt;
         }
 
-        if (name.equals("void")) {
-            return null;
-        }
+        if (name.equals("void")) { return null; }
         // catch array types
         if (name.endsWith("]")) {
             int px = name.indexOf('[');
             // compute base type
             Type baseType = getType(name.substring(0, px), context);
-            if (baseType == null) {
-                return null;
-            }
+            if (baseType == null) { return null; }
             String indexExprs = name.substring(px);
             // the basetype exists now, so fetch a corresponding array type
             // (if there is none, the name info will create one)
@@ -443,10 +423,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
 
         ProgramElement pe = context;
-        while (pe != null && !(pe instanceof TypeScope)) {
-            context = pe;
-            pe = redirectScopeNesting(pe);
-        }
+        while (pe != null && !(pe instanceof TypeScope)) { context = pe; pe = redirectScopeNesting(pe); }
         TypeScope scope = (TypeScope) pe;
         ClassType result = null;
 
@@ -489,15 +466,10 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             }
             scope = s;
             pe = s.getASTParent();
-            while (pe != null && !(pe instanceof TypeScope)) {
-                context = pe;
-                pe = redirectScopeNesting(pe);
-            }
+            while (pe != null && !(pe instanceof TypeScope)) { context = pe; pe = redirectScopeNesting(pe); }
             s = (TypeScope) pe;
         }
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
 
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
@@ -524,9 +496,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             // any unqualified local type would have been imported already!
             String defaultName = Naming.dot("java.lang", name);
             result = ni.getClassType(defaultName);
-            if (result == null) {
-                result = ni.getClassType(name);
-            }
+            if (result == null) { result = ni.getClassType(name); }
         }
         if (result != null) {
             scope.addTypeToScope(result, name); // add it to the CU scope
@@ -537,7 +507,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     /**
      * redirects the nesting of scopes when a method-frame occurs
      *
-     * @param scope the current scope
+     * @param scope
+     *        the current scope
      * @return the new scope
      */
     private ProgramElement redirectScopeNesting(ProgramElement scope) {
@@ -547,7 +518,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             if (!(type instanceof TypeDeclaration)) {
                 throw new IllegalStateException(
                     "In the source section of" + "method-frame only types for which source code is "
-                        + "available are supported.");
+                            + "available are supported.");
             }
             return (TypeDeclaration) getType(
                 ((MethodCallStatement) scope).getExecutionContext().getTypeReference());
@@ -579,13 +550,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * If unresolved classes are ignored, we use {@link #registerUnresolvedTypeRef(TypeReference)}
      * to create dummy stubs.
      *
-     * @param ignoreUnresolvedClasses ignore unresolved classes iff true
+     * @param ignoreUnresolvedClasses
+     *        ignore unresolved classes iff true
      */
     public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
         this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
-        if (ignoreUnresolvedClasses) {
-            stubClasses.clear();
-        }
+        if (ignoreUnresolvedClasses) { stubClasses.clear(); }
     }
 
     /*
@@ -617,15 +587,11 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         String typeString = Naming.toPathName(tyref);
 
         // bugfix: The reference might be to an array. Remove the array reference then.
-        while (typeString.endsWith("[]")) {
-            typeString = typeString.substring(0, typeString.length() - 2);
-        }
+        while (typeString.endsWith("[]")) { typeString = typeString.substring(0, typeString.length() - 2); }
 
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        if (stub != null) {
-            throw new IllegalStateException("try to resolve an unknown type twice");
-        }
+        if (stub != null) { throw new IllegalStateException("try to resolve an unknown type twice"); }
 
         recoder.abstraction.Type ty;
 
@@ -639,7 +605,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             if (!typeString.contains(".")) {
                 throw new UnresolvedReferenceException(
                     "Type references to undefined classes may only appear if they are fully qualified: "
-                        + tyref.toSource(),
+                            + tyref.toSource(),
                     tyref);
             }
 

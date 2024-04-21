@@ -14,8 +14,7 @@ public class ProgramList implements SVSubstitute {
 
 
     public ProgramList(ImmutableArray<ProgramElement> list) {
-        assert list != null
-                : "Constructor of ProgramList must" + " not be called with null argument";
+        assert list != null : "Constructor of ProgramList must" + " not be called with null argument";
         this.list = list;
     }
 
@@ -24,9 +23,7 @@ public class ProgramList implements SVSubstitute {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof ProgramList)) {
-            return false;
-        }
+        if (!(o instanceof ProgramList)) { return false; }
         return list.equals(((ProgramList) o).list);
     }
 

@@ -24,7 +24,8 @@ public interface ImplicitElementInfo extends ProgramModelInfo {
      * Returns the default constructor associated with the given class type, or <CODE>null</CODE> if
      * there is none.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      * @return the default constructor of the given type, or <CODE>null</CODE>.
      */
     DefaultConstructor getDefaultConstructor(ClassType ct);

@@ -341,24 +341,30 @@ public interface Visitor {
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds block contract for new statement block to block contract of old block statement.
      *
-     * @param oldBlock the old block
-     * @param newBlock the new block
+     * @param oldBlock
+     *        the old block
+     * @param newBlock
+     *        the new block
      */
     void performActionOnLoopContract(final StatementBlock oldBlock, final StatementBlock newBlock);
 
     /**
      * Adds loop contract for new loop statement to loop contract of old loop statement.
      *
-     * @param oldLoop the old loop statement
-     * @param newLoop the new loop statement
+     * @param oldLoop
+     *        the old loop statement
+     * @param newLoop
+     *        the new loop statement
      */
     void performActionOnLoopContract(final LoopStatement oldLoop, final LoopStatement newLoop);
 
@@ -403,7 +409,8 @@ public interface Visitor {
     /**
      * Performs action on JML assert statement.
      *
-     * @param jmlAssert the statement to perform the action on.
+     * @param jmlAssert
+     *        the statement to perform the action on.
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 }

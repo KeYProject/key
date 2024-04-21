@@ -24,7 +24,8 @@ public class IllegalChangeReportException extends RuntimeException {
     /**
      * Creates a new illegal change report exception.
      *
-     * @param msg a string.
+     * @param msg
+     *        a string.
      */
     public IllegalChangeReportException(String msg) {
         super(msg);

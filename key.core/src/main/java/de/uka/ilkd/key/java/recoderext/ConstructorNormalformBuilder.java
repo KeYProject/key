@@ -86,7 +86,8 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
      * }
      * </code>
      *
-     * @param cd the ClassDeclaration of which the initilizers have to be collected
+     * @param cd
+     *        the ClassDeclaration of which the initilizers have to be collected
      * @return the list of copy assignments and method references realising the initializers.
      */
     private ASTList<Statement> collectInitializers(ClassDeclaration cd) {
@@ -164,11 +165,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
             }
 
             final List<Variable> finalVars = getLocalClass2FinalVar().get(cd);
-            if (finalVars != null) {
-                for (final Variable v : finalVars) {
-                    v2t.put(v, v.getType());
-                }
-            }
+            if (finalVars != null) { for (final Variable v : finalVars) { v2t.put(v, v.getType()); } }
 
             if (cd.getName() == null || cd.getStatementContainer() != null
                     || cd.getContainingClassType() != null && !cd.isStatic()) {
@@ -184,9 +181,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
     protected Field getImplicitEnclosingThis(ClassDeclaration cd) {
         for (final Field f : cd.getAllFields()) {
-            if (f.getName().equals(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS)) {
-                return f;
-            }
+            if (f.getName().equals(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS)) { return f; }
         }
         return null;
     }
@@ -204,9 +199,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         attach(new MethodReference(new SuperReference(),
             new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
         final Iterator<Statement> initializers = class2initializers.get(cd).iterator();
-        for (int i = 0; initializers.hasNext(); i++) {
-            attach(initializers.next().deepClone(), body, i + 1);
-        }
+        for (int i = 0; initializers.hasNext(); i++) { attach(initializers.next().deepClone(), body, i + 1); }
         MethodDeclaration def = new MethodDeclaration(mods, null, // return type is void
             new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), parameters, recThrows, body);
         def.makeAllParentRolesValid();
@@ -217,8 +210,10 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
      * Creates the normalform of the given constructor, that is declared in class cd. For a detailed
      * description of the normalform to be built see the KeY Manual.
      *
-     * @param cd the ClassDeclaration where the cons is declared
-     * @param cons the Constructor to be transformed
+     * @param cd
+     *        the ClassDeclaration where the cons is declared
+     * @param cons
+     *        the Constructor to be transformed
      * @return the constructor normalform
      */
     private MethodDeclaration normalform(ClassDeclaration cd, Constructor cons) {
@@ -231,9 +226,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         TypeDeclaration td = class2enclosingClass.get(cd);
         final List<Variable> outerVars = getLocalClass2FinalVar().get(cd);
         int j = et == null ? 0 : 1;
-        if (outerVars != null) {
-            j += outerVars.size();
-        }
+        if (outerVars != null) { j += outerVars.size(); }
         ParameterDeclaration pd = null;
         CopyAssignment ca = null;
         String etId = "_ENCLOSING_THIS";
@@ -266,9 +259,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         }
 
         if (outerVars != null && !outerVars.isEmpty()) {
-            if (parameters.isEmpty()) {
-                attachDefaultConstructor(cd);
-            }
+            if (parameters.isEmpty()) { attachDefaultConstructor(cd); }
 
             for (final Variable v : outerVars) {
                 parameters.add(new ParameterDeclaration(
@@ -278,9 +269,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         }
 
         if (pd != null) {
-            if (parameters.isEmpty()) {
-                attachDefaultConstructor(cd);
-            }
+            if (parameters.isEmpty()) { attachDefaultConstructor(cd); }
             parameters.add(pd);
         }
 
@@ -290,9 +279,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
             // first statement has to be a this or super constructor call
             if (!(first instanceof SpecialConstructorReference)) {
-                if (body.getBody() == null) {
-                    body.setBody(new ASTArrayList<>());
-                }
+                if (body.getBody() == null) { body.setBody(new ASTArrayList<>()); }
                 attach(new MethodReference(new SuperReference(),
                     new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
             } else {
@@ -306,14 +293,10 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                         ((SuperConstructorReference) first).getReferencePrefix();
                     ASTList<Expression> args = ((SpecialConstructorReference) first).getArguments();
                     if (referencePrefix instanceof Expression) {
-                        if (args == null) {
-                            args = new ASTArrayList<>(1);
-                        }
+                        if (args == null) { args = new ASTArrayList<>(1); }
                         args.add((Expression) referencePrefix);
                     } else if (class2superContainer.get(cd) != null) {
-                        if (args == null) {
-                            args = new ASTArrayList<>(1);
-                        }
+                        if (args == null) { args = new ASTArrayList<>(1); }
                         args.add(new VariableReference(new Identifier(etId)));
                     }
                     attach(
@@ -327,9 +310,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
             // order
             if (!(first instanceof ThisConstructorReference)) {
                 ASTList<Statement> initializers = class2initializers.get(cd);
-                if (ca != null) {
-                    attach(ca, body, 0);
-                }
+                if (ca != null) { attach(ca, body, 0); }
                 for (int i = 0; outerVars != null && i < outerVars.size(); i++) {
                     attach(
                         new CopyAssignment(
@@ -355,9 +336,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
     private ConstructorDeclaration attachConstructorDecl(TypeDeclaration td) {
         if (td.getASTParent() instanceof New n) {
-            if (n.getArguments() == null || n.getArguments().isEmpty()) {
-                return null;
-            }
+            if (n.getArguments() == null || n.getArguments().isEmpty()) { return null; }
             ConstructorDeclaration constr =
                 services.getCrossReferenceSourceInfo().getConstructorDeclaration(
                     services.getCrossReferenceSourceInfo().getConstructor(n));
@@ -375,26 +354,21 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
         if (td instanceof ClassDeclaration) {
             List<Constructor> constructors = class2constructors.get(td);
             ConstructorDeclaration anonConstr = null;
-            if (td.getName() == null) {
-                anonConstr = attachConstructorDecl(td);
-            }
-            if (anonConstr != null) {
-                constructors.add(anonConstr);
-            }
+            if (td.getName() == null) { anonConstr = attachConstructorDecl(td); }
+            if (anonConstr != null) { constructors.add(anonConstr); }
             for (Constructor constructor : constructors) {
                 attach(normalform((ClassDeclaration) td, constructor), td, 0);
             }
 
             ASTList<MethodDeclaration> mdl = class2methodDeclaration.get(td);
-            for (MethodDeclaration methodDeclaration : mdl) {
-                attach(methodDeclaration, td, 0);
-            }
+            for (MethodDeclaration methodDeclaration : mdl) { attach(methodDeclaration, td, 0); }
         }
     }
 }

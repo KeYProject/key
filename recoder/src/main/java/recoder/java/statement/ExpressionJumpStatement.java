@@ -33,27 +33,25 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Expression jump statement.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public ExpressionJumpStatement(Expression expr) {
-        if (expr != null) {
-            setExpression(expr);
-        }
+        if (expr != null) { setExpression(expr); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
     /**
      * Expression jump statement.
      *
-     * @param proto an expression jump statement.
+     * @param proto
+     *        an expression jump statement.
      */
 
     protected ExpressionJumpStatement(ExpressionJumpStatement proto) {
         super(proto);
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
+        if (proto.expression != null) { expression = proto.expression.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -63,9 +61,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
+        if (expression != null) { expression.setExpressionContainer(this); }
     }
 
     /**
@@ -74,22 +70,21 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (expression == p) {
             Expression r = (Expression) q;
             expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         return false;
@@ -112,9 +107,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -131,7 +124,8 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Set expression.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public void setExpression(Expression expr) {
@@ -151,25 +145,21 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
-        }
+        if (expression != null) { if (index == 0) { return expression; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: expression
-        if (expression == child) {
-            return 0;
-        }
+        if (expression == child) { return 0; }
         return -1;
     }
 }

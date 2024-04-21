@@ -14,8 +14,7 @@ import org.key_project.util.ExtList;
  */
 public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
-    public CcatchReturnParameterDeclaration(ExtList children) {
-    }
+    public CcatchReturnParameterDeclaration(ExtList children) {}
 
     @Override
     public int getChildCount() {

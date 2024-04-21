@@ -46,9 +46,7 @@ public abstract class AbstractProfile implements Profile {
 
         ImmutableSet<String> result = DefaultImmutableSet.nil();
 
-        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) {
-            result = result.add(goalChooserBuilder.name());
-        }
+        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) { result = result.add(goalChooserBuilder.name()); }
 
         return result;
     }
@@ -105,11 +103,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public StrategyFactory getStrategyFactory(Name n) {
-        for (StrategyFactory sf : getStrategyFactories()) {
-            if (sf.name().equals(n)) {
-                return sf;
-            }
-        }
+        for (StrategyFactory sf : getStrategyFactories()) { if (sf.name().equals(n)) { return sf; } }
         return null;
     }
 
@@ -132,7 +126,8 @@ public abstract class AbstractProfile implements Profile {
     /**
      * sets the user selected goal chooser builder to be used as prototype
      *
-     * @throws IllegalArgumentException if a goal chooser of the given name is not supported
+     * @throws IllegalArgumentException
+     *         if a goal chooser of the given name is not supported
      */
     public void setSelectedGoalChooserBuilder(String name) {
 
@@ -148,15 +143,14 @@ public abstract class AbstractProfile implements Profile {
      * looks up the demanded goal chooser is supported and returns a new instance if possible
      * otherwise <code>null</code> is returned
      *
-     * @param name the String with the goal choosers name
+     * @param name
+     *        the String with the goal choosers name
      * @return a new instance of the builder or <code>null</code> if the demanded chooser is not
      *         supported
      */
     public GoalChooserBuilder lookupGC(String name) {
         for (GoalChooserBuilder supprotedGCB : supportedGCB) {
-            if (supprotedGCB.name().equals(name)) {
-                return supprotedGCB.copy();
-            }
+            if (supprotedGCB.name().equals(name)) { return supprotedGCB.copy(); }
         }
         return null;
     }
@@ -209,7 +203,8 @@ public abstract class AbstractProfile implements Profile {
      * Sets the default profile which is used if no profile is defined in custom problem files
      * (loaded via {@link KeYUserProblemFile}).
      *
-     * @param defaultProfile The default profile which is used if no profile is defined in custom
+     * @param defaultProfile
+     *        The default profile which is used if no profile is defined in custom
      *        problem files (loaded via {@link KeYUserProblemFile}).
      */
     public static void setDefaultProfile(Profile defaultProfile) {

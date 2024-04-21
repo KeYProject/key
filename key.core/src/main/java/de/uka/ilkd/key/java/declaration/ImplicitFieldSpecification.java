@@ -22,7 +22,8 @@ public class ImplicitFieldSpecification extends FieldSpecification {
     /**
      * Implicit Field specification.
      *
-     * @param var the ProgramVariable representing this concrete field
+     * @param var
+     *        the ProgramVariable representing this concrete field
      */
     public ImplicitFieldSpecification(ProgramVariable var) {
         this(var, var.getKeYJavaType());
@@ -31,8 +32,10 @@ public class ImplicitFieldSpecification extends FieldSpecification {
     /**
      * Implicit Field specification.
      *
-     * @param var the ProgramVariable representing this concrete field
-     * @param type the Type of this field
+     * @param var
+     *        the ProgramVariable representing this concrete field
+     * @param type
+     *        the Type of this field
      */
 
     public ImplicitFieldSpecification(ProgramVariable var, Type type) {
@@ -44,7 +47,8 @@ public class ImplicitFieldSpecification extends FieldSpecification {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnImplicitFieldSpecification(this);

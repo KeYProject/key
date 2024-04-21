@@ -159,10 +159,14 @@ public final class IssueDialog extends JDialog {
     /**
      * Create an issue dialog with the given title and description.
      *
-     * @param owner parent window
-     * @param title window title
-     * @param description description to show
-     * @param issues the issues
+     * @param owner
+     *        parent window
+     * @param title
+     *        window title
+     * @param description
+     *        description to show
+     * @param issues
+     *        the issues
      */
     public IssueDialog(Window owner, String title, String description,
             Set<PositionedIssueString> issues) {
@@ -173,7 +177,8 @@ public final class IssueDialog extends JDialog {
      * Escapes special HTML chars the Strings of the warning messages and decorates weblinks such
      * that they are clickable.
      *
-     * @param warnings the warnings to decorate
+     * @param warnings
+     *        the warnings to decorate
      * @return the list of decorated and escaped (otherwise unchanged) warnings
      */
     private static List<PositionedIssueString> decorateHTML(Set<PositionedIssueString> warnings) {
@@ -207,11 +212,16 @@ public final class IssueDialog extends JDialog {
      * Construct a new issue dialog based on the title, the warnings to show and the exception to
      * show.
      *
-     * @param owner parent window
-     * @param title dialog title
-     * @param warnings warnings to show
-     * @param critical whether the issue is critical
-     * @param throwable exception to show (may be null)
+     * @param owner
+     *        parent window
+     * @param title
+     *        dialog title
+     * @param warnings
+     *        warnings to show
+     * @param critical
+     *        whether the issue is critical
+     * @param throwable
+     *        exception to show (may be null)
      */
     IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
             boolean critical, Throwable throwable) {
@@ -222,12 +232,18 @@ public final class IssueDialog extends JDialog {
     /**
      * Construct a new issue dialog given the title, description, warnings and exception.
      *
-     * @param owner parent window
-     * @param title dialog title
-     * @param head description
-     * @param warnings warnings to show
-     * @param critical criticality of the issue
-     * @param throwable exception to show (may be null)
+     * @param owner
+     *        parent window
+     * @param title
+     *        dialog title
+     * @param head
+     *        description
+     * @param warnings
+     *        warnings to show
+     * @param critical
+     *        criticality of the issue
+     * @param throwable
+     *        exception to show (may be null)
      */
     IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,
             boolean critical, Throwable throwable) {
@@ -468,7 +484,8 @@ public final class IssueDialog extends JDialog {
      * Gets the hyper link element (i.e., the anchor tag of the HTMLDocument) the mouse cursor
      * currently points to.
      *
-     * @param event the mouse event, needed to get the position of the cursor
+     * @param event
+     *        the mouse event, needed to get the position of the cursor
      * @return the corresponding tag element or null if the mouse does not currently point to one
      */
     private static Element getHyperlinkElement(MouseEvent event) {
@@ -476,9 +493,7 @@ public final class IssueDialog extends JDialog {
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
         if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
-            if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
-                return elem;
-            }
+            if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) { return elem; }
         }
         return null;
     }
@@ -525,9 +540,7 @@ public final class IssueDialog extends JDialog {
 
         // by default, do not ignore any warnings
         chkIgnoreWarnings.setSelected(false);
-        if (!critical) {
-            pSouth.add(chkIgnoreWarnings);
-        }
+        if (!critical) { pSouth.add(chkIgnoreWarnings); }
         pSouth.add(pButtons);
         getRootPane().setDefaultButton(btnOK);
 
@@ -552,8 +565,10 @@ public final class IssueDialog extends JDialog {
      * shown in the dialog.
      * Important: make sure to also log the exception before showing the dialog!
      *
-     * @param parent the parent of the dialog (will be blocked)
-     * @param exception the exception to display
+     * @param parent
+     *        the parent of the dialog (will be blocked)
+     * @param exception
+     *        the exception to display
      */
     public static void showExceptionDialog(Window parent, Throwable exception) {
         // make sure UI is usable after any exception
@@ -568,8 +583,10 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog of a set of (non-critical) parser warnings.
      *
-     * @param parent the parent of the dialog (will be blocked)
-     * @param warnings the set of warnings, will be sorted by file when displaying
+     * @param parent
+     *        the parent of the dialog (will be blocked)
+     * @param warnings
+     *        the set of warnings, will be sorted by file when displaying
      */
     public static void showWarningsIfNecessary(Window parent,
             ImmutableSet<PositionedString> warnings) {
@@ -594,7 +611,8 @@ public final class IssueDialog extends JDialog {
      * Extracts message, position, and stracktrace from the given exception. To be successful, the
      * exception must have a location (see {@link ExceptionTools#getLocation(Throwable)}).
      *
-     * @param exception the exception to extract the data from
+     * @param exception
+     *        the exception to extract the data from
      * @return a new PositionedIssueString created from the data
      */
     private static PositionedIssueString extractMessage(Throwable exception) {
@@ -603,16 +621,10 @@ public final class IssueDialog extends JDialog {
             String message = exception.getMessage();
             String info = sw.toString();
 
-            if (exception instanceof ParseCancellationException) {
-                exception = exception.getCause();
-            }
+            if (exception instanceof ParseCancellationException) { exception = exception.getCause(); }
 
-            if (exception instanceof InputMismatchException ime) {
-                message = ExceptionTools.getNiceMessage(ime);
-            }
-            if (exception instanceof NoViableAltException nvae) {
-                message = ExceptionTools.getNiceMessage(nvae);
-            }
+            if (exception instanceof InputMismatchException ime) { message = ExceptionTools.getNiceMessage(ime); }
+            if (exception instanceof NoViableAltException nvae) { message = ExceptionTools.getNiceMessage(nvae); }
 
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
@@ -627,12 +639,8 @@ public final class IssueDialog extends JDialog {
             Optional<Location> location = ExceptionTools.getLocation(exception);
             if (location.isPresent()) {
                 var loc = location.get();
-                if (!loc.getPosition().isNegative()) {
-                    pos = loc.getPosition();
-                }
-                if (loc.getFileURI().isPresent()) {
-                    resourceLocation = loc.getFileURI().get();
-                }
+                if (!loc.getPosition().isNegative()) { pos = loc.getPosition(); }
+                if (loc.getFileURI().isPresent()) { resourceLocation = loc.getFileURI().get(); }
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 new Location(resourceLocation, pos), info);
@@ -644,9 +652,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private void accept() {
-        if (!critical && chkIgnoreWarnings.isSelected()) {
-            ignoredWarnings.addAll(warnings);
-        }
+        if (!critical && chkIgnoreWarnings.isSelected()) { ignoredWarnings.addAll(warnings); }
         setVisible(false);
     }
 
@@ -664,9 +670,7 @@ public final class IssueDialog extends JDialog {
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
             URI uri = location.getFileURI().get();
-            if (uri.getScheme() == null) {
-                uri = URI.create("file:" + uri.getPath());
-            }
+            if (uri.getScheme() == null) { uri = URI.create("file:" + uri.getPath()); }
             fTextField.setText("URL: " + uri);
             fTextField.setVisible(true);
 
@@ -723,15 +727,11 @@ public final class IssueDialog extends JDialog {
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
         // if we have no position there is no highlight
         Position pos = ps.getLocation().getPosition();
-        if (pos.isNegative()) {
-            return;
-        }
+        if (pos.isNegative()) { return; }
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, pos);
         int end = offset;
-        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
-            end++;
-        }
+        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) { end++; }
         try {
             if (critical) {
                 dh.addHighlight(offset, end, new SquigglyUnderlinePainter(Color.RED, 2, 1f));
@@ -754,22 +754,12 @@ public final class IssueDialog extends JDialog {
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {
-        if (line < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (column < 0) {
-            throw new IllegalArgumentException();
-        }
+        if (line < 0) { throw new IllegalArgumentException(); }
+        if (column < 0) { throw new IllegalArgumentException(); }
 
         int pos = 0;
-        for (; pos < source.length() && line > 0; ++pos) {
-            if (source.charAt(pos) == '\n') {
-                --line;
-            }
-        }
-        if (line == 0) {
-            return Math.min(pos + column, source.length());
-        }
+        for (; pos < source.length() && line > 0; ++pos) { if (source.charAt(pos) == '\n') { --line; } }
+        if (line == 0) { return Math.min(pos + column, source.length()); }
 
         // Best effort, don't throw here
         return 0;

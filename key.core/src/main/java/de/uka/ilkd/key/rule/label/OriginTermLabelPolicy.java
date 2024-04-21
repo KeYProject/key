@@ -27,17 +27,11 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm,
             Term newTerm, TermLabel label) {
-        if (services.getProof() == null) {
-            return label;
-        }
+        if (services.getProof() == null) { return label; }
 
-        if (services.getTermBuilder().getOriginFactory() == null) {
-            return null;
-        }
+        if (services.getTermBuilder().getOriginFactory() == null) { return null; }
 
-        if (!OriginTermLabel.canAddLabel(newTerm.op(), services)) {
-            return null;
-        }
+        if (!OriginTermLabel.canAddLabel(newTerm.op(), services)) { return null; }
 
         OriginTermLabel newLabel = (OriginTermLabel) label;
         OriginTermLabel oldLabel = null;
@@ -57,9 +51,7 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             result = oldLabel;
         }
 
-        if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
-            result = null;
-        }
+        if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) { result = null; }
 
         return result;
     }

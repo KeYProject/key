@@ -38,21 +38,19 @@ public final class ProofInitServiceUtil {
     /**
      * Forbid instances.
      */
-    private ProofInitServiceUtil() {
-    }
+    private ProofInitServiceUtil() {}
 
     /**
      * Returns the {@link POExtension} which supports the given {@link ProofOblInput}.
      *
-     * @param po The {@link ProofOblInput} for which {@link POExtension} are requested.
+     * @param po
+     *        The {@link ProofOblInput} for which {@link POExtension} are requested.
      * @return The available {@link POExtension}s.
      */
     public static ImmutableList<POExtension> getOperationPOExtension(ProofOblInput po) {
         ImmutableList<POExtension> result = ImmutableSLList.nil();
         for (POExtension extension : poExtensions) {
-            if (extension.isPOSupported(po)) {
-                result = result.prepend(extension);
-            }
+            if (extension.isPOSupported(po)) { result = result.prepend(extension); }
         }
         return result;
     }
@@ -87,7 +85,8 @@ public final class ProofInitServiceUtil {
      * {@link Thread}).
      * </p>
      *
-     * @param profileName The name of the requested {@link Profile}.
+     * @param profileName
+     *        The name of the requested {@link Profile}.
      * @return The {@link Profile} with the given name for usage in the {@link Thread} of the user
      *         interface or {@code null} if not available.
      */
@@ -104,7 +103,8 @@ public final class ProofInitServiceUtil {
     /**
      * Returns the {@link DefaultProfileResolver} for the given profile name.
      *
-     * @param profileName The name of the profile.
+     * @param profileName
+     *        The name of the profile.
      * @return The corresponding {@link DefaultProfileResolver} or {@code null} if not available.
      */
     public static DefaultProfileResolver getDefaultProfileResolver(String profileName) {

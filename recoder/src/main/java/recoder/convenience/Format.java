@@ -108,8 +108,10 @@ public class Format {
      * controls minimum indentation. The digit is used for <CODE>%p</CODE>,<CODE>%P</CODE>, and
      * <CODE>%r</CODE>.
      *
-     * @param formatText the format text, containing tags.
-     * @param e the model element to be formatted.
+     * @param formatText
+     *        the format text, containing tags.
+     * @param e
+     *        the model element to be formatted.
      * @return a textual representation of the model element.
      */
     public static String toString(String formatText, ModelElement e) {
@@ -143,9 +145,7 @@ public class Format {
                     if (e instanceof NamedModelElement) {
                         if (e instanceof ProgramModelElement) {
                             res.append(((ProgramModelElement) e).getFullName());
-                            if (e instanceof Method) {
-                                res.append(toString("%N", ((Method) e).getSignature()));
-                            }
+                            if (e instanceof Method) { res.append(toString("%N", ((Method) e).getSignature())); }
                         } else if (e instanceof ReferencePrefix) {
                             res.append(Naming.toPathName((ReferencePrefix) e));
                         } else {
@@ -160,9 +160,7 @@ public class Format {
                 case 'm':
                     if (e instanceof NamedModelElement) {
                         res.append(((NamedModelElement) e).getName());
-                        if (e instanceof Method) {
-                            res.append(toString("%N", ((Method) e).getSignature()));
-                        }
+                        if (e instanceof Method) { res.append(toString("%N", ((Method) e).getSignature())); }
                     } else if (e instanceof Identifier) {
                         res.append(((Identifier) e).getText());
                     } else if (e instanceof CompilationUnit) {
@@ -170,9 +168,7 @@ public class Format {
                     }
                     break;
                 case 's':
-                    if (e instanceof SourceElement) {
-                        res.append(((SourceElement) e).toSource().trim());
-                    }
+                    if (e instanceof SourceElement) { res.append(((SourceElement) e).toSource().trim()); }
                     break;
                 case 'c':
                     if (e == null) {
@@ -203,9 +199,7 @@ public class Format {
                     if (e instanceof SourceElement) {
                         SourceElement se = (SourceElement) e;
                         se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getStartPosition(), columns, res);
-                        }
+                        if (se != null) { append(se.getStartPosition(), columns, res); }
                     }
                     break;
                 case 'P':
@@ -224,25 +218,19 @@ public class Format {
                     if (e instanceof SourceElement) {
                         SourceElement se = (SourceElement) e;
                         se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getRelativePosition(), columns, res);
-                        }
+                        if (se != null) { append(se.getRelativePosition(), columns, res); }
                     }
                     break;
                 case 'u':
                     if (e instanceof ProgramElement) {
                         CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(Naming.toCanonicalName(cu));
-                        }
+                        if (cu != null) { res.append(Naming.toCanonicalName(cu)); }
                     }
                     break;
                 case 'f':
                     if (e instanceof ProgramElement) {
                         CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(cu.getDataLocation());
-                        }
+                        if (cu != null) { res.append(cu.getDataLocation()); }
                     }
                     break;
                 default:
@@ -256,26 +244,21 @@ public class Format {
 
     private static void append(Position pos, int columns, StringBuffer buf) {
         int k = 1;
-        for (int i = columns; i > 1; i -= 1, k *= 10) {
-        }
+        for (int i = columns; i > 1; i -= 1, k *= 10) {}
         int line = -1;
         int col = -1;
         if (pos != Position.UNDEFINED) {
             line = pos.getLine();
             col = pos.getColumn();
         }
-        for (int j = Math.max(1, line); j < k; j *= 10) {
-            buf.append(' ');
-        }
+        for (int j = Math.max(1, line); j < k; j *= 10) { buf.append(' '); }
         if (line == -1) {
             buf.append('?');
         } else {
             buf.append(line);
         }
         buf.append('/');
-        for (int j = Math.max(1, col); j < k; j *= 10) {
-            buf.append(' ');
-        }
+        for (int j = Math.max(1, col); j < k; j *= 10) { buf.append(' '); }
         if (col == -1) {
             buf.append('?');
         } else {
@@ -288,8 +271,10 @@ public class Format {
      * a call to {@link #toString(String, String, String, String, List)} using
      * <CODE>"(", ", ", ")"</CODE> formatting.
      *
-     * @param formatText the format text, containing tags.
-     * @param l the list to be formatted.
+     * @param formatText
+     *        the format text, containing tags.
+     * @param l
+     *        the list to be formatted.
      * @return a textual representation of the list.
      * @see #toString(String, String, String, String, List)
      */
@@ -301,28 +286,28 @@ public class Format {
      * Formats a list of model elements. Each element is formatted according to the format string,
      * surrounded by the header/footer and each inner element is followed by a separator.
      *
-     * @param formatText the format text, containing tags.
-     * @param header the list start.
-     * @param separator the element separator.
-     * @param footer the list start.
-     * @param l the list to be formatted.
+     * @param formatText
+     *        the format text, containing tags.
+     * @param header
+     *        the list start.
+     * @param separator
+     *        the element separator.
+     * @param footer
+     *        the list start.
+     * @param l
+     *        the list to be formatted.
      * @return a textual representation of the list.
      * @since 0.72
      */
     public static String toString(String formatText, String header, String separator, String footer,
             List<? extends ModelElement> l) {
-        if (l == null) {
-            return null;
-        }
+        if (l == null) { return null; }
         StringBuilder sb = new StringBuilder(64);
         sb.append(header);
         int s = l.size();
         if (s > 0) {
             sb.append(toString(formatText, l.get(0)));
-            for (int i = 1; i < s; i++) {
-                sb.append(separator);
-                sb.append(toString(formatText, l.get(i)));
-            }
+            for (int i = 1; i < s; i++) { sb.append(separator); sb.append(toString(formatText, l.get(i))); }
         }
         sb.append(footer);
         return sb.toString();
@@ -332,7 +317,8 @@ public class Format {
      * Formats a source element using a default format.
      * The default format string is {@code "\"%s\"@%p [%f]"}
      *
-     * @param se the source element to be formatted.
+     * @param se
+     *        the source element to be formatted.
      * @return a textual representation of the source element.
      *
      */
@@ -344,7 +330,8 @@ public class Format {
      * Formats a program element list using a default format. The default format string is
      * {@code "\"%s\" @%p"}
      *
-     * @param l the list to be formatted.
+     * @param l
+     *        the list to be formatted.
      * @return a textual representation of the list.
      *
      */

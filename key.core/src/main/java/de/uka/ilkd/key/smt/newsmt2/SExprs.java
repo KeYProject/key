@@ -51,7 +51,8 @@ public class SExprs {
      * There is some optimisation regarding the nature of the list of expressions: If it is empty,
      * the result is "true". If it is a singleton, it is this single expression.
      *
-     * @param clauses non-null list of boolean expression
+     * @param clauses
+     *        non-null list of boolean expression
      * @return an SExpr equivalent to the conjunction of the clauses.
      */
     public static SExpr and(List<SExpr> clauses) {
@@ -71,27 +72,24 @@ public class SExprs {
      * conclusion. If the conclusion is true, the result is true. If the conclusion is false, the
      * result is the negation of the assumption.
      *
-     * @param ante a boolean expression
-     * @param cons a boolean expression
+     * @param ante
+     *        a boolean expression
+     * @param cons
+     *        a boolean expression
      * @return a boolean expression equivalent to the implication {@code (=> ante concl)}
      */
     public static SExpr imp(SExpr ante, SExpr cons) {
-        if (ante.equals(TRUE)) {
-            return cons;
-        }
-        if (cons.equals(FALSE)) {
-            return not(ante);
-        }
-        if (ante.equals(FALSE) || cons.equals(TRUE)) {
-            return TRUE;
-        }
+        if (ante.equals(TRUE)) { return cons; }
+        if (cons.equals(FALSE)) { return not(ante); }
+        if (ante.equals(FALSE) || cons.equals(TRUE)) { return TRUE; }
         return new SExpr("=>", Type.BOOL, ante, cons);
     }
 
     /**
      * Produce a logical negation
      *
-     * @param se a boolean expression
+     * @param se
+     *        a boolean expression
      * @return a boolean expresion
      */
     private static SExpr not(SExpr se) {
@@ -104,15 +102,15 @@ public class SExprs {
      * If vars is empty: no quantifiers are produced and if the matrix has a pattern, the pattern is
      * removed.
      *
-     * @param vars a list of variable declarations {@code (var Type)}
-     * @param matrix a boolean expression
+     * @param vars
+     *        a list of variable declarations {@code (var Type)}
+     * @param matrix
+     *        a boolean expression
      * @return
      */
     public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
         if (vars.isEmpty()) {
-            if (matrix.getName().equals("!")) {
-                return matrix.getChildren().get(0);
-            }
+            if (matrix.getName().equals("!")) { return matrix.getChildren().get(0); }
             return matrix;
         } else {
             return new SExpr("forall", Type.BOOL, new SExpr(vars), coerce(matrix, Type.BOOL));
@@ -122,10 +120,13 @@ public class SExprs {
     /**
      * Takes an SExpression and converts it to the given type, if possible.
      *
-     * @param exp the SExpression to convert
-     * @param type the desired type
+     * @param exp
+     *        the SExpression to convert
+     * @param type
+     *        the desired type
      * @return The same SExpr, but with the desired type
-     * @throws SMTTranslationException if an impossible conversion is attempted
+     * @throws SMTTranslationException
+     *         if an impossible conversion is attempted
      */
     public static SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
         assert type != null;
@@ -162,16 +163,17 @@ public class SExprs {
     /**
      * Takes a list of {@link SExpr}s and converts it to a list of the given type, if possible.
      *
-     * @param exprs the list to convert
-     * @param type the desired target type
+     * @param exprs
+     *        the list to convert
+     * @param type
+     *        the desired target type
      * @return A fresh list with the same SExpr, but with the desired type
-     * @throws SMTTranslationException if an impossible conversion is attempted
+     * @throws SMTTranslationException
+     *         if an impossible conversion is attempted
      */
     public static List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
         List<SExpr> result = new ArrayList<>();
-        for (SExpr expr : exprs) {
-            result.add(coerce(expr, type));
-        }
+        for (SExpr expr : exprs) { result.add(coerce(expr, type)); }
         return result;
     }
 
@@ -180,8 +182,10 @@ public class SExprs {
      *
      * If the list is empty, then {@code e} is returned.
      *
-     * @param e the expression to wrap
-     * @param patterns a possibly empty list of expressions
+     * @param e
+     *        the expression to wrap
+     * @param patterns
+     *        a possibly empty list of expressions
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
@@ -192,8 +196,10 @@ public class SExprs {
      * Wrap the provided expression with a name label.
      * Result is {@code (e :named name)}.
      *
-     * @param e expression
-     * @param name label
+     * @param e
+     *        expression
+     * @param name
+     *        label
      * @return the named expr
      */
     public static SExpr named(SExpr e, String name) {
@@ -209,14 +215,14 @@ public class SExprs {
      *
      * If the list is empty, then {@code e} is returned.
      *
-     * @param e the expression to wrap
-     * @param patterns a possibly empty collection of expressions
+     * @param e
+     *        the expression to wrap
+     * @param patterns
+     *        a possibly empty collection of expressions
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, List<SExpr> patterns) {
-        if (patterns.isEmpty()) {
-            return e;
-        }
+        if (patterns.isEmpty()) { return e; }
 
         ArrayList<SExpr> children = new ArrayList<>();
         children.add(e);
@@ -228,7 +234,8 @@ public class SExprs {
     /**
      * Turn a KeY sort into an SMT sort (by prefixing {@link #SORT_PREFIX}.
      *
-     * @param sort the sort to translate to SMT
+     * @param sort
+     *        the sort to translate to SMT
      * @return an SEXpr representing the sort (of type T)
      */
     public static SExpr sortExpr(Sort sort) {
@@ -238,10 +245,13 @@ public class SExprs {
     /**
      * Produce a cast expression
      *
-     * @param sortExp the sort as an SExpr
-     * @param exp the expression to cast
+     * @param sortExp
+     *        the sort as an SExpr
+     * @param exp
+     *        the expression to cast
      * @return a cast of type exp to sort sortExp
-     * @throws SMTTranslationException if coercion fails
+     * @throws SMTTranslationException
+     *         if coercion fails
      */
     public static SExpr castExpr(SExpr sortExp, SExpr exp) throws SMTTranslationException {
         // There is a coercion to Universe before the call.
@@ -252,9 +262,11 @@ public class SExprs {
     /**
      * Produce an anssertion. The argument will be coerced to Bool.
      *
-     * @param assertion the SExpr to wrap.
+     * @param assertion
+     *        the SExpr to wrap.
      * @return a freshly created assert SExpr.
-     * @throws SMTTranslationException if coercion fails
+     * @throws SMTTranslationException
+     *         if coercion fails
      */
     public static SExpr assertion(SExpr assertion) throws SMTTranslationException {
         return new SExpr("assert", coerce(assertion, Type.BOOL));
@@ -275,7 +287,8 @@ public class SExprs {
      *     (! (and (.A.) (.B:)) :pattern ((p1)(p2)))
      * </pre>
      *
-     * @param matrix the SExpr to pull the patterns from
+     * @param matrix
+     *        the SExpr to pull the patterns from
      * @return either matrix (if no patterns present) or a term (!... :pattern ...)
      */
     public static SExpr pullOutPatterns(SExpr matrix) {
@@ -298,15 +311,11 @@ public class SExprs {
         for (int i = 0; i < orgChildren.size(); i++) {
             SExpr repl = filterAndCollectPatterns(orgChildren.get(i), collected);
             if (repl != orgChildren.get(i)) {
-                if (children == null) {
-                    children = new ArrayList<>(orgChildren);
-                }
+                if (children == null) { children = new ArrayList<>(orgChildren); }
                 children.set(i, repl);
             }
         }
-        if (children == null) {
-            return matrix;
-        }
+        if (children == null) { return matrix; }
         return new SExpr(matrix.getName(), matrix.getType(), children);
     }
 

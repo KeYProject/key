@@ -30,8 +30,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
     private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse.instance();
 
-    private MergeRuleCompletion() {
-    }
+    private MergeRuleCompletion() {}
 
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal, boolean forced) {
@@ -60,9 +59,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             chosenDistForm = dialog.getChosenDistinguishingFormula();
         }
 
-        if (chosenCandidates == null || chosenCandidates.size() < 1) {
-            return null;
-        }
+        if (chosenCandidates == null || chosenCandidates.size() < 1) { return null; }
 
         final MergeRuleBuiltInRuleApp result = new MergeRuleBuiltInRuleApp(app.rule(), pio);
         result.setMergePartners(chosenCandidates);

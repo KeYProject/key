@@ -29,9 +29,7 @@ public class CloneTest extends TestCase {
                     "Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
             }
             String buffer2 = cv.toSource();
-            if (!buffer1.equals(buffer2)) {
-                Assert.fail(Format.toString("Reprint of parsed %u differs", cu));
-            }
+            if (!buffer1.equals(buffer2)) { Assert.fail(Format.toString("Reprint of parsed %u differs", cu)); }
         }
     }
 }

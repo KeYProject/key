@@ -85,9 +85,12 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * New.
      *
-     * @param accessPath a reference prefix.
-     * @param constructorName a type reference.
-     * @param arguments an expression mutable list.
+     * @param accessPath
+     *        a reference prefix.
+     * @param constructorName
+     *        a type reference.
+     * @param arguments
+     *        an expression mutable list.
      */
 
     public New(ReferencePrefix accessPath, TypeReference constructorName,
@@ -101,10 +104,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * New.
      *
-     * @param accessPath a reference prefix.
-     * @param constructorName a type reference.
-     * @param arguments an expression mutable list.
-     * @param anonymousClass a class declaration.
+     * @param accessPath
+     *        a reference prefix.
+     * @param constructorName
+     *        a type reference.
+     * @param arguments
+     *        an expression mutable list.
+     * @param anonymousClass
+     *        a class declaration.
      */
 
     public New(ReferencePrefix accessPath, TypeReference constructorName,
@@ -117,17 +124,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * New.
      *
-     * @param proto a new.
+     * @param proto
+     *        a new.
      */
 
     protected New(New proto) {
         super(proto);
-        if (proto.anonymousClass != null) {
-            anonymousClass = proto.anonymousClass.deepClone();
-        }
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
+        if (proto.anonymousClass != null) { anonymousClass = proto.anonymousClass.deepClone(); }
+        if (proto.accessPath != null) { accessPath = (ReferencePrefix) proto.accessPath.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -148,16 +152,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (children != null) {
-            for (int i = children.size() - 1; i >= 0; i -= 1) {
-                children.get(i).setExpressionContainer(this);
-            }
+            for (int i = children.size() - 1; i >= 0; i -= 1) { children.get(i).setExpressionContainer(this); }
         }
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
-        if (anonymousClass != null) {
-            anonymousClass.setParent(this);
-        }
+        if (accessPath != null) { accessPath.setReferenceSuffix(this); }
+        if (anonymousClass != null) { anonymousClass.setParent(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -226,7 +224,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set statement container.
      *
-     * @param parent a statement container.
+     * @param parent
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer parent) {
@@ -246,7 +245,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set expression container.
      *
-     * @param parent an expression container.
+     * @param parent
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer parent) {
@@ -266,7 +266,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set class declaration.
      *
-     * @param decl a class declaration.
+     * @param decl
+     *        a class declaration.
      */
 
     public void setClassDeclaration(ClassDeclaration decl) {
@@ -292,9 +293,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (anonymousClass != null && index == 0) {
-            return anonymousClass;
-        }
+        if (anonymousClass != null && index == 0) { return anonymousClass; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -306,54 +305,40 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null) {
-            result++;
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (children != null) {
-            result += children.size();
-        }
-        if (anonymousClass != null) {
-            result++;
-        }
+        if (accessPath != null) { result++; }
+        if (typeReference != null) { result++; }
+        if (children != null) { result += children.size(); }
+        if (anonymousClass != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
-            if (index == 0) {
-                return accessPath;
-            }
+            if (index == 0) { return accessPath; }
             index--;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
         if (anonymousClass != null) {
-            if (index == 0) {
-                return anonymousClass;
-            }
+            if (index == 0) { return anonymousClass; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -367,19 +352,11 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         // role 4 (IDX): type arguments
         if (children != null) {
             int index = children.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
-        if (accessPath == child) {
-            return 2;
-        }
-        if (anonymousClass == child) {
-            return 3;
-        }
+        if (typeReference == child) { return 1; }
+        if (accessPath == child) { return 2; }
+        if (anonymousClass == child) { return 3; }
         return -1;
     }
 
@@ -389,16 +366,17 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
@@ -416,25 +394,19 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             accessPath = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         if (anonymousClass == p) {
             ClassDeclaration r = (ClassDeclaration) q;
             anonymousClass = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;
@@ -453,7 +425,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set reference prefix.
      *
-     * @param x a reference prefix.
+     * @param x
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix x) {
@@ -473,7 +446,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -493,7 +467,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Set arguments.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {

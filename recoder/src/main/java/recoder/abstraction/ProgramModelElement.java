@@ -42,7 +42,8 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
      * Sets the instance that can retrieve information about this program model element. Should not
      * be called from outside a service.
      *
-     * @param pmi the program model info to be used for this element.
+     * @param pmi
+     *        the program model info to be used for this element.
      */
     void setProgramModelInfo(ProgramModelInfo pmi);
 
@@ -54,13 +55,9 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
      */
     class LexicalOrder implements Order {
         public final int hashCode(Object x) {
-            if (x == null) {
-                return 0;
-            }
+            if (x == null) { return 0; }
             String name = Format.toString("%N|%p|%u", (ProgramModelElement) x);
-            if (name == null) {
-                return 0;
-            }
+            if (name == null) { return 0; }
             return name.hashCode();
         }
 
@@ -70,9 +67,7 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
         }
 
         private int diff(ProgramModelElement n1, ProgramModelElement n2) {
-            if (n1 == n2) {
-                return 0;
-            }
+            if (n1 == n2) { return 0; }
             String s1 = (n1 == null) ? "" : Format.toString("%N", n1);
             String s2 = (n2 == null) ? "" : Format.toString("%N", n2);
             int res = diff(s1, s2);
@@ -85,20 +80,14 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
         }
 
         private int diff(String s1, String s2) {
-            if (s1 == null) {
-                s1 = "";
-            }
-            if (s2 == null) {
-                s2 = "";
-            }
+            if (s1 == null) { s1 = ""; }
+            if (s2 == null) { s2 = ""; }
             int len1 = s1.length();
             int len2 = s2.length();
             for (int i = 0, m = Math.min(len1, len2); i < m; i++) {
                 char c1 = s1.charAt(i);
                 char c2 = s2.charAt(i);
-                if (c1 != c2) {
-                    return c1 - c2;
-                }
+                if (c1 != c2) { return c1 - c2; }
             }
             return len1 - len2;
         }

@@ -18,7 +18,8 @@ public class PostDecrement extends Assignment {
     /**
      * Post decrement.
      *
-     * @param children an ExtList with all children of this node
+     * @param children
+     *        an ExtList with all children of this node
      */
 
     public PostDecrement(ExtList children) {
@@ -60,7 +61,8 @@ public class PostDecrement extends Assignment {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPostDecrement(this);

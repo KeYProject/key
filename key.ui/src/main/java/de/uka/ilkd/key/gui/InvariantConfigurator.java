@@ -71,9 +71,7 @@ public class InvariantConfigurator {
      * Returns the single Instance of this class
      */
     public static InvariantConfigurator getInstance() {
-        if (configurator == null) {
-            configurator = new InvariantConfigurator();
-        }
+        if (configurator == null) { configurator = new InvariantConfigurator(); }
         return configurator;
     }
 
@@ -81,21 +79,24 @@ public class InvariantConfigurator {
      * Creates a Dialog. User can enter Invariant, Variant and Modifies clause. The input is parsed
      * and a new loop invariant is returned. In case of a ParserException an error-message is shown.
      *
-     * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
+     * @param loopInv
+     *        the {@link LoopSpecification} (complete or partial) to be displayed and
      *        edited in the dialog
-     * @param services the {@link Services} object
-     * @param requiresVariant a boolean indicating whether termination shall be proven
-     * @param heapContext a list of {@link LocationVariable}s representing the relevant heaps
+     * @param services
+     *        the {@link Services} object
+     * @param requiresVariant
+     *        a boolean indicating whether termination shall be proven
+     * @param heapContext
+     *        a list of {@link LocationVariable}s representing the relevant heaps
      * @return the user edited/completed loop invariant
-     * @throws RuleAbortException if the user cancelled the dialog
+     * @throws RuleAbortException
+     *         if the user cancelled the dialog
      */
     public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
             final Services services, final boolean requiresVariant,
             final List<LocationVariable> heapContext) throws RuleAbortException {
         // Check if there is a LoopInvariant
-        if (loopInv == null) {
-            return null;
-        }
+        if (loopInv == null) { return null; }
 
         index = 0;
 
@@ -203,7 +204,8 @@ public class InvariantConfigurator {
             /**
              * Sets up the Button Panel on the Bottom of the Invariant Dialog
              *
-             * @param buttonPanel the JPanel on which the buttons are placed
+             * @param buttonPanel
+             *        the JPanel on which the buttons are placed
              */
             private void initButtonPanel(JPanel buttonPanel) {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -361,7 +363,8 @@ public class InvariantConfigurator {
             /**
              * wrapper for the pretty printer
              *
-             * @param t the {@link Term} to be printed
+             * @param t
+             *        the {@link Term} to be printed
              * @return the String representation of the term
              */
             private String printTerm(Term t, boolean pretty) {
@@ -695,9 +698,7 @@ public class InvariantConfigurator {
             public void applyActionPerformed(ActionEvent ae) {
                 index = inputPane.getSelectedIndex();
                 parse();
-                if (this.buildInvariant()) {
-                    this.dispose();
-                }
+                if (this.buildInvariant()) { this.dispose(); }
 
             }
 
@@ -777,9 +778,7 @@ public class InvariantConfigurator {
             }
 
             public void varUpdatePerformed(DocumentEvent d, String key) {
-                if (!key.equals(DEFAULT)) {
-                    throw new IllegalStateException();
-                }
+                if (!key.equals(DEFAULT)) { throw new IllegalStateException(); }
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
@@ -865,9 +864,7 @@ public class InvariantConfigurator {
                     // wenn es nur freie Invarianten gibt
                     if (invariants.get(i)[VAR_IDX].get(DEFAULT).isEmpty()) {
                         variantTerm = null;
-                        if (requiresVariant) {
-                            throw new ParserException(VARIANT_REQUIRED, null);
-                        }
+                        if (requiresVariant) { throw new ParserException(VARIANT_REQUIRED, null); }
                     } else {
                         variantTerm = parseVariant();
                         setOK(varErrors, varCols, DEFAULT);
@@ -883,9 +880,7 @@ public class InvariantConfigurator {
 
             private void updateActiveTabs(List<LocationVariable> heapContext) {
                 for (JTabbedPane p : heapPanes) {
-                    for (int j = 0; j < p.getTabCount(); j++) {
-                        p.setEnabledAt(j, false);
-                    }
+                    for (int j = 0; j < p.getTabCount(); j++) { p.setEnabledAt(j, false); }
                     for (LocationVariable lv : heapContext) {
                         p.setEnabledAt(p.indexOfTab(lv.name().toString()), true);
                     }
@@ -908,9 +903,7 @@ public class InvariantConfigurator {
                         JTextArea jta = (JTextArea) p.getComponent(p.indexOfTab(k));
                         jta.setForeground(invCol);
                         jta.setText(invError);
-                        if (invCol == COLOR_ERROR) {
-                            errorFound = true;
-                        }
+                        if (invCol == COLOR_ERROR) { errorFound = true; }
                     }
                     reeinit = false;
                 }
@@ -923,9 +916,7 @@ public class InvariantConfigurator {
                         JTextArea jta = (JTextArea) p.getComponent(p.indexOfTab(k));
                         jta.setForeground(modCol);
                         jta.setText(modError);
-                        if (modCol == COLOR_ERROR) {
-                            errorFound = true;
-                        }
+                        if (modCol == COLOR_ERROR) { errorFound = true; }
                     }
                     reeinit = false;
                 }
@@ -935,9 +926,7 @@ public class InvariantConfigurator {
                     JTextArea jta = (JTextArea) errorPanel.getComponent(2);
                     jta.setForeground(varCol);
                     jta.setText(varError);
-                    if (varCol == COLOR_ERROR) {
-                        errorFound = true;
-                    }
+                    if (varCol == COLOR_ERROR) { errorFound = true; }
                     reeinit = false;
                 }
 
@@ -987,9 +976,7 @@ public class InvariantConfigurator {
                     return services.getTermBuilder().strictlyNothing();
                 }
                 Term result = parser.parseExpression(string);
-                if (result.sort() != locSetSort) {
-                    throw newUnexpectedTypeException(locSetSort, result.sort());
-                }
+                if (result.sort() != locSetSort) { throw newUnexpectedTypeException(locSetSort, result.sort()); }
                 return result;
             }
 
@@ -1018,9 +1005,7 @@ public class InvariantConfigurator {
                 index = inputPane.getSelectedIndex();
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 Term result = parser.parseExpression(invariants.get(index)[VAR_IDX].get(DEFAULT));
-                if (result.sort() != intSort) {
-                    throw newUnexpectedTypeException(intSort, result.sort());
-                }
+                if (result.sort() != intSort) { throw newUnexpectedTypeException(intSort, result.sort()); }
                 return result;
             }
         }

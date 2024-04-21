@@ -31,9 +31,7 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         var obs = state.getObserver();
-        if (obs != null) {
-            obs.accept(new ProofScriptEngine.EchoMessage(args.message));
-        }
+        if (obs != null) { obs.accept(new ProofScriptEngine.EchoMessage(args.message)); }
     }
 
     public static class Parameters {

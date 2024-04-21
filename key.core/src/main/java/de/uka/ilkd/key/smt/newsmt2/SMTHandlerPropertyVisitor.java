@@ -11,8 +11,10 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 /**
  * Visitor pattern for {@link SMTHandlerProperty} objects.
  *
- * @param <A> argument type
- * @param <R> return type
+ * @param <A>
+ *        argument type
+ * @param <R>
+ *        return type
  */
 public interface SMTHandlerPropertyVisitor<A, R> {
     R visit(EnumProperty<?> enumProp, A arg);

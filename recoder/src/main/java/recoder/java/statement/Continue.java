@@ -31,7 +31,8 @@ public class Continue extends LabelJumpStatement {
     /**
      * Continue.
      *
-     * @param label an identifier.
+     * @param label
+     *        an identifier.
      */
 
     public Continue(Identifier label) {
@@ -42,7 +43,8 @@ public class Continue extends LabelJumpStatement {
     /**
      * Continue.
      *
-     * @param proto a continue.
+     * @param proto
+     *        a continue.
      */
 
     protected Continue(Continue proto) {

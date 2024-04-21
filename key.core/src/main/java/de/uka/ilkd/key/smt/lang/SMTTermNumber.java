@@ -41,7 +41,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param intValue the intValue to set
+     * @param intValue
+     *        the intValue to set
      */
     public void setIntValue(int intValue) {
         this.intValue = intValue;
@@ -55,7 +56,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param bitSize the bitSize to set
+     * @param bitSize
+     *        the bitSize to set
      */
     public void setBitSize(int bitSize) {
         this.bitSize = bitSize;
@@ -69,7 +71,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param upp the upp to set
+     * @param upp
+     *        the upp to set
      */
     public void setUpp(SMTTerm upp) {
         this.upp = upp;
@@ -79,9 +82,7 @@ public class SMTTermNumber extends SMTTerm {
     @Override
     public SMTSort sort() {
 
-        if (sort != null) {
-            return sort;
-        }
+        if (sort != null) { return sort; }
 
         if (bitSize > 0) {
             return SMTSort.mkBV(bitSize);
@@ -138,18 +139,12 @@ public class SMTTermNumber extends SMTTerm {
     /** {@inheritDoc} */
     public String toString(int nestPos) {
         StringBuffer tab = new StringBuffer();
-        for (int i = 0; i < nestPos; i++) {
-            tab = tab.append(" ");
-        }
+        for (int i = 0; i < nestPos; i++) { tab = tab.append(" "); }
 
         // Negative, bounded value
-        if (bitSize > 0 && intValue < 0) {
-            return tab + "(bvneg (_ bv" + -intValue + " " + bitSize + "))";
-        }
+        if (bitSize > 0 && intValue < 0) { return tab + "(bvneg (_ bv" + -intValue + " " + bitSize + "))"; }
 
-        if (bitSize > 0) {
-            return tab + "(_ bv" + intValue + " " + bitSize + ")";
-        }
+        if (bitSize > 0) { return tab + "(_ bv" + intValue + " " + bitSize + ")"; }
 
         return tab + String.valueOf(intValue);
     }
@@ -157,43 +152,29 @@ public class SMTTermNumber extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (term == null) {
-            return false;
-        }
+        if (term == null) { return false; }
 
-        if (this == term) {
-            return true;
-        }
+        if (this == term) { return true; }
 
-        if (!(term instanceof SMTTermNumber tn)) {
-            return false;
-        }
+        if (!(term instanceof SMTTermNumber tn)) { return false; }
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }
 
     public boolean equals(SMTTerm term) {
 
-        if (term == null) {
-            return false;
-        }
+        if (term == null) { return false; }
 
-        if (this == term) {
-            return true;
-        }
+        if (this == term) { return true; }
 
-        if (!(term instanceof SMTTermNumber tn)) {
-            return false;
-        }
+        if (!(term instanceof SMTTermNumber tn)) { return false; }
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }
 
     public boolean equals(SMTTermNumber tn) {
 
-        if (this == tn) {
-            return true;
-        }
+        if (this == tn) { return true; }
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
 

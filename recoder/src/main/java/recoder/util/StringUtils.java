@@ -21,9 +21,7 @@ public class StringUtils {
     private static String[] tmpStrs = new String[64];
 
     private static void initTmpStrs() {
-        for (int i = tmpStrs.length - 1; i >= 0; i--) {
-            tmpStrs[i] = null;
-        }
+        for (int i = tmpStrs.length - 1; i >= 0; i--) { tmpStrs[i] = null; }
         tmpStrCount = 0;
     }
 
@@ -50,9 +48,7 @@ public class StringUtils {
      * Splits the given string using the specified separator character.
      */
     public static synchronized String[] split(String str, char separator) {
-        if (str == null) {
-            return null;
-        }
+        if (str == null) { return null; }
         initTmpStrs();
         String hs;
         int start = 0;
@@ -73,9 +69,7 @@ public class StringUtils {
      */
     public static String basename(String s) {
         int lastIndex = s.lastIndexOf(java.io.File.separator);
-        if (lastIndex == -1) {
-            return s;
-        }
+        if (lastIndex == -1) { return s; }
         return s.substring(lastIndex + 1);
     }
 
@@ -84,9 +78,7 @@ public class StringUtils {
      */
     public static String basenameDot(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1) {
-            return s;
-        }
+        if (lastIndex == -1) { return s; }
         return s.substring(lastIndex + 1);
     }
 
@@ -95,9 +87,7 @@ public class StringUtils {
      */
     public static String cutSuffix(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1) {
-            return s;
-        }
+        if (lastIndex == -1) { return s; }
         return s.substring(0, lastIndex);
     }
 
@@ -106,9 +96,7 @@ public class StringUtils {
      */
     public static String cutPrefix(String s) {
         int firstIndex = s.indexOf('.');
-        if (firstIndex == -1) {
-            return null;
-        }
+        if (firstIndex == -1) { return null; }
         return s.substring(firstIndex + 1);
     }
 
@@ -132,9 +120,7 @@ public class StringUtils {
      */
     public static String getPrefix(String s) {
         int firstIndex = s.indexOf('.');
-        if (firstIndex == -1) {
-            return null;
-        }
+        if (firstIndex == -1) { return null; }
         return s.substring(0, firstIndex);
     }
 
@@ -143,9 +129,7 @@ public class StringUtils {
      */
     public static String getSuffix(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1) {
-            return null;
-        }
+        if (lastIndex == -1) { return null; }
         return s.substring(lastIndex + 1);
     }
 
@@ -185,9 +169,7 @@ public class StringUtils {
         StringBuilder returnString = new StringBuilder();
         for (int i = 0; i < argv.length; i++) {
             returnString.append(argv[i]);
-            if (i <= argv.length - 1) {
-                returnString.append(" ");
-            }
+            if (i <= argv.length - 1) { returnString.append(" "); }
         }
         return returnString.toString();
     }
@@ -199,9 +181,7 @@ public class StringUtils {
         StringTokenizer tokenizer = new StringTokenizer(s, " ");
         int tokenCount = tokenizer.countTokens();
         String[] returnArray = new String[tokenCount + 1];
-        if (tokenCount == 0) {
-            return returnArray;
-        }
+        if (tokenCount == 0) { return returnArray; }
 
         int i = 0;
         while (tokenizer.hasMoreTokens()) {
@@ -217,35 +197,21 @@ public class StringUtils {
      * "true", "T", "yes" or "1", and "false", "F", "yes" or "0" respectively. Case is ignored, so
      * "True" or "f" would also considered valid.
      *
-     * @param str the property value.
+     * @param str
+     *        the property value.
      * @return the value of the property, interpreted as a boolean.
-     * @throws IllegalArgumentException if the value cannot be interpreted.
+     * @throws IllegalArgumentException
+     *         if the value cannot be interpreted.
      */
     public static boolean parseBooleanProperty(String str) {
-        if (str.equalsIgnoreCase("true")) {
-            return true;
-        }
-        if (str.equalsIgnoreCase("false")) {
-            return false;
-        }
-        if (str.equalsIgnoreCase("t")) {
-            return true;
-        }
-        if (str.equalsIgnoreCase("f")) {
-            return false;
-        }
-        if (str.equalsIgnoreCase("yes")) {
-            return true;
-        }
-        if (str.equalsIgnoreCase("no")) {
-            return false;
-        }
-        if (str.equals("1")) {
-            return true;
-        }
-        if (str.equals("0")) {
-            return false;
-        }
+        if (str.equalsIgnoreCase("true")) { return true; }
+        if (str.equalsIgnoreCase("false")) { return false; }
+        if (str.equalsIgnoreCase("t")) { return true; }
+        if (str.equalsIgnoreCase("f")) { return false; }
+        if (str.equalsIgnoreCase("yes")) { return true; }
+        if (str.equalsIgnoreCase("no")) { return false; }
+        if (str.equals("1")) { return true; }
+        if (str.equals("0")) { return false; }
         throw new IllegalArgumentException(str + " cannot be interpreted as boolean value");
     }
 

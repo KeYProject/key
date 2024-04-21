@@ -163,9 +163,7 @@ public final class SeqLDT extends LDT {
             return seqIndexOf;
         } else if (op instanceof SeqGet) {
             return seqGet;
-        } else if (op instanceof SeqLength) {
-            return seqLen;
-        }
+        } else if (op instanceof SeqLength) { return seqLen; }
         assert false;
         return null;
     }
@@ -173,9 +171,7 @@ public final class SeqLDT extends LDT {
     @Nullable
     @Override
     public JFunction getFunctionFor(String operationName, Services services) {
-        if (operationName.equals("add")) {
-            return getSeqConcat();
-        }
+        if (operationName.equals("add")) { return getSeqConcat(); }
         return null;
     }
 
@@ -188,9 +184,7 @@ public final class SeqLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op().equals(seqEmpty)) {
-            return EmptySeqLiteral.INSTANCE;
-        }
+        if (t.op().equals(seqEmpty)) { return EmptySeqLiteral.INSTANCE; }
         assert false;
         return null;
     }

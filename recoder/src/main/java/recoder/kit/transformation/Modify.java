@@ -45,18 +45,20 @@ public class Modify extends TwoPassTransformation {
     /**
      * Creates a new transformation object that modifies a declaration.
      *
-     * @param sc the service configuration to use.
-     * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
+     * @param sc
+     *        the service configuration to use.
+     * @param isVisible
+     *        flag indicating if this transformation shall be visible.
+     * @param decl
+     *        the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
      *        identifier name.
-     * @param code the modifier to create, using the codes from {@link recoder.kit.ModifierKit}.
+     * @param code
+     *        the modifier to create, using the codes from {@link recoder.kit.ModifierKit}.
      */
     public Modify(CrossReferenceServiceConfiguration sc, boolean isVisible, Declaration decl,
             int code) {
         super(sc);
-        if (decl == null) {
-            throw new IllegalArgumentException("Missing declaration");
-        }
+        if (decl == null) { throw new IllegalArgumentException("Missing declaration"); }
         this.isVisible = isVisible;
         this.decl = decl;
         this.modifier = code;
@@ -64,14 +66,8 @@ public class Modify extends TwoPassTransformation {
 
     private static boolean containsModifier(Declaration decl, Class mod) {
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
-            return false;
-        }
-        for (DeclarationSpecifier res : mods) {
-            if (mod.isInstance(res)) {
-                return true;
-            }
-        }
+        if (mods == null) { return false; }
+        for (DeclarationSpecifier res : mods) { if (mod.isInstance(res)) { return true; } }
         return false;
     }
 
@@ -81,9 +77,7 @@ public class Modify extends TwoPassTransformation {
 
     private int getLastModifierPosition() {
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
-            return 0;
-        }
+        if (mods == null) { return 0; }
         return mods.size();
     }
 
@@ -107,44 +101,30 @@ public class Modify extends TwoPassTransformation {
             break;
         case ModifierKit.PUBLIC:
             remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Public) {
-                break;
-            }
+            if (remove instanceof Public) { break; }
             insert = getProgramFactory().createPublic();
             break;
         case ModifierKit.PROTECTED:
             remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Protected) {
-                break;
-            }
+            if (remove instanceof Protected) { break; }
             insert = getProgramFactory().createProtected();
             break;
         case ModifierKit.PRIVATE:
             remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Private) {
-                break;
-            }
+            if (remove instanceof Private) { break; }
             insert = getProgramFactory().createPrivate();
             break;
         case ModifierKit.STATIC:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
+            if (ModifierKit.getVisibilityModifier(decl) != null) { insertPosition += 1; }
             insert = getProgramFactory().createStatic();
             break;
         case ModifierKit.FINAL:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            if (containsModifier(decl, Static.class)) {
-                insertPosition += 1;
-            }
+            if (ModifierKit.getVisibilityModifier(decl) != null) { insertPosition += 1; }
+            if (containsModifier(decl, Static.class)) { insertPosition += 1; }
             insert = getProgramFactory().createFinal();
             break;
         case ModifierKit.ABSTRACT:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
+            if (ModifierKit.getVisibilityModifier(decl) != null) { insertPosition += 1; }
             insert = getProgramFactory().createAbstract();
             break;
         case ModifierKit.SYNCHRONIZED:
@@ -176,17 +156,14 @@ public class Modify extends TwoPassTransformation {
     /**
      * Attaches or detaches modifiers when necessary.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
         super.transform();
-        if (remove != null) {
-            detach(remove);
-        }
-        if (insert != null) {
-            attach(insert, decl, insertPosition);
-        }
+        if (remove != null) { detach(remove); }
+        if (insert != null) { attach(insert, decl, insertPosition); }
     }
 
     /**

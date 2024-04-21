@@ -54,7 +54,8 @@ public class ProofJavaSourceCollection {
     /**
      * Add a file to the set returned by {@link #getRelevantFiles()}.
      *
-     * @param relevantFile the URI of the file to add.
+     * @param relevantFile
+     *        the URI of the file to add.
      */
     public void addRelevantFile(URI relevantFile) {
         this.relevantFiles = this.relevantFiles.add(relevantFile);
@@ -63,7 +64,8 @@ public class ProofJavaSourceCollection {
     /**
      * Add some files to the set returned by {@link #getRelevantFiles()}.
      *
-     * @param relevantFiles the URIs of the files to add.
+     * @param relevantFiles
+     *        the URIs of the files to add.
      */
     public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
         if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {

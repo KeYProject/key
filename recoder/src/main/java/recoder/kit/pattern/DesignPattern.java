@@ -24,9 +24,11 @@ public interface DesignPattern extends ModelElement {
     /**
      * Get a participants by its index.
      *
-     * @param index an index of a participant.
+     * @param index
+     *        an index of a participant.
      * @return the participant.
-     * @throws IndexOutOfBoundsException, if the index is not in bounds.
+     * @throws IndexOutOfBoundsException,
+     *         if the index is not in bounds.
      */
     ModelElement getParticipantAt(int index);
 }

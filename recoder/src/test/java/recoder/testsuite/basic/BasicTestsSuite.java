@@ -21,17 +21,13 @@ public class BasicTestsSuite {
 
     @NonNull
     public static File getProjectFile() {
-        if (projectFile == null) {
-            init();
-        }
+        if (projectFile == null) { init(); }
         return projectFile;
     }
 
     @NonNull
     public static CrossReferenceServiceConfiguration getConfig() {
-        if (config == null) {
-            init();
-        }
+        if (config == null) { init(); }
         return config;
     }
 
@@ -41,8 +37,6 @@ public class BasicTestsSuite {
         // to check if errors are reported correctly
         config.getProjectSettings().setErrorHandler(new DefaultErrorHandler(0));
         projectFile = new File(projectConfig);
-        if (!projectFile.exists()) {
-            throw new IllegalArgumentException("Project File not found!");
-        }
+        if (!projectFile.exists()) { throw new IllegalArgumentException("Project File not found!"); }
     }
 }

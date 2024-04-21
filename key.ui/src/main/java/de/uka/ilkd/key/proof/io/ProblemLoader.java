@@ -62,7 +62,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
         long runTime = System.currentTimeMillis() - currentTime;
         if (message != null) {
             final String errorMessage = "Failed to load "
-                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                    + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, message));
             mediator.getUI().reportStatus(this, errorMessage);
         }
@@ -79,9 +79,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     }
 
     private void fireTaskStarted() {
-        if (ptl != null) {
-            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Loading, "Loading problem ...", 0));
-        }
+        if (ptl != null) { ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Loading, "Loading problem ...", 0)); }
     }
 
     private void fireTaskFinished(long runningTime, final Throwable message) {
@@ -98,9 +96,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     @Override
     protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
-        if (control.selectProofObligation(initConfig)) {
-            setProof(mediator.getSelectedProof());
-        }
+        if (control.selectProofObligation(initConfig)) { setProof(mediator.getSelectedProof()); }
     }
 
     /**
@@ -138,14 +134,12 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                     mediator.startInterface(true);
                     if (message != null) {
                         final String errorMessage = "Failed to load "
-                            + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
                         mediator.notify(new ExceptionFailureEvent(errorMessage, message));
                         mediator.getUI().reportStatus(this, errorMessage);
                     }
                     fireTaskFinished(runTime, message);
-                    if (mediator.getSelectedProof() != null) {
-                        mediator.getSelectionModel().defaultSelection();
-                    }
+                    if (mediator.getSelectedProof() != null) { mediator.getSelectionModel().defaultSelection(); }
                 }
             }
         };

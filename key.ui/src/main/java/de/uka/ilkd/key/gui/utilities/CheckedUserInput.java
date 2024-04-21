@@ -29,7 +29,8 @@ public class CheckedUserInput extends JPanel {
         String NO_USER_INPUT = " ";
 
         /**
-         * @param toBeChecked the user input to be checked.
+         * @param toBeChecked
+         *        the user input to be checked.
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */
@@ -115,9 +116,7 @@ public class CheckedUserInput extends JPanel {
 
 
     private TrafficLight getTrafficLight() {
-        if (trafficLight == null) {
-            trafficLight = new TrafficLight(10);
-        }
+        if (trafficLight == null) { trafficLight = new TrafficLight(10); }
         return trafficLight;
     }
 
@@ -170,9 +169,7 @@ public class CheckedUserInput extends JPanel {
         String text = inputFieldForFormula.getText();
         String result = inspector.check(text);
         setValid(result);
-        for (CheckedUserInputListener listener : listeners) {
-            listener.userInputChanged(text, result == null, result);
-        }
+        for (CheckedUserInputListener listener : listeners) { listener.userInputChanged(text, result == null, result); }
     }
 
     public void addListener(CheckedUserInputListener listener) {
@@ -231,9 +228,7 @@ public class CheckedUserInput extends JPanel {
         dialog.setSize(Math.max(dim.width, dialog.getOkButton().getWidth() * 4), dim.height);
         dialog.setVisible(true);
 
-        if (dialog.okButtonHasBeenPressed()) {
-            return userInput.getInput();
-        }
+        if (dialog.okButtonHasBeenPressed()) { return userInput.getInput(); }
         return null;
     }
 

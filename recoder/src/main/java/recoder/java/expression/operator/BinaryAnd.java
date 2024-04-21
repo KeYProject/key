@@ -32,8 +32,10 @@ public class BinaryAnd extends Operator {
     /**
      * Binary and.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public BinaryAnd(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class BinaryAnd extends Operator {
     /**
      * Binary and.
      *
-     * @param proto a binary and.
+     * @param proto
+     *        a binary and.
      */
 
     protected BinaryAnd(BinaryAnd proto) {

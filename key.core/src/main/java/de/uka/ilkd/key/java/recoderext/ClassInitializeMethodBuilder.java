@@ -52,9 +52,11 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
      * preparation method is created and added for all classes, which are declared in one of the
      * given compilation units.
      *
-     * @param services the CrossReferenceServiceConfiguration with the information about the recoder
+     * @param services
+     *        the CrossReferenceServiceConfiguration with the information about the recoder
      *        model
-     * @param cache a cache object that stores information which is needed by and common to many
+     * @param cache
+     *        a cache object that stores information which is needed by and common to many
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
@@ -75,9 +77,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
      */
     private boolean isConstantField(FieldSpecification spec) {
         boolean result = spec.isStatic() && spec.isFinal();
-        if (!result) {
-            return false;
-        }
+        if (!result) { return false; }
         recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
 
         try {
@@ -126,7 +126,8 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
      * <p>
      * some special settings for implicit fields are performed here as well
      *
-     * @param typeDeclaration the ClassDeclaration whose fields have to be prepared
+     * @param typeDeclaration
+     *        the ClassDeclaration whose fields have to be prepared
      * @return the list of copy assignments
      */
     private ASTList<Statement> getInitializers(TypeDeclaration typeDeclaration) {
@@ -170,9 +171,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
 
             for (int i = 0; i < typeCount; i++) {
                 TypeDeclaration td = cu.getTypeDeclarationAt(i);
-                if (!(td instanceof ClassDeclaration)) {
-                    class2initializers.put(td, getInitializers(td));
-                }
+                if (!(td instanceof ClassDeclaration)) { class2initializers.put(td, getInitializers(td)); }
             }
 
         }
@@ -245,9 +244,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<Statement> initializerExecutionBody;
 
         initializerExecutionBody = class2initializers.get(td);
-        if (initializerExecutionBody == null) {
-            initializerExecutionBody = new ASTArrayList<>(20);
-        }
+        if (initializerExecutionBody == null) { initializerExecutionBody = new ASTArrayList<>(20); }
 
         if (td instanceof ClassDeclaration cd && td != javaLangObject) {
             initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
@@ -357,7 +354,8 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
     /**
      * creates the static method <code>&lt;clprepare&gt;</code> for the given type declaration
      *
-     * @param td the TypeDeclaration to which the new created method will be attached
+     * @param td
+     *        the TypeDeclaration to which the new created method will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createInitializeMethod(TypeDeclaration td) {
@@ -373,7 +371,8 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
         attach(createInitializeMethod(td), td, 0);

@@ -46,7 +46,8 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Class initializer.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public ClassInitializer(StatementBlock body) {
@@ -57,8 +58,10 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Class initializer.
      *
-     * @param modifier a static.
-     * @param body a statement block.
+     * @param modifier
+     *        a static.
+     * @param body
+     *        a statement block.
      */
 
     public ClassInitializer(Static modifier, StatementBlock body) {
@@ -74,14 +77,13 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Class initializer.
      *
-     * @param proto a class initializer.
+     * @param proto
+     *        a class initializer.
      */
 
     protected ClassInitializer(ClassInitializer proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -101,9 +103,7 @@ public class ClassInitializer extends JavaDeclaration
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -137,7 +137,8 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Set body.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -161,9 +162,7 @@ public class ClassInitializer extends JavaDeclaration
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -175,37 +174,29 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (body != null) {
-            result++;
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -214,13 +205,9 @@ public class ClassInitializer extends JavaDeclaration
         // role 1: body
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (body == child) {
-            return 1;
-        }
+        if (body == child) { return 1; }
         return -1;
     }
 
@@ -230,16 +217,17 @@ public class ClassInitializer extends JavaDeclaration
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -257,9 +245,7 @@ public class ClassInitializer extends JavaDeclaration
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -278,7 +264,8 @@ public class ClassInitializer extends JavaDeclaration
     /**
      * Set member parent.
      *
-     * @param t a type declaration.
+     * @param t
+     *        a type declaration.
      */
 
     public void setMemberParent(TypeDeclaration t) {

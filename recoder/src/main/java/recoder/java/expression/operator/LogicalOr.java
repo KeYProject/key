@@ -32,8 +32,10 @@ public class LogicalOr extends Operator {
     /**
      * Logical or.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public LogicalOr(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class LogicalOr extends Operator {
     /**
      * Logical or.
      *
-     * @param proto a logical or.
+     * @param proto
+     *        a logical or.
      */
 
     protected LogicalOr(LogicalOr proto) {

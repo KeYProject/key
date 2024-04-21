@@ -71,12 +71,18 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * Creates a class invariant.
      *
-     * @param name the unique internal name of the invariant
-     * @param displayName the displayed name of the invariant
-     * @param kjt the KeYJavaType to which the invariant belongs
-     * @param visibility the visibility of the invariant (null for default visibility)
-     * @param inv the invariant formula itself
-     * @param selfVar the variable used for the receiver object
+     * @param name
+     *        the unique internal name of the invariant
+     * @param displayName
+     *        the displayed name of the invariant
+     * @param kjt
+     *        the KeYJavaType to which the invariant belongs
+     * @param visibility
+     *        the visibility of the invariant (null for default visibility)
+     * @param inv
+     *        the invariant formula itself
+     * @param selfVar
+     *        the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
@@ -86,13 +92,20 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * Creates a class invariant.
      *
-     * @param name the unique internal name of the invariant
-     * @param displayName the displayed name of the invariant
-     * @param kjt the KeYJavaType to which the invariant belongs
-     * @param visibility the visibility of the invariant (null for default visibility)
-     * @param inv the invariant formula itself
-     * @param selfVar the variable used for the receiver object
-     * @param free whether this contract is free.
+     * @param name
+     *        the unique internal name of the invariant
+     * @param displayName
+     *        the displayed name of the invariant
+     * @param kjt
+     *        the KeYJavaType to which the invariant belongs
+     * @param visibility
+     *        the visibility of the invariant (null for default visibility)
+     * @param inv
+     *        the invariant formula itself
+     * @param selfVar
+     *        the variable used for the receiver object
+     * @param free
+     *        whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar,

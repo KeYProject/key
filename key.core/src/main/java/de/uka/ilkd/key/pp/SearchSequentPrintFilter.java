@@ -36,7 +36,8 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     /**
      * sets the filter's search string
      *
-     * @param searchString the new search string
+     * @param searchString
+     *        the new search string
      */
     public void setSearchString(String searchString) {
         this.searchString = searchString;
@@ -50,10 +51,13 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     }
 
     /**
-     * @param search the String we are looking for
-     * @param regex indicating whether search string should be treated as regex
+     * @param search
+     *        the String we are looking for
+     * @param regex
+     *        indicating whether search string should be treated as regex
      * @return A pattern matching the input String
-     * @throws IllegalRegexException if the given pattern is not a valid regex
+     * @throws IllegalRegexException
+     *         if the given pattern is not a valid regex
      */
     public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
         int searchFlag = 0;
@@ -70,9 +74,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         // characters and contract several whitespaces into a
         // single one so that line breaks are treated correctly.
 
-        if (!regex) {
-            search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0");
-        }
+        if (!regex) { search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0"); }
 
         Pattern p = null;
         try {

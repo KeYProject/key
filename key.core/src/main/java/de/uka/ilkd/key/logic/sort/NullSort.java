@@ -58,9 +58,7 @@ public final class NullSort extends SortImpl {
             result = DefaultImmutableSet.nil();
 
             for (Sort n : services.getNamespaces().sorts().allElements()) {
-                if (n != this && n.extendsTrans(objectSort)) {
-                    result = result.add(n);
-                }
+                if (n != this && n.extendsTrans(objectSort)) { result = result.add(n); }
             }
 
             lastServices = new WeakReference<>(services);

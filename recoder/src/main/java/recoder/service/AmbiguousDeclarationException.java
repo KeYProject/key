@@ -34,8 +34,10 @@ public class AmbiguousDeclarationException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param declaration the declaration found to be ambiguous.
-     * @param conflictingElement the alternative declaration, found earlier.
+     * @param declaration
+     *        the declaration found to be ambiguous.
+     * @param conflictingElement
+     *        the alternative declaration, found earlier.
      */
     public AmbiguousDeclarationException(Declaration declaration,
             ProgramModelElement conflictingElement) {
@@ -46,9 +48,12 @@ public class AmbiguousDeclarationException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param declaration the declaration found to be ambiguous.
-     * @param conflictingElement the alternative declaration, found earlier.
+     * @param s
+     *        an explanation.
+     * @param declaration
+     *        the declaration found to be ambiguous.
+     * @param conflictingElement
+     *        the alternative declaration, found earlier.
      */
     public AmbiguousDeclarationException(String s, Declaration declaration,
             ProgramModelElement conflictingElement) {

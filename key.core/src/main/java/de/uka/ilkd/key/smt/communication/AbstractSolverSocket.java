@@ -48,8 +48,10 @@ public abstract class AbstractSolverSocket {
     /**
      * Creates a new solver socket with given solver name and ModelExtractor.
      *
-     * @param name the name of the solver in use
-     * @param query the ModelExtractor used to extract a counterexample
+     * @param name
+     *        the name of the solver in use
+     * @param query
+     *        the ModelExtractor used to extract a counterexample
      */
     protected AbstractSolverSocket(@NonNull String name, ModelExtractor query) {
         this.name = name;
@@ -71,9 +73,12 @@ public abstract class AbstractSolverSocket {
     /**
      * Invoked when the solver has sent a new message to its stdout or stderr.
      *
-     * @param pipe the Pipe that received the message
-     * @param msg the message as String
-     * @throws IOException if an I/O error occurs
+     * @param pipe
+     *        the Pipe that received the message
+     * @param msg
+     *        the message as String
+     * @throws IOException
+     *         if an I/O error occurs
      */
     public abstract void messageIncoming(@NonNull Pipe pipe, @NonNull String msg)
             throws IOException;
@@ -82,7 +87,8 @@ public abstract class AbstractSolverSocket {
      * Modify an SMT problem String in some way (e.g. prepend some SMT commands). By default, the
      * String is not changed at all.
      *
-     * @param problem the SMT problem String to be modified
+     * @param problem
+     *        the SMT problem String to be modified
      * @return a modified version of the problem
      */
     public String modifyProblem(String problem) {
@@ -92,8 +98,10 @@ public abstract class AbstractSolverSocket {
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
      *
-     * @param type the SolverType to create the socket for
-     * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
+     * @param type
+     *        the SolverType to create the socket for
+     * @param query
+     *        the ModelExtractor that can be used to extract a counterexample (for non-CE
      *        solvers this can be null)
      * @return the newly created socket
      */

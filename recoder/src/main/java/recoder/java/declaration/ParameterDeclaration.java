@@ -49,8 +49,10 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param typeRef a type reference.
-     * @param name an identifier.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
      */
 
     public ParameterDeclaration(TypeReference typeRef, Identifier name) {
@@ -62,9 +64,12 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param name an identifier.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
      */
 
     public ParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
@@ -78,7 +83,8 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param proto a parameter declaration.
+     * @param proto
+     *        a parameter declaration.
      */
 
     protected ParameterDeclaration(ParameterDeclaration proto) {
@@ -103,9 +109,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (varSpec != null) {
-            varSpec.setParent(this);
-        }
+        if (varSpec != null) { varSpec.setParent(this); }
     }
 
     public VariableSpecification getVariableSpecification() {
@@ -140,46 +144,34 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (varSpec != null) {
-            result++;
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (typeReference != null) { result++; }
+        if (varSpec != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (varSpec != null) {
-            if (index == 0) {
-                return varSpec;
-            }
-        }
+        if (varSpec != null) { if (index == 0) { return varSpec; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -189,16 +181,10 @@ public class ParameterDeclaration extends VariableDeclaration {
         // role 2 (IDX): var specs
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
-        if (varSpec == child) {
-            return 2;
-        }
+        if (typeReference == child) { return 1; }
+        if (varSpec == child) { return 2; }
         return -1;
     }
 
@@ -208,16 +194,17 @@ public class ParameterDeclaration extends VariableDeclaration {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -235,17 +222,13 @@ public class ParameterDeclaration extends VariableDeclaration {
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (varSpec == p) {
             VariableSpecification r = (VariableSpecification) q;
             varSpec = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;
@@ -264,7 +247,8 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Set parameter container.
      *
-     * @param c a parameter container.
+     * @param c
+     *        a parameter container.
      */
 
     public void setParameterContainer(ParameterContainer c) {

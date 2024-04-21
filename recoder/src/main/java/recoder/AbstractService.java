@@ -16,9 +16,7 @@ public abstract class AbstractService implements Service {
     }
 
     protected AbstractService(ServiceConfiguration config) {
-        if (config == null) {
-            throw new NullPointerException("No service configuration given");
-        }
+        if (config == null) { throw new NullPointerException("No service configuration given"); }
         this.serviceConfiguration = config;
     }
 
@@ -28,11 +26,11 @@ public abstract class AbstractService implements Service {
      * can be memorized if it has not been passed in by a constructor already. The default
      * implementation does nothing.
      *
-     * @param cfg the service configuration this services has been assigned to.
+     * @param cfg
+     *        the service configuration this services has been assigned to.
      */
     @SuppressWarnings("all")
-    public void initialize(ServiceConfiguration cfg) {
-    }
+    public void initialize(ServiceConfiguration cfg) {}
 
     public ServiceConfiguration getServiceConfiguration() {
         return serviceConfiguration;

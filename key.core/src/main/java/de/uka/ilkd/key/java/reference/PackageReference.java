@@ -33,7 +33,8 @@ public class PackageReference extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a
      *        ProgramElementName (as the name of the method reference), a ReferencePrefix (as
      *        accessPath to the package), Comments.
      */
@@ -65,34 +66,26 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
+        if (prefix != null) { result++; }
+        if (name != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
-        if (name != null) {
-            if (index == 0) {
-                return name;
-            }
-        }
+        if (name != null) { if (index == 0) { return name; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -137,7 +130,8 @@ public class PackageReference extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPackageReference(this);
@@ -148,9 +142,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof PackageReference pr)) {
-            return false;
-        }
+        if (!(o instanceof PackageReference pr)) { return false; }
         return pr.name.equals(name) && (pr.prefix == null && prefix == null
                 || pr.prefix != null && prefix != null && pr.prefix.equals(prefix));
     }

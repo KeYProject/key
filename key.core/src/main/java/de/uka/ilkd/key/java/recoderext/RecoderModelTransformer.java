@@ -45,8 +45,10 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     /**
      * creates a transformer for the recoder model
      *
-     * @param services the CrossReferenceServiceConfiguration to access model information
-     * @param cache a cache object that stores information which is needed by and common to many
+     * @param services
+     *        the CrossReferenceServiceConfiguration to access model information
+     * @param cache
+     *        a cache object that stores information which is needed by and common to many
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
@@ -68,29 +70,29 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             return new NullLiteral();
         } else if (type instanceof PrimitiveType) {
             return switch (type.getName()) {
-                case "boolean" -> new BooleanLiteral(false);
-                case "byte", "short", "int", "\\bigint" -> new IntLiteral(0);
-                case "long" -> new LongLiteral(0);
-                case "\\real" -> new RealLiteral();
-                case "char" -> new CharLiteral((char) 0);
-                case "float" -> new FloatLiteral(0.0F);
-                case "double" -> new DoubleLiteral(0.0D);
-                case "\\locset" -> EmptySetLiteral.INSTANCE;
-                case "\\seq" -> EmptySeqLiteral.INSTANCE;
-                case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
-                case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
-                case "\\map" -> EmptyMapLiteral.INSTANCE;
-                default -> {
-                    if (type.getName().startsWith("\\dl_")) {
-                        // The default value of a type is resolved later, then we know the Sort of the
-                        // type
-                        yield  new DLEmbeddedExpression(
-                                "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
-                                Collections.emptyList());
-                    }
-                    Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
-                    yield null;
+            case "boolean" -> new BooleanLiteral(false);
+            case "byte", "short", "int", "\\bigint" -> new IntLiteral(0);
+            case "long" -> new LongLiteral(0);
+            case "\\real" -> new RealLiteral();
+            case "char" -> new CharLiteral((char) 0);
+            case "float" -> new FloatLiteral(0.0F);
+            case "double" -> new DoubleLiteral(0.0D);
+            case "\\locset" -> EmptySetLiteral.INSTANCE;
+            case "\\seq" -> EmptySeqLiteral.INSTANCE;
+            case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
+            case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
+            case "\\map" -> EmptyMapLiteral.INSTANCE;
+            default -> {
+                if (type.getName().startsWith("\\dl_")) {
+                    // The default value of a type is resolved later, then we know the Sort of the
+                    // type
+                    yield new DLEmbeddedExpression(
+                        "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
+                        Collections.emptyList());
                 }
+                Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
+                yield null;
+            }
             };
         }
         return null;
@@ -99,9 +101,12 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     /**
      * attaches a method declaration to the declaration of type td at position idx
      *
-     * @param md the MethodDeclaration to insert
-     * @param td the TypeDeclaration that becomes parent of the new method
-     * @param idx the position where to add the method
+     * @param md
+     *        the MethodDeclaration to insert
+     * @param td
+     *        the TypeDeclaration that becomes parent of the new method
+     * @param idx
+     *        the position where to add the method
      */
     public void attach(MethodDeclaration md, TypeDeclaration td, int idx) {
         super.attach(md, td, idx);
@@ -145,9 +150,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     protected Identifier getId(TypeDeclaration td) {
-        if (td.getIdentifier() != null) {
-            return td.getIdentifier().deepClone();
-        }
+        if (td.getIdentifier() != null) { return td.getIdentifier().deepClone(); }
 
         final ClassType firstActualSupertype = getAllSupertypes(td).get(1);
         return firstActualSupertype instanceof TypeDeclaration
@@ -158,20 +161,14 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected ClassDeclaration containingClass(TypeDeclaration td) {
         NonTerminalProgramElement container = (ClassDeclaration) td.getContainingClassType();
-        if (container == null) {
-            container = td.getASTParent();
-        }
-        while (!(container instanceof ClassDeclaration)) {
-            container = container.getASTParent();
-        }
+        if (container == null) { container = td.getASTParent(); }
+        while (!(container instanceof ClassDeclaration)) { container = container.getASTParent(); }
         return (ClassDeclaration) container;
     }
 
     protected MethodDeclaration containingMethod(TypeDeclaration td) {
         NonTerminalProgramElement container = td.getASTParent();
-        while (container != null && !(container instanceof MethodDeclaration)) {
-            container = container.getASTParent();
-        }
+        while (container != null && !(container instanceof MethodDeclaration)) { container = container.getASTParent(); }
         return (MethodDeclaration) container;
     }
 
@@ -181,9 +178,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      */
     public void makeExplicit() {
         Set<ClassDeclaration> s = classDeclarations();
-        for (ClassDeclaration cd : s) {
-            makeExplicit(cd);
-        }
+        for (ClassDeclaration cd : s) { makeExplicit(cd); }
     }
 
     // 3 methods to access the transformation cache.
@@ -236,9 +231,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         }
 
         public List<ClassType> getAllSupertypes(TypeDeclaration td) {
-            if (typeDeclaration2allSupertypes == null) {
-                init();
-            }
+            if (typeDeclaration2allSupertypes == null) { init(); }
             return typeDeclaration2allSupertypes.get(td);
         }
 
@@ -247,29 +240,21 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         }
 
         public Set<ClassDeclaration> getClassDeclarations() {
-            if (classDeclarations == null) {
-                init();
-            }
+            if (classDeclarations == null) { init(); }
             return classDeclarations;
         }
 
         protected void init() {
             TypeAndClassDeclarationCollector cdc = new TypeAndClassDeclarationCollector();
-            for (CompilationUnit unit : cUnits) {
-                cdc.walk(unit);
-            }
+            for (CompilationUnit unit : cUnits) { cdc.walk(unit); }
             classDeclarations = cdc.result();
 
             typeDeclaration2allSupertypes = new LinkedHashMap<>();
-            for (TypeDeclaration td : cdc.types()) {
-                typeDeclaration2allSupertypes.put(td, td.getAllSupertypes());
-            }
+            for (TypeDeclaration td : cdc.types()) { typeDeclaration2allSupertypes.put(td, td.getAllSupertypes()); }
         }
 
         public Map<ClassType, List<Variable>> getLocalClass2FinalVarMapping() {
-            if (localClass2FinalVar == null) {
-                localClass2FinalVar = new LinkedHashMap<>();
-            }
+            if (localClass2FinalVar == null) { localClass2FinalVar = new LinkedHashMap<>(); }
             return localClass2FinalVar;
         }
 
@@ -293,9 +278,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         public void walk(SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement pe) {
-                for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
-                    walk(pe.getChildAt(i));
-                }
+                for (int i = 0, sz = pe.getChildCount(); i < sz; i++) { walk(pe.getChildAt(i)); }
             }
         }
 
@@ -312,12 +295,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
                 while (ct instanceof ClassDeclaration && ct != containingClassTypeOfProgVarV) {
                     List<Variable> vars = lc2fv.get(ct);
-                    if (vars == null) {
-                        vars = new LinkedList<>();
-                    }
-                    if (!vars.contains(v)) {
-                        vars.add(v);
-                    }
+                    if (vars == null) { vars = new LinkedList<>(); }
+                    if (!vars.contains(v)) { vars.add(v); }
                     lc2fv.put(ct, vars);
                     ct = si.getContainingClassType(ct);
                 }
@@ -335,13 +314,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
         public void walk(SourceElement s) {
             s.accept(this);
-            if (s instanceof TypeDeclaration) {
-                types.add((TypeDeclaration) s);
-            }
+            if (s instanceof TypeDeclaration) { types.add((TypeDeclaration) s); }
             if (s instanceof NonTerminalProgramElement pe) {
-                for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
-                    walk(pe.getChildAt(i));
-                }
+                for (int i = 0, sz = pe.getChildCount(); i < sz; i++) { walk(pe.getChildAt(i)); }
             }
         }
 

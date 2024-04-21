@@ -21,9 +21,7 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
      */
     @Override
     public MatchConditions match(Term subst, MatchConditions mc, Services services) {
-        if (subst.sort() == JavaDLTheory.FORMULA) {
-            return addInstantiation(subst, mc, services);
-        }
+        if (subst.sort() == JavaDLTheory.FORMULA) { return addInstantiation(subst, mc, services); }
         return null;
     }
 
@@ -32,9 +30,7 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
             Services services) {
 
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNextSibling();
-        }
+        if (result != null) { termPosition.gotoNextSibling(); }
 
         return result;
     }

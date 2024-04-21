@@ -34,7 +34,8 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     /**
      * This constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
 
     public ThisConstructorReference(ASTList<Expression> arguments) {
@@ -45,7 +46,8 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     /**
      * This constructor reference.
      *
-     * @param proto a this constructor reference.
+     * @param proto
+     *        a this constructor reference.
      */
 
     protected ThisConstructorReference(ThisConstructorReference proto) {
@@ -67,9 +69,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
         // role 0 (IDX): parameters
         if (arguments != null) {
             int index = arguments.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }

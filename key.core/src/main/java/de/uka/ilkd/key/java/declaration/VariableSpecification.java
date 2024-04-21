@@ -82,9 +82,11 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of RECODER ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: an Expression
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: an Expression
      *        (as initializer of the variable) a Comment
-     * @param dim the dimension of this type
+     * @param dim
+     *        the dimension of this type
      */
     public VariableSpecification(ExtList children, IProgramVariable var, int dim, Type type) {
         super(children);
@@ -102,32 +104,26 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null) {
-            result++;
-        }
-        if (initializer != null) {
-            result++;
-        }
+        if (var != null) { result++; }
+        if (initializer != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
-            if (index == 0) {
-                return var;
-            }
+            if (index == 0) { return var; }
             index--;
         }
-        if (initializer != null && index == 0) {
-            return initializer;
-        }
+        if (initializer != null && index == 0) { return initializer; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -157,9 +153,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (initializer != null && index == 0) {
-            return initializer;
-        }
+        if (initializer != null && index == 0) { return initializer; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -251,7 +245,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnVariableSpecification(this);
@@ -264,29 +259,17 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof VariableSpecification vs)) {
-            return false;
-        }
-        if (dimensions != vs.getDimensions()) {
-            return false;
-        }
+        if (!(se instanceof VariableSpecification vs)) { return false; }
+        if (dimensions != vs.getDimensions()) { return false; }
         if (type != null) {
-            if (!(type.equals(vs.getType()))) {
-                return false;
-            }
+            if (!(type.equals(vs.getType()))) { return false; }
         } else {
-            if (vs.getType() != null) {
-                return false;
-            }
+            if (vs.getType() != null) { return false; }
         }
         nat.add(var, vs.getProgramVariable());
-        if (vs.getChildCount() != getChildCount()) {
-            return false;
-        }
+        if (vs.getChildCount() != getChildCount()) { return false; }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
-                return false;
-            }
+            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) { return false; }
         }
         return true;
     }
@@ -295,9 +278,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
-        if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            return null;
-        }
+        if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) { return null; }
         return matchCond;
     }
 }

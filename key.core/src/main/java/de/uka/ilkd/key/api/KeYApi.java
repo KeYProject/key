@@ -29,8 +29,7 @@ public abstract class KeYApi {
     /**
      * Create a new KeY API and create the sub APIs
      */
-    private KeYApi() {
-    }
+    private KeYApi() {}
 
     /**
      *
@@ -91,10 +90,14 @@ public abstract class KeYApi {
      * Load a proof file, creates a KeY environment that can be accessed with other methods from
      * this facade
      *
-     * @param file Path to the source code folder/file or to a *.proof file
-     * @param classPaths Optionally: Additional specifications for API classes
-     * @param bootClassPath Optionally: Different default specifications for Java API
-     * @param includes Optionally: Additional includes to consider
+     * @param file
+     *        Path to the source code folder/file or to a *.proof file
+     * @param classPaths
+     *        Optionally: Additional specifications for API classes
+     * @param bootClassPath
+     *        Optionally: Different default specifications for Java API
+     * @param includes
+     *        Optionally: Additional includes to consider
      */
     public abstract void loadProofFile(File file, List<File> classPaths, File bootClassPath,
             List<File> includes);

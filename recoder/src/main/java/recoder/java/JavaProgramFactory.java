@@ -82,19 +82,12 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             ProgramElement fc = ((CompilationUnit) pe).getChildAt(0);
             int distcu = c.getStartPosition().getLine();
             int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
-            if (c instanceof SingleLineComment) {
-                distcu--;
-            }
-            if (distcu >= distfc) {
-                dest = fc;
-            }
+            if (c instanceof SingleLineComment) { distcu--; }
+            if (distcu >= distfc) { dest = fc; }
         } else if (!c.isPrefixed()) {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
-            if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++) {
-                }
-            }
+            if (ppe != null) { for (; ppe.getChildAt(i) != dest; i++) {} }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
             } else {
@@ -102,9 +95,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 while (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
-                    if (i == 0) {
-                        break;
-                    }
+                    if (i == 0) { break; }
                     dest = ppe.getChildAt(i - 1);
                 }
                 // Comments attached better - Fix by T.Gutzmann
@@ -117,9 +108,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     ppe = ppe.getASTParent();
                     doChange = true;
                 }
-                if (ppe != null && doChange) {
-                    dest = ppe;
-                }
+                if (ppe != null && doChange) { dest = ppe; }
                 if (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     if (ppe.getEndPosition().compareTo(c.getStartPosition()) >= 0) {
@@ -195,9 +184,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine()
                             - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
-                    if (c instanceof SingleLineComment) {
-                        distPost--;
-                    }
+                    if (c instanceof SingleLineComment) { distPost--; }
                     if (distPre <= distPost) {
                         dest = npe.getChildAt(idx + 1);
                         c.setPrefixed(true);
@@ -214,9 +201,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             }
         }
         ASTList<Comment> cml = dest.getComments();
-        if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<>());
-        }
+        if (cml == null) { dest.setComments(cml = new ASTArrayList<>()); }
         cml.add(c);
     }
 
@@ -237,9 +222,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         TreeWalker tw = new TreeWalker(pe);
         while (tw.next()) {
             pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement) pe).makeParentRoleValid();
-            }
+            if (pe instanceof NonTerminalProgramElement) { ((NonTerminalProgramElement) pe).makeParentRoleValid(); }
             Position pos = pe.getFirstElement().getStartPosition();
             while ((commentIndex < commentCount) && pos.compareTo(cpos) > 0) {
                 attachComment(current, pe);
@@ -251,9 +234,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             }
         }
         if (commentIndex < commentCount) {
-            while (pe.getASTParent() != null) {
-                pe = pe.getASTParent();
-            }
+            while (pe.getASTParent() != null) { pe = pe.getASTParent(); }
 
             /*
              * postfixed comments may need to be attached to a child of current program element, so
@@ -264,9 +245,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 ProgramElement dest = pe;
                 ProgramElement newDest = null;
                 while (dest instanceof NonTerminalProgramElement npe) {
-                    if (npe.getChildCount() == 0) {
-                        break;
-                    }
+                    if (npe.getChildCount() == 0) { break; }
                     newDest = npe.getChildAt(npe.getChildCount() - 1);
                     if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0
                             || ((npe.getEndPosition().compareTo(current.getStartPosition()) == 0)
@@ -279,9 +258,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     }
                 }
                 ASTList<Comment> cml = dest.getComments();
-                if (cml == null) {
-                    dest.setComments(cml = new ASTArrayList<>());
-                }
+                if (cml == null) { dest.setComments(cml = new ASTArrayList<>()); }
                 current.setPrefixed(false);
                 cml.add(current);
                 commentIndex += 1;
@@ -315,9 +292,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         } else {
             radix = 10;
         }
-        if (nm.startsWith("-", index)) {
-            throw new NumberFormatException("Negative sign in wrong position");
-        }
+        if (nm.startsWith("-", index)) { throw new NumberFormatException("Negative sign in wrong position"); }
         int len = nm.length() - index;
         if (radix == 16 && len == 8) {
             char first = nm.charAt(index);
@@ -346,9 +321,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      */
     public static long parseLong(String nm) throws NumberFormatException {
         // fixes a bug
-        if (nm.equalsIgnoreCase("0L")) {
-            return 0;
-        }
+        if (nm.equalsIgnoreCase("0L")) { return 0; }
 
         int radix;
         boolean negative = false;
@@ -369,13 +342,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             radix = 10;
         }
 
-        if (nm.startsWith("-", index)) {
-            throw new NumberFormatException("Negative sign in wrong position");
-        }
+        if (nm.startsWith("-", index)) { throw new NumberFormatException("Negative sign in wrong position"); }
         int endIndex = nm.length();
-        if (nm.endsWith("L") || nm.endsWith("l")) {
-            endIndex -= 1;
-        }
+        if (nm.endsWith("L") || nm.endsWith("l")) { endIndex -= 1; }
 
         int len = endIndex - index;
         if (radix == 16 && len == 16) {
@@ -423,7 +392,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      * start communicating or linking among their configuration partners. The service configuration
      * can be memorized if it has not been passed in by a constructor already.
      *
-     * @param cfg the service configuration this services has been assigned to.
+     * @param cfg
+     *        the service configuration this services has been assigned to.
      */
     public void initialize(ServiceConfiguration cfg) {
         // if (serviceConfiguration == null) {
@@ -574,9 +544,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         synchronized (parser) {
             JavaCCParser.initialize(in);
             ASTList<Statement> res = JavaCCParser.GeneralizedStatements();
-            for (Statement re : res) {
-                postWork(re);
-            }
+            for (Statement re : res) { postWork(re); }
             return res;
         }
     }
@@ -738,7 +706,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the current project settings
      * for the specified writer,
      *
-     * @param out the (initial) writer to print to.
+     * @param out
+     *        the (initial) writer to print to.
      * @return a new pretty printer.
      */
     public PrettyPrinter getPrettyPrinter(Writer out) {
@@ -3316,14 +3285,10 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            if (added) {
-                return -1;
-            }
+            if (added) { return -1; }
             int result = reader.read(cbuf, off, len);
             if (!added && result < len) {
-                if (result == -1) {
-                    result++;
-                }
+                if (result == -1) { result++; }
                 cbuf[off + result++] = '\n';
                 added = true;
             }

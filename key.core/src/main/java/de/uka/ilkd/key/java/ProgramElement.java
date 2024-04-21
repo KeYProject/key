@@ -27,8 +27,10 @@ public interface ProgramElement extends SourceElement, ModelElement {
      * found instantiations of the schemavariables. If the match failed, <tt>null</tt> is returned
      * instead.
      *
-     * @param source the SourceData with the program element to match
-     * @param matchCond the MatchConditions found up to this point
+     * @param source
+     *        the SourceData with the program element to match
+     * @param matchCond
+     *        the MatchConditions found up to this point
      * @return the resulting match conditions or <tt>null</tt> if the match failed
      */
     MatchConditions match(SourceData source, MatchConditions matchCond);

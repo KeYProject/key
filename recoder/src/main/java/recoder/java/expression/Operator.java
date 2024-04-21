@@ -45,7 +45,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param unaryChild an expression.
+     * @param unaryChild
+     *        an expression.
      */
 
     public Operator(Expression unaryChild) {
@@ -57,8 +58,10 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Operator(Expression lhs, Expression rhs) {
@@ -71,14 +74,13 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param proto an operator.
+     * @param proto
+     *        an operator.
      */
 
     protected Operator(Operator proto) {
         super(proto);
-        if (proto.children != null) {
-            children = proto.children.deepClone();
-        }
+        if (proto.children != null) { children = proto.children.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -97,9 +99,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (children != null) {
-            for (int i = children.size() - 1; i >= 0; i -= 1) {
-                children.get(i).setExpressionContainer(this);
-            }
+            for (int i = children.size() - 1; i >= 0; i -= 1) { children.get(i).setExpressionContainer(this); }
         }
     }
 
@@ -179,15 +179,15 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -199,9 +199,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
         // array initializer (for NewArray)
         if (children != null) {
             int index = children.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }
@@ -219,7 +217,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -243,9 +242,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Expression getExpressionAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -255,16 +252,17 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
@@ -295,7 +293,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Set arguments.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {

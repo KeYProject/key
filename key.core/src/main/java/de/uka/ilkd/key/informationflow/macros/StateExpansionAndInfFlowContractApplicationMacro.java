@@ -39,9 +39,9 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     @Override
     public String getDescription() {
         return "Extract the self-composed states after the merge of the "
-            + "symbolic execution goals which is included in the proof "
-            + "obligation generation from information flow contracts "
-            + "and apply all relevant information flow contracts.";
+                + "symbolic execution goals which is included in the proof "
+                + "obligation generation from information flow contracts "
+                + "and apply all relevant information flow contracts.";
     }
 
     @Override
@@ -61,13 +61,9 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (proof == null) {
-            return false;
-        }
+        if (proof == null) { return false; }
         final Services services = proof.getServices();
-        if (services == null) {
-            return false;
-        }
+        if (services == null) { return false; }
         final ProofOblInput poForProof =
             services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)

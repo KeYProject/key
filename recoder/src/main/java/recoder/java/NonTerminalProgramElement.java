@@ -24,9 +24,11 @@ public interface NonTerminalProgramElement extends ProgramElement {
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     ProgramElement getChildAt(int index);
 
@@ -35,7 +37,8 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * is searched for by identity: <CODE>
      * getChildAt(getIndexOfChild(x)) == x</CODE>.
      *
-     * @param child the exact child to look for.
+     * @param child
+     *        the exact child to look for.
      * @return the index of the given child, or <CODE>-1</CODE>.
      */
     int getIndexOfChild(ProgramElement child);
@@ -46,7 +49,8 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * has been playing in this parent element. This information is required internally for proper
      * undo of transformations and is to be delivered to the detached method of the ChangeHistory.
      *
-     * @param child the exact child to look for.
+     * @param child
+     *        the exact child to look for.
      * @return the positional code of the given child, or <CODE>-1</CODE>.
      * @see recoder.service.ChangeHistory#detached
      */
@@ -63,7 +67,8 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * <p>
      * This method is deprecated as of 0.75
      *
-     * @param positionCode the position code.
+     * @param positionCode
+     *        the position code.
      * @return the index of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      * @deprecated
@@ -75,7 +80,8 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * Extracts the role of a child from its position code. This information is required internally
      * for proper undo of transformations.
      *
-     * @param positionCode the position code.
+     * @param positionCode
+     *        the position code.
      * @return the role code of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      */
@@ -109,10 +115,13 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * the child is effectively removed. The parent role of the new child is validated, while the
      * parent link of the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
     boolean replaceChild(ProgramElement p, ProgramElement q);
 

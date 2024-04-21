@@ -32,7 +32,8 @@ public class BinaryNot extends Operator {
     /**
      * Binary not.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public BinaryNot(Expression child) {
@@ -43,7 +44,8 @@ public class BinaryNot extends Operator {
     /**
      * Binary not.
      *
-     * @param proto a binary not.
+     * @param proto
+     *        a binary not.
      */
 
     protected BinaryNot(BinaryNot proto) {

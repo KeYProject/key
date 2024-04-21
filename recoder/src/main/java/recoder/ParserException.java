@@ -26,7 +26,8 @@ public class ParserException extends Exception {
     /**
      * Parser exception.
      *
-     * @param msg a string.
+     * @param msg
+     *        a string.
      */
     public ParserException(String msg) {
         super(msg);

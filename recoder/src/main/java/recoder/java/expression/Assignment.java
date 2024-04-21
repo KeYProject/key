@@ -34,7 +34,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Assignment.
      *
-     * @param unaryChild an expression.
+     * @param unaryChild
+     *        an expression.
      */
 
     public Assignment(Expression unaryChild) {
@@ -44,8 +45,10 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Assignment(Expression lhs, Expression rhs) {
@@ -55,7 +58,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Assignment.
      *
-     * @param proto an assignment.
+     * @param proto
+     *        an assignment.
      */
 
     protected Assignment(Assignment proto) {
@@ -89,7 +93,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

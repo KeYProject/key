@@ -42,37 +42,56 @@ public class LexPathOrdering implements TermOrdering {
 
         // used in anonymous classes inheriting from CompRes
         @SuppressWarnings("unused")
-        public boolean uncomparable() { return false; }
+        public boolean uncomparable() {
+            return false;
+        }
 
-        public boolean eq() { return false; }
+        public boolean eq() {
+            return false;
+        }
 
-        public boolean gt() { return false; }
+        public boolean gt() {
+            return false;
+        }
 
-        public boolean lt() { return false; }
+        public boolean lt() {
+            return false;
+        }
 
-        public boolean geq() { return gt() || eq(); }
+        public boolean geq() {
+            return gt() || eq();
+        }
 
         // kept for symmetry reasons
         @SuppressWarnings("unused")
-        public boolean leq() { return lt() || eq(); }
+        public boolean leq() {
+            return lt() || eq();
+        }
     }
 
     private final static CompRes UNCOMPARABLE = new CompRes() {
-        public boolean uncomparable() { return true; }
+        public boolean uncomparable() {
+            return true;
+        }
     };
     private final static CompRes EQUALS = new CompRes() {
-        public boolean eq() { return true; }
+        public boolean eq() {
+            return true;
+        }
     };
     private final static CompRes GREATER = new CompRes() {
-        public boolean gt() { return true; }
+        public boolean gt() {
+            return true;
+        }
     };
     private final static CompRes LESS = new CompRes() {
-        public boolean lt() { return true; }
+        public boolean lt() {
+            return true;
+        }
     };
 
 
-    private record CacheKey(Term left, Term right) {
-    }
+    private record CacheKey(Term left, Term right) {}
 
 
     private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();
@@ -83,9 +102,7 @@ public class LexPathOrdering implements TermOrdering {
         CompRes res = cache.get(key);
         if (res == null) {
             res = compareHelp2(p_a, p_b);
-            if (cache.size() > 100000) {
-                cache.clear();
-            }
+            if (cache.size() > 100000) { cache.clear(); }
             cache.put(key, res);
         }
         return res;
@@ -93,12 +110,8 @@ public class LexPathOrdering implements TermOrdering {
 
     private CompRes compareHelp2(Term p_a, Term p_b) {
 
-        if (oneSubGeq(p_a, p_b)) {
-            return GREATER;
-        }
-        if (oneSubGeq(p_b, p_a)) {
-            return LESS;
-        }
+        if (oneSubGeq(p_a, p_b)) { return GREATER; }
+        if (oneSubGeq(p_b, p_a)) { return LESS; }
 
         final int opComp =
             compare(p_a.op(), p_a.sort(), p_a.getLabels(), p_b.op(), p_b.sort(), p_b.getLabels());
@@ -107,24 +120,14 @@ public class LexPathOrdering implements TermOrdering {
             if (lexComp.eq()) {
                 return EQUALS;
             } else if (lexComp.gt()) {
-                if (greaterThanSubs(p_a, p_b, 1)) {
-                    return GREATER;
-                }
-            } else if (lexComp.lt()) {
-                if (greaterThanSubs(p_b, p_a, 1)) {
-                    return LESS;
-                }
-            }
+                if (greaterThanSubs(p_a, p_b, 1)) { return GREATER; }
+            } else if (lexComp.lt()) { if (greaterThanSubs(p_b, p_a, 1)) { return LESS; } }
         }
 
         if (opComp > 0) {
-            if (greaterThanSubs(p_a, p_b, 0)) {
-                return GREATER;
-            }
+            if (greaterThanSubs(p_a, p_b, 0)) { return GREATER; }
         } else {
-            if (greaterThanSubs(p_b, p_a, 0)) {
-                return LESS;
-            }
+            if (greaterThanSubs(p_b, p_a, 0)) { return LESS; }
         }
 
         return UNCOMPARABLE;
@@ -142,34 +145,22 @@ public class LexPathOrdering implements TermOrdering {
                 }
             }
 
-            if (i >= p_b.arity()) {
-                return GREATER;
-            }
+            if (i >= p_b.arity()) { return GREATER; }
 
             final CompRes subRes = compareHelp(p_a.sub(i), p_b.sub(i));
-            if (!subRes.eq()) {
-                return subRes;
-            }
+            if (!subRes.eq()) { return subRes; }
 
             ++i;
         }
     }
 
     private boolean greaterThanSubs(Term p_a, Term p_b, int firstSub) {
-        for (int i = firstSub; i < p_b.arity(); ++i) {
-            if (!compareHelp(p_a, p_b.sub(i)).gt()) {
-                return false;
-            }
-        }
+        for (int i = firstSub; i < p_b.arity(); ++i) { if (!compareHelp(p_a, p_b.sub(i)).gt()) { return false; } }
         return true;
     }
 
     private boolean oneSubGeq(Term p_a, Term p_b) {
-        for (int i = 0; i != p_a.arity(); ++i) {
-            if (compareHelp(p_a.sub(i), p_b).geq()) {
-                return true;
-            }
-        }
+        for (int i = 0; i != p_a.arity(); ++i) { if (compareHelp(p_a.sub(i), p_b).geq()) { return true; } }
         return false;
     }
 
@@ -181,51 +172,35 @@ public class LexPathOrdering implements TermOrdering {
      */
     private int compare(Operator aOp, Sort aSort, ImmutableArray<TermLabel> aLabels, Operator bOp,
             Sort bSort, ImmutableArray<TermLabel> bLabels) {
-        if (aOp == bOp) {
-            return 0;
-        }
+        if (aOp == bOp) { return 0; }
 
         // Search for literals
         int v = literalWeighter.compareWeights(aOp, bOp);
-        if (v != 0) {
-            return v;
-        }
+        if (v != 0) { return v; }
 
         if (isVar(aOp)) {
-            if (!isVar(bOp)) {
-                return 1;
-            }
+            if (!isVar(bOp)) { return 1; }
         } else {
-            if (isVar(bOp)) {
-                return -1;
-            }
+            if (isVar(bOp)) { return -1; }
         }
 
         // compare the sorts of the symbols: more specific sorts are smaller
         v = getSortDepth(bSort) - getSortDepth(aSort);
-        if (v != 0) {
-            return v;
-        }
+        if (v != 0) { return v; }
 
         // Search for special function symbols
         v = functionWeighter.compareWeights(aOp, bOp);
-        if (v != 0) {
-            return v;
-        }
+        if (v != 0) { return v; }
 
         // smaller arity is smaller
         v = aOp.arity() - bOp.arity();
-        if (v != 0) {
-            return v;
-        }
+        if (v != 0) { return v; }
 
         // compare anonHeap labels: if only one term has an anonHeap label,
         // then this is smaller
         v = (aLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? -1 : 0);
         v += (bLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? 1 : 0);
-        if (v != 0) {
-            return v;
-        }
+        if (v != 0) { return v; }
 
         // use the names of the symbols
         v = aOp.name().compareTo(bOp.name());
@@ -265,19 +240,11 @@ public class LexPathOrdering implements TermOrdering {
 
         // HACKish: ensure that object sorts are bigger than primitive sorts
         final String sName = s.name().toString();
-        if ("int".equals(sName)) {
-            res = 10000;
-        }
-        if ("boolean".equals(sName)) {
-            res = 20000;
-        }
-        if (s instanceof NullSort) {
-            return 30000;
-        }
+        if ("int".equals(sName)) { res = 10000; }
+        if ("boolean".equals(sName)) { res = 20000; }
+        if (s instanceof NullSort) { return 30000; }
 
-        for (Sort sort : s.extendsSorts()) {
-            res = Math.max(res, getSortDepth(sort));
-        }
+        for (Sort sort : s.extendsSorts()) { res = Math.max(res, getSortDepth(sort)); }
 
         return res + 1;
     }
@@ -355,9 +322,7 @@ public class LexPathOrdering implements TermOrdering {
 
             final String opStr = p_op.name().toString();
 
-            if (intFunctionNames.contains(opStr) || theoryFunctionNames.contains(opStr)) {
-                return 0;
-            }
+            if (intFunctionNames.contains(opStr) || theoryFunctionNames.contains(opStr)) { return 0; }
 
             if (opStr.equals("allLocs")) {
                 return 1;
@@ -367,58 +332,28 @@ public class LexPathOrdering implements TermOrdering {
                 return 3;
             } else if (opStr.equals("singleton")) {
                 return 4;
-            } else if (opStr.equals("freshLocs")) {
-                return 5;
-            }
+            } else if (opStr.equals("freshLocs")) { return 5; }
 
-            if (opStr.equals("neg")) {
-                return 1;
-            }
+            if (opStr.equals("neg")) { return 1; }
 
-            if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) {
-                return 1;
-            }
-            if (p_op instanceof JFunction && ((Function) p_op).sort() instanceof NullSort) {
-                return 2;
-            }
-            if (p_op instanceof JFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
-                return 3;
-            }
+            if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) { return 1; }
+            if (p_op instanceof JFunction && ((Function) p_op).sort() instanceof NullSort) { return 2; }
+            if (p_op instanceof JFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) { return 3; }
 
-            if (opStr.equals("add")) {
-                return 6;
-            }
-            if (opStr.equals("mul")) {
-                return 7;
-            }
-            if (opStr.equals("div")) {
-                return 8;
-            }
-            if (opStr.equals("jdiv")) {
-                return 9;
-            }
+            if (opStr.equals("add")) { return 6; }
+            if (opStr.equals("mul")) { return 7; }
+            if (opStr.equals("div")) { return 8; }
+            if (opStr.equals("jdiv")) { return 9; }
 
 
-            if (opStr.equals("intersect")) {
-                return 6;
-            }
-            if (opStr.equals("union")) {
-                return 7;
-            }
-            if (opStr.equals("infiniteUnion")) {
-                return 8;
-            }
-            if (opStr.equals("setMinus")) {
-                return 9;
-            }
+            if (opStr.equals("intersect")) { return 6; }
+            if (opStr.equals("union")) { return 7; }
+            if (opStr.equals("infiniteUnion")) { return 8; }
+            if (opStr.equals("setMinus")) { return 9; }
 
 
-            if (opStr.equals("seqSingleton")) {
-                return 6;
-            }
-            if (opStr.equals("seqConcat")) {
-                return 7;
-            }
+            if (opStr.equals("seqSingleton")) { return 6; }
+            if (opStr.equals("seqConcat")) { return 7; }
 
             return null;
         }
@@ -432,15 +367,9 @@ public class LexPathOrdering implements TermOrdering {
         protected Integer getWeight(Operator p_op) {
             final String opStr = p_op.name().toString();
 
-            if (opStr.equals("heap")) {
-                return 0;
-            }
-            if (p_op instanceof JFunction && ((Function) p_op).isUnique()) {
-                return 5;
-            }
-            if (opStr.equals("pair")) {
-                return 10;
-            }
+            if (opStr.equals("heap")) { return 0; }
+            if (p_op instanceof JFunction && ((Function) p_op).isUnique()) { return 5; }
+            if (opStr.equals("pair")) { return 10; }
 
 
             /*
@@ -481,9 +410,7 @@ public class LexPathOrdering implements TermOrdering {
      */
     public static int compare(BigInteger a, BigInteger b) {
         final int c = a.abs().compareTo(b.abs());
-        if (c != 0) {
-            return c;
-        }
+        if (c != 0) { return c; }
         return b.signum() - a.signum();
     }
 

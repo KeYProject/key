@@ -31,8 +31,10 @@ public class JmlAssert extends JavaStatement {
     private final KeyAst.Expression condition;
 
     /**
-     * @param kind the kind of this statement
-     * @param condition the condition for this statement
+     * @param kind
+     *        the kind of this statement
+     * @param condition
+     *        the condition for this statement
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition) {
         this.kind = kind;
@@ -42,7 +44,8 @@ public class JmlAssert extends JavaStatement {
     /**
      * copy constructor
      *
-     * @param proto the original JML assert a statement to copy
+     * @param proto
+     *        the original JML assert a statement to copy
      */
     public JmlAssert(JmlAssert proto) {
         super(proto);

@@ -41,7 +41,8 @@ public class Try extends BranchStatement implements StatementContainer {
     /**
      * Try.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public Try(StatementBlock body) {
@@ -52,8 +53,10 @@ public class Try extends BranchStatement implements StatementContainer {
     /**
      * Try.
      *
-     * @param body a statement block.
-     * @param branches a branch mutable list.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch mutable list.
      */
 
     public Try(StatementBlock body, ASTList<Branch> branches) {
@@ -65,17 +68,14 @@ public class Try extends BranchStatement implements StatementContainer {
     /**
      * Try.
      *
-     * @param proto a try.
+     * @param proto
+     *        a try.
      */
 
     protected Try(Try proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
-        if (proto.branches != null) {
-            branches = proto.branches.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
+        if (proto.branches != null) { branches = proto.branches.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -95,9 +95,7 @@ public class Try extends BranchStatement implements StatementContainer {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
         if (branches != null) {
             for (int i = branches.size() - 1; i >= 0; i -= 1) {
                 Branch b = branches.get(i);
@@ -122,47 +120,37 @@ public class Try extends BranchStatement implements StatementContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (body != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: body
         // role 1 (IDX): branch
-        if (body == child) {
-            return 0;
-        }
+        if (body == child) { return 0; }
         if (branches != null) {
             int index = branches.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         return -1;
     }
@@ -173,23 +161,22 @@ public class Try extends BranchStatement implements StatementContainer {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         int count;
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         count = (branches == null) ? 0 : branches.size();
@@ -225,7 +212,8 @@ public class Try extends BranchStatement implements StatementContainer {
     /**
      * Set body.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -249,9 +237,7 @@ public class Try extends BranchStatement implements StatementContainer {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -268,7 +254,8 @@ public class Try extends BranchStatement implements StatementContainer {
     /**
      * Set branch list.
      *
-     * @param branches a branch mutable list.
+     * @param branches
+     *        a branch mutable list.
      */
 
     public void setBranchList(ASTList<Branch> branches) {
@@ -292,9 +279,7 @@ public class Try extends BranchStatement implements StatementContainer {
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 

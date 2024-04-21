@@ -44,14 +44,14 @@ public final class ExceptionTools {
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
         Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
-    private ExceptionTools() {
-    }
+    private ExceptionTools() {}
 
     /**
      * Get the throwable's message. This will return a nicer error message for
      * certain ANTLR exceptions.
      *
-     * @param throwable a throwable
+     * @param throwable
+     *        a throwable
      * @return message for the exception
      */
     public static String getMessage(Throwable throwable) {
@@ -99,10 +99,7 @@ public final class ExceptionTools {
         sb.append("\n");
         sb.append("Expected token type(s): ");
         for (var interval : expectedTokens.getIntervals()) {
-            for (int i = interval.a; i <= interval.b; i++) {
-                sb.append(vocabulary.getDisplayName(i));
-                sb.append("\n");
-            }
+            for (int i = interval.a; i <= interval.b; i++) { sb.append(vocabulary.getDisplayName(i)); sb.append("\n"); }
         }
 
         return sb.toString();
@@ -113,9 +110,11 @@ public final class ExceptionTools {
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
      * Result may be null.
      *
-     * @param exc the Throwable to extract the Location from
+     * @param exc
+     *        the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
-     * @throws MalformedURLException if the no URL can be parsed from the String stored inside the
+     * @throws MalformedURLException
+     *         if the no URL can be parsed from the String stored inside the
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
@@ -129,13 +128,9 @@ public final class ExceptionTools {
             return Optional.ofNullable(getLocation((TokenMgrError) exc));
         } else if (exc instanceof InputMismatchException ime) {
             return Optional.ofNullable(getLocation(ime));
-        } else if (exc instanceof NoViableAltException nvae) {
-            return Optional.ofNullable(getLocation(nvae));
-        }
+        } else if (exc instanceof NoViableAltException nvae) { return Optional.ofNullable(getLocation(nvae)); }
 
-        if (exc.getCause() != null) {
-            return getLocation(exc.getCause());
-        }
+        if (exc.getCause() != null) { return getLocation(exc.getCause()); }
 
         return Optional.empty();
     }

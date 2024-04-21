@@ -43,7 +43,8 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public Case(Expression e) {
@@ -54,8 +55,10 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param e an expression.
-     * @param body a statement mutable list.
+     * @param e
+     *        an expression.
+     * @param body
+     *        a statement mutable list.
      */
 
     public Case(Expression e, ASTList<Statement> body) {
@@ -67,17 +70,14 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param proto a case.
+     * @param proto
+     *        a case.
      */
 
     protected Case(Case proto) {
         super(proto);
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.expression != null) { expression = proto.expression.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -97,14 +97,8 @@ public class Case extends Branch implements ExpressionContainer {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
-        if (body != null) {
-            for (Statement statement : body) {
-                statement.setStatementContainer(this);
-            }
-        }
+        if (expression != null) { expression.setExpressionContainer(this); }
+        if (body != null) { for (Statement statement : body) { statement.setStatementContainer(this); } }
     }
 
     @Override
@@ -115,7 +109,8 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Set parent.
      *
-     * @param parent a switch.
+     * @param parent
+     *        a switch.
      */
 
     public void setParent(Switch parent) {
@@ -130,12 +125,8 @@ public class Case extends Branch implements ExpressionContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (body != null) {
-            result += body.size();
-        }
+        if (expression != null) { result++; }
+        if (body != null) { result += body.size(); }
         return result;
     }
 
@@ -143,24 +134,22 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
         if (body != null) {
             len = body.size();
-            if (len > index) {
-                return body.get(index);
-            }
+            if (len > index) { return body.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -169,14 +158,10 @@ public class Case extends Branch implements ExpressionContainer {
     public int getChildPositionCode(ProgramElement child) {
         // role 0: expression
         // role 1 (IDX): body
-        if (expression == child) {
-            return 0;
-        }
+        if (expression == child) { return 0; }
         if (body != null) {
             int index = body.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         return -1;
     }
@@ -187,23 +172,22 @@ public class Case extends Branch implements ExpressionContainer {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         int count;
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (expression == p) {
             Expression r = (Expression) q;
             expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         count = (body == null) ? 0 : body.size();
@@ -239,9 +223,7 @@ public class Case extends Branch implements ExpressionContainer {
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -262,9 +244,7 @@ public class Case extends Branch implements ExpressionContainer {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -281,13 +261,12 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Set expression.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public void setExpression(Expression e) {
-        if (e == null) {
-            throw new NullPointerException("Cases must have an expression");
-        }
+        if (e == null) { throw new NullPointerException("Cases must have an expression"); }
         expression = e;
     }
 
@@ -303,7 +282,8 @@ public class Case extends Branch implements ExpressionContainer {
     /**
      * Set body.
      *
-     * @param list a statement mutable list.
+     * @param list
+     *        a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -315,9 +295,7 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0) {
-            return this;
-        }
+        if (body == null || body.size() == 0) { return this; }
         return body.get(body.size() - 1).getLastElement();
     }
 }

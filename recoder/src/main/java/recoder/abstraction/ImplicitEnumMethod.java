@@ -25,9 +25,7 @@ public abstract class ImplicitEnumMethod implements Method {
      */
     public ImplicitEnumMethod(ClassType ownerClass) {
         super();
-        if (ownerClass == null) {
-            throw new NullPointerException();
-        }
+        if (ownerClass == null) { throw new NullPointerException(); }
         this.ownerClass = ownerClass;
     }
 

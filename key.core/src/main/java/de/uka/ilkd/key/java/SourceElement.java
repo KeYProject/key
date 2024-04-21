@@ -77,7 +77,8 @@ public interface SourceElement extends SVSubstitute {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     void visit(Visitor v);
 

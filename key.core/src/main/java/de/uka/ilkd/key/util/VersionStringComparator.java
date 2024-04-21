@@ -26,9 +26,7 @@ public class VersionStringComparator implements Comparator<String> {
         if (s != null) {
             final String[] p = s.split(SEPARATOR_PATTERN);
             final Integer[] r = new Integer[p.length];
-            for (int i = 0; i < p.length; i++) {
-                r[i] = parseInt(p[i]);
-            }
+            for (int i = 0; i < p.length; i++) { r[i] = parseInt(p[i]); }
             return r;
         } else {
             return new Integer[0];

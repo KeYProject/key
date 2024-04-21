@@ -35,17 +35,13 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-            + ", name='" + name + '\'' + '}';
+                + ", name='" + name + '\'' + '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TextualJMLMergePointDecl that)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!(o instanceof TextualJMLMergePointDecl that)) { return false; }
         return getMergeProc().equals(that.getMergeProc());
     }
 

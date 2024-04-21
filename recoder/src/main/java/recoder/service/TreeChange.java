@@ -32,7 +32,8 @@ public abstract class TreeChange {
     /**
      * Constructor for the change.
      *
-     * @param root the root of the change.
+     * @param root
+     *        the root of the change.
      */
     TreeChange(ProgramElement root) {
         this.root = root;

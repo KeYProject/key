@@ -167,8 +167,10 @@ public class CloseAfterMerge implements BuiltInRule {
      * Constructs the actual syntactic weakening formula \phi(s1, s2) expressing that s2 is a
      * weakening of s1.
      *
-     * @param closeApp The rule application containing the required data.
-     * @param isWeakeningGoal The {@link Proof} {@link Goal} for the logical weakening formula.
+     * @param closeApp
+     *        The rule application containing the required data.
+     * @param isWeakeningGoal
+     *        The {@link Proof} {@link Goal} for the logical weakening formula.
      *
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
@@ -193,10 +195,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // Collect sorts and create logical variables for
         // closing over program variables.
         final LinkedList<Sort> argSorts = new LinkedList<>();
-        for (LocationVariable var : allLocs) {
-            argSorts.add(var.sort());
-            origQfdVarTerms.add(tb.var(var));
-        }
+        for (LocationVariable var : allLocs) { argSorts.add(var.sort()); origQfdVarTerms.add(tb.var(var)); }
 
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
@@ -239,9 +238,12 @@ public class CloseAfterMerge implements BuiltInRule {
      * the term are replaced by fresh logical variables, where multiple occurrences of the same
      * constant are replaced by the same variable.
      *
-     * @param term Term to universally close.
-     * @param constsToReplace Skolem constants to replace before the universal closure.
-     * @param services The services object.
+     * @param term
+     *        Term to universally close.
+     * @param constsToReplace
+     *        Skolem constants to replace before the universal closure.
+     * @param services
+     *        The services object.
      * @return A new term which is equivalent to the universal closure of the argument term, with
      *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
      *         before.
@@ -274,18 +276,25 @@ public class CloseAfterMerge implements BuiltInRule {
     /**
      * Creates a complete CloseAfterMergeBuiltInRuleApp.
      *
-     * @param pio Position of the Update-ProgramCounter formula.
-     * @param thePartnerNode The partner node to close.
-     * @param correspondingMergeNode The corresponding merge node that is not closed. This is needed
+     * @param pio
+     *        Position of the Update-ProgramCounter formula.
+     * @param thePartnerNode
+     *        The partner node to close.
+     * @param correspondingMergeNode
+     *        The corresponding merge node that is not closed. This is needed
      *        to add a reference to its parent in the partner goal at the place of this rule
      *        application.
-     * @param mergeNodeState The SE state for the merge node; needed for adding an implicative
+     * @param mergeNodeState
+     *        The SE state for the merge node; needed for adding an implicative
      *        premise ensuring the soundness of merge rules.
-     * @param partnerState The SE state for the partner node.
-     * @param pc The program counter common to the two states -- a formula of the form
+     * @param partnerState
+     *        The SE state for the partner node.
+     * @param pc
+     *        The program counter common to the two states -- a formula of the form
      *        {@code U\<{...}\>
      *        PHI}, where U is an update in normal form and PHI is a DL formula).
-     * @param newNames The set of new names (of Skolem constants) introduced in the merge.
+     * @param newNames
+     *        The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
     public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,

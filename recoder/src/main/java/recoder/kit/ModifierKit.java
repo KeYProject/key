@@ -71,17 +71,13 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     }
 
     public static int getCode(Modifier m) {
-        if (m == null) {
-            return PACKAGE;
-        }
+        if (m == null) { return PACKAGE; }
         if (m instanceof VisibilityModifier) {
             if (m instanceof Public) {
                 return PUBLIC;
             } else if (m instanceof Protected) {
                 return PROTECTED;
-            } else if (m instanceof Private) {
-                return PRIVATE;
-            }
+            } else if (m instanceof Private) { return PRIVATE; }
         } else if (m instanceof Static) {
             return STATIC;
         } else if (m instanceof Final) {
@@ -96,22 +92,16 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
             return STRICT;
         } else if (m instanceof Volatile) {
             return VOLATILE;
-        } else if (m instanceof Native) {
-            return NATIVE;
-        }
+        } else if (m instanceof Native) { return NATIVE; }
         throw new IllegalArgumentException("Unknown Modifier " + m.getClass().getName());
     }
 
     public static VisibilityModifier getVisibilityModifier(Declaration decl) {
         Debug.assertNonnull(decl);
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
-            return null;
-        }
+        if (mods == null) { return null; }
         for (DeclarationSpecifier res : mods) {
-            if (res instanceof VisibilityModifier) {
-                return (VisibilityModifier) res;
-            }
+            if (res instanceof VisibilityModifier) { return (VisibilityModifier) res; }
         }
         return null;
     }
@@ -119,14 +109,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     private static boolean containsModifier(Declaration decl, Class mod) {
         Debug.assertNonnull(decl, mod);
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
-            return false;
-        }
-        for (DeclarationSpecifier res : mods) {
-            if (mod.isInstance(res)) {
-                return true;
-            }
-        }
+        if (mods == null) { return false; }
+        for (DeclarationSpecifier res : mods) { if (mod.isInstance(res)) { return true; } }
         return false;
     }
 
@@ -149,19 +133,13 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         case PACKAGE:
             if (code == PACKAGE) {
                 m = getVisibilityModifier(decl);
-                if (m != null) {
-                    MiscKit.remove(ch, m);
-                }
+                if (m != null) { MiscKit.remove(ch, m); }
                 return null;
             }
         case PUBLIC:
             m = getVisibilityModifier(decl);
-            if (m instanceof Public) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
+            if (m instanceof Public) { return null; }
+            if (m != null) { MiscKit.remove(ch, m); }
             if (mods == null) {
                 mods = new ASTArrayList<>();
                 decl.setDeclarationSpecifiers(mods);
@@ -171,12 +149,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
             break;
         case PROTECTED:
             m = getVisibilityModifier(decl);
-            if (m instanceof Protected) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
+            if (m instanceof Protected) { return null; }
+            if (m != null) { MiscKit.remove(ch, m); }
             if (mods == null) {
                 mods = new ASTArrayList<>();
                 decl.setDeclarationSpecifiers(mods);
@@ -186,12 +160,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
             break;
         case PRIVATE:
             m = getVisibilityModifier(decl);
-            if (m instanceof Private) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
+            if (m instanceof Private) { return null; }
+            if (m != null) { MiscKit.remove(ch, m); }
             if (mods == null) {
                 mods = new ASTArrayList<>();
                 decl.setDeclarationSpecifiers(mods);
@@ -200,64 +170,46 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
             insertPos = 0;
             break;
         case STATIC:
-            if (containsModifier(decl, Static.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Static.class)) { return null; }
             m = getVisibilityModifier(decl);
             insertPos = (m == null) ? 0 : 1;
             m = fact.createStatic();
             break;
         case FINAL:
-            if (containsModifier(decl, Final.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Final.class)) { return null; }
             m = getVisibilityModifier(decl);
             insertPos = (m == null) ? 0 : 1;
-            if (containsModifier(decl, Static.class)) {
-                insertPos += 1;
-            }
+            if (containsModifier(decl, Static.class)) { insertPos += 1; }
             m = fact.createFinal();
             break;
         case ABSTRACT:
-            if (containsModifier(decl, Abstract.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Abstract.class)) { return null; }
             m = getVisibilityModifier(decl);
             insertPos = (m == null) ? 0 : 1;
             m = fact.createAbstract();
             break;
         case SYNCHRONIZED:
-            if (containsModifier(decl, Synchronized.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Synchronized.class)) { return null; }
             insertPos = (mods == null) ? 0 : mods.size();
             m = fact.createSynchronized();
             break;
         case TRANSIENT:
-            if (containsModifier(decl, Transient.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Transient.class)) { return null; }
             insertPos = (mods == null) ? 0 : mods.size();
             m = fact.createTransient();
             break;
         case STRICT:
-            if (containsModifier(decl, StrictFp.class)) {
-                return null;
-            }
+            if (containsModifier(decl, StrictFp.class)) { return null; }
             insertPos = (mods == null) ? 0 : mods.size();
             m = fact.createStrictFp();
             break;
         case VOLATILE:
-            if (containsModifier(decl, Volatile.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Volatile.class)) { return null; }
             insertPos = (mods == null) ? 0 : mods.size();
             m = fact.createVolatile();
             break;
         case NATIVE:
-            if (containsModifier(decl, Native.class)) {
-                return null;
-            }
+            if (containsModifier(decl, Native.class)) { return null; }
             insertPos = (mods == null) ? 0 : mods.size();
             m = fact.createNative();
             break;
@@ -266,9 +218,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         }
         mods.add(insertPos, m);
         m.setParent(decl); // make parent role valid
-        if (ch != null) {
-            ch.attached(m);
-        }
+        if (ch != null) { ch.attached(m); }
         return m;
     }
 
@@ -289,9 +239,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
             ClassType ct) {
         Debug.assertNonnull(si, mdecl, ct);
         Debug.assertBoolean(mdecl instanceof Member);
-        if (si.isVisibleFor((Member) mdecl, ct)) {
-            return true;
-        }
+        if (si.isVisibleFor((Member) mdecl, ct)) { return true; }
         int minimumNeeded;
         TypeDeclaration mt = mdecl.getMemberParent();
         if (mt == ct) {

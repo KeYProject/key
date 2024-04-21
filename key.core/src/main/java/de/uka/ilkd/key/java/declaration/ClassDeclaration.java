@@ -67,12 +67,18 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Class declaration.
      *
-     * @param mods a modifier array.
-     * @param name Identifier of the class
-     * @param members an array containing the memberdeclarations of this type
-     * @param implemented of type Implement containing the interfaces implemented by this class
-     * @param extended Extend containing the class extended by the class of this classdeclaration
-     * @param parentIsInterfaceDeclaration boolean true iff parent is an InterfaceDeclaration
+     * @param mods
+     *        a modifier array.
+     * @param name
+     *        Identifier of the class
+     * @param members
+     *        an array containing the memberdeclarations of this type
+     * @param implemented
+     *        of type Implement containing the interfaces implemented by this class
+     * @param extended
+     *        Extend containing the class extended by the class of this classdeclaration
+     * @param parentIsInterfaceDeclaration
+     *        boolean true iff parent is an InterfaceDeclaration
      */
     public ClassDeclaration(Modifier[] mods, ProgramElementName name, Extends extended,
             ProgramElementName fullName, Implements implemented, MemberDeclaration[] members,
@@ -88,13 +94,16 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * uses children list to create non-anonymous class
      *
-     * @param children the ExtList with all children building up this class declaration May contain:
+     * @param children
+     *        the ExtList with all children building up this class declaration May contain:
      *        a Extends (as pointer to a class), a Implements (as pointer to an interface)
      *        ProgramElementName (as name), several MemberDeclaration (as members of the type), a
      *        parentIsInterfaceDeclaration (indicating if parent is interface), several Modifier (as
      *        modifiers of the type decl), a Comment
-     * @param fullName the fully qualified ProgramElementName of this class
-     * @param isLibrary a boolean flag indicating if this class represents a library class (such
+     * @param fullName
+     *        the fully qualified ProgramElementName of this class
+     * @param isLibrary
+     *        a boolean flag indicating if this class represents a library class (such
      *        classes have usually no method implementations but specifications)
      */
     public ClassDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary,
@@ -119,61 +128,43 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (name != null) {
-            result++;
-        }
-        if (extending != null) {
-            result++;
-        }
-        if (implementing != null) {
-            result++;
-        }
-        if (members != null) {
-            result += members.size();
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (name != null) { result++; }
+        if (extending != null) { result++; }
+        if (implementing != null) { result++; }
+        if (members != null) { result += members.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (extending != null) {
-            if (index == 0) {
-                return extending;
-            }
+            if (index == 0) { return extending; }
             index--;
         }
         if (implementing != null) {
-            if (index == 0) {
-                return implementing;
-            }
+            if (index == 0) { return implementing; }
             index--;
         }
-        if (members != null) {
-            return members.get(index);
-        }
+        if (members != null) { return members.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -235,9 +226,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());
             }
         }
-        if (extending != null) {
-            types = types.prepend(extending.getTypeReferenceAt(0).getKeYJavaType());
-        }
+        if (extending != null) { types = types.prepend(extending.getTypeReferenceAt(0).getKeYJavaType()); }
         return types;
     }
 
@@ -245,7 +234,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnClassDeclaration(this);

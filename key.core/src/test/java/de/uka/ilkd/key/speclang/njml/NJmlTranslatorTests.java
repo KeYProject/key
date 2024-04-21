@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+            + "speclang" + File.separator + "testFile.key";
     private final PreParser preParser;
 
     public NJmlTranslatorTests() {
@@ -92,8 +92,8 @@ public class NJmlTranslatorTests {
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
-                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
-                + Path.of("Test.java").toUri() + ", 5/38)",
+                    + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
+                    + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 

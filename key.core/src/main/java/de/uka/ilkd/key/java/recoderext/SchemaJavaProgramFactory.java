@@ -130,19 +130,15 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public static void throwSortInvalid(SchemaVariable sv, String s) throws ParseException {
         throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
-            + sv.sort().name().toString() + " does not comply with expected type " + s
-            + " in Java program.");
+                + sv.sort().name().toString() + " does not comply with expected type " + s
+                + " in Java program.");
     }
 
 
     public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
-        if (svns == null) {
-            return false;
-        }
+        if (svns == null) { return false; }
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof SchemaVariable) {
-            return n.sort() == sort;
-        }
+        if (n instanceof SchemaVariable) { return n.sort() == sort; }
         return false;
     }
 
@@ -160,83 +156,63 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public StatementSVWrapper getStatementSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Statement");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Statement"); }
 
         return new StatementSVWrapper(sv);
     }
 
     public ExpressionSVWrapper getExpressionSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Expression");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Expression"); }
         return new ExpressionSVWrapper(sv);
     }
 
 
     public LabelSVWrapper getLabelSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Label");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Label"); }
         return new LabelSVWrapper(sv);
     }
 
     public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "MethodSignature");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "MethodSignature"); }
         return new MethodSignatureSVWrapper(sv);
     }
 
     public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
-            throwSortInvalid(sv, "Label");
-        }
+        if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) { throwSortInvalid(sv, "Label"); }
         return new JumpLabelSVWrapper(sv);
     }
 
     public TypeSVWrapper getTypeSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Type");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Type"); }
         return new TypeSVWrapper(sv);
     }
 
     public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Type");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Type"); }
         return new ExecCtxtSVWrapper(sv);
     }
 
     public ProgramVariableSVWrapper getProgramVariableSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Program Variable");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Program Variable"); }
         return new ProgramVariableSVWrapper(sv);
     }
 
     public CatchSVWrapper getCatchSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Catch");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Catch"); }
         return new CatchSVWrapper(sv);
     }
 
     public CcatchSVWrapper getCcatchSV(String s) throws ParseException {
         SchemaVariable sv = lookupSchemaVariable(s);
-        if (!(sv instanceof ProgramSV)) {
-            throwSortInvalid(sv, "Ccatch");
-        }
+        if (!(sv instanceof ProgramSV)) { throwSortInvalid(sv, "Ccatch"); }
         return new CcatchSVWrapper(sv);
     }
 
@@ -252,10 +228,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         if (!c.isPrefixed()) {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
-            if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++) {
-                }
-            }
+            if (ppe != null) { for (; ppe.getChildAt(i) != dest; i++) {} }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
             } else {
@@ -263,9 +236,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
                 while (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
-                    if (i == 0) {
-                        break;
-                    }
+                    if (i == 0) { break; }
                     dest = ppe.getChildAt(i - 1);
                 }
             }
@@ -278,9 +249,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             }
         }
         ASTList<Comment> cml = dest.getComments();
-        if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<>());
-        }
+        if (cml == null) { dest.setComments(cml = new ASTArrayList<>()); }
         cml.add(c);
     }
 
@@ -300,9 +269,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         TreeWalker tw = new TreeWalker(pe);
         while (tw.next()) {
             pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement) pe).makeParentRoleValid();
-            }
+            if (pe instanceof NonTerminalProgramElement) { ((NonTerminalProgramElement) pe).makeParentRoleValid(); }
             if (pe.getFirstElement() != null) {
                 Position pos = pe.getFirstElement().getStartPosition();
                 while ((commentIndex < commentCount) && pos.compareTo(cpos) > 0) {
@@ -316,13 +283,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             }
         }
         if (commentIndex < commentCount) {
-            while (pe.getASTParent() != null) {
-                pe = pe.getASTParent();
-            }
+            while (pe.getASTParent() != null) { pe = pe.getASTParent(); }
             ASTList<Comment> cml = pe.getComments();
-            if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<>());
-            }
+            if (cml == null) { pe.setComments(cml = new ASTArrayList<>()); }
             do {
                 current = comments.get(commentIndex);
                 current.setPrefixed(false);
@@ -522,9 +485,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             try {
                 SchemaJavaParser.initialize(in);
                 ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
-                for (Statement re : res) {
-                    postWork(re);
-                }
+                for (Statement re : res) { postWork(re); }
                 return res;
             } catch (ParseException e) {
                 ParserException pe = new ParserException();

@@ -20,7 +20,8 @@ public class IsStatic extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe the instance of expression contained by the meta construct
+     * @param pe
+     *        the instance of expression contained by the meta construct
      */
     public IsStatic(ProgramElement pe) {
         super("#isstatic", pe);

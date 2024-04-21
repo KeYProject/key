@@ -36,7 +36,8 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments, a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments, a
      *        Then, an Else, an Expression (as condition of If)
      */
     public If(ExtList children) {
@@ -61,8 +62,10 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenBranch a then.
+     * @param e
+     *        an expression.
+     * @param thenBranch
+     *        a then.
      */
 
     public If(Expression e, Then thenBranch) {
@@ -72,9 +75,12 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenBranch a then.
-     * @param elseBranch an else.
+     * @param e
+     *        an expression.
+     * @param thenBranch
+     *        a then.
+     * @param elseBranch
+     *        an else.
      */
     public If(Expression e, Then thenBranch, Else elseBranch) {
         this.expression = e;
@@ -98,37 +104,29 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
 
     public int getChildCount() {
-        if (elseBranch != null) {
-            return 3;
-        }
+        if (elseBranch != null) { return 3; }
         return 2;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
         if (thenBranch != null) {
-            if (index == 0) {
-                return thenBranch;
-            }
+            if (index == 0) { return thenBranch; }
             index--;
         }
-        if (elseBranch != null) {
-            if (index == 0) {
-                return elseBranch;
-            }
-        }
+        if (elseBranch != null) { if (index == 0) { return elseBranch; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -151,9 +149,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (index == 0) {
-            return expression;
-        }
+        if (index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -192,9 +188,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public int getBranchCount() {
         int result = 1;
-        if (elseBranch != null) {
-            result += 1;
-        }
+        if (elseBranch != null) { result += 1; }
         return result;
     }
 
@@ -208,12 +202,8 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Branch getBranchAt(int index) {
-        if (index == 0) {
-            return thenBranch;
-        }
-        if (elseBranch != null && index == 1) {
-            return elseBranch;
-        }
+        if (index == 0) { return thenBranch; }
+        if (elseBranch != null && index == 1) { return elseBranch; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -221,7 +211,8 @@ public class If extends BranchStatement implements ExpressionContainer {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnIf(this);

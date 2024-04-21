@@ -35,7 +35,8 @@ public abstract class Modifier extends JavaProgramElement
     /**
      * Modifier.
      *
-     * @param proto a modifier.
+     * @param proto
+     *        a modifier.
      */
 
     protected Modifier(Modifier proto) {
@@ -65,7 +66,8 @@ public abstract class Modifier extends JavaProgramElement
     /**
      * Set parent.
      *
-     * @param parent a declaration.
+     * @param parent
+     *        a declaration.
      */
 
     public void setParent(Declaration parent) {

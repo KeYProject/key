@@ -44,7 +44,8 @@ public class TypeCast extends TypeOperator {
     /**
      * Type cast.
      *
-     * @param proto a type cast.
+     * @param proto
+     *        a type cast.
      */
 
     protected TypeCast(TypeCast proto) {
@@ -70,36 +71,30 @@ public class TypeCast extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null) {
-            result++;
-        }
-        if (children != null) {
-            result += children.size();
-        }
+        if (typeReference != null) { result++; }
+        if (children != null) { result += children.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -71,7 +71,8 @@ public class KeYSelectionModel {
     /**
      * Sets the selected proof.
      *
-     * @param p the proof to select.
+     * @param p
+     *        the proof to select.
      *
      * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
@@ -116,14 +117,13 @@ public class KeYSelectionModel {
     /**
      * sets the node that is focused by the user
      *
-     * @param n the selected node
+     * @param n
+     *        the selected node
      */
     public synchronized void setSelectedNode(Node n) {
         final Node previousSelectedNode = selectedNode;
         // switch proof if needed
-        if (n.proof() != getSelectedProof()) {
-            setSelectedProof(n.proof());
-        }
+        if (n.proof() != getSelectedProof()) { setSelectedProof(n.proof()); }
         goalIsValid = false;
         selectedNode = n;
         selectedSequent = selectedNode.sequent();
@@ -134,16 +134,16 @@ public class KeYSelectionModel {
     /**
      * Sets the node and sequent focused by the user.
      *
-     * @param node selected node
-     * @param sequent selected sequent
+     * @param node
+     *        selected node
+     * @param sequent
+     *        selected sequent
      */
     public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
             RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
-        if (node.proof() != getSelectedProof()) {
-            setSelectedProof(node.proof());
-        }
+        if (node.proof() != getSelectedProof()) { setSelectedProof(node.proof()); }
         goalIsValid = true;
         selectedGoal = null;
         selectedNode = node;
@@ -155,7 +155,8 @@ public class KeYSelectionModel {
     /**
      * sets the node that is focused by the user
      *
-     * @param g the Goal that contains the selected node
+     * @param g
+     *        the Goal that contains the selected node
      */
     public synchronized void setSelectedGoal(Goal g) {
         final Node previousNode = selectedNode;
@@ -190,9 +191,7 @@ public class KeYSelectionModel {
      * @return the goal the selected node belongs to, null if it is an inner node
      */
     public Goal getSelectedGoal() {
-        if (proof == null) {
-            throw new IllegalStateException("No proof loaded.");
-        }
+        if (proof == null) { throw new IllegalStateException("No proof loaded."); }
         if (!goalIsValid) {
             selectedGoal = proof.getOpenGoal(selectedNode);
             goalIsValid = true;
@@ -206,9 +205,7 @@ public class KeYSelectionModel {
      * @return true iff the selected node is a goal
      */
     public boolean isGoal() {
-        if (!goalIsValid) {
-            return (getSelectedGoal() != null);
-        }
+        if (!goalIsValid) { return (getSelectedGoal() != null); }
         return selectedGoal != null;
     }
 
@@ -291,9 +288,7 @@ public class KeYSelectionModel {
         Goal g = null;
         Iterator<Goal> it = new DefaultSelectionIterator();
 
-        while (g == null && it.hasNext()) {
-            g = it.next();
-        }
+        while (g == null && it.hasNext()) { g = it.next(); }
 
         /*
          * Order of preference: 1. Not yet closable goals 2. Goals which are not closed for all
@@ -311,14 +306,13 @@ public class KeYSelectionModel {
      * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
      * proof root is selected.
      *
-     * @param old the Node to start looking for open goals
+     * @param old
+     *        the Node to start looking for open goals
      */
     // XXX this method is never used
     public void nearestOpenGoalSelection(Node old) {
         Node n = old;
-        while (n != null && n.isClosed()) {
-            n = n.parent();
-        }
+        while (n != null && n.isClosed()) { n = n.parent(); }
         if (n == null) {
             if (proof.find(old)) {
                 setSelectedNode(old);
@@ -339,26 +333,20 @@ public class KeYSelectionModel {
      * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
      * of the subtree starting at <code>n</code> which is not already closed
      *
-     * @param n the Node where to start from
+     * @param n
+     *        the Node where to start from
      * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
      *         is not already closed. <code>null</code> is returned if no such goal exists.
      */
     private Goal getFirstOpenGoalBelow(Node n) {
         final Iterator<Node> it = n.leavesIterator();
-        while (it.hasNext()) {
-            final Node node = it.next();
-            if (!node.isClosed()) {
-                return proof.getOpenGoal(node);
-            }
-        }
+        while (it.hasNext()) { final Node node = it.next(); if (!node.isClosed()) { return proof.getOpenGoal(node); } }
         return null;
     }
 
     public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            if (!listenerList.contains(listener)) {
-                addKeYSelectionListener(listener);
-            }
+            if (!listenerList.contains(listener)) { addKeYSelectionListener(listener); }
         }
     }
 
@@ -380,9 +368,7 @@ public class KeYSelectionModel {
         synchronized (listenerList) {
             final KeYSelectionEvent<Node> selectionEvent =
                 new KeYSelectionEvent<>(this, previousNode);
-            for (final KeYSelectionListener listener : listenerList) {
-                listener.selectedNodeChanged(selectionEvent);
-            }
+            for (final KeYSelectionListener listener : listenerList) { listener.selectedNodeChanged(selectionEvent); }
         }
     }
 
@@ -391,9 +377,7 @@ public class KeYSelectionModel {
             LOGGER.debug("Selected Proof changed, firing...");
             final KeYSelectionEvent<Proof> selectionEvent =
                 new KeYSelectionEvent<>(this, previousProof);
-            for (final KeYSelectionListener listener : listenerList) {
-                listener.selectedProofChanged(selectionEvent);
-            }
+            for (final KeYSelectionListener listener : listenerList) { listener.selectedProofChanged(selectionEvent); }
             LOGGER.trace("Selected Proof changed, done firing.");
         }
     }

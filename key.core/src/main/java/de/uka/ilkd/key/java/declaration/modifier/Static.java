@@ -24,7 +24,8 @@ public class Static extends Modifier {
     /**
      * Static
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
 
     public Static(ExtList children) {

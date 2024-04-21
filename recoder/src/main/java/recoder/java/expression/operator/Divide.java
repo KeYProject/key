@@ -32,8 +32,10 @@ public class Divide extends Operator {
     /**
      * Divide.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Divide(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class Divide extends Operator {
     /**
      * Divide.
      *
-     * @param proto a divide.
+     * @param proto
+     *        a divide.
      */
 
     protected Divide(Divide proto) {

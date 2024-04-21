@@ -32,7 +32,8 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param value a float value.
+     * @param value
+     *        a float value.
      */
 
     public FloatLiteral(float value) {
@@ -42,8 +43,10 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param children an ExtList with all children(here:comments)
-     * @param value a string.
+     * @param children
+     *        an ExtList with all children(here:comments)
+     * @param value
+     *        a string.
      */
 
     public FloatLiteral(ExtList children, String value) {
@@ -54,7 +57,8 @@ public class FloatLiteral extends Literal {
     /**
      * Float literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public FloatLiteral(String value) {
@@ -65,9 +69,7 @@ public class FloatLiteral extends Literal {
      * tests if equals
      */
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof FloatLiteral)) {
-            return false;
-        }
+        if (!(o instanceof FloatLiteral)) { return false; }
         return ((FloatLiteral) o).getValue().equals(getValue());
     }
 
@@ -94,7 +96,8 @@ public class FloatLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFloatLiteral(this);

@@ -54,21 +54,17 @@ public class SpecDataLocation implements DataLocation {
         return false;
     }
 
-    public void inputStreamClosed() {
-    }
+    public void inputStreamClosed() {}
 
     public boolean isWritable() {
         return false;
     }
 
-    public void outputStreamClosed() {
-    }
+    public void outputStreamClosed() {}
 
-    public void readerClosed() {
-    }
+    public void readerClosed() {}
 
-    public void writerClosed() {
-    }
+    public void writerClosed() {}
 
     public String toString() {
         return type + ":" + location;

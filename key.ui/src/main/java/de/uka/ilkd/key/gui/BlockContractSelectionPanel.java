@@ -35,8 +35,10 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
      *
-     * @param services The {@link Services}
-     * @param selection The selected contracts.
+     * @param services
+     *        The {@link Services}
+     * @param selection
+     *        The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     public static BlockContract computeBlockContract(Services services,
@@ -47,9 +49,7 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
             return selection.get(0);
         } else {
             ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
-            for (BlockContract contract : selection) {
-                contracts = contracts.add(contract);
-            }
+            for (BlockContract contract : selection) { contracts = contracts.add(contract); }
             return BlockContractImpl.combine(contracts, services);
         }
     }
@@ -62,8 +62,10 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
      *
-     * @param services The {@link Services}
-     * @param selection The selected contracts.
+     * @param services
+     *        The {@link Services}
+     * @param selection
+     *        The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     @Override

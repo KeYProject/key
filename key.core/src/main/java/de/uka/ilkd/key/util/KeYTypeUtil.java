@@ -33,14 +33,15 @@ public final class KeYTypeUtil {
     /**
      * Forbid instances.
      */
-    private KeYTypeUtil() {
-    }
+    private KeYTypeUtil() {}
 
     /**
      * Checks if the given type is an inner or anonymous type.
      *
-     * @param services The {@link Services} to use.
-     * @param type The type to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param type
+     *        The type to check.
      * @return {@code true} is inner or anonymous, {@code false} is not
      */
     public static boolean isInnerType(Services services, KeYJavaType type) {
@@ -55,8 +56,10 @@ public final class KeYTypeUtil {
     /**
      * Returns the name of the parent package/type or {@code null} if it has no one.
      *
-     * @param services The {@link Services} to use.
-     * @param type The type.
+     * @param services
+     *        The {@link Services} to use.
+     * @param type
+     *        The type.
      * @return The parent package/type or {@code null} if it has no one.
      */
     public static String getParentName(Services services, KeYJavaType type) {
@@ -66,8 +69,10 @@ public final class KeYTypeUtil {
     /**
      * Returns the name of the parent package/type or {@code null} if it has no one.
      *
-     * @param services The {@link Services} to use.
-     * @param fullName The name of the current package/type.
+     * @param services
+     *        The {@link Services} to use.
+     * @param fullName
+     *        The name of the current package/type.
      * @return The parent package/type or {@code null} if it has no one.
      */
     private static String getParentName(Services services, String fullName) {
@@ -91,8 +96,10 @@ public final class KeYTypeUtil {
     /**
      * Checks if the given full name is a type in KeY.
      *
-     * @param services The services to use.
-     * @param fullName The full name to check.
+     * @param services
+     *        The services to use.
+     * @param fullName
+     *        The full name to check.
      * @return {@code true} = is type, {@code false} = is no type
      */
     public static boolean isType(Services services, String fullName) {
@@ -102,8 +109,10 @@ public final class KeYTypeUtil {
     /**
      * Returns the {@link KeYJavaType} fore the given name.
      *
-     * @param services The {@link Services} to use.
-     * @param fullName The full name of the requested {@link KeYJavaType}.
+     * @param services
+     *        The {@link Services} to use.
+     * @param fullName
+     *        The full name of the requested {@link KeYJavaType}.
      * @return The found {@link KeYJavaType} or {@code null} if no type exist with the given name.
      */
     public static KeYJavaType getType(Services services, String fullName) {
@@ -117,7 +126,8 @@ public final class KeYTypeUtil {
     /**
      * Checks if the given {@link KeYJavaType} is a library class.
      *
-     * @param kjt The {@link KeYJavaType} to check.
+     * @param kjt
+     *        The {@link KeYJavaType} to check.
      * @return {@code true} is library class, {@code false} is no library class.
      */
     public static boolean isLibraryClass(KeYJavaType kjt) {
@@ -128,7 +138,8 @@ public final class KeYTypeUtil {
     /**
      * Checks if the given {@link IProgramMethod} is an implicit constructor.
      *
-     * @param pm The {@link IProgramMethod} to check.
+     * @param pm
+     *        The {@link IProgramMethod} to check.
      * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g.
      *         method or explicit construcotr).
      */
@@ -141,8 +152,10 @@ public final class KeYTypeUtil {
      * Returns the {@link IProgramMethod} of the explicit constructor for the given implicit
      * constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param implicitConstructor The implicit constructor.
+     * @param services
+     *        The {@link Services} to use.
+     * @param implicitConstructor
+     *        The implicit constructor.
      * @return The found explicit constructor or {@code null} if not available.
      */
     public static IProgramMethod findExplicitConstructor(Services services,
@@ -177,7 +190,8 @@ public final class KeYTypeUtil {
     /**
      * Resolves the type of the given {@link ParameterDeclaration}.
      *
-     * @param parameterDeclaration The {@link ParameterDeclaration} to resolve.
+     * @param parameterDeclaration
+     *        The {@link ParameterDeclaration} to resolve.
      * @return The full qualified type name or {@code null} if the given
      *         {@link ParameterDeclaration} is {@code null}.
      */
@@ -189,7 +203,8 @@ public final class KeYTypeUtil {
     /**
      * Resolves the type of the given {@link TypeReference}.
      *
-     * @param typeReference The {@link TypeReference} to resolve.
+     * @param typeReference
+     *        The {@link TypeReference} to resolve.
      * @return The full qualified type name or {@code null} if the given {@link TypeReference} is
      *         {@code null}.
      */
@@ -200,7 +215,8 @@ public final class KeYTypeUtil {
     /**
      * Resolves the type of the given {@link Type}.
      *
-     * @param type The {@link Type} to resolve.
+     * @param type
+     *        The {@link Type} to resolve.
      * @return The full qualified type name or {@code null} if the given {@link Type} is
      *         {@code null}.
      */
@@ -210,9 +226,7 @@ public final class KeYTypeUtil {
         } else if (type instanceof ArrayType arrayType) {
             StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
-            for (int i = 0; i < arrayType.getDimension(); i++) {
-                sb.append("[]");
-            }
+            for (int i = 0; i < arrayType.getDimension(); i++) { sb.append("[]"); }
             return sb.toString();
         } else {
             return type != null ? type.getFullName() : null;

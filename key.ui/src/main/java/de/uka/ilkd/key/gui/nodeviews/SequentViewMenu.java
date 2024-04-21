@@ -23,7 +23,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 /**
  * The menu shown by a {@link SequentViewListener} when the user clicks on a {@link SequentView}.
  *
- * @param <T> a type of {@link SequentView} on which this menu is shown.
+ * @param <T>
+ *        a type of {@link SequentView} on which this menu is shown.
  */
 public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     private static final long serialVersionUID = -366978815217974621L;
@@ -48,8 +49,10 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Creates a new menu that displays all applicable actions at the given position.
      *
-     * @param sequentView the SequentView that is the parent of this menu
-     * @param pos the PosInSequent
+     * @param sequentView
+     *        the SequentView that is the parent of this menu
+     * @param pos
+     *        the PosInSequent
      */
     SequentViewMenu(T sequentView, PosInSequent pos) {
         super();
@@ -89,15 +92,14 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
             KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
                 getSequentView().getMainWindow().getMediator());
 
-        for (Action action : actions) {
-            add(action);
-        }
+        for (Action action : actions) { add(action); }
     }
 
     /**
      * Adds an action to copy the selected term to the clipboard.
      *
-     * @param control the action listener for the action.
+     * @param control
+     *        the action listener for the action.
      */
     protected void addClipboardItem(MenuControl control) {
         JMenuItem item = new JMenuItem(COPY_TO_CLIPBOARD);
@@ -108,7 +110,8 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Adds an action to show the name creation info to the clipboard.
      *
-     * @param control the action listener for the action.
+     * @param control
+     *        the action listener for the action.
      */
     protected void createNameCreationInfoSection(MenuControl control) {
         JMenuItem item = new JMenuItem(NAME_CREATION_INFO);

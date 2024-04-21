@@ -35,7 +35,8 @@ public record URLDataLocation(URL url) implements DataLocation {
     }
 
     /**
-     * @throws UnsupportedOperationException always
+     * @throws UnsupportedOperationException
+     *         always
      * @see DataLocation#getOutputStream()
      */
     public OutputStream getOutputStream() throws IOException {
@@ -43,7 +44,8 @@ public record URLDataLocation(URL url) implements DataLocation {
     }
 
     /**
-     * @throws UnsupportedOperationException always
+     * @throws UnsupportedOperationException
+     *         always
      * @see DataLocation#getWriter()
      */
     public Writer getWriter() throws IOException {
@@ -84,16 +86,12 @@ public record URLDataLocation(URL url) implements DataLocation {
         return false;
     }
 
-    public void inputStreamClosed() {
-    }
+    public void inputStreamClosed() {}
 
-    public void outputStreamClosed() {
-    }
+    public void outputStreamClosed() {}
 
-    public void readerClosed() {
-    }
+    public void readerClosed() {}
 
-    public void writerClosed() {
-    }
+    public void writerClosed() {}
 
 }

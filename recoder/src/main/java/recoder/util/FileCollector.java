@@ -64,18 +64,12 @@ public class FileCollector {
                 String[] content = current.list();
                 for (int i = content.length - 1; i >= 0; i -= 1) {
                     stack[count++] = new File(current, content[i]); // push
-                    if (count == stack.length) {
-                        growStack();
-                    }
+                    if (count == stack.length) { growStack(); }
                 }
-                if (count == 0) {
-                    break outer;
-                }
+                if (count == 0) { break outer; }
                 current = stack[--count]; // pop
             }
-            if (current.exists()) {
-                return true;
-            }
+            if (current.exists()) { return true; }
         }
         current = null;
         return false;
@@ -89,11 +83,7 @@ public class FileCollector {
      *         {@link #getFile()}.
      */
     public boolean next(String suffix) {
-        while (next()) {
-            if (current.getName().endsWith(suffix)) {
-                return true;
-            }
-        }
+        while (next()) { if (current.getName().endsWith(suffix)) { return true; } }
         return false;
     }
 
@@ -109,16 +99,12 @@ public class FileCollector {
         File pfile = null;
         while (next()) {
             String p = current.getParent();
-            if (p == null) {
-                p = "";
-            }
+            if (p == null) { p = ""; }
             if (!pname.equals(p)) {
                 pname = p;
                 pfile = new File(pname);
             }
-            if (filter.accept(pfile, current.getName())) {
-                return true;
-            }
+            if (filter.accept(pfile, current.getName())) { return true; }
         }
         return false;
     }

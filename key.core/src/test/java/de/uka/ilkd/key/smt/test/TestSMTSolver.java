@@ -17,12 +17,10 @@ public abstract class TestSMTSolver extends TestCommons {
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt" + File.separator;
 
     @BeforeEach
-    public void setUp() {
-    }
+    public void setUp() {}
 
     @AfterEach
-    public void tearDown() throws Exception {
-    }
+    public void tearDown() throws Exception {}
 
     @Test
     public void testAndnot() throws Exception {

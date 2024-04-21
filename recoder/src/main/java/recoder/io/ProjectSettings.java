@@ -73,9 +73,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         defaults.put(INPUT_PATH, classpath);
 
         String defaultPath = getSystemProperty("user.dir");
-        if (defaultPath == null) {
-            defaultPath = ".";
-        }
+        if (defaultPath == null) { defaultPath = "."; }
         setDefault(OUTPUT_PATH, defaultPath);
         setDefault(CLASS_SEARCH_MODE, "sc");
         setDefault(ERROR_THRESHOLD, "20");
@@ -130,8 +128,10 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * Defines a property with the given name and value and informs all registered listeners. The
      * method will automatically remove all segments from the search path that do not exist.
      *
-     * @param key the name of the property to set.
-     * @param value the value of the property to set.
+     * @param key
+     *        the name of the property to set.
+     * @param value
+     *        the value of the property to set.
      * @return the old value associated with the key, or <CODE>null</CODE> if this property has not
      *         been set.
      */
@@ -169,7 +169,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Returns the property with the given name.
      *
-     * @param key the name of the property to look for.
+     * @param key
+     *        the name of the property to look for.
      * @return the property associated with the given key.
      */
     public String getProperty(String key) {
@@ -179,7 +180,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Returns the default property with the given name.
      *
-     * @param key the name of the default property to look for.
+     * @param key
+     *        the name of the default property to look for.
      * @return the property associated with the given key.
      */
     public String getDefaultProperty(String key) {
@@ -200,9 +202,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * writes back the property.
      */
     private String normalizeSearchPath(String pathlist) {
-        if (pathlist == null) {
-            return null;
-        }
+        if (pathlist == null) { return null; }
         Set<String> alreadyExisting = new HashSet<>();
         StringBuilder newpathlist = new StringBuilder();
         pathlist = pathlist.replace('/', File.separatorChar);
@@ -212,9 +212,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         while (paths.hasMoreTokens()) {
             String singlePath = paths.nextToken();
             if (!alreadyExisting.contains(singlePath) && new File(singlePath).exists()) {
-                if (!firstToken) {
-                    newpathlist.append(File.pathSeparator);
-                }
+                if (!firstToken) { newpathlist.append(File.pathSeparator); }
                 newpathlist.append(singlePath);
                 alreadyExisting.add(singlePath);
                 firstToken = false;
@@ -234,18 +232,12 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      */
     public boolean ensureSystemClassesAreInPath() {
         ClassFileRepository cfr = serviceConfiguration.getClassFileRepository();
-        if (cfr.findClassFile("java.lang.Object") != null) {
-            return true;
-        }
+        if (cfr.findClassFile("java.lang.Object") != null) { return true; }
         File archive = FileUtils.getPathOfSystemClasses();
-        if (archive == null) {
-            archive = new File(".");
-        }
+        if (archive == null) { archive = new File("."); }
         String classes = archive.getPath();
         String oldpath = getProperty(INPUT_PATH);
-        if (oldpath.length() == 0) {
-            oldpath = ".";
-        }
+        if (oldpath.length() == 0) { oldpath = "."; }
         setProperty(INPUT_PATH, oldpath + File.pathSeparator + classes);
         return cfr.findClassFile("java.lang.Object") != null;
     }
@@ -259,23 +251,17 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      */
     public void ensureExtensionClassesAreInPath() {
         File extDir = FileUtils.getPathOfExtensionClassesDir();
-        if (extDir == null) {
-            return;
-        }
+        if (extDir == null) { return; }
         String oldpath = getProperty(INPUT_PATH);
         String extPath = extDir.getPath();
-        if (oldpath.contains(extPath)) {
-            return;
-        }
+        if (oldpath.contains(extPath)) { return; }
 
         // add all the jars from extDir in the path
         StringBuilder additions = null;
         File[] jars = extDir.listFiles(ProjectSettings.jarFilter);
         if (jars.length > 0) {
             additions = new StringBuilder();
-            for (File jar : jars) {
-                additions.append(File.pathSeparator + jar.getPath());
-            }
+            for (File jar : jars) { additions.append(File.pathSeparator + jar.getPath()); }
         }
         setProperty(INPUT_PATH, oldpath + File.pathSeparator + additions);
     }
@@ -283,7 +269,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Registers a property change listener.
      *
-     * @param l the listener to register.
+     * @param l
+     *        the listener to register.
      */
     public void addPropertyChangeListener(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
@@ -292,7 +279,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Deregisters a property change listener.
      *
-     * @param l the listener to deregister.
+     * @param l
+     *        the listener to deregister.
      */
     public void removePropertyChangeListener(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
@@ -314,25 +302,20 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * @return the current error handler.
      */
     public ErrorHandler getErrorHandler() {
-        if (errorHandler == null) {
-            setErrorHandler(null);
-        }
+        if (errorHandler == null) { setErrorHandler(null); }
         return errorHandler;
     }
 
     /**
      * Sets the current error handler and registers it as a change update listener.
      *
-     * @param handler the new error handler.
+     * @param handler
+     *        the new error handler.
      */
     public void setErrorHandler(ErrorHandler handler) {
-        if (handler == null) {
-            handler = new DefaultErrorHandler(Integer.parseInt(getProperty(ERROR_THRESHOLD)));
-        }
+        if (handler == null) { handler = new DefaultErrorHandler(Integer.parseInt(getProperty(ERROR_THRESHOLD))); }
         if (handler != errorHandler) {
-            if (errorHandler != null) {
-                serviceConfiguration.getChangeHistory().removeModelUpdateListener(handler);
-            }
+            if (errorHandler != null) { serviceConfiguration.getChangeHistory().removeModelUpdateListener(handler); }
             errorHandler = handler;
             serviceConfiguration.getChangeHistory().addModelUpdateListener(errorHandler);
         }

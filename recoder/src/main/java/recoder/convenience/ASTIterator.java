@@ -47,7 +47,8 @@ public class ASTIterator {
     /**
      * Creates a new ASTIterator assigned to the given listener.
      *
-     * @param l the iterator listener
+     * @param l
+     *        the iterator listener
      */
     public ASTIterator(ASTIteratorListener l) {
         setListener(l);
@@ -56,7 +57,8 @@ public class ASTIterator {
     /**
      * Assigns a certain listener to the iterator.
      *
-     * @param l the listener
+     * @param l
+     *        the listener
      */
     public void setListener(ASTIteratorListener l) {
         listener = l;
@@ -65,7 +67,8 @@ public class ASTIterator {
     /**
      * Performs a depth first search traversal through the given AST.
      *
-     * @param pe the AST element to iterate through
+     * @param pe
+     *        the AST element to iterate through
      */
     public void iterate(ProgramElement pe) {
         if (listener != null) {
@@ -79,7 +82,8 @@ public class ASTIterator {
      * Recurses through the given AST in depth first search order. This method calls the
      * ASTIteratorListener methods.
      *
-     * @param pe the current program element.
+     * @param pe
+     *        the current program element.
      */
     protected void recurse(ProgramElement pe) {
         if (pe != null) {
@@ -101,10 +105,7 @@ public class ASTIterator {
                     break;
                 case ASTIterator.ENTER_ALL:
                     childCount = ntpe.getChildCount();
-                    for (int i = 0; i < childCount; i++) {
-                        ProgramElement child = ntpe.getChildAt(i);
-                        recurse(child);
-                    }
+                    for (int i = 0; i < childCount; i++) { ProgramElement child = ntpe.getChildAt(i); recurse(child); }
                 }
             }
             listener.leavingNode(this, pe);
@@ -123,15 +124,13 @@ public class ASTIterator {
      *
      * </PRE>
      *
-     * @param pe the current program element.
+     * @param pe
+     *        the current program element.
      */
     protected void simpleRecurse(ProgramElement pe) {
         if (pe instanceof NonTerminalProgramElement ntpe) {
             int childCount = ntpe.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                ProgramElement child = ntpe.getChildAt(i);
-                simpleRecurse(child);
-            }
+            for (int i = 0; i < childCount; i++) { ProgramElement child = ntpe.getChildAt(i); simpleRecurse(child); }
         }
     }
 

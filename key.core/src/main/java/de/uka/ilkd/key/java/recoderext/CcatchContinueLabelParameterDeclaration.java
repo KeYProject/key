@@ -47,27 +47,23 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (label != null) {
-            if (index == 0) {
-                return label;
-            }
-        }
+        if (label != null) { if (index == 0) { return label; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
     public int getChildPositionCode(ProgramElement child) {
         // role 0: label
-        if (label == child) {
-            return 0;
-        }
+        if (label == child) { return 0; }
         return -1;
     }
 
@@ -77,23 +73,22 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
 
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (label == p) {
             Identifier r = (Identifier) q;
             label = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;

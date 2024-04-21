@@ -37,9 +37,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLFieldDecl fd)) {
-            return false;
-        }
+        if (!(o instanceof TextualJMLFieldDecl fd)) { return false; }
         return mods.equals(fd.mods) && decl.equals(fd.decl);
     }
 

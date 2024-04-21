@@ -85,15 +85,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
     @Override
     public void transform() {
         super.transform();
-        for (AnnotationUseSpecification au : toRemove) {
-            detach(au);
-        }
-        for (AnnotationDeclaration ad : unusedAnnotationTypes) {
-            detach(ad);
-        }
-        for (AnnotationDeclaration ad : usedAnnotationTypes) {
-            replace(ad, makeInterface(ad));
-        }
+        for (AnnotationUseSpecification au : toRemove) { detach(au); }
+        for (AnnotationDeclaration ad : unusedAnnotationTypes) { detach(ad); }
+        for (AnnotationDeclaration ad : usedAnnotationTypes) { replace(ad, makeInterface(ad)); }
     }
 
     private InterfaceDeclaration makeInterface(AnnotationDeclaration ad) {
@@ -105,9 +99,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
             MemberDeclaration newMD;
             if (md instanceof AnnotationPropertyDeclaration apd) {
                 MethodDeclaration m = f.createMethodDeclaration();
-                if (apd.getComments() != null) {
-                    m.setComments(apd.getComments().deepClone());
-                }
+                if (apd.getComments() != null) { m.setComments(apd.getComments().deepClone()); }
                 m.setIdentifier(apd.getIdentifier().deepClone());
                 m.setTypeReference(apd.getTypeReference().deepClone());
                 // everything else is not allowed to be set for annotation property declaration
@@ -124,9 +116,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
         }
         replacement.setIdentifier(ad.getIdentifier().deepClone());
         replacement.setMembers(newMems);
-        if (ad.getComments() != null) {
-            replacement.setComments(ad.getComments().deepClone());
-        }
+        if (ad.getComments() != null) { replacement.setComments(ad.getComments().deepClone()); }
         replacement.setDeclarationSpecifiers(ad.getDeclarationSpecifiers().deepClone());
         replacement.makeParentRoleValid();
         return replacement;

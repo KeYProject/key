@@ -24,9 +24,7 @@ public class HeapContext {
         List<LocationVariable> result = new ArrayList<>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (savedHeap == heap && !transaction) {
-                continue;
-            }
+            if (savedHeap == heap && !transaction) { continue; }
             result.add(heap);
         }
         return result;

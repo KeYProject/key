@@ -41,8 +41,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseExited(MouseEvent me) {
-    }
+    public void mouseExited(MouseEvent me) {}
 
     @Override
     public void mouseClicked(MouseEvent me) {
@@ -58,9 +57,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
                         ProofMacroMenu macroMenu =
                             new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
-                        if (macroMenu.isEmpty()) {
-                            macroMenu.add(new JLabel("No strategies available"));
-                        }
+                        if (macroMenu.isEmpty()) { macroMenu.add(new JLabel("No strategies available")); }
                         JPopupMenu popupMenu = macroMenu.getPopupMenu();
                         popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
@@ -94,8 +91,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mousePressed(MouseEvent me) {
-    }
+    public void mousePressed(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {
@@ -106,8 +102,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseEntered(MouseEvent me) {
-    }
+    public void mouseEntered(MouseEvent me) {}
 
     public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;

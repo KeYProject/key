@@ -62,8 +62,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param arrayName a type reference.
-     * @param dimExpr an expression mutable list.
+     * @param arrayName
+     *        a type reference.
+     * @param dimExpr
+     *        an expression mutable list.
      */
 
     public NewArray(TypeReference arrayName, ASTList<Expression> dimExpr) {
@@ -75,9 +77,12 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param arrayName a type reference.
-     * @param dimensions an int value.
-     * @param initializer an array initializer.
+     * @param arrayName
+     *        a type reference.
+     * @param dimensions
+     *        an int value.
+     * @param initializer
+     *        an array initializer.
      */
 
     public NewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer) {
@@ -90,14 +95,13 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param proto a new array.
+     * @param proto
+     *        a new array.
      */
 
     protected NewArray(NewArray proto) {
         super(proto);
-        if (proto.arrayInitializer != null) {
-            arrayInitializer = proto.arrayInitializer.deepClone();
-        }
+        if (proto.arrayInitializer != null) { arrayInitializer = proto.arrayInitializer.deepClone(); }
         dimensions = proto.dimensions;
         makeParentRoleValid();
     }
@@ -118,15 +122,11 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (arrayInitializer != null) {
-            arrayInitializer.setExpressionContainer(this);
-        }
+        if (arrayInitializer != null) { arrayInitializer.setExpressionContainer(this); }
     }
 
     public SourceElement getLastElement() {
-        if (arrayInitializer != null) {
-            return arrayInitializer.getLastElement();
-        }
+        if (arrayInitializer != null) { return arrayInitializer.getLastElement(); }
         return this;
     }
 
@@ -138,16 +138,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         // array initializer (for NewArray)
         if (children != null) {
             int index = children.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
-        if (arrayInitializer == child) {
-            return 3;
-        }
+        if (typeReference == child) { return 1; }
+        if (arrayInitializer == child) { return 3; }
         return -1;
     }
 
@@ -208,7 +202,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -228,7 +223,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * Set expression container.
      *
-     * @param parent an expression container.
+     * @param parent
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer parent) {
@@ -267,7 +263,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * Set array initializer.
      *
-     * @param init an array initializer.
+     * @param init
+     *        an array initializer.
      */
 
     public void setArrayInitializer(ArrayInitializer init) {
@@ -282,46 +279,34 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null) {
-            result++;
-        }
-        if (children != null) {
-            result += children.size();
-        }
-        if (arrayInitializer != null) {
-            result++;
-        }
+        if (typeReference != null) { result++; }
+        if (children != null) { result += children.size(); }
+        if (arrayInitializer != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
-        if (arrayInitializer != null) {
-            if (index == 0) {
-                return arrayInitializer;
-            }
-        }
+        if (arrayInitializer != null) { if (index == 0) { return arrayInitializer; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -333,12 +318,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getExpressionCount() {
         int result = 0;
-        if (children != null) {
-            result += children.size();
-        }
-        if (arrayInitializer != null) {
-            result++;
-        }
+        if (children != null) { result += children.size(); }
+        if (arrayInitializer != null) { result++; }
         return result;
     }
 
@@ -352,16 +333,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         int len;
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
-        if (arrayInitializer != null) {
-            if (index == 0) {
-                return arrayInitializer;
-            }
-        }
+        if (arrayInitializer != null) { if (index == 0) { return arrayInitializer; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -371,16 +346,17 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
@@ -398,17 +374,13 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (arrayInitializer == p) {
             ArrayInitializer r = (ArrayInitializer) q;
             arrayInitializer = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         return false;

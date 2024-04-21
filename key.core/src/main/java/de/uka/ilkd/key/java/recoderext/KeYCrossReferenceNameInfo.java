@@ -48,8 +48,10 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     /**
      * register a class type.
      *
-     * @param ct class type to register
-     * @throws ConvertException if there was already a different type registered for the same name
+     * @param ct
+     *        class type to register
+     * @throws ConvertException
+     *         if there was already a different type registered for the same name
      */
     @Override
     public void register(ClassType ct) {
@@ -85,7 +87,8 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
      * unregister a class type. This happens for instance when removing an EnumDeclaration and
      * inserting an EnumClassDeclaration instead
      *
-     * @param fullname name of the type to be unregistered
+     * @param fullname
+     *        name of the type to be unregistered
      */
     @Override
     public void unregisterClassType(String fullname) {
@@ -99,9 +102,7 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     @Override
     public Type getType(String name) {
         Type t = super.getType(name);
-        if (t instanceof ClassType) {
-            classtypes.put(name, (ClassType) t);
-        }
+        if (t instanceof ClassType) { classtypes.put(name, (ClassType) t); }
         return t;
     }
 
@@ -110,14 +111,13 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
      *
      * This implementation checks whether an implementation is available and fails if not.
      *
-     * @throws ConvertException if no implementation of java.lang.Object is available presently.
+     * @throws ConvertException
+     *         if no implementation of java.lang.Object is available presently.
      */
     @Override
     public ClassType getJavaLangObject() throws ConvertException {
         ClassType result = super.getJavaLangObject();
-        if (result == null) {
-            throw new ConvertException("Class type 'java.lang.Object' cannot be found");
-        }
+        if (result == null) { throw new ConvertException("Class type 'java.lang.Object' cannot be found"); }
         return result;
     }
 

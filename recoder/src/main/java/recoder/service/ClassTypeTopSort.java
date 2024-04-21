@@ -21,9 +21,7 @@ abstract class ClassTypeTopSort implements Formats {
     protected abstract List<ClassType> getAdjacent(ClassType c);
 
     private void initIndeg() {
-        for (int i = 0; i < indeg.length; i++) {
-            indeg[i] = 0;
-        }
+        for (int i = 0; i < indeg.length; i++) { indeg[i] = 0; }
     }
 
     private int incrIndeg(int index) {
@@ -47,9 +45,7 @@ abstract class ClassTypeTopSort implements Formats {
                 idx = classesDFS.size() - 1;
                 List<ClassType> neighbors = getAdjacent(c);
                 int s = neighbors.size();
-                for (ClassType neighbor : neighbors) {
-                    addClass(neighbor);
-                }
+                for (ClassType neighbor : neighbors) { addClass(neighbor); }
             }
             incrIndeg(idx);
         }
@@ -60,16 +56,14 @@ abstract class ClassTypeTopSort implements Formats {
             int idx = classesDFS.indexOf(c);
             if (idx == -1) {
                 Debug.error(Format.toString("Could not find " + ELEMENT_LONG, c) + "\nList: "
-                    + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
+                        + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
                 System.exit(0);
             }
             if (decrIndeg(idx) == 0) {
                 result.add(c);
                 List<ClassType> neighbors = getAdjacent(c);
                 int s = neighbors.size();
-                for (ClassType neighbor : neighbors) {
-                    sort(neighbor, result);
-                }
+                for (ClassType neighbor : neighbors) { sort(neighbor, result); }
             }
         }
     }
@@ -80,9 +74,7 @@ abstract class ClassTypeTopSort implements Formats {
         addClass(c);
         List<ClassType> result = new ArrayList<>(classesDFS.size());
         sort(c, result);
-        if (result.size() < classesDFS.size()) {
-            throw new RuntimeException("Cyclic inheritance detected!");
-        }
+        if (result.size() < classesDFS.size()) { throw new RuntimeException("Cyclic inheritance detected!"); }
         return result;
     }
 }

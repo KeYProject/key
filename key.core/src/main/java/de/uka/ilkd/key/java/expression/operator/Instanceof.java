@@ -24,7 +24,8 @@ public class Instanceof extends TypeOperator {
     /**
      * Instanceof.
      *
-     * @param children an ExtList with all children of this node the first children in list will be
+     * @param children
+     *        an ExtList with all children of this node the first children in list will be
      *        the expression on the left side, the second the one on the right side a type
      *        reference.
      */
@@ -48,12 +49,8 @@ public class Instanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null) {
-            result += children.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
+        if (children != null) { result += children.size(); }
+        if (typeReference != null) { result++; }
         return result;
     }
 
@@ -64,25 +61,21 @@ public class Instanceof extends TypeOperator {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
-        if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
-        }
+        if (typeReference != null) { if (index == 0) { return typeReference; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -120,7 +113,8 @@ public class Instanceof extends TypeOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnInstanceof(this);

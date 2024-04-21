@@ -31,8 +31,10 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
     /**
      * creates a condition that checks if a type is a EnumDeclaration
      *
-     * @param resolver the type resolver to be checked
-     * @param negated should the result be negated
+     * @param resolver
+     *        the type resolver to be checked
+     * @param negated
+     *        should the result be negated
      */
     public EnumTypeCondition(TypeResolver resolver, boolean negated) {
         this.resolver = resolver;

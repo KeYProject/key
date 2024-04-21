@@ -74,13 +74,9 @@ public final class PosInOccurrence {
      * the same occurrence
      */
     public boolean eqEquals(Object obj) {
-        if (!(obj instanceof PosInOccurrence cmp)) {
-            return false;
-        }
+        if (!(obj instanceof PosInOccurrence cmp)) { return false; }
 
-        if (!sequentFormula.equals(cmp.sequentFormula)) {
-            return false;
-        }
+        if (!sequentFormula.equals(cmp.sequentFormula)) { return false; }
 
         return equalsHelp(cmp);
     }
@@ -89,28 +85,23 @@ public final class PosInOccurrence {
      * Contrary to <code>eqEquals</code>, this method returns true only for pio objects that point
      * to the same (identical) formula
      *
-     * @param obj the Object to which this one is compared
+     * @param obj
+     *        the Object to which this one is compared
      * @return true if both objects are equal
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof PosInOccurrence cmp)) {
-            return false;
-        }
+        if (!(obj instanceof PosInOccurrence cmp)) { return false; }
 
         // NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
         // of <code>!=</code> in this condition
-        if (sequentFormula() != cmp.sequentFormula()) {
-            return false;
-        }
+        if (sequentFormula() != cmp.sequentFormula()) { return false; }
 
         return equalsHelp(cmp);
     }
 
     private boolean equalsHelp(final PosInOccurrence cmp) {
-        if (inAntec == cmp.inAntec) {
-            return posInTerm.equals(cmp.posInTerm);
-        }
+        if (inAntec == cmp.inAntec) { return posInTerm.equals(cmp.posInTerm); }
         return false;
     }
 
@@ -163,7 +154,8 @@ public final class PosInOccurrence {
     /**
      * Replace the formula this object points to with the new formula given
      *
-     * @param p_newFormula the new formula
+     * @param p_newFormula
+     *        the new formula
      * @return a <code>PosInOccurrence</code> object that points to the same position within the
      *         formula <code>p_newFormula</code> as this object does within the formula
      *         <code>constrainedFormula()</code>. It is not tested whether this position exists
@@ -171,9 +163,7 @@ public final class PosInOccurrence {
      */
     public PosInOccurrence replaceConstrainedFormula(SequentFormula p_newFormula) {
         assert p_newFormula != null;
-        if (p_newFormula == sequentFormula) {
-            return this;
-        }
+        if (p_newFormula == sequentFormula) { return this; }
         return new PosInOccurrence(p_newFormula, posInTerm, inAntec);
     }
 
@@ -181,9 +171,7 @@ public final class PosInOccurrence {
      * returns the subterm this object points to
      */
     public Term subTerm() {
-        if (subTermCache == null) {
-            subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
-        }
+        if (subTermCache == null) { subTermCache = posInTerm.getSubTerm(sequentFormula.formula()); }
         return subTermCache;
     }
 
@@ -191,9 +179,7 @@ public final class PosInOccurrence {
      * Ascend to the top node of the formula this object points to
      */
     public PosInOccurrence topLevel() {
-        if (isTopLevel()) {
-            return this;
-        }
+        if (isTopLevel()) { return this; }
         return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), inAntec);
     }
 

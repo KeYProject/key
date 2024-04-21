@@ -118,8 +118,8 @@ public class SendFeedbackAction extends AbstractAction {
             } catch (Exception e) {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
-                    + e.getMessage() + "\n" + serializeStackTrace(e))
-                            .getBytes(StandardCharsets.UTF_8);
+                        + e.getMessage() + "\n" + serializeStackTrace(e))
+                                .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
@@ -314,9 +314,7 @@ public class SendFeedbackAction extends AbstractAction {
             for (File f : directory.listFiles()) {
                 if (f.isDirectory()) {
                     getJavaFilesRecursively(f, list);
-                } else if (f.getName().endsWith(".java")) {
-                    list.add(f);
-                }
+                } else if (f.getName().endsWith(".java")) { list.add(f); }
             }
         }
 
@@ -355,8 +353,9 @@ public class SendFeedbackAction extends AbstractAction {
                 saveMetaDataToFile(jfc.getSelectedFile(), message);
                 JOptionPane.showMessageDialog(parent,
                     String.format("Your message has been saved to the file %s.\n"
-                        + "If you want to report a bug, you can enclose this file in an\n"
-                        + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
+                            + "If you want to report a bug, you can enclose this file in an\n"
+                            + "e-mail to " + FEEDBACK_RECIPIENT + ".",
+                        jfc.getSelectedFile()));
             }
         } catch (Exception e) {
             LOGGER.error("", e);
@@ -376,9 +375,7 @@ public class SendFeedbackAction extends AbstractAction {
             "to the KeY mailing list.", "", "Click OK if you want to send the report now." };
         int answer = JOptionPane.showConfirmDialog(parent, msgs, "Ready to send?",
             JOptionPane.YES_NO_OPTION);
-        if (answer != JOptionPane.YES_OPTION) {
-            return;
-        }
+        if (answer != JOptionPane.YES_OPTION) { return; }
 
         try {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -418,9 +415,7 @@ public class SendFeedbackAction extends AbstractAction {
     private void saveMetaData(OutputStream os, String message) throws IOException {
         try (ZipOutputStream stream = new ZipOutputStream(new BufferedOutputStream(os))) {
             for (SendFeedbackItem item : items) {
-                if (item.isSelected() && item.isEnabled()) {
-                    item.appendDataToZipOutputStream(stream);
-                }
+                if (item.isSelected() && item.isEnabled()) { item.appendDataToZipOutputStream(stream); }
             }
             stream.putNextEntry(new ZipEntry("bugDescription.txt"));
             stream.write(message.getBytes(StandardCharsets.UTF_8));
@@ -485,7 +480,7 @@ public class SendFeedbackAction extends AbstractAction {
         JButton saveFeedbackReportButton = new JButton("Save Feedback...");
         saveFeedbackReportButton.setToolTipText(
             "<html>Information about current proof state are saved to a file.<br>"
-                + "This file can be also used when reporting a bug via e-mail.");
+                    + "This file can be also used when reporting a bug via e-mail.");
         saveFeedbackReportButton.addActionListener(e -> {
             saveZIP(bugDescription.getText());
             dialog.dispose();
@@ -494,8 +489,8 @@ public class SendFeedbackAction extends AbstractAction {
         JButton sendFeedbackReportButton = new JButton("Send Feedback...");
         sendFeedbackReportButton
                 .setToolTipText("<html>Information about current proof state are sent via a "
-                    + "secure https connection to the developers.<br>"
-                    + "The receiving server is located at KIT (formal.kastel.kit.edu).");
+                        + "secure https connection to the developers.<br>"
+                        + "The receiving server is located at KIT (formal.kastel.kit.edu).");
         sendFeedbackReportButton.addActionListener(e -> {
             sendReport(bugDescription.getText());
             dialog.dispose();
@@ -515,11 +510,11 @@ public class SendFeedbackAction extends AbstractAction {
         labels.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         labels.setText(
             "<html>The report feature can be used to send information about your current state of KeY to report a bug or to ask for advice from the KeY team.<br>"
-                + "You can either store the information in a zip locally (and then e.g. send that via e-mail to "
-                + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
-                + "Please select the information that you want to include from the list on the right.<br>"
-                + "If you send the information directly, <b>please make sure to indicate your e-mail address</b> "
-                + "in the message below such that the team can respond.");
+                    + "You can either store the information in a zip locally (and then e.g. send that via e-mail to "
+                    + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
+                    + "Please select the information that you want to include from the list on the right.<br>"
+                    + "If you send the information directly, <b>please make sure to indicate your e-mail address</b> "
+                    + "in the message below such that the team can respond.");
         Container container = dialog.getContentPane();
         container.setLayout(new BorderLayout());
         container.add(labels, BorderLayout.NORTH);

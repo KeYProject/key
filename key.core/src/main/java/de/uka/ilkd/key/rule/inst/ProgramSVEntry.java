@@ -28,8 +28,10 @@ public class ProgramSVEntry implements Serializable {
      * creates a new entry encapsulating the SchemaVariable key and its JavaProgramElement
      * instantiation value
      *
-     * @param key the SchemaVariable that is instantiated
-     * @param value the JavaProgramElement
+     * @param key
+     *        the SchemaVariable that is instantiated
+     * @param value
+     *        the JavaProgramElement
      */
     public ProgramSVEntry(SchemaVariable key, JavaProgramElement value) {
         this.key = key;
@@ -51,9 +53,7 @@ public class ProgramSVEntry implements Serializable {
      * @return true iff the keys and the mapped values are equal
      */
     public boolean equals(Object o) {
-        if (!(o instanceof ProgramSVEntry cmp)) {
-            return false;
-        }
+        if (!(o instanceof ProgramSVEntry cmp)) { return false; }
         return key().equals(cmp.key()) && value().equals(cmp.value());
     }
 

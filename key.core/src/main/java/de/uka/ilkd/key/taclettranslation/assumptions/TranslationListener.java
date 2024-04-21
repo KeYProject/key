@@ -20,7 +20,8 @@ public interface TranslationListener {
      * Called when the translator finds a term that have a sort. You can use this event to collect
      * all sorts that are used.
      *
-     * @param sort the sort that has been found.
+     * @param sort
+     *        the sort that has been found.
      */
     void eventSort(Sort sort);
 
@@ -28,7 +29,8 @@ public interface TranslationListener {
      * Called when the translator finds a term that has a quantified variable. You can use this
      * event to collect all quantified variables that are used.
      *
-     * @param var the quantified variable that has been found.
+     * @param var
+     *        the quantified variable that has been found.
      */
     void eventQuantifiedVariable(QuantifiableVariable var);
 
@@ -45,10 +47,14 @@ public interface TranslationListener {
      * given term. The result type determines whether the translation is aborted: The idea is, to
      * make the translation robust against invalid instantiation.
      *
-     * @param dest the generic sort to instantiate
-     * @param sort the instantiation sort.
-     * @param t the taclet thats belongs to the term
-     * @param term the term to be instantiated
+     * @param dest
+     *        the generic sort to instantiate
+     * @param sort
+     *        the instantiation sort.
+     * @param t
+     *        the taclet thats belongs to the term
+     * @param term
+     *        the term to be instantiated
      * @return return <code>true</code> if you want to terminate the translation of the taclet,
      *         otherwise <code>false<code>.
      */

@@ -32,8 +32,10 @@ public class Minus extends Operator {
     /**
      * Minus.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Minus(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class Minus extends Operator {
     /**
      * Minus.
      *
-     * @param proto a minus.
+     * @param proto
+     *        a minus.
      */
 
     protected Minus(Minus proto) {

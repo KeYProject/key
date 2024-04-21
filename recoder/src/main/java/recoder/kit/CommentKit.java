@@ -24,8 +24,10 @@ public class CommentKit {
      * Factory method creating an empty or faked comment conforming to JavaDoc conventions for the
      * given method declaration.
      *
-     * @param method a non- <CODE>null</CODE> method declaration.
-     * @param dummy flag to indicate whether a fake comment text should be inserted.
+     * @param method
+     *        a non- <CODE>null</CODE> method declaration.
+     * @param dummy
+     *        flag to indicate whether a fake comment text should be inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(MethodDeclaration method, boolean dummy) {
@@ -41,17 +43,13 @@ public class CommentKit {
         for (int i = 0; i < c; i += 1) {
             ParameterDeclaration param = method.getParameterDeclarationAt(i);
             text.append("  @param ").append(param.getVariables().get(0).getName()).append(' ');
-            if (dummy) {
-                text.append(guessDocumentation(param.getTypeReference(), false));
-            }
+            if (dummy) { text.append(guessDocumentation(param.getTypeReference(), false)); }
             text.append('\n');
         }
         TypeReference ret = method.getTypeReference();
         if (ret != null && !"void".equals(ret.getName())) {
             text.append("  @return ");
-            if (dummy) {
-                text.append(guessDocumentation(ret, true));
-            }
+            if (dummy) { text.append(guessDocumentation(ret, true)); }
             text.append('\n');
         }
         Throws th = method.getThrown();
@@ -59,9 +57,7 @@ public class CommentKit {
             List<TypeReference> excepts = th.getExceptions();
             for (TypeReference tr : excepts) {
                 text.append("  @exception ").append(tr.getName());
-                if (dummy) {
-                    text.append(" occasionally thrown.\n");
-                }
+                if (dummy) { text.append(" occasionally thrown.\n"); }
             }
         }
         text.append("*/");
@@ -72,8 +68,10 @@ public class CommentKit {
      * Factory method creating an empty or faked comment conforming to JavaDoc conventions for the
      * given field declaration.
      *
-     * @param field a non- <CODE>null</CODE> field declaration.
-     * @param dummy flag to indicate whether a fake comment text should be inserted.
+     * @param field
+     *        a non- <CODE>null</CODE> field declaration.
+     * @param dummy
+     *        flag to indicate whether a fake comment text should be inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(FieldDeclaration field, boolean dummy) {
@@ -93,10 +91,14 @@ public class CommentKit {
      * a class implementing <CODE>
      * java.io.Serializable</CODE>.
      *
-     * @param si the source info service.
-     * @param ni the name info service.
-     * @param field a non- <CODE>null</CODE> field declaration.
-     * @param dummy flag to indicate whether a fake comment text should be inserted.
+     * @param si
+     *        the source info service.
+     * @param ni
+     *        the name info service.
+     * @param field
+     *        a non- <CODE>null</CODE> field declaration.
+     * @param dummy
+     *        flag to indicate whether a fake comment text should be inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(SourceInfo si, NameInfo ni, FieldDeclaration field,
@@ -113,7 +115,7 @@ public class CommentKit {
         if (dummy) {
             String name = field.getVariables().get(0).getName();
             return factory.createDocComment("/**\n  " + guessDocumentation(name, true)
-                + (isSerial ? "\n  @serial" : "") + "\n*/");
+                    + (isSerial ? "\n  @serial" : "") + "\n*/");
         } else {
             return factory.createDocComment("/**\n  " + (isSerial ? "\n  @serial" : "") + "n*/");
         }
@@ -123,8 +125,10 @@ public class CommentKit {
      * Factory method creating an empty or faked comment conforming to JavaDoc conventions for the
      * given type declaration.
      *
-     * @param type a non- <CODE>null</CODE> type declaration.
-     * @param dummy flag to indicate whether a fake comment text should be inserted.
+     * @param type
+     *        a non- <CODE>null</CODE> type declaration.
+     * @param dummy
+     *        flag to indicate whether a fake comment text should be inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(TypeDeclaration type, boolean dummy) {
@@ -143,8 +147,10 @@ public class CommentKit {
      * Guesses a documentation for the given type (reference). The generated documentation perfectly
      * describes the type, given that it is perfectly self-explanatory ;)
      *
-     * @param tr a type reference.
-     * @param returned flag indicating if the documentation should describe a method return value.
+     * @param tr
+     *        a type reference.
+     * @param returned
+     *        flag indicating if the documentation should describe a method return value.
      * @return the description string.
      */
     static String guessDocumentation(TypeReference tr, boolean returned) {
@@ -159,9 +165,7 @@ public class CommentKit {
         String ty = guessDocumentation(tn, false);
         switch (tr.getDimensions()) {
         case 0:
-            if (returned) {
-                return "the " + ty;
-            }
+            if (returned) { return "the " + ty; }
             if ("aeiouAEIOU".indexOf(ty.charAt(0)) >= 0) {
                 return "an " + ty;
             } else {
@@ -181,8 +185,10 @@ public class CommentKit {
      * met and separates the words: <TT>
      * guessDocumentation("HelloWorld", false) == "hello world."</TT>
      *
-     * @param name a string used as an identifier.
-     * @param capital flag indicating if the first word of the derived documentation should start
+     * @param name
+     *        a string used as an identifier.
+     * @param capital
+     *        flag indicating if the first word of the derived documentation should start
      *        with a capital letter.
      * @return the description string.
      */
@@ -195,23 +201,17 @@ public class CommentKit {
             char ch = name.charAt(i);
             if (Character.isUpperCase(ch)) {
                 if (i < len - 1 && Character.isUpperCase(name.charAt(i + 1))) {
-                    if (i > 0 && !Character.isUpperCase(name.charAt(i - 1))) {
-                        res.append(' ');
-                    }
+                    if (i > 0 && !Character.isUpperCase(name.charAt(i - 1))) { res.append(' '); }
                     res.append(ch);
                 } else {
-                    if (i > 0) {
-                        res.append(' ');
-                    }
+                    if (i > 0) { res.append(' '); }
                     res.append(Character.toLowerCase(ch));
                 }
             } else {
                 res.append(ch);
             }
         }
-        if (capital) {
-            res.setCharAt(0, Character.toUpperCase(res.charAt(0)));
-        }
+        if (capital) { res.setCharAt(0, Character.toUpperCase(res.charAt(0))); }
         res.append('.');
         return res.toString();
     }

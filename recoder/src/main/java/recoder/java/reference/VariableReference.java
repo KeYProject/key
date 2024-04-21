@@ -45,7 +45,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Variable reference.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public VariableReference(Identifier id) {
@@ -56,13 +57,12 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Variable reference.
      *
-     * @param proto a variable reference.
+     * @param proto
+     *        a variable reference.
      */
     protected VariableReference(VariableReference proto) {
         super(proto);
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
+        if (proto.name != null) { name = proto.name.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -80,9 +80,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (name != null) {
-            name.setParent(this);
-        }
+        if (name != null) { name.setParent(this); }
     }
 
     /**
@@ -110,24 +108,20 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (name != null) {
-            if (index == 0) {
-                return name;
-            }
-        }
+        if (name != null) { if (index == 0) { return name; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: name
-        if (name == child) {
-            return 0;
-        }
+        if (name == child) { return 0; }
         return -1;
     }
 
@@ -143,7 +137,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
     public void setReferenceSuffix(ReferenceSuffix path) {
         this.accessParent = path;
@@ -155,21 +150,20 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;
@@ -187,7 +181,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
     public void setExpressionContainer(ExpressionContainer c) {
         parent = c;
@@ -214,7 +209,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
     public void setIdentifier(Identifier id) {
         name = id;

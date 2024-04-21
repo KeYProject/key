@@ -26,7 +26,8 @@ public abstract class BranchStatement extends JavaStatement implements NonTermin
     /**
      * Branch statement.
      *
-     * @param proto a branch statement.
+     * @param proto
+     *        a branch statement.
      */
 
     protected BranchStatement(BranchStatement proto) {

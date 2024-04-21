@@ -35,9 +35,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     }
 
     protected int introductionTime(Operator op, Goal goal) {
-        if (op == add || op == mul || op == Z) {
-            return -1;
-        }
+        if (op == add || op == mul || op == Z) { return -1; }
 
         final LRUCache<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
@@ -64,13 +62,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             appliedRules = appliedRules.tail();
 
             if (app instanceof TacletApp tapp) {
-                if (!inNewSmallSymRuleSet(tapp)) {
-                    continue;
-                }
+                if (!inNewSmallSymRuleSet(tapp)) { continue; }
 
-                if (introducesSkolemSymbol(tapp, op)) {
-                    return appliedRules.size();
-                }
+                if (introducesSkolemSymbol(tapp, op)) { return appliedRules.size(); }
             }
         }
 
@@ -82,12 +76,8 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             tapp.instantiations().pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            if (!(entry.key() instanceof SkolemTermSV)) {
-                continue;
-            }
-            if (op == ((Term) entry.value().getInstantiation()).op()) {
-                return true;
-            }
+            if (!(entry.key() instanceof SkolemTermSV)) { continue; }
+            if (op == ((Term) entry.value().getInstantiation()).op()) { return true; }
         }
         return false;
     }
@@ -97,9 +87,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         while (!ruleSets.isEmpty()) {
             final RuleSet rs = ruleSets.head();
             ruleSets = ruleSets.tail();
-            if (rs.name().equals(newSymRuleSetName)) {
-                return true;
-            }
+            if (rs.name().equals(newSymRuleSetName)) { return true; }
         }
         return false;
     }

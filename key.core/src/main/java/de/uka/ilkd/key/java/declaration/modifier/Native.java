@@ -24,7 +24,8 @@ public class Native extends Modifier {
     /**
      * Native
      *
-     * @param children list of children. May contain: Comments
+     * @param children
+     *        list of children. May contain: Comments
      */
     public Native(ExtList children) {
         super(children);

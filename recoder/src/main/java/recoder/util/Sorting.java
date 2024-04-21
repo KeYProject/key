@@ -19,15 +19,9 @@ public class Sorting {
         for (int m = (a.length - 1) / 2; m >= 0; m -= 1) {
             for (int j, i = m; (j = 2 * i + 1) < a.length; i = j) {
                 int k = j + 1;
-                if (ord.greater(a[i], a[j])) {
-                    j = i;
-                }
-                if (k < a.length && ord.greater(a[k], a[j])) {
-                    j = k;
-                }
-                if (i == j) {
-                    break;
-                }
+                if (ord.greater(a[i], a[j])) { j = i; }
+                if (k < a.length && ord.greater(a[k], a[j])) { j = k; }
+                if (i == j) { break; }
                 Object swap = a[i];
                 a[i] = a[j];
                 a[j] = swap;
@@ -39,15 +33,9 @@ public class Sorting {
             a[m] = swap;
             for (int j, i = 0; (j = 2 * i + 1) < m; i = j) {
                 int k = j + 1;
-                if (ord.greater(a[i], a[j])) {
-                    j = i;
-                }
-                if (k < m && ord.greater(a[k], a[j])) {
-                    j = k;
-                }
-                if (i == j) {
-                    break;
-                }
+                if (ord.greater(a[i], a[j])) { j = i; }
+                if (k < m && ord.greater(a[k], a[j])) { j = k; }
+                if (i == j) { break; }
                 swap = a[i];
                 a[i] = a[j];
                 a[j] = swap;
@@ -63,10 +51,7 @@ public class Sorting {
         for (int i = 1; i < a.length; i += 1) {
             Object x = a[i];
             int j = i - 1;
-            while (j >= 0 && ord.greater(a[j], x)) {
-                a[j + 1] = a[j];
-                j -= 1;
-            }
+            while (j >= 0 && ord.greater(a[j], x)) { a[j + 1] = a[j]; j -= 1; }
             a[j + 1] = x;
         }
     }
@@ -75,10 +60,7 @@ public class Sorting {
         for (int i = le + 1; i <= ri; i += 1) {
             Object x = a[i];
             int j = i - 1;
-            while (j >= le && ord.greater(a[j], x)) {
-                a[j + 1] = a[j];
-                j -= 1;
-            }
+            while (j >= le && ord.greater(a[j], x)) { a[j + 1] = a[j]; j -= 1; }
             a[j + 1] = x;
         }
     }
@@ -103,12 +85,8 @@ public class Sorting {
             int j = ri;
             Object x = median(a[le], a[ri], a[(le + ri) / 2], ord);
             do {
-                while (ord.less(a[i], x)) {
-                    ++i;
-                }
-                while (ord.less(x, a[j])) {
-                    --j;
-                }
+                while (ord.less(a[i], x)) { ++i; }
+                while (ord.less(x, a[j])) { --j; }
                 if (i <= j) {
                     Object h = a[i];
                     a[i] = a[j];
@@ -135,11 +113,7 @@ public class Sorting {
     }
 
     public static boolean isOrdered(Object[] a, Order ord) {
-        for (int i = a.length - 1; i > 0; i -= 1) {
-            if (ord.greater(a[i - 1], a[i])) {
-                return false;
-            }
-        }
+        for (int i = a.length - 1; i > 0; i -= 1) { if (ord.greater(a[i - 1], a[i])) { return false; } }
         return true;
     }
 

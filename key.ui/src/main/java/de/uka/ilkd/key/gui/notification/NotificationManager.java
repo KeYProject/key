@@ -61,7 +61,8 @@ public class NotificationManager {
     /**
      * adds a notification task to this manager
      *
-     * @param task the NotificationTask to be added
+     * @param task
+     *        the NotificationTask to be added
      */
     public void addNotificationTask(NotificationTask task) {
         notificationTasks.put(task.getEventID(), task);
@@ -70,7 +71,8 @@ public class NotificationManager {
     /**
      * removes the given notification task from the list of active tasks
      *
-     * @param task the task to be removed
+     * @param task
+     *        the task to be removed
      */
     public void removeNotificationTask(NotificationTask task) {
         removeNotificationTask(task.getEventID());
@@ -81,7 +83,8 @@ public class NotificationManager {
      * <p>
      * This functionality is used by the Eclipse integration.
      *
-     * @param eventID The {@link NotificationEventID} to remove its {@link NotificationTask}.
+     * @param eventID
+     *        The {@link NotificationEventID} to remove its {@link NotificationTask}.
      * @return The removed {@link NotificationTask} or {@code null} if none was available.
      */
     public NotificationTask removeNotificationTask(NotificationEventID eventID) {
@@ -124,8 +127,6 @@ public class NotificationManager {
      */
     public void handleNotificationEvent(NotificationEvent event) {
         NotificationTask notificationTask = notificationTasks.get(event.getEventID());
-        if (notificationTask != null) {
-            notificationTask.execute(event, this);
-        }
+        if (notificationTask != null) { notificationTask.execute(event, this); }
     }
 }

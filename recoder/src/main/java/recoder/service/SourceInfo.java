@@ -35,7 +35,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the class type that contains the given program element.
      *
-     * @param context a program element.
+     * @param context
+     *        a program element.
      * @return the type to which the given program element belongs (may be <CODE>null</CODE>).
      */
     ClassType getContainingClassType(ProgramElement context);
@@ -43,7 +44,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred package.
      *
-     * @param r a package reference.
+     * @param r
+     *        a package reference.
      * @return the referred package (may be <CODE>null</CODE>).
      */
     Package getPackage(PackageReference r);
@@ -51,7 +53,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the type for the given program element.
      *
-     * @param pe the program element to compute the type for.
+     * @param pe
+     *        the program element to compute the type for.
      * @return the type for that object (may be <CODE>null</CODE>).
      */
     Type getType(ProgramElement pe);
@@ -59,7 +62,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred type.
      *
-     * @param tr a type reference.
+     * @param tr
+     *        a type reference.
      * @return the referred type (may be <CODE>null</CODE>).
      */
     Type getType(TypeReference tr);
@@ -67,7 +71,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the declared type.
      *
-     * @param td a type declaration.
+     * @param td
+     *        a type declaration.
      * @return the corresponding type.
      */
     ClassType getType(TypeDeclaration td);
@@ -77,7 +82,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * <code>vs</code> is an <code>EnumConstantSpecification</code>, the call is delegated to
      * <code>getType(VariableDefinition)</code>.
      *
-     * @param vs a variable specification.
+     * @param vs
+     *        a variable specification.
      * @return the type for that variable (may be <CODE>null</CODE>).
      */
     Type getType(VariableSpecification vs);
@@ -87,8 +93,10 @@ public interface SourceInfo extends ProgramModelInfo {
      * to check for name clashes when introducing a new identifier. Neither name nor context may be
      * <CODE>null</CODE>.
      *
-     * @param name the name for the type to be looked up; may or may not be qualified.
-     * @param context a program element defining the lookup context (scope).
+     * @param name
+     *        the name for the type to be looked up; may or may not be qualified.
+     * @param context
+     *        a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
     Type getType(String name, ProgramElement context);
@@ -96,7 +104,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the type of the given expression (may be <CODE>null</CODE>).
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      * @return the type of the expression, or <CODE>null</CODE> if the type could not be computed.
      */
     Type getType(Expression expr);
@@ -106,8 +115,10 @@ public interface SourceInfo extends ProgramModelInfo {
      * false if the primitive type is not one of byte, char, short, or if the expression is not a
      * compile-time constant int as defined in the Java language specification.
      *
-     * @param expr the expression that might be a compile-time constant fitting into the given type.
-     * @param to the type that the expression might fit into.
+     * @param expr
+     *        the expression that might be a compile-time constant fitting into the given type.
+     * @param to
+     *        the type that the expression might fit into.
      * @return <CODE>true</CODE> if the expression value is "constant" and would fit into a variable
      *         of the given type without loss of information, <CODE>false</CODE> in any other case.
      */
@@ -118,8 +129,10 @@ public interface SourceInfo extends ProgramModelInfo {
      * variable may be a local variable, a parameter or a field. Useful to check for name clashes
      * when introducing a new identifier.
      *
-     * @param name the name of the variable to be looked up.
-     * @param context a program element defining the lookup context.
+     * @param name
+     *        the name of the variable to be looked up.
+     * @param context
+     *        a program element defining the lookup context.
      * @return the corresponding variable (may be <CODE>null</CODE>).
      */
     Variable getVariable(String name, ProgramElement context);
@@ -127,7 +140,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the declared variable.
      *
-     * @param vs a variable definition.
+     * @param vs
+     *        a variable definition.
      * @return the corresponding variable.
      */
     Variable getVariable(VariableSpecification vs);
@@ -135,7 +149,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred variable.
      *
-     * @param vr a variable reference.
+     * @param vr
+     *        a variable reference.
      * @return the referred variable (may be <CODE>null</CODE>).
      */
     Variable getVariable(VariableReference vr);
@@ -143,7 +158,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred field.
      *
-     * @param fr a field reference.
+     * @param fr
+     *        a field reference.
      * @return the referred field (may be <CODE>null</CODE>).
      */
     Field getField(FieldReference fr);
@@ -152,7 +168,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the locally defined fields of the given type declaration. This method does not report
      * inherited fields. The returned list matches the syntactic order of the declarations.
      *
-     * @param td a type declaration.
+     * @param td
+     *        a type declaration.
      * @return a list of fields that are members of the declaration.
      * @see ProgramModelInfo#getFields
      * @see ProgramModelInfo#getAllFields
@@ -163,7 +180,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the locally defined inner types of the given type declaration. This method does not
      * report inherited types. The returned list matches the syntactic order of the declarations.
      *
-     * @param td a type declaration.
+     * @param td
+     *        a type declaration.
      * @return a list of inner types that are members of the declaration.
      * @see ProgramModelInfo#getTypes
      * @see ProgramModelInfo#getAllTypes
@@ -173,7 +191,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the declared method.
      *
-     * @param md a method declaration.
+     * @param md
+     *        a method declaration.
      * @return the corresponding method.
      */
     Method getMethod(MethodDeclaration md);
@@ -183,7 +202,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * report inherited methods. The returned list matches the syntactic order of the declarations.
      * If td is an enum declaration, implicit members are also added.
      *
-     * @param td a type declaration.
+     * @param td
+     *        a type declaration.
      * @return a list of methods that are members of the declaration.
      * @see ProgramModelInfo#getMethods
      * @see ProgramModelInfo#getAllMethods
@@ -193,10 +213,13 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred method, if there is an unambiguous one.
      *
-     * @param mr the method reference to collate.
+     * @param mr
+     *        the method reference to collate.
      * @return the referred method.
-     * @throws AmbiguousReferenceException if there are no single most specific applicable method.
-     * @throws UnresolvedReferenceException if there are no applicable method.
+     * @throws AmbiguousReferenceException
+     *         if there are no single most specific applicable method.
+     * @throws UnresolvedReferenceException
+     *         if there are no applicable method.
      * @see #getMethods(MethodReference)
      */
     Method getMethod(MethodReference mr);
@@ -208,7 +231,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * specific methods are returned; the program is not semantically correct if there is more than
      * one such method.
      *
-     * @param mr the method reference to collate.
+     * @param mr
+     *        the method reference to collate.
      * @return the list of applicable methods.
      * @see #getMethod(MethodReference)
      */
@@ -217,7 +241,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the declared constructor.
      *
-     * @param cd a constructor declaration.
+     * @param cd
+     *        a constructor declaration.
      * @return the corresponding constructor.
      */
     Constructor getConstructor(ConstructorDeclaration cd);
@@ -227,7 +252,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * matches the syntactic order of the declarations. This method always returns a non-empty list,
      * at least containing a {@link recoder.abstraction.DefaultConstructor}.
      *
-     * @param td a type declaration.
+     * @param td
+     *        a type declaration.
      * @return a list of constructors that are members of the declaration.
      * @see ProgramModelInfo#getConstructors
      */
@@ -236,10 +262,13 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the referred constructor, if there is an unambiguous one.
      *
-     * @param cr the constructor reference to collate.
+     * @param cr
+     *        the constructor reference to collate.
      * @return the constructor referred.
-     * @throws AmbiguousReferenceException if there are is no most specific applicable constructor.
-     * @throws UnresolvedReferenceException if there are no applicable constructor.
+     * @throws AmbiguousReferenceException
+     *         if there are is no most specific applicable constructor.
+     * @throws UnresolvedReferenceException
+     *         if there are no applicable constructor.
      * @see #getConstructors(ConstructorReference)
      */
     Constructor getConstructor(ConstructorReference cr);
@@ -249,7 +278,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * most specific constructors are returned; the program is not semantically correct if there is
      * more than one such constructor.
      *
-     * @param cr the constructor reference to collate.
+     * @param cr
+     *        the constructor reference to collate.
      * @return the list of applicable constructors.
      * @see #getConstructor(ConstructorReference)
      */
@@ -259,7 +289,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Creates a signature by resolving the types of the given expression list. An empty or
      * <CODE>null</CODE> expression list results in an empty type list.
      *
-     * @param args a list of expressions (may be <CODE>null</CODE>).
+     * @param args
+     *        a list of expressions (may be <CODE>null</CODE>).
      * @return a list of types that correspond to the respective expressions.
      */
     List<Type> makeSignature(List<Expression> args);
@@ -269,7 +300,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * this was not possible, the replaced reference otherwise. Note that this method does not
      * notify the change history of the change!
      *
-     * @param urq an uncollated reference.
+     * @param urq
+     *        an uncollated reference.
      * @return a resolved reference, or <CODE>null</CODE> if the reference could not be resolved.
      */
     Reference resolveURQ(UncollatedReferenceQualifier urq);
@@ -277,7 +309,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Check in a program element and built up all scopes.
      *
-     * @param pe the root of a syntax tree that shall be analyzed.
+     * @param pe
+     *        the root of a syntax tree that shall be analyzed.
      * @deprecated this method will not be public in future - use ChangeHistory.attach instead
      */
     @Deprecated
@@ -287,7 +320,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given classtype. Returns <CODE>null</CODE>, if the
      * given type is not a type declaration.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      * @return the corresponding type declaration, or <CODE>null</CODE>, if the given type has no
      *         syntactical representation.
      */
@@ -297,7 +331,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given method. Returns <CODE>
      * null</CODE>, if the given method is not a method declaration.
      *
-     * @param m a method.
+     * @param m
+     *        a method.
      * @return the corresponding method declaration, or <CODE>null</CODE>, if the given method has
      *         no syntactical representation.
      */
@@ -307,7 +342,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given method. Returns <CODE>
      * null</CODE>, if the given method is not a method declaration.
      *
-     * @param c a constructor.
+     * @param c
+     *        a constructor.
      * @return the corresponding method declaration, or <CODE>null</CODE>, if the given method has
      *         no syntactical representation.
      */
@@ -317,7 +353,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given variable. Returns <CODE>
      * null</CODE>, if the given variable is not a variable specification.
      *
-     * @param v a variable.
+     * @param v
+     *        a variable.
      * @return the corresponding variable specification, or <CODE>null</CODE>, if the given variable
      *         has no syntactical representation.
      */
@@ -331,7 +368,8 @@ public interface SourceInfo extends ProgramModelInfo {
      * loop. Statement that can leave the top level statement block will report
      * {@link #METHOD_EXIT}as a successor.
      *
-     * @param s a statement.
+     * @param s
+     *        a statement.
      * @return a list of succeeding statements.
      * @since 0.71
      */
@@ -355,7 +393,8 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the (annotation) type of the given annotation use.
      *
-     * @param au an annotation use
+     * @param au
+     *        an annotation use
      * @return the type of the referenced annotation type
      */
     Type getAnnotationType(AnnotationUseSpecification au);

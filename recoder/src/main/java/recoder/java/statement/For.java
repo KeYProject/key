@@ -37,10 +37,14 @@ public class For extends LoopStatement implements VariableScope {
     /**
      * For.
      *
-     * @param inits a loop initializer mutable list.
-     * @param guard an expression.
-     * @param updates an expression mutable list.
-     * @param body a statement.
+     * @param inits
+     *        a loop initializer mutable list.
+     * @param guard
+     *        an expression.
+     * @param updates
+     *        an expression mutable list.
+     * @param body
+     *        a statement.
      */
 
     public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
@@ -55,7 +59,8 @@ public class For extends LoopStatement implements VariableScope {
     /**
      * For.
      *
-     * @param proto a for.
+     * @param proto
+     *        a for.
      */
 
     protected For(For proto) {
@@ -108,9 +113,7 @@ public class For extends LoopStatement implements VariableScope {
     public List<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
             LoopInitializer li = inits.get(0);
-            if (li instanceof LocalVariableDeclaration) {
-                return ((LocalVariableDeclaration) li).getVariables();
-            }
+            if (li instanceof LocalVariableDeclaration) { return ((LocalVariableDeclaration) li).getVariables(); }
         }
         return new ArrayList<>();
     }
@@ -121,11 +124,7 @@ public class For extends LoopStatement implements VariableScope {
             LoopInitializer li = inits.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 List<VariableSpecification> vars = ((LocalVariableDeclaration) li).getVariables();
-                for (VariableSpecification v : vars) {
-                    if (name.equals(v.getName())) {
-                        return v;
-                    }
-                }
+                for (VariableSpecification v : vars) { if (name.equals(v.getName())) { return v; } }
             }
         }
         return null;

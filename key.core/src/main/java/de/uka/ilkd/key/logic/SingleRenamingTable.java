@@ -21,9 +21,7 @@ public class SingleRenamingTable extends RenamingTable {
     }
 
     public SourceElement getRenaming(SourceElement se) {
-        if (se.equals(oldVar)) {
-            return newVar;
-        }
+        if (se.equals(oldVar)) { return newVar; }
         return null;
     }
 
@@ -35,7 +33,7 @@ public class SingleRenamingTable extends RenamingTable {
         LocationVariable ov = (LocationVariable) oldVar;
         LocationVariable nv = (LocationVariable) newVar;
         return ("SingleRenamingTable: " + oldVar + " id: " + System.identityHashCode(ov) + " -> "
-            + newVar + " id: " + System.identityHashCode(nv));
+                + newVar + " id: " + System.identityHashCode(nv));
     }
 
     public HashMap<SourceElement, SourceElement> getHashMap() {

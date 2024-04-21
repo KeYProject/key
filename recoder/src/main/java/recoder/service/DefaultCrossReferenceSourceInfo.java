@@ -42,7 +42,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     /**
      * Creates a new service.
      *
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultCrossReferenceSourceInfo(ServiceConfiguration config) {
         super(config);
@@ -51,7 +52,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     /**
      * Change notification callback method.
      *
-     * @param changes the configuration this services becomes part of.
+     * @param changes
+     *        the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
 
@@ -69,17 +71,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         // detached first
         for (TreeChange tc : changed) {
             if (tc instanceof DetachChange) {
-                if (!tc.isMinor()) {
-                    processChange(tc);
-                }
+                if (!tc.isMinor()) { processChange(tc); }
                 listeners.fireProgressEvent(++c);
             }
         }
         for (TreeChange tc : changed) {
             if (tc instanceof AttachChange) {
-                if (!tc.isMinor()) {
-                    processChange(tc);
-                }
+                if (!tc.isMinor()) { processChange(tc); }
                 listeners.fireProgressEvent(++c);
             }
         }
@@ -133,9 +131,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                     tw.next(); // skip pe
                     while (tw.next()) {
                         ProgramElement p = tw.getProgramElement();
-                        if (p instanceof Reference) {
-                            deregisterReference((Reference) p);
-                        }
+                        if (p instanceof Reference) { deregisterReference((Reference) p); }
                     }
                 }
                 listeners.fireProgressEvent(++c);
@@ -213,24 +209,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given method (or constructor). The references stem from
      * all known compilation units.
      *
-     * @param m a method.
+     * @param m
+     *        a method.
      * @return a possibly empty list of references to the given method.
      */
     public List<MemberReference> getReferences(Method m) {
         Debug.assertNonnull(m);
         updateModel();
         Set references = element2references.get(m);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<MemberReference> result = new ArrayList<>(s);
-        for (Object o : references) {
-            result.add((MemberReference) o);
-        }
+        for (Object o : references) { result.add((MemberReference) o); }
         return result;
     }
 
@@ -238,24 +229,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given constructor. The references stem from all known
      * compilation units.
      *
-     * @param c a constructor.
+     * @param c
+     *        a constructor.
      * @return a possibly empty list of references to the given constructor.
      */
     public List<ConstructorReference> getReferences(Constructor c) {
         Debug.assertNonnull(c);
         updateModel();
         Set<Reference> references = element2references.get(c);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<ConstructorReference> result = new ArrayList<>(s);
-        for (Reference o : references) {
-            result.add((ConstructorReference) o);
-        }
+        for (Reference o : references) { result.add((ConstructorReference) o); }
         return result;
     }
 
@@ -263,24 +249,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given variable. The references stem from all known
      * compilation units.
      *
-     * @param v a variable.
+     * @param v
+     *        a variable.
      * @return a possibly empty list of references to the given variable.
      */
     public List<VariableReference> getReferences(Variable v) {
         Debug.assertNonnull(v);
         updateModel();
         Set references = element2references.get(v);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<VariableReference> result = new ArrayList<>(s);
-        for (Object o : references) {
-            result.add((VariableReference) o);
-        }
+        for (Object o : references) { result.add((VariableReference) o); }
         return result;
     }
 
@@ -288,24 +269,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given field. The references stem from all known
      * compilation units.
      *
-     * @param f a field.
+     * @param f
+     *        a field.
      * @return a possibly empty list of references to the given field.
      */
     public List<FieldReference> getReferences(Field f) {
         Debug.assertNonnull(f);
         updateModel();
         Set references = element2references.get(f);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<FieldReference> result = new ArrayList<>(s);
-        for (Object o : references) {
-            result.add((FieldReference) o);
-        }
+        for (Object o : references) { result.add((FieldReference) o); }
         return result;
     }
 
@@ -313,24 +289,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given type. The references stem from all known
      * compilation units.
      *
-     * @param t a type.
+     * @param t
+     *        a type.
      * @return a possibly empty list of references to the given type.
      */
     public List<TypeReference> getReferences(Type t) {
         Debug.assertNonnull(t);
         updateModel();
         Set<Reference> references = element2references.get(t);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<TypeReference> result = new ArrayList<>(s);
-        for (Reference r : references) {
-            result.add((TypeReference) r);
-        }
+        for (Reference r : references) { result.add((TypeReference) r); }
         return result;
     }
 
@@ -338,24 +309,19 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      * Retrieves the list of references to a given package. The references stem from all known
      * compilation units.
      *
-     * @param p a package.
+     * @param p
+     *        a package.
      * @return a possibly empty list of references to the given package.
      */
     public List<PackageReference> getReferences(Package p) {
         Debug.assertNonnull(p);
         updateModel();
         Set<Reference> references = element2references.get(p);
-        if (references == null) {
-            return new ArrayList<>(0);
-        }
+        if (references == null) { return new ArrayList<>(0); }
         int s = references.size();
-        if (s == 0) {
-            return new ArrayList<>(0);
-        }
+        if (s == 0) { return new ArrayList<>(0); }
         List<PackageReference> result = new ArrayList<>(s);
-        for (Reference pr : references) {
-            result.add((PackageReference) pr);
-        }
+        for (Reference pr : references) { result.add((PackageReference) pr); }
         return result;
     }
 
@@ -384,9 +350,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
      */
     private void analyzeReferences(ProgramElement pe) {
         if (pe instanceof NonTerminalProgramElement nt) {
-            for (int i = 0, c = nt.getChildCount(); i < c; i += 1) {
-                analyzeReferences(nt.getChildAt(i));
-            }
+            for (int i = 0, c = nt.getChildCount(); i < c; i += 1) { analyzeReferences(nt.getChildAt(i)); }
         } else {
             return;
         }
@@ -412,9 +376,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 registerReference(vr, v);
             } else if (pe instanceof TypeReference tr) {
                 Type t = getType(tr);
-                if (t instanceof ParameterizedType) {
-                    t = ((ParameterizedType) t).getGenericType();
-                }
+                if (t instanceof ParameterizedType) { t = ((ParameterizedType) t).getGenericType(); }
                 if (t != null) { // void type otherwise
                     if (!(t instanceof DefaultNameInfo.UnknownClassType)) {
                         registerReference(tr, t);
@@ -423,9 +385,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                             TypeReferenceContainer parent = tr.getParent();
                             if (parent instanceof InheritanceSpecification) {
                                 subType = ((InheritanceSpecification) parent).getParent();
-                            } else if (parent instanceof New) {
-                                subType = ((New) parent).getClassDeclaration();
-                            }
+                            } else if (parent instanceof New) { subType = ((New) parent).getClassDeclaration(); }
                             if (subType != null) {
                                 ClassType superType = (ClassType) t;
                                 ProgramModelInfo pmi = superType.getProgramModelInfo();
@@ -495,8 +455,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             }
         }
         return "" + c1 + " variables with " + r1 + " references\n" + c2 + " methods with " + r2
-            + " references\n" + c3 + " constructors with " + r3 + " references\n" + c4
-            + " types with " + r4 + " references\n" + c5 + " packages with " + r5 + " references";
+                + " references\n" + c3 + " constructors with " + r3 + " references\n" + c4
+                + " types with " + r4 + " references\n" + c5 + " packages with " + r5 + " references";
     }
 
     /*
@@ -539,9 +499,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         for (int i = cul.size() - 1; i >= 0; i -= 1) {
             CompilationUnit cu = cul.get(i);
             analyzeReferences(cu);
-            if (fire) {
-                listeners.fireProgressEvent(++c);
-            }
+            if (fire) { listeners.fireProgressEvent(++c); }
         }
     }
 

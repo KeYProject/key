@@ -107,9 +107,7 @@ public class FixedBugs {
         CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         StringBuilder cuText = new StringBuilder("class B { }//");
-        for (int i = 0; i < 4081; i++) {
-            cuText.append(" ");
-        }
+        for (int i = 0; i < 4081; i++) { cuText.append(" "); }
         for (int i = 4081; i < 4087; i++) {
             // that's around the critical part, where the
             // size of the CU matches the JavaCCParser buffer

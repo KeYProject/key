@@ -31,8 +31,10 @@ public class Equals extends ComparativeOperator {
     /**
      * Equals.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Equals(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class Equals extends ComparativeOperator {
     /**
      * Equals.
      *
-     * @param proto an equals.
+     * @param proto
+     *        an equals.
      */
 
     protected Equals(Equals proto) {

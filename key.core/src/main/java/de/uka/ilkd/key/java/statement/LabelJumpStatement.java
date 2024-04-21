@@ -35,7 +35,8 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Label jump statement.
      *
-     * @param label the Label of this jump statement
+     * @param label
+     *        the Label of this jump statement
      */
 
     public LabelJumpStatement(Label label) {
@@ -47,7 +48,8 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public LabelJumpStatement(ExtList children) {
         super(children);
@@ -82,9 +84,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if ((name instanceof ProgramElementName) || (name == null)) {
-            return (ProgramElementName) name;
-        }
+        if ((name instanceof ProgramElementName) || (name == null)) { return (ProgramElementName) name; }
         return null;
     }
 
@@ -100,16 +100,14 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (name != null) {
-            if (index == 0) {
-                return name;
-            }
-        }
+        if (name != null) { if (index == 0) { return name; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 

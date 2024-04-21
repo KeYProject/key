@@ -189,8 +189,8 @@ public class SolverPropertiesLoader {
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
         String nameBuilder = name +
-            "_" +
-            counter;
+                "_" +
+                counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique
@@ -213,9 +213,7 @@ public class SolverPropertiesLoader {
                 SOLVERS.add(createdType);
                 // If the solver is a LEGACY solver (only available in experimental mode),
                 // add it to the separate list:
-                if (SettingsConverter.read(solverProp, LEGACY, false)) {
-                    LEGACY_SOLVERS.add(createdType);
-                }
+                if (SettingsConverter.read(solverProp, LEGACY, false)) { LEGACY_SOLVERS.add(createdType); }
             }
         }
         return new ArrayList<>(SOLVERS);
@@ -257,9 +255,7 @@ public class SolverPropertiesLoader {
         command =
             SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND, DEFAULT_COMMAND);
         timeout = SettingsConverter.read(props, SolverPropertiesLoader.TIMEOUT, DEFAULT_TIMEOUT);
-        if (timeout < -1) {
-            timeout = -1;
-        }
+        if (timeout < -1) { timeout = -1; }
         params =
             SettingsConverter.readRawString(props, SolverPropertiesLoader.PARAMS, DEFAULT_PARAMS);
         version =
@@ -320,9 +316,7 @@ public class SolverPropertiesLoader {
                     .getResources(PACKAGE_PATH + SOLVER_LIST_FILE).asIterator(); it.hasNext();) {
                 URL res = it.next();
                 try (InputStream stream = res.openStream()) {
-                    if (stream == null) {
-                        continue;
-                    }
+                    if (stream == null) { continue; }
                     // load solvers from this single solvers.txt
                     Collection<Properties> props = new ArrayList<>();
                     BufferedReader reader =
@@ -342,11 +336,8 @@ public class SolverPropertiesLoader {
                             if (!unsupportedKeys.isEmpty()) {
                                 StringBuilder msg = new StringBuilder(
                                     "Properties file " + fileName
-                                        + " contains unsupported keys: {");
-                                for (String key : unsupportedKeys) {
-                                    msg.append(key);
-                                    msg.append(", ");
-                                }
+                                            + " contains unsupported keys: {");
+                                for (String key : unsupportedKeys) { msg.append(key); msg.append(", "); }
                                 msg.replace(msg.length() - 2, msg.length(), "}");
                                 LOGGER.warn(msg.toString());
                             }

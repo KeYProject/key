@@ -44,25 +44,19 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-            + "proofs, this macro starts a side calculation which does "
-            + "the symbolic execution only once. The result is "
-            + "instantiated twice with the variable to be used in the "
-            + "two executions of the self-composition.";
+                + "proofs, this macro starts a side calculation which does "
+                + "the symbolic execution only once. The result is "
+                + "instantiated twice with the variable to be used in the "
+                + "two executions of the self-composition.";
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null) {
-            return false;
-        }
-        if (posInOcc == null || posInOcc.subTerm() == null) {
-            return false;
-        }
+        if (goals == null || goals.head() == null) { return false; }
+        if (posInOcc == null || posInOcc.subTerm() == null) { return false; }
         Services services = proof.getServices();
         ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof InfFlowContractPO po)) {
-            return false;
-        }
+        if (!(poForProof instanceof InfFlowContractPO po)) { return false; }
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(po.getContract(),
             po.getIFVars().c1, po.getIFVars().c2, services);

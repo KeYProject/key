@@ -95,7 +95,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Adds a change history listener to the history.
      *
-     * @param chl a listener.
+     * @param chl
+     *        a listener.
      */
     public void addChangeHistoryListener(ChangeHistoryListener chl) {
         synchronized (changeListeners) {
@@ -110,7 +111,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Removes a change history listener from the history.
      *
-     * @param chl a listener.
+     * @param chl
+     *        a listener.
      */
     public void removeChangeHistoryListener(ChangeHistoryListener chl) {
         synchronized (changeListeners) {
@@ -118,9 +120,7 @@ public class ChangeHistory extends AbstractService {
                 if (changeListeners[i] == chl) {
                     ChangeHistoryListener[] newListeners =
                         new ChangeHistoryListener[changeListeners.length - 1];
-                    if (i > 0) {
-                        System.arraycopy(changeListeners, 0, newListeners, 0, i);
-                    }
+                    if (i > 0) { System.arraycopy(changeListeners, 0, newListeners, 0, i); }
                     if (i < changeListeners.length - 1) {
                         System.arraycopy(changeListeners, i + 1, newListeners, i,
                             changeListeners.length - 1 - i);
@@ -135,7 +135,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Adds a model update listener to the history.
      *
-     * @param l a listener.
+     * @param l
+     *        a listener.
      */
     public void addModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
@@ -150,7 +151,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Removes a model update listener from the history.
      *
-     * @param l a listener.
+     * @param l
+     *        a listener.
      */
     public void removeModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
@@ -158,9 +160,7 @@ public class ChangeHistory extends AbstractService {
                 if (updateListeners[i] == l) {
                     ModelUpdateListener[] newListeners =
                         new ModelUpdateListener[updateListeners.length - 1];
-                    if (i > 0) {
-                        System.arraycopy(updateListeners, 0, newListeners, 0, i);
-                    }
+                    if (i > 0) { System.arraycopy(updateListeners, 0, newListeners, 0, i); }
                     if (i < updateListeners.length - 1) {
                         System.arraycopy(updateListeners, i + 1, newListeners, i,
                             updateListeners.length - 1 - i);
@@ -196,7 +196,7 @@ public class ChangeHistory extends AbstractService {
                 } else {
                     throw new IllegalChangeReportException(
                         "Duplicate attachment of one element in different places: " + newChange
-                            + " followed " + oldChange);
+                                + " followed " + oldChange);
                 }
             }
             if (newChange instanceof DetachChange) { // attach(x) - detach(x)
@@ -229,7 +229,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Informs the change history of the addition of a new subtree given by its root element.
      *
-     * @param root the root of the change.
+     * @param root
+     *        the root of the change.
      */
     public void attached(ProgramElement root) {
         Debug.assertNonnull(root);
@@ -238,13 +239,11 @@ public class ChangeHistory extends AbstractService {
         enqueueChange(ac); // to the update queue
         pushChange(ac); // to the transformation sequence stack
         if (DEBUG) {
-            if (!(root instanceof CompilationUnit)) {
-                root = root.getASTParent();
-            }
+            if (!(root instanceof CompilationUnit)) { root = root.getASTParent(); }
             ProgramElement orphan = MiscKit.checkParentLinks(root);
             if (orphan != null) {
                 Debug.log("### Orphan detected: " + Format.toString(Formats.ELEMENT_LONG, orphan)
-                    + " in call from \n" + Debug.makeStackTrace());
+                        + " in call from \n" + Debug.makeStackTrace());
             }
         }
     }
@@ -253,10 +252,13 @@ public class ChangeHistory extends AbstractService {
      * Informs the change history of the deletion of a subtree given by its root element. In case
      * that the detached element is reattached, the former parent is given explicitly.
      *
-     * @param root the root of the detached subtree.
-     * @param parent the former parent of the detached subtree; may be <CODE>null
+     * @param root
+     *        the root of the detached subtree.
+     * @param parent
+     *        the former parent of the detached subtree; may be <CODE>null
      *               </CODE> only if the root is a compilation unit.
-     * @param pos the positional code of the root in its former parent, as obtained by
+     * @param pos
+     *        the positional code of the root in its former parent, as obtained by
      *        {@link recoder.java.NonTerminalProgramElement#getChildPositionCode}; the code may be
      *        arbitrary if the root is a compilation unit.
      */
@@ -272,8 +274,10 @@ public class ChangeHistory extends AbstractService {
      * Informs the change history of the deletion of a subtree given by its root element. This
      * method assumes that the parent link of the root element still points to the old parent.
      *
-     * @param root the root of the detached subtree.
-     * @param pos the positional code of the root in its former parent, as obtained by
+     * @param root
+     *        the root of the detached subtree.
+     * @param pos
+     *        the positional code of the root in its former parent, as obtained by
      *        {@link recoder.java.NonTerminalProgramElement#getChildPositionCode}; the code may be
      *        arbitrary if the root is a compilation unit.
      */
@@ -285,8 +289,10 @@ public class ChangeHistory extends AbstractService {
      * Informs the change history of the replacement of a subtree by another one given by their root
      * elements. The replacement must have a valid parent.
      *
-     * @param root the root of a subtree that has been replaced.
-     * @param replacement the root of a subtree that took over the role of the former tree.
+     * @param root
+     *        the root of a subtree that has been replaced.
+     * @param replacement
+     *        the root of a subtree that took over the role of the former tree.
      */
     public void replaced(ProgramElement root, ProgramElement replacement) {
         Debug.assertNonnull(root, replacement);
@@ -302,7 +308,7 @@ public class ChangeHistory extends AbstractService {
             ProgramElement orphan = MiscKit.checkParentLinks(parent);
             if (orphan != null) {
                 Debug.log("### Orphan detected: " + Format.toString(Formats.ELEMENT_LONG, orphan)
-                    + " in call from \n" + Debug.makeStackTrace());
+                        + " in call from \n" + Debug.makeStackTrace());
             }
         }
     }
@@ -310,17 +316,14 @@ public class ChangeHistory extends AbstractService {
     /**
      * Stores the current tree change.
      *
-     * @param tc the tree change.
+     * @param tc
+     *        the tree change.
      */
     private void enqueueChange(TreeChange tc) {
         changeList.add(tc);
-        if (DEBUG) {
-            Debug.log(tc.toString());
-        }
+        if (DEBUG) { Debug.log(tc.toString()); }
         TreeChange duplicate = root2change.put(tc.getChangeRoot(), tc);
-        if (duplicate != null) {
-            checkConflict(duplicate, tc);
-        }
+        if (duplicate != null) { checkConflict(duplicate, tc); }
         needsUpdate = true;
     }
 
@@ -339,14 +342,10 @@ public class ChangeHistory extends AbstractService {
     private void removeTailChange() {
         int s = changeList.size();
         TreeChange tc = changeList.get(s - 1);
-        if (DEBUG) {
-            Debug.log("SUPPRESSING " + tc);
-        }
+        if (DEBUG) { Debug.log("SUPPRESSING " + tc); }
         root2change.remove(tc.getChangeRoot());
         changeList.remove(s - 1);
-        if (s == 1) {
-            needsUpdate = false;
-        }
+        if (s == 1) { needsUpdate = false; }
     }
 
     /**
@@ -387,16 +386,12 @@ public class ChangeHistory extends AbstractService {
      * information.
      */
     public final void updateModel() {
-        if (!needsUpdate) {
-            return;
-        }
+        if (!needsUpdate) { return; }
         if (isUpdating) {
             delayedUpdate = true;
             return;
         }
-        if (DEBUG) {
-            Debug.log("MODEL UPDATE >>>>>");
-        }
+        if (DEBUG) { Debug.log("MODEL UPDATE >>>>>"); }
         synchronized (updateListeners) {
             int s = updateListeners.length;
             if (s > 0) {
@@ -412,14 +407,10 @@ public class ChangeHistory extends AbstractService {
             ChangeHistoryEvent event = new ChangeHistoryEvent(this, changeList);
             changeList = new ArrayList<>();
             root2change.clear();
-            if (DEBUG) {
-                Debug.log("  EVENT: " + event + " END EVENT");
-            }
+            if (DEBUG) { Debug.log("  EVENT: " + event + " END EVENT"); }
             ChangeHistoryListener[] listeners = this.changeListeners;
             // it is important to exactly follow the listeners order
-            for (ChangeHistoryListener listener : listeners) {
-                listener.modelChanged(event);
-            }
+            for (ChangeHistoryListener listener : listeners) { listener.modelChanged(event); }
             isUpdating = false;
             if (!delayedUpdate) {
                 break;
@@ -427,15 +418,11 @@ public class ChangeHistory extends AbstractService {
                 delayedUpdate = false;
             }
         } while (needsUpdate);
-        if (DEBUG) {
-            Debug.log("<<<<< END UPDATE");
-        }
+        if (DEBUG) { Debug.log("<<<<< END UPDATE"); }
         synchronized (updateListeners) {
             int s = updateListeners.length;
             if (s > 0) {
-                for (ModelUpdateListener updateListener : updateListeners) {
-                    updateListener.modelUpdated(updateEvent);
-                }
+                for (ModelUpdateListener updateListener : updateListeners) { updateListener.modelUpdated(updateEvent); }
             }
         }
     }
@@ -458,26 +445,24 @@ public class ChangeHistory extends AbstractService {
      * transformation is inserted which is automatically overwritten if a new transformation begins
      * and the default transformation report sequence is still empty.
      *
-     * @param transformation the transformation that begins.
+     * @param transformation
+     *        the transformation that begins.
      * @since 0.53
      */
     public void begin(Transformation transformation) {
-        if (DEBUG) {
-            Debug.log("BEGIN \"" + transformation.toString() + "\"");
-        }
+        if (DEBUG) { Debug.log("BEGIN \"" + transformation.toString() + "\""); }
         push(transformation);
     }
 
     /**
      * Rollback all entries down to and including the given position.
      *
-     * @param position last position to rollback.
+     * @param position
+     *        last position to rollback.
      */
     private void rollback(int position) {
         // undo all transformations until the position is met
-        if (DEBUG) {
-            Debug.log("BEGIN ROLLBACK");
-        }
+        if (DEBUG) { Debug.log("BEGIN ROLLBACK"); }
         while (reportCount > position) {
             reportCount -= 1;
             if (reportStack[reportCount] instanceof TreeChange lastChange) {
@@ -491,14 +476,10 @@ public class ChangeHistory extends AbstractService {
                     // add the undo
                     enqueueChange(undoChange);
                 }
-            } else if (DEBUG) {
-                Debug.log("ROLLED BACK \"" + reportStack[reportCount] + "\"");
-            }
+            } else if (DEBUG) { Debug.log("ROLLED BACK \"" + reportStack[reportCount] + "\""); }
             reportStack[reportCount] = null;
         }
-        if (DEBUG) {
-            Debug.log("END ROLLBACK");
-        }
+        if (DEBUG) { Debug.log("END ROLLBACK"); }
     }
 
     /**
@@ -507,12 +488,7 @@ public class ChangeHistory extends AbstractService {
      */
     private int locate(Transformation transformation) {
         int position = reportCount;
-        while (position >= 0) {
-            position -= 1;
-            if (reportStack[position] == transformation) {
-                break;
-            }
-        }
+        while (position >= 0) { position -= 1; if (reportStack[position] == transformation) { break; } }
         return position;
     }
 
@@ -520,15 +496,14 @@ public class ChangeHistory extends AbstractService {
      * Removes the last transformations and reverts all their changes until the given transformation
      * has been rolled back. The given transformation is removed.
      *
-     * @throws NoSuchTransformationException if the given transformation is not known, for instance
+     * @throws NoSuchTransformationException
+     *         if the given transformation is not known, for instance
      *         if it has already been removed.
      * @since 0.53
      */
     public void rollback(Transformation transformation) throws NoSuchTransformationException {
         int position = locate(transformation);
-        if (position < 0) {
-            throw new NoSuchTransformationException(transformation);
-        }
+        if (position < 0) { throw new NoSuchTransformationException(transformation); }
         rollback(position);
     }
 
@@ -546,7 +521,8 @@ public class ChangeHistory extends AbstractService {
     /**
      * Checks if the given transformation is reported in this history and can be rolled back.
      *
-     * @param transformation the transformation to locate.
+     * @param transformation
+     *        the transformation to locate.
      * @return <CODE>true</CODE>, if the given transformation can be rolled back, <CODE>false</CODE>
      *         otherwise.
      * @since 0.53
@@ -561,27 +537,25 @@ public class ChangeHistory extends AbstractService {
      * @since 0.53
      */
     public void commit() {
-        while (reportCount > 0) {
-            reportStack[--reportCount] = null;
-        }
-        if (DEBUG) {
-            Debug.log("COMMITTING");
-        }
+        while (reportCount > 0) { reportStack[--reportCount] = null; }
+        if (DEBUG) { Debug.log("COMMITTING"); }
     }
 
     /**
      * Undoes a tree change by remove/inserting a child from/to its current/former parent.
      *
-     * @param tc the change to undo.
+     * @param tc
+     *        the change to undo.
      * @return the resulting tree change description.
-     * @throws ClassCastException if the child does not fit to the position.
-     * @throws IllegalArgumentException if the child is at wrong position.
-     * @throws IndexOutOfBoundsException if the child is at wrong position.
+     * @throws ClassCastException
+     *         if the child does not fit to the position.
+     * @throws IllegalArgumentException
+     *         if the child is at wrong position.
+     * @throws IndexOutOfBoundsException
+     *         if the child is at wrong position.
      */
     private TreeChange undo(TreeChange tc) {
-        if (DEBUG) {
-            Debug.log("Undoing " + tc.toString());
-        }
+        if (DEBUG) { Debug.log("Undoing " + tc.toString()); }
         TreeChange result;
         ProgramElement child = tc.getChangeRoot();
         NonTerminalProgramElement parent = tc.getChangeRootParent();
@@ -593,14 +567,10 @@ public class ChangeHistory extends AbstractService {
             } else {
                 result = new DetachChange(child, null, 0);
             }
-            if (DEBUG) {
-                Debug.log(" -> " + result);
-            }
+            if (DEBUG) { Debug.log(" -> " + result); }
             return result;
         }
-        if (!(tc instanceof DetachChange dc)) {
-            return null;
-        }
+        if (!(tc instanceof DetachChange dc)) { return null; }
 
         // !!!!!!!!!!!!!!!!!!!!!!
         // if (dc.getReplacement() != null) ...
@@ -1382,9 +1352,7 @@ public class ChangeHistory extends AbstractService {
             throw new IllegalChangeReportException("Unknown parent type in " + dc);
         }
         result = new AttachChange(child);
-        if (DEBUG) {
-            Debug.log(" -> " + result);
-        }
+        if (DEBUG) { Debug.log(" -> " + result); }
         return result;
     }
 }

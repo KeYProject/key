@@ -36,11 +36,16 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     /**
      * Constructor declaration.
      *
-     * @param modifier a visibility modifier.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
-     * @param body a statement block.
+     * @param modifier
+     *        a visibility modifier.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
      */
 
     public ConstructorDeclaration(VisibilityModifier modifier, Identifier name,
@@ -57,7 +62,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     /**
      * Constructor declaration.
      *
-     * @param proto a constructor declaration.
+     * @param proto
+     *        a constructor declaration.
      */
 
     protected ConstructorDeclaration(ConstructorDeclaration proto) {

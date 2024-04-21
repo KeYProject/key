@@ -108,7 +108,8 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      * creates the implicit static <code>&lt;createObject&gt;</code> method that takes the object to
      * be created out of the pool
      *
-     * @param type the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
+     * @param type
+     *        the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
@@ -126,9 +127,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     @Override
     public ProblemReport analyze() {
-        for (final ClassDeclaration cd : classDeclarations()) {
-            class2identifier.put(cd, getId(cd));
-        }
+        for (final ClassDeclaration cd : classDeclarations()) { class2identifier.put(cd, getId(cd)); }
         setProblemReport(NO_PROBLEM);
         return NO_PROBLEM;
     }
@@ -136,11 +135,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
-        if (td instanceof ClassDeclaration) {
-            attach(createMethod((ClassDeclaration) td), td, td.getMembers().size());
-        }
+        if (td instanceof ClassDeclaration) { attach(createMethod((ClassDeclaration) td), td, td.getMembers().size()); }
     }
 }

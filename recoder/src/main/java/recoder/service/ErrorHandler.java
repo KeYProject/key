@@ -37,8 +37,10 @@ public interface ErrorHandler extends ModelUpdateListener {
      * Handles exceptions and may return so that the callee can attempt to resume or fail, throwing
      * the given error as an exception.
      *
-     * @param e an error cause.
-     * @throws RuntimeException the given exception might be wrapped in a RunTimeException and be
+     * @param e
+     *        an error cause.
+     * @throws RuntimeException
+     *         the given exception might be wrapped in a RunTimeException and be
      *         thrown.
      */
     void reportError(Exception e) throws RuntimeException;

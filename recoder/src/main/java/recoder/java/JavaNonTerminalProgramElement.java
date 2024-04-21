@@ -27,7 +27,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     /**
      * Java program element.
      *
-     * @param proto a java program element.
+     * @param proto
+     *        a java program element.
      */
 
     protected JavaNonTerminalProgramElement(JavaProgramElement proto) {
@@ -64,7 +65,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * <p>
      * This method is deprecated as of 0.75
      *
-     * @param positionCode the position code.
+     * @param positionCode
+     *        the position code.
      * @return the index of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      * @deprecated
@@ -77,7 +79,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     /**
      * Extracts the role of a child from its position code.
      *
-     * @param positionCode the position code.
+     * @param positionCode
+     *        the position code.
      * @return the role code of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      */
@@ -90,7 +93,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * is searched for by identity: <CODE>
      * getChildAt(getIndexOfChild(x)) == x</CODE>.
      *
-     * @param child the exact child to look for.
+     * @param child
+     *        the exact child to look for.
      * @return the index of the given child, or <CODE>-1</CODE>.
      */
     public int getIndexOfChild(ProgramElement child) {
@@ -103,8 +107,6 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
     public void validateAll() throws ModelException {
         TreeWalker tw = new TreeWalker(this);
-        while (tw.next()) {
-            tw.getProgramElement().validate();
-        }
+        while (tw.next()) { tw.getProgramElement().validate(); }
     }
 }

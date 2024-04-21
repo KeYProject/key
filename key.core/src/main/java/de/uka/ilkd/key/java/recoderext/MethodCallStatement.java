@@ -43,8 +43,10 @@ public class MethodCallStatement extends JavaStatement
     /**
      * MethodCallStatement.
      *
-     * @param resultVar the ProgramVariable the return value is assigned to
-     * @param body a Statement containing the method body of the called method
+     * @param resultVar
+     *        the ProgramVariable the return value is assigned to
+     * @param body
+     *        a Statement containing the method body of the called method
      */
 
     public MethodCallStatement(Expression resultVar, ExecutionContext ec, StatementBlock body) {
@@ -57,20 +59,15 @@ public class MethodCallStatement extends JavaStatement
     /**
      * MethodCallStatement.
      *
-     * @param proto a MethodCallStatement
+     * @param proto
+     *        a MethodCallStatement
      */
 
     protected MethodCallStatement(MethodCallStatement proto) {
         super(proto);
-        if (proto.resultVar != null) {
-            resultVar = proto.resultVar.deepClone();
-        }
-        if (proto.ec != null) {
-            ec = proto.ec.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.resultVar != null) { resultVar = proto.resultVar.deepClone(); }
+        if (proto.ec != null) { ec = proto.ec.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -78,7 +75,8 @@ public class MethodCallStatement extends JavaStatement
     /**
      * Set the result variable.
      *
-     * @param resultVar the result variable
+     * @param resultVar
+     *        the result variable
      */
 
     public void setResultVariable(Expression resultVar) {
@@ -98,7 +96,8 @@ public class MethodCallStatement extends JavaStatement
     /**
      * Set body.
      *
-     * @param body the Statement
+     * @param body
+     *        the Statement
      */
 
     public void setBody(Statement body) {
@@ -154,43 +153,33 @@ public class MethodCallStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null) {
-            result++;
-        }
-        if (ec != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (resultVar != null) { result++; }
+        if (ec != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
         if (ec != null) {
-            if (index == 0) {
-                return ec;
-            }
+            if (index == 0) { return ec; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -200,16 +189,10 @@ public class MethodCallStatement extends JavaStatement
         // role -/0: resultVar
         // role 1/2: ec
         // role 2/1: body
-        if (resultVar == child) {
-            return 0;
-        }
-        if (ec == child) {
-            return (resultVar != null) ? 1 : 0;
-        }
+        if (resultVar == child) { return 0; }
+        if (ec == child) { return (resultVar != null) ? 1 : 0; }
 
-        if (body == child) {
-            return (resultVar != null) ? 2 : 1;
-        }
+        if (body == child) { return (resultVar != null) ? 2 : 1; }
         return -1;
     }
 
@@ -227,15 +210,15 @@ public class MethodCallStatement extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -253,15 +236,15 @@ public class MethodCallStatement extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for a expression.
+     * @param index
+     *        an index for a expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
-        if (resultVar != null && index == 0) {
-            return resultVar;
-        }
+        if (resultVar != null && index == 0) { return resultVar; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -271,32 +254,29 @@ public class MethodCallStatement extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (resultVar == p) {
             Expression r = (Expression) q;
             resultVar = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         } else if (ec == p) {
             ec = (ExecutionContext) q;
-            if (ec != null) {
-                ec.setParent(this);
-            }
+            if (ec != null) { ec.setParent(this); }
             return true;
         } else if (body == p) {
             Statement r = (Statement) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -307,20 +287,13 @@ public class MethodCallStatement extends JavaStatement
      */
     public void makeParentRoleValid() {
         // TODO weigl: makes no sense: super.makeParentRoleValid();
-        if (resultVar != null) {
-            resultVar.setExpressionContainer(this);
-        }
-        if (ec != null) {
-            ec.setParent(this);
-        }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (resultVar != null) { resultVar.setExpressionContainer(this); }
+        if (ec != null) { ec.setParent(this); }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     /**
      * Deep clone.

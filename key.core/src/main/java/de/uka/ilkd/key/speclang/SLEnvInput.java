@@ -109,9 +109,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
                         filePath);
-                    if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
-                    }
+                    if (url != null) { rs = RuleSourceFactory.initRuleFile(url); }
                 }
 
                 // rule source found? -> read
@@ -164,9 +162,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         collector.start();
         for (ProgramElement loop : collector.getNodes()) {
             LoopSpecification inv = specExtractor.extractLoopInvariant(pm, (LoopStatement) loop);
-            if (inv != null) {
-                specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
-            }
+            if (inv != null) { specRepos.addLoopInvariant(inv.setTarget(kjt, pm)); }
         }
     }
 
@@ -182,9 +178,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<LoopContract> loopContracts =
                 specExtractor.extractLoopContracts(pm, (LoopStatement) loop);
 
-            for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
-            }
+            for (LoopContract specification : loopContracts) { specRepos.addLoopContract(specification, true); }
         }
     }
 
@@ -199,16 +193,12 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<BlockContract> blockContracts =
                 specExtractor.extractBlockContracts(pm, (StatementBlock) block);
 
-            for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
-            }
+            for (BlockContract specification : blockContracts) { specRepos.addBlockContract(specification, true); }
 
             final ImmutableSet<LoopContract> loopContracts =
                 specExtractor.extractLoopContracts(pm, (StatementBlock) block);
 
-            for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
-            }
+            for (LoopContract specification : loopContracts) { specRepos.addLoopContract(specification, true); }
         }
     }
 
@@ -237,9 +227,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<BlockContract> blockContracts =
                 specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
-            for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
-            }
+            for (BlockContract specification : blockContracts) { specRepos.addBlockContract(specification, true); }
         }
     }
 
@@ -252,9 +240,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<LoopContract> loopContracts =
                 specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
-            for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
-            }
+            for (LoopContract specification : loopContracts) { specRepos.addLoopContract(specification, true); }
         }
     }
 
@@ -269,21 +255,15 @@ public final class SLEnvInput extends AbstractEnvInput {
                 try {
                     if (node instanceof JmlAssert) {
                         jsf.translateJmlAssertCondition((JmlAssert) node, pm);
-                    } else if (node instanceof SetStatement) {
-                        jsf.translateSetStatement((SetStatement) node, pm);
-                    }
+                    } else if (node instanceof SetStatement) { jsf.translateSetStatement((SetStatement) node, pm); }
                 } catch (ProofInputException e) {
                     // Store the first exception that occurred
-                    if (this.exception == null) {
-                        this.exception = e;
-                    }
+                    if (this.exception == null) { this.exception = e; }
                 }
             }
         };
         walker.start();
-        if (walker.exception != null) {
-            throw walker.exception;
-        }
+        if (walker.exception != null) { throw walker.exception; }
     }
 
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
@@ -369,9 +349,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
-        if (initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("InitConfig not set."); }
 
         final GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 

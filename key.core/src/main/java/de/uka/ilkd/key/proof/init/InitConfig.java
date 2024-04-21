@@ -179,16 +179,12 @@ public class InitConfig {
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
-        for (final Choice c : activatedChoices) {
-            c2DC.remove(c.category());
-        }
+        for (final Choice c : activatedChoices) { c2DC.remove(c.category()); }
 
         ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
             final Choice c = choiceNS().lookup(new Name(s));
-            if (c != null) {
-                category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
-            }
+            if (c != null) { category2DefaultChoiceList = category2DefaultChoiceList.prepend(c); }
         }
         this.activatedChoices = activatedChoices
                 .union(
@@ -232,9 +228,7 @@ public class InitConfig {
     }
 
     public Taclet lookupActiveTaclet(Name name) {
-        if (activatedTacletCache == null) {
-            fillActiveTacletCache();
-        }
+        if (activatedTacletCache == null) { fillActiveTacletCache(); }
         return activatedTacletCache.get(name);
     }
 
@@ -242,9 +236,7 @@ public class InitConfig {
      * returns the activated taclets of this initial configuration
      */
     public Collection<Taclet> activatedTaclets() {
-        if (activatedTacletCache == null) {
-            fillActiveTacletCache();
-        }
+        if (activatedTacletCache == null) { fillActiveTacletCache(); }
         return activatedTacletCache.values();
     }
 
@@ -253,22 +245,16 @@ public class InitConfig {
      * fills the active taclet cache
      */
     private void fillActiveTacletCache() {
-        if (activatedTacletCache != null) {
-            return;
-        }
+        if (activatedTacletCache != null) { return; }
         final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
         var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
             if (t.getChoices().eval(choices)) {
-                if (b != null && b.getGoal2Choices() != null) {
-                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
-                }
+                if (b != null && b.getGoal2Choices() != null) { t = b.getTacletWithoutInactiveGoalTemplates(choices); }
 
-                if (t != null) {
-                    tacletCache.put(t.name(), t);
-                }
+                if (t != null) { tacletCache.put(t.name(), t); }
             }
         }
         activatedTacletCache = Collections.unmodifiableMap(tacletCache);
@@ -303,9 +289,7 @@ public class InitConfig {
      * same justification.
      */
     public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
-        for (Rule r : s) {
-            registerRule(r, j);
-        }
+        for (Rule r : s) { registerRule(r, j); }
     }
 
     /**
@@ -425,9 +409,7 @@ public class InitConfig {
     @SuppressWarnings("unchecked")
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
-        if (settings != null) {
-            ic.setSettings(new ProofSettings(settings));
-        }
+        if (settings != null) { ic.setSettings(new ProofSettings(settings)); }
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = new HashMap<>(category2DefaultChoice);
         ic.setTaclet2Builder(
@@ -444,7 +426,7 @@ public class InitConfig {
     @Override
     public String toString() {
         return "Namespaces:" + namespaces() + "\n" + "Services:" + services + "\n" + "Taclets:"
-            + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
+                + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
     }
 
     public FileRepo getFileRepo() {

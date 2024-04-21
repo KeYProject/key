@@ -13,7 +13,8 @@ public interface TypeReferenceInfix extends ReferencePrefix, ReferenceSuffix, Na
     /**
      * Set reference prefix.
      *
-     * @param prefix a reference prefix.
+     * @param prefix
+     *        a reference prefix.
      */
     void setReferencePrefix(ReferencePrefix prefix);
 }

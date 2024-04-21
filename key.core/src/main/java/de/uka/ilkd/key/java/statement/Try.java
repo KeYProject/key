@@ -37,7 +37,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public Try(StatementBlock body) {
@@ -51,8 +52,10 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param body a statement block.
-     * @param branches a branch array.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch array.
      */
 
     public Try(StatementBlock body, Branch[] branches) {
@@ -67,8 +70,10 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param body a statement block.
-     * @param branches a branch array.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch array.
      */
 
     public Try(StatementBlock body, ImmutableArray<Branch> branches) {
@@ -83,7 +88,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param children a list with all children
+     * @param children
+     *        a list with all children
      */
 
     public Try(ExtList children) {
@@ -148,33 +154,27 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (body != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -209,9 +209,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -228,15 +226,15 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Return the branch at the specified index in this node's "virtual" branch array.
      *
-     * @param index an index for a branch.
+     * @param index
+     *        an index for a branch.
      * @return the branch with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -253,7 +251,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnTry(this);

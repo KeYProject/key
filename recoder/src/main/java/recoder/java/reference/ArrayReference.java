@@ -52,8 +52,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Array reference.
      *
-     * @param accessPath a reference prefix.
-     * @param initializers an expression mutable list.
+     * @param accessPath
+     *        a reference prefix.
+     * @param initializers
+     *        an expression mutable list.
      */
 
     public ArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers) {
@@ -65,17 +67,14 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Array reference.
      *
-     * @param proto an array reference.
+     * @param proto
+     *        an array reference.
      */
 
     protected ArrayReference(ArrayReference proto) {
         super(proto);
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
-        if (proto.inits != null) {
-            inits = proto.inits.deepClone();
-        }
+        if (proto.accessPath != null) { accessPath = (ReferencePrefix) proto.accessPath.deepClone(); }
+        if (proto.inits != null) { inits = proto.inits.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -95,13 +94,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
+        if (accessPath != null) { accessPath.setReferenceSuffix(this); }
         if (inits != null) {
-            for (int i = inits.size() - 1; i >= 0; i -= 1) {
-                inits.get(i).setExpressionContainer(this);
-            }
+            for (int i = inits.size() - 1; i >= 0; i -= 1) { inits.get(i).setExpressionContainer(this); }
         }
     }
 
@@ -127,12 +122,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public int getExpressionCount() {
         int c = 0;
-        if (accessPath instanceof Expression) {
-            c += 1;
-        }
-        if (inits != null) {
-            c += inits.size();
-        }
+        if (accessPath instanceof Expression) { c += 1; }
+        if (inits != null) { c += inits.size(); }
         return c;
     }
 
@@ -144,14 +135,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public Expression getExpressionAt(int index) {
         if (accessPath instanceof Expression) {
-            if (index == 0) {
-                return (Expression) accessPath;
-            }
+            if (index == 0) { return (Expression) accessPath; }
             index--;
         }
-        if (inits != null) {
-            return inits.get(index);
-        }
+        if (inits != null) { return inits.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -161,23 +148,22 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         if (accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             accessPath = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         count = (inits == null) ? 0 : inits.size();
@@ -213,9 +199,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (accessPath instanceof TypeReference && index == 0) {
-            return (TypeReference) accessPath;
-        }
+        if (accessPath instanceof TypeReference && index == 0) { return (TypeReference) accessPath; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -232,7 +216,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -252,7 +237,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set reference prefix.
      *
-     * @param accessPath a reference prefix.
+     * @param accessPath
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix accessPath) {
@@ -267,47 +253,37 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null) {
-            result++;
-        }
-        if (inits != null) {
-            result += inits.size();
-        }
+        if (accessPath != null) { result++; }
+        if (inits != null) { result += inits.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (accessPath != null) {
-            if (index == 0) {
-                return accessPath;
-            }
+            if (index == 0) { return accessPath; }
             index--;
         }
-        if (inits != null) {
-            return inits.get(index);
-        }
+        if (inits != null) { return inits.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
         // role 1 (IDX): parameters
-        if (accessPath == child) {
-            return 0;
-        }
+        if (accessPath == child) { return 0; }
         if (inits != null) {
             int index = inits.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         return -1;
     }
@@ -325,7 +301,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -345,7 +322,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set dimension expressions.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
 
     public void setDimensionExpressions(ASTList<Expression> list) {

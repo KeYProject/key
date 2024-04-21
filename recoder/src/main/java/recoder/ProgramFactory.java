@@ -137,7 +137,8 @@ public interface ProgramFactory extends Service {
      * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the current project settings
      * for the specified writer,
      *
-     * @param out the (initial) writer to print to.
+     * @param out
+     *        the (initial) writer to print to.
      * @return a new pretty printer.
      */
     PrettyPrinter getPrettyPrinter(Writer out);

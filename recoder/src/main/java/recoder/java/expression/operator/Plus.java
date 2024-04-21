@@ -30,8 +30,10 @@ public class Plus extends Operator {
     /**
      * Plus.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Plus(Expression lhs, Expression rhs) {
@@ -42,7 +44,8 @@ public class Plus extends Operator {
     /**
      * Plus.
      *
-     * @param proto a plus.
+     * @param proto
+     *        a plus.
      */
 
     protected Plus(Plus proto) {

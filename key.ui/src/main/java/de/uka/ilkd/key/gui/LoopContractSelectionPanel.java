@@ -33,9 +33,7 @@ public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<
             return selection.get(0);
         } else {
             ImmutableSet<LoopContract> contracts = DefaultImmutableSet.nil();
-            for (LoopContract contract : selection) {
-                contracts = contracts.add(contract);
-            }
+            for (LoopContract contract : selection) { contracts = contracts.add(contract); }
             return LoopContractImpl.combine(contracts, services);
         }
     }

@@ -44,9 +44,12 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the transformation mode
      *
-     * @param root the ProgramElement where to begin
-     * @param outerLabel the ProgramElementName of the outer label
-     * @param innerLabel the ProgramElementName of the inner label
+     * @param root
+     *        the ProgramElement where to begin
+     * @param outerLabel
+     *        the ProgramElementName of the outer label
+     * @param innerLabel
+     *        the ProgramElementName of the inner label
      */
     public WhileInvariantTransformation(ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
@@ -69,8 +72,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the check mode
      *
-     * @param root the ProgramElement where to begin
-     * @param inst the SVInstantiations if available
+     * @param root
+     *        the ProgramElement where to begin
+     * @param inst
+     *        the SVInstantiations if available
      */
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {
@@ -113,9 +118,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 needInnerLabel = true;
             } else {
                 ExtList changeList = stack.peek();
-                if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
-                    changeList.removeFirst();
-                }
+                if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
                 returnOccurred = true;
                 Statement assignFlag = KeYJavaASTFactory.assign(rtrn, BooleanLiteral.TRUE);
                 final StatementBlock stmnts;
@@ -190,9 +193,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         break;
                     }
                 }
-                if (!replaced) {
-                    doDefaultAction(x);
-                }
+                if (!replaced) { doDefaultAction(x); }
             }
         } else {
             doDefaultAction(x);
@@ -204,9 +205,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
         if (replaceBreakWithNoLabel == 0) {
             // the most outer while loop
             // get guard
-            if (changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-            }
+            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
             @SuppressWarnings("unused")
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
@@ -272,13 +271,11 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     public void performActionOnEnhancedFor(EnhancedFor x) {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
-            if (changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-            }
+            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
 
             if (breakInnerLabel != breakOuterLabel) {
                 LOGGER.warn("inner and outer label must be the same in "
-                    + "WhileInvariantTransformation.performActionOnEnhancedFor");
+                        + "WhileInvariantTransformation.performActionOnEnhancedFor");
             }
 
             Statement body = changeList.get(Statement.class);

@@ -28,13 +28,9 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
             @NonNull LabeledParserRuleContext depends) {
         super(mods);
         setPosition(depends);
-        for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            this.depends.put(hName, ImmutableSLList.nil());
-        }
+        for (Name hName : HeapLDT.VALID_HEAP_NAMES) { this.depends.put(hName, ImmutableSLList.nil()); }
 
-        for (Name heap : heaps) {
-            this.depends.put(heap, ImmutableSLList.singleton(depends));
-        }
+        for (Name heap : heaps) { this.depends.put(heap, ImmutableSLList.singleton(depends)); }
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends() {
@@ -53,9 +49,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLDepends a)) {
-            return false;
-        }
+        if (!(o instanceof TextualJMLDepends a)) { return false; }
         return mods.equals(a.mods) && depends.equals(a.depends);
     }
 

@@ -55,7 +55,8 @@ public class CreateBuilder extends RecoderModelTransformer {
      * creates the implicit static <code>&lt;createObject&gt;</code> method that takes the object to
      * be created out of the pool
      *
-     * @param type the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
+     * @param type
+     *        the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
@@ -72,11 +73,10 @@ public class CreateBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
-        if (td instanceof ClassDeclaration) {
-            attach(createMethod((ClassDeclaration) td), td, td.getMembers().size());
-        }
+        if (td instanceof ClassDeclaration) { attach(createMethod((ClassDeclaration) td), td, td.getMembers().size()); }
     }
 }

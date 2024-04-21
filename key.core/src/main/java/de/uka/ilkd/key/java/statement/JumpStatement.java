@@ -15,7 +15,8 @@ public abstract class JumpStatement extends JavaStatement {
     /**
      * Jump statement.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
     public JumpStatement(ExtList children) {
         super(children);
@@ -25,7 +26,6 @@ public abstract class JumpStatement extends JavaStatement {
     /**
      * Jump statement.
      */
-    public JumpStatement() {
-    }
+    public JumpStatement() {}
 
 }

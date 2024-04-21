@@ -39,8 +39,10 @@ public class SequentChangeInfo {
      * creates a new sequent change info whose semisequent described by position pos has changed.
      * The made changes are stored in semiCI and the resulting sequent is given by result
      *
-     * @param pos the PosInOccurrence describing the semisequent where the changes took place
-     * @param semiCI the SemisequentChangeInfo describing the changes in detail (which formulas have
+     * @param pos
+     *        the PosInOccurrence describing the semisequent where the changes took place
+     * @param semiCI
+     *        the SemisequentChangeInfo describing the changes in detail (which formulas have
      *        been added/removed)
      * @return the sequent change information object describing the complete changes made to the
      *         sequent together with the operations result.
@@ -55,12 +57,16 @@ public class SequentChangeInfo {
      * antec (true selects antecedent; false selects succedent) has changed. The made changes are
      * stored in semiCI and the resulting sequent is given by result
      *
-     * @param antec a boolean indicating if the given semisequent change information describes the
+     * @param antec
+     *        a boolean indicating if the given semisequent change information describes the
      *        changes of the antecedent or succedent
-     * @param semiCI the SemisequentChangeInfo describing the changes in detail (which formulas have
+     * @param semiCI
+     *        the SemisequentChangeInfo describing the changes in detail (which formulas have
      *        been added/removed)
-     * @param result the Sequent which is the result of the changes
-     * @param original the Sequent to which the described changes have been applied
+     * @param result
+     *        the Sequent which is the result of the changes
+     * @param original
+     *        the Sequent to which the described changes have been applied
      * @return the sequent change information object describing the complete changes made to the
      *         sequent together with the operations result.
      */
@@ -77,9 +83,11 @@ public class SequentChangeInfo {
      * creates a new sequent change info whose semisequents have changed. The made changes are
      * stored in semiCI and the resulting sequent is given by result
      *
-     * @param anteCI the SemisequentChangeInfo describing the changes of the antecedent in detail
+     * @param anteCI
+     *        the SemisequentChangeInfo describing the changes of the antecedent in detail
      *        (which formulas have been added/removed)
-     * @param sucCI the SemisequentChangeInfo describing the changes of the succedent detail (which
+     * @param sucCI
+     *        the SemisequentChangeInfo describing the changes of the succedent detail (which
      *        formulas have been added/removed)
      * @return the sequent change information object describing the complete changes made to the
      *         sequent together with the operations result.
@@ -93,10 +101,14 @@ public class SequentChangeInfo {
      * creates a new sequent change information object. Therefore, it combines the changes to the
      * semisequents of the sequent.
      *
-     * @param antecedent the SemisequentChangeInfo describing the changes of the antecedent
-     * @param succedent the SemisequentChangeInfo describing the changes of the succedent
-     * @param resultingSequent the Sequent being the result of the changes
-     * @param originalSequent the Sequent that has been transformed
+     * @param antecedent
+     *        the SemisequentChangeInfo describing the changes of the antecedent
+     * @param succedent
+     *        the SemisequentChangeInfo describing the changes of the succedent
+     * @param resultingSequent
+     *        the Sequent being the result of the changes
+     * @param originalSequent
+     *        the Sequent that has been transformed
      */
     private SequentChangeInfo(SemisequentChangeInfo antecedent, SemisequentChangeInfo succedent,
             Sequent resultingSequent, Sequent originalSequent) {
@@ -144,7 +156,8 @@ public class SequentChangeInfo {
      * on the value of selector 'antec' which is the antecedent if 'antec' is true and the succedent
      * otherwise.
      *
-     * @param antec a boolean used to select one of the two semisequents of a sequent (true means
+     * @param antec
+     *        a boolean used to select one of the two semisequents of a sequent (true means
      *        antecedent; false means succedent)
      * @return list of formulas added to the selected semisequent
      */
@@ -173,7 +186,8 @@ public class SequentChangeInfo {
      * depends on the value of selector 'antec' which is the antecedent if 'antec' is true and the
      * succedent otherwise.
      *
-     * @param antec a boolean used to select one of the two semisequents of a sequent (true means
+     * @param antec
+     *        a boolean used to select one of the two semisequents of a sequent (true means
      *        antecedent; false means succedent)
      * @return list of formulas removed from the selected semisequent
      */
@@ -201,7 +215,8 @@ public class SequentChangeInfo {
      * depends on the value of selector 'antec' which is the antecedent if 'antec' is true and the
      * succedent otherwise.
      *
-     * @param antec a boolean used to select one of the two semisequents of a sequent (true means
+     * @param antec
+     *        a boolean used to select one of the two semisequents of a sequent (true means
      *        antecedent; false means succedent)
      * @return list of formulas modified within the selected semisequent
      */
@@ -227,7 +242,8 @@ public class SequentChangeInfo {
     /**
      * Returns the formulas that have been rejected when trying to add as being redundant.
      *
-     * @param antec a boolean used to select one of the two semisequents of a sequent (true means
+     * @param antec
+     *        a boolean used to select one of the two semisequents of a sequent (true means
      *        antecedent; false means succedent)
      * @return list of formulas rejected when trying to add to the selected semisequent
      */
@@ -252,8 +268,10 @@ public class SequentChangeInfo {
     /**
      * concatenates the two lists in arbitrary but deterministic order
      *
-     * @param antecList the list of antecedent elements
-     * @param succList the list of succeden elements
+     * @param antecList
+     *        the list of antecedent elements
+     * @param succList
+     *        the list of succeden elements
      * @return the concatenated list
      */
     private <T> ImmutableList<T> concatenateHelper(final ImmutableList<T> antecList,
@@ -277,26 +295,20 @@ public class SequentChangeInfo {
      */
     public void combine(SequentChangeInfo succ) {
         final SequentChangeInfo antec = this;
-        if (antec == succ) {
-            return;
-        }
+        if (antec == succ) { return; }
 
         antec.resultingSequent = succ.resultingSequent;
 
         if (antec.antecedent != succ.antecedent) {
             if (antec.antecedent == null) {
                 antec.antecedent = succ.antecedent;
-            } else if (succ.antecedent != null) {
-                antec.antecedent.combine(succ.antecedent);
-            }
+            } else if (succ.antecedent != null) { antec.antecedent.combine(succ.antecedent); }
         }
 
         if (antec.succedent != succ.succedent) {
             if (antec.succedent == null) {
                 antec.succedent = succ.succedent;
-            } else if (succ.succedent != null) {
-                antec.succedent.combine(succ.succedent);
-            }
+            } else if (succ.succedent != null) { antec.succedent.combine(succ.succedent); }
         }
     }
 

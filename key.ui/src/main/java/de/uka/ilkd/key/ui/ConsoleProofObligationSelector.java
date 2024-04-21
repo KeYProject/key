@@ -53,9 +53,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
         for (Contract c : contracts) {
 
-            if (KeYTypeUtil.isLibraryClass(c.getKJT())) {
-                continue;
-            }
+            if (KeYTypeUtil.isLibraryClass(c.getKJT())) { continue; }
 
             this.contracts.add(c);
         }
@@ -64,9 +62,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     protected void printAvailableProofObligations() {
         LOGGER.info("Available Contracts: ");
-        for (int i = 0; i < contracts.size(); i++) {
-            printContract(i);
-        }
+        for (int i = 0; i < contracts.size(); i++) { printContract(i); }
     }
 
     private void printContract(int i) {
@@ -112,16 +108,10 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
             initConfig.getServices().getSpecificationRepository().getProofs(po);
 
         // no proofs?
-        if (proofs.isEmpty()) {
-            return null;
-        }
+        if (proofs.isEmpty()) { return null; }
 
         // try to find closed proof
-        for (Proof proof : proofs) {
-            if (proof.mgt().getStatus().getProofClosed()) {
-                return proof;
-            }
-        }
+        for (Proof proof : proofs) { if (proof.mgt().getStatus().getProofClosed()) { return proof; } }
 
         // just take any proof
         return proofs.iterator().next();
@@ -151,9 +141,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
             try {
                 LOGGER.debug("PO nr: ");
                 i = readInt();
-                if (i >= 0 && i < contracts.size()) {
-                    return i;
-                }
+                if (i >= 0 && i < contracts.size()) { return i; }
                 i = -1;
                 LOGGER.error("Contract number out of range!");
             } catch (NumberFormatException e) {

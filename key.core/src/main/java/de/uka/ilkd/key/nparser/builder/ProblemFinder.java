@@ -57,9 +57,7 @@ public class ProblemFinder extends ExpressionBuilder {
                 proofObligation = "";
             }
         }
-        if (ctx.PROBLEM() != null) {
-            problem = accept(ctx.termorseq());
-        }
+        if (ctx.PROBLEM() != null) { problem = accept(ctx.termorseq()); }
         return null;
     }
 

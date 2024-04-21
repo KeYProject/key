@@ -32,7 +32,8 @@ public class PostIncrement extends Assignment {
     /**
      * Post increment.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public PostIncrement(Expression child) {
@@ -43,7 +44,8 @@ public class PostIncrement extends Assignment {
     /**
      * Post increment.
      *
-     * @param proto a post increment.
+     * @param proto
+     *        a post increment.
      */
 
     protected PostIncrement(PostIncrement proto) {

@@ -65,7 +65,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * Creates a new service.
      *
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultSourceInfo(ServiceConfiguration config) {
         super(config);
@@ -75,14 +76,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * determines whether or not the given element is part of a tree node of the given type.
      * Especially, this is true if the program element is itself an object of the given class.
      *
-     * @param pe the program element to be checked
-     * @param c the class type of the expected parent
+     * @param pe
+     *        the program element to be checked
+     * @param c
+     *        the class type of the expected parent
      * @return true iff any tree parent (including pe itself) is an instance of c
      */
     static boolean isPartOf(ProgramElement pe, Class c) {
-        while (pe != null && !c.isInstance(pe)) {
-            pe = pe.getASTParent();
-        }
+        while (pe != null && !c.isInstance(pe)) { pe = pe.getASTParent(); }
         return pe != null;
     }
 
@@ -93,9 +94,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      */
     private static VariableScope findOuterVariableScope(VariableScope ts) {
         NonTerminalProgramElement pe = ts.getASTParent();
-        while (pe != null && !(pe instanceof VariableScope)) {
-            pe = pe.getASTParent();
-        }
+        while (pe != null && !(pe instanceof VariableScope)) { pe = pe.getASTParent(); }
         return (VariableScope) pe;
     }
 
@@ -105,9 +104,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         while (true) {
             int c = parent.getStatementCount();
             int p = 0;
-            while (parent.getStatementAt(p) != s) {
-                p += 1;
-            }
+            while (parent.getStatementAt(p) != s) { p += 1; }
             if (p < c - 1) {
                 list.add(parent.getStatementAt(p + 1));
                 break;
@@ -137,9 +134,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private static Statement findInnermostBreakBlock(Statement s) {
         NonTerminalProgramElement parent = s.getStatementContainer();
         while (parent != null && !(parent instanceof MemberDeclaration)) {
-            if ((parent instanceof LoopStatement) || (parent instanceof Switch)) {
-                return (Statement) parent;
-            }
+            if ((parent instanceof LoopStatement) || (parent instanceof Switch)) { return (Statement) parent; }
             parent = parent.getASTParent();
         }
         return null;
@@ -148,9 +143,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private static LoopStatement findInnermostLoop(Statement s) {
         NonTerminalProgramElement parent = s.getStatementContainer();
         while (parent != null && !(parent instanceof MemberDeclaration)) {
-            if (parent instanceof LoopStatement) {
-                return (LoopStatement) parent;
-            }
+            if (parent instanceof LoopStatement) { return (LoopStatement) parent; }
             parent = parent.getASTParent();
         }
         return null;
@@ -159,7 +152,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * Initializes the new service; called by the configuration.
      *
-     * @param cfg the configuration this services becomes part of.
+     * @param cfg
+     *        the configuration this services becomes part of.
      */
     public void initialize(ServiceConfiguration cfg) {
         super.initialize(cfg);
@@ -223,7 +217,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * handles the given change by trying not to invalidate too much pre-computed information.
      *
-     * @param change the change made in the AST
+     * @param change
+     *        the change made in the AST
      */
     void processChange(TreeChange change) {
         // the following code implements a very restrictive way to invalidate
@@ -259,9 +254,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 String oldname = ((Identifier) changed).getText();
                 if (par instanceof VariableSpecification) {
                     unregister((VariableSpecification) par, oldname);
-                } else if (par instanceof TypeDeclaration) {
-                    unregister((TypeDeclaration) par, oldname);
-                }
+                } else if (par instanceof TypeDeclaration) { unregister((TypeDeclaration) par, oldname); }
             }
             // now inform NameInfo
             processIdentifierChanged(change);
@@ -291,9 +284,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private void processIdentifierChanged(TreeChange tc) {
-        if (!(getNameInfo() instanceof DefaultNameInfo dni)) {
-            return;
-        }
+        if (!(getNameInfo() instanceof DefaultNameInfo dni)) { return; }
 
         Identifier id = (Identifier) tc.getChangeRoot();
         NonTerminalProgramElement npe = id.getParent();
@@ -314,9 +305,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 Object old = dni.getType(td.getFullName());
                 if (old == td) // special handling which might occur if a nameclash happened before,
                                // which would now be resolved
-                {
-                    dni.unregisterClassType(td.getFullName(), true);
-                }
+                { dni.unregisterClassType(td.getFullName(), true); }
             }
         } else if (npe instanceof FieldSpecification fs) {
             if (tc instanceof AttachChange) {
@@ -335,7 +324,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // handleCUPackageChange(ps.getParent(), oldpname, isAttach);
             throw new IllegalTransformationException(
                 "Changing an Identifier contained in a PackageSpecification is not valid."
-                    + " Change either the containing PackageReference or PackageSpecification instead.");
+                        + " Change either the containing PackageReference or PackageSpecification instead.");
         }
     }
 
@@ -343,7 +332,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * determines whether or not the given progran element is the name of a "globally" visible
      * entity.
      *
-     * @param pe the program element to be checked
+     * @param pe
+     *        the program element to be checked
      * @return true iff the given element deteremines the name or is part of the name of an entity.
      */
     private boolean determinesGlobalEntityName(ProgramElement pe) {
@@ -358,7 +348,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * determines whether or not the given progran element specifies the type of a "globally"
      * visible entity.
      *
-     * @param pe the program element to be checked
+     * @param pe
+     *        the program element to be checked
      * @return true iff the given element deteremines the type or is part of the type specification.
      */
     private boolean determinesGlobalEntityType(ProgramElement pe) {
@@ -389,35 +380,25 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /* protected for KeY */
     protected ClassType getFromUnitPackage(String name, CompilationUnit cu) {
         String xname = Naming.getPackageName(cu);
-        if (xname.length() > 0) {
-            xname = Naming.dot(xname, name);
-        }
-        if (DEBUG) {
-            Debug.log("Checking unit package type " + xname);
-        }
+        if (xname.length() > 0) { xname = Naming.dot(xname, name); }
+        if (DEBUG) { Debug.log("Checking unit package type " + xname); }
         return getNameInfo().getClassType(xname);
     }
 
     // traverse *all* directly imported types
     /* protected for KeY */
     protected ClassType getFromTypeImports(String name, List<Import> il) {
-        if (DEBUG) {
-            Debug.log("Checking " + name + " in type imports");
-        }
+        if (DEBUG) { Debug.log("Checking " + name + " in type imports"); }
         ClassType result = null;
         NameInfo ni = getNameInfo();
         for (int i = il.size() - 1; i >= 0; i -= 1) {
             Import imp = il.get(i);
-            if (imp.isMultiImport()) {
-                continue;
-            }
+            if (imp.isMultiImport()) { continue; }
             TypeReference tr = imp.getTypeReference();
             ClassType newResult = null;
             String trname =
                 imp.isStaticImport() ? imp.getStaticIdentifier().getText() : tr.getName();
-            if (DEBUG) {
-                Debug.log(" Checking against " + trname);
-            }
+            if (DEBUG) { Debug.log(" Checking against " + trname); }
             // trname must end with the start of name
             if (name.startsWith(trname)) {
                 int tlen = trname.length();
@@ -449,8 +430,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             .reportError(
                                 new AmbiguousImportException(
                                     "Ambiguous import " + Format.toString(ELEMENT_LONG, imp)
-                                        + " - could be " + Format.toString("%N", result) + " or "
-                                        + Format.toString("%N", newResult),
+                                            + " - could be " + Format.toString("%N", result) + " or "
+                                            + Format.toString("%N", newResult),
                                     imp, result, newResult));
                     // ignore if forced to do so
                 }
@@ -468,9 +449,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /* protected for KeY */
     protected ClassType getFromPackageImports(String name, List<Import> il,
             ClassType searchingFrom) {
-        if (DEBUG) {
-            Debug.log("Checking " + name + " in package imports");
-        }
+        if (DEBUG) { Debug.log("Checking " + name + " in package imports"); }
         ClassType result = null;
         NameInfo ni = getNameInfo();
         for (int i = il.size() - 1; i >= 0; i--) {
@@ -478,9 +457,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (imp.isMultiImport()) {
                 TypeReferenceInfix ref = imp.getReference();
                 String xname = Naming.toPathName(ref, name);
-                if (DEBUG) {
-                    Debug.log("Checking wildcard type " + xname);
-                }
+                if (DEBUG) { Debug.log("Checking wildcard type " + xname); }
                 ClassType newResult = ni.getClassType(xname);
                 // pretend not to have seen package-visible types
                 if ((!imp.isStaticImport() && newResult != null && !newResult.isPublic())
@@ -494,8 +471,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         getErrorHandler()
                                 .reportError(new AmbiguousImportException(
                                     "Ambiguous import of type " + name + ": could be "
-                                        + Format.toString("%N", result) + " or "
-                                        + Format.toString("%N", newResult),
+                                            + Format.toString("%N", result) + " or "
+                                            + Format.toString("%N", newResult),
                                     imp, result, newResult));
                         // ignore problem to resume
                     }
@@ -510,24 +487,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * Searches the given short name as a member type of the given class.
      */
     private ClassType getMemberType(String shortName, ClassType ct) {
-        if (DEBUG) {
-            Debug.log("Checking for type " + shortName + " within " + ct.getFullName());
-        }
+        if (DEBUG) { Debug.log("Checking for type " + shortName + " within " + ct.getFullName()); }
         List<? extends ClassType> innerTypes = ct.getTypes();
         for (int i = innerTypes.size() - 1; i >= 0; i -= 1) {
             ClassType candid = innerTypes.get(i);
-            if (shortName.equals(candid.getName())) {
-                return candid;
-            }
+            if (shortName.equals(candid.getName())) { return candid; }
         }
         // search supertypes
         List<? extends ClassType> superTypes = ct.getSupertypes();
         for (ClassType possibleSuperclass : superTypes) {
             // fixed in recoder 0.80: interfaces may contain member interfaces
             ClassType result = getMemberType(shortName, possibleSuperclass);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
         return null;
     }
@@ -542,11 +513,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         String shortName = (dotPos == -1) ? name : name.substring(0, dotPos);
         if (DEBUG) {
             String output = "Looking for type " + shortName + " in scope of "
-                + Format.toString("%c[%p]: ", scope);
+                    + Format.toString("%c[%p]: ", scope);
             List<? extends ClassType> ctl = scope.getTypesInScope();
-            if (ctl != null && ctl.size() > 0) {
-                output += " " + Format.toString("%n", ctl);
-            }
+            if (ctl != null && ctl.size() > 0) { output += " " + Format.toString("%n", ctl); }
             Debug.log(output);
         }
         result = scope.getTypeInScope(shortName);
@@ -572,7 +541,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<ClassType> ctl = getAllTypes(ct);
         if (DEBUG) {
             Debug.log("Checking type " + shortName + " as inherited member of " + ct.getFullName()
-                + ": " + Format.toString("%N", ctl));
+                    + ": " + Format.toString("%N", ctl));
         }
         ClassType result = null;
         int nc = ctl.size();
@@ -600,8 +569,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * to check for name clashes when introducing a new identifier. Neither name nor context may be
      * <CODE>null</CODE>.
      *
-     * @param name the name for the type to be looked up; may or may not be qualified.
-     * @param context a program element defining the lookup context (scope).
+     * @param name
+     *        the name for the type to be looked up; may or may not be qualified.
+     * @param context
+     *        a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
     public Type getType(String name, ProgramElement context) {
@@ -612,29 +583,21 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         // check primitive types, array types of primitive types,
         // and void --- these happen often
         Type t = name2primitiveType.get(name);
-        if (t != null) {
-            return t;
-        }
-        if (name.equals("void")) {
-            return null;
-        }
+        if (t != null) { return t; }
+        if (name.equals("void")) { return null; }
         // catch array types
         if (name.endsWith("]")) {
             int px = name.indexOf('[');
             // compute base type
             Type baseType = getType(name.substring(0, px), context);
-            if (baseType == null) {
-                return null;
-            }
+            if (baseType == null) { return null; }
             String indexExprs = name.substring(px);
             // the basetype exists now, so fetch a corresponding array type
             // (if there is none, the name info will create one)
             return ni.getType(baseType.getFullName() + indexExprs);
         }
 
-        if (DEBUG) {
-            Debug.log("Looking for type " + name + Format.toString(" @%p in %u", context));
-        }
+        if (DEBUG) { Debug.log("Looking for type " + name + Format.toString(" @%p in %u", context)); }
 
         updateModel();
 
@@ -646,14 +609,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
 
         ProgramElement pe = context;
-        while (pe != null && !(pe instanceof TypeScope)) {
-            context = pe;
-            pe = pe.getASTParent();
-        }
+        while (pe != null && !(pe instanceof TypeScope)) { context = pe; pe = pe.getASTParent(); }
         TypeScope scope = (TypeScope) pe;
         if (scope == null) {
             Debug.log("Null scope during type query " + name + " in context "
-                + Format.toString(Formats.ELEMENT_LONG, context));
+                    + Format.toString(Formats.ELEMENT_LONG, context));
             Debug.log(Debug.makeStackTrace());
         }
         ClassType result = null;
@@ -692,35 +652,29 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
                 if (newResult != null) {
                     if (result == null) {
-                        if (DEBUG) {
-                            Debug.log("Found type " + name + " inherited in type scope "
-                                + td.getFullName());
-                        }
+                        if (DEBUG) { Debug.log("Found type " + name + " inherited in type scope "
+                                + td.getFullName()); }
                         result = newResult;
                         break;
                     } else if (result != newResult) {
                         // !!!!!!! Problematic if this is a speculative
                         // question - do we really want to bail out?
                         getErrorHandler().reportError(new AmbiguousReferenceException("Type "
-                            + Format.toString("%N", newResult)
-                            + " is an inherited member type that is also defined as outer member type "
-                            + Format.toString("%N", result), null, result, newResult));
+                                + Format.toString("%N", newResult)
+                                + " is an inherited member type that is also defined as outer member type "
+                                + Format.toString("%N", result),
+                            null, result, newResult));
                         break;
                     }
                 }
             }
             scope = s;
             pe = s.getASTParent();
-            while (pe != null && !(pe instanceof TypeScope)) {
-                context = pe;
-                pe = pe.getASTParent();
-            }
+            while (pe != null && !(pe instanceof TypeScope)) { context = pe; pe = pe.getASTParent(); }
             s = (TypeScope) pe;
         }
         if (result != null) {
-            if (DEBUG) {
-                Debug.log(Format.toString("Found %N", result));
-            }
+            if (DEBUG) { Debug.log(Format.toString("Found %N", result)); }
             return result;
         }
 
@@ -748,39 +702,29 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // check global types: if unqualified, attempt "java.lang.<name>":
             // any unqualified local type would have been imported already!
             String defaultName = Naming.dot("java.lang", name);
-            if (DEBUG) {
-                Debug.log("Checking type " + defaultName);
-            }
+            if (DEBUG) { Debug.log("Checking type " + defaultName); }
             result = ni.getClassType(defaultName);
             if (result == null) {
-                if (DEBUG) {
-                    Debug.log("Checking type " + name);
-                }
+                if (DEBUG) { Debug.log("Checking type " + name); }
                 result = ni.getClassType(name);
             }
         }
         if (result != null) {
             scope.addTypeToScope(result, name); // add it to the CU scope
         }
-        if (DEBUG) {
-            Debug.log(Format.toString("Found %N", result));
-        }
+        if (DEBUG) { Debug.log(Format.toString("Found %N", result)); }
         return result;
     }
 
     public Type getType(TypeReference tr) {
         Type res = (Type) reference2element.get(tr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         ReferencePrefix rp = tr.getReferencePrefix();
         if (rp instanceof PackageReference) {
             String name = Naming.toPathName(rp, tr.getName());
             res = getNameInfo().getClassType(name);
             if (res != null) {
-                for (int d = tr.getDimensions(); d > 0; d -= 1) {
-                    res = getNameInfo().createArrayType(res);
-                }
+                for (int d = tr.getDimensions(); d > 0; d -= 1) { res = getNameInfo().createArrayType(res); }
             }
         } else {
             res = getType(Naming.toPathName(tr), tr);
@@ -812,22 +756,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     public Type getType(VariableSpecification vs) {
-        if (vs instanceof EnumConstantSpecification) {
-            return getType((EnumConstantSpecification) vs);
-        }
+        if (vs instanceof EnumConstantSpecification) { return getType((EnumConstantSpecification) vs); }
         updateModel(); // probably not necessary
         TypeReference tr = (vs.getParent()).getTypeReference();
         Type result = getType(tr);
         if (result != null) {
             int d = vs.getDimensions();
-            if (vs.getASTParent() instanceof ParameterDeclaration pd) {
-                if (pd.isVarArg()) {
-                    d++;
-                }
-            }
-            for (; d > 0; d -= 1) {
-                result = getNameInfo().createArrayType(result);
-            }
+            if (vs.getASTParent() instanceof ParameterDeclaration pd) { if (pd.isVarArg()) { d++; } }
+            for (; d > 0; d -= 1) { result = getNameInfo().createArrayType(result); }
         }
         return result;
     }
@@ -849,7 +785,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * <code>null</code> iff type is unknown. This is the desired behaviour, however, it's not
      * implemented 100% consistently (TODO!!)
      *
-     * @param pe the program element to analyze.
+     * @param pe
+     *        the program element to analyze.
      * @return the type of the program element or <tt>null</tt> if the type is void;
      *         <tt>DefaultNameInfo.unknownClassType</tt> if the type is unknown or unavailable.
      */
@@ -867,12 +804,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         } else if (pe instanceof EnumConstantSpecification) {
             result = getType((EnumConstantSpecification) pe);
         } else if (pe instanceof MethodDeclaration) {
-            if (!(pe instanceof ConstructorDeclaration)) {
-                result = getReturnType((MethodDeclaration) pe);
-            }
-        } else if (pe instanceof TypeDeclaration) {
-            result = getType((TypeDeclaration) pe);
-        }
+            if (!(pe instanceof ConstructorDeclaration)) { result = getReturnType((MethodDeclaration) pe); }
+        } else if (pe instanceof TypeDeclaration) { result = getType((TypeDeclaration) pe); }
         return result;
     }
 
@@ -899,9 +832,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 for (int d = n.getDimensions(); d > 0; d -= 1) {
                     Type oldResult = result;
                     result = getNameInfo().getArrayType(result);
-                    if (result == null) {
-                        result = getNameInfo().createArrayType(oldResult);
-                    }
+                    if (result == null) { result = getNameInfo().createArrayType(oldResult); }
                 }
             } else if ((op instanceof PreIncrement) || (op instanceof PostIncrement)
                     || (op instanceof PreDecrement) || (op instanceof PostDecrement)
@@ -909,9 +840,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 result = getType(args.get(0));
             } else if ((op instanceof Positive) || (op instanceof Negative)) {
                 result = getType(args.get(0));
-                if (java5Allowed() && result instanceof ClassType) {
-                    result = getUnboxedType((ClassType) result);
-                }
+                if (java5Allowed() && result instanceof ClassType) { result = getUnboxedType((ClassType) result); }
             } else if ((op instanceof Plus) || (op instanceof Minus) || (op instanceof Times)
                     || (op instanceof Divide) || (op instanceof Modulo)) {
                 Type t1 = getType(args.get(0));
@@ -921,9 +850,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if ((t1 instanceof PrimitiveType) ^ (t2 instanceof PrimitiveType)) {
                         if (t1 instanceof ClassType) {
                             t1 = getUnboxedType((ClassType) t1);
-                        } else if (t2 instanceof ClassType) {
-                            t2 = getUnboxedType((ClassType) t2);
-                        }
+                        } else if (t2 instanceof ClassType) { t2 = getUnboxedType((ClassType) t2); }
                     }
                 }
 
@@ -945,7 +872,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if ((t1 != null) && (t2 != null)) {
                         getErrorHandler()
                                 .reportError(new TypingException("Illegal operand types for plus "
-                                    + t1 + " + " + t2 + " in expression " + op, op));
+                                        + t1 + " + " + t2 + " in expression " + op,
+                                    op));
                         result = getNameInfo().getUnknownType();
                     }
                 }
@@ -955,9 +883,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 Type t1 = getType(args.get(0));
                 if (java5Allowed()) {
                     Type t2 = getType(args.get(1));
-                    if (t1 instanceof ClassType && t2 instanceof PrimitiveType) {
-                        t1 = getUnboxedType((ClassType) t1);
-                    }
+                    if (t1 instanceof ClassType && t2 instanceof PrimitiveType) { t1 = getUnboxedType((ClassType) t1); }
                 }
                 result = t1;
             } else if ((op instanceof ComparativeOperator) || (op instanceof LogicalAnd)
@@ -998,12 +924,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         result = serviceConfiguration.getConstantEvaluator()
                                 .getCompileTimeConstantType(op);
                         if (result == null) {
-                            if (isNarrowingTo(e1, (PrimitiveType) t2)) {
-                                return t2;
-                            }
-                            if (isNarrowingTo(e2, (PrimitiveType) t1)) {
-                                return t1;
-                            }
+                            if (isNarrowingTo(e1, (PrimitiveType) t2)) { return t2; }
+                            if (isNarrowingTo(e2, (PrimitiveType) t1)) { return t1; }
                             result = getPromotedType((PrimitiveType) t1, (PrimitiveType) t2);
                         }
                     }
@@ -1028,9 +950,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 List<Type> tml = new ArrayList<>(getAllSupertypes((ClassType) t1));
                                 List<? extends ClassType> comp = getAllSupertypes((ClassType) t2);
                                 for (int j = tml.size() - 1; j >= 0; j--) {
-                                    if (!comp.contains(tml.get(j))) {
-                                        tml.remove(j);
-                                    }
+                                    if (!comp.contains(tml.get(j))) { tml.remove(j); }
                                 }
                                 removeSupertypesFromList(tml);
                                 if (tml.size() == 0) {
@@ -1068,9 +988,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 result = getNameInfo().getDoubleType();
             } else if (expr instanceof CharLiteral) {
                 result = getNameInfo().getCharType();
-            } else if (expr instanceof StringLiteral) {
-                result = getNameInfo().getJavaLangString();
-            }
+            } else if (expr instanceof StringLiteral) { result = getNameInfo().getJavaLangString(); }
         } else if (expr instanceof Reference) { ///////////////// References
             if (expr instanceof UncollatedReferenceQualifier) {
                 result = getType((UncollatedReferenceQualifier) expr);
@@ -1144,12 +1062,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                     (ClassType) replacement);
                                 result = ((ParameterizedType) result).getGenericType();
                             }
-                            if (result == currentTypeParam) {
-                                result = replacement;
-                            }
-                            if (typeArgs != null) {
-                                result = new ParameterizedType((ClassType) result, typeArgs);
-                            }
+                            if (result == currentTypeParam) { result = replacement; }
+                            if (typeArgs != null) { result = new ParameterizedType((ClassType) result, typeArgs); }
                         }
                     }
                     MethodReference mr = (MethodReference) expr;
@@ -1181,9 +1095,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 }
             } else if (expr instanceof AnnotationPropertyReference) {
                 AnnotationProperty ap = getAnnotationProperty((AnnotationPropertyReference) expr);
-                if (ap != null) {
-                    result = ap.getReturnType();
-                }
+                if (ap != null) { result = ap.getReturnType(); }
             } else if (expr instanceof ArrayLengthReference) {
                 result = getNameInfo().getIntType();
             } else if (expr instanceof ArrayReference aref) {
@@ -1191,9 +1103,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 if (ht != null && !(ht instanceof UnknownClassType)) {
                     List<Expression> dimExprs = aref.getDimensionExpressions();
                     int dims = dimExprs.size();
-                    for (int i = 0; i < dims; i++) {
-                        ht = ((ArrayType) ht).getBaseType();
-                    }
+                    for (int i = 0; i < dims; i++) { ht = ((ArrayType) ht).getBaseType(); }
                     if (ht != null) {
                         result = ht;
                     } else {
@@ -1219,9 +1129,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     thisType = (ClassType) getType(rp);
                 }
                 List<ClassType> supers = thisType.getSupertypes();
-                if ((supers != null) && (!supers.isEmpty())) {
-                    result = supers.get(0);
-                }
+                if ((supers != null) && (!supers.isEmpty())) { result = supers.get(0); }
             }
         } else if (expr instanceof ArrayInitializer) { //// ArrayInitializer
             ProgramElement pe = expr;
@@ -1232,15 +1140,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = getType(pe);
         } else if (expr instanceof ElementValueArrayInitializer) {
             ProgramElement pe = expr;
-            while ((pe != null) && !(pe instanceof VariableSpecification)) {
-                pe = pe.getASTParent();
-            }
+            while ((pe != null) && !(pe instanceof VariableSpecification)) { pe = pe.getASTParent(); }
             result = getType(pe);
         } else if (expr instanceof AnnotationUseSpecification) {
             result = getType(((AnnotationUseSpecification) expr).getTypeReference());
         } else {
             Debug.error("Type analysis for general expressions is currently not implemented: "
-                + expr + " <" + expr.getClass().getName() + ">");
+                    + expr + " <" + expr.getClass().getName() + ">");
         }
         return result;
     }
@@ -1309,29 +1215,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private void inferType2(String typeParamName, List<Type> result, Type t, Type actualArgType) {
         Type toAdd = actualArgType;
         int reduceDim = 0;
-        while (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBaseType();
-            reduceDim++;
-        }
+        while (t instanceof ArrayType) { t = ((ArrayType) t).getBaseType(); reduceDim++; }
         if (t instanceof TypeParameter && t.getName().equals(typeParamName)) {
-            while (reduceDim > 0) {
-                toAdd = ((ArrayType) toAdd).getBaseType();
-                reduceDim--;
-            }
+            while (reduceDim > 0) { toAdd = ((ArrayType) toAdd).getBaseType(); reduceDim--; }
             List<? extends Type> ctl = new ArrayList<ClassType>();
             int dim = 0;
             if (toAdd instanceof ArrayType) {
                 // special handling needed: go to base type, collect supertypes, then create array
                 // types
-                while (toAdd instanceof ArrayType) {
-                    toAdd = ((ArrayType) toAdd).getBaseType();
-                    dim++;
-                }
+                while (toAdd instanceof ArrayType) { toAdd = ((ArrayType) toAdd).getBaseType(); dim++; }
                 ctl = getAllSupertypes((ClassType) toAdd);
                 List<Type> tmp = new ArrayList<>(ctl.size());
-                for (Type type : ctl) {
-                    tmp.add(getNameInfo().createArrayType(type, dim));
-                }
+                for (Type type : ctl) { tmp.add(getNameInfo().createArrayType(type, dim)); }
                 ctl = tmp;
             } else {
                 ctl = getAllSupertypes((ClassType) toAdd); // ClassCastException => invalid source
@@ -1342,11 +1237,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 result.addAll(ctl);
             } else {
                 // intersect the two lists ("retainAll")
-                for (int i = result.size() - 1; i >= 0; i--) {
-                    if (!ctl.contains(result.get(i))) {
-                        result.remove(i);
-                    }
-                }
+                for (int i = result.size() - 1; i >= 0; i--) { if (!ctl.contains(result.get(i))) { result.remove(i); } }
             }
         }
     }
@@ -1372,38 +1263,20 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     // TODO one of many hacks...
     public /* private!! */ boolean containsTypeParameter(Type t) {
-        while (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBaseType();
-        }
-        if (!(t instanceof ClassType)) {
-            return false;
-        }
-        if (t instanceof TypeParameter) {
-            return true;
-        }
+        while (t instanceof ArrayType) { t = ((ArrayType) t).getBaseType(); }
+        if (!(t instanceof ClassType)) { return false; }
+        if (t instanceof TypeParameter) { return true; }
         if (t instanceof ParameterizedType pt) {
-            if (pt.getGenericType() instanceof TypeParameter) {
-                return true;
-            }
-            for (TypeArgument ta : pt.getTypeArgs()) {
-                if (containsTypeParameter(ta)) {
-                    return true;
-                }
-            }
+            if (pt.getGenericType() instanceof TypeParameter) { return true; }
+            for (TypeArgument ta : pt.getTypeArgs()) { if (containsTypeParameter(ta)) { return true; } }
         }
         return false;
     }
 
     private boolean containsTypeParameter(TypeArgument ta) {
-        if (getBaseType(ta) instanceof TypeParameter) {
-            return true;
-        }
+        if (getBaseType(ta) instanceof TypeParameter) { return true; }
         if (ta.getTypeArguments() != null) {
-            for (TypeArgument nta : ta.getTypeArguments()) {
-                if (containsTypeParameter(nta)) {
-                    return true;
-                }
-            }
+            for (TypeArgument nta : ta.getTypeArguments()) { if (containsTypeParameter(nta)) { return true; } }
         }
         return false;
     }
@@ -1470,9 +1343,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         ConstantEvaluator ce = serviceConfiguration.getConstantEvaluator();
         ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
         if (!ce.isCompileTimeConstant(expr, res)
-                || res.getTypeCode() != ConstantEvaluator.INT_TYPE) {
-            return false;
-        }
+                || res.getTypeCode() != ConstantEvaluator.INT_TYPE) { return false; }
         int value = res.getInt();
         return (minValue <= value) && (value <= maxValue);
     }
@@ -1514,13 +1385,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public ClassType getContainingClassType(ProgramElement context) {
         Debug.assertNonnull(context);
         // updateModel(); not necessary
-        if (context instanceof TypeDeclaration) {
-            context = context.getASTParent();
-        }
+        if (context instanceof TypeDeclaration) { context = context.getASTParent(); }
         do {
-            if (context instanceof ClassType) {
-                return (ClassType) context;
-            }
+            if (context instanceof ClassType) { return (ClassType) context; }
             context = context.getASTParent();
         } while (context != null);
         return null;
@@ -1547,11 +1414,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         // for private use only - no model update required
         List<? extends Field> fl = ct.getAllFields();
         int nf = fl.size();
-        for (Field f : fl) {
-            if (name.equals(f.getName())) {
-                return f;
-            }
-        }
+        for (Field f : fl) { if (name.equals(f.getName())) { return f; } }
         return null;
     }
 
@@ -1563,9 +1426,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         ProgramElement originalContext = context;
         Debug.assertNonnull(name, context);
         updateModel();
-        if (DEBUG) {
-            Debug.log("Looking for variable " + name);
-        }
+        if (DEBUG) { Debug.log("Looking for variable " + name); }
         // special case handling for java 5 first:
         if (java5Allowed()
                 && (context instanceof VariableReference
@@ -1585,13 +1446,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
         // look for the next variable scope equals to or parent of context
         ProgramElement pe = context;
-        while (pe != null && !(pe instanceof VariableScope)) {
-            context = pe;
-            pe = pe.getASTParent();
-        }
-        if (DEBUG) {
-            Debug.log("Found scope " + Format.toString("%c @%p", pe));
-        }
+        while (pe != null && !(pe instanceof VariableScope)) { context = pe; pe = pe.getASTParent(); }
+        if (DEBUG) { Debug.log("Found scope " + Format.toString("%c @%p", pe)); }
         if (pe == null) {
             // a null scope can happen if we try to find a variable
             // speculatively (for URQ resolution)
@@ -1602,9 +1458,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         do {
             result = scope.getVariableInScope(name);
             if (result != null) {
-                if (DEBUG) {
-                    Debug.log("Found variable in scope " + Format.toString("%c @%p", scope));
-                }
+                if (DEBUG) { Debug.log("Found variable in scope " + Format.toString("%c @%p", scope)); }
 
                 // must double check this result - rare cases of confusion
                 // involving field references before a local variable of the
@@ -1644,9 +1498,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             }
             if (scope instanceof TypeDeclaration) {
                 result = getInheritedField(name, (TypeDeclaration) scope);
-                if (result != null) {
-                    break;
-                }
+                if (result != null) { break; }
                 // might want to check for ambiguity of outer class fields!!!
             }
             pe = scope.getASTParent();
@@ -1663,9 +1515,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             ClassType ct = MiscKit.getParentTypeDeclaration(originalContext);
             result = getVariableFromStaticSingleImport(name, imports, ct);
             if (result == null) // try on demand
-            {
-                result = getVariableFromStaticOnDemandImport(name, imports, ct);
-            }
+            { result = getVariableFromStaticOnDemandImport(name, imports, ct); }
         }
         return result;
     }
@@ -1676,20 +1526,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Variable oldResult = null;
         Import firstImport = null; // for error handling only
         for (Import imp : imports) {
-            if (!imp.isStaticImport() || imp.isMultiImport()) {
-                continue;
-            }
+            if (!imp.isStaticImport() || imp.isMultiImport()) { continue; }
             // has import correct name?
-            if (!name.equals(imp.getStaticIdentifier().getText())) {
-                continue;
-            }
+            if (!name.equals(imp.getStaticIdentifier().getText())) { continue; }
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
             for (Field field : fields) {
-                if (!field.getName().equals(name)) {
-                    continue;
-                }
+                if (!field.getName().equals(name)) { continue; }
                 if (isVisibleFor(field, context)) {
                     result = field;
                     if (oldResult != null && oldResult != result) {
@@ -1717,16 +1561,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Variable oldResult = null;
         Import firstImport = null; // for error handling only
         for (Import imp : imports) {
-            if (!imp.isStaticImport() || !imp.isMultiImport()) {
-                continue;
-            }
+            if (!imp.isStaticImport() || !imp.isMultiImport()) { continue; }
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
             for (Field field : fields) {
-                if (!field.getName().equals(name)) {
-                    continue;
-                }
+                if (!field.getName().equals(name)) { continue; }
                 if (isVisibleFor(field, context)) {
                     result = field;
                     if (oldResult != null && oldResult != result) {
@@ -1751,31 +1591,21 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public Field getField(FieldReference fr) {
         Field res = (Field) reference2element.get(fr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         updateModel();
         String name = fr.getName();
         ReferencePrefix rp = fr.getReferencePrefix();
         if (rp == null) {
             res = (Field) getVariable(name, fr);
-            if (res != null) {
-                reference2element.put(fr, res);
-            }
+            if (res != null) { reference2element.put(fr, res); }
             return res;
         } else {
             ClassType thisType = getContainingClassType(fr);
-            if (thisType == null) {
-                return null;
-            }
+            if (thisType == null) { return null; }
             ClassType ct = (ClassType) getType(rp);
-            if (ct == null || ct instanceof UnknownClassType) {
-                return null;
-            }
+            if (ct == null || ct instanceof UnknownClassType) { return null; }
             List<? extends Field> fl = ct.getAllFields();
-            if (fl == null) {
-                return null;
-            }
+            if (fl == null) { return null; }
             for (int i = fl.size() - 1; i >= 0; i--) {
                 res = fl.get(i);
                 if (res.getName() == name) {
@@ -1792,22 +1622,16 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             return getField((FieldReference) vr);
         } else {
             Variable res = (Variable) reference2element.get(vr);
-            if (res != null) {
-                return res;
-            }
+            if (res != null) { return res; }
             res = getVariable(vr.getName(), vr);
-            if (res != null) {
-                reference2element.put(vr, res);
-            }
+            if (res != null) { reference2element.put(vr, res); }
             return res;
         }
     }
 
     // args == null is admissible
     public List<Type> makeSignature(List<Expression> args) {
-        if (args == null || args.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (args == null || args.isEmpty()) { return new ArrayList<>(0); }
         // updateModel(); not necessary
         int arity = args.size();
         List<Type> result = new ArrayList<>(arity);
@@ -1816,7 +1640,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             Type et = getType(e);
             if (et == null) {
                 getErrorHandler().reportError(new TypingException("Unknown type for argument #" + i
-                    + " in call " + Format.toString(ELEMENT_LONG, e.getExpressionContainer()), e));
+                        + " in call " + Format.toString(ELEMENT_LONG, e.getExpressionContainer()),
+                    e));
                 et = getNameInfo().getUnknownType();
             }
             result.add(et);
@@ -1835,8 +1660,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * UNTESTED AND INCOMPLETE
      *
-     * @param m the method to be checked
-     * @param mr the method reference to be checked
+     * @param m
+     *        the method to be checked
+     * @param mr
+     *        the method reference to be checked
      * @return warning/error message or {@code null} if everything was fine
      */
     private final String isAppropriate(Method m, MethodReference mr) {
@@ -1887,28 +1714,20 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private final boolean occursInStaticContext(MethodReference mr) {
         ProgramElement pe = mr;
         while (pe != null) {
-            if (pe instanceof ClassInitializer) {
-                return ((ClassInitializer) pe).isStatic();
-            }
-            if (pe instanceof MethodDeclaration) {
-                return ((MethodDeclaration) pe).isStatic();
-            }
-            if (pe instanceof FieldDeclaration) {
-                return ((FieldDeclaration) pe).isStatic();
-            }
+            if (pe instanceof ClassInitializer) { return ((ClassInitializer) pe).isStatic(); }
+            if (pe instanceof MethodDeclaration) { return ((MethodDeclaration) pe).isStatic(); }
+            if (pe instanceof FieldDeclaration) { return ((FieldDeclaration) pe).isStatic(); }
             pe = pe.getASTParent();
         }
         // this only happens if parent links aren't set properly
         getErrorHandler().reportError(new ModelException("cannot determine if MethodReference "
-            + Format.toString(pe) + " occurs in static context; check parent links!"));
+                + Format.toString(pe) + " occurs in static context; check parent links!"));
         return false;
     }
 
     public AnnotationProperty getAnnotationProperty(AnnotationPropertyReference apr) {
         AnnotationProperty res = (AnnotationProperty) reference2element.get(apr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         Type at = getType(apr.getParent().getParent().getTypeReference());
         if (at instanceof ClassType ct && ((ClassType) at).isAnnotationType()) {
             List<? extends Method> ml = ct.getMethods();
@@ -1942,9 +1761,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public Method getMethod(MethodReference mr) {
         Method res = (Method) reference2element.get(mr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         List<? extends Method> mlist = getMethods(mr);
         if (mlist == null || mlist.isEmpty()) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
@@ -1982,17 +1799,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = getMethods(targetClass, mr.getName(), signature, mr.getTypeArguments());
             // if we didn't find an adequate method - the target class may be
             // an inner or anonymous class. So we have to look "outside"
-            if (result != null && result.size() > 0) {
-                return result;
-            }
+            if (result != null && result.size() > 0) { return result; }
             for (ClassTypeContainer ctc = targetClass.getContainer(); ctc != null; ctc =
                 ctc.getContainer()) {
                 if (ctc instanceof ClassType) {
                     result =
                         getMethods((ClassType) ctc, mr.getName(), signature, mr.getTypeArguments());
-                    if ((result != null) && (result.size() > 0)) {
-                        return result;
-                    }
+                    if ((result != null) && (result.size() > 0)) { return result; }
                 }
             }
             // If java 5 is supported, check if an appropriate method is imported through a static
@@ -2000,13 +1813,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (java5Allowed()) {
                 List<Import> imports = UnitKit.getCompilationUnit(mr).getImports();
                 result = getMethodsFromStaticSingleImports(mr, imports);
-                if (result != null && result.size() > 0) {
-                    return result;
-                }
+                if (result != null && result.size() > 0) { return result; }
                 result = getMethodsFromStaticOnDemandImports(mr, imports);
-                if (result != null && result.size() > 0) {
-                    return result;
-                }
+                if (result != null && result.size() > 0) { return result; }
             }
 
 
@@ -2026,9 +1835,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 list.add(getNameInfo().getUnknownMethod());
                 return list;
             }
-            if (rpt instanceof ArrayType) {
-                rpt = getNameInfo().getJavaLangObject();
-            }
+            if (rpt instanceof ArrayType) { rpt = getNameInfo().getJavaLangObject(); }
             result = getMethods((ClassType) rpt, mr.getName(), signature, mr.getTypeArguments());
         }
         return result;
@@ -2044,16 +1851,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         NameInfo ni = getNameInfo();
         List<Method> result = new ArrayList<>();
         for (Import imp : imports) {
-            if (!imp.isStaticImport() || !imp.isMultiImport()) {
-                continue;
-            }
+            if (!imp.isStaticImport() || !imp.isMultiImport()) { continue; }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (Method m : ml) {
                 // is method static and has matching name?
-                if (m.isStatic() && m.getName().equals(mr.getName())) {
-                    result.add(m);
-                }
+                if (m.isStatic() && m.getName().equals(mr.getName())) { result.add(m); }
             }
         }
         List<Type> sig = makeSignature(mr.getArguments());
@@ -2067,27 +1870,22 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * @param mr
      * @param imports
      * @return
-     * @throws AmbiguousImportException if there are any ambiguities
+     * @throws AmbiguousImportException
+     *         if there are any ambiguities
      */
     private List<Method> getMethodsFromStaticSingleImports(MethodReference mr,
             List<Import> imports) {
         NameInfo ni = getNameInfo();
         List<Method> result = new ArrayList<>();
         for (Import imp : imports) {
-            if (!imp.isStaticImport() || imp.isMultiImport()) {
-                continue;
-            }
+            if (!imp.isStaticImport() || imp.isMultiImport()) { continue; }
             // is import applicable?
-            if (!imp.getStaticIdentifier().getText().equals(mr.getName())) {
-                continue;
-            }
+            if (!imp.getStaticIdentifier().getText().equals(mr.getName())) { continue; }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (Method m : ml) {
                 // is method static and has matching name? (This is also checked again later)
-                if (m.isStatic() && m.getName().equals(mr.getName())) {
-                    result.add(m);
-                }
+                if (m.isStatic() && m.getName().equals(mr.getName())) { result.add(m); }
                 // Could remove duplicates here (imports may be listed twice), but that's
                 // autoamtically done
                 // by first pass of filterMostSpecificMethods()
@@ -2100,9 +1898,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public Constructor getConstructor(ConstructorReference cr) {
         Constructor res = (Constructor) reference2element.get(cr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         List<? extends Constructor> clist = getConstructors(cr);
         if (clist == null || clist.isEmpty()) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
@@ -2161,16 +1957,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Debug.assertNonnull(td);
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
-        if (members == null) {
-            return new ArrayList<>(0);
-        }
+        if (members == null) { return new ArrayList<>(0); }
         int s = members.size();
         List<TypeDeclaration> result = new ArrayList<>();
-        for (MemberDeclaration m : members) {
-            if (m instanceof TypeDeclaration) {
-                result.add((TypeDeclaration) m);
-            }
-        }
+        for (MemberDeclaration m : members) { if (m instanceof TypeDeclaration) { result.add((TypeDeclaration) m); } }
         return result;
         // was: td.getTypesInScope(); -- faster, but not order preserving
     }
@@ -2179,9 +1969,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Debug.assertNonnull(td);
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
-        if (members == null) {
-            return new ArrayList<>(0);
-        }
+        if (members == null) { return new ArrayList<>(0); }
         int s = members.size();
         List<FieldSpecification> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
@@ -2199,17 +1987,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Debug.assertNonnull(td);
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
-        if (members == null && !(td instanceof EnumDeclaration)) {
-            return new ArrayList<>(0);
-        }
+        if (members == null && !(td instanceof EnumDeclaration)) { return new ArrayList<>(0); }
         int s = (members == null) ? 0 : members.size();
         List<Method> result = new ArrayList<>();
         for (int i = 0; i < s; i += 1) {
             MemberDeclaration m = members.get(i);
             if (m instanceof MethodDeclaration) {
-                if (!(m instanceof ConstructorDeclaration)) {
-                    result.add((MethodDeclaration) m);
-                }
+                if (!(m instanceof ConstructorDeclaration)) { result.add((MethodDeclaration) m); }
             }
         }
         if (td instanceof EnumDeclaration) {
@@ -2229,9 +2013,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         int s = (members == null) ? 0 : members.size();
         for (int i = 0; i < s; i += 1) {
             MemberDeclaration m = members.get(i);
-            if (m instanceof ConstructorDeclaration) {
-                result.add((ConstructorDeclaration) m);
-            }
+            if (m instanceof ConstructorDeclaration) { result.add((ConstructorDeclaration) m); }
         }
         if (result.isEmpty() && !td.isInterface() && td.getName() != null) {
             result.add(serviceConfiguration.getImplicitElementInfo().getDefaultConstructor(td));
@@ -2241,13 +2023,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     public Package getPackage(PackageReference pr) {
         Package res = (Package) reference2element.get(pr);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
         res = getNameInfo().createPackage(Naming.toPathName(pr));
-        if (res != null) {
-            reference2element.put(pr, res);
-        }
+        if (res != null) { reference2element.put(pr, res); }
         return res;
     }
 
@@ -2272,9 +2050,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (decl == null) {
             return ctc.getProgramModelInfo().getTypes(ctc);
         } else {
-            while (decl != null && !(decl instanceof TypeScope)) {
-                decl = decl.getASTParent();
-            }
+            while (decl != null && !(decl instanceof TypeScope)) { decl = decl.getASTParent(); }
             Debug.assertNonnull(decl, "Internal error - scope inconsistency");
             return ((TypeScope) decl).getTypesInScope();
         }
@@ -2283,17 +2059,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public ClassTypeContainer getClassTypeContainer(ClassType ct) {
         Debug.assertNonnull(ct);
         TypeDeclaration td = getTypeDeclaration(ct);
-        if (td == null) {
-            return ct.getProgramModelInfo().getClassTypeContainer(ct);
-        }
+        if (td == null) { return ct.getProgramModelInfo().getClassTypeContainer(ct); }
         // updateModel(); not necessary
         ProgramElement cur = td;
         NonTerminalProgramElement par = cur.getASTParent();
         while (par != null) {
             cur = par;
-            if (cur instanceof ClassTypeContainer) {
-                return (ClassTypeContainer) cur;
-            }
+            if (cur instanceof ClassTypeContainer) { return (ClassTypeContainer) cur; }
             par = cur.getASTParent();
         }
         return getNameInfo().createPackage(Naming.getPackageName((CompilationUnit) cur));
@@ -2303,9 +2075,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         updateModel();
         int s = (trl != null) ? trl.size() : 0;
         List<ClassType> result = new ArrayList<>(s);
-        for (int i = 0; i < s; i++) {
-            result.add((ClassType) getType(trl.get(i)));
-        }
+        for (int i = 0; i < s; i++) { result.add((ClassType) getType(trl.get(i))); }
         return result;
     }
 
@@ -2335,12 +2105,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             return ct.getProgramModelInfo().getSupertypes(ct);
         } else {
             ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-            if (ctce == null) {
-                classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-            }
-            if (ctce.supertypes != null) {
-                return ctce.supertypes;
-            }
+            if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+            if (ctce.supertypes != null) { return ctce.supertypes; }
             ArrayList<ClassType> res = new ArrayList<>();
             if (td instanceof EnumDeclaration) {
                 // only java.lang.Enum and java.lang.Object
@@ -2352,9 +2118,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 res.add(getNameInfo().getJavaLangObject());
             } else if (td instanceof InterfaceDeclaration id) {
                 Extends ext = id.getExtendedTypes();
-                if (ext != null) {
-                    addToTypeList(res, ext.getSupertypes());
-                }
+                if (ext != null) { addToTypeList(res, ext.getSupertypes()); }
                 res.add(getNameInfo().getJavaLangObject());
             } else if (td instanceof TypeParameterDeclaration tp) {
                 if (tp.getBounds() == null || tp.getBounds().size() == 0) {
@@ -2380,19 +2144,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     res.add((ClassType) getType(tr));
                 } else {
                     Extends ext = cd.getExtendedTypes();
-                    if (ext != null) {
-                        addToTypeList(res, ext.getSupertypes());
-                    }
+                    if (ext != null) { addToTypeList(res, ext.getSupertypes()); }
                     Implements imp = cd.getImplementedTypes();
-                    if (imp != null) {
-                        addToTypeList(res, imp.getSupertypes());
-                    }
+                    if (imp != null) { addToTypeList(res, imp.getSupertypes()); }
                 }
                 if (res.isEmpty()) {
                     ClassType jlo = getNameInfo().getJavaLangObject();
-                    if (ct != jlo) {
-                        res.add(jlo);
-                    }
+                    if (ct != jlo) { res.add(jlo); }
                 }
             }
             return ctce.supertypes = res;
@@ -2469,9 +2227,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = m.getProgramModelInfo().getExceptions(m);
         } else {
             Throws t = md.getThrown();
-            if (t != null) {
-                result = getTypeList(t.getExceptions());
-            }
+            if (t != null) { result = getTypeList(t.getExceptions()); }
         }
         return result;
     }
@@ -2485,9 +2241,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = m.getProgramModelInfo().getReturnType(m);
         } else {
             TypeReference tr = md.getTypeReference();
-            if (tr != null && !"void".equals(tr.getName())) {
-                result = getType(tr);
-            }
+            if (tr != null && !"void".equals(tr.getName())) { result = getType(tr); }
         }
         return result;
     }
@@ -2716,9 +2470,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         }
                     }
                 }
-                if (throwAgain) {
-                    throw cce;
-                }
+                if (throwAgain) { throw cce; }
             }
             Debug.assertBoolean(parent == result.getASTParent());
         }
@@ -2734,9 +2486,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (s instanceof LoopStatement loop) {
             switch (getBooleanStatus(loop.getGuard())) {
             case CONSTANT_TRUE:
-                if (loop.getBody() != null) {
-                    list.add(loop.getBody());
-                }
+                if (loop.getBody() != null) { list.add(loop.getBody()); }
                 break;
             case CONSTANT_FALSE:
                 if (loop.isCheckedBeforeIteration()) {
@@ -2744,16 +2494,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     addSequentialFollower(s, list);
                 } else {
                     // do
-                    if (loop.getBody() != null) {
-                        list.add(loop.getBody());
-                    }
+                    if (loop.getBody() != null) { list.add(loop.getBody()); }
                     addSequentialFollower(s, list);
                 }
                 break;
             case NOT_CONSTANT:
-                if (loop.getBody() != null) {
-                    list.add(loop.getBody());
-                }
+                if (loop.getBody() != null) { list.add(loop.getBody()); }
                 addSequentialFollower(s, list);
                 break;
             }
@@ -2797,16 +2543,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             // significant
                             hasDefault = true;
                         }
-                    } else if (b instanceof Case) {
-                        stats = ((Case) b).getBody();
-                    }
-                    if (stats != null && !stats.isEmpty()) {
-                        list.add(stats.get(0));
-                    }
+                    } else if (b instanceof Case) { stats = ((Case) b).getBody(); }
+                    if (stats != null && !stats.isEmpty()) { list.add(stats.get(0)); }
                 }
-                if (!hasDefault) {
-                    addSequentialFollower(s, list);
-                }
+                if (!hasDefault) { addSequentialFollower(s, list); }
             }
         } else if (s instanceof Try) {
             list.add(((Try) s).getBody());
@@ -2834,12 +2574,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             }
                         }
                     }
-                    if (newException) {
-                        list.add(ca.getBody());
-                    }
-                } else if (b instanceof Finally) {
-                    list.add(((Finally) b).getBody());
-                }
+                    if (newException) { list.add(ca.getBody()); }
+                } else if (b instanceof Finally) { list.add(((Finally) b).getBody()); }
             }
             addSequentialFollower(s, list);
         } else if (s instanceof ExpressionJumpStatement) {
@@ -2883,14 +2619,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * this is done by the parser frontends or by calling make(All)ParentRole(s)Valid(). If the
      * program element is not a CompilationUnit, it must have a valid parent.
      *
-     * @param pe the program element to add.
+     * @param pe
+     *        the program element to add.
      */
     public void register(ProgramElement pe) {
         Debug.assertNonnull(pe);
         if (pe instanceof CompilationUnit) {
-            if (!((CompilationUnit) pe).isDefinedScope()) {
-                analyzeProgramElement(pe);
-            }
+            if (!((CompilationUnit) pe).isDefinedScope()) { analyzeProgramElement(pe); }
         } else {
             Debug.assertNonnull(pe.getASTParent());
             analyzeProgramElement(pe);
@@ -2900,7 +2635,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * analyzes the given tree element within the specified scope.
      *
-     * @param pe the root element of the tree to be analyzed
+     * @param pe
+     *        the root element of the tree to be analyzed
      */
     private void analyzeProgramElement(ProgramElement pe) {
         Debug.assertNonnull(pe);
@@ -2912,9 +2648,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private void analyzeProgramElement0(ProgramElement pe) {
-        if (pe instanceof TerminalProgramElement) {
-            return;
-        }
+        if (pe instanceof TerminalProgramElement) { return; }
         // traversal will continue with the children of this element
         if (pe instanceof ScopeDefiningElement) {
             ((ScopeDefiningElement) pe).setDefinedScope(true);
@@ -2929,22 +2663,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     // usually, the type scope is just the parent
                     // there are few exceptions, such as labeled or switch
                     // statements
-                    while (!(parent instanceof TypeScope scope)) {
-                        parent = parent.getASTParent();
-                    }
+                    while (!(parent instanceof TypeScope scope)) { parent = parent.getASTParent(); }
                     ClassType dup = scope.getTypeInScope(typename);
                     if (dup != null && dup != td) {
                         getErrorHandler()
                                 .reportError(new AmbiguousDeclarationException(
                                     "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, td)
-                                        + " - was " + Format.toString(ELEMENT_SHORT, dup),
+                                            + " - was " + Format.toString(ELEMENT_SHORT, dup),
                                     td, dup));
                         // continue anyway, if we have to
                     }
                     scope.addTypeToScope(td, typename);
-                    if (DEBUG) {
-                        Debug.log(Format.toString("Registering %N", td));
-                    }
+                    if (DEBUG) { Debug.log(Format.toString("Registering %N", td)); }
                     getNameInfo().register(td);
                 }
             }
@@ -2954,16 +2684,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             NonTerminalProgramElement parent = vs.getASTParent().getASTParent();
             // usually, the variable scope is the grand parent
             // there are few exceptions, such as labeled or switch statements
-            while (!(parent instanceof VariableScope scope)) {
-                parent = parent.getASTParent();
-            }
+            while (!(parent instanceof VariableScope scope)) { parent = parent.getASTParent(); }
 
             String vname = vs.getName();
             Variable dup = scope.getVariableInScope(vname);
             if (dup != null && dup != vs) {
                 getErrorHandler().reportError(new AmbiguousDeclarationException(
                     "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, vs) + " - was "
-                        + Format.toString(ELEMENT_SHORT, dup),
+                            + Format.toString(ELEMENT_SHORT, dup),
                     vs, dup));
                 // continue anyway, if we have to resume
             }
@@ -2976,22 +2704,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if (dup != null) {
                         getErrorHandler().reportError(new AmbiguousDeclarationException(
                             "Hidden local declaration: " + Format.toString(ELEMENT_SHORT, vs)
-                                + " - hides " + Format.toString(ELEMENT_SHORT, dup),
+                                    + " - hides " + Format.toString(ELEMENT_SHORT, dup),
                             vs, dup));
                         // resume anyway
                     }
                 }
             }
             scope.addVariableToScope(vs);
-            if (vs instanceof FieldSpecification) {
-                getNameInfo().register((Field) vs);
-            }
+            if (vs instanceof FieldSpecification) { getNameInfo().register((Field) vs); }
         }
         NonTerminalProgramElement cont = (NonTerminalProgramElement) pe;
         int childCount = cont.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            analyzeProgramElement0(cont.getChildAt(i));
-        }
+        for (int i = 0; i < childCount; i++) { analyzeProgramElement0(cont.getChildAt(i)); }
     }
 
     void unregister(TypeDeclaration td) {
@@ -3003,17 +2727,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * of all known supertypes (if necessary).
      */
     void unregister(TypeDeclaration td, String shortname) {
-        if (shortname != null) {
-            ((TypeScope) (td.getASTParent())).removeTypeFromScope(shortname);
-        }
+        if (shortname != null) { ((TypeScope) (td.getASTParent())).removeTypeFromScope(shortname); }
         getNameInfo().unregisterClassType(td.getFullName());
         ClassTypeCacheEntry ctce = classTypeCache.get(td);
         if (ctce != null) {
             List<? extends ClassType> superTypes = ctce.supertypes;
             if (superTypes != null) {
-                for (int i = superTypes.size() - 1; i >= 0; i -= 1) {
-                    removeSubtype(td, superTypes.get(i));
-                }
+                for (int i = superTypes.size() - 1; i >= 0; i -= 1) { removeSubtype(td, superTypes.get(i)); }
             }
         }
     }
@@ -3024,9 +2744,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     void unregister(VariableSpecification vs, String shortname) {
         ProgramElement pe = vs.getASTParent().getASTParent();
-        while (!(pe instanceof VariableScope)) {
-            pe = pe.getASTParent();
-        }
+        while (!(pe instanceof VariableScope)) { pe = pe.getASTParent(); }
         ((VariableScope) pe).removeVariableFromScope(shortname);
         if (vs instanceof FieldSpecification) {
             ClassType ct = ((Field) vs).getContainingClassType();
@@ -3037,7 +2755,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * unregisters the information, that has been computed when registering the given element.
      *
-     * @param pe the program element to be unregistered
+     * @param pe
+     *        the program element to be unregistered
      */
     void unregister(ProgramElement pe) {
         Debug.assertNonnull(pe);
@@ -3048,16 +2767,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         } else if (pe instanceof VariableDeclaration) {
             List<? extends VariableSpecification> vspecs =
                 ((VariableDeclaration) pe).getVariables();
-            for (int i = vspecs.size() - 1; i >= 0; i -= 1) {
-                unregister(vspecs.get(i));
-            }
+            for (int i = vspecs.size() - 1; i >= 0; i -= 1) { unregister(vspecs.get(i)); }
         }
         TreeWalker tw = new TreeWalker(pe);
         while (tw.next()) {
             pe = tw.getProgramElement();
-            if (pe instanceof ScopeDefiningElement) {
-                flushScopes((ScopeDefiningElement) pe);
-            }
+            if (pe instanceof ScopeDefiningElement) { flushScopes((ScopeDefiningElement) pe); }
         }
     }
 
@@ -3077,16 +2792,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     }
                 }
             } else {
-                for (int j = ctl.size() - 1; j >= 0; j -= 1) {
-                    dni.unregisterClassType(ctl.get(j).getFullName());
-                }
+                for (int j = ctl.size() - 1; j >= 0; j -= 1) { dni.unregisterClassType(ctl.get(j).getFullName()); }
             }
         }
         if (sde instanceof TypeDeclaration) {
             List<FieldSpecification> fl = ((TypeDeclaration) sde).getFieldsInScope();
-            for (int j = fl.size() - 1; j >= 0; j -= 1) {
-                dni.unregisterField(fl.get(j).getFullName());
-            }
+            for (int j = fl.size() - 1; j >= 0; j -= 1) { dni.unregisterField(fl.get(j).getFullName()); }
         }
         sde.setDefinedScope(false);
     }

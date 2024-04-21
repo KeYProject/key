@@ -29,10 +29,14 @@ public class For extends LoopStatement implements VariableScope {
     /**
      * For. Used for the Recoder2KeY transformation
      *
-     * @param inits a loop initializer mutable list.
-     * @param guard an expression.
-     * @param updates an expression mutable list.
-     * @param body a statement.
+     * @param inits
+     *        a loop initializer mutable list.
+     * @param guard
+     *        an expression.
+     * @param updates
+     *        an expression mutable list.
+     * @param body
+     *        a statement.
      */
     public For(LoopInitializer[] inits, Expression guard, Expression[] updates, Statement body) {
         super(inits, guard, updates, body);
@@ -78,9 +82,7 @@ public class For extends LoopStatement implements VariableScope {
     public ImmutableArray<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
-            if (li instanceof LocalVariableDeclaration) {
-                return ((LocalVariableDeclaration) li).getVariables();
-            }
+            if (li instanceof LocalVariableDeclaration) { return ((LocalVariableDeclaration) li).getVariables(); }
         }
         return EMPTY_VARSPECS;
     }
@@ -93,9 +95,7 @@ public class For extends LoopStatement implements VariableScope {
                     ((LocalVariableDeclaration) li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);
-                    if (name.equals(v.getName())) {
-                        return v;
-                    }
+                    if (name.equals(v.getName())) { return v; }
                 }
             }
         }
@@ -106,7 +106,8 @@ public class For extends LoopStatement implements VariableScope {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFor(this);

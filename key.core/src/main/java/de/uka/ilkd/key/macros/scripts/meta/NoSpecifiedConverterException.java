@@ -19,8 +19,10 @@ public class NoSpecifiedConverterException extends InjectionException {
     /**
      * Creates an exception with the given {@code message} and {@code argument}.
      *
-     * @param message a non-null string
-     * @param argument the argument for which the conversion failed
+     * @param message
+     *        a non-null string
+     * @param argument
+     *        the argument for which the conversion failed
      */
     public NoSpecifiedConverterException(String message, ProofScriptArgument<?> argument) {
         super(message, argument);
@@ -29,9 +31,12 @@ public class NoSpecifiedConverterException extends InjectionException {
     /**
      * Creates an exception with the given arguments.
      *
-     * @param message a non-null string
-     * @param cause a cause of this exception
-     * @param argument the argument for which the conversion failed
+     * @param message
+     *        a non-null string
+     * @param cause
+     *        a cause of this exception
+     * @param argument
+     *        the argument for which the conversion failed
      */
     public NoSpecifiedConverterException(String message, Throwable cause,
             ProofScriptArgument<?> argument) {

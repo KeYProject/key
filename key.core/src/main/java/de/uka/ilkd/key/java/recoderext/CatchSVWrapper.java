@@ -26,7 +26,8 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     public void setSV(SchemaVariable sv) {
         this.sv = sv;

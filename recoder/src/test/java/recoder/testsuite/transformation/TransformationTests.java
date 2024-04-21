@@ -83,9 +83,7 @@ public class TransformationTests {
 
         List<TypeReference> trl =
             crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getType("Test"));
-        for (TypeReference tr : trl) {
-            System.out.println(tr.toSource());
-        }
+        for (TypeReference tr : trl) { System.out.println(tr.toSource()); }
     }
 
     private void defaultConstructorReferences(VisibilityModifier vm) {

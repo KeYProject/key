@@ -68,22 +68,17 @@ public class MiscKit {
      * Query checking if a given non terminal is identical to or an ancestor of the given node. If
      * any of the elements is <CODE>null</CODE>, there is no ancestor relation.
      *
-     * @param root a non terminal that might be the ancestor of the given element.
-     * @param node a program element that might be a descendant of (or identical to) the given non
+     * @param root
+     *        a non terminal that might be the ancestor of the given element.
+     * @param node
+     *        a program element that might be a descendant of (or identical to) the given non
      *        terminal.
      * @return <CODE>true</CODE>, if the given root is an ancestor of the given node,
      *         <CODE>false</CODE> otherwise.
      */
     public static boolean contains(NonTerminalProgramElement root, ProgramElement node) {
-        if (root == null) {
-            return false;
-        }
-        while (node != null) {
-            if (node == root) {
-                return true;
-            }
-            node = node.getASTParent();
-        }
+        if (root == null) { return false; }
+        while (node != null) { if (node == root) { return true; } node = node.getASTParent(); }
         return false;
     }
 
@@ -91,24 +86,27 @@ public class MiscKit {
      * Auxiliary transformation that sets the name of the specified element to the specified string,
      * creating a proper identifier.
      *
-     * @param e the element to name.
-     * @param name the future element name.
+     * @param e
+     *        the element to name.
+     * @param name
+     *        the future element name.
      * @since 0.63
      */
     public static void setName(NamedProgramElement e, String name) {
-        if (!name.equals(e.getName())) {
-            Transformation.doAttach(e.getFactory().createIdentifier(name), e);
-        }
+        if (!name.equals(e.getName())) { Transformation.doAttach(e.getFactory().createIdentifier(name), e); }
     }
 
     /**
      * Transformation that renames a program element. If the new name is different from the old one,
      * a new Identifier is created and replaces the old one.
      *
-     * @param namedElement the element to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     * @param namedElement
+     *        the element to be renamed; may not be <CODE>null</CODE>.
+     * @param newName
+     *        the new name for the element; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
-     * @param ch the change history (may be <CODE>null</CODE>).
+     * @param ch
+     *        the change history (may be <CODE>null</CODE>).
      * @return the new identifier if it has replaced the old one; the old identifier otherwise.
      * @deprecated replaced by Transformation.replace
      */
@@ -121,9 +119,7 @@ public class MiscKit {
             Identifier newId = namedElement.getFactory().createIdentifier(newName);
             namedElement.setIdentifier(newId);
             newId.setParent(namedElement);
-            if (ch != null) {
-                ch.replaced(oldId, newId);
-            }
+            if (ch != null) { ch.replaced(oldId, newId); }
             return newId;
         }
         return oldId;
@@ -132,7 +128,8 @@ public class MiscKit {
     /**
      * retrieves the compilation unit of the specified program element
      *
-     * @param pe ProgramElement for which to get the {@link CompilationUnit}
+     * @param pe
+     *        ProgramElement for which to get the {@link CompilationUnit}
      * @return the {@link CompilationUnit} that contains the specified program element
      * @deprecated use UnitKit.getCompilationUnit instead
      */
@@ -148,14 +145,13 @@ public class MiscKit {
      * <CODE>null</CODE>, if the program element is not part of a type declaration, e.g. a
      * CompilationUnit.
      *
-     * @param pe a program element.
+     * @param pe
+     *        a program element.
      * @return the innermost type declaration containing pe, or <CODE>null
      * </CODE>.
      */
     public static TypeDeclaration getParentTypeDeclaration(ProgramElement pe) {
-        do {
-            pe = pe.getASTParent();
-        } while ((pe != null) && !(pe instanceof TypeDeclaration));
+        do { pe = pe.getASTParent(); } while ((pe != null) && !(pe instanceof TypeDeclaration));
         return (TypeDeclaration) pe;
     }
 
@@ -163,13 +159,12 @@ public class MiscKit {
      * Query returning the innermost scope defining element the given program element is contained
      * within. If the given program element is a scope defining element, it is returned.
      *
-     * @param pe a program element.
+     * @param pe
+     *        a program element.
      * @return the innermost scope defining element type declaration equals pe or containing pe.
      */
     public static ScopeDefiningElement getScopeDefiningElement(ProgramElement pe) {
-        while (!(pe instanceof ScopeDefiningElement)) {
-            pe = pe.getASTParent();
-        }
+        while (!(pe instanceof ScopeDefiningElement)) { pe = pe.getASTParent(); }
         return (ScopeDefiningElement) pe;
     }
 
@@ -178,14 +173,13 @@ public class MiscKit {
      * <CODE>null</CODE>, if the program element is not part of a member declaration, e.g. a
      * CompilationUnit.
      *
-     * @param pe a program element.
+     * @param pe
+     *        a program element.
      * @return the innermost member declaration containing pe, or <CODE>null
      * </CODE>.
      */
     public static MemberDeclaration getParentMemberDeclaration(ProgramElement pe) {
-        do {
-            pe = pe.getASTParent();
-        } while ((pe != null) && !(pe instanceof MemberDeclaration));
+        do { pe = pe.getASTParent(); } while ((pe != null) && !(pe instanceof MemberDeclaration));
         return (MemberDeclaration) pe;
     }
 
@@ -194,7 +188,8 @@ public class MiscKit {
      * debugging purposes. Returns the first program element encountered that has an invalid parent
      * link, or <CODE>null</CODE> if every element is linked correctly.
      *
-     * @param root the root of the subtree to check (is not checked itself).
+     * @param root
+     *        the root of the subtree to check (is not checked itself).
      * @return an descendant of root that has a bad parent link, or <CODE>null
      * </CODE> if there is no such element.
      */
@@ -202,13 +197,9 @@ public class MiscKit {
         if (root instanceof NonTerminalProgramElement nt) {
             for (int s = nt.getChildCount(), i = 0; i < s; i += 1) {
                 ProgramElement child = nt.getChildAt(i);
-                if (child.getASTParent() != nt) {
-                    return child;
-                }
+                if (child.getASTParent() != nt) { return child; }
                 child = checkParentLinks(child);
-                if (child != null) {
-                    return child;
-                }
+                if (child != null) { return child; }
             }
         }
         return null;
@@ -221,25 +212,23 @@ public class MiscKit {
      * This method is not very useful if the change history is left undefined, but will work
      * nethertheless.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param child the child to remove from its parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param child
+     *        the child to remove from its parent.
      * @deprecated replaced by Transformation.replace
      */
     @Deprecated
     public static void remove(ChangeHistory ch, ProgramElement child) {
         Debug.assertNonnull(child);
         if (child instanceof CompilationUnit) {
-            if (ch != null) {
-                ch.detached(child, 0);
-            }
+            if (ch != null) { ch.detached(child, 0); }
         } else {
             NonTerminalProgramElement parent = child.getASTParent();
             Debug.assertNonnull(parent);
             int oldIndex = parent.getChildPositionCode(child);
             parent.replaceChild(child, null);
-            if (ch != null) {
-                ch.detached(child, parent, oldIndex);
-            }
+            if (ch != null) { ch.detached(child, parent, oldIndex); }
         }
     }
 
@@ -249,9 +238,12 @@ public class MiscKit {
      * units properly, but otherwise assumes that the parent link is defined. This method is not
      * very useful if the change history is left undefined, but will work nethertheless.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param child the child to remove from its parent.
-     * @param replacement the child to replace its original (must be of appropriate type).
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param child
+     *        the child to remove from its parent.
+     * @param replacement
+     *        the child to replace its original (must be of appropriate type).
      * @deprecated replaced by Transformation.replace
      */
     @Deprecated
@@ -262,9 +254,7 @@ public class MiscKit {
                 NonTerminalProgramElement parent = child.getASTParent();
                 parent.replaceChild(child, replacement);
             }
-            if (ch != null) {
-                ch.replaced(child, replacement);
-            }
+            if (ch != null) { ch.replaced(child, replacement); }
         }
     }
 
@@ -272,9 +262,12 @@ public class MiscKit {
      * Transformation that appends or prepends the given child to the list in the given parent. No
      * checks for redundancy or validity are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to append to.
-     * @param child the child to be appended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to append to.
+     * @param child
+     *        the child to be appended to the list in the parent.
      */
     private static void add(ChangeHistory ch, CompilationUnit parent, Import child,
             boolean asHead) {
@@ -290,18 +283,19 @@ public class MiscKit {
             }
         }
         child.setParent(parent); // make parent link valid
-        if (ch != null) {
-            ch.attached(child);
-        }
+        if (ch != null) { ch.attached(child); }
     }
 
     /**
      * Transformation that appends the given Import to the list in the given Compilation Unit. No
      * checks for redundancy or validity are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to append to.
-     * @param child the child to be appended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to append to.
+     * @param child
+     *        the child to be appended to the list in the parent.
      */
     public static void append(ChangeHistory ch, CompilationUnit parent, Import child) {
         add(ch, parent, child, false);
@@ -311,9 +305,12 @@ public class MiscKit {
      * Transformation that prepends the given Import to the list in the given Compilation Unit. No
      * checks for redundancy or validity are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to prepend.
-     * @param child the child to be prepended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to prepend.
+     * @param child
+     *        the child to be prepended to the list in the parent.
      */
     public static void prepend(ChangeHistory ch, CompilationUnit parent, Import child) {
         add(ch, parent, child, true);
@@ -323,9 +320,12 @@ public class MiscKit {
      * Transformation that appends or prepends the given child to the list in the given parent. No
      * checks for redundancy or vadility are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to append to.
-     * @param child the child to be appended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to append to.
+     * @param child
+     *        the child to be appended to the list in the parent.
      */
     private static void add(ChangeHistory ch, StatementBlock parent, Statement child,
             boolean asHead) {
@@ -341,18 +341,19 @@ public class MiscKit {
             }
         }
         child.setStatementContainer(parent); // make parent link valid
-        if (ch != null) {
-            ch.attached(child);
-        }
+        if (ch != null) { ch.attached(child); }
     }
 
     /**
      * Transformation that appends the given Statement to the list in the given StatementBlock. No
      * checks for redundancy or vadility are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to append to.
-     * @param child the child to be appended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to append to.
+     * @param child
+     *        the child to be appended to the list in the parent.
      */
     public static void append(ChangeHistory ch, StatementBlock parent, Statement child) {
         add(ch, parent, child, false);
@@ -362,9 +363,12 @@ public class MiscKit {
      * Transformation that prepends the given Statement to the list in the given StatementBlock. No
      * checks for redundancy or vadility are performed.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param parent the parent containing a list of childs to prepend.
-     * @param child the child to be prepended to the list in the parent.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param parent
+     *        the parent containing a list of childs to prepend.
+     * @param child
+     *        the child to be prepended to the list in the parent.
      */
     public static void prepend(ChangeHistory ch, StatementBlock parent, Statement child) {
         add(ch, parent, child, true);
@@ -373,7 +377,8 @@ public class MiscKit {
     /**
      * Removes relative and absolute indentation information from the given tree.
      *
-     * @param root the root of the subtree.
+     * @param root
+     *        the root of the subtree.
      */
     public static void unindent(ProgramElement root) {
         TreeWalker w = new TreeWalker(root);
@@ -390,9 +395,12 @@ public class MiscKit {
      * Adds object mappings from original to cloned versions for each node in a tree to an existing
      * map.
      *
-     * @param originalRoot the root of the original tree.
-     * @param cloneRoot the root of the cloned tree.
-     * @param map the map in which to put the node pairs.
+     * @param originalRoot
+     *        the root of the original tree.
+     * @param cloneRoot
+     *        the root of the cloned tree.
+     * @param map
+     *        the map in which to put the node pairs.
      */
     public static void mapClones(ProgramElement originalRoot, ProgramElement cloneRoot,
             Map<ProgramElement, ProgramElement> map) {
@@ -411,20 +419,19 @@ public class MiscKit {
      * If there are many queries for clones, it is more efficient to instantiate an own mapping
      * using a hash table and the {@link #mapClones}auxiliary.
      *
-     * @param original the element to find the corresponding clone for.
-     * @param originalRoot the root of the original tree.
-     * @param cloneRoot the root of the cloned tree.
+     * @param original
+     *        the element to find the corresponding clone for.
+     * @param originalRoot
+     *        the root of the original tree.
+     * @param cloneRoot
+     *        the root of the cloned tree.
      */
     public static ProgramElement getClone(ProgramElement original, ProgramElement originalRoot,
             ProgramElement cloneRoot) {
         Debug.assertNonnull(original, originalRoot, cloneRoot);
         TreeWalker w1 = new TreeWalker(originalRoot);
         TreeWalker w2 = new TreeWalker(cloneRoot);
-        while (w1.next() & w2.next()) {
-            if (w1.getProgramElement() == original) {
-                return w2.getProgramElement();
-            }
-        }
+        while (w1.next() & w2.next()) { if (w1.getProgramElement() == original) { return w2.getProgramElement(); } }
         return original;
     }
 

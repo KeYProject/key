@@ -73,9 +73,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
         errors.add(se);
 
-        if (throwDirect) {
-            throwException();
-        }
+        if (throwDirect) { throwException(); }
     }
 
     /**
@@ -92,9 +90,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors()) {
-            throw new ParserException("", errors);
-        }
+        if (hasErrors()) { throw new ParserException("", errors); }
     }
 
 
@@ -121,9 +117,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException(Supplier<String[]> lines) {
-        if (hasErrors()) {
-            throwException(lines.get());
-        }
+        if (hasErrors()) { throwException(lines.get()); }
     }
 
     /**
@@ -153,13 +147,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String getBeatifulErrorMessage(String[] lines) {
             return ("syntax-error in " + positionAsUrl() + "\n" + msg + "\n" + showInInput(lines)
-                + "\n");
+                    + "\n");
         }
 
         public String showInInput(String[] lines) {
             String line = lines[this.line];
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
-                + StringUtil.repeat("^", (offendingSymbol.getText().length()));
+                    + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {

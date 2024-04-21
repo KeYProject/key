@@ -38,9 +38,7 @@ public class TestMiscTools {
     @Test
     public void testDisectFilenameUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/') {
-            return;
-        }
+        if (File.separatorChar != '/') { return; }
         String s = "/home/daniel//workspace/key";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("", ls[0]);
@@ -61,9 +59,7 @@ public class TestMiscTools {
     @Test
     public void testDisectFilenameWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\') {
-            return;
-        }
+        if (File.separatorChar != '\\') { return; }
         String s = "C:\\Windows\\Users\\";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("C:", ls[0]);
@@ -72,9 +68,7 @@ public class TestMiscTools {
     @Test
     public void testMakeFilenameRelativeUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/') {
-            return;
-        }
+        if (File.separatorChar != '/') { return; }
 
         String s = "/home/daniel/bla";
         String t = "/home/daniel/blubb";
@@ -95,9 +89,7 @@ public class TestMiscTools {
     @Test
     public void testMakeFilenameRelativeWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\') {
-            return;
-        }
+        if (File.separatorChar != '\\') { return; }
 
         // test windows delimiters
         String s = "C:\\Windows";
@@ -223,7 +215,8 @@ public class TestMiscTools {
      * This is a test for the method {@link MiscTools#parseURL(String)}. It tests for some strings
      * if they can be converted to URLs correctly. Note: This test creates a temporary zip file.
      *
-     * @throws Exception if a string can not be converted successfully
+     * @throws Exception
+     *         if a string can not be converted successfully
      */
     @Test
     public void testTryParseURL() throws Exception {

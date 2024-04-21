@@ -29,13 +29,11 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
 
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
-        if (args.goals == null) {
-            throw new ScriptException("No parameter specified!");
-        }
+        if (args.goals == null) { throw new ScriptException("No parameter specified!"); }
 
         if (state.getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
-                + state.getProof().openGoals().size() + ", but should be " + args.goals);
+                    + state.getProof().openGoals().size() + ", but should be " + args.goals);
         }
     }
 

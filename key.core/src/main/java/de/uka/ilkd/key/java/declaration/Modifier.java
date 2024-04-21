@@ -24,7 +24,8 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
     /**
      * Modifier.
      *
-     * @param children May contain: some Comments
+     * @param children
+     *        May contain: some Comments
      */
     public Modifier(ExtList children) {
         super(children);
@@ -51,7 +52,8 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnModifier(this);

@@ -69,7 +69,8 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public Switch(Expression e) {
@@ -80,8 +81,10 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e an expression.
-     * @param branches a branch mutable list.
+     * @param e
+     *        an expression.
+     * @param branches
+     *        a branch mutable list.
      */
 
     public Switch(Expression e, ASTList<Branch> branches) {
@@ -93,17 +96,14 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param proto a switch.
+     * @param proto
+     *        a switch.
      */
 
     protected Switch(Switch proto) {
         super(proto);
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
-        if (proto.branches != null) {
-            branches = proto.branches.deepClone();
-        }
+        if (proto.expression != null) { expression = proto.expression.deepClone(); }
+        if (proto.branches != null) { branches = proto.branches.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -125,47 +125,37 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (expression != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: expression
         // role 1 (IDX): branch
-        if (expression == child) {
-            return 0;
-        }
+        if (expression == child) { return 0; }
         if (branches != null) {
             int index = branches.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         return -1;
     }
@@ -176,9 +166,7 @@ public class Switch extends BranchStatement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
+        if (expression != null) { expression.setExpressionContainer(this); }
         if (branches != null) {
             for (int i = branches.size() - 1; i >= 0; i -= 1) {
                 Branch b = branches.get(i);
@@ -197,23 +185,22 @@ public class Switch extends BranchStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         int count;
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (expression == p) {
             Expression r = (Expression) q;
             expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         count = (branches == null) ? 0 : branches.size();
@@ -253,9 +240,7 @@ public class Switch extends BranchStatement
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -272,13 +257,12 @@ public class Switch extends BranchStatement
     /**
      * Set expression.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public void setExpression(Expression e) {
-        if (e == null) {
-            throw new NullPointerException("Switches must have an expression");
-        }
+        if (e == null) { throw new NullPointerException("Switches must have an expression"); }
         expression = e;
     }
 
@@ -295,7 +279,8 @@ public class Switch extends BranchStatement
     /**
      * Set branch list.
      *
-     * @param branches a branch mutable list.
+     * @param branches
+     *        a branch mutable list.
      */
 
     public void setBranchList(ASTList<Branch> branches) {
@@ -319,9 +304,7 @@ public class Switch extends BranchStatement
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -341,37 +324,27 @@ public class Switch extends BranchStatement
     }
 
     public List<TypeDeclaration> getTypesInScope() {
-        if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (name2type == null || name2type.isEmpty()) { return new ArrayList<>(0); }
         List<TypeDeclaration> res = new ArrayList<>();
-        for (TypeDeclaration td : name2type.values()) {
-            res.add(td);
-        }
+        for (TypeDeclaration td : name2type.values()) { res.add(td); }
         return res;
     }
 
     public ClassType getTypeInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null) {
-            return null;
-        }
+        if (name2type == null) { return null; }
         return name2type.get(name);
     }
 
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<>();
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { name2type = new HashMap<>(); }
         name2type.put(name, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { return; }
         name2type.remove(name);
     }
 
@@ -381,33 +354,25 @@ public class Switch extends BranchStatement
             return new ArrayList<>(0);
         }
         List<VariableSpecification> res = new ArrayList<>();
-        for (VariableSpecification vs : name2var.values()) {
-            res.add(vs);
-        }
+        for (VariableSpecification vs : name2var.values()) { res.add(vs); }
         return res;
     }
 
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2var == null) {
-            return null;
-        }
+        if (name2var == null) { return null; }
         return name2var.get(name);
     }
 
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            name2var = new HashMap<>();
-        }
+        if (name2var == null || name2var == UNDEFINED_SCOPE) { name2var = new HashMap<>(); }
         name2var.put(var.getName(), var);
     }
 
     public void removeVariableFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2var == null || name2var == UNDEFINED_SCOPE) { return; }
         name2var.remove(name);
     }
 
@@ -416,9 +381,7 @@ public class Switch extends BranchStatement
     }
 
     public SourceElement getLastElement() {
-        if (getBranchCount() == 0) {
-            return this;
-        }
+        if (getBranchCount() == 0) { return this; }
         return getBranchAt(getBranchCount() - 1).getLastElement();
     }
 }

@@ -57,9 +57,12 @@ public class ProofScriptEngine {
     /**
      * Instantiates a new proof script engine.
      *
-     * @param script the script
-     * @param initLocation the initial location
-     * @param initiallySelectedGoal the initially selected goal
+     * @param script
+     *        the script
+     * @param initLocation
+     *        the initial location
+     * @param initiallySelectedGoal
+     *        the initially selected goal
      */
     public ProofScriptEngine(String script, Location initLocation, Goal initiallySelectedGoal) {
         this.script = script;
@@ -71,9 +74,7 @@ public class ProofScriptEngine {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
-        for (ProofScriptCommand<?> cmd : loader) {
-            result.put(cmd.getName(), cmd);
-        }
+        for (ProofScriptCommand<?> cmd : loader) { result.put(cmd.getName(), cmd); }
 
         return result;
     }
@@ -86,24 +87,18 @@ public class ProofScriptEngine {
 
         stateMap = new EngineState(proof);
 
-        if (initiallySelectedGoal != null) {
-            stateMap.setGoal(initiallySelectedGoal);
-        }
+        if (initiallySelectedGoal != null) { stateMap.setGoal(initiallySelectedGoal); }
 
         // add the filename (if available) to the statemap.
         Optional<URI> uri = initialLocation.getFileURI();
         uri.ifPresent(value -> stateMap.setBaseFileName(Paths.get(value).toFile()));
 
         // add the observer (if installed) to the state map
-        if (commandMonitor != null) {
-            stateMap.setObserver(commandMonitor);
-        }
+        if (commandMonitor != null) { stateMap.setObserver(commandMonitor); }
 
         int cnt = 0;
         while (true) {
-            if (Thread.interrupted()) {
-                throw new InterruptedException();
-            }
+            if (Thread.interrupted()) { throw new InterruptedException(); }
 
             ScriptLineParser.ParsedCommand parsed = mlp.parseCommand();
             if (parsed == null) {
@@ -114,9 +109,7 @@ public class ProofScriptEngine {
             final Location start = parsed.start();
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
-            if (cmd.length() > MAX_CHARS_PER_COMMAND) {
-                cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
-            }
+            if (cmd.length() > MAX_CHARS_PER_COMMAND) { cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'"; }
 
             final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
             if (commandMonitor != null && stateMap.isEchoOn()
@@ -128,15 +121,11 @@ public class ProofScriptEngine {
 
             try {
                 String name = argMap.get(ScriptLineParser.COMMAND_KEY);
-                if (name == null) {
-                    throw new ScriptException("No command");
-                }
+                if (name == null) { throw new ScriptException("No command"); }
 
                 ProofScriptCommand<Object> command =
                     (ProofScriptCommand<Object>) COMMANDS.get(name);
-                if (command == null) {
-                    throw new ScriptException("Unknown command " + name);
-                }
+                if (command == null) { throw new ScriptException("Unknown command " + name); }
 
                 Object o = command.evaluateArguments(stateMap, argMap);
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
@@ -185,7 +174,8 @@ public class ProofScriptEngine {
     /**
      * Set the routine that is executed before every successfully executed command.
      *
-     * @param monitor the monitor to set
+     * @param monitor
+     *        the monitor to set
      */
     public void setCommandMonitor(Consumer<Message> monitor) {
         this.commandMonitor = monitor;
@@ -198,9 +188,7 @@ public class ProofScriptEngine {
     public interface Message {
     }
 
-    public record EchoMessage(String message) implements Message {
-    }
+    public record EchoMessage(String message) implements Message {}
 
-    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
-    }
+    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {}
 }

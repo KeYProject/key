@@ -41,8 +41,7 @@ public class SpecialReferenceWrapper extends ThisReference
     /**
      * Make parent role valid.
      */
-    public void makeParentRoleValid() {
-    }
+    public void makeParentRoleValid() {}
 
     /**
      * Get AST parent.
@@ -55,8 +54,7 @@ public class SpecialReferenceWrapper extends ThisReference
 
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     public SpecialReferenceWrapper deepClone() {
         return new SpecialReferenceWrapper(typeRef, myprefix);
@@ -74,7 +72,8 @@ public class SpecialReferenceWrapper extends ThisReference
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
     public void setStatementContainer(StatementContainer c) {
         statementParent = c;
@@ -98,7 +97,8 @@ public class SpecialReferenceWrapper extends ThisReference
     /**
      * Set reference suffix.
      *
-     * @param myprefix a reference prefix.
+     * @param myprefix
+     *        a reference prefix.
      */
     public void setReferencePrefix(ReferencePrefix myprefix) {
         this.myprefix = myprefix;

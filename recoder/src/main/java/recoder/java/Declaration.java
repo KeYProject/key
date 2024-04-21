@@ -35,7 +35,8 @@ public interface Declaration extends NonTerminalProgramElement {
     /**
      * Sets the declaration specifiers (annotations plus modifiers)
      *
-     * @param d the new list of declaration specifiers
+     * @param d
+     *        the new list of declaration specifiers
      */
     void setDeclarationSpecifiers(ASTList<DeclarationSpecifier> d);
 }

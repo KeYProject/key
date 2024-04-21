@@ -34,15 +34,10 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public AbstractIndex(int initialCapacity) {
-        if (initialCapacity < 4) {
-            initialCapacity = 4;
-        }
+        if (initialCapacity < 4) { initialCapacity = 4; }
         int cap = 4;
         ld = 2;
-        while (cap < initialCapacity) {
-            ld += 1;
-            cap += cap;
-        }
+        while (cap < initialCapacity) { ld += 1; cap += cap; }
         table = new Object[cap];
         id = new long[cap];
         ld = 32 - ld;
@@ -70,57 +65,39 @@ public abstract class AbstractIndex implements HashCode {
         count = 0;
         for (int i = oldCapacity - 1; i >= 0; i -= 1) {
             Object ob = oldMap[i];
-            if (ob != null && ob != DELETED) {
-                insert(ob, oldId[i]);
-            }
+            if (ob != null && ob != DELETED) { insert(ob, oldId[i]); }
         }
     }
 
     public boolean contains(Object key) {
-        if (key == null) {
-            return false;
-        }
+        if (key == null) { return false; }
         int hash = (-1640531527 * hashCode(key)) >>> ld;
         int index = hash;
         do {
             Object ob = table[index];
-            if (ob == null) {
-                return false;
-            }
-            if (equals(ob, key)) {
-                return true;
-            }
+            if (ob == null) { return false; }
+            if (equals(ob, key)) { return true; }
             index = (index + (hash | 1)) & (table.length - 1);
         } while (index != hash);
         return false;
     }
 
     public final long get(Object key) {
-        if (key == null) {
-            return -1L;
-        }
+        if (key == null) { return -1L; }
         int hash = (-1640531527 * hashCode(key)) >>> ld;
         int index = hash;
         do {
             Object ob = table[index];
-            if (ob == null) {
-                return -1L;
-            }
-            if (equals(ob, key)) {
-                return id[index];
-            }
+            if (ob == null) { return -1L; }
+            if (equals(ob, key)) { return id[index]; }
             index = (index + (hash | 1)) & (table.length - 1);
         } while (index != hash);
         return -1;
     }
 
     public final long put(Object key, long id) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null key");
-        }
-        if (count >= table.length * THRESHOLD) {
-            rehash();
-        }
+        if (key == null) { throw new IllegalArgumentException("Null key"); }
+        if (count >= table.length * THRESHOLD) { rehash(); }
         return insert(key, id);
     }
 
@@ -149,16 +126,12 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public final long remove(Object key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null key");
-        }
+        if (key == null) { throw new IllegalArgumentException("Null key"); }
         int hash = (-1640531527 * hashCode(key)) >>> ld;
         int index = hash;
         do {
             Object ob = table[index];
-            if (ob == null) {
-                return -1L;
-            }
+            if (ob == null) { return -1L; }
             if (equals(ob, key)) {
                 table[index] = DELETED;
                 count -= 1;
@@ -170,8 +143,7 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public void clear() {
-        for (int index = table.length; --index >= 0; table[index] = null) {
-        }
+        for (int index = table.length; --index >= 0; table[index] = null) {}
         count = 0;
     }
 
@@ -180,19 +152,10 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public boolean equals(Object ob) {
-        if (!(ob instanceof AbstractIndex x)) {
-            return false;
-        }
-        if (x.size() != size()) {
-            return false;
-        }
+        if (!(ob instanceof AbstractIndex x)) { return false; }
+        if (x.size() != size()) { return false; }
         Enumeration enum2 = x.elements();
-        while (enum2.hasMoreElements()) {
-            Object z = enum2.nextElement();
-            if (get(z) != x.get(z)) {
-                return false;
-            }
-        }
+        while (enum2.hasMoreElements()) { Object z = enum2.nextElement(); if (get(z) != x.get(z)) { return false; } }
         return true;
     }
 
@@ -200,10 +163,7 @@ public abstract class AbstractIndex implements HashCode {
         try {
             AbstractIndex t = (AbstractIndex) super.clone();
             t.table = new Object[table.length];
-            for (int i = table.length; i-- > 0;) {
-                t.table[i] = table[i];
-                t.id[i] = id[i];
-            }
+            for (int i = table.length; i-- > 0;) { t.table[i] = table[i]; t.id[i] = id[i]; }
             return t;
         } catch (CloneNotSupportedException e) {
             throw new InternalError();
@@ -220,9 +180,7 @@ public abstract class AbstractIndex implements HashCode {
             buf.append(s);
             buf.append("=");
             buf.append(get(s));
-            if (i < max) {
-                buf.append(", ");
-            }
+            if (i < max) { buf.append(", "); }
         }
         buf.append("}");
         return buf.toString();
@@ -240,9 +198,7 @@ public abstract class AbstractIndex implements HashCode {
 
         public boolean hasMoreElements() {
             while (index < table.length) {
-                if (table[index] != null && table[index] != DELETED) {
-                    return true;
-                }
+                if (table[index] != null && table[index] != DELETED) { return true; }
                 index += 1;
             }
             return false;
@@ -250,9 +206,7 @@ public abstract class AbstractIndex implements HashCode {
 
         public Object nextElement() {
             while (index < table.length) {
-                if (table[index] != null && table[index] != DELETED) {
-                    return table[index++];
-                }
+                if (table[index] != null && table[index] != DELETED) { return table[index++]; }
                 index += 1;
             }
             throw new NoSuchElementException("Enumerator");

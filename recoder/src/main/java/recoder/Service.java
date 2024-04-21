@@ -14,7 +14,8 @@ public interface Service {
      * start communicating or linking among their configuration partners. The service configuration
      * can be memorized if it has not been passed in by a constructor already.
      *
-     * @param cfg the service configuration this services has been assigned to.
+     * @param cfg
+     *        the service configuration this services has been assigned to.
      */
     void initialize(ServiceConfiguration cfg);
 

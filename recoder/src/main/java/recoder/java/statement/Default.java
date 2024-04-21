@@ -39,7 +39,8 @@ public class Default extends Branch {
     /**
      * Default.
      *
-     * @param body a statement mutable list.
+     * @param body
+     *        a statement mutable list.
      */
 
     public Default(ASTList<Statement> body) {
@@ -50,14 +51,13 @@ public class Default extends Branch {
     /**
      * Default.
      *
-     * @param proto a default.
+     * @param proto
+     *        a default.
      */
 
     protected Default(Default proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -74,7 +74,8 @@ public class Default extends Branch {
     /**
      * Set parent.
      *
-     * @param parent a switch.
+     * @param parent
+     *        a switch.
      */
 
     public void setParent(Switch parent) {
@@ -87,11 +88,7 @@ public class Default extends Branch {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            for (Statement statement : body) {
-                statement.setStatementContainer(this);
-            }
-        }
+        if (body != null) { for (Statement statement : body) { statement.setStatementContainer(this); } }
     }
 
     /**
@@ -102,27 +99,25 @@ public class Default extends Branch {
 
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result += body.size();
-        }
+        if (body != null) { result += body.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (body != null) {
             len = body.size();
-            if (len > index) {
-                return body.get(index);
-            }
+            if (len > index) { return body.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -132,9 +127,7 @@ public class Default extends Branch {
         // role 0 (IDX): body
         if (body != null) {
             int index = body.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }
@@ -145,17 +138,18 @@ public class Default extends Branch {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         int count;
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         count = (body == null) ? 0 : body.size();
         for (int i = 0; i < count; i++) {
             if (body.get(i) == p) {
@@ -189,9 +183,7 @@ public class Default extends Branch {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -207,7 +199,8 @@ public class Default extends Branch {
     /**
      * Set body.
      *
-     * @param list a statement mutable list.
+     * @param list
+     *        a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -219,9 +212,7 @@ public class Default extends Branch {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0) {
-            return this;
-        }
+        if (body == null || body.size() == 0) { return this; }
         return body.get(body.size() - 1).getLastElement();
     }
 }

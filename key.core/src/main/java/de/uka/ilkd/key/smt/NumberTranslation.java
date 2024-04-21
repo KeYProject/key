@@ -20,14 +20,15 @@ public final class NumberTranslation {
     /**
      * This methods translates a term with sort "numbers" into a BigInteger representing the number.
      *
-     * @param term term with sort "numbers"
+     * @param term
+     *        term with sort "numbers"
      * @return An instance of BigInteger representing the number
      */
     public static BigInteger translate(Term term) {
         if (!term.sort().name().toString().trim().equals("numbers")) {
             throw new IllegalArgumentException(
                 "Only terms with sort \"numbers\" may be translated.\n" + "Term " + term
-                    + " is  of sort " + term.sort().name().toString().trim());
+                        + " is  of sort " + term.sort().name().toString().trim());
         }
         Operator op = term.op();
         String name = op.name().toString();
@@ -61,9 +62,7 @@ public final class NumberTranslation {
     static {
         /* initialize smallInts */
         smallInts = new BigInteger[11];
-        for (int i = 0; i < smallInts.length; ++i) {
-            smallInts[i] = new BigInteger(String.valueOf(i));
-        }
+        for (int i = 0; i < smallInts.length; ++i) { smallInts[i] = new BigInteger(String.valueOf(i)); }
     }
 
 }

@@ -32,8 +32,10 @@ public class LogicalAnd extends Operator {
     /**
      * Logical and.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public LogicalAnd(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class LogicalAnd extends Operator {
     /**
      * Logical and.
      *
-     * @param proto a logical and.
+     * @param proto
+     *        a logical and.
      */
 
     protected LogicalAnd(LogicalAnd proto) {

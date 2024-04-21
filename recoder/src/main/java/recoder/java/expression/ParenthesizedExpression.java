@@ -41,7 +41,8 @@ public class ParenthesizedExpression extends Operator
     /**
      * Parenthesized expression.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public ParenthesizedExpression(Expression child) {
@@ -52,7 +53,8 @@ public class ParenthesizedExpression extends Operator
     /**
      * Parenthesized expression.
      *
-     * @param proto a parenthesized expression.
+     * @param proto
+     *        a parenthesized expression.
      */
     protected ParenthesizedExpression(ParenthesizedExpression proto) {
         super(proto);
@@ -95,7 +97,8 @@ public class ParenthesizedExpression extends Operator
     /**
      * Set statement container.
      *
-     * @param parent a statement container.
+     * @param parent
+     *        a statement container.
      */
     public void setStatementContainer(StatementContainer parent) {
         statementParent = parent;
@@ -106,7 +109,8 @@ public class ParenthesizedExpression extends Operator
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
     public void setExpressionContainer(ExpressionContainer c) {
         expressionParent = c;
@@ -127,14 +131,14 @@ public class ParenthesizedExpression extends Operator
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -151,7 +155,8 @@ public class ParenthesizedExpression extends Operator
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {

@@ -109,8 +109,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name The name to use.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        The name to use.
      */
     public AbstractOperationPO(InitConfig initConfig, String name) {
         this(initConfig, name, false, false);
@@ -119,11 +121,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name he name to use.
-     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        he name to use.
+     * @param addUninterpretedPredicate
+     *        {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel
+     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public AbstractOperationPO(InitConfig initConfig, String name,
@@ -136,7 +142,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Returns the uninterpreted predicate used in the given {@link Proof} if available.
      *
-     * @param proof The {@link Proof} to get its uninterpreted predicate.
+     * @param proof
+     *        The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
     public static Term getUninterpretedPredicate(Proof proof) {
@@ -144,9 +151,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO operationPO) {
-                if (operationPO.isAddUninterpretedPredicate()) {
-                    return operationPO.getUninterpretedPredicate();
-                }
+                if (operationPO.isAddUninterpretedPredicate()) { return operationPO.getUninterpretedPredicate(); }
             }
         }
         return null;
@@ -155,7 +160,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Returns the uninterpreted predicate used in the given {@link Proof} if available.
      *
-     * @param proof The {@link Proof} to get its uninterpreted predicate.
+     * @param proof
+     *        The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
     public static Set<Term> getAdditionalUninterpretedPredicates(Proof proof) {
@@ -177,9 +183,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}. Otherwise the
      * given {@link Term} is returned.
      *
-     * @param services The {@link Services} which provides the {@link Proof} and its
+     * @param services
+     *        The {@link Services} which provides the {@link Proof} and its
      *        {@link ProofOblInput}.
-     * @param term The {@link Term} to modify.
+     * @param term
+     *        The {@link Term} to modify.
      * @return The modified or original {@link Term}.
      */
     public static Term addUninterpretedPredicateIfRequired(Services services, Term term) {
@@ -199,11 +207,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}. Otherwise the
      * given {@link Term} is returned.
      *
-     * @param services The {@link Services} which provides the {@link Proof} and its
+     * @param services
+     *        The {@link Services} which provides the {@link Proof} and its
      *        {@link ProofOblInput}.
-     * @param term The {@link Term} to modify.
-     * @param variablesToProtect {@link LocationVariable}s to protect.
-     * @param exceptionVar The exception variable to protect.
+     * @param term
+     *        The {@link Term} to modify.
+     * @param variablesToProtect
+     *        {@link LocationVariable}s to protect.
+     * @param exceptionVar
+     *        The exception variable to protect.
      * @return The modified or original {@link Term}.
      */
     public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, Term term,
@@ -223,7 +235,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Checks if the "addUninterpretedPredicate" value is set in the given {@link Properties}.
      *
-     * @param properties The {@link Properties} to read value from.
+     * @param properties
+     *        The {@link Properties} to read value from.
      * @return {@code true} is set, {@code false} is not set.
      */
     protected static boolean isAddUninterpretedPredicate(Properties properties) {
@@ -234,7 +247,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Checks if the "addSymbolicExecutionLabel" value is set in the given {@link Properties}.
      *
-     * @param properties The {@link Properties} to read value from.
+     * @param properties
+     *        The {@link Properties} to read value from.
      * @return {@code true} is set, {@code false} is not set.
      */
     protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
@@ -272,10 +286,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             updateSubs[i] = tb.var(selfVar);
             i++;
         }
-        for (ProgramVariable paramVar : paramVars) {
-            updateSubs[i] = tb.var(paramVar);
-            i++;
-        }
+        for (ProgramVariable paramVar : paramVars) { updateSubs[i] = tb.var(paramVar); i++; }
         return updateSubs;
     }
 
@@ -302,9 +313,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (LocationVariable heap : modHeaps) {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
-                if (target.getStateCount() == 2) {
-                    heaps.add(atPreVars.get(heap));
-                }
+                if (target.getStateCount() == 2) { heaps.add(atPreVars.get(heap)); }
             }
         }
         return heaps;
@@ -326,9 +335,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<Term, Term> heapToAtPre = new LinkedHashMap<>();
-        for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
-        }
+        for (LocationVariable heap : modHeaps) { heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap))); }
         return heapToAtPre;
     }
 
@@ -345,8 +352,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
             } catch (IllegalArgumentException iae) {
                 throw new IllegalStateException(
                     "You are trying to prove a contract that involves Java Card "
-                        + "transactions, but the required Java Card API classes are not "
-                        + "in your project.");
+                            + "transactions, but the required Java Card API classes are not "
+                            + "in your project.");
             }
         }
         return pre;
@@ -365,9 +372,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
         } else {
             final Term body = representsFromContract;
-            assert body.op() == Equality.EQUALS
-                    : "Only fully functional represents clauses for model"
-                        + " methods are supported!";
+            assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model"
+                    + " methods are supported!";
             progPost = tb.apply(saveBeforeHeaps,
                 tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
         }
@@ -521,15 +527,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Modifies the post condition with help of
      * {@link POExtension#modifyPostTerm(InitConfig, Services, Term)}.
      *
-     * @param proofServices The {@link Services} to use.
-     * @param post The post condition to modify.
+     * @param proofServices
+     *        The {@link Services} to use.
+     * @param post
+     *        The post condition to modify.
      * @return The modified post condition or the original one if no modifications were performed.
      */
     protected Term modifyPostTerm(Services proofServices, Term post) {
         ImmutableList<POExtension> extensions = ProofInitServiceUtil.getOperationPOExtension(this);
-        for (POExtension extension : extensions) {
-            post = extension.modifyPostTerm(proofConfig, proofServices, post);
-        }
+        for (POExtension extension : extensions) { post = extension.modifyPostTerm(proofConfig, proofServices, post); }
         return post;
     }
 
@@ -572,10 +578,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * block 2. code to execute in the try block 3. code to execute in the catch block 4. code to
      * execute in the finally block
      *
-     * @param formalParVars Arguments from formal parameters for method call.
-     * @param selfVar The self variable.
-     * @param resultVar The result variable.
-     * @param services services instance
+     * @param formalParVars
+     *        Arguments from formal parameters for method call.
+     * @param selfVar
+     *        The self variable.
+     * @param resultVar
+     *        The result variable.
+     * @param services
+     *        services instance
      * @return operation blocks as statement blocks
      */
     protected abstract ImmutableList<StatementBlock> buildOperationBlocks(
@@ -586,11 +596,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the "general assumption".
      *
-     * @param selfVar The self variable.
-     * @param selfKJT The {@link KeYJavaType} of the self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param heaps The heaps.
-     * @param services The services instance.
+     * @param selfVar
+     *        The self variable.
+     * @param selfKJT
+     *        The {@link KeYJavaType} of the self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param heaps
+     *        The heaps.
+     * @param services
+     *        The services instance.
      * @return The {@link Term} containing the general assumptions.
      */
     protected Term buildFreePre(ProgramVariable selfVar, KeYJavaType selfKJT,
@@ -631,21 +646,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Generates the general assumption that all parameter arguments are valid.
      *
-     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
     protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
         Term paramsOK = tb.tt();
-        for (ProgramVariable paramVar : paramVars) {
-            paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
-        }
+        for (ProgramVariable paramVar : paramVars) { paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar)); }
         return paramsOK;
     }
 
     /**
      * Generates the general assumption that all parameter arguments are valid.
      *
-     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
     protected Term generateParamsOK2(ImmutableList<Term> paramVars) {
@@ -664,12 +679,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the precondition.
      *
-     * @param modHeaps The heaps.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param modHeaps
+     *        The heaps.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The {@link Term} representing the precondition.
      */
     protected abstract Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
@@ -679,14 +699,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the postcondition.
      *
-     * @param modHeaps The heaps.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param resultVar The result variable.
-     * @param exceptionVar The exception variable.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param modHeaps
+     *        The heaps.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param resultVar
+     *        The result variable.
+     * @param exceptionVar
+     *        The exception variable.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The {@link Term} representing the postcondition.
      */
     protected abstract Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
@@ -709,11 +736,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates {@link #uninterpretedPredicate}.
      *
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param formalParamVars The formal parameters {@link LocationVariable}s.
-     * @param exceptionVar The exception variable.
-     * @param name The name of the uninterpreted predicate.
-     * @param services services instance.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param formalParamVars
+     *        The formal parameters {@link LocationVariable}s.
+     * @param exceptionVar
+     *        The exception variable.
+     * @param name
+     *        The name of the uninterpreted predicate.
+     * @param services
+     *        services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
@@ -732,10 +764,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Creates a new uninterpreted predicate which is added to
      * {@link #additionalUninterpretedPredicates}.
      *
-     * @param formalParamVars The formal parameters {@link LocationVariable}s.
-     * @param exceptionVar The exception variable.
-     * @param name The name of the uninterpreted predicate.
-     * @param services services instance.
+     * @param formalParamVars
+     *        The formal parameters {@link LocationVariable}s.
+     * @param exceptionVar
+     *        The exception variable.
+     * @param name
+     *        The name of the uninterpreted predicate.
+     * @param services
+     *        services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term newAdditionalUninterpretedPredicate(
@@ -750,10 +786,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Creates a {@link Term} to use in the postcondition of the generated {@link Sequent} which
      * represents the uninterpreted predicate.
      *
-     * @param formalParamVars The formal parameters {@link LocationVariable}s.
-     * @param exceptionVar The exception variable.
-     * @param name The name of the uninterpreted predicate.
-     * @param services services instance.
+     * @param formalParamVars
+     *        The formal parameters {@link LocationVariable}s.
+     * @param exceptionVar
+     *        The exception variable.
+     * @param name
+     *        The name of the uninterpreted predicate.
+     * @param services
+     *        services instance.
      * @return The created uninterpreted predicate.
      */
     protected Term createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
@@ -762,9 +802,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Term> arguments = ImmutableSLList.nil(); // tb.var(paramVars);
         // Method parameters
-        for (LocationVariable formalParam : formalParamVars) {
-            arguments = arguments.prepend(tb.var(formalParam));
-        }
+        for (LocationVariable formalParam : formalParamVars) { arguments = arguments.prepend(tb.var(formalParam)); }
         // Exception variable (As second argument for the predicate)
         arguments = arguments.prepend(exceptionVar);
         // Heap (As first argument for the predicate)
@@ -782,11 +820,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the frame clause including the modifies clause.
      *
-     * @param modHeaps The heaps.
-     * @param heapToAtPre The previous heap before execution.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param services services instance
+     * @param modHeaps
+     *        The heaps.
+     * @param heapToAtPre
+     *        The previous heap before execution.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param services
+     *        services instance
      * @return The created {@link Term} representing the frame clause.
      */
     protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
@@ -797,16 +840,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Creates the {@link Term} which contains the modality including the complete program to
      * execute.
      *
-     * @param paramVars Formal parameters of method call.
-     * @param formalParamVars Arguments from formal parameters for method call.
-     * @param selfVar The self variable.
-     * @param resultVar The result variable.
-     * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param paramVars
+     *        Formal parameters of method call.
+     * @param formalParamVars
+     *        Arguments from formal parameters for method call.
+     * @param selfVar
+     *        The self variable.
+     * @param resultVar
+     *        The result variable.
+     * @param exceptionVar
+     *        The {@link ProgramVariable} used to store caught exceptions.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
-     * @param postTerm The post condition.
-     * @param sb The {@link StatementBlock} to execute in try block.
-     * @param services services instance.
+     * @param postTerm
+     *        The post condition.
+     * @param sb
+     *        The {@link StatementBlock} to execute in try block.
+     * @param services
+     *        services instance.
      * @return The created {@link Term}.
      */
     protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
@@ -838,7 +890,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Returns the base heap.
      *
-     * @param services services instance.
+     * @param services
+     *        services instance.
      * @return The {@link LocationVariable} of the base heap.
      */
     protected LocationVariable getBaseHeap(Services services) {
@@ -848,7 +901,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Returns the saved heap.
      *
-     * @param services services instance.
+     * @param services
+     *        services instance.
      * @return The {@link LocationVariable} of the saved heap.
      */
     protected LocationVariable getSavedHeap(Services services) {
@@ -858,12 +912,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the try catch block to execute.
      *
-     * @param formalParVars Arguments from formal parameters for method call.
-     * @param selfVar The self variable.
-     * @param resultVar The result variable.
-     * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
-     * @param transaction Transaction flag.
-     * @param sb The {@link StatementBlock}s to execute.
+     * @param formalParVars
+     *        Arguments from formal parameters for method call.
+     * @param selfVar
+     *        The self variable.
+     * @param resultVar
+     *        The result variable.
+     * @param exceptionVar
+     *        The {@link ProgramVariable} used to store caught exceptions.
+     * @param transaction
+     *        Transaction flag.
+     * @param sb
+     *        The {@link StatementBlock}s to execute.
      * @return The created {@link JavaBlock} which contains the try catch block.
      */
     protected JavaBlock buildJavaBlock(ImmutableList<LocationVariable> formalParVars,
@@ -935,11 +995,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the initial updates.
      *
-     * @param paramVars Formal parameters of method call.
-     * @param formalParamVars Arguments from formal parameters for method call.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param paramVars
+     *        Formal parameters of method call.
+     * @param formalParamVars
+     *        Arguments from formal parameters for method call.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
-     * @param services The services instance.
+     * @param services
+     *        The services instance.
      * @return The {@link Term} representing the initial updates.
      */
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
@@ -979,7 +1043,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Returns the name of the {@link Proof} based on the given transaction flag.
      *
-     * @param transactionFlag The transaction flag.
+     * @param transactionFlag
+     *        The transaction flag.
      * @return The proof name to use.
      */
     protected abstract String buildPOName(boolean transactionFlag);
@@ -1014,9 +1079,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (KeYJavaType superType : proofServices.getJavaInfo()
                 .getAllSupertypes(getCalleeKeYJavaType())) {
             for (FunctionalOperationContract fop : cs) {
-                if (fop.getSpecifiedIn().equals(superType)) {
-                    lookupContracts = lookupContracts.append(fop);
-                }
+                if (fop.getSpecifiedIn().equals(superType)) { lookupContracts = lookupContracts.append(fop); }
             }
         }
         return lookupContracts;
@@ -1032,9 +1095,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (FunctionalOperationContract fop : lookupContracts) {
             representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
                 resultVar, atPreVars, proofServices);
-            if (representsFromContract != null) {
-                break;
-            }
+            if (representsFromContract != null) { break; }
         }
         return representsFromContract;
     }
@@ -1045,12 +1106,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // register the variables so they are declared in proof header
         // if the proof is saved to a file
         register(paramVars, proofServices);
-        for (ProgramVariable var : vars) {
-            register(var, proofServices);
-        }
-        for (LocationVariable lv : atPreVars) {
-            register(lv, proofServices);
-        }
+        for (ProgramVariable var : vars) { register(var, proofServices); }
+        for (LocationVariable lv : atPreVars) { register(lv, proofServices); }
     }
 
     private Term createApplyGlobalUpdateTerm(final ProgramVariable selfVar,

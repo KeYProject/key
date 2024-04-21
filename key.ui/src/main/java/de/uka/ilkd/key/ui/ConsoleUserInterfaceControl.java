@@ -115,7 +115,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * assigned to keyProblemFile in method loadProblem(File).
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-            + " save a proof but no corresponding key problem file is " + "available.";
+                + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
@@ -145,9 +145,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
-            if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
-            }
+            if (!isAtLeastOneMacroRunning()) { printResults(openGoals, info, result2); }
         } else if (info.getSource() instanceof ProblemLoader) {
             LOGGER.debug("{}", result2);
             System.exit(-1);
@@ -202,10 +200,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use.
-     * @param includes the included files to use
+     * @param file
+     *        the File with the problem description or the proof
+     * @param classPath
+     *        the class path entries to use.
+     * @param bootClassPath
+     *        the boot class path to use.
+     * @param includes
+     *        the included files to use
      */
     public void loadProblem(File file, List<File> classPath, File bootClassPath,
             List<File> includes) {
@@ -272,9 +274,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public final void taskProgress(int position) {
         super.taskProgress(position);
         if (progressMax > 0) {
-            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
-                System.out.print(PROGRESS_MARK);
-            }
+            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) { System.out.print(PROGRESS_MARK); }
         }
     }
 
@@ -356,30 +356,26 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result the result
-     * @param proof the proof
-     * @param keyProblemFile the key problem file
+     * @param result
+     *        the result
+     * @param proof
+     *        the proof
+     * @param keyProblemFile
+     *        the key problem file
      * @return true, if successful
      */
     public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
-        if (result instanceof Throwable) {
-            throw new RuntimeException("Error in batchmode.", (Throwable) result);
-        }
+        if (result instanceof Throwable) { throw new RuntimeException("Error in batchmode.", (Throwable) result); }
 
         // Save the proof before exit.
         String baseName = keyProblemFile.getAbsolutePath();
         int idx = baseName.indexOf(".key");
-        if (idx == -1) {
-            idx = baseName.indexOf(".proof");
-        }
+        if (idx == -1) { idx = baseName.indexOf(".proof"); }
         baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
         File f;
         int counter = 0;
-        do {
-            f = new File(baseName + ".auto." + counter + ".proof");
-            counter++;
-        } while (f.exists());
+        do { f = new File(baseName + ".auto." + counter + ".proof"); counter++; } while (f.exists());
 
         try {
             // a copy with running number to compare different runs

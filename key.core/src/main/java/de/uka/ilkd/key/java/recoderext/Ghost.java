@@ -15,8 +15,7 @@ public class Ghost extends Modifier {
     private static final long serialVersionUID = -4883937081008486072L;
 
 
-    public Ghost() {
-    }
+    public Ghost() {}
 
 
     protected Ghost(Ghost proto) {
@@ -29,6 +28,5 @@ public class Ghost extends Modifier {
     }
 
 
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 }

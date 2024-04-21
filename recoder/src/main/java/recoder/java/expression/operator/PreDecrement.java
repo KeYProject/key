@@ -32,7 +32,8 @@ public class PreDecrement extends Assignment {
     /**
      * Pre decrement.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public PreDecrement(Expression child) {
@@ -43,7 +44,8 @@ public class PreDecrement extends Assignment {
     /**
      * Pre decrement.
      *
-     * @param proto a pre decrement.
+     * @param proto
+     *        a pre decrement.
      */
 
     protected PreDecrement(PreDecrement proto) {

@@ -15,8 +15,7 @@ public class Model extends Modifier {
     private static final long serialVersionUID = -1997772798461795576L;
 
 
-    public Model() {
-    }
+    public Model() {}
 
 
     protected Model(Model proto) {
@@ -29,6 +28,5 @@ public class Model extends Modifier {
     }
 
 
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 }

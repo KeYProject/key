@@ -57,21 +57,15 @@ public class SVInstantiationCP implements Feature {
 
     private SchemaVariable findSVWithName(TacletApp app) {
 
-        if (svToInstantiate == null) {
-            return app.taclet().getTrigger().triggerVar();
-        }
+        if (svToInstantiate == null) { return app.taclet().getTrigger().triggerVar(); }
 
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
-        for (SchemaVariable svt : vars) {
-            if (svt.name().equals(svToInstantiate)) {
-                return svt;
-            }
-        }
+        for (SchemaVariable svt : vars) { if (svt.name().equals(svToInstantiate)) { return svt; } }
 
         Debug.fail("Did not find schema variable " + svToInstantiate
-            + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
-            + "Either the name of the variable is wrong, or the variable\n"
-            + "has already been instantiated.");
+                + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
+                + "Either the name of the variable is wrong, or the variable\n"
+                + "has already been instantiated.");
         return null;
     }
 
@@ -107,7 +101,9 @@ public class SVInstantiationCP implements Feature {
             final CPBranch branch = new CPBranch() {
                 public void choose() {}
 
-                public RuleApp getRuleAppForBranch() { return newApp; }
+                public RuleApp getRuleAppForBranch() {
+                    return newApp;
+                }
             };
 
             return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();

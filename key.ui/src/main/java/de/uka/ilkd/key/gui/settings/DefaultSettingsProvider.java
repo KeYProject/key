@@ -20,8 +20,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     private int priority;
     private Icon icon;
 
-    public DefaultSettingsProvider() {
-    }
+    public DefaultSettingsProvider() {}
 
     public DefaultSettingsProvider(String desc, JPanel pane) {
         setDescription(desc);
@@ -52,8 +51,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-    }
+    public void applySettings(MainWindow window) throws InvalidSettingsInputException {}
 
     @Override
     public Icon getIcon() {

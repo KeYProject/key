@@ -18,9 +18,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
 
     public SLTranslationException(String message, Throwable cause, Location location) {
         super(message, cause);
-        if (location == null) {
-            throw new IllegalArgumentException();
-        }
+        if (location == null) { throw new IllegalArgumentException(); }
         this.location = location;
     }
 

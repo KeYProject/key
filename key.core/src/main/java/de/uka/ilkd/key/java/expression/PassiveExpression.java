@@ -17,7 +17,8 @@ public class PassiveExpression extends ParenthesizedExpression {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. In this case the order of
+     * @param children
+     *        the children of this AST element as KeY classes. In this case the order of
      *        the children is IMPORTANT. May contain: several of Expression (should be one, the
      *        first is taken as parenthesized expression), Comments
      */
@@ -33,7 +34,8 @@ public class PassiveExpression extends ParenthesizedExpression {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPassiveExpression(this);

@@ -43,9 +43,7 @@ public class TestSchemaModalOperators {
     private Services services;
 
     private static Semisequent parseTermForSemisequent(String t) {
-        if ("".equals(t)) {
-            return Semisequent.EMPTY_SEMISEQUENT;
-        }
+        if ("".equals(t)) { return Semisequent.EMPTY_SEMISEQUENT; }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
         return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }

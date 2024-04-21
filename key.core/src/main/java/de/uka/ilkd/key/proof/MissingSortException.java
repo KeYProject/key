@@ -23,7 +23,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Sort of " + toInstantiate + " is unknown.\n"
-            + "The sort can be given manually using an expression like \"id:sort\".";
+                + "The sort can be given manually using an expression like \"id:sort\".";
         return errmsg;
     }
 

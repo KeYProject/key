@@ -31,9 +31,7 @@ public final class ProblemLoaderException extends Exception {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (getMessage() != null) {
-            sb = sb.append(getMessage());
-        }
+        if (getMessage() != null) { sb = sb.append(getMessage()); }
         sb = sb.append(" (");
         if (origin == null) {
             sb = sb.append("unknown origin");

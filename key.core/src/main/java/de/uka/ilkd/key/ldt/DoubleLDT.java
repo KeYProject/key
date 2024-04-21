@@ -119,9 +119,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
-        } else if (subs.length == 2) {
-            return isResponsible(op, subs[0], subs[1], services, ec);
-        }
+        } else if (subs.length == 2) { return isResponsible(op, subs[0], subs[1], services, ec); }
         return false;
     }
 
@@ -138,9 +136,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
-        if (sub != null && sub.sort().extendsTrans(targetSort())) {
-            return op instanceof Negative;
-        }
+        if (sub != null && sub.sort().extendsTrans(targetSort())) { return op instanceof Negative; }
         return false;
     }
 

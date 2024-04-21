@@ -41,7 +41,8 @@ public abstract class TwoPassTransformation extends Transformation {
     /**
      * Creates a new transformation using the given service configuration.
      *
-     * @param sc the service configuration to use.
+     * @param sc
+     *        the service configuration to use.
      */
     public TwoPassTransformation(CrossReferenceServiceConfiguration sc) {
         super(sc);
@@ -69,18 +70,15 @@ public abstract class TwoPassTransformation extends Transformation {
      * visible. Redefined methods should call this method via <CODE>
      * super.transform()</CODE> as the first action.
      *
-     * @throws IllegalStateException if the analysis did not initialize the report.
+     * @throws IllegalStateException
+     *         if the analysis did not initialize the report.
      * @see #analyze()
      * @see #isVisible()
      * @see recoder.service.ChangeHistory#begin(Transformation)
      */
     public void transform() {
-        if (getProblemReport() == null) {
-            throw new IllegalStateException("No analyze");
-        }
-        if (isVisible()) {
-            getChangeHistory().begin(this);
-        }
+        if (getProblemReport() == null) { throw new IllegalStateException("No analyze"); }
+        if (isVisible()) { getChangeHistory().begin(this); }
     }
 
     /**
@@ -89,9 +87,7 @@ public abstract class TwoPassTransformation extends Transformation {
      */
     public ProblemReport execute() {
         ProblemReport report = analyze();
-        if ((report instanceof NoProblem) && !(report instanceof Identity)) {
-            transform();
-        }
+        if ((report instanceof NoProblem) && !(report instanceof Identity)) { transform(); }
         return report;
     }
 

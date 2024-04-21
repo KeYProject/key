@@ -24,7 +24,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public ToggleTermOriginTrackingAction(MainWindow mainWindow) {
         super(mainWindow);

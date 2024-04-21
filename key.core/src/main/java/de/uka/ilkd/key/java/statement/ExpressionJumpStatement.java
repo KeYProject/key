@@ -42,7 +42,8 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Expression jump statement.
      *
-     * @param expr an Expression used to jump
+     * @param expr
+     *        an Expression used to jump
      */
     public ExpressionJumpStatement(Expression expr) {
         expression = expr;
@@ -60,14 +61,14 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for an expression.
+     * @param index
+     *        an index for an expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -92,16 +93,14 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
-        }
+        if (expression != null) { if (index == 0) { return expression; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

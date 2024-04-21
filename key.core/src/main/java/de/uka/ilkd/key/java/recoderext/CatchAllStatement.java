@@ -32,8 +32,10 @@ public class CatchAllStatement extends JavaStatement
     /**
      * Construct a catch all statement
      *
-     * @param r the VariableReference of the catch clause
-     * @param body the StatementBlock representing the catch clause's body
+     * @param r
+     *        the VariableReference of the catch clause
+     * @param body
+     *        the StatementBlock representing the catch clause's body
      */
     public CatchAllStatement(VariableReference r, StatementBlock body) {
         this.body = body;
@@ -68,9 +70,7 @@ public class CatchAllStatement extends JavaStatement
 
 
     public Expression getExpressionAt(int index) {
-        if (param != null && index == 0) {
-            return param;
-        }
+        if (param != null && index == 0) { return param; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -114,12 +114,8 @@ public class CatchAllStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
-        if (param != null) {
-            result++;
-        }
+        if (body != null) { result++; }
+        if (param != null) { result++; }
         return result;
     }
 
@@ -127,21 +123,19 @@ public class CatchAllStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (param != null) {
-            if (index == 0) {
-                return param;
-            }
+            if (index == 0) { return param; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -153,16 +147,12 @@ public class CatchAllStatement extends JavaStatement
         if (param == p) {
             VariableReference r = (VariableReference) q;
             param = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         } else if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -174,22 +164,14 @@ public class CatchAllStatement extends JavaStatement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (param != null) {
-            param.setExpressionContainer(this);
-        }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (param != null) { param.setExpressionContainer(this); }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
 
     public int getChildPositionCode(ProgramElement child) {
-        if (param == child) {
-            return 0;
-        }
-        if (body == child) {
-            return 1;
-        }
+        if (param == child) { return 0; }
+        if (body == child) { return 1; }
         return -1;
     }
 

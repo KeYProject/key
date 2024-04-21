@@ -83,9 +83,7 @@ public class OptionManager {
         options.addElement(descr);
         str2opt.put("-" + shortOpt, descr);
         str2opt.put("--" + longOpt, descr);
-        if ((multiplicity & MANDATORY) != 0) {
-            mandatories.addElement(descr);
-        }
+        if ((multiplicity & MANDATORY) != 0) { mandatories.addElement(descr); }
     }
 
     int getOptionCount() {
@@ -99,9 +97,7 @@ public class OptionManager {
             OptionMultiplicityException, IllegalOptionValueException, MissingOptionValueException {
         String opt = args[offset];
         OptionDescription descr = (OptionDescription) str2opt.get(opt);
-        if (descr == null) {
-            throw new UnknownOptionException(args[offset]);
-        }
+        if (descr == null) { throw new UnknownOptionException(args[offset]); }
         // first check for multiplicity constraints
         if ((descr.multiplicity & SINGLE) != 0 && descr.values.size() > 0) {
             throw new OptionMultiplicityException(opt);
@@ -110,9 +106,7 @@ public class OptionManager {
         // now compute the value
         String sval = null;
         if (descr.type != SIMPLE) {
-            if (offset == args.length) {
-                throw new MissingOptionValueException(opt);
-            }
+            if (offset == args.length) { throw new MissingOptionValueException(opt); }
             sval = args[offset++];
         }
         Object optval = null;
@@ -158,15 +152,11 @@ public class OptionManager {
             throws UnknownOptionException, OptionMultiplicityException, IllegalOptionValueException,
             MissingOptionValueException, MissingArgumentException {
         int offset = 0;
-        while (offset < args.length && args[offset].startsWith("-")) {
-            offset = parseArg(args, offset);
-        }
+        while (offset < args.length && args[offset].startsWith("-")) { offset = parseArg(args, offset); }
         // check if all mandatory arguments have been set
         for (Enumeration mand = mandatories.elements(); mand.hasMoreElements();) {
             OptionDescription descr = (OptionDescription) mand.nextElement();
-            if (descr.values.isEmpty()) {
-                throw new MissingArgumentException(descr.shortOpt);
-            }
+            if (descr.values.isEmpty()) { throw new MissingArgumentException(descr.shortOpt); }
         }
         String[] result = new String[args.length - offset];
         System.arraycopy(args, offset, result, 0, result.length);
@@ -235,9 +225,7 @@ public class OptionManager {
      */
     public Vector getValues(String opt) {
         OptionDescription descr = (OptionDescription) str2opt.get("-" + opt);
-        if (descr == null) {
-            return null;
-        }
+        if (descr == null) { return null; }
         return descr.values;
     }
 

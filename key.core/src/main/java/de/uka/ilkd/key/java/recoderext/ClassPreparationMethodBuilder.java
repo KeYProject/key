@@ -46,9 +46,11 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      * preparation method is created and added for all classes, which are declared in one of the
      * given compilation units.
      *
-     * @param services the CrossReferenceServiceConfiguration with the information about the recoder
+     * @param services
+     *        the CrossReferenceServiceConfiguration with the information about the recoder
      *        model
-     * @param cache a cache object that stores information which is needed by and common to many
+     * @param cache
+     *        a cache object that stores information which is needed by and common to many
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
@@ -68,9 +70,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      */
     private boolean isConstantField(FieldSpecification spec) {
         boolean result = spec.isStatic() && spec.isFinal();
-        if (!result) {
-            return false;
-        }
+        if (!result) { return false; }
         recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
 
         try {
@@ -89,7 +89,8 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      * <p>
      * some special settings for implicit fields are performed here as well
      *
-     * @param typeDeclaration the ClassDeclaration whose fields have to be prepared
+     * @param typeDeclaration
+     *        the ClassDeclaration whose fields have to be prepared
      * @return the list of copy assignments
      */
     private ASTList<Statement> prepareFields(TypeDeclaration typeDeclaration) {
@@ -123,7 +124,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
                 if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration cd) {
                     if (cd.getTypeDeclarationCount() > 0) {
                         LOGGER.debug("clPrepBuilder: Inner Class detected. "
-                            + "Reject building class initialisation methods.");
+                                + "Reject building class initialisation methods.");
                     }
 
                     // collect initializers for transformation phase
@@ -138,7 +139,8 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
     /**
      * creates the static method <code>&lt;clprepare&gt;</code> for the given type declaration
      *
-     * @param td the TypeDeclaration to which the new created method will be attached
+     * @param td
+     *        the TypeDeclaration to which the new created method will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration td) {
@@ -155,7 +157,8 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
         attach(createPrepareMethod(td), td, 0);

@@ -32,8 +32,10 @@ public class BinaryOrAssignment extends Assignment {
     /**
      * Binary or assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public BinaryOrAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class BinaryOrAssignment extends Assignment {
     /**
      * Binary or assignment.
      *
-     * @param proto a binary or assignment.
+     * @param proto
+     *        a binary or assignment.
      */
 
     protected BinaryOrAssignment(BinaryOrAssignment proto) {

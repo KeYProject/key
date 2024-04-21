@@ -78,9 +78,7 @@ public class KeYProgModelInfo {
     private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
             Object o = rec2key().toRecoder(kjt);
-            if (o instanceof ClassType) {
-                return ((ClassType) o).getAllMethods();
-            }
+            if (o instanceof ClassType) { return ((ClassType) o).getAllMethods(); }
         }
         return new ArrayList<>();
     }
@@ -118,21 +116,15 @@ public class KeYProgModelInfo {
         for (int i = rmethods.size() - 1; i >= 0; i--) {
             recoder.abstraction.Method rm = rmethods.get(i);
             IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
-            if (m != null) {
-                result = result.prepend(m);
-            }
+            if (m != null) { result = result.prepend(m); }
         }
         return result;
     }
 
     private List<recoder.abstraction.Type> getRecoderTypes(ImmutableList<? extends Type> types) {
-        if (types == null) {
-            return null;
-        }
+        if (types == null) { return null; }
         final ArrayList<recoder.abstraction.Type> tl = new ArrayList<>(types.size());
-        for (final Type n : types) {
-            tl.add((recoder.abstraction.Type) rec2key().toRecoder(n));
-        }
+        for (final Type n : types) { tl.add((recoder.abstraction.Type) rec2key().toRecoder(n)); }
         return tl;
     }
 
@@ -150,17 +142,13 @@ public class KeYProgModelInfo {
             result =
                 searchType(shortName, ((recoder.java.declaration.ClassDeclaration) rt).getTypes());
 
-            if (result != null) {
-                return (KeYJavaType) rec2key().toKeY(result);
-            }
+            if (result != null) { return (KeYJavaType) rec2key().toKeY(result); }
 
             // check for imported types
             recoder.java.NonTerminalProgramElement rct =
                 (recoder.java.NonTerminalProgramElement) rt;
             recoder.java.CompilationUnit cunit;
-            while (!(rct.getASTParent() instanceof recoder.java.CompilationUnit)) {
-                rct = rct.getASTParent();
-            }
+            while (!(rct.getASTParent() instanceof recoder.java.CompilationUnit)) { rct = rct.getASTParent(); }
 
             cunit = (CompilationUnit) rct.getASTParent();
 
@@ -182,9 +170,7 @@ public class KeYProgModelInfo {
                     }
                 }
                 result = searchType(shortName, types);
-                if (result != null) {
-                    return (KeYJavaType) rec2key().toKeY(result);
-                }
+                if (result != null) { return (KeYJavaType) rec2key().toKeY(result); }
 
             }
         }
@@ -194,11 +180,7 @@ public class KeYProgModelInfo {
 
     private recoder.abstraction.ClassType searchType(String shortName,
             final List<? extends ClassType> types) {
-        for (recoder.abstraction.ClassType type : types) {
-            if (type.getName().equals(shortName)) {
-                return type;
-            }
-        }
+        for (recoder.abstraction.ClassType type : types) { if (type.getName().equals(shortName)) { return type; } }
         return null;
     }
 
@@ -265,7 +247,7 @@ public class KeYProgModelInfo {
         }
         // should not occur
         throw new RuntimeException("Method isSubtype in class KeYProgModelInfo "
-            + "currently only supports two class types or two " + "array type but no mixture!");
+                + "currently only supports two class types or two " + "array type but no mixture!");
     }
 
     private boolean isSubtype(recoder.abstraction.ClassType classSubType,
@@ -281,7 +263,8 @@ public class KeYProgModelInfo {
     /**
      * checks if name refers to a package
      *
-     * @param name a String with the name to be checked
+     * @param name
+     *        a String with the name to be checked
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
@@ -329,9 +312,7 @@ public class KeYProgModelInfo {
     private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
             Object o = rec2key().toRecoder(kjt);
-            if (o instanceof ClassType rct) {
-                return rct.getProgramModelInfo().getMethods(rct);
-            }
+            if (o instanceof ClassType rct) { return rct.getProgramModelInfo().getMethods(rct); }
         }
         return new ArrayList<>();
     }
@@ -366,9 +347,12 @@ public class KeYProgModelInfo {
      * is compatible to the given one. If used to resolve a method call, the result should be
      * defined and unambiguous.
      *
-     * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
-     * @param signature the statical type signature of a callee.
+     * @param ct
+     *        the class type to get methods from.
+     * @param m
+     *        the name of the methods in question.
+     * @param signature
+     *        the statical type signature of a callee.
      */
 
     public ImmutableList<Method> getMethods(KeYJavaType ct, String m, ImmutableList<Type> signature,
@@ -388,7 +372,8 @@ public class KeYProgModelInfo {
      * Returns the methods locally defined within the given class type. If the type is represented
      * in source code, the returned list matches the syntactic order.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
 
     public ImmutableList<Method> getMethods(KeYJavaType ct) {
@@ -408,7 +393,8 @@ public class KeYProgModelInfo {
      * Returns the ProgramMethods locally defined within the given class type. If the type is
      * represented in source code, the returned list matches the syntactic order.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
     public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
@@ -417,9 +403,7 @@ public class KeYProgModelInfo {
             recoder.abstraction.Method rm = rml.get(i);
             if (!(rm instanceof recoder.bytecode.MethodInfo)) {
                 final var element = (ProgramMethod) rec2key().toKeY(rm);
-                if (element != null) {
-                    result = result.prepend(element);
-                }
+                if (element != null) { result = result.prepend(element); }
 
             }
         }
@@ -430,7 +414,8 @@ public class KeYProgModelInfo {
      * Returns the constructors locally defined within the given class type. If the type is
      * represented in source code, the returned list matches the syntactic order.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
 
     public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct) {
@@ -439,9 +424,7 @@ public class KeYProgModelInfo {
         for (int i = rcl.size() - 1; i >= 0; i--) {
             recoder.abstraction.Method rm = rcl.get(i);
             IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
-            if (m != null) {
-                result = result.prepend(m);
-            }
+            if (m != null) { result = result.prepend(m); }
         }
         return result;
     }
@@ -450,16 +433,16 @@ public class KeYProgModelInfo {
      * retrieves the most specific constructor declared in the given type with respect to the given
      * signature
      *
-     * @param ct the KeYJavyType where to look for the constructor
-     * @param signature IList<KeYJavaType> representing the signature of the constructor
+     * @param ct
+     *        the KeYJavyType where to look for the constructor
+     * @param signature
+     *        IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
     public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
-        if (constructors.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(constructors.get(0));
-        }
+        if (constructors.size() == 1) { return (IProgramMethod) rec2key().toKeY(constructors.get(0)); }
         if (constructors.isEmpty()) {
             LOGGER.debug("javainfo: Constructor not found: {}", ct);
             return null;
@@ -475,18 +458,14 @@ public class KeYProgModelInfo {
         final Map<String, IProgramMethod> m = implicits.get(ct);
         if (m != null) {
             final IProgramMethod pm = m.get(name);
-            if (pm != null) {
-                return pm;
-            }
+            if (pm != null) { return pm; }
         }
         TypeDeclaration cd = (TypeDeclaration) ct.getJavaType();
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod pm
-                    && pm.getMethodDeclaration().getName().equals(name)) {
-                return pm;
-            }
+                    && pm.getMethodDeclaration().getName().equals(name)) { return pm; }
         }
         LOGGER.debug("keyprogmodelinfo: implicit method {} not found in {}", name, ct);
         return null;
@@ -498,9 +477,12 @@ public class KeYProgModelInfo {
      * supertype where it is visible for the given type, and has a signature that is compatible to
      * the given one.
      *
-     * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
-     * @param signature the statical type signature of a callee.
+     * @param ct
+     *        the class type to get methods from.
+     * @param m
+     *        the name of the methods in question.
+     * @param signature
+     *        the statical type signature of a callee.
      * @return the IProgramMethods, if one is found, null if none or more than one IProgramMethod is
      *         found (in this case a debug output is written to console).
      */
@@ -526,7 +508,8 @@ public class KeYProgModelInfo {
     /**
      * returns the same fields as given in <tt>rfl</tt> and returns their KeY representation
      *
-     * @param rfl the List of fields to be looked up
+     * @param rfl
+     *        the List of fields to be looked up
      * @return list with the corresponding fields as KeY datastructures
      */
     private ImmutableList<Field> asKeYFields(List<? extends recoder.abstraction.Field> rfl) {
@@ -544,7 +527,7 @@ public class KeYProgModelInfo {
             } else {
                 LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf.getFullName());
                 LOGGER.debug("This happens currently as classes only available in byte code "
-                    + "are only partially converted ");
+                        + "are only partially converted ");
             }
         }
         return result;
@@ -554,13 +537,12 @@ public class KeYProgModelInfo {
      * returns the fields defined within the given class type. If the type is represented in source
      * code, the returned list matches the syntactic order.
      *
-     * @param ct the class type whose fields are returned
+     * @param ct
+     *        the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getVisibleArrayFields(ct);
-        }
+        if (ct.getJavaType() instanceof ArrayType) { return getVisibleArrayFields(ct); }
         recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
 
         return asKeYFields(rct.getProgramModelInfo().getFields(rct));
@@ -572,13 +554,12 @@ public class KeYProgModelInfo {
      * topological order starting with the fields of the given type If the type is represented in
      * source code, the returned list matches the syntactic order.
      *
-     * @param ct the class type whose fields are returned
+     * @param ct
+     *        the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public ImmutableList<Field> getAllVisibleFields(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayDeclaration) {
-            return getVisibleArrayFields(ct);
-        }
+        if (ct.getJavaType() instanceof ArrayDeclaration) { return getVisibleArrayFields(ct); }
 
         recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         List<recoder.abstraction.Field> rfl = rct.getProgramModelInfo().getAllFields(rct);
@@ -589,7 +570,8 @@ public class KeYProgModelInfo {
     /**
      * returns all fields of and visible in an array field
      *
-     * @param arrayType the KeYJavaType of the array
+     * @param arrayType
+     *        the KeYJavaType of the array
      * @return the list of visible fields
      */
     private ImmutableList<Field> getVisibleArrayFields(KeYJavaType arrayType) {
@@ -603,9 +585,7 @@ public class KeYProgModelInfo {
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
                     ((FieldDeclaration) member).getFieldSpecifications();
-                for (int j = specs.size() - 1; j >= 0; j--) {
-                    result = result.prepend(specs.get(j));
-                }
+                for (int j = specs.size() - 1; j >= 0; j--) { result = result.prepend(specs.get(j)); }
             }
         }
 
@@ -642,7 +622,8 @@ public class KeYProgModelInfo {
     /**
      * returns a list of KeYJavaTypes representing the given recoder types in the same order
      *
-     * @param rctl the ASTList<ClassType> to be converted
+     * @param rctl
+     *        the ASTList<ClassType> to be converted
      * @return list of KeYJavaTypes representing the given recoder types in the same order
      */
     private ImmutableList<KeYJavaType> asKeYJavaTypes(
@@ -651,9 +632,7 @@ public class KeYProgModelInfo {
         for (int i = rctl.size() - 1; i >= 0; i--) {
             final recoder.abstraction.ClassType rct = rctl.get(i);
             final KeYJavaType kct = (KeYJavaType) rec2key().toKeY(rct);
-            if (kct != null) {
-                result = result.prepend(kct);
-            }
+            if (kct != null) { result = result.prepend(kct); }
         }
         return result;
     }
@@ -661,7 +640,8 @@ public class KeYProgModelInfo {
     /**
      * Returns all known supertypes of the given class type with the type itself as first element.
      *
-     * @param ct a class type
+     * @param ct
+     *        a class type
      * @return the list of the known subtypes of the given class type.
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
@@ -671,7 +651,8 @@ public class KeYProgModelInfo {
     /**
      * Returns all proper subtypes of the given class type
      *
-     * @param ct a class type
+     * @param ct
+     *        a class type
      * @return the list of the known subtypes of the given class type.
      */
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
@@ -685,8 +666,10 @@ public class KeYProgModelInfo {
     /**
      * Parses a given JavaBlock using cd as context to determine the right references.
      *
-     * @param block a String describing a java block
-     * @param cd ClassDeclaration representing the context in which the block has to be interpreted.
+     * @param block
+     *        a String describing a java block
+     * @param cd
+     *        ClassDeclaration representing the context in which the block has to be interpreted.
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, ClassDeclaration cd, NamespaceSet nss) {
@@ -698,7 +681,8 @@ public class KeYProgModelInfo {
     /**
      * Parses a given JavaBlock using an empty context.
      *
-     * @param block a String describing a java block
+     * @param block
+     *        a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readJavaBlock(String block, NamespaceSet nss) {
@@ -715,10 +699,7 @@ public class KeYProgModelInfo {
         ArrayList<recoder.abstraction.Type> rsignature = new ArrayList<>(signature.size());
         Iterator<KeYJavaType> i = signature.iterator();
         int j = 0;
-        while (i.hasNext()) {
-            rsignature.add(j, (recoder.abstraction.Type) rec2key().toRecoder(i.next()));
-            j++;
-        }
+        while (i.hasNext()) { rsignature.add(j, (recoder.abstraction.Type) rec2key().toRecoder(i.next())); j++; }
 
         // If ct is an interface, but does not declare the method, we
         // need to start the search "upstairs"
@@ -737,9 +718,7 @@ public class KeYProgModelInfo {
             List<recoder.abstraction.ClassType> superTypes = rct.getAllSupertypes();
             int k = 0;
             while (k < superTypes.size()
-                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature)) {
-                k++;
-            }
+                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature)) { k++; }
             if (k < superTypes.size()) {
                 rct = superTypes.get(k);
                 KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
@@ -764,9 +743,7 @@ public class KeYProgModelInfo {
             KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
             if (r == null) {
                 LOGGER.info("Type {}: {} not found", ct.getFullName(), name);
-            } else if (!result.contains(r)) {
-                result = result.prepend(r);
-            }
+            } else if (!result.contains(r)) { result = result.prepend(r); }
         }
 
         List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);

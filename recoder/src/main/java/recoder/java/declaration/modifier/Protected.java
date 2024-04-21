@@ -30,7 +30,8 @@ public class Protected extends VisibilityModifier {
     /**
      * Protected.
      *
-     * @param proto a protected.
+     * @param proto
+     *        a protected.
      */
 
     protected Protected(Protected proto) {

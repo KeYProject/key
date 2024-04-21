@@ -34,9 +34,7 @@ public class Property implements DesignPattern {
     private MethodDeclaration indexedSetter;
 
     public Property(FieldDeclaration field) {
-        if (field == null) {
-            throw new NullPointerException();
-        }
+        if (field == null) { throw new NullPointerException(); }
         this.field = field;
         ProgramFactory factory = field.getFactory();
         TypeReference typeRef = field.getTypeReference();
@@ -44,7 +42,7 @@ public class Property implements DesignPattern {
         String typeName = typeRef.toString();
         String className = Naming.createClassName(fieldName);
         String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this."
-            + fieldName + "=" + fieldName + ";}";
+                + fieldName + "=" + fieldName + ";}";
         try {
             setter = factory.parseMethodDeclaration(source);
             source = "public " + typeName + " get" + className + "(){return " + fieldName + ";}";
@@ -53,10 +51,10 @@ public class Property implements DesignPattern {
                 // cut last "[]"
                 typeName = typeName.substring(0, typeName.length() - 2);
                 source = "public void set" + className + "(int index, " + typeName + " " + fieldName
-                    + ") { this." + fieldName + "[index] = " + fieldName + "; }";
+                        + ") { this." + fieldName + "[index] = " + fieldName + "; }";
                 indexedSetter = factory.parseMethodDeclaration(source);
                 source = "public " + typeName + " get" + className + "(int index){return "
-                    + fieldName + "[index];}";
+                        + fieldName + "[index];}";
                 indexedGetter = factory.parseMethodDeclaration(source);
             }
         } catch (ParserException pe) {
@@ -91,61 +89,41 @@ public class Property implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (field != null) {
-            res += 1;
-        }
-        if (getter != null) {
-            res += 1;
-        }
-        if (setter != null) {
-            res += 1;
-        }
-        if (indexedGetter != null) {
-            res += 1;
-        }
-        if (indexedSetter != null) {
-            res += 1;
-        }
+        if (field != null) { res += 1; }
+        if (getter != null) { res += 1; }
+        if (setter != null) { res += 1; }
+        if (indexedGetter != null) { res += 1; }
+        if (indexedSetter != null) { res += 1; }
         return res;
     }
 
     /**
      * Get a participants by its index.
      *
-     * @param index an index of a participant.
+     * @param index
+     *        an index of a participant.
      * @return the participant.
-     * @throws IndexOutOfBoundsException, if the index is not in bounds.
+     * @throws IndexOutOfBoundsException,
+     *         if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
         if (field != null) {
-            if (index == 0) {
-                return field;
-            }
+            if (index == 0) { return field; }
             index -= 1;
         }
         if (getter != null) {
-            if (index == 0) {
-                return getter;
-            }
+            if (index == 0) { return getter; }
             index -= 1;
         }
         if (setter != null) {
-            if (index == 0) {
-                return setter;
-            }
+            if (index == 0) { return setter; }
             index -= 1;
         }
         if (indexedGetter != null) {
-            if (index == 0) {
-                return indexedGetter;
-            }
+            if (index == 0) { return indexedGetter; }
             index -= 1;
         }
-        if (indexedSetter != null) {
-            if (index == 0) {
-                return indexedSetter;
-            }
-        }
+        if (indexedSetter != null) { if (index == 0) { return indexedSetter; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -164,9 +142,7 @@ public class Property implements DesignPattern {
         } else {
             stype = setter.getParameters().get(0).getTypeReference().getName();
         }
-        if (field != null) {
-            ftype = field.getTypeReference().getName();
-        }
+        if (field != null) { ftype = field.getTypeReference().getName(); }
         String btype = (gtype == null) ? stype : gtype;
         if ((stype != null && !btype.equals(stype)) || (gtype != null && !btype.equals(gtype))
                 || (ftype != null && !btype.equals(ftype))) {

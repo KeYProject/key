@@ -35,7 +35,7 @@ public class WalkPositionTest extends TestCase {
                 if (newPos.getLine() < oldPos.getLine() || (newPos.getLine() == oldPos.getLine()
                         && newPos.getColumn() < newPos.getColumn())) {
                     Assert.fail("Position mismatch: " + Format.toString("%c @%p in %u", oldPe) + "/"
-                        + Format.toString("%c @%p", pe));
+                            + Format.toString("%c @%p", pe));
                 }
                 oldPos = newPos;
                 oldPe = pe;

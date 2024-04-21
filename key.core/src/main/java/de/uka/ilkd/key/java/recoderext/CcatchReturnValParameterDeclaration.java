@@ -37,7 +37,8 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     /**
      * Parameter declaration.
      *
-     * @param proto a parameter declaration.
+     * @param proto
+     *        a parameter declaration.
      */
     protected CcatchReturnValParameterDeclaration(CcatchReturnValParameterDeclaration proto) {
         delegate = proto.delegate;
@@ -87,24 +88,22 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (delegate != null && index == 0) {
-            return delegate;
-        }
+        if (delegate != null && index == 0) { return delegate; }
 
         throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
     public int getChildPositionCode(ProgramElement child) {
-        if (child == delegate) {
-            return 0;
-        }
+        if (child == delegate) { return 0; }
         return -1;
     }
 
@@ -114,16 +113,17 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (delegate == p) {
             setDelegate((ParameterDeclaration) q);
             return true;
@@ -144,7 +144,8 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     /**
      * Set parameter container.
      *
-     * @param c a parameter container.
+     * @param c
+     *        a parameter container.
      */
     @Override
     public void setParameterContainer(ParameterContainer c) {
@@ -182,9 +183,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
 
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int idx) {
-        if (delegate != null && idx == 0) {
-            return delegate;
-        }
+        if (delegate != null && idx == 0) { return delegate; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

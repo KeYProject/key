@@ -32,8 +32,10 @@ public class ShiftRight extends Operator {
     /**
      * Shift right.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public ShiftRight(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class ShiftRight extends Operator {
     /**
      * Shift right.
      *
-     * @param proto a shift right.
+     * @param proto
+     *        a shift right.
      */
 
     protected ShiftRight(ShiftRight proto) {

@@ -136,24 +136,42 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * Construct a loop contract for a block that starts with a loop.
      *
-     * @param baseName the base name.
-     * @param block the block this contract belongs to.
-     * @param labels all labels belonging to the block.
-     * @param method the method containing the block.
-     * @param modalityKind this contract's modality.
-     * @param preconditions this contract's preconditions on every heap.
-     * @param measuredBy this contract's measured-by term.
-     * @param postconditions this contract's postconditions on every heap.
-     * @param modifiesClauses this contract's modifies clauses on every heap.
-     * @param freeModifiesClauses this contract's free modifies clauses on every heap.
-     * @param infFlowSpecs this contract's information flow specifications.
-     * @param variables this contract's variables.
-     * @param transactionApplicable whether or not this contract is applicable for transactions.
-     * @param hasMod a map specifying on which heaps this contract has a modified clause.
-     * @param hasFreeMod a map specifying on which heaps this contract has a free modified clause.
-     * @param decreases the contract's decreases clause.
-     * @param functionalContracts the functional contracts corresponding to this contract.
-     * @param services services.
+     * @param baseName
+     *        the base name.
+     * @param block
+     *        the block this contract belongs to.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param method
+     *        the method containing the block.
+     * @param modalityKind
+     *        this contract's modality.
+     * @param preconditions
+     *        this contract's preconditions on every heap.
+     * @param measuredBy
+     *        this contract's measured-by term.
+     * @param postconditions
+     *        this contract's postconditions on every heap.
+     * @param modifiesClauses
+     *        this contract's modifies clauses on every heap.
+     * @param freeModifiesClauses
+     *        this contract's free modifies clauses on every heap.
+     * @param infFlowSpecs
+     *        this contract's information flow specifications.
+     * @param variables
+     *        this contract's variables.
+     * @param transactionApplicable
+     *        whether or not this contract is applicable for transactions.
+     * @param hasMod
+     *        a map specifying on which heaps this contract has a modified clause.
+     * @param hasFreeMod
+     *        a map specifying on which heaps this contract has a free modified clause.
+     * @param decreases
+     *        the contract's decreases clause.
+     * @param functionalContracts
+     *        the functional contracts corresponding to this contract.
+     * @param services
+     *        services.
      */
     public LoopContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method,
@@ -185,10 +203,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         loopLabels.add(outerLabel);
 
         SourceElement first = block.getFirstElement();
-        while (first instanceof LabeledStatement s) {
-            loopLabels.add(s.getLabel());
-            first = s.getBody();
-        }
+        while (first instanceof LabeledStatement s) { loopLabels.add(s.getLabel()); first = s.getBody(); }
 
         EnhancedForElimination enhancedForElim = null;
 
@@ -206,8 +221,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             loop = enhancedForElim.getLoop();
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                + "loop may have a loop contract! \n" + "This block begins with "
-                + block.getFirstElement());
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
 
         if (enhancedForElim == null) {
@@ -230,24 +245,42 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * Construct a loop contract for a loop.
      *
-     * @param baseName the base name.
-     * @param loop the loop this contract belongs to.
-     * @param labels all labels belonging to the block.
-     * @param method the method containing the block.
-     * @param modalityKind this contract's modality.
-     * @param preconditions this contract's preconditions on every heap.
-     * @param measuredBy this contract's measured-by term.
-     * @param postconditions this contract's postconditions on every heap.
-     * @param modifiesClauses this contract's modifies clauses on every heap.
-     * @param freeModifiesClauses this contract's free modifies clauses on every heap.
-     * @param infFlowSpecs this contract's information flow specifications.
-     * @param variables this contract's variables.
-     * @param transactionApplicable whether or not this contract is applicable for transactions.
-     * @param hasMod a map specifying on which heaps this contract has a modified clause.
-     * @param hasFreeMod a map specifying on which heaps this contract has a free modified clause.
-     * @param decreases the contract's decreases clause.
-     * @param functionalContracts the functional contracts corresponding to this contract.
-     * @param services services.
+     * @param baseName
+     *        the base name.
+     * @param loop
+     *        the loop this contract belongs to.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param method
+     *        the method containing the block.
+     * @param modalityKind
+     *        this contract's modality.
+     * @param preconditions
+     *        this contract's preconditions on every heap.
+     * @param measuredBy
+     *        this contract's measured-by term.
+     * @param postconditions
+     *        this contract's postconditions on every heap.
+     * @param modifiesClauses
+     *        this contract's modifies clauses on every heap.
+     * @param freeModifiesClauses
+     *        this contract's free modifies clauses on every heap.
+     * @param infFlowSpecs
+     *        this contract's information flow specifications.
+     * @param variables
+     *        this contract's variables.
+     * @param transactionApplicable
+     *        whether or not this contract is applicable for transactions.
+     * @param hasMod
+     *        a map specifying on which heaps this contract has a modified clause.
+     * @param hasFreeMod
+     *        a map specifying on which heaps this contract has a free modified clause.
+     * @param decreases
+     *        the contract's decreases clause.
+     * @param functionalContracts
+     *        the functional contracts corresponding to this contract.
+     * @param services
+     *        services.
      */
     public LoopContractImpl(final String baseName, final LoopStatement loop,
             final List<Label> labels, final IProgramMethod method,
@@ -310,8 +343,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     /**
      *
-     * @param contracts a set of loop contracts to combine.
-     * @param services services.
+     * @param contracts
+     *        a set of loop contracts to combine.
+     * @param services
+     *        services.
      * @return the combination of the specified loop contracts.
      */
     public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
@@ -322,9 +357,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * Create replacement map for index and values variables.
      *
-     * @param index the index program variable
-     * @param values the values program variable
-     * @param services the services object
+     * @param index
+     *        the index program variable
+     * @param values
+     *        the values program variable
+     * @param services
+     *        the services object
      * @return the new according op replacer
      */
     private static OpReplacer createOpReplacer(final ProgramVariable index,
@@ -344,9 +382,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * Replace the given variable in the given variable map
      *
-     * @param vars the old variables
-     * @param variable the variable to be replaced
-     * @param services the services object
+     * @param vars
+     *        the old variables
+     * @param variable
+     *        the variable to be replaced
+     * @param services
+     *        the services object
      * @return the new variables
      */
     private static LoopContractImpl replaceVariable(LoopContractImpl vars, ProgramVariable variable,
@@ -363,9 +404,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     /**
      *
-     * @param loop a loop.
-     * @param block the block containing the loop.
-     * @param enhancedForElim the transformation used to transform the loop, or {@code null}.
+     * @param loop
+     *        a loop.
+     * @param block
+     *        the block containing the loop.
+     * @param enhancedForElim
+     *        the transformation used to transform the loop, or {@code null}.
      * @return the initializers if the loop is a for-loop, {@code null} otherwise.
      */
     private static StatementBlock getHeadStatement(LoopStatement loop, StatementBlock block,
@@ -375,13 +419,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         if (loop instanceof For) {
             ExtList headStatements = new ExtList();
 
-            if (enhancedForElim != null) {
-                headStatements.add(enhancedForElim.getHead());
-            }
+            if (enhancedForElim != null) { headStatements.add(enhancedForElim.getHead()); }
 
-            for (Statement statement : loop.getInitializers()) {
-                headStatements.add(statement);
-            }
+            for (Statement statement : loop.getInitializers()) { headStatements.add(statement); }
 
             sb = new StatementBlock(headStatements);
         } else if (loop instanceof While) {
@@ -392,8 +432,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                + "loop may have a loop contract! \n" + "This block begins with "
-                + block.getFirstElement());
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
 
         return sb;
@@ -401,12 +441,18 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     /**
      *
-     * @param loop a loop.
-     * @param block the block containing the loop.
-     * @param outerLabel the label to use for break statements.
-     * @param innerLabel the label to use for continue statements.
-     * @param loopLabels all labels belonging to the loop.
-     * @param services services.
+     * @param loop
+     *        a loop.
+     * @param block
+     *        the block containing the loop.
+     * @param outerLabel
+     *        the label to use for break statements.
+     * @param innerLabel
+     *        the label to use for continue statements.
+     * @param loopLabels
+     *        all labels belonging to the loop.
+     * @param services
+     *        services.
      * @return the loop's body. If the loop is a for-loop, it is transformed to a while-loop.
      * @see InnerBreakAndContinueReplacer
      */
@@ -428,17 +474,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                     outerLabel, innerLabel, services).replace();
 
             ExtList updateStatements = new ExtList();
-            for (Expression statement : loop.getUpdates()) {
-                updateStatements.add(statement);
-            }
+            for (Expression statement : loop.getUpdates()) { updateStatements.add(statement); }
 
             sb = new StatementBlock(new StatementBlock(
                 new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
                 new StatementBlock(updateStatements)));
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                + "loop may have a loop contract! \n" + "This block begins with "
-                + block.getFirstElement());
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
 
         return sb;
@@ -446,8 +490,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     /**
      *
-     * @param loop a loop.
-     * @param block the block containing the loop.
+     * @param loop
+     *        a loop.
+     * @param block
+     *        the block containing the loop.
      * @return all statements in the block after the loop.
      */
     private static StatementBlock getTailStatement(LoopStatement loop, StatementBlock block) {
@@ -456,15 +502,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         if (loop instanceof For || loop instanceof While) {
             ExtList tailStatements = new ExtList();
 
-            for (int i = 1; i < block.getStatementCount(); ++i) {
-                tailStatements.add(block.getStatementAt(i));
-            }
+            for (int i = 1; i < block.getStatementCount(); ++i) { tailStatements.add(block.getStatementAt(i)); }
 
             sb = new StatementBlock(tailStatements);
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                + "loop may have a loop contract! \n" + "This block begins with "
-                + block.getFirstElement());
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
 
         return sb;
@@ -537,11 +581,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         public static LoopContractImpl.ReplaceTypes fromClass(Class<?> cls) {
-            for (ReplaceTypes c : values()) {
-                if (c.targetClass.isAssignableFrom(cls)) {
-                    return c;
-                }
-            }
+            for (ReplaceTypes c : values()) { if (c.targetClass.isAssignableFrom(cls)) { return c; } }
 
             throw new AssertionError();
         }
@@ -715,10 +755,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     public String getUniqueName() {
         if (getTarget() != null) {
             return "Loop Contract " + getBlock().getStartPosition().line() + " "
-                + getTarget().getUniqueName();
+                    + getTarget().getUniqueName();
         } else {
             return "Loop Contract " + getBlock().getStartPosition().line() + " "
-                + Math.abs(getBlock().hashCode());
+                    + Math.abs(getBlock().hashCode());
         }
     }
 
@@ -794,9 +834,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services) {
-        if (replacedEnhancedForVars != null) {
-            return replacedEnhancedForVars;
-        }
+        if (replacedEnhancedForVars != null) { return replacedEnhancedForVars; }
 
         if (index == null && values == null) {
             replacedEnhancedForVars = (LoopContractImpl) update(newBlock, preconditions,
@@ -823,9 +861,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Term newDecreases = replacer.replace(decreases);
 
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                    continue;
-                }
+                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) { continue; }
                 newPreconditions.put(heap, replacer.replace(getPrecondition(heap, services)));
                 newFreePreconditions.put(heap,
                     replacer.replace(getFreePrecondition(heap, services)));
@@ -848,9 +884,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract setBlock(StatementBlock newBlock) {
-        if (newBlock.equals(block)) {
-            return this;
-        }
+        if (newBlock.equals(block)) { return this; }
 
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method,
             modalityKind,
@@ -863,9 +897,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract setLoop(LoopStatement newLoop) {
-        if (newLoop.equals(loop)) {
-            return this;
-        }
+        if (newLoop.equals(loop)) { return this; }
 
         LoopContractImpl result = new LoopContractImpl(
             baseName, newLoop, labels, method, modalityKind,
@@ -882,9 +914,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
 
-        if (newPM.equals(method)) {
-            return this;
-        }
+        if (newPM.equals(method)) { return this; }
 
         LoopContractImpl result = new LoopContractImpl(
             baseName, block, labels, (IProgramMethod) newPM, modalityKind,
@@ -898,11 +928,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     @Override
     public String toString() {
         return "SimpleLoopContract [block=" + block + ", labels=" + labels + ", method=" + method
-            + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
-            + ", preconditions=" + preconditions + ", postconditions=" + postconditions
-            + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
-            + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
-            + ", hasMod=" + hasMod + "]";
+                + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
+                + ", preconditions=" + preconditions + ", postconditions=" + postconditions
+                + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
+                + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
+                + ", hasMod=" + hasMod + "]";
     }
 
     /**
@@ -926,32 +956,54 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         /**
          * Creates loop contract for a block that starts with a loop.
          *
-         * @param baseName the contract's base name.
-         * @param block the block the contract belongs to.
-         * @param labels all labels belonging to the block.
-         * @param method the method containing the block.
-         * @param behavior the contract's behavior.
-         * @param variables the variables.
-         * @param requires the contract's precondition.
-         * @param measuredBy the contract's measured-by clause.
-         * @param ensures the contracts postcondition due to normal termination.
-         * @param infFlowSpecs the contract's information flow specifications.
-         * @param breaks the contract's postconditions for abrupt termination with {@code break}
+         * @param baseName
+         *        the contract's base name.
+         * @param block
+         *        the block the contract belongs to.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param method
+         *        the method containing the block.
+         * @param behavior
+         *        the contract's behavior.
+         * @param variables
+         *        the variables.
+         * @param requires
+         *        the contract's precondition.
+         * @param measuredBy
+         *        the contract's measured-by clause.
+         * @param ensures
+         *        the contracts postcondition due to normal termination.
+         * @param infFlowSpecs
+         *        the contract's information flow specifications.
+         * @param breaks
+         *        the contract's postconditions for abrupt termination with {@code break}
          *        statements.
-         * @param continues the contract's postconditions for abrupt termination with
+         * @param continues
+         *        the contract's postconditions for abrupt termination with
          *        {@code continue} statements.
-         * @param returns the contract's postcondition for abrupt termination with {@code return}
+         * @param returns
+         *        the contract's postcondition for abrupt termination with {@code return}
          *        statements.
-         * @param signals the contract's postcondition for abrupt termination due to abrupt
+         * @param signals
+         *        the contract's postcondition for abrupt termination due to abrupt
          *        termination.
-         * @param signalsOnly a term specifying which uncaught exceptions may occur.
-         * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param assignablesFree map from every heap to an assignable_free term.
-         * @param hasMod map specifying on which heaps this contract has a modifies clause.
-         * @param hasFreeMod map specifying on which heaps this contract has a free modifies clause.
-         * @param decreases the decreases term.
-         * @param services services.
+         * @param signalsOnly
+         *        a term specifying which uncaught exceptions may occur.
+         * @param diverges
+         *        a diverges clause.
+         * @param assignables
+         *        map from every heap to an assignable term.
+         * @param assignablesFree
+         *        map from every heap to an assignable_free term.
+         * @param hasMod
+         *        map specifying on which heaps this contract has a modifies clause.
+         * @param hasFreeMod
+         *        map specifying on which heaps this contract has a free modifies clause.
+         * @param decreases
+         *        the decreases term.
+         * @param services
+         *        services.
          */
         public Creator(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
@@ -973,32 +1025,54 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         /**
          * Creates loop contract for a loop.
          *
-         * @param baseName the contract's base name.
-         * @param loop the loop the contract belongs to.
-         * @param labels all labels belonging to the block.
-         * @param method the method containing the block.
-         * @param behavior the contract's behavior.
-         * @param variables the variables.
-         * @param requires the contract's precondition.
-         * @param measuredBy the contract's measured-by clause.
-         * @param ensures the contracts postcondition due to normal termination.
-         * @param infFlowSpecs the contract's information flow specifications.
-         * @param breaks the contract's postconditions for abrupt termination with {@code break}
+         * @param baseName
+         *        the contract's base name.
+         * @param loop
+         *        the loop the contract belongs to.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param method
+         *        the method containing the block.
+         * @param behavior
+         *        the contract's behavior.
+         * @param variables
+         *        the variables.
+         * @param requires
+         *        the contract's precondition.
+         * @param measuredBy
+         *        the contract's measured-by clause.
+         * @param ensures
+         *        the contracts postcondition due to normal termination.
+         * @param infFlowSpecs
+         *        the contract's information flow specifications.
+         * @param breaks
+         *        the contract's postconditions for abrupt termination with {@code break}
          *        statements.
-         * @param continues the contract's postconditions for abrupt termination with
+         * @param continues
+         *        the contract's postconditions for abrupt termination with
          *        {@code continue} statements.
-         * @param returns the contract's postcondition for abrupt termination with {@code return}
+         * @param returns
+         *        the contract's postcondition for abrupt termination with {@code return}
          *        statements.
-         * @param signals the contract's postcondition for abrupt termination due to abrupt
+         * @param signals
+         *        the contract's postcondition for abrupt termination due to abrupt
          *        termination.
-         * @param signalsOnly a term specifying which uncaught exceptions may occur.
-         * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param assignablesFree map from every heap to an assignable_free term.
-         * @param hasMod map specifying on which heaps this contract has a modifies clause.
-         * @param hasFreeMod map specifying on which heaps this contract has a free modifies clause.
-         * @param decreases the decreases term.
-         * @param services services.
+         * @param signalsOnly
+         *        a term specifying which uncaught exceptions may occur.
+         * @param diverges
+         *        a diverges clause.
+         * @param assignables
+         *        map from every heap to an assignable term.
+         * @param assignablesFree
+         *        map from every heap to an assignable_free term.
+         * @param hasMod
+         *        map specifying on which heaps this contract has a modifies clause.
+         * @param hasFreeMod
+         *        map specifying on which heaps this contract has a free modifies clause.
+         * @param decreases
+         *        the decreases term.
+         * @param services
+         *        services.
          */
         public Creator(String baseName, LoopStatement loop, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
@@ -1052,9 +1126,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         protected Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = super.buildPreconditions();
 
-            if (decreases != null) {
-                result.replaceAll((k, v) -> and(v, geq(decreases, zero())));
-            }
+            if (decreases != null) { result.replaceAll((k, v) -> and(v, geq(decreases, zero()))); }
 
             return result;
         }
@@ -1069,8 +1141,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         /**
          *
-         * @param contracts the contracts to combine.
-         * @param services services.
+         * @param contracts
+         *        the contracts to combine.
+         * @param services
+         *        services.
          */
         public Combinator(LoopContract[] contracts, Services services) {
             super(contracts, services);
@@ -1079,9 +1153,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         @Override
         protected LoopContract combine() {
             assert contracts.length > 0;
-            if (contracts.length == 1) {
-                return contracts[0];
-            }
+            if (contracts.length == 1) { return contracts[0]; }
 
             final LoopContract head = contracts[0];
             StringBuilder baseName = new StringBuilder(head.getBaseName());

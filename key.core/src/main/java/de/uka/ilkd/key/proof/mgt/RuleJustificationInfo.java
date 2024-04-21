@@ -48,9 +48,7 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
-        if (InfFlowContractAppTaclet.hasType(rule)) {
-            InfFlowContractAppTaclet.unregister(rule.name());
-        }
+        if (InfFlowContractAppTaclet.hasType(rule)) { InfFlowContractAppTaclet.unregister(rule.name()); }
         rule2justif.remove(new RuleKey(rule));
     }
 

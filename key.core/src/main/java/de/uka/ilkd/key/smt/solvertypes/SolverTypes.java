@@ -56,9 +56,7 @@ public final class SolverTypes {
      */
     @NonNull
     public static Collection<SolverType> getLegacySolvers() {
-        if (SOLVERS.isEmpty()) {
-            getSolverTypes();
-        }
+        if (SOLVERS.isEmpty()) { getSolverTypes(); }
         return new ArrayList<>(LEGACY_SOLVERS);
     }
 

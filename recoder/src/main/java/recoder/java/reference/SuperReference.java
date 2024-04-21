@@ -49,7 +49,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Super reference.
      *
-     * @param accessPath a reference expression.
+     * @param accessPath
+     *        a reference expression.
      */
 
     public SuperReference(ReferencePrefix accessPath) {
@@ -60,14 +61,13 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Super reference.
      *
-     * @param proto a super reference.
+     * @param proto
+     *        a super reference.
      */
 
     protected SuperReference(SuperReference proto) {
         super(proto);
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
+        if (proto.accessPath != null) { accessPath = (ReferencePrefix) proto.accessPath.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -87,9 +87,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
+        if (accessPath != null) { accessPath.setReferenceSuffix(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -127,7 +125,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set reference suffix.
      *
-     * @param x a reference suffix.
+     * @param x
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
@@ -147,7 +146,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -181,25 +181,21 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (accessPath != null) {
-            if (index == 0) {
-                return accessPath;
-            }
-        }
+        if (accessPath != null) { if (index == 0) { return accessPath; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
-        if (accessPath == child) {
-            return 0;
-        }
+        if (accessPath == child) { return 0; }
         return -1;
     }
 
@@ -220,9 +216,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public Expression getExpressionAt(int index) {
-        if (accessPath instanceof Expression && index == 0) {
-            return (Expression) accessPath;
-        }
+        if (accessPath instanceof Expression && index == 0) { return (Expression) accessPath; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -243,9 +237,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if ((accessPath instanceof TypeReference) && index == 0) {
-            return (TypeReference) accessPath;
-        }
+        if ((accessPath instanceof TypeReference) && index == 0) { return (TypeReference) accessPath; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -255,22 +247,21 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             accessPath = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         return false;

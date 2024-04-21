@@ -96,7 +96,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Class declaration.
      *
-     * @param members a member declaration mutable list.
+     * @param members
+     *        a member declaration mutable list.
      */
     public ClassDeclaration(ASTList<MemberDeclaration> members) {
         setMembers(members);
@@ -106,19 +107,14 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Class declaration.
      *
-     * @param proto a class declaration.
+     * @param proto
+     *        a class declaration.
      */
     protected ClassDeclaration(ClassDeclaration proto) {
         super(proto);
-        if (proto.extending != null) {
-            extending = proto.extending.deepClone();
-        }
-        if (proto.implementing != null) {
-            implementing = proto.implementing.deepClone();
-        }
-        if (proto.typeParameters != null) {
-            typeParameters = proto.typeParameters.deepClone();
-        }
+        if (proto.extending != null) { extending = proto.extending.deepClone(); }
+        if (proto.implementing != null) { implementing = proto.implementing.deepClone(); }
+        if (proto.typeParameters != null) { typeParameters = proto.typeParameters.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -136,17 +132,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (extending != null) {
-            extending.setParent(this);
-        }
-        if (implementing != null) {
-            implementing.setParent(this);
-        }
-        if (typeParameters != null) {
-            for (TypeParameterDeclaration tp : typeParameters) {
-                tp.setParent(this);
-            }
-        }
+        if (extending != null) { extending.setParent(this); }
+        if (implementing != null) { implementing.setParent(this); }
+        if (typeParameters != null) { for (TypeParameterDeclaration tp : typeParameters) { tp.setParent(this); } }
     }
 
     /**
@@ -156,72 +144,50 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (name != null) {
-            result++;
-        }
-        if (extending != null) {
-            result++;
-        }
-        if (implementing != null) {
-            result++;
-        }
-        if (members != null) {
-            result += members.size();
-        }
-        if (typeParameters != null) {
-            result += typeParameters.size();
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (name != null) { result++; }
+        if (extending != null) { result++; }
+        if (implementing != null) { result++; }
+        if (members != null) { result += members.size(); }
+        if (typeParameters != null) { result += typeParameters.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index) {
-                return typeParameters.get(index);
-            }
+            if (len > index) { return typeParameters.get(index); }
             index -= len;
         }
         if (extending != null) {
-            if (index == 0) {
-                return extending;
-            }
+            if (index == 0) { return extending; }
             index--;
         }
         if (implementing != null) {
-            if (index == 0) {
-                return implementing;
-            }
+            if (index == 0) { return implementing; }
             index--;
         }
         if (members != null) {
-            if (index < members.size()) {
-                return members.get(index);
-            }
+            if (index < members.size()) { return members.get(index); }
             index -= members.size();
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -236,30 +202,18 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         // role 5 (IDX): type parameters
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (name == child) {
-            return 1;
-        }
-        if (extending == child) {
-            return 2;
-        }
-        if (implementing == child) {
-            return 3;
-        }
+        if (name == child) { return 1; }
+        if (extending == child) { return 2; }
+        if (implementing == child) { return 3; }
         if (members != null) {
             int index = members.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 4;
-            }
+            if (index >= 0) { return (index << 4) | 4; }
         }
         if (typeParameters != null) {
             int index = typeParameters.size();
-            if (index >= 0) {
-                return (index << 4) | 5;
-            }
+            if (index >= 0) { return (index << 4) | 5; }
         }
         return -1;
     }
@@ -270,15 +224,16 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -296,25 +251,19 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (extending == p) {
             Extends r = (Extends) q;
             extending = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (implementing == p) {
             Implements r = (Implements) q;
             implementing = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         count = (members == null) ? 0 : members.size();
@@ -358,7 +307,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Set statement container. Must be a {@link recoder.java.StatementBlock}.
      *
-     * @param p a statement container.
+     * @param p
+     *        a statement container.
      */
     public void setStatementContainer(StatementContainer p) {
         parent = (StatementBlock) p;
@@ -376,7 +326,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Set extended types.
      *
-     * @param spec an extends.
+     * @param spec
+     *        an extends.
      */
     public void setExtendedTypes(Extends spec) {
         extending = spec;
@@ -394,7 +345,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Set implemented types.
      *
-     * @param spec an implements.
+     * @param spec
+     *        an implements.
      */
     public void setImplementedTypes(Implements spec) {
         implementing = spec;

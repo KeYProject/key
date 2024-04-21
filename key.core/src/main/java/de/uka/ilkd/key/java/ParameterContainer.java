@@ -23,9 +23,11 @@ public interface ParameterContainer extends StatementContainer {
      * Return the parameter declaration at the specified index in this node's "virtual" parameter
      * declaration array.
      *
-     * @param index an index for a parameter declaration.
+     * @param index
+     *        an index for a parameter declaration.
      * @return the parameter declaration with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     ParameterDeclaration getParameterDeclarationAt(int index);
 }

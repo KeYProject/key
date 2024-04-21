@@ -24,7 +24,8 @@ public class Synchronized extends Modifier {
     /**
      * Synchronized.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
 
     public Synchronized(ExtList children) {

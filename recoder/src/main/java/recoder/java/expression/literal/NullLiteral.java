@@ -31,7 +31,8 @@ public class NullLiteral extends Literal {
     /**
      * Null literal.
      *
-     * @param proto a null literal.
+     * @param proto
+     *        a null literal.
      */
 
     protected NullLiteral(NullLiteral proto) {

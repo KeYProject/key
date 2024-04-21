@@ -31,7 +31,8 @@ public class Volatile extends Modifier {
     /**
      * Volatile.
      *
-     * @param proto a volatile.
+     * @param proto
+     *        a volatile.
      */
 
     protected Volatile(Volatile proto) {

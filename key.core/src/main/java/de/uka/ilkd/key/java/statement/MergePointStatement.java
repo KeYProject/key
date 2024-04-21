@@ -55,16 +55,16 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for an expression.
+     * @param index
+     *        an index for an expression.
      *
      * @return the expression with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (identifier != null && index == 0) {
-            return (Expression) identifier;
-        }
+        if (identifier != null && index == 0) { return (Expression) identifier; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -84,24 +84,22 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public int getChildCount() {
         int result = 0;
-        if (identifier != null) {
-            result++;
-        }
+        if (identifier != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (identifier != null) {
-            if (index == 0) {
-                return identifier;
-            }
+            if (index == 0) { return identifier; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -111,7 +109,8 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMergePointStatement(this);

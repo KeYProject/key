@@ -145,9 +145,7 @@ public final class ASCII_UCodeESC_CharStream {
 
     private void FillBuff() throws java.io.IOException {
         int i;
-        if (maxNextCharInd == 4096) {
-            maxNextCharInd = nextCharInd = 0;
-        }
+        if (maxNextCharInd == 4096) { maxNextCharInd = nextCharInd = 0; }
 
         try {
             if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
@@ -169,9 +167,7 @@ public final class ASCII_UCodeESC_CharStream {
     }
 
     private char ReadByte() throws java.io.IOException {
-        if (++nextCharInd >= maxNextCharInd) {
-            FillBuff();
-        }
+        if (++nextCharInd >= maxNextCharInd) { FillBuff(); }
 
         return nextCharBuf[nextCharInd];
     }
@@ -247,9 +243,7 @@ public final class ASCII_UCodeESC_CharStream {
 
         char c;
 
-        if (++bufpos == available) {
-            AdjustBuffSize();
-        }
+        if (++bufpos == available) { AdjustBuffSize(); }
 
         if (((buffer[bufpos] = c = (char) ((char) 0xff & ReadByte())) == '\\')) {
             UpdateLineColumn(c);
@@ -258,18 +252,14 @@ public final class ASCII_UCodeESC_CharStream {
 
             for (;;) // Read all the backslashes
             {
-                if (++bufpos == available) {
-                    AdjustBuffSize();
-                }
+                if (++bufpos == available) { AdjustBuffSize(); }
 
                 try {
                     if ((buffer[bufpos] = c = (char) ((char) 0xff & ReadByte())) != '\\') {
                         UpdateLineColumn(c);
                         // found a non-backslash char.
                         if ((c == 'u') && ((backSlashCnt & 1) == 1)) {
-                            if (--bufpos < 0) {
-                                bufpos = bufsize - 1;
-                            }
+                            if (--bufpos < 0) { bufpos = bufsize - 1; }
 
                             break;
                         }
@@ -278,9 +268,7 @@ public final class ASCII_UCodeESC_CharStream {
                         return '\\';
                     }
                 } catch (java.io.IOException e) {
-                    if (backSlashCnt > 1) {
-                        backup(backSlashCnt);
-                    }
+                    if (backSlashCnt > 1) { backup(backSlashCnt); }
 
                     return '\\';
                 }
@@ -291,9 +279,7 @@ public final class ASCII_UCodeESC_CharStream {
 
             // Here, we have seen an odd number of backslash's followed by a 'u'
             try {
-                while ((c = (char) ((char) 0xff & ReadByte())) == 'u') {
-                    ++column;
-                }
+                while ((c = (char) ((char) 0xff & ReadByte())) == 'u') { ++column; }
 
                 buffer[bufpos] =
                     c = (char) (hexval(c) << 12 | hexval((char) ((char) 0xff & ReadByte())) << 8
@@ -361,9 +347,7 @@ public final class ASCII_UCodeESC_CharStream {
     public void backup(int amount) {
 
         inBuf += amount;
-        if ((bufpos -= amount) < 0) {
-            bufpos += bufsize;
-        }
+        if ((bufpos -= amount) < 0) { bufpos += bufsize; }
     }
 
     public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {

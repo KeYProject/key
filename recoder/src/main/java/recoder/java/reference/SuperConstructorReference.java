@@ -44,7 +44,8 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
 
     public SuperConstructorReference(ASTList<Expression> arguments) {
@@ -55,8 +56,10 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param path a reference prefix.
-     * @param arguments an expression mutable list.
+     * @param path
+     *        a reference prefix.
+     * @param arguments
+     *        an expression mutable list.
      */
 
     public SuperConstructorReference(ReferencePrefix path, ASTList<Expression> arguments) {
@@ -68,14 +71,13 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param proto a super constructor reference.
+     * @param proto
+     *        a super constructor reference.
      */
 
     protected SuperConstructorReference(SuperConstructorReference proto) {
         super(proto);
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
+        if (proto.accessPath != null) { accessPath = (ReferencePrefix) proto.accessPath.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -85,22 +87,16 @@ public class SuperConstructorReference extends SpecialConstructorReference
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
+        if (accessPath != null) { accessPath.setReferenceSuffix(this); }
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
         // role 1 (IDX): parameters
-        if (accessPath == child) {
-            return 0;
-        }
+        if (accessPath == child) { return 0; }
         if (arguments != null) {
             int index = arguments.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         return -1;
     }
@@ -118,7 +114,8 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Set reference prefix.
      *
-     * @param qualifier a reference prefix.
+     * @param qualifier
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix qualifier) {

@@ -47,10 +47,13 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
     /**
      * Construct a method body shortcut
      *
-     * @param bodySource exact class where the body is declared
-     * @param resultVar the Expression naming the variable to which the result of the mthod is
+     * @param bodySource
+     *        exact class where the body is declared
+     * @param resultVar
+     *        the Expression naming the variable to which the result of the mthod is
      *        assigned
-     * @param methRef MethodReference that represents the call
+     * @param methRef
+     *        MethodReference that represents the call
      */
 
     public MethodBodyStatement(TypeReference bodySource, Expression resultVar,
@@ -85,7 +88,8 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
     /**
      * Set the result variable.
      *
-     * @param resultVar the Expression used as result variable
+     * @param resultVar
+     *        the Expression used as result variable
      */
 
     public void setResultVariable(Expression resultVar) {
@@ -153,60 +157,42 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
 
     public int getChildCount() {
         int result = 0;
-        if (bodySource != null) {
-            result++;
-        }
-        if (resultVar != null) {
-            result++;
-        }
-        if (methodReferencePrefix != null) {
-            result++;
-        }
-        if (methodName != null) {
-            result++;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (bodySource != null) { result++; }
+        if (resultVar != null) { result++; }
+        if (methodReferencePrefix != null) { result++; }
+        if (methodName != null) { result++; }
+        if (arguments != null) { result += arguments.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (bodySource != null) {
-            if (index == 0) {
-                return bodySource;
-            }
+            if (index == 0) { return bodySource; }
             index--;
         }
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
         if (methodReferencePrefix != null) {
-            if (index == 0) {
-                return methodReferencePrefix;
-            }
+            if (index == 0) { return methodReferencePrefix; }
             index--;
         }
         if (methodName != null) {
-            if (index == 0) {
-                return methodName;
-            }
+            if (index == 0) { return methodName; }
             index--;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -223,15 +209,15 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
     /**
      * Return the type reference at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a type reference.
+     * @param index
+     *        an index for a type reference.
      * @return the type reference with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (bodySource != null && index == 0) {
-            return bodySource;
-        }
+        if (bodySource != null && index == 0) { return bodySource; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -244,32 +230,26 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
 
     public int getExpressionCount() {
         int result = 0;
-        if (resultVar != null) {
-            result++;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (resultVar != null) { result++; }
+        if (arguments != null) { result += arguments.size(); }
         return result;
     }
 
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for a expression.
+     * @param index
+     *        an index for a expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -279,29 +259,26 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (bodySource == p) {
             TypeReference r = (TypeReference) q;
             bodySource = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         } else if (resultVar == p) {
             Expression r = (Expression) q;
             resultVar = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         } else if (methodReferencePrefix == p) {
             ReferencePrefix rp = (ReferencePrefix) q;
@@ -337,27 +314,15 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
         // TODO weigl makes no sense super.makeParentRoleValid();
         // super.... is abstract
 
-        if (bodySource != null) {
-            bodySource.setParent(this);
-        }
+        if (bodySource != null) { bodySource.setParent(this); }
 
-        if (resultVar != null) {
-            resultVar.setExpressionContainer(this);
-        }
+        if (resultVar != null) { resultVar.setExpressionContainer(this); }
 
-        if (methodName != null) {
-            methodName.setParent(this);
-        }
+        if (methodName != null) { methodName.setParent(this); }
 
-        if (methodReferencePrefix != null) {
-            methodReferencePrefix.setReferenceSuffix(this);
-        }
+        if (methodReferencePrefix != null) { methodReferencePrefix.setReferenceSuffix(this); }
 
-        if (arguments != null) {
-            for (Expression argument : arguments) {
-                argument.setExpressionContainer(this);
-            }
-        }
+        if (arguments != null) { for (Expression argument : arguments) { argument.setExpressionContainer(this); } }
     }
 
     public int getChildPositionCode(ProgramElement child) {
@@ -365,24 +330,14 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
         // role 1: resultVar
         // role 2: prefix
         // others: arguments
-        if (bodySource == child) {
-            return 0;
-        }
-        if (resultVar == child) {
-            return 1;
-        }
-        if (methodReferencePrefix == child) {
-            return 2;
-        }
-        if (methodName == child) {
-            return 3;
-        }
+        if (bodySource == child) { return 0; }
+        if (resultVar == child) { return 1; }
+        if (methodReferencePrefix == child) { return 2; }
+        if (methodName == child) { return 3; }
 
         for (int i = 0, sz = arguments.size(); i < sz; i++) {
             final Expression e = arguments.get(i);
-            if (e == child) {
-                return i + 4;
-            }
+            if (e == child) { return i + 4; }
         }
 
         return -1;
@@ -406,13 +361,11 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
         if (arguments != null) {
             for (int i = 0; i < arguments.size(); i++) {
                 args.append(arguments.get(i));
-                if (i != arguments.size() - 1) {
-                    args.append(", ");
-                }
+                if (i != arguments.size() - 1) { args.append(", "); }
             }
         }
         return getBodySource().getName() + "::" + getReferencePrefix() + "."
-            + getIdentifier().getText() + "(" + args + "):" + resultVar;
+                + getIdentifier().getText() + "(" + args + "):" + resultVar;
     }
 
 

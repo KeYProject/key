@@ -37,7 +37,8 @@ public class IntLiteral extends AbstractIntegerLiteral {
     /**
      * Creates a new IntLiteral representing the given int.
      *
-     * @param value the int value represented by the literal
+     * @param value
+     *        the int value represented by the literal
      */
     public IntLiteral(int value) {
         this.value = value;
@@ -50,8 +51,10 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * Specification. This includes hexadecimal, decimal, octal, and binary literals as well as
      * literals containing underscores as separators. In addition, a preceding '-' sign is allowed.
      *
-     * @param valStr the String that contains the literal
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @param valStr
+     *        the String that contains the literal
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
      *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
@@ -64,9 +67,12 @@ public class IntLiteral extends AbstractIntegerLiteral {
     /**
      * Constructor for Recoder2KeY transformation.
      *
-     * @param children the children of this AST element as KeY classes, may contain: Comments
-     * @param valStr the value of the literal
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @param children
+     *        the children of this AST element as KeY classes, may contain: Comments
+     * @param valStr
+     *        the value of the literal
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of int range
      */
     public IntLiteral(ExtList children, String valStr) {
@@ -103,9 +109,11 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * method are checked for range correctly, particularly considering the asymmetric range of int.
      * Hexadecimal, octal and binary literals are converted using two's complement.
      *
-     * @param sourceStr the String containing the value
+     * @param sourceStr
+     *        the String containing the value
      * @return the parsed value as a long
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of int range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
      *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
@@ -141,9 +149,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
         }
 
         // add minus sign again
-        if (neg) {
-            valStr = "-" + valStr;
-        }
+        if (neg) { valStr = "-" + valStr; }
 
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */

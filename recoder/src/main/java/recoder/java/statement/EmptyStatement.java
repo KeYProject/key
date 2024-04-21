@@ -36,7 +36,8 @@ public class EmptyStatement extends JavaProgramElement
     /**
      * Empty statement.
      *
-     * @param proto an empty statement.
+     * @param proto
+     *        an empty statement.
      */
 
     protected EmptyStatement(EmptyStatement proto) {
@@ -76,7 +77,8 @@ public class EmptyStatement extends JavaProgramElement
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

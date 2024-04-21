@@ -32,8 +32,10 @@ public class UnsignedShiftRight extends Operator {
     /**
      * Unsigned shift right.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public UnsignedShiftRight(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class UnsignedShiftRight extends Operator {
     /**
      * Unsigned shift right.
      *
-     * @param proto an unsigned shift right.
+     * @param proto
+     *        an unsigned shift right.
      */
 
     protected UnsignedShiftRight(UnsignedShiftRight proto) {

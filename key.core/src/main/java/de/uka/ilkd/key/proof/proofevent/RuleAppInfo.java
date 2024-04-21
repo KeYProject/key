@@ -33,9 +33,12 @@ public class RuleAppInfo {
     /**
      * Construct a new rule application information container.
      *
-     * @param appliedRule the applied rule
-     * @param originalNode node the rule was applied on
-     * @param newNodes node(s) created by the rule application
+     * @param appliedRule
+     *        the applied rule
+     * @param originalNode
+     *        node the rule was applied on
+     * @param newNodes
+     *        node(s) created by the rule application
      */
     RuleAppInfo(RuleApp appliedRule, Node originalNode,
             ImmutableList<NodeReplacement> newNodes) {
@@ -66,6 +69,6 @@ public class RuleAppInfo {
 
     public String toString() {
         return "RuleApp: " + getRuleApp() + "\nNode: " + getOriginalNode() + "\nResulting nodes: "
-            + newNodes;
+                + newNodes;
     }
 }

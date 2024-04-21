@@ -47,12 +47,8 @@ public class LoopScopeBlock extends JavaStatement
 
     protected LoopScopeBlock(LoopScopeBlock proto) {
         super(proto);
-        if (proto.indexPV != null) {
-            indexPV = proto.indexPV.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.indexPV != null) { indexPV = proto.indexPV.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -67,7 +63,8 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Set body.
      *
-     * @param body the Statement
+     * @param body
+     *        the Statement
      */
     public void setBody(Statement body) {
         this.body = body;
@@ -114,34 +111,28 @@ public class LoopScopeBlock extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (indexPV != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (indexPV != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
-            if (index == 0) {
-                return indexPV;
-            }
+            if (index == 0) { return indexPV; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -150,13 +141,9 @@ public class LoopScopeBlock extends JavaStatement
     public int getChildPositionCode(ProgramElement child) {
         // role -/0: indexPV
         // role 2/1: body
-        if (indexPV == child) {
-            return 0;
-        }
+        if (indexPV == child) { return 0; }
 
-        if (body == child) {
-            return (indexPV != null) ? 2 : 1;
-        }
+        if (body == child) { return (indexPV != null) ? 2 : 1; }
         return -1;
     }
 
@@ -173,14 +160,14 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -196,15 +183,15 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for a expression.
+     * @param index
+     *        an index for a expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
-        if (indexPV != null && index == 0) {
-            return indexPV;
-        }
+        if (indexPV != null && index == 0) { return indexPV; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -214,25 +201,24 @@ public class LoopScopeBlock extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (indexPV == p) {
             Expression r = (Expression) q;
             indexPV = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         } else if (body == p) {
             Statement r = (Statement) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -243,17 +229,12 @@ public class LoopScopeBlock extends JavaStatement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (indexPV != null) {
-            indexPV.setExpressionContainer(this);
-        }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (indexPV != null) { indexPV.setExpressionContainer(this); }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     /**
      * Deep clone.

@@ -57,8 +57,7 @@ public class SMTFile {
 
 
     public void addSort(SMTSort sort) {
-        if (!sorts.contains(sort)) {
-        }
+        if (!sorts.contains(sort)) {}
         sorts.add(sort);
     }
 
@@ -90,7 +89,8 @@ public class SMTFile {
     }
 
     /**
-     * @param defaultLogic the defaultLogic to set
+     * @param defaultLogic
+     *        the defaultLogic to set
      */
     public void setDefaultLogic(String defaultLogic) {
         this.defaultLogic = defaultLogic;
@@ -104,7 +104,8 @@ public class SMTFile {
     }
 
     /**
-     * @param scope the scope to set
+     * @param scope
+     *        the scope to set
      */
     public void setScope(String scope) {
         this.scope = scope;
@@ -151,9 +152,7 @@ public class SMTFile {
 
         for (SMTTerm f : formulas) {
 
-            if (f == SMTTerm.TRUE) {
-                continue;
-            }
+            if (f == SMTTerm.TRUE) { continue; }
             out.append('\n');
             if (f.getComment() != null) {
                 String comment = f.getComment();
@@ -227,13 +226,9 @@ public class SMTFile {
         // out.println(";(set-option :print-success false)");
         out.println();
 
-        for (SMTSort s : sorts) {
-            out.println(s.toString());
-        }
+        for (SMTSort s : sorts) { out.println(s.toString()); }
         out.println();
-        for (SMTFunction func : functions) {
-            out.println(func.toString());
-        }
+        for (SMTFunction func : functions) { out.println(func.toString()); }
         out.println();
         for (SMTTerm form : formulas) {
             if (form != SMTTerm.TRUE) {

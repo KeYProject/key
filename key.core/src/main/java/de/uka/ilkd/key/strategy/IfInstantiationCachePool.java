@@ -34,9 +34,7 @@ public class IfInstantiationCachePool {
             cache = cacheMgr.get(n);
         }
 
-        if (cache != null) {
-            return cache;
-        }
+        if (cache != null) { return cache; }
 
         cache = new IfInstantiationCache();
 
@@ -45,9 +43,7 @@ public class IfInstantiationCachePool {
             cache2 = cacheMgr.putIfAbsent(n, cache);
         }
 
-        if (cache2 != null) {
-            cache = cache2;
-        }
+        if (cache2 != null) { cache = cache2; }
 
         return cache;
     }
@@ -63,9 +59,7 @@ public class IfInstantiationCachePool {
         synchronized (cacheMgr) {
             cache = cacheMgr.remove(n);
         }
-        if (cache != null) {
-            cache.reset();
-        }
+        if (cache != null) { cache.reset(); }
     }
 
     public static class IfInstantiationCache {

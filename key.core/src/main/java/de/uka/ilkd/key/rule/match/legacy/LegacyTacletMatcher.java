@@ -57,7 +57,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     private final Term findExp;
 
     /**
-     * @param taclet the Taclet matched by this matcher
+     * @param taclet
+     *        the Taclet matched by this matcher
      */
     public LegacyTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
@@ -79,10 +80,13 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * tries to match the bound variables of the given term against the one described by the
      * template
      *
-     * @param term the Term whose bound variables are matched against the JavaBlock of the template
+     * @param term
+     *        the Term whose bound variables are matched against the JavaBlock of the template
      *        (marked as final to help the compiler inlining methods)
-     * @param template the Term whose bound variables are the template that have to be matched
-     * @param matchCond the MatchConditions that has to be paid respect when trying to match
+     * @param template
+     *        the Term whose bound variables are the template that have to be matched
+     * @param matchCond
+     *        the MatchConditions that has to be paid respect when trying to match
      * @return the new matchconditions if a match is possible, otherwise null
      */
     private MatchConditions matchBoundVariables(Term term, Term template,
@@ -120,11 +124,15 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * schema given by the template term or null if no match is possible (marked as final to help
      * the compiler inlining methods)
      *
-     * @param term the Term whose JavaBlock is matched against the JavaBlock of the template
-     * @param template the Term whose JavaBlock is the template that has to be matched
-     * @param matchCond the MatchConditions that has to be paid respect when trying to match the
+     * @param term
+     *        the Term whose JavaBlock is matched against the JavaBlock of the template
+     * @param template
+     *        the Term whose JavaBlock is the template that has to be matched
+     * @param matchCond
+     *        the MatchConditions that has to be paid respect when trying to match the
      *        JavaBlocks
-     * @param services the Services object encapsulating information about the program context
+     * @param services
+     *        the Services object encapsulating information about the program context
      * @return the new matchconditions if a match is possible, otherwise null
      */
     MatchConditions matchJavaBlock(
@@ -156,9 +164,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * the given Term template to the Term term or null if no matching is possible. (marked as final
      * to help the compiler inlining methods)
      *
-     * @param term the Term the Template should match
-     * @param template the Term tried to be instantiated so that it matches term
-     * @param matchCond the MatchConditions to be obeyed by a successful match
+     * @param term
+     *        the Term the Template should match
+     * @param template
+     *        the Term tried to be instantiated so that it matches term
+     * @param matchCond
+     *        the MatchConditions to be obeyed by a successful match
      * @return the new MatchConditions needed to match template with term, if possible, null
      *         otherwise
      *
@@ -180,9 +191,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 if (l instanceof SchemaVariable schemaLabel) {
                     final MatchConditions cond = ElementMatcher.getElementMatcherFor(schemaLabel)
                             .match(schemaLabel, term, matchCond, services);
-                    if (cond == null) {
-                        return null;
-                    }
+                    if (cond == null) { return null; }
                     matchCond = cond;
                 }
             }
@@ -206,9 +215,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 for (int i = 0, arity = term.arity(); i < arity && matchCond != null; i++) {
                     matchCond = match(term.sub(i), template.sub(i), matchCond, services);
                 }
-                if (matchCond != null) {
-                    matchCond = matchCond.shrinkRenameTable();
-                }
+                if (matchCond != null) { matchCond = matchCond.shrinkRenameTable(); }
             }
         }
 
@@ -262,20 +269,16 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         ImmutableList<MatchConditions> newMC;
 
         for (final IfFormulaInstantiation candidateInst : p_toMatch) {
-            assert itIfSequent.hasNext()
-                    : "p_toMatch and assumes sequent must have same number of elements";
+            assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty()) {
-                return null;
-            }
+            if (newMC.isEmpty()) { return null; }
 
             p_matchCond = newMC.head();
         }
 
-        assert !itIfSequent.hasNext()
-                : "p_toMatch and assumes sequent must have same number of elements";
+        assert !itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
     }
@@ -307,15 +310,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     /**
      * looks if a variable is declared as not free in
      *
-     * @param var the SchemaVariable to look for
+     * @param var
+     *        the SchemaVariable to look for
      * @return true iff declared not free
      */
     private boolean varDeclaredNotFree(SchemaVariable var) {
-        for (final NotFreeIn nfi : varsNotFreeIn) {
-            if (nfi.first() == var) {
-                return true;
-            }
-        }
+        for (final NotFreeIn nfi : varsNotFreeIn) { if (nfi.first() == var) { return true; } }
         return false;
     }
 
@@ -324,7 +324,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * returns true iff the given variable is bound either in the ifSequent or in any part of the
      * TacletGoalTemplates
      *
-     * @param v the bound variable to be searched
+     * @param v
+     *        the bound variable to be searched
      */
     private boolean varIsBound(SchemaVariable v) {
         return (v instanceof QuantifiableVariable) && boundVars.contains((QuantifiableVariable) v);
@@ -362,10 +363,14 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     /**
      * ignores a possible update prefix
      *
-     * @param term the term to be matched
-     * @param template the pattern term
-     * @param matchCond the accumulated match conditions for a successful match
-     * @param services the Services
+     * @param term
+     *        the term to be matched
+     * @param template
+     *        the pattern term
+     * @param matchCond
+     *        the accumulated match conditions for a successful match
+     * @param services
+     *        the Services
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates
      *         (Which have been added to the update context in the match conditions)
      */
@@ -425,9 +430,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             cond = ElementMatcher.getElementMatcherFor(sv).match(sv, term.op(), cond, services);
         }
 
-        if (cond != null) {
-            cond = checkVariableConditions(sv, term, cond, services);
-        }
+        if (cond != null) { cond = checkVariableConditions(sv, term, cond, services); }
 
         return cond;
     }
@@ -441,9 +444,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             Services services) {
         matchCond = ElementMatcher.getElementMatcherFor(sv).match(sv, pe, matchCond, services);
 
-        if (matchCond != null) {
-            matchCond = checkConditions(matchCond, services);
-        }
+        if (matchCond != null) { matchCond = checkConditions(matchCond, services); }
 
         return matchCond;
     }

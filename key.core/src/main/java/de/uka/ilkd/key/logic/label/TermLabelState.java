@@ -38,14 +38,14 @@ public class TermLabelState {
     /**
      * Constructor.
      */
-    public TermLabelState() {
-    }
+    public TermLabelState() {}
 
     /**
      * Return the state {@link Map} in which arbitrary key values pairs can be stored for the given
      * {@link TermLabel} {@link Name}.
      *
-     * @param termLabelName The {@link Name} of the {@link TermLabel}.
+     * @param termLabelName
+     *        The {@link Name} of the {@link TermLabel}.
      * @return The {@link Map} used by the {@link TermLabel}s participants.
      */
     public Map<Object, Object> getLabelState(Name termLabelName) {

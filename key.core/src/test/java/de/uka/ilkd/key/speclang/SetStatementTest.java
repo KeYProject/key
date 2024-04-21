@@ -40,7 +40,7 @@ public class SetStatementTest {
      * the filename of the key file which is needed to create Services and JavaInfo
      */
     private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "setStatements" + File.separator + "testFile.key";
+            + "setStatements" + File.separator + "testFile.key";
 
     /**
      * JavaInfo containing information about the available datatypes and methods

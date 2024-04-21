@@ -80,8 +80,10 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     /**
      * wraps a RECODER ClassDeclaration in a compilation unit
      *
-     * @param classDecl the recoder.java.ClassDeclaration to wrap
-     * @param context the Context containing the recoder.java.CompilationUnit where the class is
+     * @param classDecl
+     *        the recoder.java.ClassDeclaration to wrap
+     * @param context
+     *        the Context containing the recoder.java.CompilationUnit where the class is
      *        wrapped
      * @return the enclosing recoder.java.CompilationUnit
      */
@@ -113,8 +115,10 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      * parses a given JavaBlock using the context to determine the right references and returns a
      * statement block of recoder.
      *
-     * @param block a String describing a java block
-     * @param context recoder.java.CompilationUnit in which the block has to be interpreted
+     * @param block
+     *        a String describing a java block
+     * @param context
+     *        recoder.java.CompilationUnit in which the block has to be interpreted
      * @return the parsed and resolved recoder statement block
      */
     protected recoder.java.StatementBlock recoderBlock(String block, Context context) {
@@ -135,12 +139,14 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             LOGGER.debug(
                 "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n", e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
-                + "\n **** END ****\n failed. Thrown Exception:" + e, e);
+                    + "\n **** END ****\n failed. Thrown Exception:" + e,
+                e);
         } catch (IOException ioe) {
             LOGGER.debug(
                 "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the IO exception:", ioe);
             throw new ConvertException("IO Error when parsing: \n **** BEGIN ****\n " + block
-                + "\n **** END ****\n failed. Thrown IOException:" + ioe, ioe);
+                    + "\n **** END ****\n failed. Thrown IOException:" + ioe,
+                ioe);
         }
 
         embedClass(embedMethod(embedBlock(bl), context), context);
@@ -153,6 +159,5 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      *
      * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
      */
-    public void parseSpecialClasses() {
-    }
+    public void parseSpecialClasses() {}
 }

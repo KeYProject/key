@@ -49,18 +49,14 @@ public class TestPositions {
     private static void preorderTraverse(ProgramElement element,
             Consumer<ProgramElement> consumer) {
         consumer.accept(element);
-        if (!(element instanceof NonTerminalProgramElement e)) {
-            return;
-        }
+        if (!(element instanceof NonTerminalProgramElement e)) { return; }
         var n = e.getChildCount();
-        for (int i = 0; i < n; ++i) {
-            preorderTraverse(e.getChildAt(i), consumer);
-        }
+        for (int i = 0; i < n; ++i) { preorderTraverse(e.getChildAt(i), consumer); }
     }
 
     private static String formatElement(ProgramElement e) {
         return e.getClass().getName() + "," + formatPosition(e.getStartPosition()) + ","
-            + formatPosition(e.getEndPosition());
+                + formatPosition(e.getEndPosition());
     }
 
     @SuppressWarnings("unused")

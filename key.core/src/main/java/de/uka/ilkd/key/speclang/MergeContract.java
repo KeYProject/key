@@ -32,7 +32,8 @@ public interface MergeContract extends SpecificationElement {
     Class<? extends MergeProcedure> getMergeProcedure();
 
     /**
-     * @param services TODO
+     * @param services
+     *        TODO
      * @return The instantiated {@link MergeProcedure}.
      */
     MergeProcedure getInstantiatedMergeProcedure(Services services);

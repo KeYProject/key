@@ -45,6 +45,6 @@ public class SeqConcat extends ADTPrefixConstruct {
     @Override
     public String toSource() {
         return "\\seq_concat(" + children.get(0).toSource() + "," + children.get(1).toSource()
-            + ")";
+                + ")";
     }
 }

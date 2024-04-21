@@ -64,17 +64,14 @@ public class InterfaceDeclaration extends TypeDeclaration {
     /**
      * Interface declaration.
      *
-     * @param proto an interface declaration.
+     * @param proto
+     *        an interface declaration.
      */
 
     protected InterfaceDeclaration(InterfaceDeclaration proto) {
         super(proto);
-        if (proto.extending != null) {
-            extending = proto.extending.deepClone();
-        }
-        if (proto.typeParameters != null) {
-            typeParameters = proto.typeParameters.deepClone();
-        }
+        if (proto.extending != null) { extending = proto.extending.deepClone(); }
+        if (proto.typeParameters != null) { typeParameters = proto.typeParameters.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -94,14 +91,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (extending != null) {
-            extending.setParent(this);
-        }
-        if (typeParameters != null) {
-            for (TypeParameterDeclaration tp : typeParameters) {
-                tp.setParent(this);
-            }
-        }
+        if (extending != null) { extending.setParent(this); }
+        if (typeParameters != null) { for (TypeParameterDeclaration tp : typeParameters) { tp.setParent(this); } }
     }
 
     /**
@@ -112,65 +103,47 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (name != null) {
-            result++;
-        }
-        if (extending != null) {
-            result++;
-        }
-        if (members != null) {
-            result += members.size();
-        }
-        if (typeParameters != null) {
-            result += typeParameters.size();
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (name != null) { result++; }
+        if (extending != null) { result++; }
+        if (members != null) { result += members.size(); }
+        if (typeParameters != null) { result += typeParameters.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index) {
-                return typeParameters.get(index);
-            }
+            if (len > index) { return typeParameters.get(index); }
             index -= len;
         }
         if (extending != null) {
-            if (index == 0) {
-                return extending;
-            }
+            if (index == 0) { return extending; }
             index--;
         }
         if (members != null) {
             len = members.size();
-            if (len > index) {
-                return members.get(index);
-            }
+            if (len > index) { return members.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -185,27 +158,17 @@ public class InterfaceDeclaration extends TypeDeclaration {
         // role 5 (IDX): type parameters
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (name == child) {
-            return 1;
-        }
-        if (extending == child) {
-            return 2;
-        }
+        if (name == child) { return 1; }
+        if (extending == child) { return 2; }
         if (members != null) {
             int index = members.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 4;
-            }
+            if (index >= 0) { return (index << 4) | 4; }
         }
         if (typeParameters != null) {
             int index = typeParameters.size();
-            if (index >= 0) {
-                return (index << 4) | 5;
-            }
+            if (index >= 0) { return (index << 4) | 5; }
         }
         return -1;
     }
@@ -216,16 +179,17 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -243,17 +207,13 @@ public class InterfaceDeclaration extends TypeDeclaration {
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (extending == p) {
             Extends r = (Extends) q;
             extending = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         count = (members == null) ? 0 : members.size();
@@ -298,7 +258,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
     /**
      * Set extended types.
      *
-     * @param spec an extends.
+     * @param spec
+     *        an extends.
      */
 
     public void setExtendedTypes(Extends spec) {

@@ -45,7 +45,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
 
     public InheritanceSpecification(TypeReference supertype) {
@@ -57,7 +58,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param supertypes a type reference mutable list.
+     * @param supertypes
+     *        a type reference mutable list.
      */
 
     public InheritanceSpecification(ASTList<TypeReference> supertypes) {
@@ -68,14 +70,13 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param proto an inheritance specification.
+     * @param proto
+     *        an inheritance specification.
      */
 
     protected InheritanceSpecification(InheritanceSpecification proto) {
         super(proto);
-        if (proto.supertypes != null) {
-            supertypes = proto.supertypes.deepClone();
-        }
+        if (proto.supertypes != null) { supertypes = proto.supertypes.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -96,16 +97,12 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (supertypes != null) {
-            for (int i = supertypes.size() - 1; i >= 0; i -= 1) {
-                supertypes.get(i).setParent(this);
-            }
+            for (int i = supertypes.size() - 1; i >= 0; i -= 1) { supertypes.get(i).setParent(this); }
         }
     }
 
     public SourceElement getLastElement() {
-        if (supertypes == null) {
-            return this;
-        }
+        if (supertypes == null) { return this; }
         return supertypes.get(supertypes.size() - 1);
     }
 
@@ -117,24 +114,22 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null) {
-            result += supertypes.size();
-        }
+        if (supertypes != null) { result += supertypes.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (supertypes != null) {
-            return supertypes.get(index);
-        }
+        if (supertypes != null) { return supertypes.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -142,9 +137,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
         // role 0 (IDX): types
         if (supertypes != null) {
             int index = supertypes.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }
@@ -155,16 +148,17 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (supertypes == null) ? 0 : supertypes.size();
         for (int i = 0; i < count; i++) {
@@ -195,7 +189,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Set parent.
      *
-     * @param decl a type declaration.
+     * @param decl
+     *        a type declaration.
      */
 
     public void setParent(TypeDeclaration decl) {
@@ -215,7 +210,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Set supertypes.
      *
-     * @param list a type reference mutable list.
+     * @param list
+     *        a type reference mutable list.
      */
 
     public void setSupertypes(ASTList<TypeReference> list) {
@@ -239,9 +235,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (supertypes != null) {
-            return supertypes.get(index);
-        }
+        if (supertypes != null) { return supertypes.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

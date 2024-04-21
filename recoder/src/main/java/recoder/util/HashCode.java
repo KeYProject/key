@@ -33,7 +33,8 @@ public interface HashCode extends Equality {
     /**
      * Return an integer value representing the object.
      *
-     * @param x an object.
+     * @param x
+     *        an object.
      * @return the hash code.
      */
     int hashCode(Object x);

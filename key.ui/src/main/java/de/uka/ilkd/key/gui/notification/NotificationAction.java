@@ -15,7 +15,8 @@ public interface NotificationAction {
     /**
      * executes the action
      *
-     * @param event the NotificationEvent triggering this action
+     * @param event
+     *        the NotificationEvent triggering this action
      * @return indicator if action has been executed successfully
      */
     boolean execute(NotificationEvent event);

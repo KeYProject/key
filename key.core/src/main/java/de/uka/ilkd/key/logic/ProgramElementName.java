@@ -29,7 +29,8 @@ public class ProgramElementName extends Name
     /**
      * create a new name
      *
-     * @param name the String with the name of the program element
+     * @param name
+     *        the String with the name of the program element
      */
     public ProgramElementName(String name) {
         super(name);
@@ -42,7 +43,8 @@ public class ProgramElementName extends Name
     /**
      * create a new name
      *
-     * @param name the String with the name of the program element
+     * @param name
+     *        the String with the name of the program element
      */
     public ProgramElementName(String name, Comment[] c) {
         super(name);
@@ -106,7 +108,8 @@ public class ProgramElementName extends Name
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnProgramElementName(this);
@@ -156,9 +159,7 @@ public class ProgramElementName extends Name
      * elements are assigned to the same name, otherwise the names have to be equal
      */
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof ProgramElementName)) {
-            return false;
-        }
+        if (!(se instanceof ProgramElementName)) { return false; }
         return nat.sameAbstractName(this, se);
     }
 

@@ -33,7 +33,8 @@ public class While extends LoopStatement {
     /**
      * While.
      *
-     * @param guard an expression.
+     * @param guard
+     *        an expression.
      */
 
     public While(Expression guard) {
@@ -44,8 +45,10 @@ public class While extends LoopStatement {
     /**
      * While.
      *
-     * @param guard an expression.
-     * @param body a statement.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
      */
 
     public While(Expression guard, Statement body) {
@@ -57,7 +60,8 @@ public class While extends LoopStatement {
     /**
      * While.
      *
-     * @param proto a while.
+     * @param proto
+     *        a while.
      */
 
     protected While(While proto) {

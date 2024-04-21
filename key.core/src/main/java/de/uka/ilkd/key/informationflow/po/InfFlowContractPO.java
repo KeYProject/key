@@ -57,15 +57,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // add new information flow symbols
         // (by the way: why only formal parameters?)
-        for (Term formalParam : symbExecVars.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c1.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c2.formalParams) {
-            addIFSymbol(formalParam);
-        }
+        for (Term formalParam : symbExecVars.formalParams) { addIFSymbol(formalParam); }
+        for (Term formalParam : ifVars.c1.formalParams) { addIFSymbol(formalParam); }
+        for (Term formalParam : ifVars.c2.formalParams) { addIFSymbol(formalParam); }
     }
 
     @Override
@@ -88,18 +82,14 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
         collectClassAxioms(contract.getKJT(), proofConfig);
 
         for (final NoPosTacletApp t : taclets) {
-            if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                addIFSymbol(t.taclet());
-            }
+            if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) { addIFSymbol(t.taclet()); }
         }
     }
 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof InfFlowContractPO cPO)) {
-            return false;
-        }
+        if (!(po instanceof InfFlowContractPO cPO)) { return false; }
         return contract.equals(cPO.contract);
     }
 
@@ -182,8 +172,10 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {

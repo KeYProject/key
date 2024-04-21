@@ -45,8 +45,10 @@ public interface SpecificationElement {
     /**
      * Applies a unary operator to every term in this specification element.
      *
-     * @param op the operator to apply.
-     * @param services services.
+     * @param op
+     *        the operator to apply.
+     * @param services
+     *        services.
      * @return this specification element with the operator applied.
      */
     SpecificationElement map(UnaryOperator<Term> op, Services services);

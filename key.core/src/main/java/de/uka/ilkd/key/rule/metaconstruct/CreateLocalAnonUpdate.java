@@ -34,9 +34,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         final Term target = term.sub(0);
 
         // the target term should have a Java block
-        if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
-            return null;
-        }
+        if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) { return null; }
 
         assert target.op() instanceof Modality;
 

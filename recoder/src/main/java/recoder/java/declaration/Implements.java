@@ -32,7 +32,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
 
     public Implements(TypeReference supertype) {
@@ -43,7 +44,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param list a type reference mutable list.
+     * @param list
+     *        a type reference mutable list.
      */
 
     public Implements(ASTList<TypeReference> list) {
@@ -54,7 +56,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param proto an implements.
+     * @param proto
+     *        an implements.
      */
 
     protected Implements(Implements proto) {

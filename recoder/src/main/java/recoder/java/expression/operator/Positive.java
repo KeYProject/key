@@ -32,7 +32,8 @@ public class Positive extends Operator {
     /**
      * Positive.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public Positive(Expression child) {
@@ -43,7 +44,8 @@ public class Positive extends Operator {
     /**
      * Positive.
      *
-     * @param proto a positive.
+     * @param proto
+     *        a positive.
      */
 
     protected Positive(Positive proto) {

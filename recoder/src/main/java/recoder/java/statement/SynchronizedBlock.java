@@ -43,7 +43,8 @@ public class SynchronizedBlock extends JavaStatement
     /**
      * Synchronized block.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public SynchronizedBlock(StatementBlock body) {
@@ -54,8 +55,10 @@ public class SynchronizedBlock extends JavaStatement
     /**
      * Synchronized block.
      *
-     * @param e an expression.
-     * @param body a statement block.
+     * @param e
+     *        an expression.
+     * @param body
+     *        a statement block.
      */
 
     public SynchronizedBlock(Expression e, StatementBlock body) {
@@ -67,17 +70,14 @@ public class SynchronizedBlock extends JavaStatement
     /**
      * Synchronized block.
      *
-     * @param proto a synchronized block.
+     * @param proto
+     *        a synchronized block.
      */
 
     protected SynchronizedBlock(SynchronizedBlock proto) {
         super(proto);
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.expression != null) { expression = proto.expression.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -97,12 +97,8 @@ public class SynchronizedBlock extends JavaStatement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
+        if (expression != null) { expression.setExpressionContainer(this); }
     }
 
     /**
@@ -111,30 +107,27 @@ public class SynchronizedBlock extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (expression == p) {
             Expression r = (Expression) q;
             expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -157,9 +150,7 @@ public class SynchronizedBlock extends JavaStatement
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -176,7 +167,8 @@ public class SynchronizedBlock extends JavaStatement
     /**
      * Set expression.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public void setExpression(Expression e) {
@@ -191,47 +183,35 @@ public class SynchronizedBlock extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (expression != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: expression
         // role 1: body
-        if (expression == child) {
-            return 0;
-        }
-        if (body == child) {
-            return 1;
-        }
+        if (expression == child) { return 0; }
+        if (body == child) { return 1; }
         return -1;
     }
 
@@ -248,7 +228,8 @@ public class SynchronizedBlock extends JavaStatement
     /**
      * Set body.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -272,9 +253,7 @@ public class SynchronizedBlock extends JavaStatement
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

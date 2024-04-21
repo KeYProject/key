@@ -70,9 +70,7 @@ public class ResolveBoxing extends TwoPassTransformation {
                     if (mr.getArguments() != null) {
                         int idx = mr.getArguments().indexOf(e);
                         // TODO does not work with var arg!!! Will throw exception !!!
-                        if (idx != -1) {
-                            tt = m.getSignature().get(idx);
-                        }
+                        if (idx != -1) { tt = m.getSignature().get(idx); }
                         // otherwise, expression is not used as an argument
                         // but e.g. as a reference prefix
                     }
@@ -91,16 +89,12 @@ public class ResolveBoxing extends TwoPassTransformation {
                         if (op.getArguments().get(0) != e) {
 
                             Type target = si.getType(op);
-                            if (target instanceof IntersectionType) {
-                                toBox.add(e);
-                            }
+                            if (target instanceof IntersectionType) { toBox.add(e); }
                             /*
                              * in case it's not an intersection, but just a "most common" type: /*
                              * example: (true ? "hello, world" : 5).getClass();
                              */
-                            if (t instanceof PrimitiveType && target instanceof ClassType) {
-                                toBox.add(e);
-                            }
+                            if (t instanceof PrimitiveType && target instanceof ClassType) { toBox.add(e); }
                         }
 
                     }
@@ -113,26 +107,18 @@ public class ResolveBoxing extends TwoPassTransformation {
                 } else if (parent instanceof Return) {
                     tt = si.getType(MiscKit.getParentMemberDeclaration(parent));
                 } else if (parent instanceof Switch) {
-                    if (t instanceof ClassType && !((ClassType) t).isEnumType()) {
-                        toUnbox.add(e);
-                    }
+                    if (t instanceof ClassType && !((ClassType) t).isEnumType()) { toUnbox.add(e); }
                 } else if (parent instanceof Assert) {
-                    if (t instanceof ClassType) {
-                        toUnbox.add(e);
-                    }
+                    if (t instanceof ClassType) { toUnbox.add(e); }
                 } else if (parent instanceof ArrayReference) {
-                    if (t instanceof ClassType) {
-                        toUnbox.add(e);
-                    }
+                    if (t instanceof ClassType) { toUnbox.add(e); }
                 } else if (parent instanceof ArrayInitializer) {
                     tt = ((ArrayType) si.getType((ArrayInitializer) parent)).getBaseType();
                 }
                 if (tt != null) {
                     if (tt instanceof ClassType && t instanceof PrimitiveType) {
                         toBox.add(e);
-                    } else if (tt instanceof PrimitiveType && t instanceof ClassType) {
-                        toUnbox.add(e);
-                    }
+                    } else if (tt instanceof PrimitiveType && t instanceof ClassType) { toUnbox.add(e); }
                 }
             }
         }

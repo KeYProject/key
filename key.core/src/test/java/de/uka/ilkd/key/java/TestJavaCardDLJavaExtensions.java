@@ -16,7 +16,7 @@ public class TestJavaCardDLJavaExtensions {
     private final HelperClassForTests helper = new HelperClassForTests();
 
     public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "javacardDLExtensions" + File.separator;
+            + "javacardDLExtensions" + File.separator;
 
 
     public TestJavaCardDLJavaExtensions() {
@@ -31,8 +31,8 @@ public class TestJavaCardDLJavaExtensions {
             return;
         }
         Assertions.fail("Something with type resolution in method frames is corrupt. "
-            + "The type Test should not be found in the default scope as it is "
-            + "declared inside package test.");
+                + "The type Test should not be found in the default scope as it is "
+                + "declared inside package test.");
     }
 
     @Test

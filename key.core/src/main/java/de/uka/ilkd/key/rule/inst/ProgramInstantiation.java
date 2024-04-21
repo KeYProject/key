@@ -13,7 +13,8 @@ public class ProgramInstantiation extends InstantiationEntry<ProgramElement> {
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     * @param pe
+     *        the ProgramElement the SchemaVariable is instantiated with
      */
     ProgramInstantiation(ProgramElement pe) {
         super(pe);

@@ -52,7 +52,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
     /**
      * Set comments.
      *
-     * @param list a comment list.
+     * @param list
+     *        a comment list.
      */
     void setComments(ASTList<Comment> list);
 
@@ -108,15 +109,15 @@ public interface ProgramElement extends SourceElement, ModelElement {
          * The function does not compare comments or indentation information. Instead, the toSource
          * method can be used to perform a more stringent comparison.
          *
-         * @param x the root of the first syntax tree.
-         * @param y the root of the second syntax tree.
+         * @param x
+         *        the root of the first syntax tree.
+         * @param y
+         *        the root of the second syntax tree.
          * @return true, iff both roots have the same class and equal children (if any).
          */
 
         public boolean equals(Object x, Object y) {
-            if (x == null || y == null) {
-                return false;
-            }
+            if (x == null || y == null) { return false; }
             if (x instanceof NonTerminalProgramElement a) {
                 if (x.getClass() != y.getClass()) {
                     if (x instanceof UncollatedReferenceQualifier) {
@@ -139,29 +140,15 @@ public interface ProgramElement extends SourceElement, ModelElement {
                 int n = a.getChildCount();
                 int m = b.getChildCount();
                 if ((a instanceof ArrayLengthReference)
-                        && (b instanceof UncollatedReferenceQualifier)) {
-                    m -= 1;
-                }
+                        && (b instanceof UncollatedReferenceQualifier)) { m -= 1; }
                 if ((b instanceof ArrayLengthReference)
-                        && (a instanceof UncollatedReferenceQualifier)) {
-                    n -= 1;
-                }
-                if (n != m) {
-                    return false;
-                }
-                for (int i = 0; i < n; i += 1) {
-                    if (!equals(a.getChildAt(i), b.getChildAt(i))) {
-                        return false;
-                    }
-                }
+                        && (a instanceof UncollatedReferenceQualifier)) { n -= 1; }
+                if (n != m) { return false; }
+                for (int i = 0; i < n; i += 1) { if (!equals(a.getChildAt(i), b.getChildAt(i))) { return false; } }
                 return true;
             } else if (x instanceof TerminalProgramElement) {
-                if (x.getClass() != y.getClass()) {
-                    return false;
-                }
-                if (x instanceof Identifier) {
-                    return ((Identifier) x).getText().equals(((Identifier) y).getText());
-                }
+                if (x.getClass() != y.getClass()) { return false; }
+                if (x instanceof Identifier) { return ((Identifier) x).getText().equals(((Identifier) y).getText()); }
                 if (x instanceof Literal) {
                     if (x instanceof IntLiteral) {
                         return ((IntLiteral) x).getValue().equals(((IntLiteral) y).getValue());
@@ -173,9 +160,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
                         return ((StringLiteral) x).getValue()
                                 .equals(((StringLiteral) y).getValue());
                     }
-                    if (x instanceof NullLiteral) {
-                        return true;
-                    }
+                    if (x instanceof NullLiteral) { return true; }
                     if (x instanceof CharLiteral) {
                         return ((CharLiteral) x).getValue().equals(((CharLiteral) y).getValue());
                     }

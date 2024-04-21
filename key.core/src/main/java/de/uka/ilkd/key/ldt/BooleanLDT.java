@@ -83,9 +83,7 @@ public final class BooleanLDT extends LDT {
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
-        } else if (subs.length == 2) {
-            return isResponsible(op, subs[0], subs[1], services, ec);
-        }
+        } else if (subs.length == 2) { return isResponsible(op, subs[0], subs[1], services, ec); }
         return false;
     }
 

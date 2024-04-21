@@ -41,12 +41,15 @@ public class InterfaceDeclaration extends TypeDeclaration {
     /**
      * uses children list to create non-anonymous class
      *
-     * @param children an ExtList that may contain: an Extends (as pointer to a class),
+     * @param children
+     *        an ExtList that may contain: an Extends (as pointer to a class),
      *        ProgramElementName (as name), several MemberDeclaration (as members of the type), a
      *        parentIsInterfaceDeclaration (indicating if parent is interface), several Modifier (as
      *        modifiers of the type decl), a Comment
-     * @param fullName the fully qualified ProgramElementName of the declared type
-     * @param isLibrary a boolean flag indicating if this interface is part of a library (library
+     * @param fullName
+     *        the fully qualified ProgramElementName of the declared type
+     * @param isLibrary
+     *        a boolean flag indicating if this interface is part of a library (library
      *        interfaces come often with a specification and are only available as bytecode)
      */
     public InterfaceDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
@@ -67,54 +70,40 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (name != null) {
-            result++;
-        }
-        if (extending != null) {
-            result++;
-        }
-        if (members != null) {
-            result += members.size();
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (name != null) { result++; }
+        if (extending != null) { result++; }
+        if (members != null) { result += members.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (extending != null) {
-            if (index == 0) {
-                return extending;
-            }
+            if (index == 0) { return extending; }
             index--;
         }
         if (members != null) {
             len = members.size();
-            if (len > index) {
-                return members.get(index);
-            }
+            if (len > index) { return members.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -207,7 +196,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnInterfaceDeclaration(this);

@@ -42,10 +42,14 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar the heap variable.
-     * @param selfVar the self variable.
-     * @param paramVars the list of parameter variables.
-     * @param services the services object.
+     * @param heapVar
+     *        the heap variable.
+     * @param selfVar
+     *        the self variable.
+     * @param paramVars
+     *        the list of parameter variables.
+     * @param services
+     *        the services object.
      * @return the modifies clause.
      */
     Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
@@ -54,11 +58,16 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar the heap variable
-     * @param heapTerm the heap variable term.
-     * @param selfTerm the self variable term.
-     * @param paramTerms the list of parameter variable terms.
-     * @param services the services object.
+     * @param heapVar
+     *        the heap variable
+     * @param heapTerm
+     *        the heap variable term.
+     * @param selfTerm
+     *        the self variable term.
+     * @param paramTerms
+     *        the list of parameter variable terms.
+     * @param services
+     *        the services object.
      * @return the modifies clause.
      */
     Term getMod(LocationVariable heapVar, Term heapTerm, Term selfTerm,
@@ -67,10 +76,14 @@ public interface OperationContract extends Contract {
     /**
      * Returns the free modifies clause of the contract.
      *
-     * @param heapVar the heap variable.
-     * @param selfVar the self variable.
-     * @param paramVars the list of parameter variables.
-     * @param services the services object.
+     * @param heapVar
+     *        the heap variable.
+     * @param selfVar
+     *        the self variable.
+     * @param paramVars
+     *        the list of parameter variables.
+     * @param services
+     *        the services object.
      * @return the free modifies clause.
      */
     Term getFreeMod(LocationVariable heapVar, ProgramVariable selfVar,
@@ -80,11 +93,16 @@ public interface OperationContract extends Contract {
     /**
      * Returns the free modifies clause of the contract.
      *
-     * @param heapVar the heap variable
-     * @param heapTerm the heap variable term.
-     * @param selfTerm the self variable term.
-     * @param paramTerms the list of parameter variable terms.
-     * @param services the services object.
+     * @param heapVar
+     *        the heap variable
+     * @param heapTerm
+     *        the heap variable term.
+     * @param selfTerm
+     *        the self variable term.
+     * @param paramTerms
+     *        the list of parameter variable terms.
+     * @param services
+     *        the services object.
      * @return the free modifies clause.
      */
     Term getFreeMod(LocationVariable heapVar, Term heapTerm,

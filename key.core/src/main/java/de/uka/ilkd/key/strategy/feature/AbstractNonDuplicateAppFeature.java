@@ -41,21 +41,15 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
-        if (newApp.rule() != ruleCmp.rule()) {
-            return false;
-        }
+        if (newApp.rule() != ruleCmp.rule()) { return false; }
 
         final TacletApp cmp = (TacletApp) ruleCmp;
 
         // compare the position of application
         if (newPio != null) {
-            if (!(cmp instanceof PosTacletApp)) {
-                return false;
-            }
+            if (!(cmp instanceof PosTacletApp)) { return false; }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if (!comparePio(newApp, cmp, newPio, oldPio)) {
-                return false;
-            }
+            if (!comparePio(newApp, cmp, newPio, oldPio)) { return false; }
         }
 
 
@@ -65,9 +59,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations =
             cmp.ifFormulaInstantiations();
         if (newAppIfFmlInstantiations == null || cmpIfFmlInstantiations == null) {
-            if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) {
-                return false;
-            }
+            if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) { return false; }
         } else {
 
             final Iterator<IfFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
@@ -75,9 +67,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
-                    return false;
-                }
+                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) { return false; }
             }
         }
 
@@ -85,9 +75,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
-        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
-            return false;
-        }
+        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) { return false; }
 
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
             inst0.interesting();
@@ -100,9 +88,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
-            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
-                continue;
-            }
+            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) { continue; }
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
@@ -128,11 +114,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         List<RuleApp> apps = cache.get(node, app.rule().name());
 
         // Check all rules with this name
-        for (RuleApp a : apps) {
-            if (sameApplication(a, app, pos)) {
-                return false;
-            }
-        }
+        for (RuleApp a : apps) { if (sameApplication(a, app, pos)) { return false; } }
 
         return true;
     }

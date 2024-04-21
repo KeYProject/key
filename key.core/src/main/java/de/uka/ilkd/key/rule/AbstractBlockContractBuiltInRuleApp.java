@@ -33,9 +33,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
+     * @param rule
+     *        the rule being applied.
+     * @param occurrence
+     *        the position at which the rule is applied.
+     * @param ifInstantiations
+     *        if instantiations.
      */
     public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
@@ -49,15 +52,15 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param goal the current goal.
-     * @param rule the rule being applied.
+     * @param goal
+     *        the current goal.
+     * @param rule
+     *        the rule being applied.
      * @return this.
      */
     public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal,
             final AbstractBlockContractRule rule) {
-        if (complete() || cannotComplete(goal)) {
-            return this;
-        }
+        if (complete() || cannotComplete(goal)) { return this; }
         final Services services = goal.proof().getServices();
         final AbstractBlockContractRule.Instantiation instantiation =
             rule.instantiate(posInOccurrence().subTerm(), goal, services);
@@ -78,9 +81,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param statement the new statement.
-     * @param contract the new contract.
-     * @param heaps the new heap context.
+     * @param statement
+     *        the new statement.
+     * @param contract
+     *        the new contract.
+     * @param heaps
+     *        the new heap context.
      */
     public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {

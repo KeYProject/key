@@ -19,7 +19,8 @@ public class Extends extends InheritanceSpecification {
     /**
      * Extends.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
     public Extends(TypeReference supertype) {
         super(supertype);
@@ -28,7 +29,8 @@ public class Extends extends InheritanceSpecification {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May include: several
+     * @param children
+     *        the children of this AST element as KeY classes. May include: several
      *        TypeReference (as references to the supertypes) a Comment
      */
     public Extends(ExtList children) {
@@ -39,7 +41,8 @@ public class Extends extends InheritanceSpecification {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnExtends(this);

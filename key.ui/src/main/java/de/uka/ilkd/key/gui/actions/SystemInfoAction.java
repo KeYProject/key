@@ -31,17 +31,13 @@ public class SystemInfoAction extends MainWindowAction {
         Object[] contents = new Object[6];
         contents[0] = "KeY info:\n";
         String params = System.getProperty("sun.java.command");
-        if (params == null) {
-            params = "(unknown)";
-        }
+        if (params == null) { params = "(unknown)"; }
         int i = params.indexOf("Main");
-        if (i > 0) {
-            params = params.substring(i + 4);
-        }
+        if (i > 0) { params = params.substring(i + 4); }
         java.lang.management.RuntimeMXBean rmb =
             java.lang.management.ManagementFactory.getRuntimeMXBean();
         final String keyInfoText = "Version: " + KeYConstants.VERSION + "\nKeY parameters: "
-            + params + "\nVM parameters: " + formatList(rmb.getInputArguments());
+                + params + "\nVM parameters: " + formatList(rmb.getInputArguments());
         JTextArea keyInfo = new JTextArea(keyInfoText, 3, TEXT_COLS);
         keyInfo.setEditable(false);
         contents[1] = keyInfo;
@@ -92,20 +88,12 @@ public class SystemInfoAction extends MainWindowAction {
     }
 
     private void formatMap(StringBuffer sb, Map<?, ?> props) {
-        for (Object o : props.keySet()) {
-            sb.append(o);
-            sb.append("=\"");
-            sb.append(props.get(o));
-            sb.append("\"\n");
-        }
+        for (Object o : props.keySet()) { sb.append(o); sb.append("=\""); sb.append(props.get(o)); sb.append("\"\n"); }
     }
 
     private String formatList(List<?> l) {
         StringBuilder sb = new StringBuilder();
-        for (Object o : l) {
-            sb.append(o);
-            sb.append(" ");
-        }
+        for (Object o : l) { sb.append(o); sb.append(" "); }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }

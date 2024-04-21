@@ -24,7 +24,8 @@ public interface NamedProgramElement extends NamedModelElement, NonTerminalProgr
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
     void setIdentifier(Identifier id);
 }

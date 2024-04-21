@@ -55,8 +55,10 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Ccatch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -69,8 +71,10 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Ccatch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
         super();
@@ -83,19 +87,16 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Ccatch.
      *
-     * @param proto a Ccatch.
+     * @param proto
+     *        a Ccatch.
      */
     protected Ccatch(Ccatch proto) {
         super(proto);
-        if (proto.hasParameterDeclaration()) {
-            parameter = Optional.ofNullable(proto.parameter.get().deepClone());
-        }
+        if (proto.hasParameterDeclaration()) { parameter = Optional.ofNullable(proto.parameter.get().deepClone()); }
         if (proto.hasNonStdParameterDeclaration()) {
             nonStdParameter = Optional.ofNullable(proto.nonStdParameter.get().deepClone());
         }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -117,9 +118,7 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     public void makeParentRoleValid() {
         parameter.ifPresent(p -> p.setParameterContainer(this));
         nonStdParameter.ifPresent(p -> p.setParameterContainer(this));
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     @Override
@@ -135,43 +134,33 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     @Override
     public int getChildCount() {
         int result = 0;
-        if (hasParameterDeclaration()) {
-            result++;
-        }
-        if (hasNonStdParameterDeclaration()) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (hasParameterDeclaration()) { result++; }
+        if (hasNonStdParameterDeclaration()) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
-            if (index == 0) {
-                return parameter.get();
-            }
+            if (index == 0) { return parameter.get(); }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
-            if (index == 0) {
-                return nonStdParameter.get();
-            }
+            if (index == 0) { return nonStdParameter.get(); }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -181,15 +170,9 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: parameter
         // role 1: body
-        if (parameter.map(p -> p == child).orElse(false)) {
-            return 0;
-        }
-        if (nonStdParameter.map(p -> p == child).orElse(false)) {
-            return 0;
-        }
-        if (body == child) {
-            return 1;
-        }
+        if (parameter.map(p -> p == child).orElse(false)) { return 0; }
+        if (nonStdParameter.map(p -> p == child).orElse(false)) { return 0; }
+        if (body == child) { return 1; }
         return -1;
     }
 
@@ -199,39 +182,34 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (hasParameterDeclaration() && parameter.map(param -> param == p).orElse(false)) {
             ParameterDeclaration r = (ParameterDeclaration) q;
             parameter = Optional.of(r);
-            if (r != null) {
-                r.setParameterContainer(this);
-            }
+            if (r != null) { r.setParameterContainer(this); }
             return true;
         }
         if (hasNonStdParameterDeclaration()
                 && nonStdParameter.map(param -> param == p).orElse(false)) {
             CcatchNonstandardParameterDeclaration r = (CcatchNonstandardParameterDeclaration) q;
             nonStdParameter = Optional.of(r);
-            if (r != null) {
-                r.setParameterContainer(this);
-            }
+            if (r != null) { r.setParameterContainer(this); }
             return true;
         }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -254,9 +232,7 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -278,16 +254,12 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (hasParameterDeclaration() && index == 0) {
-            return parameter.get();
-        }
+        if (hasParameterDeclaration() && index == 0) { return parameter.get(); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public CcatchNonstandardParameterDeclaration getNonstandardParameterDeclarationAt(int index) {
-        if (hasNonStdParameterDeclaration() && index == 0) {
-            return nonStdParameter.get();
-        }
+        if (hasNonStdParameterDeclaration() && index == 0) { return nonStdParameter.get(); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -303,7 +275,8 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Set body.
      *
-     * @param statement a statement.
+     * @param statement
+     *        a statement.
      */
     public void setBody(Statement statement) {
         body = (StatementBlock) statement;
@@ -312,7 +285,8 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Set parent.
      *
-     * @param parent a try.
+     * @param parent
+     *        a try.
      */
     public void setParent(Exec parent) {
         this.parent = parent;
@@ -347,7 +321,8 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Set parameter declaration.
      *
-     * @param p a parameter declaration.
+     * @param p
+     *        a parameter declaration.
      */
     public void setParameterDeclaration(ParameterDeclaration p) {
         parameter = Optional.ofNullable(p);
@@ -356,7 +331,8 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     /**
      * Set parameter declaration.
      *
-     * @param p a parameter declaration.
+     * @param p
+     *        a parameter declaration.
      */
     public void setNonStdParameterDeclaration(CcatchNonstandardParameterDeclaration p) {
         nonStdParameter = Optional.ofNullable(p);
@@ -391,18 +367,14 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
         if (hasParameterDeclaration()) {
             VariableSpecification v =
                 parameter.map(ParameterDeclaration::getVariableSpecification).orElse(null);
-            if (name.equals(v.getName())) {
-                return v;
-            }
+            if (name.equals(v.getName())) { return v; }
         } else if (nonStdParameter.map(p -> p instanceof CcatchReturnValParameterDeclaration)
                 .orElse(false)) {
             VariableSpecification v =
                 nonStdParameter.map(CcatchReturnValParameterDeclaration.class::cast)
                         .map(CcatchReturnValParameterDeclaration::getDelegate)
                         .map(ParameterDeclaration::getVariableSpecification).orElse(null);
-            if (name.equals(v.getName())) {
-                return v;
-            }
+            if (name.equals(v.getName())) { return v; }
         }
 
         return null;

@@ -36,8 +36,10 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * Instantiates a new exception with position information.
      *
-     * @param message the message, not null
-     * @param position the position
+     * @param message
+     *        the message, not null
+     * @param position
+     *        the position
      */
     public PosConvertException(String message, Position position) {
         super(message);
@@ -48,9 +50,12 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * Instantiates a new exception with position and file information.
      *
-     * @param message the message, not null
-     * @param position the position
-     * @param file the file that contains the error
+     * @param message
+     *        the message, not null
+     * @param position
+     *        the position
+     * @param file
+     *        the file that contains the error
      */
     public PosConvertException(String message, Position position, String file) {
         super(message);

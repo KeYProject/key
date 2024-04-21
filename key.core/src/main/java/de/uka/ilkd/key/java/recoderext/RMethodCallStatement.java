@@ -34,9 +34,12 @@ public class RMethodCallStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param resultVar the ProgramVariable the return value is assigned to
-     * @param ecsvw the ExecutionContext
-     * @param body a Statement containing the method body of the called method
+     * @param resultVar
+     *        the ProgramVariable the return value is assigned to
+     * @param ecsvw
+     *        the ExecutionContext
+     * @param body
+     *        a Statement containing the method body of the called method
      */
 
     public RMethodCallStatement(ProgramVariableSVWrapper resultVar, ExecutionContext ecsvw,
@@ -51,50 +54,38 @@ public class RMethodCallStatement extends JavaStatement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null) {
-            result++;
-        }
-        if (ecsvw != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (resultVar != null) { result++; }
+        if (ecsvw != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
         if (ecsvw != null) {
-            if (index == 0) {
-                return ecsvw;
-            }
+            if (index == 0) { return ecsvw; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -104,15 +95,9 @@ public class RMethodCallStatement extends JavaStatement
         // role 0: resultVar
         // role 1: execution context
         // role 2: body
-        if (resultVar == child) {
-            return 0;
-        }
-        if (ecsvw == child) {
-            return 1;
-        }
-        if (body == child) {
-            return 2;
-        }
+        if (resultVar == child) { return 0; }
+        if (ecsvw == child) { return 1; }
+        if (body == child) { return 2; }
         return -1;
     }
 
@@ -132,19 +117,20 @@ public class RMethodCallStatement extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (body == p) {
             Statement r = (Statement) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -209,15 +195,12 @@ public class RMethodCallStatement extends JavaStatement
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     // ???
     public JavaStatement deepClone() {

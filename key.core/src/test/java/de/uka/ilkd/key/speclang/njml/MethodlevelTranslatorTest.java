@@ -35,9 +35,7 @@ public class MethodlevelTranslatorTest {
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         try {
             JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
-            if (parser.getNumberOfSyntaxErrors() != 0) {
-                debugLexer(expr);
-            }
+            if (parser.getNumberOfSyntaxErrors() != 0) { debugLexer(expr); }
         } catch (Exception e) {
             debugLexer(expr);
         }
@@ -60,9 +58,7 @@ public class MethodlevelTranslatorTest {
         JmlParser.Classlevel_commentsContext ctx = null;
         try {
             ctx = parser.classlevel_comments();
-            if (parser.getNumberOfSyntaxErrors() != 0) {
-                debugLexer(modelMethodNullable);
-            }
+            if (parser.getNumberOfSyntaxErrors() != 0) { debugLexer(modelMethodNullable); }
         } catch (Exception e) {
             debugLexer(modelMethodNullable);
             System.out.println(e.getMessage());
@@ -108,9 +104,7 @@ public class MethodlevelTranslatorTest {
         JmlParser.Classlevel_commentsContext ctx = null;
         try {
             ctx = parser.classlevel_comments();
-            if (parser.getNumberOfSyntaxErrors() != 0) {
-                debugLexer(modelMethodNullable);
-            }
+            if (parser.getNumberOfSyntaxErrors() != 0) { debugLexer(modelMethodNullable); }
         } catch (Exception e) {
             debugLexer(modelMethodNullable);
         }

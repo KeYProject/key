@@ -31,7 +31,8 @@ public class Synchronized extends Modifier {
     /**
      * Synchronized.
      *
-     * @param proto a synchronized.
+     * @param proto
+     *        a synchronized.
      */
 
     protected Synchronized(Synchronized proto) {

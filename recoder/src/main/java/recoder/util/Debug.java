@@ -60,14 +60,8 @@ public class Debug {
      */
     protected static boolean isSet(Properties prop, String key) {
         String value = prop.getProperty(key);
-        if (value == null) {
-            return false;
-        }
-        for (String negativeValue : NEGATIVE_VALUES) {
-            if (negativeValue.equalsIgnoreCase(value)) {
-                return false;
-            }
-        }
+        if (value == null) { return false; }
+        for (String negativeValue : NEGATIVE_VALUES) { if (negativeValue.equalsIgnoreCase(value)) { return false; } }
         return true;
     }
 
@@ -90,9 +84,7 @@ public class Debug {
     }
 
     public static void setOutput(PrintStream s) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
+        if (s == null) { throw new NullPointerException(); }
         output = s;
     }
 
@@ -101,18 +93,14 @@ public class Debug {
      * .recoderrc.
      */
     public static void println(String option, String printoutString) {
-        if (isSet(getDebuggingOptions(), option)) {
-            System.out.println(printoutString);
-        }
+        if (isSet(getDebuggingOptions(), option)) { System.out.println(printoutString); }
     }
 
     /**
      * Print out a string if it the option is set. print the option string also.
      */
     public static void printlno(String option, String printoutString) {
-        if (isSet(getDebuggingOptions(), option)) {
-            System.out.println("Option " + option + ":" + printoutString);
-        }
+        if (isSet(getDebuggingOptions(), option)) { System.out.println("Option " + option + ":" + printoutString); }
     }
 
     /**
@@ -158,120 +146,114 @@ public class Debug {
      * Prints an information, depending on level.
      */
     public static void info(int level, String info) {
-        if (Debug.level >= level) {
-            output.println(INFO_MESSAGE + info);
-        }
+        if (Debug.level >= level) { output.println(INFO_MESSAGE + info); }
     }
 
     /**
      * Assertion method for general conditions.
      *
-     * @param expression predicate that must hold.
-     * @throws IllegalStateException if the expression evaluates to false.
+     * @param expression
+     *        predicate that must hold.
+     * @throws IllegalStateException
+     *         if the expression evaluates to false.
      */
     public final static void assertBoolean(boolean expression) {
-        if (!expression) {
-            throw new IllegalStateException(ASSERTION_MESSAGE + "(general condition)");
-        }
+        if (!expression) { throw new IllegalStateException(ASSERTION_MESSAGE + "(general condition)"); }
     }
 
     /**
      * Assertion method for general conditions.
      *
-     * @param expression predicate that must hold.
-     * @param message detail message.
-     * @throws IllegalStateException if the expression evaluates to false.
+     * @param expression
+     *        predicate that must hold.
+     * @param message
+     *        detail message.
+     * @throws IllegalStateException
+     *         if the expression evaluates to false.
      */
     public final static void assertBoolean(boolean expression, String message) {
-        if (!expression) {
-            throw new IllegalStateException(ASSERTION_MESSAGE + message);
-        }
+        if (!expression) { throw new IllegalStateException(ASSERTION_MESSAGE + message); }
     }
 
     /**
      * Special assertion method to test for invalid objects.
      *
-     * @param nonnull object that may not be null.
-     * @throws NullPointerException if the object is null.
+     * @param nonnull
+     *        object that may not be null.
+     * @throws NullPointerException
+     *         if the object is null.
      */
     public final static void assertNonnull(Object nonnull) {
-        if (nonnull == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object)" + "\n");
-        }
+        if (nonnull == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object)" + "\n"); }
     }
 
     /**
      * Special assertion method to test for invalid objects.
      *
-     * @param nonnull1 object that may not be null.
-     * @param nonnull2 object that may not be null.
-     * @throws NullPointerException if the object is null.
+     * @param nonnull1
+     *        object that may not be null.
+     * @param nonnull2
+     *        object that may not be null.
+     * @throws NullPointerException
+     *         if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2) {
-        if (nonnull1 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n");
-        }
-        if (nonnull2 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n");
-        }
+        if (nonnull1 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n"); }
+        if (nonnull2 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n"); }
     }
 
     /**
      * Special assertion method to test for invalid objects.
      *
-     * @param nonnull1 object that may not be null.
-     * @param nonnull2 object that may not be null.
-     * @param nonnull3 object that may not be null.
-     * @throws NullPointerException if the object is null.
+     * @param nonnull1
+     *        object that may not be null.
+     * @param nonnull2
+     *        object that may not be null.
+     * @param nonnull3
+     *        object that may not be null.
+     * @throws NullPointerException
+     *         if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3) {
-        if (nonnull1 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n");
-        }
-        if (nonnull2 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n");
-        }
-        if (nonnull3 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 3)" + "\n");
-        }
+        if (nonnull1 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n"); }
+        if (nonnull2 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n"); }
+        if (nonnull3 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 3)" + "\n"); }
     }
 
     /**
      * Special assertion method to test for invalid objects.
      *
-     * @param nonnull1 object that may not be null.
-     * @param nonnull2 object that may not be null.
-     * @param nonnull3 object that may not be null.
-     * @param nonnull4 object that may not be null.
-     * @throws NullPointerException if the object is null.
+     * @param nonnull1
+     *        object that may not be null.
+     * @param nonnull2
+     *        object that may not be null.
+     * @param nonnull3
+     *        object that may not be null.
+     * @param nonnull4
+     *        object that may not be null.
+     * @throws NullPointerException
+     *         if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3,
             Object nonnull4) {
-        if (nonnull1 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n");
-        }
-        if (nonnull2 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n");
-        }
-        if (nonnull3 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 3)" + "\n");
-        }
-        if (nonnull4 == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 4)" + "\n");
-        }
+        if (nonnull1 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n"); }
+        if (nonnull2 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 2)" + "\n"); }
+        if (nonnull3 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 3)" + "\n"); }
+        if (nonnull4 == null) { throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 4)" + "\n"); }
     }
 
     /**
      * Special assertion method to test for invalid objects.
      *
-     * @param nonnull object that may not be null.
-     * @param message detail message.
-     * @throws NullPointerException if the object is null.
+     * @param nonnull
+     *        object that may not be null.
+     * @param message
+     *        detail message.
+     * @throws NullPointerException
+     *         if the object is null.
      */
     public final static void assertNonnull(Object nonnull, String message) {
-        if (nonnull == null) {
-            throw new NullPointerException(ASSERTION_MESSAGE + message);
-        }
+        if (nonnull == null) { throw new NullPointerException(ASSERTION_MESSAGE + message); }
     }
 
     /**
@@ -303,11 +285,10 @@ public class Debug {
         long totalMem = run.totalMemory();
         long freeMem = run.freeMemory();
         long oldFreeMem;
-        do {
-            run.gc();
-            oldFreeMem = freeMem;
-            freeMem = run.freeMemory();
-        } while (freeMem > oldFreeMem + 256); // allow addition of 256 bytes
+        do { run.gc(); oldFreeMem = freeMem; freeMem = run.freeMemory(); } while (freeMem > oldFreeMem + 256); // allow
+                                                                                                               // addition
+                                                                                                               // of 256
+                                                                                                               // bytes
         return totalMem - freeMem;
     }
 }

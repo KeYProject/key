@@ -147,10 +147,14 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Creates a new instance an SMT solver.
      *
-     * @param problem the problem to send to the external solver process
-     * @param listener the listener that has to be informed when the solver state changes
-     * @param services the services needed to translate the problem to SMT format
-     * @param myType the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
+     * @param problem
+     *        the problem to send to the external solver process
+     * @param listener
+     *        the listener that has to be informed when the solver state changes
+     * @param services
+     *        the services needed to translate the problem to SMT format
+     * @param myType
+     *        the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
      */
     public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services,
             SolverType myType) {
@@ -168,8 +172,10 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * <code>SolverLauncher</code>. If you want to start a solver please have a look at
      * <code>SolverLauncher</code>.
      *
-     * @param timeout the timeout to use for the solver
-     * @param settings the SMTSettings to use for this solver
+     * @param timeout
+     *        the timeout to use for the solver
+     * @param settings
+     *        the SMTSettings to use for this solver
      */
     @Override
     public void start(SolverTimeout timeout, SMTSettings settings) {
@@ -208,9 +214,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public long getStartTime() {
-        if (solverTimeout == null) {
-            return -1;
-        }
+        if (solverTimeout == null) { return -1; }
         return solverTimeout.scheduledExecutionTime();
     }
 
@@ -351,9 +355,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
         String[] parameters = this.type.getSolverParameters().split(" ");
         String[] result = new String[parameters.length + 1];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1];
-        }
+        for (int i = 0; i < result.length; i++) { result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1]; }
         return result;
     }
 
@@ -362,9 +364,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         // order of assignments is important
         setReasonOfInterruption(reason);
         setSolverState(SolverState.Stopped);
-        if (solverTimeout != null) {
-            solverTimeout.cancel();
-        }
+        if (solverTimeout != null) { solverTimeout.cancel(); }
         if (thread != null) {
             processLauncher.stop();
             thread.interrupt();

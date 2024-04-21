@@ -31,7 +31,8 @@ public class Native extends Modifier {
     /**
      * Native.
      *
-     * @param proto a native.
+     * @param proto
+     *        a native.
      */
 
     protected Native(Native proto) {

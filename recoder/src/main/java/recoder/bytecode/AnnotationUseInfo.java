@@ -18,7 +18,8 @@ public class AnnotationUseInfo implements AnnotationUse {
     protected final String fullAnnotationTypeName;
 
     /**
-     * @param fullName name of the annotation
+     * @param fullName
+     *        name of the annotation
      * @param evpl
      */
     public AnnotationUseInfo(String fullName, List<ElementValuePair> evpl) {
@@ -35,9 +36,7 @@ public class AnnotationUseInfo implements AnnotationUse {
         StringBuilder res = new StringBuilder();
         boolean first = true;
         for (ElementValuePair evp : elementValuePairs) {
-            if (!first) {
-                res.append(",");
-            }
+            if (!first) { res.append(","); }
             first = false;
             res.append(evp.toString());
         }

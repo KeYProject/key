@@ -15,8 +15,7 @@ import org.key_project.util.ExtList;
 public class CcatchContinueWildcardParameterDeclaration
         extends CcatchNonstandardParameterDeclaration {
 
-    public CcatchContinueWildcardParameterDeclaration(ExtList children) {
-    }
+    public CcatchContinueWildcardParameterDeclaration(ExtList children) {}
 
     @Override
     public int getChildCount() {

@@ -48,9 +48,7 @@ public class MethodKit {
     public static ASTList<Expression> createArguments(ParameterContainer p) {
         int c = p.getParameterDeclarationCount();
         ASTList<Expression> res = new ASTArrayList<>(c);
-        for (int i = 0; i < c; i += 1) {
-            res.add(VariableKit.createVariableReference(p.getParameterDeclarationAt(i)));
-        }
+        for (int i = 0; i < c; i += 1) { res.add(VariableKit.createVariableReference(p.getParameterDeclarationAt(i))); }
         return res;
     }
 
@@ -94,8 +92,10 @@ public class MethodKit {
      * removed, otherwise its existance is ensured; any visibility modifier is removed - this
      * changes the visibility to public.
      *
-     * @param decl the MethodDeclaration to be made abstract
-     * @param forInterface boolean indicating if the abstract method is for an interface
+     * @param decl
+     *        the MethodDeclaration to be made abstract
+     * @param forInterface
+     *        boolean indicating if the abstract method is for an interface
      * @return the abstract method declaration
      * @deprecated not tested
      */
@@ -104,9 +104,7 @@ public class MethodKit {
             boolean forInterface) {
         ProgramFactory factory = decl.getFactory();
         // create some prototypes
-        if (decl.isStatic()) {
-            throw new IllegalArgumentException("A static method cannot made abstract!");
-        }
+        if (decl.isStatic()) { throw new IllegalArgumentException("A static method cannot made abstract!"); }
         StatementBlock body = decl.getBody();
         decl.setBody(null); // not necessary to clone this.
         MethodDeclaration res = decl.deepClone();
@@ -122,20 +120,14 @@ public class MethodKit {
         VisibilityModifier vismod = res.getVisibilityModifier();
         if (forInterface) {
             // interfaces should not have an abstract
-            if (abstractPos >= 0) {
-                modList.remove(abstractPos);
-            }
+            if (abstractPos >= 0) { modList.remove(abstractPos); }
             // interfaces should not have a visibility modifier
-            if (vismod != null) {
-                modList.remove(vismod);
-            }
+            if (vismod != null) { modList.remove(vismod); }
         } else {
             if (abstractPos < 0) {
                 // we need an abstract here
-                if (modList == null) {
-                    res.setDeclarationSpecifiers(
-                        modList = new ASTArrayList<>(1));
-                }
+                if (modList == null) { res.setDeclarationSpecifiers(
+                    modList = new ASTArrayList<>(1)); }
                 modList.add((vismod == null) ? 0 : 1, anAbstract);
             } else {
                 return res; // already there
@@ -172,8 +164,10 @@ public class MethodKit {
      * Creates a packer class for parameter list of a method. This Packer class contains one
      * constructor which tuples all parameters of the method into an object. Works on AST elements.
      *
-     * @param packerClassName the String with the name of the packer class
-     * @param parameters the list of {@link ParameterDeclaration}s for the packer class to wrap
+     * @param packerClassName
+     *        the String with the name of the packer class
+     * @param parameters
+     *        the list of {@link ParameterDeclaration}s for the packer class to wrap
      * @return the class declaration of the packed class
      * @deprecated needs severe rework (AL)
      */
@@ -265,8 +259,10 @@ public class MethodKit {
      * a return type wider than the type of the field (or matching if they are primitive) and has a
      * return statement as last top level statement of the method body referring to the field.
      *
-     * @param si the source info service to be used.
-     * @param f the field to find a getter for.
+     * @param si
+     *        the source info service to be used.
+     * @param f
+     *        the field to find a getter for.
      * @return the list of getters; may be empty if there are no getters that match the criteria in
      *         the class.
      */
@@ -274,47 +270,27 @@ public class MethodKit {
         Debug.assertNonnull(si, f);
         List<MethodDeclaration> res = new ArrayList<>();
         TypeDeclaration tdecl = (TypeDeclaration) f.getContainingClassType();
-        if (tdecl instanceof InterfaceDeclaration) {
-            return res;
-        }
+        if (tdecl instanceof InterfaceDeclaration) { return res; }
         List<MemberDeclaration> mems = tdecl.getMembers();
-        if (mems == null) {
-            return res;
-        }
+        if (mems == null) { return res; }
         Type fieldType = si.getType(f);
         for (int i = mems.size() - 1; i >= 0; i -= 1) {
             MemberDeclaration md = mems.get(i);
-            if (!(md instanceof MethodDeclaration m)) {
-                continue;
-            }
+            if (!(md instanceof MethodDeclaration m)) { continue; }
             if (fieldType instanceof PrimitiveType) {
-                if (m.getReturnType() != fieldType) {
-                    continue;
-                }
+                if (m.getReturnType() != fieldType) { continue; }
             } else {
-                if (!si.isWidening(fieldType, m.getReturnType())) {
-                    continue;
-                }
+                if (!si.isWidening(fieldType, m.getReturnType())) { continue; }
             }
             StatementBlock body = m.getBody();
-            if (body == null) {
-                continue;
-            }
+            if (body == null) { continue; }
             List<Statement> statements = body.getBody();
-            if (statements == null) {
-                continue;
-            }
+            if (statements == null) { continue; }
             Statement last = statements.get(statements.size() - 1);
-            if (!(last instanceof Return)) {
-                continue;
-            }
+            if (!(last instanceof Return)) { continue; }
             Expression expr = ((Return) last).getExpression();
-            if (!(expr instanceof FieldReference fr)) {
-                continue;
-            }
-            if (si.getField(fr) == f) {
-                res.add(m);
-            }
+            if (!(expr instanceof FieldReference fr)) { continue; }
+            if (si.getField(fr) == f) { res.add(m); }
         }
         return res;
     }
@@ -323,11 +299,15 @@ public class MethodKit {
      * Transformation that renames a method and all known references to it. The new name should not
      * hide another method.
      *
-     * @param ch the change history (may be <CODE>null</CODE>).
-     * @param xr the cross referencer service.
-     * @param method the method declaration to be renamed; may neither be <CODE>
+     * @param ch
+     *        the change history (may be <CODE>null</CODE>).
+     * @param xr
+     *        the cross referencer service.
+     * @param method
+     *        the method declaration to be renamed; may neither be <CODE>
      *                null</CODE> nor a constructor declaration.
-     * @param newName the new name for the method; may not be <CODE>null</CODE> and must denote a
+     * @param newName
+     *        the new name for the method; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
@@ -354,15 +334,14 @@ public class MethodKit {
      * Query that returns a list of methods that the given method directly overwrites or implements.
      * A method that is multiply inherited (from interfaces) occurs multiple times, accordingly.
      *
-     * @param m a method.
+     * @param m
+     *        a method.
      * @return a list of methods that are overwritten or implemented by <CODE>m
      * </CODE>.
      */
     public static List<Method> getRedefinedMethods(Method m) {
         Debug.assertNonnull(m);
-        if (m instanceof Constructor) {
-            return new ArrayList<>(0);
-        }
+        if (m instanceof Constructor) { return new ArrayList<>(0); }
         ClassType ct = m.getContainingClassType();
         String mname = m.getName();
         List<Type> msig = m.getSignature();
@@ -372,9 +351,7 @@ public class MethodKit {
             List<? extends Method> meths = supers.get(i).getAllMethods();
             for (int j = meths.size() - 1; j >= 0; j -= 1) {
                 Method m2 = meths.get(j);
-                if (m2.getName().equals(mname) && m2.getSignature().equals(msig)) {
-                    result.add(m2);
-                }
+                if (m2.getName().equals(mname) && m2.getSignature().equals(msig)) { result.add(m2); }
             }
         }
         return result;
@@ -383,15 +360,15 @@ public class MethodKit {
     /**
      * Query that returns a list of methods that redefine or implement the given method.
      *
-     * @param xr the cross referencer service to use.
-     * @param m a method.
+     * @param xr
+     *        the cross referencer service to use.
+     * @param m
+     *        a method.
      * @return a list of methods that redefine or implement <CODE>m</CODE>.
      */
     public static List<Method> getRedefiningMethods(CrossReferenceSourceInfo xr, Method m) {
         Debug.assertNonnull(m);
-        if (m instanceof Constructor) {
-            return new ArrayList<>(0);
-        }
+        if (m instanceof Constructor) { return new ArrayList<>(0); }
         ClassType ct = m.getContainingClassType();
         String mname = m.getName();
         List<Type> msig = m.getSignature();
@@ -401,9 +378,7 @@ public class MethodKit {
             List<? extends Method> meths = subs.get(i).getMethods();
             for (int j = meths.size() - 1; j >= 0; j -= 1) {
                 Method m2 = meths.get(j);
-                if (m2.getName().equals(mname) && m2.getSignature().equals(msig)) {
-                    result.add(m2);
-                }
+                if (m2.getName().equals(mname) && m2.getSignature().equals(msig)) { result.add(m2); }
             }
         }
         return result;
@@ -412,28 +387,20 @@ public class MethodKit {
     /**
      * Updating query that checks if the given method is a main method.
      *
-     * @param ni the NameInfo service to use.
-     * @param m the method to check.
+     * @param ni
+     *        the NameInfo service to use.
+     * @param m
+     *        the method to check.
      * @return <CODE>true</CODE> if the given method has the form "public static void main(String[]
      *         ...)", <CODE>false</CODE> otherwise.
      */
     public static boolean isMain(NameInfo ni, Method m) {
-        if (!m.isPublic()) {
-            return false;
-        }
-        if (!m.isStatic()) {
-            return false;
-        }
-        if (!m.getName().equals("main")) {
-            return false;
-        }
-        if (m.getReturnType() != null) {
-            return false;
-        }
+        if (!m.isPublic()) { return false; }
+        if (!m.isStatic()) { return false; }
+        if (!m.getName().equals("main")) { return false; }
+        if (m.getReturnType() != null) { return false; }
         List<Type> list = m.getSignature();
-        if (list.size() != 1) {
-            return false;
-        }
+        if (list.size() != 1) { return false; }
         // we do not have to create an array type, as this would have been
         // done by the getSignature call already.
         return list.get(0) == ni.getArrayType(ni.getJavaLangString());
@@ -444,8 +411,10 @@ public class MethodKit {
      * <CODE>writeObject</CODE>,<CODE>readObject
      * </CODE>,<CODE>writeReplace</CODE>,<CODE>readResolve</CODE>.
      *
-     * @param ni the NameInfo service to use.
-     * @param m the method to check.
+     * @param ni
+     *        the NameInfo service to use.
+     * @param m
+     *        the method to check.
      * @return <CODE>true</CODE> if the given method is one of the serialization methods,
      *         <CODE>false</CODE> otherwise.
      */
@@ -472,7 +441,8 @@ public class MethodKit {
      * Returns a deep clone of the header of the given declaration; the body of the result is
      * <CODE>null</CODE>.
      *
-     * @param md the method declaration to clone the header from.
+     * @param md
+     *        the method declaration to clone the header from.
      * @return a new method declaration sharing the header with the given one.
      * @see recoder.java.SourceElement#deepClone()
      */
@@ -487,18 +457,19 @@ public class MethodKit {
     /**
      * Query returning a method locally defined in the given type with the given name and signature.
      *
-     * @param type the class type the method might be defined in.
-     * @param name the name of the method.
-     * @param signature the signature of the method.
+     * @param type
+     *        the class type the method might be defined in.
+     * @param name
+     *        the name of the method.
+     * @param signature
+     *        the signature of the method.
      * @return the method as defined in the class type, or <CODE>null</CODE> if there is no match.
      */
     public static Method getDefinedMethod(ClassType type, String name, List<Type> signature) {
         List<? extends Method> methods = type.getMethods();
         for (int j = methods.size() - 1; j >= 0; j -= 1) {
             Method m = methods.get(j);
-            if (name.equals(m.getName()) && signature.equals(m.getSignature())) {
-                return m;
-            }
+            if (name.equals(m.getName()) && signature.equals(m.getSignature())) { return m; }
         }
         return null;
     }
@@ -509,10 +480,14 @@ public class MethodKit {
      * bottom-most ones are reported. If there is a version defined in a super class, it will be the
      * first entry in the list (position 0).
      *
-     * @param ni the name info service to use.
-     * @param base the class type which would contain the redefining method.
-     * @param name the name of the possibly redefining method.
-     * @param signature the signature of the possibly redefining method.
+     * @param ni
+     *        the name info service to use.
+     * @param base
+     *        the class type which would contain the redefining method.
+     * @param name
+     *        the name of the possibly redefining method.
+     * @param signature
+     *        the signature of the possibly redefining method.
      * @return a list of methods that are directly redefined by a method with the given name and
      *         signature; the first entry is the method inherited from a class, if any.
      */
@@ -553,9 +528,12 @@ public class MethodKit {
      * class. The query will not check any contents of the redefining method, e.g. to see if private
      * members of the super class are accessed.
      *
-     * @param pmi a program model info to use.
-     * @param redefined the method to be redefined.
-     * @param redefining the method that is / would be redefining.
+     * @param pmi
+     *        a program model info to use.
+     * @param redefined
+     *        the method to be redefined.
+     * @param redefining
+     *        the method that is / would be redefining.
      * @return a problem report, one of the following:
      *         <UL>
      *         <LI>FinalOverwrite, if the redefined method is final;
@@ -572,21 +550,15 @@ public class MethodKit {
     public static Problem checkMethodRedefinition(ProgramModelInfo pmi, Method redefined,
             Method redefining) {
 
-        if (redefining instanceof Constructor) {
-            return null;
-        }
+        if (redefining instanceof Constructor) { return null; }
         if (redefined.isFinal() || redefined.getContainingClassType().isFinal()) {
             return new FinalOverwrite(redefined);
         }
         if (redefined.getReturnType() != redefining.getReturnType()) {
             return new DifferentReturnTypeOverwrite(redefined);
         }
-        if (TypeKit.isLessVisible(redefining, redefined)) {
-            return new MorePrivateOverwrite(redefined);
-        }
-        if (!redefining.isStatic() && redefined.isStatic()) {
-            return new NonStaticOverwrite(redefined);
-        }
+        if (TypeKit.isLessVisible(redefining, redefined)) { return new MorePrivateOverwrite(redefined); }
+        if (!redefining.isStatic() && redefined.isStatic()) { return new NonStaticOverwrite(redefined); }
         // check exceptions
         List<? extends ClassType> exceptions = redefining.getExceptions();
         if (exceptions != null) {
@@ -601,10 +573,14 @@ public class MethodKit {
     /**
      * Query that finds out problems before inserting a new method declaration.
      *
-     * @param ni the name info to use.
-     * @param si the source info to use.
-     * @param context the future context of the method.
-     * @param candidate the method declaration that might be inserted.
+     * @param ni
+     *        the name info to use.
+     * @param si
+     *        the source info to use.
+     * @param context
+     *        the future context of the method.
+     * @param candidate
+     *        the method declaration that might be inserted.
      * @return a problem report, one of the following:
      *         <UL>
      *         <LI>IllegalInterfaceMember, if the context is an interface and the candidate is not a
@@ -628,18 +604,12 @@ public class MethodKit {
             TypeDeclaration context, MethodDeclaration candidate) {
 
         if (context instanceof InterfaceDeclaration) {
-            if (!TypeKit.isValidInterfaceMember(candidate)) {
-                return new IllegalInterfaceMember(candidate);
-            }
+            if (!TypeKit.isValidInterfaceMember(candidate)) { return new IllegalInterfaceMember(candidate); }
         }
         if (candidate instanceof Constructor) {
-            if (!candidate.getName().equals(context.getName())) {
-                return new NameConflict(context);
-            }
+            if (!candidate.getName().equals(context.getName())) { return new NameConflict(context); }
         } else {
-            if (Naming.isKeyword(candidate.getName())) {
-                return new IllegalName(candidate);
-            }
+            if (Naming.isKeyword(candidate.getName())) { return new IllegalName(candidate); }
         }
         List<MemberDeclaration> members = context.getMembers();
         String name = candidate.getName();
@@ -648,22 +618,16 @@ public class MethodKit {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
                 MemberDeclaration md = members.get(i);
                 if (md instanceof MethodDeclaration m) {
-                    if (m.getName().equals(name) && m.getSignature().equals(signature)) {
-                        return new NameConflict(m);
-                    }
+                    if (m.getName().equals(name) && m.getSignature().equals(signature)) { return new NameConflict(m); }
                 }
             }
         }
 
-        if (candidate instanceof Constructor) {
-            return null;
-        }
+        if (candidate instanceof Constructor) { return null; }
         List<Method> redefined = MethodKit.getRedefinedMethods(ni, context, name, signature);
         for (Method method : redefined) {
             Problem problem = checkMethodRedefinition(si, method, candidate);
-            if (problem != null) {
-                return problem;
-            }
+            if (problem != null) { return problem; }
         }
         return null;
     }
@@ -675,10 +639,14 @@ public class MethodKit {
      * mode is faster if the tree contains more nodes than there are global references to the given
      * method.
      *
-     * @param xr the cross referencer to use.
-     * @param m a method.
-     * @param root the root of an arbitrary syntax tree.
-     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>, local cross
+     * @param xr
+     *        the cross referencer to use.
+     * @param m
+     *        a method.
+     * @param root
+     *        the root of an arbitrary syntax tree.
+     * @param scanTree
+     *        flag indicating the search strategy; if <CODE>true</CODE>, local cross
      *        reference information is build, otherwise the global cross reference information is
      *        filtered.
      * @return the list of references to the given method in the given tree, can be empty but not
@@ -694,25 +662,17 @@ public class MethodKit {
             if (m instanceof Constructor) {
                 while (tw.next(ConstructorReference.class)) {
                     ConstructorReference cr = (ConstructorReference) tw.getProgramElement();
-                    if (xr.getConstructor(cr) == m) {
-                        result.add(cr);
-                    }
+                    if (xr.getConstructor(cr) == m) { result.add(cr); }
                 }
             } else {
                 while (tw.next(MethodReference.class)) {
                     MethodReference mr = (MethodReference) tw.getProgramElement();
-                    if (xr.getMethod(mr) == m) {
-                        result.add(mr);
-                    }
+                    if (xr.getMethod(mr) == m) { result.add(mr); }
                 }
             }
         } else {
             List<MemberReference> refs = xr.getReferences(m);
-            for (MemberReference mr : refs) {
-                if (MiscKit.contains(root, mr)) {
-                    result.add(mr);
-                }
-            }
+            for (MemberReference mr : refs) { if (MiscKit.contains(root, mr)) { result.add(mr); } }
         }
         return result;
     }
@@ -724,10 +684,14 @@ public class MethodKit {
      * </CODE>. The method does not have to actually exist in <CODE>type
      * </CODE> the query just assumes it does.
      *
-     * @param xrsi the cross referencer service to use.
-     * @param type the type which contain method.
-     * @param methodName name of the method.
-     * @param signature method signature.
+     * @param xrsi
+     *        the cross referencer service to use.
+     * @param type
+     *        the type which contain method.
+     * @param methodName
+     *        name of the method.
+     * @param signature
+     *        method signature.
      * @return a list of related methods.
      * @since 0.72
      */
@@ -749,8 +713,10 @@ public class MethodKit {
      * indirectly implements <CODE>Collection
      * </CODE>.
      *
-     * @param xrsi the cross referencer service to use.
-     * @param method a method.
+     * @param xrsi
+     *        the cross referencer service to use.
+     * @param method
+     *        a method.
      * @return a list of related methods including <CODE>method</CODE>.
      * @since 0.72
      */
@@ -770,23 +736,17 @@ public class MethodKit {
         while (!q.isEmpty()) {
             type = (ClassType) q.dequeue();
             Method m = getDefinedMethod(type, methodName, signature);
-            if (m != null) {
-                result.add(m);
-            }
+            if (m != null) { result.add(m); }
             List<Method> redefined = getRedefinedMethods(ni, type, methodName, signature);
             for (int i = redefined.size() - 1; i >= 0; i--) {
                 ClassType ct = redefined.get(i).getContainingClassType();
-                if (visited.add(ct)) {
-                    q.enqueue(ct);
-                }
+                if (visited.add(ct)) { q.enqueue(ct); }
             }
             if (m != null || !redefined.isEmpty()) {
                 List<? extends ClassType> types = xrsi.getSubtypes(type);
                 for (int i = types.size() - 1; i >= 0; i--) {
                     ClassType ct = types.get(i);
-                    if (visited.add(ct)) {
-                        q.enqueue(ct);
-                    }
+                    if (visited.add(ct)) { q.enqueue(ct); }
                 }
             }
         }
@@ -826,9 +786,7 @@ public class MethodKit {
         }
 
         private void addMethodsFromSubTypes(ClassType type) {
-            if (!searchedDown.add(type)) {
-                return;
-            }
+            if (!searchedDown.add(type)) { return; }
             List<? extends ClassType> subTypes = xrsi.getSubtypes(type);
             if (subTypes.isEmpty()) {
                 // leaf class
@@ -842,9 +800,7 @@ public class MethodKit {
         }
 
         private void addMethodsFromSuperTypes(ClassType type) {
-            if (!searchedUp.add(type)) {
-                return;
-            }
+            if (!searchedUp.add(type)) { return; }
             Method m = getDefinedMethod(type, methodName, signature);
             if (m != null) {
                 methods.add(m);

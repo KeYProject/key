@@ -21,7 +21,8 @@ public class DecreaseFontSizeAction extends MainWindowAction implements ConfigCh
     /**
      * creates the action to decrease the font size of the sequent and proof view
      *
-     * @param mainWindow the main window
+     * @param mainWindow
+     *        the main window
      */
     public DecreaseFontSizeAction(MainWindow mainWindow) {
         super(mainWindow);

@@ -46,16 +46,12 @@ public class LineProperties {
             if (line.startsWith("###")) {
                 if (lastKey != null) {
                     String str = sb.toString().trim();
-                    if (str.length() > 0) {
-                        map.put(lastKey, str);
-                    }
+                    if (str.length() > 0) { map.put(lastKey, str); }
                 }
                 sb.setLength(0);
 
                 lastKey = line.substring(3).trim();
-                if (lastKey.endsWith(":")) {
-                    lastKey = lastKey.substring(0, lastKey.length() - 1);
-                }
+                if (lastKey.endsWith(":")) { lastKey = lastKey.substring(0, lastKey.length() - 1); }
             } else {
                 sb.append(line).append("\n");
             }
@@ -63,9 +59,7 @@ public class LineProperties {
 
         if (lastKey != null) {
             String str = sb.toString().trim();
-            if (str.length() > 0) {
-                map.put(lastKey, str);
-            }
+            if (str.length() > 0) { map.put(lastKey, str); }
         }
 
     }
@@ -88,9 +82,7 @@ public class LineProperties {
 
     public List<String> getLines(String key) {
         String str = get(key);
-        if (str == null) {
-            return Collections.emptyList();
-        }
+        if (str == null) { return Collections.emptyList(); }
         return Arrays.asList(str.split("\n"));
     }
 

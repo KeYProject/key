@@ -15,7 +15,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
     /**
      * Registers a new class file for the service.
      *
-     * @param cf the new class file.
+     * @param cf
+     *        the new class file.
      */
     void register(ClassFile cf);
 
@@ -23,7 +24,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given classtype. Returns <CODE>
      * null</CODE>, if the given type is not a class file.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
     ClassFile getClassFile(ClassType ct);
 
@@ -31,7 +33,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given method. Returns <CODE>null
      * </CODE>, if the given method is not a method info.
      *
-     * @param m a method.
+     * @param m
+     *        a method.
      */
     MethodInfo getMethodInfo(Method m);
 
@@ -39,7 +42,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given constructor. Returns <CODE>
      * null</CODE>, if the given constructor is not a constructor info.
      *
-     * @param c a constructor.
+     * @param c
+     *        a constructor.
      */
     ConstructorInfo getConstructorInfo(Constructor c);
 
@@ -47,7 +51,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
      * Returns the bytecode counterpart of the given field. Returns <CODE>null
      * </CODE>, if the given field is not a field info.
      *
-     * @param f a field.
+     * @param f
+     *        a field.
      * @return the corresponding field info, or <CODE>null</CODE>, if the given field has no
      *         bytecode
      *         representation.
@@ -58,7 +63,8 @@ public interface ByteCodeInfo extends ProgramModelInfo {
     /**
      * Returns the (annotation) type of the given annotation use.
      *
-     * @param au an annotation use
+     * @param au
+     *        an annotation use
      * @return the type of the referenced annotation type
      */
     Type getAnnotationType(AnnotationUseInfo au);

@@ -31,9 +31,7 @@ public class ProgramPrefixUtil {
         MethodFrame mf = (MethodFrame) (prefix instanceof MethodFrame ? prefix : null);
         while (prefix.hasNextPrefixElement()) {
             prefix = prefix.getNextPrefixElement();
-            if (prefix instanceof MethodFrame) {
-                mf = (MethodFrame) prefix;
-            }
+            if (prefix instanceof MethodFrame) { mf = (MethodFrame) prefix; }
             length++;
         }
         return new ProgramPrefixUtil.ProgramPrefixInfo(length, mf);

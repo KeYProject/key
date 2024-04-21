@@ -32,7 +32,8 @@ public class Extends extends InheritanceSpecification {
     /**
      * Extends.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
 
     public Extends(TypeReference supertype) {
@@ -43,7 +44,8 @@ public class Extends extends InheritanceSpecification {
     /**
      * Extends.
      *
-     * @param list a type reference mutable list.
+     * @param list
+     *        a type reference mutable list.
      */
 
     public Extends(ASTList<TypeReference> list) {
@@ -54,7 +56,8 @@ public class Extends extends InheritanceSpecification {
     /**
      * Extends.
      *
-     * @param proto an extends.
+     * @param proto
+     *        an extends.
      */
 
     protected Extends(Extends proto) {

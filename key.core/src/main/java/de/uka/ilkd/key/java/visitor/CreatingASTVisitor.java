@@ -39,9 +39,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * create the CreatingASTVisitor
      *
-     * @param root the ProgramElement where to begin
-     * @param preservesPos whether the position should be preserved
-     * @param services the services instance
+     * @param root
+     *        the ProgramElement where to begin
+     * @param preservesPos
+     *        whether the position should be preserved
+     * @param services
+     *        the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos, Services services) {
         super(root, services);
@@ -68,7 +71,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * called if the program element x is unchanged
      *
-     * @param x The {@link SourceElement}.
+     * @param x
+     *        The {@link SourceElement}.
      */
     @Override
     protected void doDefaultAction(SourceElement x) {
@@ -81,9 +85,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pos = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
             Expression condition = changeList.removeFirstOccurrence(Expression.class);
             Expression message = changeList.removeFirstOccurrence(Expression.class);
 
@@ -105,9 +107,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (!preservesPositionInfo) {
-                changeList.removeFirstOccurrence(PositionInfo.class);
-            }
+            if (!preservesPositionInfo) { changeList.removeFirstOccurrence(PositionInfo.class); }
             StatementBlock newBlock = new StatementBlock(changeList);
             performActionOnBlockContract(x, newBlock);
             performActionOnLoopContract(x, newBlock);
@@ -149,9 +149,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pos = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
             Statement body = changeList.removeFirstOccurrence(Statement.class);
@@ -177,9 +175,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pos = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
             ILoopInit loopInit = changeList.removeFirstOccurrence(ILoopInit.class);
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             IForUpdates updates = changeList.removeFirstOccurrence(IForUpdates.class);
@@ -204,9 +200,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pos = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
             Statement body = changeList.removeFirstOccurrence(Statement.class);
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
@@ -254,13 +248,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
 
-            if (!preservesPositionInfo) {
-                pi = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
             Expression expr = null;
-            if (changeList.size() > 1) {
-                expr = (Expression) changeList.get(1);
-            }
+            if (changeList.size() > 1) { expr = (Expression) changeList.get(1); }
             IProgramVariable pv = (IProgramVariable) changeList.get(0);
             addChild(
                 new VariableSpecification(pv, x.getDimensions(), expr, pv.getKeYJavaType(), pi));
@@ -280,9 +270,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
 
-            if (!preservesPositionInfo) {
-                pi = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
 
             if (x.getReferencePrefix() != null) {
                 final Expression field = (Expression) changeList.get(1);
@@ -317,14 +305,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
 
-            if (!preservesPositionInfo) {
-                pi = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
 
             ReferencePrefix rp = null;
-            if (x.getReferencePrefix() != null) {
-                rp = (ReferencePrefix) changeList.get(0);
-            }
+            if (x.getReferencePrefix() != null) { rp = (ReferencePrefix) changeList.get(0); }
             changeList.remove(rp);
             MethodName name = changeList.get(MethodName.class);
             MethodReference mr = new MethodReference(changeList, name, rp, pi);
@@ -365,12 +349,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pi = PositionInfo.UNDEFINED;
-            }
-            if (x.getExpression() != null) {
-                e = (Expression) changeList.removeFirst();
-            }
+            if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
+            if (x.getExpression() != null) { e = (Expression) changeList.removeFirst(); }
             addChild(new Case(changeList, e, pi));
             changed();
         } else {
@@ -511,16 +491,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
-            if (!preservesPositionInfo) {
-                pi = PositionInfo.UNDEFINED;
-            }
-            if (x.getLabel() != null) {
-                l = (Label) changeList.removeFirst();
-            }
+            if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
+            if (x.getLabel() != null) { l = (Label) changeList.removeFirst(); }
             // bugfix: create an empty statement if the label body was removed
-            if (changeList.get(Statement.class) == null) {
-                changeList.add(new EmptyStatement());
-            }
+            if (changeList.get(Statement.class) == null) { changeList.add(new EmptyStatement()); }
             addChild(new LabeledStatement(changeList, l, pi));
             changed();
         } else {
@@ -539,9 +513,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                                                                                     // in original
                                                                                     // program
 
-            if (!preservesPositionInfo()) {
-                pi = PositionInfo.UNDEFINED;
-            }
+            if (!preservesPositionInfo()) { pi = PositionInfo.UNDEFINED; }
 
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
@@ -990,9 +962,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList children) {
                 PositionInfo pi = children.removeFirstOccurrence(PositionInfo.class);
-                if (!preservesPositionInfo) {
-                    pi = PositionInfo.UNDEFINED;
-                }
+                if (!preservesPositionInfo) { pi = PositionInfo.UNDEFINED; }
                 New y = (New) pe;
                 ReferencePrefix rp = null;
                 int rpPos = getPosition(y, y.getReferencePrefix());
@@ -1119,9 +1089,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                     prefix = (ReferencePrefix) children.get(prefixPos);
                     children.remove(prefixPos);
                 }
-                if (!preservesPositionInfo) {
-                    pos = PositionInfo.UNDEFINED;
-                }
+                if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
                 return new ArrayReference(children, prefix, pos);
             }
         };
@@ -1154,9 +1122,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                     children.remove(prefixPos);
                 }
 
-                if (!preservesPositionInfo) {
-                    pos = PositionInfo.UNDEFINED;
-                }
+                if (!preservesPositionInfo) { pos = PositionInfo.UNDEFINED; }
 
                 return new SuperConstructorReference(children, prefix, pos);
             }
@@ -1522,24 +1488,22 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * returns the position of pe2 in the virtual child array of pe1
      *
-     * @param pe1 A {@link NonTerminalProgramElement}
-     * @param pe2 A {@link ProgramElement}
+     * @param pe1
+     *        A {@link NonTerminalProgramElement}
+     * @param pe2
+     *        A {@link ProgramElement}
      * @return pe2's position in pe1
      */
     protected static int getPosition(NonTerminalProgramElement pe1, ProgramElement pe2) {
         int n = pe1.getChildCount();
         int i = 0;
-        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
-            i++;
-        }
+        while ((i < n) && (pe1.getChildAt(i) != pe2)) { i++; }
         return (i == n) ? -1 : i;
     }
 
     protected void changed() {
         ExtList list = stack.peek();
-        if (list.isEmpty() || list.getFirst() != CHANGED) {
-            list.addFirst(CHANGED);
-        }
+        if (list.isEmpty() || list.getFirst() != CHANGED) { list.addFirst(CHANGED); }
     }
 
     protected void addToTopOfStack(SourceElement x) {
@@ -1556,9 +1520,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected void addChildren(ImmutableArray<ProgramElement> arr) {
         stack.pop();
-        for (int i = 0, sz = arr.size(); i < sz; i++) {
-            addToTopOfStack(arr.get(i));
-        }
+        for (int i = 0, sz = arr.size(); i < sz; i++) { addToTopOfStack(arr.get(i)); }
     }
 
     protected abstract class DefaultAction {
@@ -1578,9 +1540,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
-                if (!preservesPositionInfo) {
-                    changeList.removeFirstOccurrence(PositionInfo.class);
-                }
+                if (!preservesPositionInfo) { changeList.removeFirstOccurrence(PositionInfo.class); }
                 addNewChild(changeList);
             } else {
                 doDefaultAction(x);

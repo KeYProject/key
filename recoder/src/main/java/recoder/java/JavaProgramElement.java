@@ -32,14 +32,13 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * Java program element.
      *
-     * @param proto a java program element.
+     * @param proto
+     *        a java program element.
      */
 
     protected JavaProgramElement(JavaProgramElement proto) {
         super(proto);
-        if (proto.comments != null) {
-            comments = proto.comments.deepClone();
-        }
+        if (proto.comments != null) { comments = proto.comments.deepClone(); }
     }
 
     /**
@@ -55,16 +54,13 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * Set comments.
      *
-     * @param list a comment list.
+     * @param list
+     *        a comment list.
      */
 
     public void setComments(ASTList<Comment> list) {
         comments = list;
-        if (comments != null) {
-            for (Comment comment : comments) {
-                comment.setParent(this);
-            }
-        }
+        if (comments != null) { for (Comment comment : comments) { comment.setParent(this); } }
     }
 
     /**

@@ -43,12 +43,17 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param mods a modifier array.
-     * @param typeRef a type reference.
-     * @param var the VariableSpecification belonging to this parameter declaration.
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param mods
+     *        a modifier array.
+     * @param typeRef
+     *        a type reference.
+     * @param var
+     *        the VariableSpecification belonging to this parameter declaration.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
-     * @param parameterIsVarArg true iff this the last parameter of a method with variable number of
+     * @param parameterIsVarArg
+     *        true iff this the last parameter of a method with variable number of
      *        arguments
      */
     public ParameterDeclaration(Modifier[] mods, TypeReference typeRef, VariableSpecification var,
@@ -62,10 +67,14 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param mods a modifier array.
-     * @param typeRef a type reference.
-     * @param var the VariableSpecification belonging to this parameter declaration.
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param mods
+     *        a modifier array.
+     * @param typeRef
+     *        a type reference.
+     * @param var
+     *        the VariableSpecification belonging to this parameter declaration.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
     public ParameterDeclaration(Modifier[] mods, TypeReference typeRef, VariableSpecification var,
@@ -77,12 +86,15 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      *
-     * @param children an ExtList of children. May contain: a VariableSpecification (specifying the
+     * @param children
+     *        an ExtList of children. May contain: a VariableSpecification (specifying the
      *        parameter) a TypeReference (as reference to the type of the declared variable) several
      *        Modifier (taken as modifiers of the declaration), a Comment
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
-     * @param parameterIsVarArg true iff this the last parameter of a method with variable number of
+     * @param parameterIsVarArg
+     *        true iff this the last parameter of a method with variable number of
      *        arguments
      */
     public ParameterDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
@@ -111,15 +123,9 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (varSpec != null) {
-            result++;
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (typeReference != null) { result++; }
+        if (varSpec != null) { result++; }
         return result;
     }
 
@@ -127,30 +133,24 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (varSpec != null) {
-            if (index == 0) {
-                return varSpec.get(0);
-            }
-        }
+        if (varSpec != null) { if (index == 0) { return varSpec.get(0); } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -200,7 +200,8 @@ public class ParameterDeclaration extends VariableDeclaration {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnParameterDeclaration(this);

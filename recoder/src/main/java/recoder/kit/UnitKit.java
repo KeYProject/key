@@ -45,16 +45,12 @@ public class UnitKit {
      * null</CODE> or not a part of a compilation unit. If the element is already a compilation
      * unit, the element is returned.
      *
-     * @param p a program element.
+     * @param p
+     *        a program element.
      * @return the compilation unit of the given element, or <CODE>null</CODE>.
      */
     public static CompilationUnit getCompilationUnit(ProgramElement p) {
-        while (p != null) {
-            if (p instanceof CompilationUnit) {
-                return (CompilationUnit) p;
-            }
-            p = p.getASTParent();
-        }
+        while (p != null) { if (p instanceof CompilationUnit) { return (CompilationUnit) p; } p = p.getASTParent(); }
         return null;
     }
 
@@ -62,9 +58,7 @@ public class UnitKit {
     // CompilationUnit createCompilationUnit(CompilationUnit brother)
 
     private static ClassType getNecessaryImportedType(CrossReferenceSourceInfo xi, Import imp) {
-        if (imp.isMultiImport()) {
-            return null;
-        }
+        if (imp.isMultiImport()) { return null; }
         TypeReference tr = imp.getTypeReference();
         ClassType ct = (ClassType) xi.getType(tr);
         if (ct == null) {
@@ -81,9 +75,7 @@ public class UnitKit {
 
     private static boolean isNecessaryMultiTypeImport(CrossReferenceSourceInfo xrsi, Import imp,
             Set coveredTypes) {
-        if (!imp.isMultiImport()) {
-            return false;
-        }
+        if (!imp.isMultiImport()) { return false; }
         if (imp.isStaticImport()) {
             return true; // TODO Gutzmann
         }
@@ -101,9 +93,7 @@ public class UnitKit {
             if (!coveredTypes.contains(ct)) {
                 List<TypeReference> refs = TypeKit.getReferences(xrsi, ct, cu, false);
                 for (int k = refs.size() - 1; k >= 0; k -= 1) {
-                    if (refs.get(k).getASTParent().getASTParent() == cu) {
-                        refs.remove(k);
-                    }
+                    if (refs.get(k).getASTParent().getASTParent() == cu) { refs.remove(k); }
                 }
                 result = !refs.isEmpty();
             }
@@ -120,17 +110,17 @@ public class UnitKit {
      * <p>
      * Static imports are not considered yet, which is a TODO
      *
-     * @param xrsi the cross reference source info to use.
-     * @param cu the compilation unit to find unnecessary imports in.
+     * @param xrsi
+     *        the cross reference source info to use.
+     * @param cu
+     *        the compilation unit to find unnecessary imports in.
      * @return a list of unnecessary imports in the unit.
      */
     public static List<Import> getUnnecessaryImports(CrossReferenceSourceInfo xrsi,
             CompilationUnit cu) {
         Debug.assertNonnull(xrsi, cu);
         List<Import> il = cu.getImports();
-        if (il == null || il.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (il == null || il.isEmpty()) { return new ArrayList<>(0); }
         List<Import> removalList = new ArrayList<>();
         Set<ClassType> coveredTypes = new HashSet<>();
         for (Import imp : il) {
@@ -150,9 +140,7 @@ public class UnitKit {
             if (imp.isStaticImport()) {
                 continue; // TODO
             }
-            if (imp.isMultiImport() && !isNecessaryMultiTypeImport(xrsi, imp, coveredTypes)) {
-                removalList.add(imp);
-            }
+            if (imp.isMultiImport() && !isNecessaryMultiTypeImport(xrsi, imp, coveredTypes)) { removalList.add(imp); }
         }
         return removalList;
     }
@@ -165,9 +153,7 @@ public class UnitKit {
             CompilationUnit cu) {
         Debug.assertNonnull(ch);
         List<Import> removalList = getUnnecessaryImports(xrsi, cu);
-        for (int i = removalList.size() - 1; i >= 0; i -= 1) {
-            MiscKit.remove(ch, removalList.get(i));
-        }
+        for (int i = removalList.size() - 1; i >= 0; i -= 1) { MiscKit.remove(ch, removalList.get(i)); }
     }
 
     /**
@@ -193,9 +179,7 @@ public class UnitKit {
             while (tw.next(TypeReference.class)) {
                 TypeReference tr = (TypeReference) tw.getProgramElement();
                 Type type = xrsi.getType(tr);
-                while (type instanceof ArrayType) {
-                    type = ((ArrayType) type).getBaseType();
-                }
+                while (type instanceof ArrayType) { type = ((ArrayType) type).getBaseType(); }
                 if ((type instanceof ClassType)
                         && !((type instanceof TypeDeclaration)
                                 && MiscKit.contains(cu, (TypeDeclaration) type))
@@ -249,18 +233,19 @@ public class UnitKit {
         }
 
         // finally, create required single type imports
-        for (ClassType ct : importedTypes) {
-            appendImport(ch, cu, ct);
-        }
+        for (ClassType ct : importedTypes) { appendImport(ch, cu, ct); }
     }
 
     /**
      * Transformation that appends an import specification for the given class type. This method
      * does not check whether the import is needed or redundant.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param cu the unit to create the import for.
-     * @param ct the class type to create the import for.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param cu
+     *        the unit to create the import for.
+     * @param ct
+     *        the class type to create the import for.
      * @return the new import.
      * @deprecated should become a fully grown transformation
      */
@@ -273,9 +258,12 @@ public class UnitKit {
      * Transformation that appends an import specification for the given class type. This method
      * does not check whether the import is needed or redundant.
      *
-     * @param ch the change history to notify (may be <CODE>null</CODE>).
-     * @param cu the unit to create the import for.
-     * @param typeName the class type name to create the import for.
+     * @param ch
+     *        the change history to notify (may be <CODE>null</CODE>).
+     * @param cu
+     *        the unit to create the import for.
+     * @param typeName
+     *        the class type name to create the import for.
      * @return the new import.
      * @deprecated should become a fully grown transformation.
      */
@@ -295,10 +283,14 @@ public class UnitKit {
      * importing it on demand. If the type is already known, <CODE>null</CODE> is returned,
      * otherwise the new import specification that imports the type directly.
      *
-     * @param ch the change history to report to (may be <CODE>null</CODE>).
-     * @param si the source info service.
-     * @param typeName the fully qualified name of the type to be known at the unit level.
-     * @param context the context in which the type should be known.
+     * @param ch
+     *        the change history to report to (may be <CODE>null</CODE>).
+     * @param si
+     *        the source info service.
+     * @param typeName
+     *        the fully qualified name of the type to be known at the unit level.
+     * @param context
+     *        the context in which the type should be known.
      * @return a new import specification as added to the compilation unit, or <CODE>null</CODE> if
      *         no new import was needed.
      * @deprecated needs further testing - use at your own risks
@@ -308,9 +300,7 @@ public class UnitKit {
             ProgramElement context) {
         Debug.assertNonnull(si, typeName, context);
         Debug.assertBoolean(typeName.length() > 0);
-        if (si.getType(typeName, context) != null) {
-            return null;
-        }
+        if (si.getType(typeName, context) != null) { return null; }
         return appendImport(ch, MiscKit.getParentCompilationUnit(context), typeName);
     }
 
@@ -318,9 +308,12 @@ public class UnitKit {
      * Transformation that ensures that all type references in the given subtree are resolvable by
      * importing the corresponding types on demand.
      *
-     * @param ch the change history to report to (may be <CODE>null</CODE>).
-     * @param si the source info service.
-     * @param root the root element in a subtree containing type references to check.
+     * @param ch
+     *        the change history to report to (may be <CODE>null</CODE>).
+     * @param si
+     *        the source info service.
+     * @param root
+     *        the root element in a subtree containing type references to check.
      * @deprecated needs further testing - use at your own risks
      */
     @Deprecated
@@ -332,13 +325,9 @@ public class UnitKit {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof TypeReference) {
                 String name = Naming.toPathName((TypeReference) pe);
-                while (name.endsWith("]")) {
-                    name = name.substring(0, name.length() - 2);
-                }
+                while (name.endsWith("]")) { name = name.substring(0, name.length() - 2); }
                 Type type = si.getType(name, pe);
-                if (type == null) {
-                    ensureImport(ch, si, name, cu);
-                }
+                if (type == null) { ensureImport(ch, si, name, cu); }
             }
         }
     }
@@ -350,9 +339,7 @@ public class UnitKit {
     public static void sortImports(ChangeHistory ch, CompilationUnit cu) {
         Debug.assertNonnull(cu);
         List<Import> il = cu.getImports();
-        if (il == null) {
-            return;
-        }
+        if (il == null) { return; }
         final String[] names = new String[il.size()];
         for (int i = 0; i < il.size(); i += 1) {
             Import imp = il.get(i);
@@ -367,10 +354,7 @@ public class UnitKit {
         for (int i = 1; i < names.length; i += 1) {
             String x = names[i];
             int j = i - 1;
-            while (j >= 0 && Order.LEXICAL.greater(names[j], x)) {
-                names[j + 1] = names[j];
-                j -= 1;
-            }
+            while (j >= 0 && Order.LEXICAL.greater(names[j], x)) { names[j + 1] = names[j]; j -= 1; }
             names[j + 1] = x;
             if (j + 1 != i) {
                 Import oldImp = il.get(i);

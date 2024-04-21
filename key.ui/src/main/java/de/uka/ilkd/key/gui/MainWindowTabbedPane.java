@@ -59,9 +59,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
     }
 
     protected void setEnabledForAllTabs(boolean b) {
-        for (int i = 0; i < getTabCount(); i++) {
-            getComponentAt(i).setEnabled(b);
-        }
+        for (int i = 0; i < getTabCount(); i++) { getComponentAt(i).setEnabled(b); }
     }
 
     public ProofTreeView getProofTreeView() {

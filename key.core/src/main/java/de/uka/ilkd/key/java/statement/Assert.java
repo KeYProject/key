@@ -21,15 +21,9 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
 
     public Expression getExpressionAt(int index) {
-        if (index == 0) {
-            return condition;
-        }
+        if (index == 0) { return condition; }
         index--;
-        if (index == 0) {
-            if (message != null) {
-                return message;
-            }
-        }
+        if (index == 0) { if (message != null) { return message; } }
         throw new IndexOutOfBoundsException();
     }
 

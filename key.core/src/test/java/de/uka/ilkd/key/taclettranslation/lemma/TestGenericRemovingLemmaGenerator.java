@@ -39,26 +39,18 @@ public class TestGenericRemovingLemmaGenerator {
         for (Sort sort : sorts) {
             Assertions.assertFalse(sort instanceof GenericSort, "No generic sorts must survive");
 
-            if (!found && sort instanceof ProxySort && sort.name().equals(nameG)) {
-                found = true;
-            }
+            if (!found && sort instanceof ProxySort && sort.name().equals(nameG)) { found = true; }
         }
         Assertions.assertTrue(found, "There is a proxy sort of the name 'G'");
     }
 
     private void collectSorts(Term term, Set<Sort> sorts) {
-        for (Term t : term.subs()) {
-            collectSorts(t, sorts);
-        }
+        for (Term t : term.subs()) { collectSorts(t, sorts); }
 
         sorts.add(term.sort());
 
-        if (term.op() instanceof SortDependingFunction sdf) {
-            sorts.add(sdf.getSortDependingOn());
-        }
+        if (term.op() instanceof SortDependingFunction sdf) { sorts.add(sdf.getSortDependingOn()); }
 
-        for (QuantifiableVariable v : term.boundVars()) {
-            sorts.add(v.sort());
-        }
+        for (QuantifiableVariable v : term.boundVars()) { sorts.add(v.sort()); }
     }
 }

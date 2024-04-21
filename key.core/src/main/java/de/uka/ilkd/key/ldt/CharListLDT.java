@@ -234,10 +234,7 @@ public final class CharListLDT extends LDT {
     public Expression translateTerm(Term t, ExtList children, Services services) {
         final StringBuilder result = new StringBuilder();
         Term term = t;
-        while (term.op().arity() != 0) {
-            result.append(translateCharTerm(term.sub(0)));
-            term = term.sub(1);
-        }
+        while (term.op().arity() != 0) { result.append(translateCharTerm(term.sub(0))); term = term.sub(1); }
         return new StringLiteral("\"" + result + "\"");
     }
 
@@ -252,9 +249,7 @@ public final class CharListLDT extends LDT {
     @Override
     public JFunction getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
-        if (operationName.equals("add")) {
-            return services.getNamespaces().functions().lookup("seqConcat");
-        }
+        if (operationName.equals("add")) { return services.getNamespaces().functions().lookup("seqConcat"); }
         return null;
     }
 }

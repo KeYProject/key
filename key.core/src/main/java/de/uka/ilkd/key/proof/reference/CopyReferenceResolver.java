@@ -18,11 +18,15 @@ public class CopyReferenceResolver {
      * For each branch closed by reference to another proof,
      * copy the relevant proof steps into this proof.
      *
-     * @param toComplete the proof whose references to closed branched shall be resolved by
+     * @param toComplete
+     *        the proof whose references to closed branched shall be resolved by
      *        copying the branches
-     * @param referencedFrom filter, if not null copy only from that proof
-     * @param callbackTotal callback that gets the total number of branches to complete
-     * @param callbackBranch callback notified every time a branch has been copied
+     * @param referencedFrom
+     *        filter, if not null copy only from that proof
+     * @param callbackTotal
+     *        callback that gets the total number of branches to complete
+     * @param callbackBranch
+     *        callback notified every time a branch has been copied
      */
     public static void copyCachedGoals(
             Proof toComplete,
@@ -35,17 +39,11 @@ public class CopyReferenceResolver {
         for (Goal g : goals) {
             Node node = g.node();
             ClosedBy c = node.lookup(ClosedBy.class);
-            if (c == null) {
-                continue;
-            }
-            if (referencedFrom != null && referencedFrom != c.proof()) {
-                continue;
-            }
+            if (c == null) { continue; }
+            if (referencedFrom != null && referencedFrom != c.proof()) { continue; }
             todo.add(g);
         }
-        if (callbackTotal != null) {
-            callbackTotal.accept(todo.size());
-        }
+        if (callbackTotal != null) { callbackTotal.accept(todo.size()); }
         for (Goal g : todo) {
             toComplete.reOpenGoal(g);
             ClosedBy c = g.node().lookup(ClosedBy.class);
@@ -55,9 +53,7 @@ public class CopyReferenceResolver {
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }
-            if (callbackBranch != null) {
-                callbackBranch.run();
-            }
+            if (callbackBranch != null) { callbackBranch.run(); }
         }
     }
 }

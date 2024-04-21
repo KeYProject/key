@@ -50,9 +50,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static boolean unregister(Name name) {
         final boolean registered = registered(name);
-        if (registered) {
-            alreadyRegistered = alreadyRegistered.remove(name);
-        }
+        if (registered) { alreadyRegistered = alreadyRegistered.remove(name); }
         return registered;
     }
 

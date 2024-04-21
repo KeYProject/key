@@ -11,8 +11,7 @@ public class NoState extends Modifier {
 
     private static final long serialVersionUID = 2717863742463891263L;
 
-    public NoState() {
-    }
+    public NoState() {}
 
 
     protected NoState(NoState proto) {
@@ -23,7 +22,6 @@ public class NoState extends Modifier {
         return new NoState(this);
     }
 
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
 }

@@ -56,9 +56,12 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param trueCost the value of <code>cond</code> that is regarded as true-value
-     * @param thenValue the value of the feature, if <code>cond</code> returns <code>trueCost</code>
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param trueCost
+     *        the value of <code>cond</code> that is regarded as true-value
+     * @param thenValue
+     *        the value of the feature, if <code>cond</code> returns <code>trueCost</code>
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>, zero
      *         otherwise
      */
@@ -68,10 +71,14 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param trueCost the value of <code>cond</code> that is regarded as true-value
-     * @param thenValue the value of the feature if <code>cond</code> returns <code>trueCost</code>
-     * @param elseValue the value of the feature if <code>cond</code> does not return
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param trueCost
+     *        the value of <code>cond</code> that is regarded as true-value
+     * @param thenValue
+     *        the value of the feature if <code>cond</code> returns <code>trueCost</code>
+     * @param elseValue
+     *        the value of the feature if <code>cond</code> does not return
      *        <code>trueCost</code>
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>,
      *         <code>elseValue</code> otherwise
@@ -83,9 +90,12 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param trueCost the value of <code>cond</code> that is regarded as true-value
-     * @param thenFeature the value of the feature if <code>cond</code> returns
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param trueCost
+     *        the value of <code>cond</code> that is regarded as true-value
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns
      *        <code>trueCost</code>
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, zero otherwise
@@ -96,11 +106,15 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param trueCost the value of <code>cond</code> that is regarded as true-value
-     * @param thenFeature the value of the feature if <code>cond</code> returns
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param trueCost
+     *        the value of <code>cond</code> that is regarded as true-value
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns
      *        <code>trueCost</code>
-     * @param elseValue the value of the feature if <code>cond</code> does not return
+     * @param elseValue
+     *        the value of the feature if <code>cond</code> does not return
      *        <code>trueCost</code>
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, <code>elseValue</code> otherwise
@@ -111,11 +125,15 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param trueCost the value of <code>cond</code> that is regarded as true-value
-     * @param thenFeature the value of the feature if <code>cond</code> returns
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param trueCost
+     *        the value of <code>cond</code> that is regarded as true-value
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns
      *        <code>trueCost</code>
-     * @param elseFeature the value of the feature if <code>cond</code> does not return
+     * @param elseFeature
+     *        the value of the feature if <code>cond</code> does not return
      *        <code>trueCost</code>
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, the value of <code>elseFeature</code> otherwise
@@ -126,8 +144,10 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenValue the value of the feature if <code>cond</code> returns zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenValue
+     *        the value of the feature if <code>cond</code> returns zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
@@ -136,9 +156,12 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenValue the value of the feature if <code>cond</code> returns zero
-     * @param elseValue the value of the feature if <code>cond</code> does not return zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenValue
+     *        the value of the feature if <code>cond</code> returns zero
+     * @param elseValue
+     *        the value of the feature if <code>cond</code> does not return zero
      * @return <code>thenValue</code> if <code>cond</code> returns zero, <code>elseValue</code>
      *         otherwise
      */
@@ -149,9 +172,12 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenFeature the value of the feature if <code>cond</code> returns zero
-     * @param elseValue the value of the feature if <code>cond</code> does not return zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns zero
+     * @param elseValue
+     *        the value of the feature if <code>cond</code> does not return zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero,
      *         <code>elseValue</code> otherwise
      */
@@ -161,9 +187,12 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenFeature the value of the feature if <code>cond</code> returns zero
-     * @param elseFeature the value of the feature if <code>cond</code> does not return zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns zero
+     * @param elseFeature
+     *        the value of the feature if <code>cond</code> does not return zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, the value of
      *         <code>elseFeature</code> otherwise
      */
@@ -173,8 +202,10 @@ public class ShannonFeature implements Feature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenFeature the value of the feature if <code>cond</code> returns zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */

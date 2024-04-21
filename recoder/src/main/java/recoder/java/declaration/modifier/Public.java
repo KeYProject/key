@@ -30,7 +30,8 @@ public class Public extends VisibilityModifier {
     /**
      * Public.
      *
-     * @param proto a public.
+     * @param proto
+     *        a public.
      */
 
     protected Public(Public proto) {

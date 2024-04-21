@@ -26,13 +26,9 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public ProgramElement getChildAt(int i) {
-        if (i == 0) {
-            return methodName;
-        }
+        if (i == 0) { return methodName; }
         i--;
-        if (i >= 0 && i < paramTypes.size()) {
-            return paramTypes.get(i);
-        }
+        if (i >= 0 && i < paramTypes.size()) { return paramTypes.get(i); }
         return null;
     }
 
@@ -43,9 +39,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public int getChildPositionCode(ProgramElement child) {
-        if (child == methodName) {
-            return 0;
-        }
+        if (child == methodName) { return 0; }
         int idx = paramTypes.indexOf(child);
         return idx < 0 ? -1 : idx + 1;
     }
@@ -61,8 +55,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     }
 
     @Override
-    public void accept(SourceVisitor arg0) {
-    }
+    public void accept(SourceVisitor arg0) {}
 
     @Override
     public SourceElement deepClone() {

@@ -34,7 +34,8 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
     /**
      * Java statement.
      *
-     * @param proto a java statement.
+     * @param proto
+     *        a java statement.
      */
 
     protected JavaStatement(JavaStatement proto) {
@@ -64,7 +65,8 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

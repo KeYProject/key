@@ -116,15 +116,15 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
      * Creates a new transformation object that shifts statement expressions to initializers of new
      * local variables.
      *
-     * @param sc the service configuration to use.
-     * @param x the expression that shall be accessed first in its statement or initializer.
+     * @param sc
+     *        the service configuration to use.
+     * @param x
+     *        the expression that shall be accessed first in its statement or initializer.
      */
     public ShiftPreceedingStatementExpressions(CrossReferenceServiceConfiguration sc,
             Expression x) {
         super(sc);
-        if (x == null) {
-            throw new IllegalArgumentException("Missing expression");
-        }
+        if (x == null) { throw new IllegalArgumentException("Missing expression"); }
         this.expression = x;
     }
 
@@ -142,9 +142,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
         // retain only expressions that might have side-effects
         int exSize = preceeding.size();
         for (int i = exSize - 1; i >= 0; i -= 1) {
-            if (!ExpressionKit.containsStatements(preceeding.get(i))) {
-                preceeding.remove(i);
-            }
+            if (!ExpressionKit.containsStatements(preceeding.get(i))) { preceeding.remove(i); }
         }
         if ((expression instanceof Statement)
                 && ((Statement) expression).getStatementContainer() != null) {
@@ -153,13 +151,9 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             for (ProgramElement pe = expression; pe != null; pe = parent) {
                 parent = pe.getASTParent();
                 if (parent instanceof Statement) {
-                    if (((Statement) parent).getStatementContainer() != null) {
-                        break;
-                    }
+                    if (((Statement) parent).getStatementContainer() != null) { break; }
                 }
-                if (parent instanceof FieldSpecification) {
-                    break;
-                }
+                if (parent instanceof FieldSpecification) { break; }
             }
         }
         /*
@@ -167,18 +161,13 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
          * recoder.java.statement.For) { parent = parent.getASTParent(); }
          */
         exSize = preceeding.size();
-        if (exSize == 0 && (parent instanceof Statement)) {
-            return setProblemReport(IDENTITY);
-        }
+        if (exSize == 0 && (parent instanceof Statement)) { return setProblemReport(IDENTITY); }
         // a field spec as parent has a side effect (implicit assignment!)
         ProgramFactory f = getProgramFactory();
         SourceInfo si = getSourceInfo();
         if (exSize > 0) {
             Type[] exTypes = new Type[exSize];
-            for (int i = 0; i < exSize; i += 1) {
-                Expression ex = preceeding.get(i);
-                exTypes[i] = si.getType(ex);
-            }
+            for (int i = 0; i < exSize; i += 1) { Expression ex = preceeding.get(i); exTypes[i] = si.getType(ex); }
             String[] varNames = VariableKit.getNewVariableNames(si, exTypes, expression);
             tempVarDecls = new ArrayList<>(exSize);
             tempVarRefs = new ArrayList<>(exSize);
@@ -206,26 +195,21 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             preparer = new PrepareStatementList(getServiceConfiguration(), (Statement) parent,
                 isVisible());
             ProblemReport report = preparer.analyze();
-            if (report instanceof Problem) {
-                return setProblemReport(report);
-            }
+            if (report instanceof Problem) { return setProblemReport(report); }
         }
         return setProblemReport(EQUIVALENCE);
     }
 
     /**
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
         super.transform();
-        if (parent instanceof Statement) {
-            newParent = (Statement) parent;
-        }
+        if (parent instanceof Statement) { newParent = (Statement) parent; }
         int exSize = preceeding.size();
-        if (exSize == 0) {
-            return;
-        }
+        if (exSize == 0) { return; }
         int tempSize = tempVarDecls.size();
         // get destination statement list and position to insert into
         if (parent instanceof Statement) {
@@ -240,9 +224,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             for (Statement child : tempVarDecls) {
                 destination.add(destIndex, child);
                 child.setStatementContainer(((Statement) parent).getStatementContainer());
-                if (isVisible()) {
-                    getChangeHistory().attached(child);
-                }
+                if (isVisible()) { getChangeHistory().attached(child); }
             }
             // replace expressions by references to local variables
             for (int i = 0; i < exSize; i += 1) {
@@ -260,16 +242,12 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             // create class initializer and insert it before the field
             StatementBlock body = f.createStatementBlock();
             // add variable declarations
-            for (int i = 0; i < tempSize; i += 1) {
-                doAttach(tempVarDecls.get(i), body, i);
-            }
+            for (int i = 0; i < tempSize; i += 1) { doAttach(tempVarDecls.get(i), body, i); }
             // shift field specification initializer to the new block
             Expression init = fs.getInitializer(); // contains "expression"
             Debug.assertNonnull(init);
             // replace expressions by references to local variables
-            for (int i = 0; i < exSize; i += 1) {
-                replace(preceeding.get(i), tempVarRefs.get(i));
-            }
+            for (int i = 0; i < exSize; i += 1) { replace(preceeding.get(i), tempVarRefs.get(i)); }
             detach(init);
             // add initialization code to end of body
             CopyAssignment ca = f.createCopyAssignment(
@@ -304,9 +282,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
      * @return the statement containing the given expression.
      */
     public Statement getEnclosingStatement() {
-        if (newParent == null) {
-            throw new IllegalStateException("Only valid after transformation");
-        }
+        if (newParent == null) { throw new IllegalStateException("Only valid after transformation"); }
         return newParent;
     }
 }

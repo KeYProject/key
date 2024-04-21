@@ -162,12 +162,8 @@ public abstract class Naming {
      * operations and it also needs less memory.
      */
     public static String dot(String prefix, String suffix) {
-        if (prefix == null) {
-            prefix = "";
-        }
-        if (suffix == null) {
-            suffix = "";
-        }
+        if (prefix == null) { prefix = ""; }
+        if (suffix == null) { suffix = ""; }
         final int plen = prefix.length();
         final int slen = suffix.length();
         final int tlen = plen + slen + 1;
@@ -189,17 +185,11 @@ public abstract class Naming {
      * 2)</CODE> yields <CODE>"java.lang.Object[][]"</CODE>.
      */
     public static String toArrayTypeName(String basename, int dimensions) {
-        if (dimensions == 0 || basename == null) {
-            return basename;
-        }
+        if (dimensions == 0 || basename == null) { return basename; }
         int len = basename.length();
         char[] buf = new char[len + 2 * dimensions];
         basename.getChars(0, len, buf, 0);
-        while (dimensions > 0) {
-            buf[len++] = '[';
-            buf[len++] = ']';
-            dimensions -= 1;
-        }
+        while (dimensions > 0) { buf[len++] = '['; buf[len++] = ']'; dimensions -= 1; }
         return new String(buf, 0, len);
     }
 
@@ -208,7 +198,8 @@ public abstract class Naming {
      * not a {@link recoder.java.reference.NameReference}. Appends array brackets if the prefix is a
      * type reference with a dimension > 0.
      *
-     * @param ref a reference prefix.
+     * @param ref
+     *        a reference prefix.
      * @return the dotted representation of the given reference.
      */
     public static String toPathName(ReferencePrefix ref) {
@@ -218,9 +209,7 @@ public abstract class Naming {
             ReferencePrefix rp = ref;
             while (rp instanceof ReferenceSuffix) {
                 ReferencePrefix rrp = ((ReferenceSuffix) rp).getReferencePrefix();
-                if (rrp == null) {
-                    break;
-                }
+                if (rrp == null) { break; }
                 rp = rrp;
                 length += ((NameReference) rp).getName().length() + 1;
             }
@@ -238,11 +227,7 @@ public abstract class Naming {
             int len = name.length();
             name.getChars(0, len, buf, i);
             i += len;
-            while (dim > 0) {
-                buf[i++] = '[';
-                buf[i++] = ']';
-                dim -= 1;
-            }
+            while (dim > 0) { buf[i++] = '['; buf[i++] = ']'; dim -= 1; }
             return new String(buf, 0, length);
         }
         return "";
@@ -254,27 +239,23 @@ public abstract class Naming {
      * suffix if it is <CODE>null</CODE> or empty. Assumes that the prefix is not a type reference
      * with a dimension > 0.
      *
-     * @param ref a reference prefix.
-     * @param suffix a suffix string.
+     * @param ref
+     *        a reference prefix.
+     * @param suffix
+     *        a suffix string.
      * @return the dotted representation of the given reference and the suffix.
      * @since 0.72
      */
     public static String toPathName(ReferencePrefix ref, String suffix) {
-        if (suffix == null) {
-            return toPathName(ref);
-        }
+        if (suffix == null) { return toPathName(ref); }
         int slength = suffix.length();
-        if (slength == 0) {
-            return toPathName(ref);
-        }
+        if (slength == 0) { return toPathName(ref); }
         if (ref instanceof NameReference) {
             int length = ((NameReference) ref).getName().length() + 1 + slength;
             ReferencePrefix rp = ref;
             while (rp instanceof ReferenceSuffix) {
                 ReferencePrefix rrp = ((ReferenceSuffix) rp).getReferencePrefix();
-                if (rrp == null) {
-                    break;
-                }
+                if (rrp == null) { break; }
                 rp = rrp;
                 length += ((NameReference) rp).getName().length() + 1;
             }
@@ -307,13 +288,9 @@ public abstract class Naming {
      */
     public static String getPackageName(CompilationUnit cu) {
         PackageSpecification spec = cu.getPackageSpecification();
-        if (spec == null) {
-            return "";
-        }
+        if (spec == null) { return ""; }
         PackageReference pref = spec.getPackageReference();
-        if (pref == null || pref.getName() == null) {
-            return "";
-        }
+        if (pref == null || pref.getName() == null) { return ""; }
         return toPathName(pref);
     }
 
@@ -323,7 +300,8 @@ public abstract class Naming {
      * type is declared within the compilation unit, it's attempted to keep the old filename
      * instead.
      *
-     * @param cu a compilation unit.
+     * @param cu
+     *        a compilation unit.
      * @return the canonical name of the unit.
      */
     public static String toCanonicalName(CompilationUnit cu) {
@@ -365,7 +343,8 @@ public abstract class Naming {
      * the name of the primary type declaration, transforms it into a platform specific file name
      * and appends the ".java" filename suffix.
      *
-     * @param cu a compilation unit.
+     * @param cu
+     *        a compilation unit.
      * @return the canonical file name of the unit.
      */
     public static String toCanonicalFilename(CompilationUnit cu) {
@@ -376,9 +355,7 @@ public abstract class Naming {
         StringBuffer buffer = new StringBuffer();
         addName(buffer, ct);
         if (suffix != null && suffix.length() > 0) {
-            if (buffer.length() > 0) {
-                buffer.append('.');
-            }
+            if (buffer.length() > 0) { buffer.append('.'); }
             buffer.append(suffix);
         }
         return buffer.toString();
@@ -410,14 +387,10 @@ public abstract class Naming {
                 }
                 buffer.append(id);
                 buffer.append('.');
-            } else if (addName(buffer, container)) {
-                buffer.append('.');
-            }
+            } else if (addName(buffer, container)) { buffer.append('.'); }
         }
         String name = c.getName();
-        if (name == null) {
-            name = String.valueOf(System.identityHashCode(c));
-        }
+        if (name == null) { name = String.valueOf(System.identityHashCode(c)); }
         if (name.length() > 0) {
             buffer.append(name);
             return true;
@@ -428,7 +401,8 @@ public abstract class Naming {
     /**
      * Checks if the given name is a Java keyword and hence an invalid identifier.
      *
-     * @param name the name to check.
+     * @param name
+     *        the name to check.
      * @return <CODE>true</CODE> if the given name is a keyword, <CODE>false
      * </CODE> otherwise.
      */

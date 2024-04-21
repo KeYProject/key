@@ -20,7 +20,8 @@ public class CopyAssignment extends Assignment {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public CopyAssignment(ExtList children) {
         super(children);
@@ -29,8 +30,10 @@ public class CopyAssignment extends Assignment {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param lhs the Expression the value is assigned to
-     * @param rhs the Expression the value which is assigned to <tt>lhs</tt>
+     * @param lhs
+     *        the Expression the value is assigned to
+     * @param rhs
+     *        the Expression the value which is assigned to <tt>lhs</tt>
      */
     public CopyAssignment(Expression lhs, Expression rhs) {
         super(lhs, rhs);
@@ -68,7 +71,8 @@ public class CopyAssignment extends Assignment {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCopyAssignment(this);

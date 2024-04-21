@@ -67,9 +67,7 @@ public class IFProofObligationVars {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
             final Term ifTerm = ifVarsIt.next();
-            if (symbTerm != null) {
-                map.put(symbTerm, ifTerm);
-            }
+            if (symbTerm != null) { map.put(symbTerm, ifTerm); }
         }
     }
 

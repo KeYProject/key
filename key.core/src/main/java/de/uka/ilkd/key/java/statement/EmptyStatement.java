@@ -23,7 +23,8 @@ public class EmptyStatement extends JavaProgramElement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public EmptyStatement(ExtList children) {
         super(children);
@@ -40,7 +41,8 @@ public class EmptyStatement extends JavaProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnEmptyStatement(this);

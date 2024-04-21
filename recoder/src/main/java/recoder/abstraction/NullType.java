@@ -26,7 +26,8 @@ public class NullType implements ClassType {
     /**
      * Create a new null type for the given program model info.
      *
-     * @param info the program model info responsible for this type.
+     * @param info
+     *        the program model info responsible for this type.
      */
     public NullType(ProgramModelInfo info) {
         this.pmi = info;
@@ -62,7 +63,8 @@ public class NullType implements ClassType {
     /**
      * Sets the instance that can retrieve information about this program model element.
      *
-     * @param info the program model info for this element.
+     * @param info
+     *        the program model info for this element.
      */
     public void setProgramModelInfo(ProgramModelInfo info) {
         pmi = info;

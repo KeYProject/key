@@ -121,9 +121,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (!super.isApplicable(goal, pio)) {
-            return false;
-        }
+        if (!super.isApplicable(goal, pio)) { return false; }
 
         final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((Modality) progPost.op()).<Modality.JavaModalityKind>kind();
@@ -177,8 +175,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Singleton constructor.
      */
-    private LoopScopeInvariantRule() {
-    }
+    private LoopScopeInvariantRule() {}
 
     // -------------------------------------------------------------------------
     // helper methods for apply()
@@ -187,14 +184,21 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Sets the content of the "initially valid" goal.
      *
-     * @param services The {@link Services} object.
-     * @param ruleApp The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
-     * @param termLabelState The {@link TermLabelState}.
-     * @param initiallyGoal The {@link Goal} containing the "initially valid" PO.
-     * @param inst The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
+     * @param services
+     *        The {@link Services} object.
+     * @param ruleApp
+     *        The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
+     * @param termLabelState
+     *        The {@link TermLabelState}.
+     * @param initiallyGoal
+     *        The {@link Goal} containing the "initially valid" PO.
+     * @param inst
+     *        The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
      *        app.
-     * @param invTerm The loop invariant formula.
-     * @param reachableState The reachable state formula.
+     * @param invTerm
+     *        The loop invariant formula.
+     * @param reachableState
+     *        The reachable state formula.
      */
     private void constructInitiallyGoal(Services services, RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal, final Instantiation inst,
@@ -209,23 +213,37 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * Creates the "Invariant Preserved and Used" goal subsuming the former preserved and use case
      * goals.
      *
-     * @param services The {@link Services} object.
-     * @param ruleApp The {@link LoopInvariantBuiltInRuleApp} object for the current rule
+     * @param services
+     *        The {@link Services} object.
+     * @param ruleApp
+     *        The {@link LoopInvariantBuiltInRuleApp} object for the current rule
      *        application.
-     * @param presrvAndUCGoal The {@link Goal} to serve as container for the new sequent.
-     * @param inst The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
+     * @param presrvAndUCGoal
+     *        The {@link Goal} to serve as container for the new sequent.
+     * @param inst
+     *        The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
      *        app.
-     * @param loopLabel The {@link Label} before the {@link While} loop.
-     * @param stmtToReplace The {@link Statement} to replace (either a {@link While} loop or a
+     * @param loopLabel
+     *        The {@link Label} before the {@link While} loop.
+     * @param stmtToReplace
+     *        The {@link Statement} to replace (either a {@link While} loop or a
      *        {@link LabeledStatement} including the {@link While} loop).
-     * @param anonUpdate The anonymized update {@link Term}.
-     * @param wellFormedAnon The wellformed formula.
-     * @param uAnonInv A formula containing the anonymized update and the loop invariant.
-     * @param frameCondition The frame condition.
-     * @param variantPO The proof obligation for the variant.
-     * @param termLabelState The {@link TermLabelState}.
-     * @param invTerm The loop invariant formula.
-     * @param uBeforeLoopDefAnonVariant An array containing the original update, the "before the
+     * @param anonUpdate
+     *        The anonymized update {@link Term}.
+     * @param wellFormedAnon
+     *        The wellformed formula.
+     * @param uAnonInv
+     *        A formula containing the anonymized update and the loop invariant.
+     * @param frameCondition
+     *        The frame condition.
+     * @param variantPO
+     *        The proof obligation for the variant.
+     * @param termLabelState
+     *        The {@link TermLabelState}.
+     * @param invTerm
+     *        The loop invariant formula.
+     * @param uBeforeLoopDefAnonVariant
+     *        An array containing the original update, the "before the
      *        loop" update for reasoning about the variant, the anonymized update, and the variant
      *        update.
      */
@@ -253,7 +271,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Creates the variable used as a loop scope index.
      *
-     * @param services The {@link Services} object.
+     * @param services
+     *        The {@link Services} object.
      * @return The variable used as a loop scope index.
      */
     private ProgramVariable loopScopeIdxVar(Services services) {
@@ -269,13 +288,19 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Creates the new program with the loop scope.
      *
-     * @param services The {@link Services} object.
-     * @param loop The original {@link While} loop that is going to be replaced.
-     * @param loopLabel The {@link Label} before the {@link While} loop.
-     * @param stmtToReplace The {@link Statement} to replace (either a {@link While} loop or a
+     * @param services
+     *        The {@link Services} object.
+     * @param loop
+     *        The original {@link While} loop that is going to be replaced.
+     * @param loopLabel
+     *        The {@link Label} before the {@link While} loop.
+     * @param stmtToReplace
+     *        The {@link Statement} to replace (either a {@link While} loop or a
      *        {@link LabeledStatement} including the {@link While} loop).
-     * @param origProg The whole original program, starting with the {@link While} loop.
-     * @param loopScopeIdxVar The variable used as a loop scope index.
+     * @param origProg
+     *        The whole original program, starting with the {@link While} loop.
+     * @param loopScopeIdxVar
+     *        The variable used as a loop scope index.
      * @return The new program with the loop scope.
      */
     private ProgramElement newProgram(Services services, final While loop,
@@ -326,12 +351,18 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Creates the {@link SequentFormula} for the "initially valid" goal.
      *
-     * @param termLabelState The {@link TermLabelState}.
-     * @param inst The {@link Instantiation} for this rule application.
-     * @param invTerm The invariant formula.
-     * @param reachableState The reachable state formula.
-     * @param services The {@link Services} object.
-     * @param initGoal The goal containing the "initially valid" PO.
+     * @param termLabelState
+     *        The {@link TermLabelState}.
+     * @param inst
+     *        The {@link Instantiation} for this rule application.
+     * @param invTerm
+     *        The invariant formula.
+     * @param reachableState
+     *        The reachable state formula.
+     * @param services
+     *        The {@link Services} object.
+     * @param initGoal
+     *        The goal containing the "initially valid" PO.
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
     private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
@@ -349,22 +380,34 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * Creates the actual formula by which the original formula containing the loop is replaced in
      * the "preserves and use case" branch.
      *
-     * @param services The {@link Services} object.
-     * @param inst The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
+     * @param services
+     *        The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
      *        app.
-     * @param anonUpdate The anonymized update {@link Term}.
-     * @param loop The original {@link While} loop that is going to be replaced.
-     * @param loopLabel The {@link Label} before the {@link While} loop.
-     * @param stmtToReplace The {@link Statement} to replace (either a {@link While} loop or a
+     * @param anonUpdate
+     *        The anonymized update {@link Term}.
+     * @param loop
+     *        The original {@link While} loop that is going to be replaced.
+     * @param loopLabel
+     *        The {@link Label} before the {@link While} loop.
+     * @param stmtToReplace
+     *        The {@link Statement} to replace (either a {@link While} loop or a
      *        {@link LabeledStatement} including the {@link While} loop).
-     * @param frameCondition The frame condition formula.
-     * @param variantPO The proof obligation for the variant.
-     * @param termLabelState The {@link TermLabelState}.
-     * @param presrvAndUCGoal The {@link Goal} starting the new "preserves and use case" branch.
-     * @param uBeforeLoopDefAnonVariant An array containing the original update, the "before the
+     * @param frameCondition
+     *        The frame condition formula.
+     * @param variantPO
+     *        The proof obligation for the variant.
+     * @param termLabelState
+     *        The {@link TermLabelState}.
+     * @param presrvAndUCGoal
+     *        The {@link Goal} starting the new "preserves and use case" branch.
+     * @param uBeforeLoopDefAnonVariant
+     *        An array containing the original update, the "before the
      *        loop" update for reasoning about the variant, the anonymized update, and the variant
      *        update.
-     * @param invTerm The loop invariant formula {@link Term}.
+     * @param invTerm
+     *        The loop invariant formula {@link Term}.
      * @return The formula by which the original formula containing the loop is replaced in the
      *         "preserves and use case" branch.
      */
@@ -408,8 +451,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * If the {@link While} loop has a loop label, returns this and the labeled statement.
      * Otherwise, returns an empty {@link Optional} and the given loop statement.
      *
-     * @param ruleApp The current {@link RuleApp}.
-     * @param whileLoop The {@link While} loop of interest.
+     * @param ruleApp
+     *        The current {@link RuleApp}.
+     * @param whileLoop
+     *        The {@link While} loop of interest.
      * @return All the {@link Label}s before <code>whileLoop</code>.
      */
     private Pair<Optional<Label>, Statement> findLoopLabel(RuleApp ruleApp, While whileLoop) {

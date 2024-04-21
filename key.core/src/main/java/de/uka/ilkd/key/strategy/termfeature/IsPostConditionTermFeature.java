@@ -17,8 +17,7 @@ public final class IsPostConditionTermFeature extends BinaryTermFeature {
     public static final IsPostConditionTermFeature INSTANCE = new IsPostConditionTermFeature();
 
 
-    private IsPostConditionTermFeature() {
-    }
+    private IsPostConditionTermFeature() {}
 
 
     @Override

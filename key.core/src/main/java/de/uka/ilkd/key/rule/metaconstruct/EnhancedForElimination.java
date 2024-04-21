@@ -143,8 +143,10 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Creates a new enhaced for-loop elimination.
      *
-     * @param execContextSV the execution context.
-     * @param forStatement the enhanced for loop to eliminate.
+     * @param execContextSV
+     *        the execution context.
+     * @param forStatement
+     *        the enhanced for loop to eliminate.
      */
     public EnhancedForElimination(ProgramSV execContextSV, EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -154,8 +156,10 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Creates a new enhaced for-loop elimination.
      *
-     * @param execContext the execution context.
-     * @param forStatement the enhanced for loop to eliminate.
+     * @param execContext
+     *        the execution context.
+     * @param forStatement
+     *        the enhanced for loop to eliminate.
      */
     public EnhancedForElimination(ExecutionContext execContext, EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -261,8 +265,10 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Checks if an expression has an array type.
      *
-     * @param expression the expression to check
-     * @param services the services for lookups
+     * @param expression
+     *        the expression to check
+     * @param services
+     *        the services for lookups
      * @return true, if expression's type is a subtype of Iterable
      */
     private boolean isArrayType(Expression expression, Services services) {
@@ -299,8 +305,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
-        assert programVariable instanceof ProgramVariable
-                : "Since this is a concrete program, the spec must not be schematic";
+        assert programVariable instanceof ProgramVariable : "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable) programVariable;
         final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
@@ -390,8 +395,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd) {
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
-        assert element instanceof ProgramVariable
-                : "Since this is a concrete program, the spec must not be schematic";
+        assert element instanceof ProgramVariable : "Since this is a concrete program, the spec must not be schematic";
         final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
         final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
@@ -402,9 +406,12 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Transfer the invariant from <code>original</code> enhanced loop to the
      * <code>transformed</code> while or for loop.
      *
-     * @param original original loop.
-     * @param transformed transformed loop.
-     * @param services services.
+     * @param original
+     *        original loop.
+     * @param transformed
+     *        transformed loop.
+     * @param services
+     *        services.
      */
     private void setInvariant(EnhancedFor original, LoopStatement transformed,
             ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
@@ -422,10 +429,14 @@ public class EnhancedForElimination extends ProgramTransformer {
      * from JML. The values function symbol is a placeholder which stems from translating the
      * <code>\values</code> keyword from JML.
      *
-     * @param rawInv The "raw" invariant.
-     * @param loopIdxVar The actual program variable for the index placeholder.
-     * @param maybeValuesVar Optional actual program variable for the values placeholder.
-     * @param services The {@link Services} object.
+     * @param rawInv
+     *        The "raw" invariant.
+     * @param loopIdxVar
+     *        The actual program variable for the index placeholder.
+     * @param maybeValuesVar
+     *        Optional actual program variable for the values placeholder.
+     * @param services
+     *        The {@link Services} object.
      *
      * @return The updated {@link LoopSpecification}, or null if the supplied invariant is null.
      */
@@ -434,9 +445,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        if (rawInv == null) {
-            return null;
-        }
+        if (rawInv == null) { return null; }
 
         Optional<Term> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
         final Map<LocationVariable, Term> newInvs = //
@@ -465,10 +474,14 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Updates the given invariants (map from heap to a single invariant) by replacing in them
      * termToReplace by a term containing replaceWith.
      *
-     * @param invs The invariants in which to replace.
-     * @param termToReplace The term to replace.
-     * @param replaceWith The program variable from which to create the replacement term.
-     * @param services The {@link Services} object.
+     * @param invs
+     *        The invariants in which to replace.
+     * @param termToReplace
+     *        The term to replace.
+     * @param replaceWith
+     *        The program variable from which to create the replacement term.
+     * @param services
+     *        The {@link Services} object.
      */
     private void updateInvs(final Map<LocationVariable, Term> invs, final Term termToReplace,
             final ProgramVariable replaceWith, final Services services) {

@@ -100,8 +100,10 @@ public class QueryExpand implements BuiltInRule {
      * This is a utility method, that may also be used by other classes.
      *
      * @param services
-     * @param query The query on which the query expand rule is applied
-     * @param instVars If null, then the result of the query can be stored in a constant (e.g.
+     * @param query
+     *        The query on which the query expand rule is applied
+     * @param instVars
+     *        If null, then the result of the query can be stored in a constant (e.g.
      *        {@code res=query(a)}). Otherwise, it is a list of logical variables that can be
      *        instantiated
      *        (using the rules allLeft, exRight) and therefore the result of the query must be
@@ -205,9 +207,7 @@ public class QueryExpand implements BuiltInRule {
 
         Term update =
             tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
-        if (callee != null) {
-            update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
-        }
+        if (callee != null) { update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update); }
 
         final Term[] argUpdates = new Term[args.size()];
         for (int i = 0; i < args.size(); i++) {
@@ -256,10 +256,13 @@ public class QueryExpand implements BuiltInRule {
      * evaluations/expansions are inserted into a copy of <code>term</code> that is returned.
      *
      * @param services
-     * @param term A formula that potentially contains queries that should be evaluated/expanded.
-     * @param positiveContext Set false iff the <code>term</code> is in a logically negated context
+     * @param term
+     *        A formula that potentially contains queries that should be evaluated/expanded.
+     * @param positiveContext
+     *        Set false iff the <code>term</code> is in a logically negated context
      *        wrt. to the succedent.
-     * @param allowExpandBelowInstQuantifier TODO
+     * @param allowExpandBelowInstQuantifier
+     *        TODO
      * @return A modified version of the <code>term</code> with inserted "query evalutions".
      * @author gladisch
      */
@@ -304,31 +307,37 @@ public class QueryExpand implements BuiltInRule {
      * Find queries in t and suitable positions where to insert their evaluations in t. This method
      * is called by the method <code>evaluateQueries<\code>.
      *
-     * @param t The term where to search for queries and query evaluation positions.
-     * @param level The current recursion level of this method call.
-     * @param pathInTerm List of integers describing the current path in the syntax tree (of the
+     * @param t
+     *        The term where to search for queries and query evaluation positions.
+     * @param level
+     *        The current recursion level of this method call.
+     * @param pathInTerm
+     *        List of integers describing the current path in the syntax tree (of the
      *        term at level 0).
-     * @param instVars If null, then query evaluation below instantiable quantifiers (i.e.
+     * @param instVars
+     *        If null, then query evaluation below instantiable quantifiers (i.e.
      *        non-Skolemizable quantifiers) is suppressed. If not null, then this list collects the
      *        logical variables of instantiable quantifers that the query evaluation depends on.
      *        This is to needed to create e.g. (forall i; query(i)=res(i)) instead of (forall
      *        i;query(i)=res); the latter is unsound.
-     * @param curPosIsPositive True iff the current position in the formula we are in is a logically
+     * @param curPosIsPositive
+     *        True iff the current position in the formula we are in is a logically
      *        positive context (when considering polarity wrt. logical negation).
-     * @param qepLevel The top-most level on the current path where the query evaluation could be
+     * @param qepLevel
+     *        The top-most level on the current path where the query evaluation could be
      *        inserted. Its either top-level (0) or below a quantifier.
-     * @param qepIsPositive True iff the logical context at position qepLevel is positive (i.e., not
+     * @param qepIsPositive
+     *        True iff the logical context at position qepLevel is positive (i.e., not
      *        negated, or negations have cancelled out).
-     * @param qeps The resulting collection of query evaluation positions.
+     * @param qeps
+     *        The resulting collection of query evaluation positions.
      * @author gladisch
      */
     @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(Term t, int level, int[] pathInTerm,
             ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
             boolean qepIsPositive, List<QueryEvalPos> qeps) {
-        if (t == null) {
-            return;
-        }
+        if (t == null) { return; }
         final Operator op = t.op();
         final int nextLevel = level + 1;
         if (op instanceof IProgramMethod && !((IProgramMethod) op).isModel()) { // Query found
@@ -412,17 +421,13 @@ public class QueryExpand implements BuiltInRule {
      * Utility method called by <code>collectQueriesRecursively</code>
      */
     private void collectQueriesRecursively(Term t, List<Term> result) {
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            return;
-        }
+        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) { return; }
         // What about checking if an update is encountered?
         if (t.op() instanceof IProgramMethod && !((IProgramMethod) t.op()).isModel()) {
             // Query found
             result.add(t);
         } else {
-            for (int i = 0; i < t.arity(); i++) {
-                collectQueriesRecursively(t.sub(i), result);
-            }
+            for (int i = 0; i < t.arity(); i++) { collectQueriesRecursively(t.sub(i), result); }
         }
     }
 
@@ -487,21 +492,17 @@ public class QueryExpand implements BuiltInRule {
 
         public String toString() {
             StringBuilder pathstr = new StringBuilder("[");
-            for (int in : pathInTerm) {
-                pathstr.append(in).append(", ");
-            }
+            for (int in : pathInTerm) { pathstr.append(in).append(", "); }
             pathstr.append("]");
             return "QueryEvalPos of " + (query != null ? query.toString() : "NOQUERY") + " in "
-                + (positivePosition ? "positive" : "negative") + " position "
-                + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"
-                + pathstr;
+                    + (positivePosition ? "positive" : "negative") + " position "
+                    + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"
+                    + pathstr;
         }
 
         public Term getTermOnPath(Term root) {
             Term result = root;
-            for (int i = 1 /* skip the first */; i < pathInTerm.length; i++) {
-                result = result.sub(pathInTerm[i]);
-            }
+            for (int i = 1 /* skip the first */; i < pathInTerm.length; i++) { result = result.sub(pathInTerm[i]); }
             return result;
         }
 
@@ -512,11 +513,7 @@ public class QueryExpand implements BuiltInRule {
                 return false;
             }
             // query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()
-            for (int i = 0; i < pathInTerm.length; i++) {
-                if (pathInTerm[i] != other.pathInTerm[i]) {
-                    return false;
-                }
-            }
+            for (int i = 0; i < pathInTerm.length; i++) { if (pathInTerm[i] != other.pathInTerm[i]) { return false; } }
             return true;
         }
 
@@ -538,15 +535,15 @@ public class QueryExpand implements BuiltInRule {
      *
      * @param term
      * @param with
-     * @param it iterator with argument positions. This is the path in the syntax tree of term.
-     * @param services TODO
+     * @param it
+     *        iterator with argument positions. This is the path in the syntax tree of term.
+     * @param services
+     *        TODO
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
     protected Term replace(Term term, Term with, int[] it, int idx, TermServices services) {
-        if (!(idx < it.length)) {
-            return with;
-        }
+        if (!(idx < it.length)) { return with; }
 
         final int arity = term.arity();
         final Term[] newSubTerms = new Term[arity];
@@ -556,9 +553,7 @@ public class QueryExpand implements BuiltInRule {
             Term subTerm = term.sub(i);
             if (i == next) {
                 newSubTerms[i] = replace(subTerm, with, it, idx, services);
-                if (newSubTerms[i] != subTerm) {
-                    changedSubTerm = true;
-                }
+                if (newSubTerms[i] != subTerm) { changedSubTerm = true; }
             } else {
                 newSubTerms[i] = subTerm;
             }
@@ -615,13 +610,9 @@ public class QueryExpand implements BuiltInRule {
                 && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
-            if (pm.isModel()) {
-                return false;
-            }
+            if (pm.isModel()) { return false; }
             // abort if inside of transformer
-            if (Transformer.inTransformer(pio)) {
-                return false;
-            }
+            if (Transformer.inTransformer(pio)) { return false; }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
                     || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())
@@ -629,9 +620,7 @@ public class QueryExpand implements BuiltInRule {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
                     Term focus = it.getSubTerm();
-                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
-                        return false;
-                    }
+                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) { return false; }
                 }
                 storeTimeOfQuery(pio.subTerm(), goal);
                 return true;
@@ -641,9 +630,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
     private void storeTimeOfQuery(Term query, Goal goal) {
-        if (timeOfTerm.get(query) == null) {
-            timeOfTerm.put(query, goal.getTime());
-        }
+        if (timeOfTerm.get(query) == null) { timeOfTerm.put(query, goal.getTime()); }
     }
 
     public Long getTimeOfQuery(Term t) {

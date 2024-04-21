@@ -102,9 +102,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];
-        for (int i = 0; i < arity; i++) {
-            result[i] = METASORT;
-        }
+        for (int i = 0; i < arity; i++) { result[i] = METASORT; }
         return result;
     }
 
@@ -136,10 +134,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         // check whether term is really a "literal"
 
         // skip any updates that have snuck in (int lits are rigid)
-        while (top == UpdateApplication.UPDATE_APPLICATION) {
-            term = term.sub(1);
-            top = term.op();
-        }
+        while (top == UpdateApplication.UPDATE_APPLICATION) { term = term.sub(1); top = term.op(); }
 
         if (top != numbers) {
             LOGGER.debug("abstractmetaoperator: Cannot convert to number: {}", term);
@@ -150,10 +145,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         top = term.op();
 
         // skip any updates that have snuck in (int lits are rigid)
-        while (top == UpdateApplication.UPDATE_APPLICATION) {
-            term = term.sub(1);
-            top = term.op();
-        }
+        while (top == UpdateApplication.UPDATE_APPLICATION) { term = term.sub(1); top = term.op(); }
 
         while (top == minus) {
             neg = !neg;
@@ -161,10 +153,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
             top = term.op();
 
             // skip any updates that have snuck in (int lits are rigid)
-            while (top == UpdateApplication.UPDATE_APPLICATION) {
-                term = term.sub(1);
-                top = term.op();
-            }
+            while (top == UpdateApplication.UPDATE_APPLICATION) { term = term.sub(1); top = term.op(); }
         }
 
         while (top != base) {
@@ -173,15 +162,10 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
             top = term.op();
 
             // skip any updates that have snuck in (int lits are rigid)
-            while (top == UpdateApplication.UPDATE_APPLICATION) {
-                term = term.sub(1);
-                top = term.op();
-            }
+            while (top == UpdateApplication.UPDATE_APPLICATION) { term = term.sub(1); top = term.op(); }
         }
 
-        if (neg) {
-            result.insert(0, "-");
-        }
+        if (neg) { result.insert(0, "-"); }
 
         return result.toString();
     }

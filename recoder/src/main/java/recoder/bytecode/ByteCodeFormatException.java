@@ -28,7 +28,8 @@ public class ByteCodeFormatException extends ParserException {
     /**
      * Constructor with description text.
      *
-     * @param msg a description.
+     * @param msg
+     *        a description.
      */
     public ByteCodeFormatException(String msg) {
         super(msg);

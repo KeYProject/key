@@ -31,7 +31,8 @@ public class Transient extends Modifier {
     /**
      * Transient.
      *
-     * @param proto a transient.
+     * @param proto
+     *        a transient.
      */
 
     protected Transient(Transient proto) {

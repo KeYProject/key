@@ -42,7 +42,8 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
 
     public Switch(Expression e) {
@@ -53,8 +54,10 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e an expression.
-     * @param branches a branch array
+     * @param e
+     *        an expression.
+     * @param branches
+     *        a branch array
      */
 
     public Switch(Expression e, Branch[] branches) {
@@ -65,7 +68,8 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param children a list with all children
+     * @param children
+     *        a list with all children
      */
 
     public Switch(ExtList children) {
@@ -83,33 +87,27 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (expression != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -134,9 +132,7 @@ public class Switch extends BranchStatement
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -172,9 +168,7 @@ public class Switch extends BranchStatement
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -192,7 +186,8 @@ public class Switch extends BranchStatement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSwitch(this);

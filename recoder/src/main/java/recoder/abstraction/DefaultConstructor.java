@@ -26,7 +26,8 @@ public class DefaultConstructor implements Constructor {
      * Create a new default constructor for the given class type. The name of the constructor is set
      * appropriately.
      *
-     * @param ownerClass the owner class of this constructor.
+     * @param ownerClass
+     *        the owner class of this constructor.
      */
     public DefaultConstructor(ClassType ownerClass) {
         Debug.assertNonnull(ownerClass);
@@ -45,7 +46,8 @@ public class DefaultConstructor implements Constructor {
     /**
      * Sets the instance that can retrieve information about this program model element.
      *
-     * @param service the program model info for this element.
+     * @param service
+     *        the program model info for this element.
      */
     public void setProgramModelInfo(ProgramModelInfo service) {
         this.service = service;

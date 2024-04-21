@@ -43,8 +43,10 @@ public class MethodFrame extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param resultVar the ProgramVariable the return value is assigned to
-     * @param body a Statement containing the method body of the called method
+     * @param resultVar
+     *        the ProgramVariable the return value is assigned to
+     * @param body
+     *        a Statement containing the method body of the called method
      */
     public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body) {
@@ -67,8 +69,10 @@ public class MethodFrame extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param resultVar the ProgramVariable the return value is assigned to
-     * @param body a Statement containing the method body of the called method
+     * @param resultVar
+     *        the ProgramVariable the return value is assigned to
+     * @param body
+     *        a Statement containing the method body of the called method
      */
     public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pos) {
@@ -187,43 +191,33 @@ public class MethodFrame extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null) {
-            result++;
-        }
-        if (execContext != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (resultVar != null) { result++; }
+        if (execContext != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
         if (execContext != null) {
-            if (index == 0) {
-                return execContext;
-            }
+            if (index == 0) { return execContext; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -242,15 +236,15 @@ public class MethodFrame extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -258,7 +252,8 @@ public class MethodFrame extends JavaStatement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMethodFrame(this);

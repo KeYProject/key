@@ -28,7 +28,8 @@ public interface ConstantEvaluator extends Service {
      * Java language specification, or <CODE>null
      * </CODE> if it is not.
      *
-     * @param expr the expression to evaluate.
+     * @param expr
+     *        the expression to evaluate.
      * @return the type of the expression, or <CODE>null</CODE> if the expression is not constant.
      */
     Type getCompileTimeConstantType(Expression expr);
@@ -37,7 +38,8 @@ public interface ConstantEvaluator extends Service {
      * Checks if the given expression is a compile-time constant as defined in the Java language
      * specification.
      *
-     * @param expr the expression to evaluate.
+     * @param expr
+     *        the expression to evaluate.
      * @return <CODE>true</CODE>, if the expression is a compile-time constant, <CODE>false</CODE>
      *         otherwise.
      */
@@ -47,8 +49,10 @@ public interface ConstantEvaluator extends Service {
      * Checks if the given expression is a compile-time constant as defined in the Java language
      * specification, and derives the result.
      *
-     * @param expr the expression to evaluate.
-     * @param res the result of the evaluation; contains the type encoding and the result value.
+     * @param expr
+     *        the expression to evaluate.
+     * @param res
+     *        the result of the evaluation; contains the type encoding and the result value.
      * @return <CODE>true</CODE>, if the expression is a compile-time constant, <CODE>false</CODE>
      *         otherwise.
      */

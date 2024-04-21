@@ -68,7 +68,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Type declaration.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
     public TypeDeclaration(Identifier name) {
         setIdentifier(name);
@@ -78,8 +79,10 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Type declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param name an identifier.
+     * @param mods
+     *        a modifier mutable list.
+     * @param name
+     *        an identifier.
      */
     public TypeDeclaration(ASTList<DeclarationSpecifier> mods, Identifier name) {
         super(mods);
@@ -90,16 +93,13 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Type declaration.
      *
-     * @param proto a type declaration.
+     * @param proto
+     *        a type declaration.
      */
     protected TypeDeclaration(TypeDeclaration proto) {
         super(proto);
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.members != null) {
-            members = proto.members.deepClone();
-        }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.members != null) { members = proto.members.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -116,13 +116,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
                 declarationSpecifiers.get(i).setParent(this);
             }
         }
-        if (name != null) {
-            name.setParent(this);
-        }
+        if (name != null) { name.setParent(this); }
         if (members != null) {
-            for (int i = members.size() - 1; i >= 0; i -= 1) {
-                members.get(i).setMemberParent(this);
-            }
+            for (int i = members.size() - 1; i >= 0; i -= 1) { members.get(i).setMemberParent(this); }
         }
     }
 
@@ -159,7 +155,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
     public void setIdentifier(Identifier id) {
         name = id;
@@ -177,7 +174,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Set parent.
      *
-     * @param p a type declaration container.
+     * @param p
+     *        a type declaration container.
      */
     public void setParent(TypeDeclarationContainer p) {
         parent = p;
@@ -199,7 +197,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Set member parent.
      *
-     * @param p a type declaration.
+     * @param p
+     *        a type declaration.
      */
     public void setMemberParent(TypeDeclaration p) {
         parent = p;
@@ -226,7 +225,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Set members.
      *
-     * @param list a member declaration mutable list.
+     * @param list
+     *        a member declaration mutable list.
      */
     public void setMembers(ASTList<MemberDeclaration> list) {
         members = list;
@@ -241,14 +241,10 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         int count = 0;
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
-                if (members.get(i) instanceof TypeDeclaration) {
-                    count += 1;
-                }
+                if (members.get(i) instanceof TypeDeclaration) { count += 1; }
             }
         }
-        if (getTypeParameters() != null) {
-            count += getTypeParameters().size();
-        }
+        if (getTypeParameters() != null) { count += getTypeParameters().size(); }
         return count;
     }
 
@@ -265,9 +261,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             for (int i = 0; i < s && index >= 0; i++) {
                 MemberDeclaration md = members.get(i);
                 if (md instanceof TypeDeclaration) {
-                    if (index == 0) {
-                        return (TypeDeclaration) md;
-                    }
+                    if (index == 0) { return (TypeDeclaration) md; }
                     index--;
                 }
             }
@@ -353,9 +347,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getClassTypeContainer(this);
     }
 
@@ -364,9 +356,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         ClassTypeContainer ctc = service.getClassTypeContainer(this);
         return (ctc instanceof ClassType) ? (ClassType) ctc : null;
     }
@@ -376,9 +366,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getPackage(this);
     }
 
@@ -389,9 +377,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getSupertypes(this);
     }
 
@@ -400,9 +386,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getAllSupertypes(this);
     }
 
@@ -411,9 +395,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         @SuppressWarnings("unchecked")
         List<FieldSpecification> fields = (List<FieldSpecification>) service.getFields(this);
         return fields;
@@ -424,9 +406,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getAllFields(this);
     }
 
@@ -435,9 +415,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getMethods(this);
     }
 
@@ -446,9 +424,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getAllMethods(this);
     }
 
@@ -457,9 +433,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getConstructors(this);
     }
 
@@ -468,9 +442,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         @SuppressWarnings("unchecked")
         List<TypeDeclaration> types = (List<TypeDeclaration>) service.getTypes(this);
         return types;
@@ -481,9 +453,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        if (service == null) {
-            Debug.error("Service not defined in TypeDeclaration " + getName());
-        }
+        if (service == null) { Debug.error("Service not defined in TypeDeclaration " + getName()); }
         return service.getAllTypes(this);
     }
 
@@ -503,48 +473,34 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public List<TypeDeclaration> getTypesInScope() {
-        if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (name2type == null || name2type.isEmpty()) { return new ArrayList<>(0); }
         List<TypeDeclaration> res = new ArrayList<>();
-        for (TypeDeclaration td : name2type.values()) {
-            res.add(td);
-        }
+        for (TypeDeclaration td : name2type.values()) { res.add(td); }
         return res;
     }
 
     public ClassType getTypeInScope(String tname) {
         Debug.assertNonnull(tname);
-        if (name2type == null) {
-            return null;
-        }
+        if (name2type == null) { return null; }
         return name2type.get(tname);
     }
 
     public void addTypeToScope(ClassType type, String tname) {
         Debug.assertNonnull(type, tname);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<>();
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { name2type = new HashMap<>(); }
         name2type.put(tname, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String tname) {
         Debug.assertNonnull(tname);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { return; }
         name2type.remove(tname);
     }
 
     public List<FieldSpecification> getFieldsInScope() {
-        if (name2field == null || name2field.isEmpty()) {
-            return new ASTArrayList<>(0);
-        }
+        if (name2field == null || name2field.isEmpty()) { return new ASTArrayList<>(0); }
         ASTList<FieldSpecification> res = new ASTArrayList<>();
-        for (FieldSpecification fs : name2field.values()) {
-            res.add(fs);
-        }
+        for (FieldSpecification fs : name2field.values()) { res.add(fs); }
         return res;
     }
 
@@ -554,26 +510,20 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     public VariableSpecification getVariableInScope(String tname) {
         Debug.assertNonnull(tname);
-        if (name2field == null) {
-            return null;
-        }
+        if (name2field == null) { return null; }
         return name2field.get(tname);
     }
 
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertBoolean(var instanceof FieldSpecification
                 || (var instanceof EnumConstantSpecification && this instanceof EnumDeclaration));
-        if (name2field == null || name2field == UNDEFINED_SCOPE) {
-            name2field = new HashMap<>();
-        }
+        if (name2field == null || name2field == UNDEFINED_SCOPE) { name2field = new HashMap<>(); }
         name2field.put(var.getName(), (FieldSpecification) var);
     }
 
     public void removeVariableFromScope(String tname) {
         Debug.assertNonnull(tname);
-        if (name2field == null || name2field == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2field == null || name2field == UNDEFINED_SCOPE) { return; }
         name2field.remove(tname);
     }
 

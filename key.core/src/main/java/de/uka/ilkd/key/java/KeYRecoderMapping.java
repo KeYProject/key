@@ -43,9 +43,12 @@ public class KeYRecoderMapping {
     /**
      * creates a KeYRecoderMapping object. Used for cloning and testing.
      *
-     * @param map a HashMap mapping ProgramElements in Recoder to ProgramElements in KeY
-     * @param revMap the reverse map (KeY->Recoder)
-     * @param parsedSpecial boolean indicating if the special classes have been parsed in
+     * @param map
+     *        a HashMap mapping ProgramElements in Recoder to ProgramElements in KeY
+     * @param revMap
+     *        the reverse map (KeY->Recoder)
+     * @param parsedSpecial
+     *        boolean indicating if the special classes have been parsed in
      */
     KeYRecoderMapping(HashMap<Object, Object> map, HashMap<Object, Object> revMap,
             KeYJavaType superArrayType, boolean parsedSpecial) {
@@ -58,7 +61,8 @@ public class KeYRecoderMapping {
     /**
      * returns a matching ProgramElement (KeY) to a given ProgramElement (Recoder)
      *
-     * @param pe a recoder.java.ProgramElement
+     * @param pe
+     *        a recoder.java.ProgramElement
      */
     public ProgramElement toKeY(recoder.java.ProgramElement pe) {
         return (ProgramElement) map.get(pe);
@@ -67,7 +71,8 @@ public class KeYRecoderMapping {
     /**
      * returns a matching ModelElement (KeY) to a given recoder.ModelElement
      *
-     * @param pe a recoder.ModelElement
+     * @param pe
+     *        a recoder.ModelElement
      */
     public ModelElement toKeY(recoder.ModelElement pe) {
         return (ModelElement) map.get(pe);
@@ -79,7 +84,8 @@ public class KeYRecoderMapping {
      * equivalent to program element pe, an assertion failure "Program Element <pe> not known" is
      * emitted.
      *
-     * @param pe a JavaProgramElement
+     * @param pe
+     *        a JavaProgramElement
      */
     public recoder.java.ProgramElement toRecoder(ProgramElement pe) {
         Object res = revMap.get(pe);
@@ -92,7 +98,8 @@ public class KeYRecoderMapping {
      * returns the Recoder-equivalent to a given ModelElement (KeY). If there's no
      * Recoder-equivalent to the ModelElement <code>pe</code> null is returned.
      *
-     * @param pe a ModelElement
+     * @param pe
+     *        a ModelElement
      */
     public recoder.ModelElement toRecoder(ModelElement pe) {
         return (recoder.ModelElement) revMap.get(pe);
@@ -154,7 +161,8 @@ public class KeYRecoderMapping {
      * These are parsed in using method parseSpecial of {@link Recoder2KeY}. To avoid multiple
      * readings this method sets a flag whether the special have been parsed in or not
      *
-     * @param b boolean indicating if the special classes have been parsed in
+     * @param b
+     *        boolean indicating if the special classes have been parsed in
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;

@@ -44,7 +44,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Statement block.
      *
-     * @param children an ExtList that contains the children
+     * @param children
+     *        an ExtList that contains the children
      */
 
     public StatementBlock(ExtList children) {
@@ -90,10 +91,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
 
-        while (current.hasNextPrefixElement()) {
-            current = current.getNextPrefixElement();
-            prefix.add(current);
-        }
+        while (current.hasNextPrefixElement()) { current = current.getNextPrefixElement(); prefix.add(current); }
 
         return new ImmutableArray<>(prefix);
     }
@@ -128,15 +126,15 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -161,9 +159,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -177,9 +173,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         int count = 0;
         if (body != null) {
             for (int i = body.size() - 1; i >= 0; i -= 1) {
-                if (body.get(i) instanceof TypeDeclaration) {
-                    count += 1;
-                }
+                if (body.get(i) instanceof TypeDeclaration) { count += 1; }
             }
         }
         return count;
@@ -202,9 +196,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             for (int i = 0; i < s && index >= 0; i++) {
                 Statement st = body.get(i);
                 if (st instanceof TypeDeclaration) {
-                    if (index == 0) {
-                        return (TypeDeclaration) st;
-                    }
+                    if (index == 0) { return (TypeDeclaration) st; }
                     index -= 1;
                 }
             }
@@ -216,7 +208,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnStatementBlock(this);
@@ -224,9 +217,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public SourceElement getFirstElement() {
-        if (isEmpty()) {
-            return this;
-        }
+        if (isEmpty()) { return this; }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }

@@ -35,8 +35,8 @@ public class JavaCharStream {
         if (inputStream != null) {
             throw new Error(
                 "\n   ERROR: Second call to the constructor of a static JavaCharStream.  You must\n"
-                    + "       either use ReInit() or set the JavaCC option STATIC to false\n"
-                    + "       during the generation of this class.");
+                        + "       either use ReInit() or set the JavaCC option STATIC to false\n"
+                        + "       during the generation of this class.");
         }
         inputStream = dstream;
         line = startline;
@@ -185,9 +185,7 @@ public class JavaCharStream {
 
     static protected void FillBuff() throws java.io.IOException {
         int i;
-        if (maxNextCharInd == 4096) {
-            maxNextCharInd = nextCharInd = 0;
-        }
+        if (maxNextCharInd == 4096) { maxNextCharInd = nextCharInd = 0; }
 
         try {
             if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
@@ -209,9 +207,7 @@ public class JavaCharStream {
     }
 
     static protected char ReadByte() throws java.io.IOException {
-        if (++nextCharInd >= maxNextCharInd) {
-            FillBuff();
-        }
+        if (++nextCharInd >= maxNextCharInd) { FillBuff(); }
 
         return nextCharBuf[nextCharInd];
     }
@@ -220,9 +216,7 @@ public class JavaCharStream {
         if (inBuf > 0) {
             --inBuf;
 
-            if (++bufpos == bufsize) {
-                bufpos = 0;
-            }
+            if (++bufpos == bufsize) { bufpos = 0; }
 
             tokenBegin = bufpos;
             return buffer[bufpos];
@@ -289,18 +283,14 @@ public class JavaCharStream {
         if (inBuf > 0) {
             --inBuf;
 
-            if (++bufpos == bufsize) {
-                bufpos = 0;
-            }
+            if (++bufpos == bufsize) { bufpos = 0; }
 
             return buffer[bufpos];
         }
 
         char c;
 
-        if (++bufpos == available) {
-            AdjustBuffSize();
-        }
+        if (++bufpos == available) { AdjustBuffSize(); }
 
         if ((buffer[bufpos] = c = ReadByte()) == '\\') {
             UpdateLineColumn(c);
@@ -309,18 +299,14 @@ public class JavaCharStream {
 
             for (;;) // Read all the backslashes
             {
-                if (++bufpos == available) {
-                    AdjustBuffSize();
-                }
+                if (++bufpos == available) { AdjustBuffSize(); }
 
                 try {
                     if ((buffer[bufpos] = c = ReadByte()) != '\\') {
                         UpdateLineColumn(c);
                         // found a non-backslash char.
                         if ((c == 'u') && ((backSlashCnt & 1) == 1)) {
-                            if (--bufpos < 0) {
-                                bufpos = bufsize - 1;
-                            }
+                            if (--bufpos < 0) { bufpos = bufsize - 1; }
 
                             break;
                         }
@@ -329,9 +315,7 @@ public class JavaCharStream {
                         return '\\';
                     }
                 } catch (java.io.IOException e) {
-                    if (backSlashCnt > 1) {
-                        backup(backSlashCnt);
-                    }
+                    if (backSlashCnt > 1) { backup(backSlashCnt); }
 
                     return '\\';
                 }
@@ -342,9 +326,7 @@ public class JavaCharStream {
 
             // Here, we have seen an odd number of backslash's followed by a 'u'
             try {
-                while ((c = ReadByte()) == 'u') {
-                    ++column;
-                }
+                while ((c = ReadByte()) == 'u') { ++column; }
 
                 buffer[bufpos] = c = (char) (hexval(c) << 12 | hexval(ReadByte()) << 8
                         | hexval(ReadByte()) << 4 | hexval(ReadByte()));
@@ -410,9 +392,7 @@ public class JavaCharStream {
     static public void backup(int amount) {
 
         inBuf += amount;
-        if ((bufpos -= amount) < 0) {
-            bufpos += bufsize;
-        }
+        if ((bufpos -= amount) < 0) { bufpos += bufsize; }
     }
 
     static public String GetImage() {

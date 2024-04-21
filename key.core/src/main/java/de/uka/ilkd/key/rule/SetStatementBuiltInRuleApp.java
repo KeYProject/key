@@ -17,8 +17,10 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp {
     /**
-     * @param rule the rule being applied
-     * @param occurrence the position at which the rule is applied
+     * @param rule
+     *        the rule being applied
+     * @param occurrence
+     *        the position at which the rule is applied
      */
     public SetStatementBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence) {
         super(rule, Objects.requireNonNull(occurrence, "rule application needs a position"), null);

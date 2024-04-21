@@ -29,7 +29,8 @@ public class DocComment extends Comment {
     /**
      * Doc comment.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     public DocComment(String text) {
@@ -39,7 +40,8 @@ public class DocComment extends Comment {
     /**
      * Doc comment.
      *
-     * @param proto a doc comment.
+     * @param proto
+     *        a doc comment.
      */
 
     protected DocComment(DocComment proto) {

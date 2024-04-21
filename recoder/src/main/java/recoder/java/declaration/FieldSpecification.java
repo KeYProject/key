@@ -33,7 +33,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
 
     public FieldSpecification(Identifier name) {
@@ -43,8 +44,10 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name an identifier.
-     * @param init an expression.
+     * @param name
+     *        an identifier.
+     * @param init
+     *        an expression.
      */
 
     public FieldSpecification(Identifier name, Expression init) {
@@ -54,9 +57,12 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name an identifier.
-     * @param dimensions an int value.
-     * @param init an expression.
+     * @param name
+     *        an identifier.
+     * @param dimensions
+     *        an int value.
+     * @param init
+     *        an expression.
      */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {
@@ -66,7 +72,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param proto a field specification.
+     * @param proto
+     *        a field specification.
      */
 
     protected FieldSpecification(FieldSpecification proto) {
@@ -90,7 +97,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Set parent.
      *
-     * @param parent must be a field declaration.
+     * @param parent
+     *        must be a field declaration.
      */
 
     public void setParent(VariableDeclaration parent) {
@@ -100,7 +108,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Set parent.
      *
-     * @param parent a field declaration.
+     * @param parent
+     *        a field declaration.
      */
 
     public void setParent(FieldDeclaration parent) {

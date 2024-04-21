@@ -43,25 +43,23 @@ public final class ProofUserManager {
     /**
      * Forbid multiple instances.
      */
-    private ProofUserManager() {
-    }
+    private ProofUserManager() {}
 
     /**
      * Registers the {@link Proof} with the given user if it is not already registered. If it is
      * already registered the user is added to the proof users if not already present.
      *
-     * @param proof The {@link Proof}.
-     * @param environment Optional the {@link KeYEnvironment} which will be disposed if the last
+     * @param proof
+     *        The {@link Proof}.
+     * @param environment
+     *        Optional the {@link KeYEnvironment} which will be disposed if the last
      *        known {@link Proof} is removed from it.
-     * @param user The user.
+     * @param user
+     *        The user.
      */
     public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
-        if (proof == null) {
-            throw new IllegalArgumentException("Proof not defined.");
-        }
-        if (user == null) {
-            throw new IllegalArgumentException("User not defined.");
-        }
+        if (proof == null) { throw new IllegalArgumentException("Proof not defined."); }
+        if (user == null) { throw new IllegalArgumentException("User not defined."); }
         synchronized (this) {
             Set<Object> users = proofUsers.computeIfAbsent(proof, k -> new HashSet<>());
             users.add(user);
@@ -78,16 +76,14 @@ public final class ProofUserManager {
      * Removes the user from the registered proof users. If the proof has no user anymore it is
      * automatically disposed via {@link Proof#dispose()}.
      *
-     * @param proof The {@link Proof}.
-     * @param user The user.
+     * @param proof
+     *        The {@link Proof}.
+     * @param user
+     *        The user.
      */
     public void removeUserAndDispose(Proof proof, Object user) {
-        if (proof == null) {
-            throw new IllegalArgumentException("Proof not defined.");
-        }
-        if (user == null) {
-            throw new IllegalArgumentException("User not defined.");
-        }
+        if (proof == null) { throw new IllegalArgumentException("Proof not defined."); }
+        if (user == null) { throw new IllegalArgumentException("User not defined."); }
         synchronized (this) {
             Set<Object> users = proofUsers.get(proof);
             if (users != null) {
@@ -130,7 +126,8 @@ public final class ProofUserManager {
     /**
      * Returns all registered user of the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to get its users.
+     * @param proof
+     *        The {@link Proof} to get its users.
      * @return The registered user of the {@link Proof}.
      */
     public Object[] getUsers(Proof proof) {
@@ -147,7 +144,8 @@ public final class ProofUserManager {
     /**
      * Returns the known environment of the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to get its {@link KeYEnvironment}.
+     * @param proof
+     *        The {@link Proof} to get its {@link KeYEnvironment}.
      * @return The {@link KeYEnvironment} of the given {@link Proof}.
      */
     public KeYEnvironment<?> getEnvironment(Proof proof) {
@@ -163,7 +161,8 @@ public final class ProofUserManager {
     /**
      * Returns all known {@link Proof}s of the given {@link KeYEnvironment}.
      *
-     * @param environment The known {@link Proof}s of the given {@link KeYEnvironment}.
+     * @param environment
+     *        The known {@link Proof}s of the given {@link KeYEnvironment}.
      * @return All known {@link Proof}s of the given {@link KeYEnvironment}.
      */
     public Proof[] getProofs(KeYEnvironment<?> environment) {

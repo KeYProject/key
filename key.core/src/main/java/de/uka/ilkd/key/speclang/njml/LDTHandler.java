@@ -23,11 +23,12 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     /**
      * Pair (KJT, Operator)
      *
-     * @param type type
-     * @param operator operator
+     * @param type
+     *        type
+     * @param operator
+     *        operator
      */
-    public record TypedOperator(KeYJavaType type, Operator operator) {
-    }
+    public record TypedOperator(KeYJavaType type, Operator operator) {}
 
     protected final Services services;
 
@@ -54,16 +55,12 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     @Nullable
     public SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
             throws SLTranslationException {
-        if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
-            return buildUnary(jop, left);
-        }
+        if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) { return buildUnary(jop, left); }
 
         KeYJavaType promotedType =
             services.getTypeConverter().getPromotedType(left.getType(), right.getType());
         TypedOperator top = getOperator(promotedType.getJavaType(), jop);
-        if (top == null) {
-            return null;
-        }
+        if (top == null) { return null; }
 
         Term a = promote(left.getTerm(), promotedType);
         Term b = promote(right.getTerm(), promotedType);
@@ -79,9 +76,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     private SLExpression buildUnary(JMLOperator jop, SLExpression left) {
         KeYJavaType type = left.getType();
         TypedOperator top = getOperator(type.getJavaType(), jop);
-        if (top == null) {
-            return null;
-        }
+        if (top == null) { return null; }
         Term resultTerm = services.getTermFactory().createTerm(top.operator, left.getTerm());
         return new SLExpression(resultTerm, top.type);
     }

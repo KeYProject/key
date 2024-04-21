@@ -31,7 +31,8 @@ public class Static extends Modifier {
     /**
      * Static.
      *
-     * @param proto a static.
+     * @param proto
+     *        a static.
      */
 
     protected Static(Static proto) {

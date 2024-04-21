@@ -45,17 +45,10 @@ public class TestZipProofSaving {
         try {
             byte[] buffer = new byte[4096];
             int read = is.read(buffer);
-            while (read >= 0) {
-                os.write(buffer, 0, read);
-                read = is.read(buffer);
-            }
+            while (read >= 0) { os.write(buffer, 0, read); read = is.read(buffer); }
         } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                os.close();
-            }
+            if (is != null) { is.close(); }
+            if (os != null) { os.close(); }
         }
     }
 

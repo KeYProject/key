@@ -59,9 +59,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
         contractPanel.setContracts(contracts, title);
         contractPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    okButton.doClick();
-                }
+                if (e.getClickCount() == 2) { okButton.doClick(); }
             }
         });
         contractPanel.setMinimumSize(new Dimension(800, 500));

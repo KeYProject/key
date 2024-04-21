@@ -48,17 +48,9 @@ public class RemoveStaticImports extends TwoPassTransformation {
         statics = new ArrayList<>();
         // are there any static imports at all?
         List<Import> il = cu.getImports();
-        if (il == null || il.isEmpty()) {
-            return IDENTITY;
-        }
-        for (Import im : il) {
-            if (im.isStaticImport()) {
-                statics.add(im);
-            }
-        }
-        if (statics.isEmpty()) {
-            return IDENTITY;
-        }
+        if (il == null || il.isEmpty()) { return IDENTITY; }
+        for (Import im : il) { if (im.isStaticImport()) { statics.add(im); } }
+        if (statics.isEmpty()) { return IDENTITY; }
 
         // traverse tree, consider member references only
         TreeWalker tw = new TreeWalker(cu);
@@ -78,9 +70,7 @@ public class RemoveStaticImports extends TwoPassTransformation {
                         getSourceInfo().getField((FieldReference) r).getContainingClassType();
                 } else if (r instanceof TypeReference) {
                     Type t = getSourceInfo().getType((TypeReference) r);
-                    if (!(t instanceof ClassType)) {
-                        continue;
-                    }
+                    if (!(t instanceof ClassType)) { continue; }
                     targetCT = (ClassType) t;
                 } else {
                     continue;
@@ -92,17 +82,13 @@ public class RemoveStaticImports extends TwoPassTransformation {
                 String n = nr.getName();
                 for (Import im : statics) {
                     TypeReference tr = im.getTypeReference(); // has to be set!
-                    if (getSourceInfo().getType(tr) != targetCT) {
-                        continue;
-                    }
+                    if (getSourceInfo().getType(tr) != targetCT) { continue; }
                     if (im.isMultiImport()) {
                         // TODO may still not be it... unlikely, but yet...
                         // (different type import may match)
                         // however, the way we currently handle this, no harm is done...
                     } else {
-                        if (!n.equals(im.getStaticIdentifier().getText())) {
-                            continue;
-                        }
+                        if (!n.equals(im.getStaticIdentifier().getText())) { continue; }
                         // TODO check: if another import matches, I *think*
                         // that should be a semantic error
                         // however, the way we currently handle this, no harm is done...
@@ -119,14 +105,10 @@ public class RemoveStaticImports extends TwoPassTransformation {
     @Override
     public void transform() {
         super.transform();
-        for (Import i : statics) {
-            detach(i);
-        }
+        for (Import i : statics) { detach(i); }
         for (Item hs : hotSpots) {
             String x = Naming.toPathName(hs.prefix, hs.r.getName());
-            if (x.startsWith("java.lang.")) {
-                x = x.substring(10);
-            }
+            if (x.startsWith("java.lang.")) { x = x.substring(10); }
             replace(hs.r, MiscKit.createUncollatedReferenceQualifier(getProgramFactory(), x));
         }
     }

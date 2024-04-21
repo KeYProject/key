@@ -41,8 +41,10 @@ public class StatementKit {
      * a {@link recoder.java.StatementBlock}. If the statement has no parent, it is wrapped into a
      * new statement list which then is returned.
      *
-     * @param s a statement; may not be <CODE>null</CODE>.
-     * @param ch the change history; may be <CODE>null</CODE>.
+     * @param s
+     *        a statement; may not be <CODE>null</CODE>.
+     * @param ch
+     *        the change history; may be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of; the list is contained
      *         in a new StatementBlock if necessary.
      * @see #getStatementMutableList
@@ -59,9 +61,7 @@ public class StatementKit {
             return result;
         }
         ASTList<Statement> result = getStatementMutableList(s);
-        if (result == null) {
-            result = wrapWithStatementBlock(s, ch).getBody();
-        }
+        if (result == null) { result = wrapWithStatementBlock(s, ch).getBody(); }
         return result;
     }
 
@@ -77,21 +77,18 @@ public class StatementKit {
      * list for that labeled statement is returned instead.</LI>
      * </UL>
      *
-     * @param s a statement; may not be <CODE>null</CODE>.
+     * @param s
+     *        a statement; may not be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of, or <CODE>null</CODE>
      *         if there is none.
      */
     public static ASTList<Statement> getStatementMutableList(Statement s) {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
-        if (con == null) {
-            return null;
-        }
+        if (con == null) { return null; }
         Statement body = null;
         if (con instanceof Statement) {
-            if (con instanceof StatementBlock) {
-                return ((StatementBlock) con).getBody();
-            }
+            if (con instanceof StatementBlock) { return ((StatementBlock) con).getBody(); }
             if (con instanceof Branch) {
                 if (con instanceof Then) {
                     body = ((Then) con).getBody();
@@ -104,30 +101,22 @@ public class StatementKit {
                     return ((Default) con).getBody();
                 } else if (con instanceof Catch) {
                     body = ((Catch) con).getBody();
-                } else if (con instanceof Finally) {
-                    body = ((Finally) con).getBody();
-                }
+                } else if (con instanceof Finally) { body = ((Finally) con).getBody(); }
             } else if (con instanceof Try) {
                 body = ((Try) con).getBody();
             } else if (con instanceof SynchronizedBlock) {
                 body = ((SynchronizedBlock) con).getBody();
-            } else if (con instanceof LabeledStatement) {
-                return getStatementMutableList((LabeledStatement) con);
-            }
+            } else if (con instanceof LabeledStatement) { return getStatementMutableList((LabeledStatement) con); }
         } else if (con instanceof MemberDeclaration) {
             if (con instanceof MethodDeclaration) {
                 body = ((MethodDeclaration) con).getBody();
-            } else if (con instanceof ClassInitializer) {
-                body = ((ClassInitializer) con).getBody();
-            }
+            } else if (con instanceof ClassInitializer) { body = ((ClassInitializer) con).getBody(); }
         }
         if (body == null) {
             Debug.assertBoolean(true, "Could not handle container of statement "
-                + Format.toString(Formats.ELEMENT_LONG, s));
+                    + Format.toString(Formats.ELEMENT_LONG, s));
         }
-        if (body instanceof StatementBlock && body != s) {
-            return ((StatementBlock) body).getBody();
-        }
+        if (body instanceof StatementBlock && body != s) { return ((StatementBlock) body).getBody(); }
         return null;
     }
 
@@ -140,8 +129,10 @@ public class StatementKit {
      * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
      * actually referred.
      *
-     * @param s a statement to be wrapped by a new statement block.
-     * @param ch the change history; may be <CODE>null</CODE>.
+     * @param s
+     *        a statement to be wrapped by a new statement block.
+     * @param ch
+     *        the change history; may be <CODE>null</CODE>.
      * @return the new statement block replacing <CODE>s</CODE>.
      * @deprecated
      */
@@ -152,9 +143,7 @@ public class StatementKit {
         StatementBlock block = s.getFactory().createStatementBlock();
         if (con != null) {
             con.replaceChild(s, block);
-            if (ch != null) {
-                ch.replaced(s, block);
-            }
+            if (ch != null) { ch.replaced(s, block); }
         }
         block.setBody(new ASTArrayList<>(1));
         block.getBody().add(s);
@@ -168,8 +157,10 @@ public class StatementKit {
      * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
      * actually referred from outside.
      *
-     * @param xr the cross referencer service used.
-     * @param s a statement that might be wrapped.
+     * @param xr
+     *        the cross referencer service used.
+     * @param s
+     *        a statement that might be wrapped.
      * @return <CODE>true</CODE> if wrapping the statement in a block would not change the program
      *         semantics, <CODE>false</CODE> otherwise.
      * @deprecated
@@ -184,9 +175,7 @@ public class StatementKit {
                 Variable v = vsl.get(j);
                 List<? extends VariableReference> vrl = xr.getReferences(v);
                 for (int i = vrl.size() - 1; i >= 0; i -= 1) {
-                    if (!MiscKit.contains(lvd, vrl.get(i))) {
-                        return false;
-                    }
+                    if (!MiscKit.contains(lvd, vrl.get(i))) { return false; }
                 }
             }
         }
@@ -200,9 +189,12 @@ public class StatementKit {
      * variable initialized by the former return value. If necessary, a new statement block is
      * created wrapping the return or throw statement.
      *
-     * @param ch the change history service (may be <CODE>null</CODE>).
-     * @param si the source info service.
-     * @param returnOrThrow a return or throw statement.
+     * @param ch
+     *        the change history service (may be <CODE>null</CODE>).
+     * @param si
+     *        the source info service.
+     * @param returnOrThrow
+     *        a return or throw statement.
      * @deprecated will become a first class transformation
      */
     @Deprecated
@@ -210,13 +202,9 @@ public class StatementKit {
             ExpressionJumpStatement returnOrThrow) {
         Debug.assertNonnull(si, returnOrThrow);
         List<Statement> destination = prepareStatementMutableList(returnOrThrow, ch);
-        if (returnOrThrow.getExpressionCount() == 0) {
-            return;
-        }
+        if (returnOrThrow.getExpressionCount() == 0) { return; }
         Expression expr = returnOrThrow.getExpressionAt(0);
-        if (!ExpressionKit.containsStatements(expr)) {
-            return;
-        }
+        if (!ExpressionKit.containsStatements(expr)) { return; }
         ProgramFactory f = returnOrThrow.getFactory();
         Type type = si.getType(expr);
         String vname =
@@ -228,9 +216,7 @@ public class StatementKit {
         lvd.makeAllParentRolesValid();
         VariableReference vref = f.createVariableReference(f.createIdentifier(vname));
         returnOrThrow.replaceChild(expr, vref);
-        if (ch != null) {
-            ch.replaced(expr, vref);
-        }
+        if (ch != null) { ch.replaced(expr, vref); }
         StatementContainer destParent = returnOrThrow.getStatementContainer();
         int idx;
         for (idx = 0; destination.get(idx) != returnOrThrow; idx += 1) {
@@ -239,16 +225,16 @@ public class StatementKit {
         destination.add(idx, lvd);
         lvd.setStatementContainer(destParent); // manual parent link validation
         // alternatively: destParent.makeParentRoleValid()
-        if (ch != null) {
-            ch.attached(lvd);
-        }
+        if (ch != null) { ch.attached(lvd); }
     }
 
     /**
      * Checks if the specified statement is reachable as defined in the static language semantics.
      *
-     * @param s a statement.
-     * @param si the SourceInfo service to use.
+     * @param s
+     *        a statement.
+     * @param si
+     *        the SourceInfo service to use.
      * @return <CODE>true</CODE> if the statement is reachable, <CODE>false
      * </CODE> otherwise.
      * @since 0.71
@@ -256,11 +242,7 @@ public class StatementKit {
     public static boolean isReachable(Statement s, SourceInfo si) {
         MemberDeclaration member = MiscKit.getParentMemberDeclaration(s);
         ControlFlowWalker w = new ControlFlowWalker(member, si);
-        while (w.next()) {
-            if (w.getStatement() == s) {
-                return true;
-            }
-        }
+        while (w.next()) { if (w.getStatement() == s) { return true; } }
         return false;
     }
 
@@ -268,17 +250,17 @@ public class StatementKit {
      * Checks if the end of the specified statement block is reachable as defined in the static
      * language semantics.
      *
-     * @param block a statement block.
-     * @param si the SourceInfo service to use.
+     * @param block
+     *        a statement block.
+     * @param si
+     *        the SourceInfo service to use.
      * @return <CODE>true</CODE> if the end of the block is reachable, <CODE>
      * false</CODE> otherwise.
      * @since 0.71
      */
     public static boolean hasReachableEnd(StatementBlock block, SourceInfo si) {
         List<Statement> body = block.getBody();
-        if (body == null || body.isEmpty()) {
-            return true;
-        }
+        if (body == null || body.isEmpty()) { return true; }
         Statement dummyExit = block.getFactory().createEmptyStatement();
         body.add(dummyExit);
         dummyExit.setStatementContainer(block);
@@ -291,7 +273,8 @@ public class StatementKit {
      * Syntactic query locating the label addressed by the specified labeled break or continue
      * statement.
      *
-     * @param s a labeled jump statement.
+     * @param s
+     *        a labeled jump statement.
      * @return the corresponding labeled statement, or <CODE>null</CODE> if there is none.
      * @since 0.71
      */
@@ -301,9 +284,7 @@ public class StatementKit {
         NonTerminalProgramElement parent = s.getASTParent();
         while (parent != null) {
             if (parent instanceof LabeledStatement lstat) {
-                if (idText.equals(lstat.getIdentifier().getText())) {
-                    return lstat;
-                }
+                if (idText.equals(lstat.getIdentifier().getText())) { return lstat; }
             }
             parent = parent.getASTParent();
         }
@@ -315,8 +296,10 @@ public class StatementKit {
      * or throw statements, and the body if its exit is reachable. For other members, returns an
      * empty list.
      *
-     * @param mdecl a member declaration.
-     * @param si the SourceInfo service to use.
+     * @param mdecl
+     *        a member declaration.
+     * @param si
+     *        the SourceInfo service to use.
      * @return a list of statements that finish the member's body after execution.
      * @since 0.72
      */
@@ -326,12 +309,8 @@ public class StatementKit {
         StatementBlock body = null;
         if (mdecl instanceof MethodDeclaration) {
             body = ((MethodDeclaration) mdecl).getBody();
-        } else if (mdecl instanceof ClassInitializer) {
-            body = ((ClassInitializer) mdecl).getBody();
-        }
-        if (body == null) {
-            return new ArrayList<>(0);
-        }
+        } else if (mdecl instanceof ClassInitializer) { body = ((ClassInitializer) mdecl).getBody(); }
+        if (body == null) { return new ArrayList<>(0); }
         Statement dummyExit = body.getFactory().createEmptyStatement();
         int s = (body.getBody() == null) ? 0 : body.getBody().size();
         Transformation.doAttach(dummyExit, body, s);
@@ -340,9 +319,7 @@ public class StatementKit {
             ProgramElement p = w.getProgramElement();
             if (p == dummyExit) {
                 result.add(body);
-            } else if (p instanceof ExpressionJumpStatement) {
-                result.add((Statement) p);
-            }
+            } else if (p instanceof ExpressionJumpStatement) { result.add((Statement) p); }
         }
         Transformation.doDetach(dummyExit);
         return result;
@@ -370,22 +347,16 @@ public class StatementKit {
 
         // either a method declaration or class initializer
         public ControlFlowWalker(MemberDeclaration parent, SourceInfo si) {
-            if (si == null || parent == null) {
-                throw new IllegalArgumentException();
-            }
+            if (si == null || parent == null) { throw new IllegalArgumentException(); }
             this.si = si;
             reached = new HashSet<>();
             stack = new ArrayList<>();
             if (parent instanceof MethodDeclaration) {
                 StatementBlock body = ((MethodDeclaration) parent).getBody();
-                if (body != null) {
-                    stack.add(body);
-                }
+                if (body != null) { stack.add(body); }
             } else if (parent instanceof ClassInitializer) {
                 StatementBlock body = ((ClassInitializer) parent).getBody();
-                if (body != null) {
-                    stack.add(body);
-                }
+                if (body != null) { stack.add(body); }
             }
         }
 
@@ -401,9 +372,7 @@ public class StatementKit {
             stack.remove(size - 1);
             successors = si.getSucceedingStatements(current);
             for (Statement f : successors) {
-                if (f != SourceInfo.METHOD_EXIT && !reached.contains(f)) {
-                    stack.add(f);
-                }
+                if (f != SourceInfo.METHOD_EXIT && !reached.contains(f)) { stack.add(f); }
             }
             return true;
         }

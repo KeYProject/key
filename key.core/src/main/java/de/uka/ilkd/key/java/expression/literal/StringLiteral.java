@@ -24,7 +24,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * String literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
     public StringLiteral(String value) {
         this.value = value;
@@ -33,8 +34,10 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * String literal.
      *
-     * @param children an ExtList with children(here:comments)
-     * @param value a string.
+     * @param children
+     *        an ExtList with children(here:comments)
+     * @param value
+     *        a string.
      */
     public StringLiteral(ExtList children, String value) {
         super(children);
@@ -43,9 +46,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
 
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof StringLiteral)) {
-            return false;
-        }
+        if (!(o instanceof StringLiteral)) { return false; }
         return ((StringLiteral) o).getValue().equals(getValue());
     }
 
@@ -62,7 +63,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnStringLiteral(this);

@@ -100,7 +100,7 @@ public class TestTacletTranslator {
             // second case first. no replace means const1=const1
 
             "  ((const1 = const1 -> (!psi))" + " & (const1 = const2 -> (add_left -> add_right))) "
-                + " -> (assume_left -> assume_right)");
+                    + " -> (assume_left -> assume_right)");
     }
 
     @Test
@@ -120,7 +120,7 @@ public class TestTacletTranslator {
             // last case first.
 
             "  (psi" + " & !tau " + " & (!psi | (add_left -> add_right))) "
-                + " -> (!phi | (assume_left -> assume_right))");
+                    + " -> (!phi | (assume_left -> assume_right))");
     }
 
     @Test

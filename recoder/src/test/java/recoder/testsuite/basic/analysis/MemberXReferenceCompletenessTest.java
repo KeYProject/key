@@ -35,9 +35,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                 for (MemberReference memberReference : list) {
                     MethodReference r = (MethodReference) memberReference;
                     Method y = xrsi.getMethod(r);
-                    if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
-                    }
+                    if (x != y) { Assert.fail(makeResolutionError(r, x, y)); }
                 }
             }
 
@@ -46,9 +44,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                 List<ConstructorReference> list = xrsi.getReferences(x);
                 for (ConstructorReference r : list) {
                     Constructor y = xrsi.getConstructor(r);
-                    if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
-                    }
+                    if (x != y) { Assert.fail(makeResolutionError(r, x, y)); }
                 }
             }
 
@@ -57,9 +53,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                 List<FieldReference> list = xrsi.getReferences(x);
                 for (FieldReference r : list) {
                     Field y = xrsi.getField(r);
-                    if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
-                    }
+                    if (x != y) { Assert.fail(makeResolutionError(r, x, y)); }
                 }
             }
         }

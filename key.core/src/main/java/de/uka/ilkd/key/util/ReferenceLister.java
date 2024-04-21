@@ -77,9 +77,7 @@ public class ReferenceLister {
     }
 
     private static void readFile(File file) throws ParserException, IOException {
-        if (!file.getName().toLowerCase().endsWith(".java")) {
-            return;
-        }
+        if (!file.getName().toLowerCase().endsWith(".java")) { return; }
 
         LOGGER.warn("Parsing: {}", file);
 

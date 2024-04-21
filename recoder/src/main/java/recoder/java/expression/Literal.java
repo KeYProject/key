@@ -32,7 +32,8 @@ public abstract class Literal extends JavaProgramElement
     /**
      * Literal.
      *
-     * @param proto a literal.
+     * @param proto
+     *        a literal.
      */
 
     protected Literal(Literal proto) {
@@ -62,7 +63,8 @@ public abstract class Literal extends JavaProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {

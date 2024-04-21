@@ -45,7 +45,8 @@ public interface DataLocation {
      * returns an input stream for the content of the location
      *
      * @return the according input stream
-     * @throws IOException thrown if an error occurs with retrieving the input stream from the
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the input stream from the
      *         according data object.
      */
     InputStream getInputStream() throws IOException;
@@ -60,7 +61,8 @@ public interface DataLocation {
      * reader, an adapter reader is placed on top of an input stream.
      *
      * @return the according reader
-     * @throws IOException thrown if an error occurs with retrieving the reader or the underlying
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the reader or the underlying
      *         input stream from the according data object.
      */
     Reader getReader() throws IOException;
@@ -89,7 +91,8 @@ public interface DataLocation {
      * returns an output stream for manipulating the content of the location
      *
      * @return the according output stream
-     * @throws IOException thrown if an error occurs with retrieving the output stream from the
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the output stream from the
      *         according data object.
      */
     OutputStream getOutputStream() throws IOException;
@@ -104,7 +107,8 @@ public interface DataLocation {
      * writer, an adapter reader is placed on top of an output stream.
      *
      * @return the according writer
-     * @throws IOException thrown if an error occurs with retrieving the writer or the underlying
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the writer or the underlying
      *         output stream from the according data object.
      */
     Writer getWriter() throws IOException;

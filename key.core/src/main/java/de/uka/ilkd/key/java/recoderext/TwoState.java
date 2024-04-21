@@ -11,8 +11,7 @@ public class TwoState extends Modifier {
 
     private static final long serialVersionUID = 1408979308814683681L;
 
-    public TwoState() {
-    }
+    public TwoState() {}
 
     protected TwoState(TwoState proto) {
         super(proto);
@@ -22,7 +21,6 @@ public class TwoState extends Modifier {
         return new TwoState(this);
     }
 
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
 }

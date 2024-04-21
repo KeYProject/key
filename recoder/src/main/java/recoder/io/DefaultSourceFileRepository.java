@@ -61,7 +61,8 @@ public class DefaultSourceFileRepository extends AbstractService
     private File outputPath;
 
     /**
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultSourceFileRepository(ServiceConfiguration config) {
         super(config);
@@ -114,9 +115,7 @@ public class DefaultSourceFileRepository extends AbstractService
             if (location2cu.get(loc) == cu) {
                 location2cu.remove(loc);
                 changedUnits.remove(cu); // no need to write it back
-                if (DEBUG) {
-                    Debug.log("Deregistering " + loc);
-                }
+                if (DEBUG) { Debug.log("Deregistering " + loc); }
                 DataLocation orig = cu.getOriginalDataLocation();
                 if (!loc.equals(orig)) {
                     // remove it except when from original location
@@ -135,9 +134,7 @@ public class DefaultSourceFileRepository extends AbstractService
             cu.setDataLocation(loc);
         }
         if (location2cu.get(loc) != cu) {
-            if (DEBUG) {
-                Debug.log("Registering " + loc);
-            }
+            if (DEBUG) { Debug.log("Registering " + loc); }
             deleteUnits.remove(loc);
             location2cu.put(loc, cu);
         }
@@ -146,12 +143,8 @@ public class DefaultSourceFileRepository extends AbstractService
     // check if the given program element can influence on the canonical
     // name of the compilation unit
     private boolean isPartOfUnitName(ProgramElement pe) {
-        if (pe instanceof Identifier || pe instanceof PackageReference) {
-            return isPartOfUnitName(pe.getASTParent());
-        }
-        if (pe instanceof PackageSpecification) {
-            return true;
-        }
+        if (pe instanceof Identifier || pe instanceof PackageReference) { return isPartOfUnitName(pe.getASTParent()); }
+        if (pe instanceof PackageSpecification) { return true; }
         if (pe instanceof TypeDeclaration) {
             NonTerminalProgramElement parent = pe.getASTParent();
             return (parent instanceof CompilationUnit)
@@ -170,9 +163,7 @@ public class DefaultSourceFileRepository extends AbstractService
             if (pe == cu) {
                 if (tc instanceof AttachChange) {
                     register(cu);
-                } else if (tc instanceof DetachChange) {
-                    deregister(cu);
-                }
+                } else if (tc instanceof DetachChange) { deregister(cu); }
             } else {
                 if (isPartOfUnitName(pe)) {
                     // re-register under new location
@@ -186,16 +177,15 @@ public class DefaultSourceFileRepository extends AbstractService
                 }
                 changedUnits.add(cu);
             }
-            if (cu == null) {
-                Debug.log("Null Unit changed in " + tc);
-            }
+            if (cu == null) { Debug.log("Null Unit changed in " + tc); }
         }
     }
 
     /**
      * Searches for the location of the source file for the given class.
      *
-     * @param classname the name of the class for which the source file should be looked up.
+     * @param classname
+     *        the name of the class for which the source file should be looked up.
      */
     public DataLocation findSourceFile(String classname) {
         // possible optimzation: cache it !!!
@@ -207,9 +197,7 @@ public class DefaultSourceFileRepository extends AbstractService
             throws ParserException {
         Debug.assertNonnull(loc, "Null location for compilation unit");
         CompilationUnit result = location2cu.get(loc);
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
         // ok - lets parse the sources
         try {
             Reader in;
@@ -260,9 +248,7 @@ public class DefaultSourceFileRepository extends AbstractService
             listeners.fireProgressEvent(i,
                 "Parsing " + filenames[i]);
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
-            if (cu != null) {
-                res.add(cu);
-            }
+            if (cu != null) { res.add(cu); }
         }
         listeners.fireProgressEvent(filenames.length);
         return res;
@@ -270,9 +256,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public CompilationUnit getCompilationUnit(String classname) {
         DataLocation loc = findSourceFile(classname);
-        if (loc == null || loc instanceof ArchiveDataLocation) {
-            return null;
-        }
+        if (loc == null || loc instanceof ArchiveDataLocation) { return null; }
         try {
             return getCompilationUnitFromLocation(loc);
         } catch (ParserException pe) {
@@ -289,9 +273,7 @@ public class DefaultSourceFileRepository extends AbstractService
     public List<CompilationUnit> getKnownCompilationUnits() {
         int n = location2cu.size();
         List<CompilationUnit> res = new ArrayList<>(n);
-        for (CompilationUnit cu : location2cu.values()) {
-            res.add(cu);
-        }
+        for (CompilationUnit cu : location2cu.values()) { res.add(cu); }
         return res;
     }
 
@@ -315,9 +297,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public boolean isUpToDate(CompilationUnit cu) {
         Debug.assertNonnull(cu);
-        if (cu.getDataLocation() == null) {
-            return false;
-        }
+        if (cu.getDataLocation() == null) { return false; }
         return !changedUnits.contains(cu);
     }
 
@@ -332,22 +312,16 @@ public class DefaultSourceFileRepository extends AbstractService
         DataLocation location = cu.getDataLocation();
         // create output path name
         if (location == null || cu.getOriginalDataLocation() == location) {
-            if (location != null) {
-                location2cu.remove(location);
-            }
+            if (location != null) { location2cu.remove(location); }
             location = createDataLocation(cu);
             cu.setDataLocation(location);
             location2cu.put(location, cu);
         }
-        if (!location.isWritable()) {
-            throw new IOException("Data location for " + location + " is not writable");
-        }
+        if (!location.isWritable()) { throw new IOException("Data location for " + location + " is not writable"); }
         if (location instanceof DataFileLocation) {
             File f = ((DataFileLocation) location).getFile();
             File parent = new File(f.getParent());
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
+            if (!parent.exists()) { parent.mkdirs(); }
         }
         Writer w = location.getWriter();
         PrettyPrinter pprinter = serviceConfiguration.getProgramFactory().getPrettyPrinter(w);
@@ -369,16 +343,10 @@ public class DefaultSourceFileRepository extends AbstractService
         listeners.fireProgressEvent(0, size, "Exporting Source Files");
         CompilationUnit[] units = new CompilationUnit[size];
         int j = 0;
-        for (CompilationUnit cu : always ? location2cu.values() : changedUnits) {
-            units[j++] = cu;
-        }
-        if (DEBUG) {
-            Debug.log("printing...");
-        }
+        for (CompilationUnit cu : always ? location2cu.values() : changedUnits) { units[j++] = cu; }
+        if (DEBUG) { Debug.log("printing..."); }
         for (int i = 0; i < size; i += 1) {
-            if (DEBUG) {
-                Debug.log("units[i].getName()");
-            }
+            if (DEBUG) { Debug.log("units[i].getName()"); }
             printUnit(units[i]);
             listeners.fireProgressEvent(i + 1, units[i]);
         }
@@ -402,7 +370,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public String information() {
         return "" + location2cu.size() + " compilation units (" + changedUnits.size()
-            + " currently changed)";
+                + " currently changed)";
     }
 
 }

@@ -26,7 +26,8 @@ public class ModelException extends RuntimeException {
     /**
      * Model exception.
      *
-     * @param s a string.
+     * @param s
+     *        a string.
      */
     public ModelException(String s) {
         super(s);

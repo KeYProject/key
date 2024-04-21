@@ -23,7 +23,8 @@ import de.uka.ilkd.key.logic.TermServices;
  * Please see information in {@link TermLabel}s on how to introduce new label types.
  * </p>
  *
- * @param <T> the type of term labels which are returned by this factory.
+ * @param <T>
+ *        the type of term labels which are returned by this factory.
  *
  * @see SingletonLabelFactory
  * @author Mattias Ulbrich
@@ -37,12 +38,15 @@ public interface TermLabelFactory<T extends TermLabel> {
      * An implementation should throw a {@link TermLabelException} if the arguments cannot be parsed
      * correctly for this type.
      *
-     * @param arguments the arguments for parsing, not <code>null</code>, no entry <code>null</code>
-     * @param services a non-<code>null</code> services object to look up symbols.
+     * @param arguments
+     *        the arguments for parsing, not <code>null</code>, no entry <code>null</code>
+     * @param services
+     *        a non-<code>null</code> services object to look up symbols.
      *
      * @return the according term label with the given arguments, not <code>null</code>
      *
-     * @throws TermLabelException if the parameters were illegally formatted
+     * @throws TermLabelException
+     *         if the parameters were illegally formatted
      */
     T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
 }

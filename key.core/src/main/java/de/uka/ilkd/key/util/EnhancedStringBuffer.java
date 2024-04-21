@@ -116,13 +116,9 @@ public class EnhancedStringBuffer {
         EnhancedStringBuffer res = new EnhancedStringBuffer();
         for (int i = tmp.length() - 1; i >= 0; i--) {
             res.prepend(tmp.charAt(i));
-            if ((tmp.length() - 1 - i) % 3 == 2) {
-                res.prepend(',');
-            }
+            if ((tmp.length() - 1 - i) % 3 == 2) { res.prepend(','); }
         }
-        if (res.length() > 0 && res.charAt(0) == ',') {
-            res.deleteCharAt(0);
-        }
+        if (res.length() > 0 && res.charAt(0) == ',') { res.deleteCharAt(0); }
         return res;
     }
 

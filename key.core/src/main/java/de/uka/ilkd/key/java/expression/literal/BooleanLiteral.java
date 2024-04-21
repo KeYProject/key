@@ -32,7 +32,8 @@ public class BooleanLiteral extends Literal {
      * get boolean literal for the given <code>value</code>. This supports use of single literals,
      * but we do not force it.
      *
-     * @param val a boolean specifying the literal to be returned
+     * @param val
+     *        a boolean specifying the literal to be returned
      * @return the BooleanLiteral representing <tt>val</tt>
      */
     public static BooleanLiteral getBooleanLiteral(boolean val) {
@@ -42,7 +43,8 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param value a boolean value.
+     * @param value
+     *        a boolean value.
      */
 
     private BooleanLiteral(boolean value) {
@@ -52,8 +54,10 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param children list with all children May contain: Comments
-     * @param value a boolean value.
+     * @param children
+     *        list with all children May contain: Comments
+     * @param value
+     *        a boolean value.
      */
     public BooleanLiteral(ExtList children, boolean value) {
         super(children);
@@ -63,9 +67,12 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param children list with all children
-     * @param pos The source code position.
-     * @param value a boolean value.
+     * @param children
+     *        list with all children
+     * @param pos
+     *        The source code position.
+     * @param value
+     *        a boolean value.
      */
     public BooleanLiteral(ExtList children, PositionInfo pos, boolean value) {
         super(children, pos);
@@ -75,8 +82,10 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param pos The source code position.
-     * @param value a boolean value.
+     * @param pos
+     *        The source code position.
+     * @param value
+     *        a boolean value.
      */
     public BooleanLiteral(PositionInfo pos, boolean value) {
         super(pos);
@@ -107,9 +116,7 @@ public class BooleanLiteral extends Literal {
      * tests if equals
      */
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof BooleanLiteral)) {
-            return false;
-        }
+        if (!(o instanceof BooleanLiteral)) { return false; }
         return ((BooleanLiteral) o).getValue() == getValue();
     }
 
@@ -127,7 +134,8 @@ public class BooleanLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnBooleanLiteral(this);

@@ -31,7 +31,8 @@ public class StrictFp extends Modifier {
     /**
      * Strict fp.
      *
-     * @param proto a strict fp.
+     * @param proto
+     *        a strict fp.
      */
 
     protected StrictFp(StrictFp proto) {

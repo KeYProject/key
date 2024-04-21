@@ -46,7 +46,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Throws.
      *
-     * @param exception a type reference.
+     * @param exception
+     *        a type reference.
      */
 
     public Throws(TypeReference exception) {
@@ -58,7 +59,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Throws.
      *
-     * @param list a type reference mutable list.
+     * @param list
+     *        a type reference mutable list.
      */
 
     public Throws(ASTList<TypeReference> list) {
@@ -69,14 +71,13 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Throws.
      *
-     * @param proto a throws.
+     * @param proto
+     *        a throws.
      */
 
     protected Throws(Throws proto) {
         super(proto);
-        if (proto.exceptions != null) {
-            exceptions = proto.exceptions.deepClone();
-        }
+        if (proto.exceptions != null) { exceptions = proto.exceptions.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -97,16 +98,12 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (exceptions != null) {
-            for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
-                exceptions.get(i).setParent(this);
-            }
+            for (int i = exceptions.size() - 1; i >= 0; i -= 1) { exceptions.get(i).setParent(this); }
         }
     }
 
     public SourceElement getLastElement() {
-        if (exceptions == null) {
-            return this;
-        }
+        if (exceptions == null) { return this; }
         return exceptions.get(exceptions.size() - 1);
     }
 
@@ -128,24 +125,22 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null) {
-            result += exceptions.size();
-        }
+        if (exceptions != null) { result += exceptions.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
+        if (exceptions != null) { return exceptions.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -153,9 +148,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
         // role 0 (IDX): type references
         if (exceptions != null) {
             int index = exceptions.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }
@@ -166,16 +159,17 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (exceptions == null) ? 0 : exceptions.size();
         for (int i = 0; i < count; i++) {
@@ -207,7 +201,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Set parent.
      *
-     * @param decl a method declaration.
+     * @param decl
+     *        a method declaration.
      */
 
     public void setParent(MethodDeclaration decl) {
@@ -227,7 +222,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Set exceptions.
      *
-     * @param list a type reference mutable list.
+     * @param list
+     *        a type reference mutable list.
      */
 
     public void setExceptions(ASTList<TypeReference> list) {
@@ -251,9 +247,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
+        if (exceptions != null) { return exceptions.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 

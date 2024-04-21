@@ -33,8 +33,10 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * creates a new location object.
      *
-     * @param archive the file that contains the archive
-     * @param itemname the name of the item within the archive
+     * @param archive
+     *        the file that contains the archive
+     * @param itemname
+     *        the name of the item within the archive
      */
     public ArchiveDataLocation(ZipFile archive, String itemname) {
         archiveFile = archive;
@@ -44,8 +46,10 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * creates a new location object.
      *
-     * @param archivename the name of the archive file
-     * @param itemname the name of the item within the archive
+     * @param archivename
+     *        the name of the archive file
+     * @param itemname
+     *        the name of the item within the archive
      */
     public ArchiveDataLocation(String archivename, String itemname) throws IOException {
         this(new ZipFile(archivename), itemname);
@@ -95,7 +99,8 @@ public class ArchiveDataLocation implements DataLocation {
      * returns an input stream that can be used to read the archive entry content.
      *
      * @return the input stream for reading the data
-     * @throws IOException if the stream cannot be created
+     * @throws IOException
+     *         if the stream cannot be created
      */
     public InputStream getInputStream() throws IOException {
         InputStream result = null;
@@ -116,7 +121,8 @@ public class ArchiveDataLocation implements DataLocation {
      * stream.
      *
      * @return the according reader
-     * @throws IOException thrown if an error occurs with retrieving the reader or the underlying
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the reader or the underlying
      *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
@@ -181,9 +187,7 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     public boolean equals(Object ob) {
-        if (ob instanceof ArchiveDataLocation) {
-            return archiveFile.equals(((ArchiveDataLocation) ob).archiveFile);
-        }
+        if (ob instanceof ArchiveDataLocation) { return archiveFile.equals(((ArchiveDataLocation) ob).archiveFile); }
         return false;
     }
 

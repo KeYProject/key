@@ -63,8 +63,10 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * <code>&lt;created&gt;</code>, <code>&lt;initialized&gt;</code> and
      * <code>&lt;nextToCreate&gt;</code> etc.
      *
-     * @param services the CrossReferenceServiceConfiguration to access model information
-     * @param cache a cache object that stores information which is needed by and common to many
+     * @param services
+     *        the CrossReferenceServiceConfiguration to access model information
+     * @param cache
+     *        a cache object that stores information which is needed by and common to many
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
@@ -75,9 +77,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     /**
      * creates an implicit field of the given type and name
      *
-     * @param typeName the name of the type of the new field to create
-     * @param fieldName the name of the field
-     * @param isStatic a boolean that is true if the field has to be created as static (class) field
+     * @param typeName
+     *        the name of the type of the new field to create
+     * @param fieldName
+     *        the name of the field
+     * @param isStatic
+     *        a boolean that is true if the field has to be created as static (class) field
      * @return the new created field declaration
      */
     public static FieldDeclaration createImplicitRecoderField(String typeName, String fieldName,
@@ -91,18 +96,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         final int modCount = 1 + (isStatic ? 1 : 0) + (isFinal ? 1 : 0);
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(modCount);
 
-        if (isStatic) {
-            modifiers.add(new Static());
-        }
+        if (isStatic) { modifiers.add(new Static()); }
         if (isPrivate) {
             modifiers.add(new Private());
         } else {
             modifiers.add(new Public());
         }
 
-        if (isFinal) {
-            modifiers.add(new Final());
-        }
+        if (isFinal) { modifiers.add(new Final()); }
 
         int idx = typeName.indexOf('[');
         final String baseType = (idx == -1 ? typeName : typeName.substring(0, idx));
@@ -138,7 +139,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     /**
      * adds implicit fields to the given type declaration
      *
-     * @param td the recoder.java.TypeDeclaration to be enriched with implicit fields
+     * @param td
+     *        the recoder.java.TypeDeclaration to be enriched with implicit fields
      */
     private void addImplicitRecoderFields(recoder.java.declaration.TypeDeclaration td) {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
@@ -190,9 +192,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
                 i++;
             }
 
-            for (final FieldDeclaration fd : newFields) {
-                attach(fd, td, 0);
-            }
+            for (final FieldDeclaration fd : newFields) { attach(fd, td, 0); }
         }
     }
 

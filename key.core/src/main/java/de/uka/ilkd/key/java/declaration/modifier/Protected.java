@@ -22,7 +22,8 @@ public class Protected extends VisibilityModifier {
     /**
      * Protected.
      *
-     * @param children list of children. May contain: Comments
+     * @param children
+     *        list of children. May contain: Comments
      */
 
     public Protected(ExtList children) {
@@ -42,18 +43,10 @@ public class Protected extends VisibilityModifier {
 
     @Override
     public int compareTo(VisibilityModifier arg0) {
-        if (arg0 instanceof Private) {
-            return -2;
-        }
-        if (arg0 == null) {
-            return -1;
-        }
-        if (arg0 instanceof Protected) {
-            return 0;
-        }
-        if (arg0 instanceof Public) {
-            return 1;
-        }
+        if (arg0 instanceof Private) { return -2; }
+        if (arg0 == null) { return -1; }
+        if (arg0 instanceof Protected) { return 0; }
+        if (arg0 instanceof Public) { return 1; }
         assert false;
         return 0;
     }

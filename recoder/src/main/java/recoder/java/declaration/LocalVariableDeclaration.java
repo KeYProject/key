@@ -48,8 +48,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param typeRef a type reference.
-     * @param name an identifier.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
      */
 
     public LocalVariableDeclaration(TypeReference typeRef, Identifier name) {
@@ -63,9 +65,12 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param vars a variable specification mutable list.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param vars
+     *        a variable specification mutable list.
      */
 
     public LocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
@@ -79,10 +84,14 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param name an identifier.
-     * @param init an expression.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param init
+     *        an expression.
      */
 
     public LocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
@@ -98,14 +107,13 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param proto a local variable declaration.
+     * @param proto
+     *        a local variable declaration.
      */
 
     protected LocalVariableDeclaration(LocalVariableDeclaration proto) {
         super(proto);
-        if (proto.varSpecs != null) {
-            varSpecs = proto.varSpecs.deepClone();
-        }
+        if (proto.varSpecs != null) { varSpecs = proto.varSpecs.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -125,11 +133,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (varSpecs != null) {
-            for (int i = varSpecs.size() - 1; i >= 0; i -= 1) {
-                varSpecs.get(i).setParent(this);
-            }
-        }
+        if (varSpecs != null) { for (int i = varSpecs.size() - 1; i >= 0; i -= 1) { varSpecs.get(i).setParent(this); } }
     }
 
     public ASTList<VariableSpecification> getVariableSpecifications() {
@@ -152,44 +156,34 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (varSpecs != null) {
-            result += varSpecs.size();
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (typeReference != null) { result++; }
+        if (varSpecs != null) { result += varSpecs.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (varSpecs != null) {
-            return varSpecs.get(index);
-        }
+        if (varSpecs != null) { return varSpecs.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -199,18 +193,12 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
         // role 2 (IDX): var specs
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
+        if (typeReference == child) { return 1; }
         if (varSpecs != null) {
             int index = varSpecs.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+            if (index >= 0) { return (index << 4) | 2; }
         }
         return -1;
     }
@@ -221,16 +209,17 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -248,9 +237,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
 
@@ -293,7 +280,8 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

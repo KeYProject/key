@@ -48,11 +48,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
      * return true if op binds in at least one argument.
      */
     private static boolean bindsVars(Operator op) {
-        for (int i = 0; i < op.arity(); i++) {
-            if (op.bindVarsAt(i)) {
-                return true;
-            }
-        }
+        for (int i = 0; i < op.arity(); i++) { if (op.bindVarsAt(i)) { return true; } }
         return false;
     }
 

@@ -31,7 +31,8 @@ public class Final extends Modifier {
     /**
      * Final.
      *
-     * @param proto a final.
+     * @param proto
+     *        a final.
      */
 
     protected Final(Final proto) {

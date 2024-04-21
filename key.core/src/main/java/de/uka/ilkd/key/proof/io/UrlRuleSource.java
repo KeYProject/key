@@ -34,8 +34,7 @@ public class UrlRuleSource extends RuleSource {
             final InputStream input = url.openStream();
             long localNumberOfBytes = 0;
             for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
-                input.read()) {
-            }
+                input.read()) {}
             input.close();
             return localNumberOfBytes;
         } catch (final IOException exception) {

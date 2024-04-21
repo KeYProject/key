@@ -32,8 +32,10 @@ public class Times extends Operator {
     /**
      * Times.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Times(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class Times extends Operator {
     /**
      * Times.
      *
-     * @param proto a times.
+     * @param proto
+     *        a times.
      */
 
     protected Times(Times proto) {

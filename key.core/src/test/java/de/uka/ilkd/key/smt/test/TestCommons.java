@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TestCommons {
     protected static final String folder =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-            + File.separator + "tacletTranslation" + File.separator;
+                + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */
@@ -87,7 +87,8 @@ public abstract class TestCommons {
     /**
      * check a problem file
      *
-     * @param filepath the path to the file
+     * @param filepath
+     *        the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
@@ -124,12 +125,8 @@ public abstract class TestCommons {
      */
     protected Collection<Taclet> getTaclets() {
         if (taclets.isEmpty()) {
-            if (initConfig == null) {
-                parse();
-            }
-            for (Taclet t : initConfig.getTaclets()) {
-                taclets.add(t);
-            }
+            if (initConfig == null) { parse(); }
+            for (Taclet t : initConfig.getTaclets()) { taclets.add(t); }
         }
         return taclets;
     }
@@ -137,9 +134,7 @@ public abstract class TestCommons {
     protected HashSet<String> getTacletNames() {
         Collection<Taclet> set = getTaclets();
         HashSet<String> names = new HashSet<>();
-        for (Taclet taclet : set) {
-            names.add(taclet.name().toString());
-        }
+        for (Taclet taclet : set) { names.add(taclet.name().toString()); }
         return names;
     }
 
@@ -160,8 +155,10 @@ public abstract class TestCommons {
     /**
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
-     * @param file problem file.
-     * @param pro determines the profile that should be used.
+     * @param file
+     *        problem file.
+     * @param pro
+     *        determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      * @profile determines the profile that should be used.
      */
@@ -170,9 +167,7 @@ public abstract class TestCommons {
         ProofAggregate result = null;
         try {
             KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
-            if (initializer == null) {
-                initializer = new ProblemInitializer(po.getProfile());
-            }
+            if (initializer == null) { initializer = new ProblemInitializer(po.getProfile()); }
             initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);
             services = initConfig.getServices();

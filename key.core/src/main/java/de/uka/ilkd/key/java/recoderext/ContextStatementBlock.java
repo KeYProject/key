@@ -23,8 +23,7 @@ public class ContextStatementBlock extends StatementBlock implements KeYRecoderE
     /**
      * Statement block.
      */
-    public ContextStatementBlock() {
-    }
+    public ContextStatementBlock() {}
 
     /**
      * Statement block.
@@ -44,7 +43,8 @@ public class ContextStatementBlock extends StatementBlock implements KeYRecoderE
     /**
      * Statement block.
      *
-     * @param proto a statement block.
+     * @param proto
+     *        a statement block.
      */
 
     protected ContextStatementBlock(ContextStatementBlock proto) {

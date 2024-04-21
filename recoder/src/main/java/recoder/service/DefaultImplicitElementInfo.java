@@ -36,7 +36,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     private List<ClassType> enumValueOfExceptions = null;
 
     /**
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultImplicitElementInfo(ServiceConfiguration config) {
         super(config);
@@ -55,9 +56,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public List<ImplicitEnumMethod> getImplicitEnumMethods(EnumDeclaration etd) {
-        if (etd == null) {
-            throw new NullPointerException();
-        }
+        if (etd == null) { throw new NullPointerException(); }
         updateModel();
         List<ImplicitEnumMethod> res = type2implicitEnumMethods.get(etd);
         if (res == null) {
@@ -86,9 +85,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public Package getPackage(ProgramModelElement pme) {
-        if (pme instanceof Package) {
-            return (Package) pme;
-        }
+        if (pme instanceof Package) { return (Package) pme; }
         if (pme instanceof DefaultConstructor || pme instanceof ImplicitEnumMethod) {
             updateModel();
             return getContainingClassType((Method) pme).getPackage();
@@ -97,12 +94,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public List<? extends ClassType> getTypes(ClassTypeContainer ctc) {
-        if (ctc instanceof Package) {
-            return serviceConfiguration.getNameInfo().getTypes((Package) ctc);
-        }
-        if (ctc instanceof DefaultConstructor) {
-            return new ArrayList<>(0);
-        }
+        if (ctc instanceof Package) { return serviceConfiguration.getNameInfo().getTypes((Package) ctc); }
+        if (ctc instanceof DefaultConstructor) { return new ArrayList<>(0); }
         return null;
     }
 
@@ -119,9 +112,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public List<ClassType> getSupertypes(ClassType ct) {
-        if (ct instanceof IntersectionType) {
-            return ct.getSupertypes();
-        }
+        if (ct instanceof IntersectionType) { return ct.getSupertypes(); }
         // valid for NullType
         return null;
     }
@@ -133,9 +124,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
             result.add(ct);
             return result;
         }
-        if (ct instanceof IntersectionType) {
-            return super.getAllSubtypes(ct);
-        }
+        if (ct instanceof IntersectionType) { return super.getAllSubtypes(ct); }
         return null;
     }
 
@@ -147,9 +136,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Field> getAllFields(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType) {
-            return super.getAllFields(ct);
-        }
+        if (ct instanceof IntersectionType) { return super.getAllFields(ct); }
         return null;
     }
 
@@ -161,9 +148,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Method> getAllMethods(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType) {
-            return super.getAllMethods(ct);
-        }
+        if (ct instanceof IntersectionType) { return super.getAllMethods(ct); }
         return null;
     }
 
@@ -180,9 +165,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public ClassType getContainingClassType(Member m) {
-        if (m instanceof DefaultConstructor || m instanceof ImplicitEnumMethod) {
-            return m.getContainingClassType();
-        }
+        if (m instanceof DefaultConstructor || m instanceof ImplicitEnumMethod) { return m.getContainingClassType(); }
         return null;
     }
 

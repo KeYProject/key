@@ -48,8 +48,10 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenStatement a statement.
+     * @param e
+     *        an expression.
+     * @param thenStatement
+     *        a statement.
      */
 
     public If(Expression e, Statement thenStatement) {
@@ -59,8 +61,10 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenBranch a then.
+     * @param e
+     *        an expression.
+     * @param thenBranch
+     *        a then.
      */
 
     public If(Expression e, Then thenBranch) {
@@ -70,15 +74,16 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenBranch a then.
-     * @param elseBranch an else.
+     * @param e
+     *        an expression.
+     * @param thenBranch
+     *        a then.
+     * @param elseBranch
+     *        an else.
      */
 
     public If(Expression e, Then thenBranch, Else elseBranch) {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        if (e == null) { throw new NullPointerException(); }
         expression = e;
         setThen(thenBranch);
         setElse(elseBranch);
@@ -88,40 +93,34 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * If.
      *
-     * @param e an expression.
-     * @param thenStatement a statement.
-     * @param elseStatement a statement.
+     * @param e
+     *        an expression.
+     * @param thenStatement
+     *        a statement.
+     * @param elseStatement
+     *        a statement.
      */
 
     public If(Expression e, Statement thenStatement, Statement elseStatement) {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        if (e == null) { throw new NullPointerException(); }
         expression = e;
         setThen(getFactory().createThen(thenStatement));
-        if (elseStatement != null) {
-            setElse(getFactory().createElse(elseStatement));
-        }
+        if (elseStatement != null) { setElse(getFactory().createElse(elseStatement)); }
         makeParentRoleValid();
     }
 
     /**
      * If.
      *
-     * @param proto an if.
+     * @param proto
+     *        an if.
      */
 
     protected If(If proto) {
         super(proto);
-        if (proto.thenBranch != null) {
-            thenBranch = proto.thenBranch.deepClone();
-        }
-        if (proto.elseBranch != null) {
-            elseBranch = proto.elseBranch.deepClone();
-        }
-        if (proto.expression != null) {
-            expression = proto.expression.deepClone();
-        }
+        if (proto.thenBranch != null) { thenBranch = proto.thenBranch.deepClone(); }
+        if (proto.elseBranch != null) { elseBranch = proto.elseBranch.deepClone(); }
+        if (proto.expression != null) { expression = proto.expression.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -147,44 +146,32 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (thenBranch != null) {
-            result++;
-        }
-        if (elseBranch != null) {
-            result++;
-        }
+        if (expression != null) { result++; }
+        if (thenBranch != null) { result++; }
+        if (elseBranch != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
         if (thenBranch != null) {
-            if (index == 0) {
-                return thenBranch;
-            }
+            if (index == 0) { return thenBranch; }
             index--;
         }
-        if (elseBranch != null) {
-            if (index == 0) {
-                return elseBranch;
-            }
-        }
+        if (elseBranch != null) { if (index == 0) { return elseBranch; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -192,15 +179,9 @@ public class If extends BranchStatement implements ExpressionContainer {
         // role 0: expression
         // role 1: then
         // role 2: else
-        if (expression == child) {
-            return 0;
-        }
-        if (thenBranch == child) {
-            return 1;
-        }
-        if (elseBranch == child) {
-            return 2;
-        }
+        if (expression == child) { return 0; }
+        if (thenBranch == child) { return 1; }
+        if (elseBranch == child) { return 2; }
         return -1;
     }
 
@@ -210,15 +191,9 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (expression != null) {
-            expression.setExpressionContainer(this);
-        }
-        if (thenBranch != null) {
-            thenBranch.setParent(this);
-        }
-        if (elseBranch != null) {
-            elseBranch.setParent(this);
-        }
+        if (expression != null) { expression.setExpressionContainer(this); }
+        if (thenBranch != null) { thenBranch.setParent(this); }
+        if (elseBranch != null) { elseBranch.setParent(this); }
     }
 
     /**
@@ -227,38 +202,33 @@ public class If extends BranchStatement implements ExpressionContainer {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (expression == p) {
             Expression r = (Expression) q;
             expression = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         if (thenBranch == p) {
             Then r = (Then) q;
             thenBranch = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (elseBranch == p) {
             Else r = (Else) q;
             elseBranch = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;
@@ -281,9 +251,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -300,7 +268,8 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * Set expression.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public void setExpression(Expression expr) {
@@ -320,7 +289,8 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * Set then.
      *
-     * @param thenBranch a then.
+     * @param thenBranch
+     *        a then.
      */
 
     public void setThen(Then thenBranch) {
@@ -340,7 +310,8 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * Set else.
      *
-     * @param elseBranch an else.
+     * @param elseBranch
+     *        an else.
      */
 
     public void setElse(Else elseBranch) {
@@ -355,12 +326,8 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     public int getBranchCount() {
         int result = 0;
-        if (thenBranch != null) {
-            result += 1;
-        }
-        if (elseBranch != null) {
-            result += 1;
-        }
+        if (thenBranch != null) { result += 1; }
+        if (elseBranch != null) { result += 1; }
         return result;
     }
 
@@ -372,16 +339,10 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     public Branch getBranchAt(int index) {
         if (thenBranch != null) {
-            if (index == 0) {
-                return thenBranch;
-            }
+            if (index == 0) { return thenBranch; }
             index -= 1;
         }
-        if (elseBranch != null) {
-            if (index == 0) {
-                return elseBranch;
-            }
-        }
+        if (elseBranch != null) { if (index == 0) { return elseBranch; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -74,8 +74,10 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent the parent
-     * @param exception the exception
+     * @param parent
+     *        the parent
+     * @param exception
+     *        the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
         setName("Edit File");
@@ -94,16 +96,9 @@ public class EditSourceFileAction extends KeyAction {
         int col = position.column();
         String text = textArea.getText();
         int i = 0;
-        while (i < text.length() && line > 1) {
-            if (text.charAt(i) == '\n') {
-                line--;
-            }
-            i++;
-        }
+        while (i < text.length() && line > 1) { if (text.charAt(i) == '\n') { line--; } i++; }
         i += col - 1;
-        if (i > textArea.getDocument().getLength()) {
-            i = textArea.getDocument().getLength();
-        }
+        if (i > textArea.getDocument().getLength()) { i = textArea.getDocument().getLength(); }
         textArea.setCaretPosition(i);
     }
 
@@ -208,9 +203,7 @@ public class EditSourceFileAction extends KeyAction {
 
     private static @Nullable File tryGetFile(@Nullable URI sourceURL) {
         File sourceFile = null;
-        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
-            sourceFile = Paths.get(sourceURL).toFile();
-        }
+        if (sourceURL != null && sourceURL.getScheme().equals("file")) { sourceFile = Paths.get(sourceURL).toFile(); }
         return sourceFile;
     }
 

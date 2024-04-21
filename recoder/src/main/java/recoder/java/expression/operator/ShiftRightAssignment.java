@@ -32,8 +32,10 @@ public class ShiftRightAssignment extends Assignment {
     /**
      * Shift right assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public ShiftRightAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class ShiftRightAssignment extends Assignment {
     /**
      * Shift right assignment.
      *
-     * @param proto a shift right assignment.
+     * @param proto
+     *        a shift right assignment.
      */
 
     protected ShiftRightAssignment(ShiftRightAssignment proto) {

@@ -37,9 +37,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
-        for (int i = 0; i != subTerms.length; ++i) {
-            subs[i] = subTerms[i].toTerm(app, pos, goal, mState);
-        }
+        for (int i = 0; i != subTerms.length; ++i) { subs[i] = subTerms[i].toTerm(app, pos, goal, mState); }
         return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
     }
 

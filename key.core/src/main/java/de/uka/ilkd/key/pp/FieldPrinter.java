@@ -72,9 +72,7 @@ class FieldPrinter {
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
-        if (pv == null) {
-            return false;
-        }
+        if (pv == null) { return false; }
 
         /*
          * Compare originTypeAndName and pvTypeAndName based on their String representation. I did
@@ -103,7 +101,8 @@ class FieldPrinter {
      * Find out whether a {@link Term} represents a field symbol, declared in a Java class.
      *
      * @return Returns true iff the given parameter represents a field constant.
-     * @param fieldTerm The target field.
+     * @param fieldTerm
+     *        The target field.
      */
     protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
             Services services) {

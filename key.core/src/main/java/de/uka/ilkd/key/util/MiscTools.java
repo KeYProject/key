@@ -63,8 +63,7 @@ public final class MiscTools {
     private static final Pattern URL_PATTERN =
         Pattern.compile("(^[a-zA-Z][a-zA-Z0-9+\\-.]*):(.*)");
 
-    private MiscTools() {
-    }
+    private MiscTools() {}
 
     // -------------------------------------------------------------------------
     // public interface
@@ -77,7 +76,8 @@ public final class MiscTools {
      * has as active statement a loop statement, thus throws an {@link AssertionError} if not or
      * otherwise results in undefined behavior in that case.
      *
-     * @param loopTerm The term for which to return the {@link LoopSpecification}.
+     * @param loopTerm
+     *        The term for which to return the {@link LoopSpecification}.
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
@@ -97,7 +97,8 @@ public final class MiscTools {
     }
 
     /**
-     * @param services The {@link Services} object.
+     * @param services
+     *        The {@link Services} object.
      * @return true iff the given {@link Services} object is associated to a {@link Profile} with
      *         permissions.
      */
@@ -110,7 +111,8 @@ public final class MiscTools {
      * Checks whether the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
      * transaction modality.
      *
-     * @param modalityKind The modality to check.
+     * @param modalityKind
+     *        The modality to check.
      * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
      *         transaction modality.
      */
@@ -122,8 +124,10 @@ public final class MiscTools {
      * Returns the applicable heap contexts out of the currently available set of three contexts:
      * The normal heap, the saved heap (transaction), and the permission heap.
      *
-     * @param modalityKind The current modality (checked for transaction).
-     * @param services The {@link Services} object (for {@link HeapLDT} and for checking whether
+     * @param modalityKind
+     *        The current modality (checked for transaction).
+     * @param services
+     *        The {@link Services} object (for {@link HeapLDT} and for checking whether
      *        we're in the permissions profile).
      * @return The list of the applicable heaps for the given scenario.
      */
@@ -134,13 +138,9 @@ public final class MiscTools {
 
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
 
-        if (isTransaction(modalityKind)) {
-            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
-        }
+        if (isTransaction(modalityKind)) { result.add(services.getTypeConverter().getHeapLDT().getSavedHeap()); }
 
-        if (isPermissions(services)) {
-            result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap());
-        }
+        if (isPermissions(services)) { result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap()); }
         return result;
     }
 
@@ -159,8 +159,10 @@ public final class MiscTools {
      * Returns the receiver term of the passed method frame, or null if the frame belongs to a
      * static method.
      *
-     * @param mf a method frame.
-     * @param services services.
+     * @param mf
+     *        a method frame.
+     * @param services
+     *        services.
      * @return the receiver term of the passed method frame, or null if the frame belongs to a
      *         static method.
      */
@@ -177,8 +179,10 @@ public final class MiscTools {
     /**
      * All variables read in the specified program element, excluding newly declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
+     * @param pe
+     *        a program element.
+     * @param services
+     *        services.
      * @return all variables read in the specified program element, excluding newly declared
      *         variables.
      */
@@ -191,8 +195,10 @@ public final class MiscTools {
     /**
      * All variables changed in the specified program element, excluding newly declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
+     * @param pe
+     *        a program element.
+     * @param services
+     *        services.
      * @return all variables changed in the specified program element, excluding newly declared
      *         variables.
      */
@@ -205,8 +211,10 @@ public final class MiscTools {
     /**
      * All variables changed in the specified program element, including newly declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
+     * @param pe
+     *        a program element.
+     * @param services
+     *        services.
      * @return all variables changed in the specified program element, including newly declared
      *         variables.
      */
@@ -220,8 +228,10 @@ public final class MiscTools {
     /**
      * All variables newly declared in the specified program element.
      *
-     * @param pe a program element.
-     * @param services services.
+     * @param pe
+     *        a program element.
+     * @param services
+     *        services.
      * @return all variables newly declared in the specified program element.
      */
     public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(ProgramElement pe,
@@ -234,7 +244,8 @@ public final class MiscTools {
     /**
      * Recursively collect all observers for this term including all of its sub terms.
      *
-     * @param t the term for which we want to collect the observer functions.
+     * @param t
+     *        the term for which we want to collect the observer functions.
      * @return the observers as a set of pairs with sorts and according observers
      */
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
@@ -243,9 +254,7 @@ public final class MiscTools {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
             result = result.add(new Pair<>(s, obs));
         }
-        for (Term sub : t.subs()) {
-            result = result.union(collectObservers(sub));
-        }
+        for (Term sub : t.subs()) { result = result.union(collectObservers(sub)); }
         return result;
     }
 
@@ -256,10 +265,14 @@ public final class MiscTools {
     /**
      * Concatenates two arrays.
      *
-     * @param s1 an array.
-     * @param s2 another array.
-     * @param <S> type o array {@code s1} and of result array.
-     * @param <T> type of array {@code s2}.
+     * @param s1
+     *        an array.
+     * @param s2
+     *        another array.
+     * @param <S>
+     *        type o array {@code s1} and of result array.
+     * @param <T>
+     *        type of array {@code s2}.
      * @return the concatenation of both arrays.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
@@ -275,11 +288,16 @@ public final class MiscTools {
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
      *
-     * @param m0 a map.
-     * @param m1 another map.
-     * @param <S> type of {@code m0}.
-     * @param <T> type of {@code m1}.
-     * @param <U> new type of result map indexes.
+     * @param m0
+     *        a map.
+     * @param m1
+     *        another map.
+     * @param <S>
+     *        type of {@code m0}.
+     * @param <T>
+     *        type of {@code m1}.
+     * @param <U>
+     *        new type of result map indexes.
      * @return the combination of both maps.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
@@ -298,7 +316,8 @@ public final class MiscTools {
      * or Windows directory delimiters. There is no check whether all other characters are valid for
      * filenames.
      *
-     * @param filename a file name.
+     * @param filename
+     *        a file name.
      * @return all directory entries in the file name.
      */
     static List<String> disectFilename(String filename) {
@@ -312,8 +331,10 @@ public final class MiscTools {
      * delimiters. Raises a RuntimeException if no relative path could be found (may happen on
      * Windows systems).
      *
-     * @param origFilename a filename.
-     * @param toFilename the name of a parent directory of {@code origFilename}.
+     * @param origFilename
+     *        a filename.
+     * @param toFilename
+     *        the name of a parent directory of {@code origFilename}.
      * @return {@code origFilename} relative to {@code toFilename}
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
@@ -328,7 +349,8 @@ public final class MiscTools {
     /**
      * Remove the file extension (.key, .proof) from the given filename.
      *
-     * @param filename file name
+     * @param filename
+     *        file name
      * @return file name without .key or .proof extension
      */
     public static String removeFileExtension(String filename) {
@@ -367,8 +389,10 @@ public final class MiscTools {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null collection
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null collection
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -381,8 +405,10 @@ public final class MiscTools {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null array of objects
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null array of objects
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -396,7 +422,8 @@ public final class MiscTools {
      * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
      * are removed.
      *
-     * @param string an arbitrary string
+     * @param string
+     *        an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
      * @author Mattias Ulbrich
      */
@@ -408,8 +435,10 @@ public final class MiscTools {
      * Checks whether a string contains another one as a whole word (i.e., separated by white spaces
      * or a semicolon at the end).
      *
-     * @param s string to search in
-     * @param word string to be searched for
+     * @param s
+     *        string to search in
+     * @param word
+     *        string to be searched for
      * @return the answer to the question specified above
      */
     public static boolean containsWholeWord(String s, String word) {
@@ -434,15 +463,14 @@ public final class MiscTools {
      * Execution Tree Debugger.
      * </p>
      *
-     * @param node The given {@link Node}.
+     * @param node
+     *        The given {@link Node}.
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
     public static String getRuleDisplayName(Node node) {
         String name = null;
-        if (node != null) {
-            name = getRuleDisplayName(node.getAppliedRuleApp());
-        }
+        if (node != null) { name = getRuleDisplayName(node.getAppliedRuleApp()); }
         return name;
     }
 
@@ -455,16 +483,15 @@ public final class MiscTools {
      * Execution Tree Debugger.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
+     * @param ruleApp
+     *        The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
     public static String getRuleDisplayName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
-            if (rule != null) {
-                name = rule.displayName();
-            }
+            if (rule != null) { name = rule.displayName(); }
         }
         return name;
     }
@@ -478,15 +505,14 @@ public final class MiscTools {
      * Execution Tree Debugger.
      * </p>
      *
-     * @param node The given {@link Node}.
+     * @param node
+     *        The given {@link Node}.
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
     public static String getRuleName(Node node) {
         String name = null;
-        if (node != null) {
-            name = getRuleName(node.getAppliedRuleApp());
-        }
+        if (node != null) { name = getRuleName(node.getAppliedRuleApp()); }
         return name;
     }
 
@@ -499,16 +525,15 @@ public final class MiscTools {
      * Execution Tree Debugger.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
+     * @param ruleApp
+     *        The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
     public static String getRuleName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
-            if (rule != null) {
-                name = rule.name().toString();
-            }
+            if (rule != null) { name = rule.name().toString(); }
         }
         return name;
     }
@@ -516,7 +541,8 @@ public final class MiscTools {
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
+     * @param proof
+     *        The {@link Proof} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
@@ -531,7 +557,8 @@ public final class MiscTools {
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
      *
-     * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
+     * @param profile
+     *        The {@link Profile} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
@@ -545,7 +572,8 @@ public final class MiscTools {
     /**
      * Returns the actual variable for a given one (this means it returns the renamed variable).
      *
-     * @param node the Node where to look up the actual variable (result from renaming)
+     * @param node
+     *        the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */
     public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
@@ -554,9 +582,7 @@ public final class MiscTools {
                 if (node.getRenamingTable() != null) {
                     for (RenamingTable rt : node.getRenamingTable()) {
                         ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(originalVar);
-                        if (renamedVar != null || !node.getLocalProgVars().contains(originalVar)) {
-                            return renamedVar;
-                        }
+                        if (renamedVar != null || !node.getLocalProgVars().contains(originalVar)) { return renamedVar; }
                     }
                 }
                 node = node.parent();
@@ -589,9 +615,7 @@ public final class MiscTools {
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof ProgramVariable) {
                 ProgramVariable pv = (ProgramVariable) node;
-                if (!pv.isMember() && !declaredPVs.contains(pv)) {
-                    result = result.add(pv);
-                }
+                if (!pv.isMember() && !declaredPVs.contains(pv)) { result = result.add(pv); }
             } else if (node instanceof VariableSpecification vs) {
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
@@ -629,9 +653,7 @@ public final class MiscTools {
             if (node instanceof Assignment) {
                 ProgramElement lhs = ((Assignment) node).getChildAt(0);
                 if (lhs instanceof ProgramVariable pv) {
-                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
-                        writtenPVs = writtenPVs.add(pv);
-                    }
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) { writtenPVs = writtenPVs.add(pv); }
                 }
             } else if (node instanceof VariableSpecification vs) {
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
@@ -666,28 +688,24 @@ public final class MiscTools {
     /**
      * read an input stream to its end into a string.
      *
-     * @param is a non-null open input stream
+     * @param is
+     *        a non-null open input stream
      * @return the string created from the input of the stream
-     * @throws IOException may occur while reading the stream
+     * @throws IOException
+     *         may occur while reading the stream
      */
     public static String toString(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[2048];
         int read;
-        while ((read = is.read(buffer)) > 0) {
-            sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
-        }
+        while ((read = is.read(buffer)) > 0) { sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8)); }
         return sb.toString();
     }
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
             ImmutableList<Term> localOuts) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term localIn : localIns) {
-            if (!localOuts.contains(localIn)) {
-                result = result.append(localIn);
-            }
-        }
+        for (Term localIn : localIns) { if (!localOuts.contains(localIn)) { result = result.append(localIn); } }
         return result;
     }
 
@@ -720,41 +738,40 @@ public final class MiscTools {
     /**
      * Tries to extract a valid URI from the given DataLocation.
      *
-     * @param loc the given DataLocation
+     * @param loc
+     *        the given DataLocation
      * @return an URI identifying the resource of the DataLocation
      */
     public static Optional<URI> extractURI(DataLocation loc) {
-        if (loc == null) {
-            throw new IllegalArgumentException("The given DataLocation is null!");
-        }
+        if (loc == null) { throw new IllegalArgumentException("The given DataLocation is null!"); }
 
         try {
             return switch (loc.getType()) {
-                case "URL" -> // URLDataLocation
-                        Optional.of(((URLDataLocation) loc).url().toURI());
-                case "ARCHIVE" -> { // ArchiveDataLocation
-                    // format: "ARCHIVE:<filename>?<itemname>"
-                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+            case "URL" -> // URLDataLocation
+                    Optional.of(((URLDataLocation) loc).url().toURI());
+            case "ARCHIVE" -> { // ArchiveDataLocation
+                // format: "ARCHIVE:<filename>?<itemname>"
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
 
-                    // extract item name and zip file
-                    int qmindex = adl.toString().lastIndexOf('?');
-                    String itemName = adl.toString().substring(qmindex + 1);
-                    ZipFile zip = adl.getFile();
+                // extract item name and zip file
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1);
+                ZipFile zip = adl.getFile();
 
-                    // use special method to ensure that path separators are correct
-                    yield Optional.of(getZipEntryURI(zip, itemName));
-                }
-                case "FILE" -> // DataFileLocation
+                // use special method to ensure that path separators are correct
+                yield Optional.of(getZipEntryURI(zip, itemName));
+            }
+            case "FILE" -> // DataFileLocation
                     // format: "FILE:<path>"
-                        Optional.of(((DataFileLocation) loc).getFile().toURI());
-                default -> // SpecDataLocation
-                    // format "<type>://<location>"
-                    // wrap into URN to ensure URI encoding is correct (no spaces!)
-                        Optional.empty();
+                    Optional.of(((DataFileLocation) loc).getFile().toURI());
+            default -> // SpecDataLocation
+                       // format "<type>://<location>"
+                       // wrap into URN to ensure URI encoding is correct (no spaces!)
+                    Optional.empty();
             };
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
-                    "The given DataLocation can not be converted into a valid URI: " + loc, e);
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
     }
 
@@ -769,10 +786,13 @@ public final class MiscTools {
      * plans for this).<br>
      * <b>Workaround:</b> Don't use directory names ending with "!".
      *
-     * @param zipFile the given zip
-     * @param entryName the entry path relative to the root of the zip
+     * @param zipFile
+     *        the given zip
+     * @param entryName
+     *        the entry path relative to the root of the zip
      * @return a zip/jar URI to the entry inside the zip
-     * @throws IOException if an I/O error occurs
+     * @throws IOException
+     *         if an I/O error occurs
      */
     public static URI getZipEntryURI(ZipFile zipFile, String entryName) throws IOException {
 
@@ -811,9 +831,7 @@ public final class MiscTools {
 
     @Nullable
     public static URI getURIFromTokenSource(String source) {
-        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-            return null;
-        }
+        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) { return null; }
 
         try {
             URI uri = new URI(source);
@@ -852,15 +870,15 @@ public final class MiscTools {
      * path in general, the path is resolved against the current working directory (see system
      * property "user.dir") consistently to the behaviour of {@link Paths#get(String, String...)}.
      *
-     * @param input the String to convert
+     * @param input
+     *        the String to convert
      * @return a URL if successful
-     * @throws MalformedURLException if the string can not be converted to URL because of an unknown
+     * @throws MalformedURLException
+     *         if the string can not be converted to URL because of an unknown
      *         protocol or illegal format
      */
     public static URL parseURL(final String input) throws MalformedURLException {
-        if (input == null) {
-            throw new NullPointerException("No URL can be created from null!");
-        }
+        if (input == null) { throw new NullPointerException("No URL can be created from null!"); }
 
         String scheme = "";
         String schemeSpecPart = "";

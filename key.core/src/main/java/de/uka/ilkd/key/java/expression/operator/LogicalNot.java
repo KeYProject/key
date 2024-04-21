@@ -21,7 +21,8 @@ public class LogicalNot extends Operator {
     /**
      * Logical not.
      *
-     * @param children an ExtList with all children of this node the first children in list will be
+     * @param children
+     *        an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
 
@@ -75,7 +76,8 @@ public class LogicalNot extends Operator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnLogicalNot(this);

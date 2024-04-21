@@ -33,8 +33,10 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      *
-     * @param unaryChild an expression.
-     * @param typeref a type reference.
+     * @param unaryChild
+     *        an expression.
+     * @param typeref
+     *        a type reference.
      */
     public TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
@@ -44,9 +46,12 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
-     * @param typeref a type reference.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
+     * @param typeref
+     *        a type reference.
      */
     public TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {
         super(lhs, rhs);
@@ -56,13 +61,12 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      *
-     * @param proto a type operator.
+     * @param proto
+     *        a type operator.
      */
     protected TypeOperator(TypeOperator proto) {
         super(proto);
-        if (proto.typeReference != null) {
-            typeReference = proto.typeReference.deepClone();
-        }
+        if (proto.typeReference != null) { typeReference = proto.typeReference.deepClone(); }
     }
 
     /**
@@ -70,9 +74,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (typeReference != null) {
-            typeReference.setParent(this);
-        }
+        if (typeReference != null) { typeReference.setParent(this); }
     }
 
     public int getChildPositionCode(ProgramElement child) {
@@ -83,13 +85,9 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         // role 4: class declaration (for New only)
         if (children != null) {
             int index = children.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
+        if (typeReference == child) { return 1; }
         return -1;
     }
 
@@ -108,9 +106,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -120,16 +116,17 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
@@ -147,9 +144,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
 
@@ -169,7 +164,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Set type reference.
      *
-     * @param t a type reference.
+     * @param t
+     *        a type reference.
      */
 
     public void setTypeReference(TypeReference t) {

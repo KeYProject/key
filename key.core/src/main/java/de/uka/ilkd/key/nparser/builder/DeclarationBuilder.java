@@ -127,9 +127,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
-        for (KeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
-            c.accept(this);
-        }
+        for (KeYParser.One_sort_declContext c : ctx.one_sort_decl()) { c.accept(this); }
         return null;
     }
 
@@ -184,7 +182,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                 // local namespaces for generic sorts
                 // addWarning(ctx, "Sort declaration is ignored, due to collision.");
                 LOGGER.info("Sort declaration of {} in {} is ignored due to collision (already "
-                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                        + "present in {}).",
+                    sortName, BuilderHelpers.getPosition(ctx),
                     existingSort.getOrigin());
             }
         }
@@ -211,9 +210,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
         for (String id : this.<String>mapOf(ctx.simple_ident())) {
             RuleSet h = new RuleSet(new Name(id));
-            if (ruleSets().lookup(new Name(id)) == null) {
-                ruleSets().add(h);
-            }
+            if (ruleSets().lookup(new Name(id)) == null) { ruleSets().add(h); }
         }
         return null;
     }

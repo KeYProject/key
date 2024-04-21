@@ -72,7 +72,8 @@ public class JmlIO {
     /**
      * Generate an empty jml i/o instance.
      *
-     * @param services a service object used for constructing the terms
+     * @param services
+     *        a service object used for constructing the terms
      */
     public JmlIO(Services services) {
         this.services = services;
@@ -81,14 +82,22 @@ public class JmlIO {
     /**
      * Full constructor of this class. Prefer the use via builder methods.
      *
-     * @param services a service object used for constructing the terms
-     * @param specInClass the class in which the expression and contracts should be evaluated
-     * @param selfVar the self variable considered for {@code this}-references
-     * @param paramVars a list of parameter variables
-     * @param resultVar the {@code \return}-variable
-     * @param excVar the variable to store exception
-     * @param atPres i do not know
-     * @param atBefores i do not know
+     * @param services
+     *        a service object used for constructing the terms
+     * @param specInClass
+     *        the class in which the expression and contracts should be evaluated
+     * @param selfVar
+     *        the self variable considered for {@code this}-references
+     * @param paramVars
+     *        a list of parameter variables
+     * @param resultVar
+     *        the {@code \return}-variable
+     * @param excVar
+     *        the variable to store exception
+     * @param atPres
+     *        i do not know
+     * @param atBefores
+     *        i do not know
      */
     public JmlIO(Services services, @Nullable KeYJavaType specInClass,
             @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
@@ -110,7 +119,8 @@ public class JmlIO {
     /**
      * Interpret the given parse tree as a represents clause
      *
-     * @throws ClassCastException if unsuitable parser rule context is given
+     * @throws ClassCastException
+     *         if unsuitable parser rule context is given
      */
     @SuppressWarnings("unchecked")
     public Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause) {
@@ -124,7 +134,8 @@ public class JmlIO {
      * Note weigl: This method does not add the given term label to the returned objects. I am not
      * if this is currently wanted/needed.
      *
-     * @throws ClassCastException if unsuitable parser rule context is given@param clause
+     * @throws ClassCastException
+     *         if unsuitable parser rule context is given@param clause
      */
     public @NonNull Pair<IObserverFunction, Term> translateRepresents(
             @NonNull LabeledParserRuleContext clause) {
@@ -135,7 +146,8 @@ public class JmlIO {
     /**
      * Checks whether the given {@code functionName} is a known JML function for KeY.
      *
-     * @param functionName a string
+     * @param functionName
+     *        a string
      * @return true if the function is known
      * @see JmlTermFactory#jml2jdl
      */
@@ -250,15 +262,14 @@ public class JmlIO {
      * for cases where {@link #translateTerm(LabeledParserRuleContext)} would in some cases give a
      * Term of sort formula and in some cases of sort boolean. Label is attached.
      *
-     * @param condition a parse tree of a boolean JML expression
+     * @param condition
+     *        a parse tree of a boolean JML expression
      * @return a formula of the given parse tree
      * @see #translateTerm(LabeledParserRuleContext)
      */
     public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
         Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
-        if (condition.second != null) {
-            return services.getTermBuilder().addLabel(term, condition.second);
-        }
+        if (condition.second != null) { return services.getTermBuilder().addLabel(term, condition.second); }
         return term;
     }
 
@@ -274,12 +285,14 @@ public class JmlIO {
     /**
      * Translate the given context into an information flow specification.
      *
-     * @param expr should be a {@link JmlParser.Separates_clauseContext} or
+     * @param expr
+     *        should be a {@link JmlParser.Separates_clauseContext} or
      *        {@link JmlParser.Determines_clauseContext}, or
      *        {@link JmlParser.Loop_separates_clauseContext} or
      *        {@link JmlParser.Loop_determines_clauseContext}.
      * @return a information flow specification from the given context.
-     * @throws ClassCastException if the {@code expr} is not suitable
+     * @throws ClassCastException
+     *         if the {@code expr} is not suitable
      */
     public @NonNull InfFlowSpec translateInfFlow(@NonNull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
@@ -298,9 +311,11 @@ public class JmlIO {
      * Translates the given context into a dependency contract, aka, accessible-clause or
      * depends-clause.
      *
-     * @param ctx should a {@link JmlParser.Accessible_clauseContext}
+     * @param ctx
+     *        should a {@link JmlParser.Accessible_clauseContext}
      * @return a dependency contract
-     * @throws ClassCastException if the {@code ctx} is not suitable
+     * @throws ClassCastException
+     *         if the {@code ctx} is not suitable
      */
     @SuppressWarnings("unchecked")
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(
@@ -313,7 +328,8 @@ public class JmlIO {
      * <p>
      * Note (weigl): No label is currently attached.
      *
-     * @throws ClassCastException if the {@code ctx} is not suitable
+     * @throws ClassCastException
+     *         if the {@code ctx} is not suitable
      */
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(
             LabeledParserRuleContext ctx) {

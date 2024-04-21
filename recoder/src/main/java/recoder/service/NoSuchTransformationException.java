@@ -36,7 +36,8 @@ public class NoSuchTransformationException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
+     * @param s
+     *        an explanation.
      */
     public NoSuchTransformationException(String s) {
         super(s);

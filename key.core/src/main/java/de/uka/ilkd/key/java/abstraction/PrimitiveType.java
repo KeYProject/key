@@ -84,9 +84,7 @@ public final class PrimitiveType implements Type {
         this.ldtName = ldtName;
         typeMap.put(name, this);
 
-        if (ldtName != null) {
-            ldtMap.put(ldtName, this);
-        }
+        if (ldtName != null) { ldtMap.put(ldtName, this); }
     }
 
     /**
@@ -166,9 +164,7 @@ public final class PrimitiveType implements Type {
                 arrayElementName = new ProgramElementName("[X");
             } else if (this.getName().equals("\\bigint")) {
                 arrayElementName = new ProgramElementName("[Y");
-            } else if (this.getName().equals("\\real")) {
-                arrayElementName = new ProgramElementName("[R");
-            }
+            } else if (this.getName().equals("\\real")) { arrayElementName = new ProgramElementName("[R"); }
         }
         assert arrayElementName != null;
         return arrayElementName;

@@ -26,20 +26,14 @@ public class Factory implements DesignPattern {
      * InterfaceDeclarations are skipped as they provide no constructors.
      */
     public Factory(ClassDeclaration factoryClass, List<TypeDeclaration> products) {
-        if (factoryClass == null || products == null) {
-            throw new NullPointerException();
-        }
+        if (factoryClass == null || products == null) { throw new NullPointerException(); }
         int n = products.size();
         factoryMethods = new ArrayList<>(n);
         for (TypeDeclaration td : products) {
-            if (td instanceof ClassDeclaration) {
-                addFactoryMethods((ClassDeclaration) td);
-            }
+            if (td instanceof ClassDeclaration) { addFactoryMethods((ClassDeclaration) td); }
         }
         List<MemberDeclaration> members = factoryClass.getMembers();
-        for (FactoryMethod factoryMethod : factoryMethods) {
-            members.add(factoryMethod.getProducer());
-        }
+        for (FactoryMethod factoryMethod : factoryMethods) { members.add(factoryMethod.getProducer()); }
         factoryClass.makeParentRoleValid();
     }
 
@@ -83,14 +77,14 @@ public class Factory implements DesignPattern {
     /**
      * Get a participants by its index.
      *
-     * @param index an index of a participant.
+     * @param index
+     *        an index of a participant.
      * @return the participant.
-     * @throws IndexOutOfBoundsException, if the index is not in bounds.
+     * @throws IndexOutOfBoundsException,
+     *         if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
-        if (factoryMethods != null) {
-            return factoryMethods.get(index);
-        }
+        if (factoryMethods != null) { return factoryMethods.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 

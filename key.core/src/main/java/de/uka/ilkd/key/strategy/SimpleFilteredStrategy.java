@@ -47,19 +47,13 @@ public class SimpleFilteredStrategy implements Strategy {
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
-            return TopRuleAppCost.INSTANCE;
-        }
+        if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) { return TopRuleAppCost.INSTANCE; }
 
         RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal, mState);
-        if (res == TopRuleAppCost.INSTANCE) {
-            return res;
-        }
+        if (res == TopRuleAppCost.INSTANCE) { return res; }
 
         long cost = goal.getTime();
-        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete()) {
-            cost += IF_NOT_MATCHED_MALUS;
-        }
+        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete()) { cost += IF_NOT_MATCHED_MALUS; }
 
         return NumberRuleAppCost.create(cost);
     }

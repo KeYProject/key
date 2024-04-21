@@ -83,11 +83,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     protected void checkArguments() {
         ImmutableArray<? extends Expression> args = getArguments();
-        for (Expression arg : args) {
-            if (arg == null) {
-                throw new NullPointerException();
-            }
-        }
+        for (Expression arg : args) { if (arg == null) { throw new NullPointerException(); } }
     }
 
     public SourceElement getFirstElement() {
@@ -119,41 +115,31 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (prefix != null) { result++; }
+        if (name != null) { result++; }
+        if (arguments != null) { result += arguments.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -179,9 +165,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -193,12 +177,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public int getExpressionCount() {
         int result = 0;
-        if (prefix instanceof Expression) {
-            result += 1;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (prefix instanceof Expression) { result += 1; }
+        if (arguments != null) { result += arguments.size(); }
         return result;
     }
 
@@ -213,14 +193,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression) {
-            if (index == 0) {
-                return (Expression) prefix;
-            }
+            if (index == 0) { return (Expression) prefix; }
             index -= 1;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -264,9 +240,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @return the expression
      */
     public Expression getArgumentAt(int index) {
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -310,9 +284,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
             pm = method(services, classType, getMethodSignature(services, ec), classType);
-            if (pm != null) {
-                return pm;
-            }
+            if (pm != null) { return pm; }
             inst = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
                 classType);
         }
@@ -321,10 +293,14 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     /**
      *
-     * @param services the Services class offering access to metamodel information
-     * @param classType the KeYJavaType where to start looking for the declared method
-     * @param signature the IList<KeYJavaType> of the arguments types
-     * @param context the KeYJavaType from where the method is called
+     * @param services
+     *        the Services class offering access to metamodel information
+     * @param classType
+     *        the KeYJavaType where to start looking for the declared method
+     * @param signature
+     *        the IList<KeYJavaType> of the arguments types
+     * @param context
+     *        the KeYJavaType from where the method is called
      * @return the found program method
      */
     public IProgramMethod method(Services services, KeYJavaType classType,
@@ -347,7 +323,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMethodReference(this);
@@ -355,9 +332,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
         IProgramMethod meth = method(services, determineStaticPrefixType(services, ec), ec);
-        if (meth == null) {
-            return ec.getTypeReference().getKeYJavaType();
-        }
+        if (meth == null) { return ec.getTypeReference().getKeYJavaType(); }
         return meth.getReturnType();
 
     }

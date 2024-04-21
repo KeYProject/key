@@ -62,9 +62,7 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
                 || this == JavaDLTheory.ANY) {
             return DefaultImmutableSet.nil();
         } else {
-            if (ext.isEmpty()) {
-                ext = DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY);
-            }
+            if (ext.isEmpty()) { ext = DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY); }
             return ext;
         }
     }
@@ -75,9 +73,7 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
             return true;
         } else if (this == JavaDLTheory.FORMULA || this == JavaDLTheory.UPDATE) {
             return false;
-        } else if (sort == JavaDLTheory.ANY) {
-            return true;
-        }
+        } else if (sort == JavaDLTheory.ANY) { return true; }
 
         return extendsSorts()
                 .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));

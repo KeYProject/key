@@ -31,8 +31,10 @@ public class LessOrEquals extends ComparativeOperator {
     /**
      * Less or equals.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public LessOrEquals(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class LessOrEquals extends ComparativeOperator {
     /**
      * Less or equals.
      *
-     * @param proto a less or equals.
+     * @param proto
+     *        a less or equals.
      */
 
     protected LessOrEquals(LessOrEquals proto) {

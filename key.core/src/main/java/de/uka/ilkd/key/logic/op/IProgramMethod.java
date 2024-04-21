@@ -26,7 +26,8 @@ public interface IProgramMethod
      * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method does not care
      * about the invoker as argSort does.
      *
-     * @param i the int specifying the parameter position
+     * @param i
+     *        the int specifying the parameter position
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
     KeYJavaType getParameterType(int i);

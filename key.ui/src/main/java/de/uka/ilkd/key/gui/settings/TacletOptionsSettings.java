@@ -60,7 +60,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * and it is also used by the eclipse projects.
      * </p>
      *
-     * @param category The category for which the explanation is requested.
+     * @param category
+     *        The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
@@ -70,9 +71,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 InputStream is =
                     TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
-                    if (is == null) {
-                        throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
-                    }
+                    if (is == null) { throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found"); }
                     explanationMap.loadFromXML(is);
                 } catch (InvalidPropertiesFormatException e) {
                     LOGGER.error("Cannot load help message in rule view (malformed XML).", e);
@@ -82,9 +81,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             }
         }
         String result = explanationMap.getProperty(category);
-        if (result == null) {
-            result = "No explanation for " + category + " available.";
-        }
+        if (result == null) { result = "No explanation for " + category + " available."; }
 
         return result;
     }
@@ -92,7 +89,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if the given choice makes a proof unsound.
      *
-     * @param choice The choice to check.
+     * @param choice
+     *        The choice to check.
      * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all
      *         other choices are sound.
      */
@@ -105,7 +103,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if the given choice makes a proof incomplete.
      *
-     * @param choice The choice to check.
+     * @param choice
+     *        The choice to check.
      * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long
      *         as all other choices are complete.
      */
@@ -119,7 +118,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if additional information for the choice are available.
      *
-     * @param choice The choice to check.
+     * @param choice
+     *        The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
     public static String getInformation(String choice) {
@@ -139,8 +139,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Searches the choice in the given {@link ChoiceEntry}s.
      *
-     * @param choices The {@link ChoiceEntry}s to search in.
-     * @param choice The choice to search.
+     * @param choices
+     *        The {@link ChoiceEntry}s to search in.
+     * @param choice
+     *        The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(List<ChoiceEntry> choices, final String choice) {
@@ -150,13 +152,12 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
      *
-     * @param choices The choices.
+     * @param choices
+     *        The choices.
      * @return The created {@link ChoiceEntry}s.
      */
     public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
-        if (choices == null) {
-            return Collections.emptyList();
-        }
+        if (choices == null) { return Collections.emptyList(); }
         return choices.stream().map(TacletOptionsSettings::createChoiceEntry)
                 .collect(Collectors.toList());
     }
@@ -164,7 +165,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Creates a {@link ChoiceEntry} for the given choice.
      *
-     * @param choice The choice.
+     * @param choice
+     *        The choice.
      * @return The created {@link ChoiceEntry}.
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
@@ -200,9 +202,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         ButtonGroup btnGroup = new ButtonGroup();
         for (ChoiceEntry c : choices) {
             JRadioButton btn = addRadioButton(c, btnGroup);
-            if (c.equals(selectedChoice)) {
-                btn.setSelected(true);
-            }
+            if (c.equals(selectedChoice)) { btn.setSelected(true); }
             btn.addActionListener(new ChoiceSettingsSetter(cat, c.choice));
         }
         addExplanation(explanation);
@@ -347,10 +347,14 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         /**
          * Constructor.
          *
-         * @param choice The choice.
-         * @param unsound Is unsound?
-         * @param incomplete Is incomplete?
-         * @param information An optionally information.
+         * @param choice
+         *        The choice.
+         * @param unsound
+         *        Is unsound?
+         * @param incomplete
+         *        Is incomplete?
+         * @param information
+         *        An optionally information.
          */
         public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
             assert choice != null;
@@ -405,9 +409,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             hashcode = hashcode * 17 + choice.hashCode();
             hashcode = hashcode * 17 + (incomplete ? 5 : 3);
             hashcode = hashcode * 17 + (unsound ? 5 : 3);
-            if (information != null) {
-                hashcode = hashcode * 17 + information.hashCode();
-            }
+            if (information != null) { hashcode = hashcode * 17 + information.hashCode(); }
             return hashcode;
         }
 

@@ -36,9 +36,12 @@ public interface SolverType {
     /**
      * Creates an instance of SMTSolver representing a concrete instance of that solver.
      *
-     * @param problem the SMT problem that is sent to the resulting SMT solver process
-     * @param listener the listener for the solver process
-     * @param services services object to be used by the solver process, if needed (see for example
+     * @param problem
+     *        the SMT problem that is sent to the resulting SMT solver process
+     * @param listener
+     *        the listener for the solver process
+     * @param services
+     *        services object to be used by the solver process, if needed (see for example
      *        {@link SMTObjTranslator})
      * @return a concrete solver process of the type at hand
      */
@@ -54,7 +57,8 @@ public interface SolverType {
      * should check for the path variable of the system and for the absolute path, otherwise it can
      * return the result of the previous call.
      *
-     * @param recheck if this is true, the installation check will be done again instead of
+     * @param recheck
+     *        if this is true, the installation check will be done again instead of
      *        returning the result from the previous call of this method
      * @return whether the solver is installed (i.e. the command is an existing file)
      */
@@ -79,7 +83,8 @@ public interface SolverType {
     /**
      * Set the solver parameters to be used.
      *
-     * @param s the new solver parameters
+     * @param s
+     *        the new solver parameters
      */
     void setSolverParameters(String s);
 
@@ -101,7 +106,8 @@ public interface SolverType {
     /**
      * Set the solver command to be used for starting processes with the type at hand.
      *
-     * @param s the new solver command
+     * @param s
+     *        the new solver command
      */
     void setSolverCommand(String s);
 
@@ -121,7 +127,8 @@ public interface SolverType {
     /**
      * Set the timeout for processes with this solver type.
      *
-     * @param timeout the new solver timeout
+     * @param timeout
+     *        the new solver timeout
      */
     void setSolverTimeout(long timeout);
 
@@ -148,7 +155,8 @@ public interface SolverType {
      * Directly before the problem description is sent to the solver one can modify the problem
      * string by using this method.
      *
-     * @param problem the SMT problem to modify
+     * @param problem
+     *        the SMT problem to modify
      * @return the modified SMT problem String
      */
     String modifyProblem(String problem);
@@ -197,7 +205,8 @@ public interface SolverType {
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
      *
-     * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
+     * @param query
+     *        the ModelExtractor that can be used to extract a counterexample (for non-CE
      *        solvers this can be null)
      * @return the newly created socket
      */

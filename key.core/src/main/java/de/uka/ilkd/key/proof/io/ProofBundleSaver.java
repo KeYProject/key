@@ -29,8 +29,10 @@ public class ProofBundleSaver extends ProofSaver {
     /**
      * Creates a new ProofBundleSaver.
      *
-     * @param proof the proof to save
-     * @param saveFile the target filename
+     * @param proof
+     *        the proof to save
+     * @param saveFile
+     *        the target filename
      */
     public ProofBundleSaver(Proof proof, File saveFile) {
         super(proof, saveFile);

@@ -37,7 +37,8 @@ public class DirectoryFileCollection implements FileCollection {
      * create a new File collection for a given directory The argument may be a single file also. A
      * directory is read recursively.
      *
-     * @param directory directory to iterate through,
+     * @param directory
+     *        directory to iterate through,
      */
     public DirectoryFileCollection(File directory) {
         this.directory = directory;
@@ -49,16 +50,12 @@ public class DirectoryFileCollection implements FileCollection {
     private static void addAllFiles(File dir, String extension, List<File> files) {
         File[] listFiles = dir.listFiles();
 
-        if (listFiles == null) {
-            throw new IllegalArgumentException(dir + " is not a directory or cannot be read!");
-        }
+        if (listFiles == null) { throw new IllegalArgumentException(dir + " is not a directory or cannot be read!"); }
 
         for (File file : listFiles) {
             if (file.isDirectory()) {
                 addAllFiles(file, extension, files);
-            } else if (extension == null || file.getName().toLowerCase().endsWith(extension)) {
-                files.add(file);
-            }
+            } else if (extension == null || file.getName().toLowerCase().endsWith(extension)) { files.add(file); }
         }
     }
 
@@ -74,9 +71,7 @@ public class DirectoryFileCollection implements FileCollection {
     private static void sortFiles(List<File> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
-                if (!(a < b)) {
-                    throw new RuntimeException("Incorrect sorting algorithms.");
-                }
+                if (!(a < b)) { throw new RuntimeException("Incorrect sorting algorithms."); }
                 File fa = files.get(a);
                 File fb = files.get(b);
 
@@ -118,9 +113,7 @@ public class DirectoryFileCollection implements FileCollection {
      */
     public Walker createWalker(String[] extensions) {
         List<File> files = new ArrayList<>();
-        for (String extension : extensions) {
-            addAllFiles(directory, extension, files);
-        }
+        for (String extension : extensions) { addAllFiles(directory, extension, files); }
         sortFiles(files);
         return new Walker(files.iterator());
     }

@@ -23,9 +23,12 @@ public class While extends LoopStatement {
     /**
      * While.
      *
-     * @param guard an expression.
-     * @param body a statement.
-     * @param pos a PositionInformation.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
+     * @param pos
+     *        a PositionInformation.
      */
 
     public While(Expression guard, Statement body, PositionInfo pos, ExtList comments) {
@@ -35,8 +38,10 @@ public class While extends LoopStatement {
     /**
      * create a new While statement with no position info and no comments but guard and body set
      *
-     * @param guard an expression.
-     * @param body a statement.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
      */
 
     public While(Expression guard, Statement body) {
@@ -46,9 +51,12 @@ public class While extends LoopStatement {
     /**
      * While.
      *
-     * @param guard an expression.
-     * @param body a statement.
-     * @param pos a PositionInformation.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
+     * @param pos
+     *        a PositionInformation.
      */
 
     public While(Expression guard, Statement body, PositionInfo pos) {
@@ -73,7 +81,8 @@ public class While extends LoopStatement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnWhile(this);

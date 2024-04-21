@@ -54,9 +54,7 @@ public class TestContextStatementBlock {
         assertTrue(
             PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof PostIncrement,
             "Suffix should start with an ++");
-        for (int i = size - 2; i >= 1; i--) {
-            statementList.add(stContainer.getChildAt(i));
-        }
+        for (int i = size - 2; i >= 1; i--) { statementList.add(stContainer.getChildAt(i)); }
 
     }
 

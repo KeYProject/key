@@ -34,9 +34,7 @@ public class FileUtils {
     }
 
     public static File getUserDirectory() {
-        if (userDirectory == null) {
-            userDirectory = new File(System.getProperty("user.dir"));
-        }
+        if (userDirectory == null) { userDirectory = new File(System.getProperty("user.dir")); }
         return userDirectory;
     }
 
@@ -47,9 +45,7 @@ public class FileUtils {
      * root directories (or devices) and the full path to the destination is returned.
      */
     public static String getRelativePath(File start, File dest) {
-        if (start.isFile()) {
-            start = new File(start.getParent());
-        }
+        if (start.isFile()) { start = new File(start.getParent()); }
         String startname;
         String destname;
         try {
@@ -58,17 +54,13 @@ public class FileUtils {
         } catch (IOException ioe) {
             return dest.getAbsolutePath();
         }
-        if (startname.equals(destname)) {
-            return ".";
-        }
+        if (startname.equals(destname)) { return "."; }
         int slen = startname.length();
         int dlen = destname.length();
         int maxlen = Math.min(slen, dlen);
         int index;
         for (index = 0; index < maxlen; index += 1) {
-            if (startname.charAt(index) != destname.charAt(index)) {
-                break;
-            }
+            if (startname.charAt(index) != destname.charAt(index)) { break; }
         }
         if (index <= 1) {
             // no common header: different devices; use absolute path
@@ -76,22 +68,16 @@ public class FileUtils {
         }
         StringBuilder result = new StringBuilder();
         if (index != slen) {
-            while (index > 0 && (startname.charAt(index) != File.separatorChar)) {
-                index -= 1;
-            }
+            while (index > 0 && (startname.charAt(index) != File.separatorChar)) { index -= 1; }
             index += 1;
             result.append("..").append(File.separatorChar);
             for (int dirs = index; dirs < slen; dirs += 1) {
-                if (startname.charAt(dirs) == File.separatorChar) {
-                    result.append("..").append(File.separatorChar);
-                }
+                if (startname.charAt(dirs) == File.separatorChar) { result.append("..").append(File.separatorChar); }
             }
         } else {
             index += 1;
         }
-        if (index < dlen) {
-            result.append(destname.substring(index));
-        }
+        if (index < dlen) { result.append(destname.substring(index)); }
         return result.toString();
     }
 
@@ -107,9 +93,7 @@ public class FileUtils {
             char sep = File.separatorChar;
             if (sep == '/') {
                 classpath = classpath.replace('\\', sep);
-            } else if (sep == '\\') {
-                classpath = classpath.replace('/', sep);
-            }
+            } else if (sep == '\\') { classpath = classpath.replace('/', sep); }
             StringTokenizer tok = new StringTokenizer(classpath, File.separator);
             while (tok.hasMoreTokens()) {
                 classpath = tok.nextToken();
@@ -128,9 +112,7 @@ public class FileUtils {
                     + File.separator + ARCHIVE_NAME;
             result = new File(classpath);
         }
-        if (!result.exists()) {
-            result = null;
-        }
+        if (!result.exists()) { result = null; }
         return result;
     }
 
@@ -147,9 +129,7 @@ public class FileUtils {
             System.getProperty("java.home") + File.separator + "lib" + File.separator + "ext";
 
         result = new File(classpath);
-        if (!result.exists()) {
-            result = null;
-        }
+        if (!result.exists()) { result = null; }
         return result;
     }
 
@@ -158,9 +138,7 @@ public class FileUtils {
         if (a.length > 0) {
             File f = new File(a[0]);
             System.out.println("File is " + f.getCanonicalPath());
-            if (f.exists()) {
-                System.out.println("Relative path is " + getRelativePath(getUserDirectory(), f));
-            }
+            if (f.exists()) { System.out.println("Relative path is " + getRelativePath(getUserDirectory(), f)); }
         }
     }
 }

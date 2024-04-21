@@ -87,19 +87,28 @@ public class RewriteTaclet extends FindTaclet {
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters that represents a
      * rewrite rule.
      *
-     * @param name the Name of the Taclet
-     * @param applPart the TacletApplPart that contains the application part of an Taclet that is
+     * @param name
+     *        the Name of the Taclet
+     * @param applPart
+     *        the TacletApplPart that contains the application part of an Taclet that is
      *        the if-sequent, the variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs the TacletAttributes; these are boolean values indicating a noninteractive or
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param ruleSets
+     *        a list of rule sets for the Taclet
+     * @param attrs
+     *        the TacletAttributes; these are boolean values indicating a noninteractive or
      *        recursive use of the Taclet.
-     * @param find the find term of the Taclet
-     * @param prefixMap an ImmutableMap that contains the prefix for each
+     * @param find
+     *        the find term of the Taclet
+     * @param prefixMap
+     *        an ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
-     * @param p_applicationRestriction an int defining state restrictions of the taclet (required
+     * @param p_applicationRestriction
+     *        an int defining state restrictions of the taclet (required
      *        for location check)
-     * @param choices the SetOf<Choices> to which this taclet belongs to
+     * @param choices
+     *        the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
@@ -151,7 +160,8 @@ public class RewriteTaclet extends FindTaclet {
      * the top level operator has to be a simultaneous update. This method checks if the assignment
      * pairs of the update contain free logic variables and gives a veto if positive
      *
-     * @param t the Term to check
+     * @param t
+     *        the Term to check
      * @return false if vetoing
      */
     private boolean veto(Term t) {
@@ -193,14 +203,10 @@ public class RewriteTaclet extends FindTaclet {
                 return null;
             }
 
-            if (polarity != 0) {
-                polarity = polarity(op, it, polarity);
-            }
+            if (polarity != 0) { polarity = polarity(op, it, polarity); }
         }
 
-        if (getApplicationRestriction() == NONE) {
-            return p_mc;
-        }
+        if (getApplicationRestriction() == NONE) { return p_mc; }
         if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1)
                 || ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
             return null;
@@ -238,12 +244,8 @@ public class RewriteTaclet extends FindTaclet {
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
-        if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
-            res.append("\\sameUpdateLevel");
-        }
-        if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
-            res.append("\\inSequentState");
-        }
+        if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) { res.append("\\sameUpdateLevel"); }
+        if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) { res.append("\\inSequentState"); }
         if ((getApplicationRestriction() & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
             res.append("\\antecedentPolarity");
         }

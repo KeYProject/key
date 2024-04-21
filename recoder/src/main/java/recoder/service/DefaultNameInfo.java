@@ -99,7 +99,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     /**
      * Creates a new initialized definition table.
      *
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultNameInfo(ServiceConfiguration config) {
         super(config);
@@ -123,9 +124,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
 
     public void propertyChange(PropertyChangeEvent evt) {
         String changedProp = evt.getPropertyName();
-        if (changedProp.equals(PropertyNames.CLASS_SEARCH_MODE)) {
-            updateSearchMode();
-        }
+        if (changedProp.equals(PropertyNames.CLASS_SEARCH_MODE)) { updateSearchMode(); }
     }
 
     // parses the class search mode property and creates the internal
@@ -161,7 +160,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     /**
      * creates and initializes a new primitive type with the given name.
      *
-     * @param name the name of the primitive type to be registered
+     * @param name
+     *        the name of the primitive type to be registered
      * @return the according type object
      */
     private PrimitiveType createPrimitiveType(String name) {
@@ -201,17 +201,13 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) {
             Debug.log(
                 "Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
-                    + Format.toString(" --- was: %N [%i]", ob));
+                        + Format.toString(" --- was: %N [%i]", ob));
         }
         // are there old array types which need to be recycled? This happens if
         // ct was actually renamed
         ArrayList al = removedArrayCache.get(ct);
         if (al != null) {
-            for (Object o : al) {
-                ArrayType at = (ArrayType) o;
-                at.makeNames();
-                name2type.put(at.getFullName(), at);
-            }
+            for (Object o : al) { ArrayType at = (ArrayType) o; at.makeNames(); name2type.put(at.getFullName(), at); }
         }
     }
 
@@ -221,100 +217,72 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public ClassType getJavaLangObject() {
-        if (javaLangObject == null) {
-            javaLangObject = getClassType("java.lang.Object");
-        }
+        if (javaLangObject == null) { javaLangObject = getClassType("java.lang.Object"); }
         return javaLangObject;
     }
 
     public ClassType getJavaLangString() {
-        if (javaLangString == null) {
-            javaLangString = getClassType("java.lang.String");
-        }
+        if (javaLangString == null) { javaLangString = getClassType("java.lang.String"); }
         return javaLangString;
     }
 
     public ClassType getJavaLangBoolean() {
-        if (javaLangBoolean == null) {
-            javaLangBoolean = getClassType("java.lang.Boolean");
-        }
+        if (javaLangBoolean == null) { javaLangBoolean = getClassType("java.lang.Boolean"); }
         return javaLangBoolean;
     }
 
     public ClassType getJavaLangByte() {
-        if (javaLangByte == null) {
-            javaLangByte = getClassType("java.lang.Byte");
-        }
+        if (javaLangByte == null) { javaLangByte = getClassType("java.lang.Byte"); }
         return javaLangByte;
     }
 
     public ClassType getJavaLangCharacter() {
-        if (javaLangCharacter == null) {
-            javaLangCharacter = getClassType("java.lang.Character");
-        }
+        if (javaLangCharacter == null) { javaLangCharacter = getClassType("java.lang.Character"); }
         return javaLangCharacter;
     }
 
     public ClassType getJavaLangShort() {
-        if (javaLangShort == null) {
-            javaLangShort = getClassType("java.lang.Short");
-        }
+        if (javaLangShort == null) { javaLangShort = getClassType("java.lang.Short"); }
         return javaLangShort;
     }
 
     public ClassType getJavaLangInteger() {
-        if (javaLangInteger == null) {
-            javaLangInteger = getClassType("java.lang.Integer");
-        }
+        if (javaLangInteger == null) { javaLangInteger = getClassType("java.lang.Integer"); }
         return javaLangInteger;
     }
 
     public ClassType getJavaLangLong() {
-        if (javaLangLong == null) {
-            javaLangLong = getClassType("java.lang.Long");
-        }
+        if (javaLangLong == null) { javaLangLong = getClassType("java.lang.Long"); }
         return javaLangLong;
     }
 
     public ClassType getJavaLangFloat() {
-        if (javaLangFloat == null) {
-            javaLangFloat = getClassType("java.lang.Float");
-        }
+        if (javaLangFloat == null) { javaLangFloat = getClassType("java.lang.Float"); }
         return javaLangFloat;
     }
 
     public ClassType getJavaLangDouble() {
-        if (javaLangDouble == null) {
-            javaLangDouble = getClassType("java.lang.Double");
-        }
+        if (javaLangDouble == null) { javaLangDouble = getClassType("java.lang.Double"); }
         return javaLangDouble;
     }
 
     public ClassType getJavaLangClass() {
-        if (javaLangClass == null) {
-            javaLangClass = getClassType("java.lang.Class");
-        }
+        if (javaLangClass == null) { javaLangClass = getClassType("java.lang.Class"); }
         return javaLangClass;
     }
 
     public ClassType getJavaLangCloneable() {
-        if (javaLangCloneable == null) {
-            javaLangCloneable = getClassType("java.lang.Cloneable");
-        }
+        if (javaLangCloneable == null) { javaLangCloneable = getClassType("java.lang.Cloneable"); }
         return javaLangCloneable;
     }
 
     public ClassType getJavaLangRunnable() {
-        if (javaLangRunnable == null) {
-            javaLangRunnable = getClassType("java.lang.Runnable");
-        }
+        if (javaLangRunnable == null) { javaLangRunnable = getClassType("java.lang.Runnable"); }
         return javaLangRunnable;
     }
 
     public ClassType getJavaIoSerializable() {
-        if (javaIoSerializable == null) {
-            javaIoSerializable = getClassType("java.io.Serializable");
-        }
+        if (javaIoSerializable == null) { javaIoSerializable = getClassType("java.io.Serializable"); }
         return javaIoSerializable;
     }
 
@@ -326,9 +294,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public ClassType getJavaLangEnum() {
-        if (javaLangEnum == null) {
-            javaLangEnum = getClassType("java.lang.Enum");
-        }
+        if (javaLangEnum == null) { javaLangEnum = getClassType("java.lang.Enum"); }
         return javaLangEnum;
     }
 
@@ -379,9 +345,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             result = new Package(name, serviceConfiguration.getImplicitElementInfo());
             name2package.put(result.getName(), result);
             int ldp = name.lastIndexOf('.');
-            if (ldp > 0) {
-                createPackage(name.substring(0, ldp));
-            }
+            if (ldp > 0) { createPackage(name.substring(0, ldp)); }
         }
         return result;
     }
@@ -396,17 +360,13 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         updateModel();
         int size = name2package.size();
         List<Package> result = new ArrayList<>(size);
-        for (Package p : name2package.values()) {
-            result.add(p);
-        }
+        for (Package p : name2package.values()) { result.add(p); }
         return result;
     }
 
     public ClassType getClassType(String name) {
         Type result = getType(name);
-        if (result instanceof ClassType) {
-            return (ClassType) result;
-        }
+        if (result instanceof ClassType) { return (ClassType) result; }
         return null;
     }
 
@@ -422,13 +382,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public ArrayType createArrayType(Type basetype, int dimensions) {
-        if (dimensions < 1) {
-            throw new IllegalArgumentException("dimensions must be >= 1");
-        }
+        if (dimensions < 1) { throw new IllegalArgumentException("dimensions must be >= 1"); }
         Type result = basetype;
-        while (dimensions-- > 0) {
-            result = createArrayType(result);
-        }
+        while (dimensions-- > 0) { result = createArrayType(result); }
         return (ArrayType) result;
     }
 
@@ -442,9 +398,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public Type getType(String name) {
         Debug.assertNonnull(name);
         updateModel();
-        if (DEBUG) {
-            Debug.log("Search requested for type " + name);
-        }
+        if (DEBUG) { Debug.log("Search requested for type " + name); }
 
         Type result = name2type.get(name);
         if (result != null && !name.equals(result.getFullName())) {
@@ -455,37 +409,27 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             result = null;
         }
         if (result == unknownType) {
-            if (DEBUG) {
-                Debug.log(name + " is known to be unknown");
-            }
+            if (DEBUG) { Debug.log(name + " is known to be unknown"); }
             return null; // report null
         } else if (result == null) {
             if (name.endsWith("]")) {
                 result = getType(name.substring(0, name.length() - 2));
-                if (result != null) {
-                    return createArrayType(result);
-                }
+                if (result != null) { return createArrayType(result); }
             }
 
             // try to load the required information
             if (result == null && loadClass(name)) {
                 result = name2type.get(name);
                 if (result == unknownType) {
-                    if (DEBUG) {
-                        Debug.log(name + " is known to be unknown");
-                    }
+                    if (DEBUG) { Debug.log(name + " is known to be unknown"); }
                     return null;
                 }
             }
             // cache positive or negative results
-            if (DEBUG && result == null) {
-                Debug.log(name + " is set to unknown");
-            }
+            if (DEBUG && result == null) { Debug.log(name + " is set to unknown"); }
             name2type.put(name, (result != null) ? result : unknownType);
         }
-        if (DEBUG && result != null) {
-            Debug.log(name + " has been found");
-        }
+        if (DEBUG && result != null) { Debug.log(name + " has been found"); }
         return result;
     }
 
@@ -494,11 +438,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         int size = name2type.size();
         List<Type> result = new ArrayList<>(size);
         // size: most types are expected to be known
-        for (Type t : name2type.values()) {
-            if (t != unknownType) {
-                result.add(t);
-            }
-        }
+        for (Type t : name2type.values()) { if (t != unknownType) { result.add(t); } }
         return result;
     }
 
@@ -511,13 +451,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<ClassType> result = new ArrayList<>();
         List<Type> tl = getTypes();
         int s = tl.size();
-        for (Type t : tl) {
-            if (t instanceof ClassType ct) {
-                if (ct.getContainer() == pkg) {
-                    result.add(ct);
-                }
-            }
-        }
+        for (Type t : tl) { if (t instanceof ClassType ct) { if (ct.getContainer() == pkg) { result.add(ct); } } }
         return result;
     }
 
@@ -526,11 +460,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<ClassType> result = new ArrayList<>(name2type.size() - 8);
         List<Type> tl = getTypes();
         int s = tl.size();
-        for (Type t : tl) {
-            if (t instanceof ClassType) {
-                result.add((ClassType) t);
-            }
-        }
+        for (Type t : tl) { if (t instanceof ClassType) { result.add((ClassType) t); } }
         return result;
     }
 
@@ -538,30 +468,20 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Debug.assertNonnull(name);
         updateModel();
         Field result = name2field.get(name);
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
         // we can try to get the type first
         int ldp = name.lastIndexOf('.');
-        if (ldp == -1) {
-            return null;
-        }
+        if (ldp == -1) { return null; }
         ClassType ct = getClassType(name.substring(0, ldp));
-        if (ct == null) {
-            return null;
-        }
+        if (ct == null) { return null; }
         List<? extends Field> fields = ct.getFields();
-        if (fields == null) {
-            return null;
-        }
+        if (fields == null) { return null; }
         String shortname = name.substring(ldp + 1);
         for (Field field : fields) {
             String fname = field.getName();
             if (/* name == fname || */shortname.equals(fname)) {
                 result = field;
-                if (result != null) {
-                    break;
-                }
+                if (result != null) { break; }
             }
         }
         return result;
@@ -571,9 +491,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         updateModel();
         int size = name2field.size();
         List<Field> result = new ArrayList<>(size);
-        for (Field f : name2field.values()) {
-            result.add(f);
-        }
+        for (Field f : name2field.values()) { result.add(f); }
         return result;
     }
 
@@ -582,21 +500,15 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         for (int i = 0; !result && i < searchMode.length; i += 1) {
             switch (searchMode[i]) {
             case SEARCH_SOURCE:
-                if (DEBUG) {
-                    Debug.log("Searching source code: " + classname);
-                }
+                if (DEBUG) { Debug.log("Searching source code: " + classname); }
                 result = loadClassFromSourceCode(classname);
                 break;
             case SEARCH_CLASS:
-                if (DEBUG) {
-                    Debug.log("Searching class file: " + classname);
-                }
+                if (DEBUG) { Debug.log("Searching class file: " + classname); }
                 result = loadClassFromPrecompiledCode(classname);
                 break;
             case SEARCH_REFLECT:
-                if (DEBUG) {
-                    Debug.log("Searching class: " + classname);
-                }
+                if (DEBUG) { Debug.log("Searching class: " + classname); }
                 result = loadClassByReflection(classname);
                 break;
             default:
@@ -655,14 +567,10 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
 
     public String information() {
         int unknown = 0;
-        for (Type t : name2type.values()) {
-            if (t == unknownType) {
-                unknown += 1;
-            }
-        }
+        for (Type t : name2type.values()) { if (t == unknownType) { unknown += 1; } }
         return "" + name2package.size() + " packages with " + (name2type.size() - unknown)
-            + " types (" + unknown + " were pure speculations) and " + name2field.size()
-            + " fields";
+                + " types (" + unknown + " were pure speculations) and " + name2field.size()
+                + " fields";
     }
 
     public void unregisterClassType(String fullname) {
@@ -677,16 +585,12 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Type array;
         ArrayList<ArrayType> al = new ArrayList<>();
         while ((array = name2type.remove(fullname)) != null) {
-            if (recycleArrayEntries) {
-                al.add((ArrayType) array);
-            }
+            if (recycleArrayEntries) { al.add((ArrayType) array); }
             fullname += "[]";
         }
         // Assumes that for any given dimension, all array types with
         // smaller dimensions already exist.
-        if (recycleArrayEntries) {
-            removedArrayCache.put(old, al);
-        }
+        if (recycleArrayEntries) { removedArrayCache.put(old, al); }
     }
 
     public void unregisterField(String fullname) {
@@ -699,9 +603,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<ClassFile> cf = getClassFileRepository().getKnownClassFiles();
         for (int i = cf.size() - 1; i >= 0; i -= 1) {
             ClassTypeContainer ctc = cf.get(i).getContainer();
-            if (ctc instanceof Package) {
-                n2p.put(ctc.getFullName(), (Package) ctc);
-            }
+            if (ctc instanceof Package) { n2p.put(ctc.getFullName(), (Package) ctc); }
         }
         name2package.clear(); // help gc a bit
         name2package = n2p;
@@ -757,18 +659,12 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         boolean unregister = false;
         Object old = name2type.get(registerTo);
         // this might be part of a valid package move, so do not corrupt caches
-        if (old == null || old == unknownType) {
-            register = true;
-        }
+        if (old == null || old == unknownType) { register = true; }
         old = name2type.get(unregisterFrom);
-        if (old == ct) {
-            unregister = true;
-        }
+        if (old == ct) { unregister = true; }
         // cannot use unregisterClassType() - original array objects need
         // to stay the same for consistency reasons!
-        if (unregister) {
-            name2type.remove(unregisterFrom);
-        }
+        if (unregister) { name2type.remove(unregisterFrom); }
         Type removed;
         String newArrayName = registerTo + "[]";
         String arrayRemove = unregisterFrom + "[]";
@@ -777,9 +673,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             arrayRemove += "[]";
             newArrayName += "[]";
         }
-        if (register) {
-            register(ct);
-        }
+        if (register) { register(ct); }
 
         // original type name is now known to be unknown
         name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file
@@ -789,12 +683,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<? extends Field> fl = ct.getFields();
         for (Field currentField : fl) {
             String fieldremove = unregisterFrom + "." + currentField.getName();
-            if (unregister) {
-                unregisterField(fieldremove);
-            }
-            if (register) {
-                register(currentField);
-            }
+            if (unregister) { unregisterField(fieldremove); }
+            if (register) { register(currentField); }
         }
     }
 

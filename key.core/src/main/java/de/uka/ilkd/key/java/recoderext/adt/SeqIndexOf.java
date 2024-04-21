@@ -16,8 +16,10 @@ public class SeqIndexOf extends Operator {
     /**
      * Creates an "index of" operator.
      *
-     * @param seq Sequence to operate on
-     * @param elem The element to look for in the sequence
+     * @param seq
+     *        Sequence to operate on
+     * @param elem
+     *        The element to look for in the sequence
      */
     public SeqIndexOf(Expression seq, Expression elem) {
         super(seq, elem);

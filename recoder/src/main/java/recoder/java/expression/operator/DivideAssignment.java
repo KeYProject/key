@@ -32,8 +32,10 @@ public class DivideAssignment extends Assignment {
     /**
      * Divide assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public DivideAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class DivideAssignment extends Assignment {
     /**
      * Divide assignment.
      *
-     * @param proto a divide assignment.
+     * @param proto
+     *        a divide assignment.
      */
 
     protected DivideAssignment(DivideAssignment proto) {

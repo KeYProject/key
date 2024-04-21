@@ -24,7 +24,8 @@ public interface Expression extends ProgramElement {
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
     void setExpressionContainer(ExpressionContainer c);
 

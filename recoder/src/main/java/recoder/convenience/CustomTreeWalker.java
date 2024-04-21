@@ -118,9 +118,7 @@ public class CustomTreeWalker extends TreeWalker {
                 } else {
                     for (int i = s - 1; i >= 0; i -= 1) {
                         ProgramElement e = nt.getChildAt(i);
-                        if (childFilter.accept(e)) {
-                            stack[count++] = e;
-                        }
+                        if (childFilter.accept(e)) { stack[count++] = e; }
                     }
                 }
             }

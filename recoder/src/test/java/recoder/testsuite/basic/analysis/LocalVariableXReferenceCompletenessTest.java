@@ -33,9 +33,7 @@ public class LocalVariableXReferenceCompletenessTest extends XReferenceCompleten
                     List<? extends VariableReference> list = xrsi.getReferences(x);
                     for (VariableReference r : list) {
                         Variable y = xrsi.getVariable(r);
-                        if (x != y) {
-                            Assert.fail(makeResolutionError(r, x, y));
-                        }
+                        if (x != y) { Assert.fail(makeResolutionError(r, x, y)); }
                     }
                 }
             }

@@ -43,12 +43,8 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
         for (Map.Entry<String, String> entry : args.entrySet()) {
             String key = entry.getKey();
             final String value = entry.getValue();
-            if ("#1".equals(key)) {
-                continue;
-            }
-            if ("#literal".equals(key)) {
-                continue;
-            }
+            if ("#1".equals(key)) { continue; }
+            if ("#literal".equals(key)) { continue; }
             if (!key.startsWith("@")) {
                 throw new ScriptException("Unexpected parameter to let, only @var allowed: " + key);
             }
@@ -71,7 +67,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                     } else {
                         throw new ScriptException(String.format(
                             "Tried to remember instantiation of schema variable %s "
-                                + "as \"%s\", but instantiation is \"%s\" and not a function",
+                                    + "as \"%s\", but instantiation is \"%s\" and not a function",
                             value, key, inst == null ? "null" : inst.toString()));
                     }
                 }

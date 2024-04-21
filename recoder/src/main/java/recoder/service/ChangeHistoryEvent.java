@@ -34,10 +34,7 @@ public class ChangeHistoryEvent extends java.util.EventObject {
 
     public String toString() {
         StringBuilder res = new StringBuilder();
-        for (TreeChange treeChange : changeList) {
-            res.append(treeChange.toString());
-            res.append("\n");
-        }
+        for (TreeChange treeChange : changeList) { res.append(treeChange.toString()); res.append("\n"); }
         return res.toString();
     }
 }

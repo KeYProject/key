@@ -46,9 +46,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
     protected TypeArgumentDeclaration(TypeArgumentDeclaration proto) {
         super(proto);
         this.wildcardMode = proto.wildcardMode;
-        if (proto.typeReference != null) {
-            this.typeReference = proto.typeReference.deepClone();
-        }
+        if (proto.typeReference != null) { this.typeReference = proto.typeReference.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -77,9 +75,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0 && typeReference != null) {
-            return typeReference;
-        }
+        if (index == 0 && typeReference != null) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -108,9 +104,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
      */
     public int getChildPositionCode(ProgramElement child) {
         // 0: typeReference
-        if (child == typeReference) {
-            return 0;
-        }
+        if (child == typeReference) { return 0; }
         return -1;
     }
 
@@ -121,14 +115,10 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
      * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (p == typeReference) {
             typeReference = (TypeReference) q;
-            if (typeReference != null) {
-                typeReference.setParent(this);
-            }
+            if (typeReference != null) { typeReference.setParent(this); }
             return true;
         }
         return false;
@@ -148,8 +138,10 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
     }
 
     /**
-     * @param tr either a TypeReference, a URQ, or an MethodReference
-     * @throws IllegalArgumentException if <code>tr</code> isn't of type TypeReference, URQ, or
+     * @param tr
+     *        either a TypeReference, a URQ, or an MethodReference
+     * @throws IllegalArgumentException
+     *         if <code>tr</code> isn't of type TypeReference, URQ, or
      *         MethodReference
      */
     public void setParent(Reference tr) {
@@ -180,9 +172,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (typeReference != null) {
-            typeReference.setParent(this);
-        }
+        if (typeReference != null) { typeReference.setParent(this); }
     }
 
     public WildcardMode getWildcardMode() {
@@ -201,9 +191,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
      * Returns type reference's type arguments, or null if wildcardMode == WildcardMode.Any
      */
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-        if (wildcardMode == WildcardMode.Any) {
-            return null;
-        }
+        if (wildcardMode == WildcardMode.Any) { return null; }
         // otherwise, type reference must be set. Leave at it is for now for error detection
         return typeReference.getTypeArguments();
     }
@@ -218,9 +206,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
 
     @Override
     public SourceElement getFirstElement() {
-        if (wildcardMode != WildcardMode.None) {
-            return this;
-        }
+        if (wildcardMode != WildcardMode.None) { return this; }
         return typeReference == null ? this : typeReference.getFirstElement();
     }
 

@@ -29,7 +29,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     /**
      * Array initializer.
      *
-     * @param list with all children. May contain: several of Expression (as the initializing
+     * @param list
+     *        with all children. May contain: several of Expression (as the initializing
      *        expression) Comments
      */
     public ArrayInitializer(ExtList list, KeYJavaType kjt) {
@@ -43,7 +44,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     /**
      * create a new array initializer with the given expressions as elements.
      *
-     * @param expressions a list of all contained elements
+     * @param expressions
+     *        a list of all contained elements
      */
     public ArrayInitializer(Expression[] expressions, KeYJavaType kjt) {
         super();
@@ -61,9 +63,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -76,9 +76,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
     @Override
     public Expression getExpressionAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 

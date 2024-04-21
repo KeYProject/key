@@ -26,8 +26,10 @@ public abstract class ComparativeOperator extends Operator {
     /**
      * Comparative operator.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public ComparativeOperator(Expression lhs, Expression rhs) {
@@ -37,7 +39,8 @@ public abstract class ComparativeOperator extends Operator {
     /**
      * Comparative operator.
      *
-     * @param proto a comparative operator.
+     * @param proto
+     *        a comparative operator.
      */
 
     protected ComparativeOperator(ComparativeOperator proto) {

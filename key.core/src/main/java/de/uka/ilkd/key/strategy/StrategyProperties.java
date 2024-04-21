@@ -277,14 +277,21 @@ public final class StrategyProperties extends Properties {
     /**
      * Sets the default settings for symbolic execution on the given {@link StrategyProperties}.
      *
-     * @param sp The {@link StrategyProperties} to modify.
-     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
-     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
-     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non-execution branch labels by
+     * @param sp
+     *        The {@link StrategyProperties} to modify.
+     * @param quantifierInstantiationWithSplitting
+     *        Instantiate quantifiers?
+     * @param methodTreatmentContract
+     *        Use method contracts or inline method bodies otherwise?
+     * @param loopTreatmentInvariant
+     *        Use loop invariants or unrole loops otherwise?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non-execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
+     * @param aliasChecks
+     *        Do alias checks?
      */
     public static void setDefaultStrategyProperties(StrategyProperties sp,
             boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
@@ -337,9 +344,7 @@ public final class StrategyProperties extends Properties {
      */
     private static Object readSingleOption(Properties p, String key) {
         String o = (String) p.get(STRATEGY_PROPERTY + key);
-        if (o != null) {
-            o = getUniqueString(o);
-        }
+        if (o != null) { o = getUniqueString(o); }
         if (o == null) {
             o = (String) DEFAULT_MAP.get(key);
             // remove this line if always satisfied. add another assignment if not.
@@ -349,25 +354,23 @@ public final class StrategyProperties extends Properties {
     }
 
     /**
-     * @param in A keyword from the strategy properties. It must be registered in
+     * @param in
+     *        A keyword from the strategy properties. It must be registered in
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
     private static String getUniqueString(String in) {
-        for (String id : STRING_POOL) {
-            if (id.equals(in)) {
-                return id;
-            }
-        }
+        for (String id : STRING_POOL) { if (id.equals(in)) { return id; } }
 
         // CAUTION:
         // If you changed something in the settings:Perhaps you need to update
         // the string pool in StrategyProperties.
 
         LOGGER.error("The string \"{}\" is not registered in the"
-            + " string pool of StrategyProperties. Probably you are loading"
-            + " properties stored with a different KeY version. This setting"
-            + " is ignored, default value is taken!", in);
+                + " string pool of StrategyProperties. Probably you are loading"
+                + " properties stored with a different KeY version. This setting"
+                + " is ignored, default value is taken!",
+            in);
         return null;
     }
 
@@ -377,9 +380,7 @@ public final class StrategyProperties extends Properties {
         for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
             final var def = entry.getValue();
             final var obj = category.get(entry.getKey().toString());
-            if (obj != null && def.getClass() == obj.getClass()) {
-                sp.put(entry.getKey(), obj);
-            }
+            if (obj != null && def.getClass() == obj.getClass()) { sp.put(entry.getKey(), obj); }
         }
         return sp;
     }
@@ -388,18 +389,14 @@ public final class StrategyProperties extends Properties {
         category = category.getOrCreateSection("options");
         for (Map.Entry<Object, Object> entry : entrySet()) {
             final var value = entry.getValue();
-            if (value != null) {
-                category.set(entry.getKey().toString(), value);
-            }
+            if (value != null) { category.set(entry.getKey().toString(), value); }
         }
     }
 
 
     public String getProperty(String key) {
         String val = super.getProperty(key);
-        if (val != null) {
-            return val;
-        }
+        if (val != null) { return val; }
         return DEFAULT_MAP.getProperty(key);
     }
 

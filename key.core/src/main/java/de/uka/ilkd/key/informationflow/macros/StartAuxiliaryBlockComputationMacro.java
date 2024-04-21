@@ -47,10 +47,10 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-            + "proofs, this macro starts a side calculation which does "
-            + "the symbolic execution only once. The result is "
-            + "instantiated twice with the variable to be used in the "
-            + "two executions of the self-composition.";
+                + "proofs, this macro starts a side calculation which does "
+                + "the symbolic execution only once. The result is "
+                + "instantiated twice with the variable to be used in the "
+                + "two executions of the self-composition.";
     }
 
     @Override
@@ -59,21 +59,15 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
                 || goals.head().node().parent() == null) {
             return false;
         }
-        if (posInOcc == null || posInOcc.subTerm() == null) {
-            return false;
-        }
+        if (posInOcc == null || posInOcc.subTerm() == null) { return false; }
 
         final Services services = proof.getServices();
 
         final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp)) {
-            return false;
-        }
+        if (!(app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp)) { return false; }
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
-        if (ifVars == null) {
-            return false;
-        }
+        if (ifVars == null) { return false; }
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
             ifVars.c2, blockRuleApp.getExecutionContext(), services);

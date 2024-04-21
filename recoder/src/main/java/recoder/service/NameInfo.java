@@ -19,7 +19,8 @@ public interface NameInfo extends Service {
      * Returns a package represented by the given fully qualified name. If the package has not been
      * encountered before, a new package is created and returned.
      *
-     * @param name a qualified name.
+     * @param name
+     *        a qualified name.
      * @return the according package, constructed on demand.
      */
     Package createPackage(String name);
@@ -27,7 +28,8 @@ public interface NameInfo extends Service {
     /**
      * Returns the package represented by the given fully qualified name, if it already exists.
      *
-     * @param name a qualified name.
+     * @param name
+     *        a qualified name.
      * @return the according package, or <CODE>null</CODE>.
      */
     Package getPackage(String name);
@@ -45,7 +47,8 @@ public interface NameInfo extends Service {
      * has not been analyzed or is undefined. The specific behavior depends on the compiler
      * configuration.
      *
-     * @param name a fully qualified type name.
+     * @param name
+     *        a fully qualified type name.
      * @return the according type, or <tt>null</tt>.
      */
     Type getType(String name);
@@ -60,7 +63,8 @@ public interface NameInfo extends Service {
     /**
      * Returns the list of known class types of the given package.
      *
-     * @param pkg a package.
+     * @param pkg
+     *        a package.
      * @return the list of class types in the package.
      */
     List<ClassType> getTypes(Package pkg);
@@ -69,7 +73,8 @@ public interface NameInfo extends Service {
      * Returns the class type represented by the given fully qualified name. If the type is
      * currently not available or does not represent a class type, the method returns <tt>null</tt>.
      *
-     * @param name a fully qualified type name.
+     * @param name
+     *        a fully qualified type name.
      * @return the according class type, or <tt>null</tt>.
      */
     ClassType getClassType(String name);
@@ -77,7 +82,8 @@ public interface NameInfo extends Service {
     /**
      * Returns the array type for the given base type, if it already exists.
      *
-     * @param basetype the base type to find an array type for.
+     * @param basetype
+     *        the base type to find an array type for.
      * @return the array type for the given base type, or <CODE>null</CODE>.
      */
     ArrayType getArrayType(Type basetype);
@@ -86,7 +92,8 @@ public interface NameInfo extends Service {
      * Returns the array type for the given base type. This method will create one if needed. Same
      * as <code>createArrayType(basetype, 1)</code>
      *
-     * @param basetype the base type to find an array type for.
+     * @param basetype
+     *        the base type to find an array type for.
      * @return the array type for the given base type.
      */
     ArrayType createArrayType(Type basetype);
@@ -95,7 +102,8 @@ public interface NameInfo extends Service {
      * Returns the array type for the given base type with the given dimensions. This method will
      * create one if needed.
      *
-     * @param basetype the base type to find an array type for.
+     * @param basetype
+     *        the base type to find an array type for.
      * @param dimensions
      * @return the array type for the given base type.
      */
@@ -289,7 +297,8 @@ public interface NameInfo extends Service {
     /**
      * Returns a field belonging to the given fully qualified name.
      *
-     * @param name fully qualified field name, e.g. "System.out".
+     * @param name
+     *        fully qualified field name, e.g. "System.out".
      * @return the field with that name, or <tt>null</tt> if no such field is known.
      */
     Field getField(String name);
@@ -304,28 +313,32 @@ public interface NameInfo extends Service {
     /**
      * Registers a class type.
      *
-     * @param ct the class type to be recognized by this service.
+     * @param ct
+     *        the class type to be recognized by this service.
      */
     void register(ClassType ct);
 
     /**
      * Registers a field.
      *
-     * @param f the field to be recognized by this service.
+     * @param f
+     *        the field to be recognized by this service.
      */
     void register(Field f);
 
     /**
      * Unregisters a class type.
      *
-     * @param fullname the (former) class type name.
+     * @param fullname
+     *        the (former) class type name.
      */
     void unregisterClassType(String fullname);
 
     /**
      * Unregisters a field.
      *
-     * @param fullname the (former) field name.
+     * @param fullname
+     *        the (former) field name.
      */
     void unregisterField(String fullname);
 

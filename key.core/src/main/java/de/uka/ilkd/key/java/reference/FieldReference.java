@@ -58,34 +58,26 @@ public class FieldReference extends VariableReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (variable != null) {
-            result++;
-        }
+        if (prefix != null) { result++; }
+        if (variable != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
-        if (variable != null) {
-            if (index == 0) {
-                return variable;
-            }
-        }
+        if (variable != null) { if (index == 0) { return variable; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -139,9 +131,7 @@ public class FieldReference extends VariableReference
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -164,9 +154,7 @@ public class FieldReference extends VariableReference
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) {
-            return (Expression) prefix;
-        }
+        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -185,7 +173,8 @@ public class FieldReference extends VariableReference
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFieldReference(this);

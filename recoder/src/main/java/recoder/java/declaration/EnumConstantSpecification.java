@@ -56,9 +56,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
      */
     public EnumConstantSpecification(EnumConstantSpecification proto) {
         super(proto);
-        if (proto.ref != null) {
-            ref = proto.ref.deepClone();
-        }
+        if (proto.ref != null) { ref = proto.ref.deepClone(); }
     }
 
     public void accept(SourceVisitor v) {
@@ -75,9 +73,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ref != null) {
-            ref.setParent(this);
-        }
+        if (ref != null) { ref.setParent(this); }
     }
 
     @Override
@@ -87,9 +83,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     @Override
     public ProgramElement getChildAt(int pos) {
-        if (pos == super.getChildCount() && ref != null) {
-            return ref;
-        }
+        if (pos == super.getChildCount() && ref != null) { return ref; }
         return super.getChildAt(pos);
     }
 
@@ -104,9 +98,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
     @Override
     public void validate() throws ModelException {
         super.validate();
-        if (ref == null) {
-            throw new ModelException("EnumConstructorReference not set in " + getFullName());
-        }
+        if (ref == null) { throw new ModelException("EnumConstructorReference not set in " + getFullName()); }
     }
 
     @Override

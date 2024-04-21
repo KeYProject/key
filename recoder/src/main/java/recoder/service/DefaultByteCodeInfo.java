@@ -36,7 +36,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     private final Map<Method, List<Type>> method2signature = new HashMap<>(128);
 
     /**
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultByteCodeInfo(ServiceConfiguration config) {
         super(config);
@@ -72,15 +73,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         if (bce instanceof MethodInfo) {
             MethodInfo mi = (MethodInfo) bce;
             List<? extends TypeParameter> tpl = mi.getContainingClassType().getTypeParameters();
-            for (TypeParameter tp : tpl) {
-                if (typeName.equals(tp.getName())) {
-                    result = tp;
-                }
-            }
+            for (TypeParameter tp : tpl) { if (typeName.equals(tp.getName())) { result = tp; } }
         }
-        if (result == null) {
-            result = getNameInfo().getType(typeName);
-        }
+        if (result == null) { result = getNameInfo().getType(typeName); }
         if (bce instanceof MethodInfo) {
             MethodInfo mi = (MethodInfo) bce;
             List<TypeArgumentInfo> typeArgs = mi.getTypeArgumentsForReturnType();
@@ -115,9 +110,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     public Package getPackage(ProgramModelElement pme) {
         Debug.assertNonnull(pme);
         ProgramModelElement x = element2container.get(pme);
-        while ((x != null) && !(x instanceof Package)) {
-            x = element2container.get(x);
-        }
+        while ((x != null) && !(x instanceof Package)) { x = element2container.get(x); }
         return (Package) x;
     }
 
@@ -151,9 +144,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             return res;
         }
         ClassFile cf = getClassFile(ct);
-        if (cf == null) {
-            return ct.getProgramModelInfo().getSupertypes(ct);
-        }
+        if (cf == null) { return ct.getProgramModelInfo().getSupertypes(ct); }
         ClassFileCacheEntry cfce = (ClassFileCacheEntry) classTypeCache.get(ct);
         Debug.assertNonnull(cfce); // created during registration
         Debug.assertNonnull(cfce.supertypes); // created during registration
@@ -217,9 +208,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                         int dim;
                         if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real
                                                                  // dimension.
-                        {
-                            basename = basename.substring(0, dim);
-                        }
+                        { basename = basename.substring(0, dim); }
                         List<? extends TypeParameter> tpl;
                         boolean checkClassTypeParameters = true;
                         // method's type parameters
@@ -231,10 +220,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                     t = tp;
                                     if (dim != -1) {
                                         dim = (ptypes[i].length() - dim) / 2;
-                                        while (dim != 0) {
-                                            t = ni.createArrayType(tp);
-                                            dim--;
-                                        }
+                                        while (dim != 0) { t = ni.createArrayType(tp); dim--; }
                                     }
                                     checkClassTypeParameters = false;
                                     break;
@@ -249,18 +235,13 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                     t = tp;
                                     if (dim != -1) {
                                         dim = (ptypes[i].length() - dim) / 2;
-                                        while (dim != 0) {
-                                            t = ni.createArrayType(tp);
-                                            dim--;
-                                        }
+                                        while (dim != 0) { t = ni.createArrayType(tp); dim--; }
                                     }
                                     break;
                                 }
                             }
                         }
-                        if (t == null) {
-                            t = ni.getType(ptypes[i]);
-                        }
+                        if (t == null) { t = ni.getType(ptypes[i]); }
                         if (mi.getTypeArgumentsForParam(i) != null) {
                             if (t instanceof ArrayType) {
                                 t = makeParameterizedArrayType(t, mi.getTypeArgumentsForParam(i));
@@ -286,14 +267,10 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             return m.getProgramModelInfo().getExceptions(m);
         } else {
             String[] etypes = mi.getExceptionsInfo();
-            if (etypes == null || etypes.length == 0) {
-                return new ArrayList<>(0);
-            }
+            if (etypes == null || etypes.length == 0) { return new ArrayList<>(0); }
             List<ClassType> res = new ArrayList<>(etypes.length);
             NameInfo ni = getNameInfo();
-            for (String etype : etypes) {
-                res.add(ni.getClassType(etype));
-            }
+            for (String etype : etypes) { res.add(ni.getClassType(etype)); }
             return res;
         }
     }
@@ -351,7 +328,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 register((ClassFile) outerClass);
             } else {
                 Debug.log("Found a non-ClassFile outer class of " + classname + ":"
-                    + Format.toString("%c %N", outerClass));
+                        + Format.toString("%c %N", outerClass));
             }
 
             // set containment
@@ -360,9 +337,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             // find package, or create a new one, respectively
             ldp = classname.lastIndexOf('.');
             String packageName = "";
-            if (ldp != -1) {
-                packageName = classname.substring(0, ldp);
-            }
+            if (ldp != -1) { packageName = classname.substring(0, ldp); }
             // set containment link
             ctc = ni.createPackage(packageName);
         }
@@ -377,25 +352,15 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
         // register fields
         List<? extends Field> fl = cf.getFieldInfos();
-        for (Field f : fl) {
-            f.setProgramModelInfo(this);
-            element2container.put(f, cf);
-            ni.register(f);
-        }
+        for (Field f : fl) { f.setProgramModelInfo(this); element2container.put(f, cf); ni.register(f); }
 
         // register methods
         List<? extends Method> ml = cf.getMethodInfos();
-        for (Method m : ml) {
-            m.setProgramModelInfo(this);
-            element2container.put(m, cf);
-        }
+        for (Method m : ml) { m.setProgramModelInfo(this); element2container.put(m, cf); }
 
         // register constructors
         List<? extends Constructor> cl = cf.getConstructorInfos();
-        for (Constructor c : cl) {
-            c.setProgramModelInfo(this);
-            element2container.put(c, cf);
-        }
+        for (Constructor c : cl) { c.setProgramModelInfo(this); element2container.put(c, cf); }
         if (cl.isEmpty() && !cf.isInterface() && !cf.isEnumType()
                 && Character.isJavaIdentifierStart(cf.getName().charAt(0))) {
             Debug.log("No constructor defined in " + cf.getFullName());
@@ -445,9 +410,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
-                if (tais != null && tais.size() > 0) {
-                    ct = new ParameterizedType(ct, tais);
-                }
+                if (tais != null && tais.size() > 0) { ct = new ParameterizedType(ct, tais); }
                 list.add(ct);
             }
         }
@@ -461,22 +424,16 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);
-                if (tais != null && tais.size() > 0) {
-                    ct = new ParameterizedType(ct, tais);
-                }
+                if (tais != null && tais.size() > 0) { ct = new ParameterizedType(ct, tais); }
                 list.add(ct);
             }
         }
         if (list.isEmpty()) {
             ClassType jlo = ni.getJavaLangObject();
-            if (cf != jlo) {
-                list.add(jlo);
-            }
+            if (cf != jlo) { list.add(jlo); }
         }
         cfce.supertypes = list;
-        for (ClassType classType : list) {
-            registerSubtype(cf, classType);
-        }
+        for (ClassType classType : list) { registerSubtype(cf, classType); }
     }
 
     public Type getAnnotationType(AnnotationUseInfo au) {

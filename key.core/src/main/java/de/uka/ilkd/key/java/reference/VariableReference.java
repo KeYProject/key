@@ -48,16 +48,14 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (variable != null) {
-            if (index == 0) {
-                return variable;
-            }
-        }
+        if (variable != null) { if (index == 0) { return variable; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -83,7 +81,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnVariableReference(this);
@@ -105,8 +104,10 @@ public class VariableReference extends JavaNonTerminalProgramElement
     /**
      * Gets the KeY java type.
      *
-     * @param javaServ the java services
-     * @param ec the execution context
+     * @param javaServ
+     *        the java services
+     * @param ec
+     *        the execution context
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

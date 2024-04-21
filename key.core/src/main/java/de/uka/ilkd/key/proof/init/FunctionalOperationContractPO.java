@@ -75,8 +75,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param contract The {@link FunctionalOperationContractPO} to prove.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param contract
+     *        The {@link FunctionalOperationContractPO} to prove.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,
             FunctionalOperationContract contract) {
@@ -87,11 +89,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param contract The {@link FunctionalOperationContractPO} to prove.
-     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param contract
+     *        The {@link FunctionalOperationContractPO} to prove.
+     * @param addUninterpretedPredicate
+     *        {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel
+     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,
@@ -322,9 +328,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalOperationContractPO cPO)) {
-            return false;
-        }
+        if (!(po instanceof FunctionalOperationContractPO cPO)) { return false; }
         return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
     }
 
@@ -359,10 +363,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
@@ -372,9 +379,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         int ind = -1;
         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
+            if (ind > 0) { break; }
             proofNum++;
         }
         if (ind == -1) {

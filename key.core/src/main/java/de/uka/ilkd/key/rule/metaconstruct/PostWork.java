@@ -33,7 +33,8 @@ public class PostWork extends ProgramTransformer {
     /**
      * Used to create this Java statement programmatically. Do not use in taclet meta constructs!
      *
-     * @param pv The {@link ProgramVariable}
+     * @param pv
+     *        The {@link ProgramVariable}
      */
     public PostWork(ProgramVariable pv) {
         super(POST_WORK, pv);

@@ -56,11 +56,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
         List<Field> result = new ArrayList<>(cd.getChildCount());
         outer: for (int i = 0; i < cd.getChildCount(); i++) {
             if (cd.getChildAt(i) instanceof FieldDeclaration fd) {
-                for (Modifier mod : fd.getModifiers()) {
-                    if (mod instanceof Model) {
-                        continue outer;
-                    }
-                }
+                for (Modifier mod : fd.getModifiers()) { if (mod instanceof Model) { continue outer; } }
                 final ASTList<FieldSpecification> fields = fd.getFieldSpecifications();
                 result.addAll(fields);
             }
@@ -83,9 +79,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-        for (final ClassDeclaration cd : classDeclarations()) {
-            class2fields.put(cd, defaultSettings(getFields(cd)));
-        }
+        for (final ClassDeclaration cd : classDeclarations()) { class2fields.put(cd, defaultSettings(getFields(cd))); }
         setProblemReport(NO_PROBLEM);
         return NO_PROBLEM;
     }
@@ -98,9 +92,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
      */
     private ASTList<Statement> defaultSettings(List<Field> fields) {
 
-        if (fields == null) {
-            return new ASTArrayList<>(0);
-        }
+        if (fields == null) { return new ASTArrayList<>(0); }
         ASTList<Statement> result = new ASTArrayList<>(fields.size());
         for (Field field : fields) {
             if (!field.isStatic()) {
@@ -135,7 +127,8 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
      * creates the implicit <code>&lt;prepare&gt;</code> method that sets the fields of the given
      * type to its default values
      *
-     * @param type the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
+     * @param type
+     *        the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
@@ -152,7 +145,8 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
      * creates the implicit <code>&lt;prepareEnter&gt;</code> method that sets the fields of the
      * given type to its default values
      *
-     * @param type the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
+     * @param type
+     *        the TypeDeclaration for which the <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
@@ -170,7 +164,8 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
         if (td instanceof ClassDeclaration) {

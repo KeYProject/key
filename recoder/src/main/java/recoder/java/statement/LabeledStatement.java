@@ -43,7 +43,8 @@ public class LabeledStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public LabeledStatement(Identifier id) {
@@ -55,8 +56,10 @@ public class LabeledStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param id an identifier.
-     * @param statement a statement.
+     * @param id
+     *        an identifier.
+     * @param statement
+     *        a statement.
      */
 
     public LabeledStatement(Identifier id, Statement statement) {
@@ -68,17 +71,14 @@ public class LabeledStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param proto a labeled statement.
+     * @param proto
+     *        a labeled statement.
      */
 
     protected LabeledStatement(LabeledStatement proto) {
         super(proto);
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -98,12 +98,8 @@ public class LabeledStatement extends JavaStatement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (name != null) {
-            name.setParent(this);
-        }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (name != null) { name.setParent(this); }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -120,30 +116,27 @@ public class LabeledStatement extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (body == p) {
             Statement r = (Statement) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
 
@@ -173,7 +166,8 @@ public class LabeledStatement extends JavaStatement
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -193,7 +187,8 @@ public class LabeledStatement extends JavaStatement
     /**
      * Set body.
      *
-     * @param s a statement.
+     * @param s
+     *        a statement.
      */
 
     public void setBody(Statement s) {
@@ -208,34 +203,28 @@ public class LabeledStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (name != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -244,12 +233,8 @@ public class LabeledStatement extends JavaStatement
     public int getChildPositionCode(ProgramElement child) {
         // role 0: name
         // role 1: body
-        if (name == child) {
-            return 0;
-        }
-        if (body == child) {
-            return 1;
-        }
+        if (name == child) { return 0; }
+        if (body == child) { return 1; }
         return -1;
     }
 
@@ -266,15 +251,15 @@ public class LabeledStatement extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

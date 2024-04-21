@@ -34,7 +34,8 @@ public abstract class AppIntermediate {
     }
 
     /**
-     * @param lineNr The line number of this application in the loaded proof file.
+     * @param lineNr
+     *        The line number of this application in the loaded proof file.
      */
     public void setLineNr(int lineNr) {
         this.lineNr = lineNr;

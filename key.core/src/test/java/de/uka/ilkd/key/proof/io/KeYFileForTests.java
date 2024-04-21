@@ -43,9 +43,7 @@ public class KeYFileForTests extends KeYFile {
      */
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
-        if (initConfig == null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("KeYFile: InitConfig not set."); }
         CountingBufferedReader cinp = null;
         try {
             cinp = new CountingBufferedReader(getNewStream(), monitor, getNumberOfChars() / 100);

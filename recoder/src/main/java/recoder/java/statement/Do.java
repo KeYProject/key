@@ -33,7 +33,8 @@ public class Do extends LoopStatement {
     /**
      * Do.
      *
-     * @param guard an expression.
+     * @param guard
+     *        an expression.
      */
 
     public Do(Expression guard) {
@@ -45,8 +46,10 @@ public class Do extends LoopStatement {
     /**
      * Do.
      *
-     * @param guard an expression.
-     * @param body a statement.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
      */
 
     public Do(Expression guard, Statement body) {
@@ -58,7 +61,8 @@ public class Do extends LoopStatement {
     /**
      * Do.
      *
-     * @param proto a do.
+     * @param proto
+     *        a do.
      */
 
     protected Do(Do proto) {

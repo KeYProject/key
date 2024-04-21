@@ -62,7 +62,8 @@ public class ClassFileDeclarationManager {
     /**
      * create a new ClassFileDeclarationManager
      *
-     * @param programFactory Factory to be used for the creation of the type declarations.
+     * @param programFactory
+     *        Factory to be used for the creation of the type declarations.
      */
     public ClassFileDeclarationManager(ProgramFactory programFactory) {
         super();
@@ -76,7 +77,8 @@ public class ClassFileDeclarationManager {
      * members to the corresponding enclosing classes
      *
      * @return a collection of compilation units
-     * @throws ConvertException if an inner class cannot be connected to the enclosing class, e.g.
+     * @throws ConvertException
+     *         if an inner class cannot be connected to the enclosing class, e.g.
      *         if this is not present
      */
     public Collection<? extends CompilationUnit> getCompilationUnits() throws ConvertException {
@@ -97,9 +99,7 @@ public class ClassFileDeclarationManager {
             try {
                 if (builder.isInnerClass()) {
                     builder.attachToEnclosingDeclaration();
-                } else if (!builder.isAnonymousClass()) {
-                    compUnits.add(builder.makeCompilationUnit());
-                }
+                } else if (!builder.isAnonymousClass()) { compUnits.add(builder.makeCompilationUnit()); }
             } catch (Exception ex) {
                 throw new ConvertException("Error while processing: " + builder.getFullClassname(),
                     ex);
@@ -112,8 +112,10 @@ public class ClassFileDeclarationManager {
      * add a class file which is to be transformed into a stub. Create a compilation unit if the
      * class file is no inner class. Otherwise remember the builder to resolve it later.
      *
-     * @param cf Classfile to add
-     * @param dataLocation location to be stored in the created stub.
+     * @param cf
+     *        Classfile to add
+     * @param dataLocation
+     *        location to be stored in the created stub.
      */
     public void addClassFile(ClassFile cf, DataLocation dataLocation) {
         ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(this, cf);
@@ -135,7 +137,8 @@ public class ClassFileDeclarationManager {
     /**
      * retrieve a specific builder from the database of builders.
      *
-     * @param className class to get a builder for.
+     * @param className
+     *        class to get a builder for.
      * @return a builder for the given className or null if no builder is stored
      */
     public ClassFileDeclarationBuilder getBuilder(String className) {
@@ -152,7 +155,8 @@ public class ClassFileDeclarationManager {
      * The test procedure is to run this program on the JDK java.* packages There should be no
      * error.
      *
-     * @throws Exception all kinds of exceptions
+     * @throws Exception
+     *         all kinds of exceptions
      */
     public static void main(String[] args) throws Exception {
 
@@ -185,12 +189,8 @@ public class ClassFileDeclarationManager {
         KeYCrossReferenceSourceInfo sourceInfo = (KeYCrossReferenceSourceInfo) sc.getSourceInfo();
         sourceInfo.setIgnoreUnresolvedClasses(true);
 
-        for (CompilationUnit cu : manager.getCompilationUnits()) {
-            sc.getChangeHistory().attached(cu);
-        }
-        for (CompilationUnit cu : sourceInfo.getCreatedStubClasses()) {
-            sc.getChangeHistory().attached(cu);
-        }
+        for (CompilationUnit cu : manager.getCompilationUnits()) { sc.getChangeHistory().attached(cu); }
+        for (CompilationUnit cu : sourceInfo.getCreatedStubClasses()) { sc.getChangeHistory().attached(cu); }
         sc.getChangeHistory().updateModel();
         for (CompilationUnit cu : manager.getCompilationUnits()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();

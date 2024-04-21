@@ -27,8 +27,10 @@ public class Package implements ClassTypeContainer {
     /**
      * Creates a new package with the given name, organized by the given program model info.
      *
-     * @param name the name of the package.
-     * @param pmi the program model info responsible for this package.
+     * @param name
+     *        the name of the package.
+     * @param pmi
+     *        the program model info responsible for this package.
      */
     public Package(String name, ProgramModelInfo pmi) {
         Debug.assertNonnull(name);
@@ -66,7 +68,8 @@ public class Package implements ClassTypeContainer {
     /**
      * Sets the instance that can retrieve information about this program model element.
      *
-     * @param service the program model info for this element.
+     * @param service
+     *        the program model info for this element.
      */
     public void setProgramModelInfo(ProgramModelInfo service) {
         this.pmi = service;
@@ -92,14 +95,10 @@ public class Package implements ClassTypeContainer {
     public List<? extends AnnotationUse> getPackageAnnotations() {
         CompilationUnit cl = pmi.getServiceConfiguration().getSourceFileRepository()
                 .getCompilationUnit(getFullName() + ".package-info");
-        if (cl != null) {
-            return cl.getPackageSpecification().getAnnotations();
-        }
+        if (cl != null) { return cl.getPackageSpecification().getAnnotations(); }
         ClassFile cf = pmi.getServiceConfiguration().getClassFileRepository()
                 .getClassFile(getFullName() + ".package-info");
-        if (cf != null) {
-            return cf.getAnnotations();
-        }
+        if (cf != null) { return cf.getAnnotations(); }
         throw new UnsupportedOperationException();
     }
 

@@ -40,7 +40,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param value a double value.
+     * @param value
+     *        a double value.
      */
 
     public DoubleLiteral(double value) {
@@ -50,8 +51,10 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param children list with all children(here:comments) May contain: Comments
-     * @param value a string.
+     * @param children
+     *        list with all children(here:comments) May contain: Comments
+     * @param value
+     *        a string.
      */
 
     public DoubleLiteral(ExtList children, String value) {
@@ -62,7 +65,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public DoubleLiteral(String value) {
@@ -73,9 +77,7 @@ public class DoubleLiteral extends Literal {
      * tests if equals
      */
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof DoubleLiteral)) {
-            return false;
-        }
+        if (!(o instanceof DoubleLiteral)) { return false; }
         return ((DoubleLiteral) o).getValue().equals(getValue());
     }
 
@@ -102,7 +104,8 @@ public class DoubleLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnDoubleLiteral(this);

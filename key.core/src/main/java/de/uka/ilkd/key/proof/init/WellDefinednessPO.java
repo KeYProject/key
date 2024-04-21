@@ -57,8 +57,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * Constructor
      *
-     * @param initConfig The initial Configuration
-     * @param check The Well-Definedness Check
+     * @param initConfig
+     *        The initial Configuration
+     * @param check
+     *        The Well-Definedness Check
      */
     public WellDefinednessPO(InitConfig initConfig, WellDefinednessCheck check) {
         super(initConfig, check.getName());
@@ -117,11 +119,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             ImmutableList<ProgramVariable> paramVars, ImmutableList<ProgramVariable> origParams) {
         // make sure ghost parameters are present
         ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
-        for (ProgramVariable param : origParams) {
-            if (param.isGhost()) {
-                ghostParams = ghostParams.append(param);
-            }
-        }
+        for (ProgramVariable param : origParams) { if (param.isGhost()) { ghostParams = ghostParams.append(param); } }
         paramVars = paramVars.append(ghostParams);
         return paramVars;
     }
@@ -136,7 +134,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * This should only be executed once per proof.
      *
-     * @param check the underlying well-definedness check
+     * @param check
+     *        the underlying well-definedness check
      * @param services
      * @return new variables to be used in the actual check
      */
@@ -184,7 +183,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * Registers the new variables
      *
-     * @param vars variables to be used in the check
+     * @param vars
+     *        variables to be used in the check
      */
     private void register(Variables vars, Services proofServices) {
         register((JFunction) vars.anonHeap.op(), proofServices);
@@ -267,9 +267,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof WellDefinednessPO wPO)) {
-            return false;
-        }
+        if (!(po instanceof WellDefinednessPO wPO)) { return false; }
         WellDefinednessCheck check = getContract();
         return check.equals(wPO.getContract());
     }
@@ -296,8 +294,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {

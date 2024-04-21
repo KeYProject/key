@@ -32,8 +32,10 @@ public class BinaryXOr extends Operator {
     /**
      * Binary X or.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public BinaryXOr(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class BinaryXOr extends Operator {
     /**
      * Binary X or.
      *
-     * @param proto a binary X or.
+     * @param proto
+     *        a binary X or.
      */
 
     protected BinaryXOr(BinaryXOr proto) {

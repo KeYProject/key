@@ -26,7 +26,8 @@ public interface ConstructorReference extends MemberReference, Statement {
     /**
      * Set arguments.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
     void setArguments(ASTList<Expression> list);
 }

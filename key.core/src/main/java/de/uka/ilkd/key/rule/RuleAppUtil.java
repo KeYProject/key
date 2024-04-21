@@ -26,8 +26,10 @@ public final class RuleAppUtil {
     /**
      * Compute the sequent formulas used by the provided rule application (if-instantiations):
      *
-     * @param ruleApp the rule application
-     * @param node proof node which contains that rule application
+     * @param ruleApp
+     *        the rule application
+     * @param node
+     *        proof node which contains that rule application
      * @return sequent formulas used
      */
     public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {
@@ -49,9 +51,7 @@ public final class RuleAppUtil {
         }
         // built-ins need special treatment:
         // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
-            builtIn.ifInsts().forEach(inputs::add);
-        }
+        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) { builtIn.ifInsts().forEach(inputs::add); }
 
         // State Merging: add all formulas as inputs
         // TODO: this is not enough, as the State Merge processes every formula in the sequent

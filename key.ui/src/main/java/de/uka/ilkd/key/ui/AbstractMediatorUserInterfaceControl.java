@@ -101,15 +101,18 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
+     * @param file
+     *        the File with the problem description or the proof
      */
     public abstract void loadProblem(File file);
 
     /**
      * Loads the proof with the given filename from the proof bundle with the given path.
      *
-     * @param proofBundle the File with the problem description or the proof
-     * @param proofFilename the filename of the proof in the bundle
+     * @param proofBundle
+     *        the File with the problem description or the proof
+     * @param proofFilename
+     *        the filename of the proof in the bundle
      */
     public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
 
@@ -215,9 +218,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
         final String errorMsg = ps.save();
-        if (errorMsg != null) {
-            reportException(this, null, new IOException(errorMsg));
-        }
+        if (errorMsg != null) { reportException(this, null, new IOException(errorMsg)); }
     }
 
     /**
@@ -234,24 +235,20 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
 
     @Override
     public void proofUnregistered(ProofEnvironmentEvent event) {
-        if (event.getSource().getProofs().isEmpty()) {
-            event.getSource().removeProofEnvironmentListener(this);
-        }
+        if (event.getSource().getProofs().isEmpty()) { event.getSource().removeProofEnvironmentListener(this); }
     }
 
     /**
      * these methods are called immediately before automode is started to ensure that the GUI can
      * respond in a reasonable way, e.g., change the cursor to a waiting cursor
      */
-    public void notifyAutoModeBeingStarted() {
-    }
+    public void notifyAutoModeBeingStarted() {}
 
     /**
      * these methods are called when automode has been stopped to ensure that the GUI can respond in
      * a reasonable way, e.g., change the cursor to the default
      */
-    public void notifyAutomodeStopped() {
-    }
+    public void notifyAutomodeStopped() {}
 
     public abstract void notify(NotificationEvent event);
 
@@ -259,7 +256,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message to be displayed asking for confirmation
+     * @param message
+     *        to be displayed asking for confirmation
      * @return true if removal has been granted
      */
     public boolean confirmTaskRemoval(String message) {
@@ -295,8 +293,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
-        for (Proof proof : pa.getProofs()) {
-            proof.addProofDisposedListener(this);
-        }
+        for (Proof proof : pa.getProofs()) { proof.addProofDisposedListener(this); }
     }
 }

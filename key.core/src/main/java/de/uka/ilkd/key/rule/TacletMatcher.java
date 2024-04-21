@@ -17,10 +17,14 @@ public interface TacletMatcher {
      * constraint formulas (probably the formulas of the antecedent or the succedent), starting with
      * the given instantiations and constraint {@code p_matchCond}.
      *
-     * @param p_toMatch list of constraint formulas to match p_template to
-     * @param p_template template formula as in "match"
-     * @param p_matchCond already performed instantiations
-     * @param p_services the Services object encapsulating information about the java datastructures
+     * @param p_toMatch
+     *        list of constraint formulas to match p_template to
+     * @param p_template
+     *        template formula as in "match"
+     * @param p_matchCond
+     *        already performed instantiations
+     * @param p_services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return Two lists (in an {@link IfMatchResult} object), containing the elements of
      *         {@code p_toMatch} that
@@ -49,8 +53,10 @@ public interface TacletMatcher {
      * variable conditions. If the given matchconditions are <code>null</code> then
      * <code>null</code> is returned
      *
-     * @param p_matchconditions the matches to be checked
-     * @param services the {@link Services}
+     * @param p_matchconditions
+     *        the matches to be checked
+     * @param services
+     *        the {@link Services}
      * @return the resulting match conditions or <code>null</code> if given matches do not satisfy
      *         the taclet's variable conditions
      */
@@ -60,11 +66,15 @@ public interface TacletMatcher {
     /**
      * checks if the conditions for a correct instantiation are satisfied
      *
-     * @param var the SchemaVariable to be instantiated
-     * @param instantiationCandidate the SVSubstitute, which is a candidate for a possible
+     * @param var
+     *        the SchemaVariable to be instantiated
+     * @param instantiationCandidate
+     *        the SVSubstitute, which is a candidate for a possible
      *        instantiation of var
-     * @param matchCond the MatchConditions which have to be respected for the new match
-     * @param services the Services object encapsulating information about the Java type model
+     * @param matchCond
+     *        the MatchConditions which have to be respected for the new match
+     * @param services
+     *        the Services object encapsulating information about the Java type model
      * @return the match conditions resulting from matching <code>var</code> with
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
@@ -76,15 +86,18 @@ public interface TacletMatcher {
      * match is unsuccessful <code>null</code>
      * is returned
      *
-     * @param term the Term to be matched against the find expression
+     * @param term
+     *        the Term to be matched against the find expression
      *        of the taclet
-     * @param matchCond the MatchConditions with side conditions to be
+     * @param matchCond
+     *        the MatchConditions with side conditions to be
      *        satisfied, e.g. partial instantiations of schema variables; before
      *        calling this method the constraint contained in the match conditions
      *        must be ensured to be satisfiable, i.e.
      *        {@code matchCond.getConstraint().isSatisfiable()} must return true
      *
-     * @param services the Services
+     * @param services
+     *        the Services
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
     MatchConditions matchFind(Term term, MatchConditions matchCond,
@@ -96,11 +109,15 @@ public interface TacletMatcher {
      * {@code term} w.r.t. the constraints (e.g., previous matches of {@code sv}) specified in the
      * {@link MatchConditions} {@code matchCond}
      *
-     * @param sv the {@link SchemaVariable}
-     * @param term the {@link Term} as a candidate for instantition of {@code sv}
-     * @param matchCond the {@link MatchConditions} with additional constraints that need to be
+     * @param sv
+     *        the {@link SchemaVariable}
+     * @param term
+     *        the {@link Term} as a candidate for instantition of {@code sv}
+     * @param matchCond
+     *        the {@link MatchConditions} with additional constraints that need to be
      *        considered
-     * @param services the {@link Services}
+     * @param services
+     *        the {@link Services}
      * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the
      *         instantiation {@code sv <- term} added
      */
@@ -112,11 +129,15 @@ public interface TacletMatcher {
      * {@code pe} w.r.t. the constraints (e.g., previous matches of {@code sv}) specified in the
      * {@link MatchConditions} {@code matchCond}
      *
-     * @param sv the {@link SchemaVariable}
-     * @param pe the {@link ProgramElement} as a candidate for instantiation of {@code sv}
-     * @param matchCond the {@link MatchConditions} with additional constraints that need to be
+     * @param sv
+     *        the {@link SchemaVariable}
+     * @param pe
+     *        the {@link ProgramElement} as a candidate for instantiation of {@code sv}
+     * @param matchCond
+     *        the {@link MatchConditions} with additional constraints that need to be
      *        considered
-     * @param services the {@link Services}
+     * @param services
+     *        the {@link Services}
      * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the
      *         instantiation {@code sv <- term} added
      */

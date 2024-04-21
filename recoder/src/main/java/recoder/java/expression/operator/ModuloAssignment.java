@@ -32,8 +32,10 @@ public class ModuloAssignment extends Assignment {
     /**
      * Modulo assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public ModuloAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class ModuloAssignment extends Assignment {
     /**
      * Modulo assignment.
      *
-     * @param proto a modulo assignment.
+     * @param proto
+     *        a modulo assignment.
      */
 
     protected ModuloAssignment(ModuloAssignment proto) {

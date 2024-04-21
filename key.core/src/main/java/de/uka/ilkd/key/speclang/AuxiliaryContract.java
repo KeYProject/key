@@ -62,7 +62,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param contract the new functional contract.
+     * @param contract
+     *        the new functional contract.
      * @see #getFunctionalContracts()
      */
     void setFunctionalContract(FunctionalAuxiliaryContract<?> contract);
@@ -107,7 +108,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param services services.
+     * @param services
+     *        services.
      * @return {@code true} if and only if this contract is read-only.
      */
     boolean isReadOnly(Services services);
@@ -128,7 +130,8 @@ public interface AuxiliaryContract extends SpecificationElement {
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
      * at all, i.e., iff it is "strictly pure."
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return whether this contract is strictly pure.
      */
     boolean hasModifiesClause(LocationVariable heap);
@@ -151,17 +154,22 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPrecondition(LocationVariable heap, Services services);
 
     /**
      *
-     * @param heap the heap to use.
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap with all free program variables
      *         replaced by those in {@code variables}.
      */
@@ -169,11 +177,15 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param atPres
+     *        a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPrecondition(LocationVariable heap, ProgramVariable self,
@@ -181,13 +193,18 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use to use instead of
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
+     * @param atPres
+     *        a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPrecondition(LocationVariable heapVariable, Term heap, Term self,
@@ -195,10 +212,14 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param terms
+     *        the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPrecondition(LocationVariable heapVariable, Term heap, Terms terms,
@@ -206,19 +227,26 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's postcondition on the specified heap.
      */
     Term getPostcondition(LocationVariable heap, Variables variables, Services services);
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param terms
+     *        the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPostcondition(LocationVariable heapVariable, Term heap, Terms terms,
@@ -226,8 +254,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
      * @return this contract's precondition on the specified heap.
      */
     Term getPostcondition(LocationVariable heap, Services services);
@@ -236,17 +266,22 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePrecondition(LocationVariable heap, Services services);
 
     /**
      *
-     * @param heap the heap to use.
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap with all free program
      *         variables replaced by those in {@code variables}.
      */
@@ -254,11 +289,15 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param atPres
+     *        a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePrecondition(LocationVariable heap, ProgramVariable self,
@@ -266,13 +305,18 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use to use instead of
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
+     * @param atPres
+     *        a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePrecondition(LocationVariable heapVariable, Term heap, Term self,
@@ -280,10 +324,14 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param terms
+     *        the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePrecondition(LocationVariable heapVariable, Term heap, Terms terms,
@@ -291,19 +339,26 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's free postcondition on the specified heap.
      */
     Term getFreePostcondition(LocationVariable heap, Variables variables, Services services);
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param terms
+     *        the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePostcondition(LocationVariable heapVariable, Term heap, Terms terms,
@@ -311,27 +366,36 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
      * @return this contract's free precondition on the specified heap.
      */
     Term getFreePostcondition(LocationVariable heap, Services services);
 
     /**
      *
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's modifies clause on the specified heap.
      */
     Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
 
     /**
      *
-     * @param heapVariable the heap to use.
-     * @param heap the heap to use.
-     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heapVariable
+     *        the heap to use.
+     * @param heap
+     *        the heap to use.
+     * @param self
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's modifies clause on the specified heap.
      */
     Term getModifiesClause(LocationVariable heapVariable, Term heap, Term self,
@@ -339,17 +403,22 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
-     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param variables
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's modifies clause on the specified heap.
      */
     Term getModifiesClause(LocationVariable heap, Variables variables, Services services);
 
     /**
      *
-     * @param heap the heap to use.
-     * @param services services.
+     * @param heap
+     *        the heap to use.
+     * @param services
+     *        services.
      * @return this contract's modifies clause on the specified heap.
      */
     Term getModifiesClause(LocationVariable heap, Services services);
@@ -406,35 +475,40 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return this contract's precondition on the specified heap.
      */
     Term getRequires(LocationVariable heap);
 
     /**
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return this contract's free precondition on the specified heap.
      */
     Term getRequiresFree(LocationVariable heap);
 
     /**
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return this contract's postcondition on the specified heap.
      */
     Term getEnsures(LocationVariable heap);
 
     /**
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return this contract's free postcondition on the specified heap.
      */
     Term getEnsuresFree(LocationVariable heap);
 
     /**
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return this contract's assignable term on the specified heap.
      */
     Term getAssignable(LocationVariable heap);
@@ -442,28 +516,33 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      * Accepts a visitor.
      *
-     * @param visitor the visitor to accept.
+     * @param visitor
+     *        the visitor to accept.
      */
     void visit(Visitor visitor);
 
     /**
      *
-     * @param services services.
+     * @param services
+     *        services.
      * @return a HTML representation of this contract.
      */
     String getHtmlText(Services services);
 
     /**
      *
-     * @param services services.
+     * @param services
+     *        services.
      * @return a plain text representation of this contract.
      */
     String getPlainText(Services services);
 
     /**
      *
-     * @param services services.
-     * @param terms the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
+     * @param terms
+     *        the terms to use instead of {@link #getPlaceholderVariables()}.
      * @return a plain text representation of this contract.
      */
     String getPlainText(Services services, Terms terms);
@@ -488,29 +567,37 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param variables variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param variables
+     *        variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *        services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     Term getMby(Variables variables, Services services);
 
     /**
      *
-     * @param selfVar the {@code self} variable to use instead of
+     * @param selfVar
+     *        the {@code self} variable to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     Term getMby(ProgramVariable selfVar, Services services);
 
     /**
      *
-     * @param heapTerms the heaps to use.
-     * @param selfTerm the {@code self} variable to use instead of
+     * @param heapTerms
+     *        the heaps to use.
+     * @param selfTerm
+     *        the {@code self} variable to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
+     * @param atPres
+     *        a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
-     * @param services services.
+     * @param services
+     *        services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
@@ -525,44 +612,51 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param selfInstantiation the new instantiation self term.
+     * @param selfInstantiation
+     *        the new instantiation self term.
      * @see #getInstantiationSelfTerm()
      */
     void setInstantiationSelf(Term selfInstantiation);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the term internally used for self or a newly instantiated one. Use with care - it is
      *         likely that this is *not* the right "self" for you.
      */
     Term getInstantiationSelfTerm(TermServices services);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original precondition of the contract.
      */
     Term getPre(Services services);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original postcondition of the contract.
      */
     Term getPost(Services services);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original free precondition of the contract.
      */
     Term getFreePre(Services services);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original free postcondition of the contract.
      */
     Term getFreePost(Services services);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original modifies clause of the contract.
      */
     Term getMod(Services services);
@@ -579,8 +673,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param newKJT the type containing the new target method.
-     * @param newPM the new target method.
+     * @param newKJT
+     *        the type containing the new target method.
+     * @param newPM
+     *        the new target method.
      * @return a contract equal to this one except that it belongs to a different target.
      */
 
@@ -588,13 +684,15 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
-     * @param newBlock the new block.
+     * @param newBlock
+     *        the new block.
      * @return a contract equal to this one except that it belongs to a different block.
      */
     AuxiliaryContract setBlock(StatementBlock newBlock);
 
     /**
-     * @param services services.
+     * @param services
+     *        services.
      * @return the original used variables like self, result etc. as terms.
      */
     Terms getVariablesAsTerms(Services services);
@@ -681,25 +779,36 @@ public interface AuxiliaryContract extends SpecificationElement {
          * creates an auxiliary contract
          * You should use the suitable `create` method instead of this constructor.
          *
-         * @param self {@code self}
-         * @param breakFlags boolean flags that are set to {@code true} when the block terminates by
+         * @param self
+         *        {@code self}
+         * @param breakFlags
+         *        boolean flags that are set to {@code true} when the block terminates by
          *        a {@code break label;} statement with the specified label.
-         * @param continueFlags boolean flags that are set to {@code true} when the block terminates
+         * @param continueFlags
+         *        boolean flags that are set to {@code true} when the block terminates
          *        by a {@code continue label;} statement with the specified label.
-         * @param returnFlag boolean flag that is set to {@code true} when the block terminates by a
+         * @param returnFlag
+         *        boolean flag that is set to {@code true} when the block terminates by a
          *        {@code return} statement.
-         * @param result result variable to set when the block terminates by a {@code return}
+         * @param result
+         *        result variable to set when the block terminates by a {@code return}
          *        statement.
-         * @param exception exception variable to set when the block terminates by an uncaught
+         * @param exception
+         *        exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
-         * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceHeaps
+         *        a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
+         * @param remembranceLocalVariables
+         *        a map from every variable {@code var} that is assignable
          *        inside the block to {@code var_Before_BLOCK}.
-         * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
+         * @param outerRemembranceHeaps
+         *        a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.
-         * @param outerRemembranceVariables a map from every variable {@code var} that is accessible
+         * @param outerRemembranceVariables
+         *        a map from every variable {@code var} that is accessible
          *        inside the block to {@code var_Before_METHOD}.
-         * @param services services.
+         * @param services
+         *        services.
          */
         public Variables(final ProgramVariable self, final Map<Label, ProgramVariable> breakFlags,
                 final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
@@ -725,10 +834,14 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * Creates a new instance.
          *
-         * @param block the block for which this instance is created.
-         * @param labels all labels that belong to the block.
-         * @param method the method containing the block.
-         * @param services services.
+         * @param block
+         *        the block for which this instance is created.
+         * @param labels
+         *        all labels that belong to the block.
+         * @param method
+         *        the method containing the block.
+         * @param services
+         *        services.
          * @return a new instance.
          */
         public static Variables create(final StatementBlock block, final List<Label> labels,
@@ -739,10 +852,14 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * Creates a new instance.
          *
-         * @param loop the loop for which this instance is created.
-         * @param labels all labels that belong to the block.
-         * @param method the method containing the block.
-         * @param services services.
+         * @param loop
+         *        the loop for which this instance is created.
+         * @param labels
+         *        all labels that belong to the block.
+         * @param method
+         *        the method containing the block.
+         * @param services
+         *        services.
          * @return a new instance.
          */
         public static Variables create(final LoopStatement loop, final List<Label> labels,
@@ -777,7 +894,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param self the {@code self} term to use.
+         * @param self
+         *        the {@code self} term to use.
          * @return a {@code Terms} object containing these variables in term form.
          */
         public Terms termify(Term self) {
@@ -791,7 +909,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param flags a map containing the variables to termify.
+         * @param flags
+         *        a map containing the variables to termify.
          * @return a map with all the same keys with termified values.
          */
         private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags) {
@@ -804,7 +923,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param remembranceVariables a map containing the variables to termify.
+         * @param remembranceVariables
+         *        a map containing the variables to termify.
          * @return a map with all the same keys with termified values.
          */
         private Map<LocationVariable, Term> termifyRemembranceVariables(
@@ -820,7 +940,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param variable a variable.
+         * @param variable
+         *        a variable.
          * @return a term containing the specified variable.
          */
         private Term termifyVariable(final ProgramVariable variable) {
@@ -852,9 +973,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
-            } else if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
+            } else if (obj == null || getClass() != obj.getClass()) { return false; }
             Variables other = (Variables) obj;
             if (breakFlags == null && other.breakFlags != null) {
                 return false;
@@ -1000,10 +1119,14 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * Constructor.
          *
-         * @param statement the block or loop the contract belongs to.
-         * @param labels all labels belonging to the block.
-         * @param method the method containing the block.
-         * @param services services.
+         * @param statement
+         *        the block or loop the contract belongs to.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param method
+         *        the method containing the block.
+         * @param services
+         *        services.
          */
         public VariablesCreator(final JavaStatement statement, final List<Label> labels,
                 final IProgramMethod method, final Services services) {
@@ -1057,22 +1180,23 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param jumps a list of jump statements.
+         * @param jumps
+         *        a list of jump statements.
          * @return the label of every labeled jump statement contained in the specified list.
          */
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
             final Set<Label> result = new LinkedHashSet<>();
-            for (LabelJumpStatement jump : jumps) {
-                result.add(jump.getLabel());
-            }
+            for (LabelJumpStatement jump : jumps) { result.add(jump.getLabel()); }
             return result;
         }
 
         /**
          * Creates flags for the specified labels
          *
-         * @param labels the labels.
-         * @param baseName the base name for the flags.
+         * @param labels
+         *        the labels.
+         * @param baseName
+         *        the base name for the flags.
          * @return
          */
         private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
@@ -1087,7 +1211,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param name a name.
+         * @param name
+         *        a name.
          * @return a boolean variable with the specified name.
          */
         private ProgramVariable createFlag(final String name) {
@@ -1105,7 +1230,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param suffix the suffix to use for the remembrance heaps.
+         * @param suffix
+         *        the suffix to use for the remembrance heaps.
          * @return a map from every heap to a remembrance heap.
          * @see Variables#remembranceHeaps
          * @see Variables#outerRemembranceHeaps
@@ -1137,9 +1263,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 first = statement.getFirstElement();
             }
 
-            while (first instanceof LabeledStatement s) {
-                first = s.getBody();
-            }
+            while (first instanceof LabeledStatement s) { first = s.getBody(); }
 
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
@@ -1188,9 +1312,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (statement instanceof LoopStatement) {
             } else {
                 first = statement.getFirstElement();
-                while (first instanceof LabeledStatement s) {
-                    first = s.getBody();
-                }
+                while (first instanceof LabeledStatement s) { first = s.getBody(); }
 
                 if (first instanceof For) {
                     ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
@@ -1221,8 +1343,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param name a base name.
-         * @param type a type.
+         * @param name
+         *        a base name.
+         * @param type
+         *        a type.
          * @return a variable with a name based on the specified base name of the specified type.
          */
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
@@ -1290,23 +1414,33 @@ public interface AuxiliaryContract extends SpecificationElement {
          * Creates a new instance. In most cases, {@link Variables#termify(Term)} or
          * {@link Terms#Terms(Variables, TermBuilder)} should be used instead of this.
          *
-         * @param self {@code self}
-         * @param breakFlags boolean flags that are set to {@code true} when the block terminates by
+         * @param self
+         *        {@code self}
+         * @param breakFlags
+         *        boolean flags that are set to {@code true} when the block terminates by
          *        a {@code break label;} statement with the specified label.
-         * @param continueFlags boolean flags that are set to {@code true} when the block terminates
+         * @param continueFlags
+         *        boolean flags that are set to {@code true} when the block terminates
          *        by a {@code continue label;} statement with the specified label.
-         * @param returnFlag boolean flag that is set to {@code true} when the block terminates by a
+         * @param returnFlag
+         *        boolean flag that is set to {@code true} when the block terminates by a
          *        {@code return} statement.
-         * @param result result variable to set when the block terminates by a {@code return}
+         * @param result
+         *        result variable to set when the block terminates by a {@code return}
          *        statement.
-         * @param exception exception variable to set when the block terminates by an uncaught
+         * @param exception
+         *        exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
-         * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceHeaps
+         *        a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
+         * @param remembranceLocalVariables
+         *        a map from every variable {@code var} that is assignable
          *        inside the block to {@code var_Before_BLOCK}.
-         * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
+         * @param outerRemembranceHeaps
+         *        a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.
-         * @param outerRemembranceVariables a map from every variable {@code var} that is accessible
+         * @param outerRemembranceVariables
+         *        a map from every variable {@code var} that is accessible
          *        inside the block to {@code var_Before_METHOD}.
          */
         public Terms(final Term self, final Map<Label, Term> breakFlags,
@@ -1329,8 +1463,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param variables the variables to termify.
-         * @param tb the term builder to use.
+         * @param variables
+         *        the variables to termify.
+         * @param tb
+         *        the term builder to use.
          */
         public Terms(Variables variables, TermBuilder tb) {
             this(variables.self != null ? tb.var(variables.self) : null,
@@ -1347,8 +1483,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param map a map containing heaps as values.
-         * @param tb a term builder.
+         * @param map
+         *        a map containing heaps as values.
+         * @param tb
+         *        a term builder.
          * @return a map with all values termified.
          */
         private static Map<LocationVariable, Term> convertHeapMap(
@@ -1360,8 +1498,10 @@ public interface AuxiliaryContract extends SpecificationElement {
 
         /**
          *
-         * @param map a map containing boolean variables as values.
-         * @param tb a term builder.
+         * @param map
+         *        a map containing boolean variables as values.
+         * @param tb
+         *        a term builder.
          * @return a map with all values termified.
          */
         private static Map<Label, Term> convertFlagMap(Map<Label, ProgramVariable> map,

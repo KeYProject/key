@@ -38,7 +38,8 @@ public class Else extends Branch {
     /**
      * Else.
      *
-     * @param body a statement.
+     * @param body
+     *        a statement.
      */
 
     public Else(Statement body) {
@@ -49,14 +50,13 @@ public class Else extends Branch {
     /**
      * Else.
      *
-     * @param proto an else.
+     * @param proto
+     *        an else.
      */
 
     protected Else(Else proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -76,9 +76,7 @@ public class Else extends Branch {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     public SourceElement getLastElement() {
@@ -98,25 +96,21 @@ public class Else extends Branch {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: body
-        if (body == child) {
-            return 0;
-        }
+        if (body == child) { return 0; }
         return -1;
     }
 
@@ -126,22 +120,21 @@ public class Else extends Branch {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (body == p) {
             Statement r = (Statement) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -164,9 +157,7 @@ public class Else extends Branch {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -182,7 +173,8 @@ public class Else extends Branch {
     /**
      * Set body.
      *
-     * @param statement a statement.
+     * @param statement
+     *        a statement.
      */
 
     public void setBody(Statement statement) {
@@ -192,7 +184,8 @@ public class Else extends Branch {
     /**
      * Set parent.
      *
-     * @param parent an if.
+     * @param parent
+     *        an if.
      */
 
     public void setParent(If parent) {

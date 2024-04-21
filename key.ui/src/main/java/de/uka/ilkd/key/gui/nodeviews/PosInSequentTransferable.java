@@ -47,15 +47,14 @@ public class PosInSequentTransferable implements Transferable {
     /**
      * creates an instance of this transferable
      *
-     * @param pis the PosInSequent to be transfered (string flavor only supported if pis denotes a
+     * @param pis
+     *        the PosInSequent to be transfered (string flavor only supported if pis denotes a
      *        term or formula, not the complete sequent)
      */
     public PosInSequentTransferable(PosInSequent pis, Services serv) {
         this.pis = pis;
-        if (!pis.isSequent()) {
-            this.stringSelection =
-                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
-        }
+        if (!pis.isSequent()) { this.stringSelection =
+            ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv); }
     }
 
     /**
@@ -84,16 +83,15 @@ public class PosInSequentTransferable implements Transferable {
      * return data is of kind {@link PosInSequent}. If the flavor equals
      * {@link DataFlavor#stringFlavor} the highlighted term is returned as parsable string.
      *
-     * @throws UnsupportedFlavorException if the flavor is not supported
+     * @throws UnsupportedFlavorException
+     *         if the flavor is not supported
      */
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
         if (flavor != null) {
             if (flavor.equals(POS_IN_SEQUENT_TRANSFER)) {
                 return pis;
-            } else if (flavor.equals(DataFlavor.stringFlavor)) {
-                return stringSelection;
-            }
+            } else if (flavor.equals(DataFlavor.stringFlavor)) { return stringSelection; }
         }
         throw new UnsupportedFlavorException(flavor);
     }

@@ -107,9 +107,7 @@ public final class DLSpecFactory {
             throws ProofInputException {
         final UseOperationContractRule.Instantiation result =
             UseOperationContractRule.computeInstantiation(fma.sub(1), services);
-        if (result == null) {
-            throw new ProofInputException("Contract formula of wrong shape: " + fma.sub(1));
-        }
+        if (result == null) { throw new ProofInputException("Contract formula of wrong shape: " + fma.sub(1)); }
 
         return result;
     }
@@ -188,9 +186,7 @@ public final class DLSpecFactory {
     public ClassInvariant createDLClassInvariant(String name, String displayName,
             ParsableVariable selfVar, Term inv) throws ProofInputException {
         assert name != null;
-        if (displayName == null) {
-            displayName = name;
-        }
+        if (displayName == null) { displayName = name; }
         assert selfVar != null;
         assert inv != null;
 
@@ -237,7 +233,7 @@ public final class DLSpecFactory {
             if (oc.contains(heapAtPreVar)) {
                 throw new ProofInputException(
                     "variable \"" + heapAtPreVar + "\" used for pre-state heap"
-                        + " must not occur in precondition or in modifies clause");
+                            + " must not occur in precondition or in modifies clause");
             }
         }
 
@@ -255,9 +251,7 @@ public final class DLSpecFactory {
         mods.put(heapLDT.getHeap(), modifies);
 
         // result variable may be omitted
-        if (resultVar == null && !pm.isVoid()) {
-            resultVar = tb.resultVar(pm, false);
-        }
+        if (resultVar == null && !pm.isVoid()) { resultVar = tb.resultVar(pm, false); }
 
         // exception variable may be omitted
         if (excVar == null) {
@@ -269,7 +263,7 @@ public final class DLSpecFactory {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "
-                    + modalityKind.name() + "; please use #catchAll block");
+                        + modalityKind.name() + "; please use #catchAll block");
             }
         }
 

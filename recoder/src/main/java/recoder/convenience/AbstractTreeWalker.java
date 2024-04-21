@@ -37,9 +37,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
      * Reset the walker reusing existing objects.
      */
     protected void reset(ProgramElement root) {
-        while (count > 0) {
-            stack[--count] = null;
-        }
+        while (count > 0) { stack[--count] = null; }
         stack[count++] = current = root;
     }
 
@@ -48,11 +46,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
      * there is no such object, the walk is finished.
      */
     public boolean next(Class c) {
-        while (next()) {
-            if (c.isInstance(current)) {
-                return true;
-            }
-        }
+        while (next()) { if (c.isInstance(current)) { return true; } }
         return false;
     }
 
@@ -61,11 +55,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
      * object, the walk is finished.
      */
     public boolean next(ModelElementFilter filter) {
-        while (next()) {
-            if (filter.accept(current)) {
-                return true;
-            }
-        }
+        while (next()) { if (filter.accept(current)) { return true; } }
         return false;
     }
 
@@ -100,23 +90,11 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof AbstractTreeWalker atw)) {
-            return false;
-        }
-        if (atw.current != current) {
-            return false;
-        }
-        if (atw.count != count) {
-            return false;
-        }
-        if (atw.stack == null) {
-            return stack == null;
-        }
-        for (int i = 0; i < count; i += 1) {
-            if (atw.stack[i] != stack[i]) {
-                return false;
-            }
-        }
+        if (!(x instanceof AbstractTreeWalker atw)) { return false; }
+        if (atw.current != current) { return false; }
+        if (atw.count != count) { return false; }
+        if (atw.stack == null) { return stack == null; }
+        for (int i = 0; i < count; i += 1) { if (atw.stack[i] != stack[i]) { return false; } }
         return true;
     }
 

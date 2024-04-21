@@ -39,18 +39,20 @@ public class AppendMember extends TwoPassTransformation {
      * Creates a new transformation object that adds the given MemberDeclaration to the list in the
      * given TypeDeclaration at a convenient position.
      *
-     * @param sc the service configuration to use.
-     * @param isVisible flag indicating if this transformation shall be visible.
-     * @param child the declaration to append. may not be <CODE>null</CODE> and must denote a valid
+     * @param sc
+     *        the service configuration to use.
+     * @param isVisible
+     *        flag indicating if this transformation shall be visible.
+     * @param child
+     *        the declaration to append. may not be <CODE>null</CODE> and must denote a valid
      *        identifier name.
-     * @param parent the TypeDeclaration where to append the member
+     * @param parent
+     *        the TypeDeclaration where to append the member
      */
     public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible,
             MemberDeclaration child, TypeDeclaration parent) {
         super(sc);
-        if (child == null || parent == null) {
-            throw new IllegalArgumentException("Missing declaration");
-        }
+        if (child == null || parent == null) { throw new IllegalArgumentException("Missing declaration"); }
         this.isVisible = isVisible;
         this.child = child;
         this.parent = parent;
@@ -86,9 +88,7 @@ public class AppendMember extends TwoPassTransformation {
                 lastConstructor = (lastConstructor < 0) ? i : lastConstructor;
             } else if (x instanceof Method) {
                 lastMethod = (lastMethod < 0) ? i : lastMethod;
-            } else if (x instanceof Type) {
-                lastType = (lastType < 0) ? i : lastType;
-            }
+            } else if (x instanceof Type) { lastType = (lastType < 0) ? i : lastType; }
         }
         if (child instanceof FieldDeclaration) {
             lastInitializer = lastConstructor = lastMethod = lastType = -1;
@@ -96,9 +96,7 @@ public class AppendMember extends TwoPassTransformation {
             lastConstructor = lastMethod = lastType = -1;
         } else if (child instanceof ConstructorDeclaration) {
             lastMethod = lastType = -1;
-        } else if (child instanceof MethodDeclaration) {
-            lastType = -1;
-        }
+        } else if (child instanceof MethodDeclaration) { lastType = -1; }
         if (lastType >= 0) {
             insertPosition = lastType + 1;
         } else if (lastMethod >= 0) {
@@ -118,7 +116,8 @@ public class AppendMember extends TwoPassTransformation {
     /**
      * Attaches the member at the proper position.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

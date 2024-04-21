@@ -37,7 +37,8 @@ public class IntLiteral extends Literal {
     /**
      * Int literal.
      *
-     * @param value an int value.
+     * @param value
+     *        an int value.
      */
 
     public IntLiteral(int value) {
@@ -47,7 +48,8 @@ public class IntLiteral extends Literal {
     /**
      * Int literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public IntLiteral(String value) {
@@ -57,7 +59,8 @@ public class IntLiteral extends Literal {
     /**
      * Int literal.
      *
-     * @param proto an int literal.
+     * @param proto
+     *        an int literal.
      */
 
     protected IntLiteral(IntLiteral proto) {
@@ -88,7 +91,8 @@ public class IntLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

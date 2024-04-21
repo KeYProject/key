@@ -49,7 +49,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Meta class reference.
      *
-     * @param reference a type reference.
+     * @param reference
+     *        a type reference.
      */
 
     public MetaClassReference(TypeReference reference) {
@@ -60,14 +61,13 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Meta class reference.
      *
-     * @param proto a meta class reference.
+     * @param proto
+     *        a meta class reference.
      */
 
     protected MetaClassReference(MetaClassReference proto) {
         super(proto);
-        if (proto.typeReference != null) {
-            typeReference = proto.typeReference.deepClone();
-        }
+        if (proto.typeReference != null) { typeReference = proto.typeReference.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -87,9 +87,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (typeReference != null) {
-            typeReference.setParent(this);
-        }
+        if (typeReference != null) { typeReference.setParent(this); }
     }
 
     /**
@@ -119,25 +117,21 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
-        }
+        if (typeReference != null) { if (index == 0) { return typeReference; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
-        if (typeReference == child) {
-            return 0;
-        }
+        if (typeReference == child) { return 0; }
         return -1;
     }
 
@@ -147,22 +141,21 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         return false;
@@ -181,7 +174,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -201,7 +195,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Set reference prefix.
      *
-     * @param accessPath a reference prefix.
+     * @param accessPath
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix accessPath) {
@@ -221,7 +216,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -245,9 +241,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -264,7 +258,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Set type reference.
      *
-     * @param ref a type reference.
+     * @param ref
+     *        a type reference.
      */
 
     public void setTypeReference(TypeReference ref) {

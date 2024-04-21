@@ -15,14 +15,14 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         implements NonTerminalProgramElement {
 
-    public JavaNonTerminalProgramElement() {
-    }
+    public JavaNonTerminalProgramElement() {}
 
 
     /**
      * Java program element.
      *
-     * @param list as ExtList with children of the node
+     * @param list
+     *        as ExtList with children of the node
      */
     public JavaNonTerminalProgramElement(ExtList list) {
         super(list);
@@ -42,16 +42,14 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     /**
      * returns the index of element el in array arr
      *
-     * @param arr the array where the element is looked for
-     * @param el the element to look for
+     * @param arr
+     *        the array where the element is looked for
+     * @param el
+     *        the element to look for
      * @return the index of the element (-1 if not found)
      */
     protected int getArrayPos(ImmutableArray<ProgramElement> arr, ProgramElement el) {
-        for (int i = 0, sz = arr.size(); i < sz; i++) {
-            if (arr.get(i) == el) {
-                return i;
-            }
-        }
+        for (int i = 0, sz = arr.size(); i < sz; i++) { if (arr.get(i) == el) { return i; } }
         return -1;
     }
 
@@ -64,19 +62,13 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         if (se == this) {
             return true;
-        } else if (se == null || this.getClass() != se.getClass()) {
-            return false;
-        }
+        } else if (se == null || this.getClass() != se.getClass()) { return false; }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) se;
-        if (jnte.getChildCount() != getChildCount()) {
-            return false;
-        }
+        if (jnte.getChildCount() != getChildCount()) { return false; }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(jnte.getChildAt(i), nat)) {
-                return false;
-            }
+            if (!getChildAt(i).equalsModRenaming(jnte.getChildAt(i), nat)) { return false; }
         }
         return true;
     }
@@ -100,22 +92,16 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        if (src == null) {
-            return null;
-        }
+        if (src == null) { return null; }
 
-        if (src.getClass() != this.getClass()) {
-            return null;
-        }
+        if (src.getClass() != this.getClass()) { return null; }
 
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) src;
         final SourceData newSource = new SourceData(ntSrc, 0, source.getServices());
 
         matchCond = matchChildren(newSource, matchCond, 0);
 
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         source.next();
         return matchCond;
@@ -140,9 +126,12 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * lists can be implemented easy).
      *
      *
-     * @param source the SourceData with the children to be matched
-     * @param matchCond the MatchConditions found so far
-     * @param offset the int denoting the index of the child to start with
+     * @param source
+     *        the SourceData with the children to be matched
+     * @param matchCond
+     *        the MatchConditions found so far
+     * @param offset
+     *        the int denoting the index of the child to start with
      * @return the resulting match conditions or <tt>null</tt> if matching failed
      */
     protected MatchConditions matchChildren(SourceData source, MatchConditions matchCond,
@@ -150,16 +139,12 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         for (int i = offset, sz = getChildCount(); i < sz; i++) {
             matchCond = getChildAt(i).match(source, matchCond);
-            if (matchCond == null) {
-                return null;
-            }
+            if (matchCond == null) { return null; }
         }
 
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
-        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
-            return null;
-        }
+        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) { return null; }
 
         return matchCond;
     }

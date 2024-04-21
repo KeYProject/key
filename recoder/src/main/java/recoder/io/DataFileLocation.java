@@ -83,7 +83,8 @@ public class DataFileLocation implements DataLocation {
      * returns an input stream for the content of the location
      *
      * @return the according input stream
-     * @throws IOException thrown if an error occurs with retrieving the input stream from the
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the input stream from the
      *         according data object.
      */
     public InputStream getInputStream() throws IOException {
@@ -102,7 +103,8 @@ public class DataFileLocation implements DataLocation {
      * reader, an adapter reader is placed on top of an input stream.
      *
      * @return the according reader
-     * @throws IOException thrown if an error occurs with retrieving the reader or the underlying
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the reader or the underlying
      *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
@@ -139,7 +141,8 @@ public class DataFileLocation implements DataLocation {
      * returns an output stream for manipulating the content of the location
      *
      * @return the according output stream
-     * @throws IOException thrown if an error occurs with retrieving the output stream from the
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the output stream from the
      *         according data object.
      */
     public OutputStream getOutputStream() throws IOException {
@@ -158,7 +161,8 @@ public class DataFileLocation implements DataLocation {
      * writer, an adapter reader is placed on top of an output stream.
      *
      * @return the according writer
-     * @throws IOException thrown if an error occurs with retrieving the writer or the underlying
+     * @throws IOException
+     *         thrown if an error occurs with retrieving the writer or the underlying
      *         output stream from the according data object.
      */
     public Writer getWriter() throws IOException {
@@ -173,9 +177,7 @@ public class DataFileLocation implements DataLocation {
     }
 
     public boolean equals(Object ob) {
-        if (ob instanceof DataFileLocation) {
-            return canonicalPath.equals(((DataFileLocation) ob).canonicalPath);
-        }
+        if (ob instanceof DataFileLocation) { return canonicalPath.equals(((DataFileLocation) ob).canonicalPath); }
         return false;
     }
 

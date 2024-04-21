@@ -33,7 +33,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Super reference.
      *
-     * @param accessPath a reference expression.
+     * @param accessPath
+     *        a reference expression.
      */
     public SuperReference(ReferencePrefix accessPath) {
         this.prefix = accessPath;
@@ -42,7 +43,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public SuperReference(ExtList children) {
         prefix = children.get(ReferencePrefix.class);
@@ -75,25 +77,21 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null) {
-            count++;
-        }
+        if (prefix != null) { count++; }
         return count;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
-        }
+        if (prefix != null) { if (index == 0) { return prefix; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -118,9 +116,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) {
-            return (Expression) prefix;
-        }
+        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -146,9 +142,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if ((prefix instanceof TypeReference) && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if ((prefix instanceof TypeReference) && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -156,7 +150,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSuperReference(this);

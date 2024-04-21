@@ -69,7 +69,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Variable specification.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
 
     public VariableSpecification(Identifier name) {
@@ -80,8 +81,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Variable specification.
      *
-     * @param name an identifier.
-     * @param init an expression.
+     * @param name
+     *        an identifier.
+     * @param init
+     *        an expression.
      */
 
     public VariableSpecification(Identifier name, Expression init) {
@@ -94,9 +97,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Variable specification.
      *
-     * @param name an identifier.
-     * @param dimensions an int value.
-     * @param init an expression.
+     * @param name
+     *        an identifier.
+     * @param dimensions
+     *        an int value.
+     * @param init
+     *        an expression.
      */
 
     public VariableSpecification(Identifier name, int dimensions, Expression init) {
@@ -110,17 +116,14 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Variable specification.
      *
-     * @param proto a variable specification.
+     * @param proto
+     *        a variable specification.
      */
 
     protected VariableSpecification(VariableSpecification proto) {
         super(proto);
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.initializer != null) {
-            initializer = proto.initializer.deepClone();
-        }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.initializer != null) { initializer = proto.initializer.deepClone(); }
         dimensions = proto.dimensions;
         makeParentRoleValid();
     }
@@ -144,12 +147,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
 
     public void makeParentRoleValid() {
-        if (name != null) {
-            name.setParent(this);
-        }
-        if (initializer != null) {
-            initializer.setExpressionContainer(this);
-        }
+        if (name != null) { name.setParent(this); }
+        if (initializer != null) { initializer.setExpressionContainer(this); }
     }
 
     /**
@@ -170,47 +169,35 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null) {
-            result++;
-        }
-        if (initializer != null) {
-            result++;
-        }
+        if (name != null) { result++; }
+        if (initializer != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
-        if (initializer != null) {
-            if (index == 0) {
-                return initializer;
-            }
-        }
+        if (initializer != null) { if (index == 0) { return initializer; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: name
         // role 1: initializer
-        if (name == child) {
-            return 0;
-        }
-        if (initializer == child) {
-            return 1;
-        }
+        if (name == child) { return 0; }
+        if (initializer == child) { return 1; }
         return -1;
     }
 
@@ -220,30 +207,27 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (initializer == p) {
             Expression r = (Expression) q;
             initializer = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
 
@@ -263,7 +247,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Set parent.
      *
-     * @param parent a variable declaration.
+     * @param parent
+     *        a variable declaration.
      */
 
     public void setParent(VariableDeclaration parent) {
@@ -287,9 +272,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public Expression getExpressionAt(int index) {
-        if (initializer != null && index == 0) {
-            return initializer;
-        }
+        if (initializer != null && index == 0) { return initializer; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -316,7 +299,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -336,13 +320,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Set dimensions.
      *
-     * @param dimensions an int value.
+     * @param dimensions
+     *        an int value.
      */
 
     public void setDimensions(int dimensions) {
-        if (dimensions < 0) {
-            throw new IllegalArgumentException("Negative dimension?");
-        }
+        if (dimensions < 0) { throw new IllegalArgumentException("Negative dimension?"); }
         this.dimensions = dimensions;
     }
 
@@ -359,7 +342,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Set initializer.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public void setInitializer(Expression expr) {
@@ -379,13 +363,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Set modifiers of the enclosing declaration.
      *
-     * @param m a modifier mutable list.
+     * @param m
+     *        a modifier mutable list.
      */
 
     public void setDeclarationSpecifiers(ASTList<DeclarationSpecifier> m) {
-        if (parent != null) {
-            parent.setDeclarationSpecifiers(m);
-        }
+        if (parent != null) { parent.setDeclarationSpecifiers(m); }
     }
 
     /**
@@ -413,9 +396,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public Type getType() {
-        if (service == null) {
-            updateModel();
-        }
+        if (service == null) { updateModel(); }
         return service.getType(this);
     }
 

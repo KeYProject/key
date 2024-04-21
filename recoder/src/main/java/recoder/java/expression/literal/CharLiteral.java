@@ -32,7 +32,8 @@ public class CharLiteral extends Literal {
     /**
      * Char literal.
      *
-     * @param value a char value.
+     * @param value
+     *        a char value.
      */
 
     public CharLiteral(char value) {
@@ -42,7 +43,8 @@ public class CharLiteral extends Literal {
     /**
      * Char literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public CharLiteral(String value) {
@@ -52,7 +54,8 @@ public class CharLiteral extends Literal {
     /**
      * Char literal.
      *
-     * @param proto a char literal.
+     * @param proto
+     *        a char literal.
      */
 
     protected CharLiteral(CharLiteral proto) {
@@ -83,7 +86,8 @@ public class CharLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param c a char value.
+     * @param c
+     *        a char value.
      */
 
     public void setValue(char c) {
@@ -93,7 +97,8 @@ public class CharLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

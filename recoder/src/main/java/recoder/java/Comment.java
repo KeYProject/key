@@ -51,7 +51,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Create a new comment with the given content. No extra comment markers are created.
      *
-     * @param text the text of the comment.
+     * @param text
+     *        the text of the comment.
      */
 
     public Comment(String text) {
@@ -61,7 +62,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Create a new comment with the given content. No extra comment markers are created.
      *
-     * @param text the text of the comment.
+     * @param text
+     *        the text of the comment.
      */
 
     public Comment(String text, boolean prefixed) {
@@ -72,7 +74,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Comment.
      *
-     * @param proto a comment.
+     * @param proto
+     *        a comment.
      */
 
     protected Comment(Comment proto) {
@@ -106,7 +109,8 @@ public class Comment extends JavaSourceElement {
      * Define if this comment should be prefixed in front of the parent element, or if it should
      * follow it. Implicitly sets isContainerComment to false.
      *
-     * @param prefixed the boolean value.
+     * @param prefixed
+     *        the boolean value.
      */
 
     public void setPrefixed(boolean prefixed) {
@@ -141,7 +145,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Set parent of the comment.
      *
-     * @param p a program element.
+     * @param p
+     *        a program element.
      */
 
     public void setParent(ProgramElement p) {
@@ -162,7 +167,8 @@ public class Comment extends JavaSourceElement {
      * Set text, including all markers. The text must contain all necessary leading and closing
      * tokens.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     public void setText(String text) {

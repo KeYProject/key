@@ -61,9 +61,12 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /**
      * Construct a method body shortcut
      *
-     * @param bodySource exact class where the body is declared
-     * @param resultVar the IProgramVariable to which the method's return value is assigned
-     * @param methodReference the MethodReference encapsulating the method's signature
+     * @param bodySource
+     *        exact class where the body is declared
+     * @param resultVar
+     *        the IProgramVariable to which the method's return value is assigned
+     * @param methodReference
+     *        the MethodReference encapsulating the method's signature
      */
     public MethodBodyStatement(TypeReference bodySource, IProgramVariable resultVar,
             MethodReference methodReference) {
@@ -73,9 +76,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.useSpecification = false;
 
         assert methodReference != null : "Missing methodreference";
-        assert methodReference.getReferencePrefix() != null
-                : "Method reference of a method body statement needs an "
-                    + "explicit reference prefix.";
+        assert methodReference.getReferencePrefix() != null : "Method reference of a method body statement needs an "
+                + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }
 
@@ -86,9 +88,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.methodReference = list.get(MethodReference.class);
 
         assert methodReference != null : "Missing methodreference";
-        assert methodReference.getReferencePrefix() != null
-                : "Method reference of a method body statement needs an "
-                    + "explicit reference prefix.";
+        assert methodReference.getReferencePrefix() != null : "Method reference of a method body statement needs an "
+                + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
         this.useSpecification = false;
     }
@@ -129,7 +130,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                     && !((LocationVariable) argument).isMember())
                     || argument instanceof SchemaVariable)) {
                 throw new IllegalArgumentException("Only local variables or schemavariables "
-                    + "allowed as arguments of a method body statement.");
+                        + "allowed as arguments of a method body statement.");
             }
         }
     }
@@ -150,9 +151,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      * @return the Statement
      */
     public Statement getBody(Services services) {
-        if (method == null) {
-            resolveMethod(services);
-        }
+        if (method == null) { resolveMethod(services); }
         return method.getBody();
     }
 
@@ -163,15 +162,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (bodySource != null) {
-            i++;
-        }
-        if (resultVar != null) {
-            i++;
-        }
-        if (methodReference != null) {
-            i++;
-        }
+        if (bodySource != null) { i++; }
+        if (resultVar != null) { i++; }
+        if (methodReference != null) { i++; }
         return i;
     }
 
@@ -186,38 +179,30 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (bodySource != null) {
-            if (index == 0) {
-                return bodySource;
-            }
+            if (index == 0) { return bodySource; }
             index--;
         }
 
         if (resultVar != null) {
-            if (index == 0) {
-                return resultVar;
-            }
+            if (index == 0) { return resultVar; }
             index--;
         }
 
-        if (methodReference != null) {
-            if (index == 0) {
-                return methodReference;
-            }
-        }
+        if (methodReference != null) { if (index == 0) { return methodReference; } }
 
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public boolean isStatic(Services services) {
-        if (method == null) {
-            resolveMethod(services);
-        }
+        if (method == null) { resolveMethod(services); }
         return method.isStatic();
     }
 
@@ -226,7 +211,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMethodBodyStatement(this);
@@ -246,9 +232,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
 
     public IProgramMethod getProgramMethod(Services services) {
-        if (method == null) {
-            resolveMethod(services);
-        }
+        if (method == null) { resolveMethod(services); }
         return method;
     }
 

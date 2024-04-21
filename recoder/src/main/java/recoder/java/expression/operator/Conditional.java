@@ -30,9 +30,12 @@ public class Conditional extends Operator {
     /**
      * Conditional.
      *
-     * @param guard an expression.
-     * @param thenExpr an expression.
-     * @param elseExpr an expression.
+     * @param guard
+     *        an expression.
+     * @param thenExpr
+     *        an expression.
+     * @param elseExpr
+     *        an expression.
      */
 
     public Conditional(Expression guard, Expression thenExpr, Expression elseExpr) {
@@ -46,7 +49,8 @@ public class Conditional extends Operator {
     /**
      * Conditional.
      *
-     * @param proto a conditional.
+     * @param proto
+     *        a conditional.
      */
 
     protected Conditional(Conditional proto) {

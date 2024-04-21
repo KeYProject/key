@@ -188,12 +188,17 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     * @param name
+     *        the name of the Taclet
+     * @param applPart
+     *        contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param ruleSets
+     *        a list of rule sets for the Taclet
+     * @param attrs
+     *        attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
@@ -233,12 +238,17 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     * @param name
+     *        the name of the Taclet
+     * @param applPart
+     *        contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param ruleSets
+     *        a list of rule sets for the Taclet
+     * @param attrs
+     *        attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
@@ -275,9 +285,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             ImmutableSet<QuantifiableVariable> result =
                 DefaultImmutableSet.nil();
 
-            for (final TacletGoalTemplate tgt : goalTemplates()) {
-                result = result.union(tgt.getBoundVariables());
-            }
+            for (final TacletGoalTemplate tgt : goalTemplates()) { result = result.union(tgt.getBoundVariables()); }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
             bvv.visit(ifSequent());
@@ -309,15 +317,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * looks if a variable is declared as new and returns its sort to match with or the schema
      * variable it shares the match-sort with. Returns null if the SV is not declared to as new.
      *
-     * @param var the SchemaVariable to look for
+     * @param var
+     *        the SchemaVariable to look for
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
     public NewVarcond varDeclaredNew(SchemaVariable var) {
-        for (final NewVarcond nv : varsNew) {
-            if (nv.getSchemaVariable() == var) {
-                return nv;
-            }
-        }
+        for (final NewVarcond nv : varsNew) { if (nv.getSchemaVariable() == var) { return nv; } }
         return null;
     }
 
@@ -402,9 +407,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     public boolean hasReplaceWith() {
         for (final TacletGoalTemplate goalDescr : goalTemplates) {
-            if (goalDescr.replaceWithExpressionAsObject() != null) {
-                return true;
-            }
+            if (goalDescr.replaceWithExpressionAsObject() != null) { return true; }
         }
         return false;
     }
@@ -415,7 +418,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
      * have some special handling, see paper of M. Giese and comment of method isContextInPrefix).
      *
-     * @param sv the Schemavariable
+     * @param sv
+     *        the Schemavariable
      * @return prefix of schema variable sv
      */
     public TacletPrefix getPrefix(SchemaVariable sv) {
@@ -429,9 +433,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * @return true iff a context flag is set in one of the entries in the prefix map.
      */
     public boolean isContextInPrefix() {
-        if (contextInfoComputed) {
-            return contextIsInPrefix;
-        }
+        if (contextInfoComputed) { return contextIsInPrefix; }
         contextInfoComputed = true;
         Iterator<TacletPrefix> it = prefixMap().valueIterator();
         while (it.hasNext()) {
@@ -450,29 +452,19 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
+        if (o == this) { return true; }
 
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
 
         final Taclet t2 = (Taclet) o;
-        if (!name.equals(t2.name)) {
-            return false;
-        }
+        if (!name.equals(t2.name)) { return false; }
 
         if ((ifSequent == null && t2.ifSequent != null)
                 || (ifSequent != null && t2.ifSequent == null)) {
             return false;
-        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
-            return false;
-        }
+        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) { return false; }
 
-        if (!choices.equals(t2.choices)) {
-            return false;
-        }
+        if (!choices.equals(t2.choices)) { return false; }
 
         return goalTemplates.equals(t2.goalTemplates);
     }
@@ -482,9 +474,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         if (o == this)
             return true;
 
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
 
         final Taclet t2 = (Taclet) o;
 
@@ -498,18 +488,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
                 if1 = if1.tail();
                 if2 = if2.tail();
             }
-            if (if1.head() != null || if2.head() != null) {
-                return false;
-            }
+            if (if1.head() != null || if2.head() != null) { return false; }
         }
 
-        if (!choices.equals(t2.choices)) {
-            return false;
-        }
+        if (!choices.equals(t2.choices)) { return false; }
 
-        if (!goalTemplates.equals(t2.goalTemplates)) {
-            return false;
-        }
+        if (!goalTemplates.equals(t2.goalTemplates)) { return false; }
 
         return true;
     }
@@ -518,9 +502,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     public int hashCode() {
         if (hashcode == 0) {
             hashcode = 37 * name.hashCode() + 17;
-            if (hashcode == 0) {
-                hashcode = -1;
-            }
+            if (hashcode == 0) { hashcode = -1; }
         }
         return hashcode;
     }
@@ -529,9 +511,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     public int hashCodeModProofIrrelevancy() {
         if (hashcode2 == 0) {
             hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
-            if (hashcode2 == 0) {
-                hashcode2 = -1;
-            }
+            if (hashcode2 == 0) { hashcode2 = -1; }
         }
         return hashcode2;
     }
@@ -548,9 +528,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             svc.visit(ifSequent());
 
             ifVariables = DefaultImmutableSet.nil();
-            for (final SchemaVariable sv : svc.vars()) {
-                ifVariables = ifVariables.add(sv);
-            }
+            for (final SchemaVariable sv : svc.vars()) { ifVariables = ifVariables.add(sv); }
         }
 
         return ifVariables;
@@ -607,9 +585,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             for (NotFreeIn pair : varsNotFreeIn) {
                 sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
                         .append(pair.second()).append(")");
-                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
-                    sb = sb.append(", ");
-                }
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) { sb = sb.append(", "); }
                 --countVarsNotFreeIn;
             }
 
@@ -630,9 +606,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-        if (!ruleSets.isEmpty()) {
-            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
-        }
+        if (!ruleSets.isEmpty()) { sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")")); }
         return sb;
     }
 
@@ -696,9 +670,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
         for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet)) {
-                return true;
-            }
+            if (admissibleRuleSets.contains(tacletRuleSet)) { return true; }
         }
         return false;
     }
@@ -713,9 +685,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         OpCollector oc = new OpCollector();
 
         // find, assumes
-        for (SchemaVariable sv : this.getIfFindVariables()) {
-            result.add(sv);
-        }
+        for (SchemaVariable sv : this.getIfFindVariables()) { result.add(sv); }
 
         // add, replacewith
         for (TacletGoalTemplate tgt : this.goalTemplates()) {
@@ -727,11 +697,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             }
         }
 
-        for (Operator op : oc.ops()) {
-            if (op instanceof SchemaVariable) {
-                result.add((SchemaVariable) op);
-            }
-        }
+        for (Operator op : oc.ops()) { if (op instanceof SchemaVariable) { result.add((SchemaVariable) op); } }
 
         return result;
     }
@@ -739,9 +705,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (SequentFormula cf : s) {
-            cf.formula().execPostOrder(oc);
-        }
+        for (SequentFormula cf : s) { cf.formula().execPostOrder(oc); }
     }
 
     /**
@@ -778,8 +742,10 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Constructor.
          *
-         * @param tacletOperation The currently performed operation.
-         * @param sequent The optional {@link Sequent} of the add or replace part of the taclet.
+         * @param tacletOperation
+         *        The currently performed operation.
+         * @param sequent
+         *        The optional {@link Sequent} of the add or replace part of the taclet.
          */
         public TacletLabelHint(TacletOperation tacletOperation, Sequent sequent) {
             assert tacletOperation != null;
@@ -795,7 +761,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
          * Constructor creating a hint indicating
          * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param term The optional replace {@link Term} of the taclet.
+         * @param term
+         *        The optional replace {@link Term} of the taclet.
          */
         public TacletLabelHint(Term term) {
             assert term != null;
@@ -808,8 +775,10 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Constructor.
          *
-         * @param labelHint The previous {@link TacletLabelHint} which is now specialised.
-         * @param sequentFormula The optional {@link SequentFormula} contained in
+         * @param labelHint
+         *        The previous {@link TacletLabelHint} which is now specialised.
+         * @param sequentFormula
+         *        The optional {@link SequentFormula} contained in
          *        {@link #getSequent()}.
          */
         public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
@@ -861,7 +830,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Sets the stack maintained during application of a taclet {@link Term}.
          *
-         * @param tacletTermStack The stack maintained during application of a taclet {@link Term}.
+         * @param tacletTermStack
+         *        The stack maintained during application of a taclet {@link Term}.
          */
         public void setTacletTermStack(Deque<Term> tacletTermStack) {
             this.tacletTermStack = tacletTermStack;
@@ -882,7 +852,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         @Override
         public String toString() {
             return tacletOperation + ", sequent = " + sequent + ", sequent formula = "
-                + sequentFormula + ", term = " + term;
+                    + sequentFormula + ", term = " + term;
         }
 
         /**
@@ -945,9 +915,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * applies the given rule application to the specified goal
      *
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param tacletApp the rule application that is executed.
+     * @param goal
+     *        the goal that the rule application should refer to.
+     * @param services
+     *        the Services encapsulating all java information
+     * @param tacletApp
+     *        the rule application that is executed.
      * @return List of the goals created by the rule which have to be proved. If this is a
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).

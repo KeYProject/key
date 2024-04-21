@@ -55,9 +55,12 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without resource information but only with positions.
      *
-     * @param relPos the relative position
-     * @param startPos the start position
-     * @param endPos the end position
+     * @param relPos
+     *        the relative position
+     * @param startPos
+     *        the start position
+     * @param endPos
+     *        the end position
      */
     public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos) {
         this.relPos = relPos;
@@ -69,10 +72,14 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without the given resource information.
      *
-     * @param relPos the relative position
-     * @param startPos the start position
-     * @param endPos the end position
-     * @param fileURI the resource the PositionInfo refers to
+     * @param relPos
+     *        the relative position
+     * @param startPos
+     *        the start position
+     * @param endPos
+     *        the end position
+     * @param fileURI
+     *        the resource the PositionInfo refers to
      */
     public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos,
             URI fileURI) {
@@ -90,7 +97,8 @@ public class PositionInfo {
      * this violates immutability, but the method is only called right after the object is
      * created...
      *
-     * @param parent the parent class of this PositionInfo
+     * @param parent
+     *        the parent class of this PositionInfo
      */
     void setParentClassURI(URI parent) {
         parentClassURI = (parent == null ? null : parent.normalize());
@@ -105,9 +113,7 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI != null && fileURI.getScheme().equals("file")) {
-            return Paths.get(fileURI).toString();
-        }
+        if (fileURI != null && fileURI.getScheme().equals("file")) { return Paths.get(fileURI).toString(); }
         return null;
     }
 
@@ -140,8 +146,10 @@ public class PositionInfo {
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos. The file
      * information have to match, otherwise null is returned.
      *
-     * @param p1 the first PositionInfo
-     * @param p2 the second PositionInfo
+     * @param p1
+     *        the first PositionInfo
+     * @param p2
+     *        the second PositionInfo
      * @return a new PositionInfo starting at the minimum of the two start positions and ending at
      *         the maximum of the two end positions.
      */
@@ -150,16 +158,12 @@ public class PositionInfo {
             return null;
         } else if (p1 == null) {
             return p2;
-        } else if (p2 == null) {
-            return p1;
-        }
+        } else if (p2 == null) { return p1; }
 
         // -> p1 and p2 not null
         if (p1 == UNDEFINED) {
             return p2;
-        } else if (p2 == UNDEFINED) {
-            return p1;
-        }
+        } else if (p2 == UNDEFINED) { return p1; }
 
         // -> p1 and p2 != UNDEFINED
         Position start;
@@ -197,7 +201,7 @@ public class PositionInfo {
             return "UNDEFINED";
         } else {
             return ((fileURI == null ? "" : fileURI) + " rel. Pos: " + relPos
-                + " start Pos: " + startPos + " end Pos: " + endPos);
+                    + " start Pos: " + startPos + " end Pos: " + endPos);
         }
     }
 

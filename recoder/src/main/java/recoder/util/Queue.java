@@ -80,7 +80,8 @@ public class Queue {
      * copies the data array to the given array. Data in the new array starts at position 0. It is
      * assumed, that the new array has a suitable size.
      *
-     * @param dest the destination array
+     * @param dest
+     *        the destination array
      */
     private void copyArray(Object[] dest) {
         int size = size();
@@ -100,9 +101,7 @@ public class Queue {
      */
     private void grow() {
         int newSize = data.length * 2;
-        if (newSize == 0) {
-            newSize = 1;
-        }
+        if (newSize == 0) { newSize = 1; }
         Object[] newData = new Object[newSize];
         if (start != -1) {
             copyArray(newData);
@@ -136,9 +135,7 @@ public class Queue {
     }
 
     public void enqueue(Object x) {
-        if (size() == data.length) {
-            grow();
-        }
+        if (size() == data.length) { grow(); }
         if (isEmpty()) {
             start = 0;
             end = 0;
@@ -168,9 +165,7 @@ public class Queue {
                     start = 0;
                 }
             }
-            if (allowShrink && (size() < data.length / 3)) {
-                shrink();
-            }
+            if (allowShrink && (size() < data.length / 3)) { shrink(); }
             return result;
         }
     }
@@ -184,21 +179,13 @@ public class Queue {
     }
 
     public boolean contains(Object x) {
-        if (isEmpty() || (x == null)) {
-            return false;
-        }
+        if (isEmpty() || (x == null)) { return false; }
         boolean result = false;
         if (start <= end) {
-            for (int i = start; (i <= end) && !result; i++) {
-                result = equality.equals(data[i], x);
-            }
+            for (int i = start; (i <= end) && !result; i++) { result = equality.equals(data[i], x); }
         } else {
-            for (int i = start; (i < data.length) && !result; i++) {
-                result = equality.equals(data[i], x);
-            }
-            for (int i = 0; (i <= end) && !result; i++) {
-                result = equality.equals(data[i], x);
-            }
+            for (int i = start; (i < data.length) && !result; i++) { result = equality.equals(data[i], x); }
+            for (int i = 0; (i <= end) && !result; i++) { result = equality.equals(data[i], x); }
         }
         return result;
     }
@@ -231,9 +218,7 @@ public class Queue {
                     more = false;
                 } else {
                     currPos++;
-                    if (currPos == data.length) {
-                        currPos = 0;
-                    }
+                    if (currPos == data.length) { currPos = 0; }
                 }
                 return result;
             }

@@ -24,7 +24,8 @@ public class MissingClassFileException extends ModelException {
     /**
      * Empty constructor.
      *
-     * @param name the name of the missing file.
+     * @param name
+     *        the name of the missing file.
      */
     public MissingClassFileException(String name) {
         this.missingClass = name;
@@ -33,8 +34,10 @@ public class MissingClassFileException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param name the name of the missing file.
+     * @param s
+     *        an explanation.
+     * @param name
+     *        the name of the missing file.
      */
     public MissingClassFileException(String s, String name) {
         super(s);

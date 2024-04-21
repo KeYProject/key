@@ -55,8 +55,10 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Creates a non-static (default) Import. Same as <code>new Import(t, multi, false)</code>
      *
-     * @param t a type reference.
-     * @param multi indicates the wildcard.
+     * @param t
+     *        a type reference.
+     * @param multi
+     *        indicates the wildcard.
      */
 
     public Import(TypeReference t, boolean multi) {
@@ -68,8 +70,10 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Creates a static Import.
      *
-     * @param t the psckage of the type to be imported
-     * @param id the name of the imported type
+     * @param t
+     *        the psckage of the type to be imported
+     * @param id
+     *        the name of the imported type
      */
     public Import(TypeReference t, Identifier id) {
         setReference(t);
@@ -89,7 +93,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Import.
      *
-     * @param t a package reference.
+     * @param t
+     *        a package reference.
      */
     public Import(PackageReference t) {
         setReference(t);
@@ -101,16 +106,13 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Import.
      *
-     * @param proto an import.
+     * @param proto
+     *        an import.
      */
     protected Import(Import proto) {
         super(proto);
-        if (proto.reference != null) {
-            reference = (TypeReferenceInfix) proto.reference.deepClone();
-        }
-        if (proto.staticIdentifier != null) {
-            staticIdentifier = proto.staticIdentifier.deepClone();
-        }
+        if (proto.reference != null) { reference = (TypeReferenceInfix) proto.reference.deepClone(); }
+        if (proto.staticIdentifier != null) { staticIdentifier = proto.staticIdentifier.deepClone(); }
         isMultiImport = proto.isMultiImport;
         isStaticImport = proto.isStaticImport;
         makeParentRoleValid();
@@ -121,9 +123,7 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (staticIdentifier != null) {
-            staticIdentifier.setParent(this);
-        }
+        if (staticIdentifier != null) { staticIdentifier.setParent(this); }
         if (reference instanceof TypeReference) {
             ((TypeReference) reference).setParent(this);
         } else if (reference instanceof PackageReference) {
@@ -160,8 +160,10 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Sets this import to be a multi type import.
      *
-     * @param multi denotes the wildcard for this import.
-     * @throws IllegalArgumentException if the reference is a package and multi is <CODE>false
+     * @param multi
+     *        denotes the wildcard for this import.
+     * @throws IllegalArgumentException
+     *         if the reference is a package and multi is <CODE>false
      *                                  </CODE>.
      */
     public void setMultiImport(boolean multi) {
@@ -208,44 +210,34 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null) {
-            result++;
-        }
-        if (staticIdentifier != null) {
-            result++;
-        }
+        if (reference != null) { result++; }
+        if (staticIdentifier != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0) {
-                return reference;
-            }
+            if (index == 0) { return reference; }
             index--;
         }
-        if (index == 0 && staticIdentifier != null) {
-            return staticIdentifier;
-        }
+        if (index == 0 && staticIdentifier != null) { return staticIdentifier; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: reference
         // role 1: static identifier (java 5 only)
-        if (child == reference) {
-            return 0;
-        }
-        if (child == staticIdentifier) {
-            return 1;
-        }
+        if (child == reference) { return 0; }
+        if (child == staticIdentifier) { return 1; }
         return -1;
     }
 
@@ -261,7 +253,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Set parent.
      *
-     * @param u a compilation unit.
+     * @param u
+     *        a compilation unit.
      */
     public void setParent(CompilationUnit u) {
         parent = u;
@@ -282,9 +275,7 @@ public class Import extends JavaNonTerminalProgramElement
      * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (reference instanceof TypeReference && index == 0) {
-            return (TypeReference) reference;
-        }
+        if (reference instanceof TypeReference && index == 0) { return (TypeReference) reference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -319,7 +310,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Set reference.
      *
-     * @param t a type reference infix.
+     * @param t
+     *        a type reference infix.
      */
     public void setReference(TypeReferenceInfix t) {
         reference = t;
@@ -331,15 +323,16 @@ public class Import extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (reference == p) {
             TypeReferenceInfix r = (TypeReferenceInfix) q;
             reference = r;

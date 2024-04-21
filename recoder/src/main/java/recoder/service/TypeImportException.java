@@ -30,7 +30,8 @@ public class TypeImportException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
+     * @param s
+     *        an explanation.
      */
     public TypeImportException(String s) {
         super(s);
@@ -39,7 +40,8 @@ public class TypeImportException extends ModelException {
     /**
      * Constructor to wrap a parser exception.
      *
-     * @param p a parser exception.
+     * @param p
+     *        a parser exception.
      */
     public TypeImportException(ParserException p) {
         super(p.toString());

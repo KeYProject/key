@@ -57,7 +57,8 @@ public class TaggedComment {
      * creates a new instance from the given string. The given string <b>must not </b> be
      * <tt>null</tt>!
      *
-     * @param comment the string containing the comment
+     * @param comment
+     *        the string containing the comment
      */
     public TaggedComment(String comment) {
         rawComment = comment;
@@ -87,7 +88,8 @@ public class TaggedComment {
      * strips comment characters from the beginning and end of the given string representing a
      * single line.
      *
-     * @param line the string representing the line. The line is assumed to be non empty.
+     * @param line
+     *        the string representing the line. The line is assumed to be non empty.
      * @return the stripped and trimmed string
      */
     protected String stripCommentChars(String line) {
@@ -95,18 +97,10 @@ public class TaggedComment {
         if (result.length() > 0) {
             int left = 0;
             int right = result.length() - 1;
-            if (result.charAt(left) == '/') {
-                left++;
-            }
-            while ((left <= right) && (result.charAt(left) == '*')) {
-                left++;
-            }
-            if (result.charAt(right) == '/') {
-                right--;
-            }
-            while ((left <= right) && (result.charAt(right) == '*')) {
-                right--;
-            }
+            if (result.charAt(left) == '/') { left++; }
+            while ((left <= right) && (result.charAt(left) == '*')) { left++; }
+            if (result.charAt(right) == '/') { right--; }
+            while ((left <= right) && (result.charAt(right) == '*')) { right--; }
             if (left <= right) {
                 result = result.substring(left, right + 1).trim();
             } else {
@@ -147,9 +141,7 @@ public class TaggedComment {
                     sw = new StringWriter();
                     pw = new PrintWriter(sw);
                     int pos = 1;
-                    while ((pos < line.length()) && !(Character.isWhitespace(line.charAt(pos)))) {
-                        pos++;
-                    }
+                    while ((pos < line.length()) && !(Character.isWhitespace(line.charAt(pos)))) { pos++; }
                     currentTag = line.substring(1, pos);
                     tagNames.addElement(currentTag);
                     line = line.substring(pos).trim();
@@ -185,9 +177,7 @@ public class TaggedComment {
      * @return the intro of the comment
      */
     public String getIntro() {
-        if (!analyzed) {
-            parseRawComment();
-        }
+        if (!analyzed) { parseRawComment(); }
         return (introText == null) ? "" : introText;
     }
 
@@ -206,9 +196,7 @@ public class TaggedComment {
      * @return the number of tags specified in the comment
      */
     public int getTagCount() {
-        if (!analyzed) {
-            parseRawComment();
-        }
+        if (!analyzed) { parseRawComment(); }
         return (tagNames == null) ? 0 : tagNames.size();
     }
 
@@ -219,9 +207,7 @@ public class TaggedComment {
      * @return an non-empty enumeration object.
      */
     public Enumeration getTags() {
-        if (!analyzed) {
-            parseRawComment();
-        }
+        if (!analyzed) { parseRawComment(); }
         if (tagNames == null) {
             return emptyEnumeration;
         } else {
@@ -232,18 +218,15 @@ public class TaggedComment {
     /**
      * returns the text for the given tag or <tt>null</tt> if that tag is not defined.
      *
-     * @param tag the name of the tag
+     * @param tag
+     *        the name of the tag
      * @return the value of that tag or <tt>null</tt>
      */
     public String getTagValue(String tag) {
         String result = null;
         if (tag != null) {
-            if (!analyzed) {
-                parseRawComment();
-            }
-            if (tagValues != null) {
-                result = tagValues.getProperty(tag, null);
-            }
+            if (!analyzed) { parseRawComment(); }
+            if (tagValues != null) { result = tagValues.getProperty(tag, null); }
         }
         return result;
     }

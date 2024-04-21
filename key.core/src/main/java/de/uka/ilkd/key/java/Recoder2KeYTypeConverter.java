@@ -122,7 +122,8 @@ public class Recoder2KeYTypeConverter {
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
      * passes this result to {@link #getKeYJavaType(recoder.abstraction.Type)}}
      *
-     * @param typeName name of a type to be converted
+     * @param typeName
+     *        name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
      * @see #getKeYJavaType(recoder.abstraction.Type)
@@ -139,30 +140,25 @@ public class Recoder2KeYTypeConverter {
      * <p>
      * Returned the cached value if present - otherwise create a new type.
      *
-     * @param t type to be converted, may be null
+     * @param t
+     *        type to be converted, may be null
      * @return null iff t == null, otherwise a keytype.
      */
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
 
         // change from 2012-02-07: there must be a definite KJT
-        if (t == null) {
-            throw new NullPointerException("null cannot be converted into a KJT");
-        }
+        if (t == null) { throw new NullPointerException("null cannot be converted into a KJT"); }
 
         // lookup in the cache
         KeYJavaType kjt = lookupInCache(t);
-        if (kjt != null) {
-            return kjt;
-        }
+        if (kjt != null) { return kjt; }
 
         // create a new KeYJavaType
         Sort s = null;
         if (t instanceof recoder.abstraction.PrimitiveType) {
             s = typeConverter.getPrimitiveSort(PrimitiveType.getPrimitiveType(t.getFullName()));
-            if (s == null) {
-                throw new RuntimeException(
-                    "Cannot assign " + t.getFullName() + " a primitive sort.");
-            }
+            if (s == null) { throw new RuntimeException(
+                "Cannot assign " + t.getFullName() + " a primitive sort."); }
             addKeYJavaType(t, s);
         } else if (t instanceof recoder.abstraction.NullType) {
             s = namespaces.sorts().lookup(NullSort.NAME);
@@ -237,20 +233,16 @@ public class Recoder2KeYTypeConverter {
                 result = typeConverter.getKeYJavaType(type);
                 if (result == null) {
                     LOGGER.debug("create new KeYJavaType for primitive type " + t
-                        + ". This should not happen");
+                            + ". This should not happen");
                     result = new KeYJavaType(type, s);
                 }
             } else if (t instanceof recoder.abstraction.NullType) {
                 type = NullType.JAVA_NULL;
                 result = new KeYJavaType(type, s);
-                if (namespaces.sorts().lookup(s.name()) == null) {
-                    namespaces.sorts().add(s);
-                }
+                if (namespaces.sorts().lookup(s.name()) == null) { namespaces.sorts().add(s); }
             } else if (t instanceof recoder.abstraction.ArrayType) {
                 result = new KeYJavaType(s);
-                if (namespaces.sorts().lookup(s.name()) == null) {
-                    namespaces.sorts().add(s);
-                }
+                if (namespaces.sorts().lookup(s.name()) == null) { namespaces.sorts().add(s); }
             } else if (t == recoder2key.getServiceConfiguration().getNameInfo()
                     .getUnknownClassType()) {
                 // result = makeSimpleKeYType((ClassType)t,s);
@@ -262,9 +254,7 @@ public class Recoder2KeYTypeConverter {
                 Debug.fail();
             }
         } else {
-            if (namespaces.sorts().lookup(s.name()) == null) {
-                namespaces.sorts().add(s);
-            }
+            if (namespaces.sorts().lookup(s.name()) == null) { namespaces.sorts().add(s); }
             result = new KeYJavaType(s);
         }
         storeInCache(t, result);
@@ -287,16 +277,15 @@ public class Recoder2KeYTypeConverter {
     /**
      * get all direct super sorts of a class type (not transitive)
      *
-     * @param classType type to examine, not null
+     * @param classType
+     *        type to examine, not null
      * @return a freshly created set of sorts
      */
     private ImmutableSet<Sort> directSuperSorts(recoder.abstraction.ClassType classType) {
 
         List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
-        for (recoder.abstraction.ClassType aSuper : supers) {
-            ss = ss.add(getKeYJavaType(aSuper).getSort());
-        }
+        for (recoder.abstraction.ClassType aSuper : supers) { ss = ss.add(getKeYJavaType(aSuper).getSort()); }
 
         /*
          * ?? if (classType.getName() == null) {
@@ -304,16 +293,15 @@ public class Recoder2KeYTypeConverter {
          * }
          */
 
-        if (ss.isEmpty() && !isObject(classType)) {
-            ss = ss.add(javaInfo.objectSort());
-        }
+        if (ss.isEmpty() && !isObject(classType)) { ss = ss.add(javaInfo.objectSort()); }
         return ss;
     }
 
     /**
      * is the full name of this type "java.lang.Object" or the short name "Object"
      *
-     * @param ct the type to be checked, not null
+     * @param ct
+     *        the type to be checked, not null
      * @return true iff the name is Object
      */
     private boolean isObject(recoder.abstraction.ClassType ct) {
@@ -323,8 +311,10 @@ public class Recoder2KeYTypeConverter {
     /**
      * create a sort out of a recoder class
      *
-     * @param ct classtype to create for, not null
-     * @param supers the set of (direct?) super-sorts
+     * @param ct
+     *        classtype to create for, not null
+     * @param supers
+     *        the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
@@ -404,9 +394,12 @@ public class Recoder2KeYTypeConverter {
     /**
      * Adds several implicit fields and methods to given list of members.
      *
-     * @param members an ExtList with the members of parent
-     * @param parent the KeYJavaType of the array to be enriched by its implicit members
-     * @param baseType the KeYJavaType of the parent's element type
+     * @param members
+     *        an ExtList with the members of parent
+     * @param parent
+     *        the KeYJavaType of the array to be enriched by its implicit members
+     * @param baseType
+     *        the KeYJavaType of the parent's element type
      */
     private void addImplicitArrayMembers(ExtList members, KeYJavaType parent, KeYJavaType baseType,
             ProgramVariable len) {
@@ -426,9 +419,7 @@ public class Recoder2KeYTypeConverter {
 
         ProgramVariable length = len;// find("length", fields);
 
-        if (arrayMethodBuilder == null) {
-            initArrayMethodBuilder();
-        }
+        if (arrayMethodBuilder == null) { initArrayMethodBuilder(); }
 
         final IProgramMethod prepare =
             arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
@@ -442,16 +433,15 @@ public class Recoder2KeYTypeConverter {
     /**
      * extracts all fields out of fielddeclaration
      *
-     * @param field the FieldDeclaration of which the field specifications have to be extracted
+     * @param field
+     *        the FieldDeclaration of which the field specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.get(i));
-        }
+        for (int i = spec.size() - 1; i >= 0; i--) { result = result.prepend(spec.get(i)); }
         return result;
     }
 
@@ -459,7 +449,8 @@ public class Recoder2KeYTypeConverter {
      * extracts all field specifications out of the given list. Therefore it descends into field
      * declarations.
      *
-     * @param list the ExtList with the members of a type declaration
+     * @param list
+     *        the ExtList with the members of a type declaration
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
@@ -467,9 +458,7 @@ public class Recoder2KeYTypeConverter {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
-            if (pe instanceof FieldDeclaration) {
-                result = result.prepend(filterField((FieldDeclaration) pe));
-            }
+            if (pe instanceof FieldDeclaration) { result = result.prepend(filterField((FieldDeclaration) pe)); }
         }
         return result;
     }

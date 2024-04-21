@@ -63,7 +63,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Type reference.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
 
     public TypeReference(Identifier name) {
@@ -74,8 +75,10 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Type reference.
      *
-     * @param prefix a reference prefix.
-     * @param name an identifier.
+     * @param prefix
+     *        a reference prefix.
+     * @param name
+     *        an identifier.
      */
 
     public TypeReference(ReferencePrefix prefix, Identifier name) {
@@ -87,8 +90,10 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Type reference.
      *
-     * @param name an identifier.
-     * @param dim an int value.
+     * @param name
+     *        an identifier.
+     * @param dim
+     *        an int value.
      */
 
     public TypeReference(Identifier name, int dim) {
@@ -106,20 +111,15 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Type reference.
      *
-     * @param proto a type reference.
+     * @param proto
+     *        a type reference.
      */
 
     protected TypeReference(TypeReference proto) {
         super(proto);
-        if (proto.prefix != null) {
-            prefix = (ReferencePrefix) proto.prefix.deepClone();
-        }
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.typeArguments != null) {
-            typeArguments = proto.typeArguments.deepClone();
-        }
+        if (proto.prefix != null) { prefix = (ReferencePrefix) proto.prefix.deepClone(); }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.typeArguments != null) { typeArguments = proto.typeArguments.deepClone(); }
         dimensions = proto.dimensions;
         makeParentRoleValid();
     }
@@ -140,17 +140,9 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (prefix != null) {
-            prefix.setReferenceSuffix(this);
-        }
-        if (name != null) {
-            name.setParent(this);
-        }
-        if (typeArguments != null) {
-            for (TypeArgumentDeclaration ta : typeArguments) {
-                ta.setParent(this);
-            }
-        }
+        if (prefix != null) { prefix.setReferenceSuffix(this); }
+        if (name != null) { name.setParent(this); }
+        if (typeArguments != null) { for (TypeArgumentDeclaration ta : typeArguments) { ta.setParent(this); } }
     }
 
     public SourceElement getFirstElement() {
@@ -175,42 +167,32 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
-        if (typeArguments != null) {
-            result += typeArguments.size();
-        }
+        if (prefix != null) { result++; }
+        if (name != null) { result++; }
+        if (typeArguments != null) { result += typeArguments.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
-        if (typeArguments != null) {
-            return typeArguments.get(index);
-        }
+        if (typeArguments != null) { return typeArguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -218,17 +200,11 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
         // role 0: prefix
         // role 1: name
         // role 2(idx): type argument
-        if (prefix == child) {
-            return 0;
-        }
-        if (name == child) {
-            return 1;
-        }
+        if (prefix == child) { return 0; }
+        if (name == child) { return 1; }
         if (typeArguments != null) {
             int idx = typeArguments.indexOf(child);
-            if (idx != -1) {
-                return (idx << 4) | 2;
-            }
+            if (idx != -1) { return (idx << 4) | 2; }
         }
         return -1;
     }
@@ -250,9 +226,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -273,9 +247,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      */
 
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) {
-            return (Expression) prefix;
-        }
+        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -285,30 +257,27 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (prefix == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             prefix = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (typeArguments != null) {
@@ -339,7 +308,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Set parent.
      *
-     * @param elem a type reference container.
+     * @param elem
+     *        a type reference container.
      */
 
     public void setParent(TypeReferenceContainer elem) {
@@ -359,7 +329,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Set reference prefix.
      *
-     * @param x a reference prefix.
+     * @param x
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix x) {
@@ -389,7 +360,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Set reference suffix.
      *
-     * @param x a reference suffix, must also be a type reference container.
+     * @param x
+     *        a reference suffix, must also be a type reference container.
      */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
@@ -409,7 +381,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Set dimensions.
      *
-     * @param dim an int value.
+     * @param dim
+     *        an int value.
      */
 
     public void setDimensions(int dim) {
@@ -439,7 +412,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {

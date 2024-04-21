@@ -50,9 +50,7 @@ public class FactoryMethod implements DesignPattern {
      * where the [Arguments] have the same names as in the [Parameters] list.
      */
     public FactoryMethod(ConstructorDeclaration product) {
-        if (product == null) {
-            throw new IllegalArgumentException("A factory method requires a product method");
-        }
+        if (product == null) { throw new IllegalArgumentException("A factory method requires a product method"); }
         this.product = product;
         createProducer();
     }
@@ -61,9 +59,7 @@ public class FactoryMethod implements DesignPattern {
      * Creates a factory method using the default constructor of the product.
      */
     public FactoryMethod(ClassDeclaration product) {
-        if (product == null) {
-            throw new IllegalArgumentException("A factory method requires a product");
-        }
+        if (product == null) { throw new IllegalArgumentException("A factory method requires a product"); }
         try {
             this.product = product.getFactory()
                     .parseConstructorDeclaration("public " + product.getName() + "(){}");
@@ -103,12 +99,8 @@ public class FactoryMethod implements DesignPattern {
      * matches the product.
      */
     public void validate() throws ModelException {
-        if (producer == null) {
-            throw new InconsistentPatternException("Factory Method pattern requires a producer");
-        }
-        if (product == null) {
-            throw new InconsistentPatternException("Factory Method pattern requires a product");
-        }
+        if (producer == null) { throw new InconsistentPatternException("Factory Method pattern requires a producer"); }
+        if (product == null) { throw new InconsistentPatternException("Factory Method pattern requires a product"); }
         if (!producer.getReturnType().getName().equals(product.getMemberParent().getName())) {
             // could be allowed to create subtypes of return type
             throw new InconsistentPatternException(
@@ -123,34 +115,26 @@ public class FactoryMethod implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (producer != null) {
-            res += 1;
-        }
-        if (product != null) {
-            res += 1;
-        }
+        if (producer != null) { res += 1; }
+        if (product != null) { res += 1; }
         return res;
     }
 
     /**
      * Get a participants by its index.
      *
-     * @param index an index of a participant.
+     * @param index
+     *        an index of a participant.
      * @return the participant.
-     * @throws IndexOutOfBoundsException, if the index is not in bounds.
+     * @throws IndexOutOfBoundsException,
+     *         if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
         if (producer != null) {
-            if (index == 0) {
-                return producer;
-            }
+            if (index == 0) { return producer; }
             index -= 1;
         }
-        if (product != null) {
-            if (index == 0) {
-                return product;
-            }
-        }
+        if (product != null) { if (index == 0) { return product; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

@@ -24,7 +24,8 @@ import org.jspecify.annotations.Nullable;
  * <li>It brings handling of errors and warnings.
  * </ul>
  *
- * @param <T> return type
+ * @param <T>
+ *        return type
  * @author Alexander Weigl
  */
 @SuppressWarnings("unchecked")
@@ -42,9 +43,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
      * @return
      */
     public <T> @Nullable T accept(@Nullable RuleContext ctx) {
-        if (ctx == null) {
-            return null;
-        }
+        if (ctx == null) { return null; }
         try {
             return (T) ctx.accept(this);
         } catch (Exception e) {
@@ -58,9 +57,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     @Override
     protected T aggregateResult(T aggregate, T nextResult) {
-        if (nextResult != null) {
-            return nextResult;
-        }
+        if (nextResult != null) { return nextResult; }
         return aggregate;
     }
 
@@ -73,48 +70,32 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
-        if (seq.isEmpty()) {
-            return null;
-        }
+        if (seq.isEmpty()) { return null; }
         return accept(seq.iterator().next());
     }
 
     protected <T> T pop() {
-        if (parameters == null) {
-            throw new IllegalStateException("Stack is empty");
-        }
+        if (parameters == null) { throw new IllegalStateException("Stack is empty"); }
         return (T) parameters.pop();
     }
 
     protected void push(Object... obj) {
-        if (parameters == null) {
-            parameters = new Stack<>();
-        }
-        for (Object a : obj) {
-            parameters.push(a);
-        }
+        if (parameters == null) { parameters = new Stack<>(); }
+        for (Object a : obj) { parameters.push(a); }
     }
 
     protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
-        if (parameters == null) {
-            parameters = new Stack<>();
-        }
+        if (parameters == null) { parameters = new Stack<>(); }
         int stackSize = parameters.size();
         push(args);
         T t = accept(ctx);
         // Stack hygiene
-        while (parameters.size() > stackSize) {
-            parameters.pop();
-        }
+        while (parameters.size() > stackSize) { parameters.pop(); }
         return t;
     }
 
     protected <T> T oneOf(ParserRuleContext... ctxs) {
-        for (ParserRuleContext ctx : ctxs) {
-            if (ctx != null) {
-                return (T) ctx.accept(this);
-            }
-        }
+        for (ParserRuleContext ctx : ctxs) { if (ctx != null) { return (T) ctx.accept(this); } }
         return null;
     }
 
@@ -123,15 +104,11 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected void each(RuleContext... ctx) {
-        for (RuleContext c : ctx) {
-            accept(c);
-        }
+        for (RuleContext c : ctx) { accept(c); }
     }
 
     protected void each(Collection<? extends ParserRuleContext> argument) {
-        for (RuleContext c : argument) {
-            accept(c);
-        }
+        for (RuleContext c : argument) { accept(c); }
     }
     // endregion
 
@@ -141,9 +118,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     public @NonNull List<BuildingIssue> getBuildingIssues() {
-        if (buildingIssues == null) {
-            buildingIssues = new LinkedList<>();
-        }
+        if (buildingIssues == null) { buildingIssues = new LinkedList<>(); }
         return buildingIssues;
     }
 

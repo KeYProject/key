@@ -68,7 +68,8 @@ public abstract class Transformation {
     /**
      * Creates a new transformation using the given service configuration.
      *
-     * @param sc the service configuration to use.
+     * @param sc
+     *        the service configuration to use.
      */
     public Transformation(CrossReferenceServiceConfiguration sc) {
         setServiceConfiguration(sc);
@@ -79,18 +80,16 @@ public abstract class Transformation {
      * exchange but does not handle the change history notification. The method does not do anything
      * with compilation units and assumes that the parent link is defined for all other types.
      *
-     * @param child the child to remove from its parent.
-     * @param replacement the child to replace its original (must be of appropriate type).
+     * @param child
+     *        the child to remove from its parent.
+     * @param replacement
+     *        the child to replace its original (must be of appropriate type).
      */
     public static void doReplace(ProgramElement child, ProgramElement replacement) {
-        if (child == replacement) {
-            return;
-        }
+        if (child == replacement) { return; }
         NonTerminalProgramElement parent = child.getASTParent();
         // compilation units may have a null parent
-        if (parent != null) {
-            parent.replaceChild(child, replacement);
-        }
+        if (parent != null) { parent.replaceChild(child, replacement); }
     }
 
     /**
@@ -98,20 +97,21 @@ public abstract class Transformation {
      * does not handle the change history notification. The method does not do anything with childs
      * that have no parent links such as compilation units.
      *
-     * @param root the root of the subtree to remove.
+     * @param root
+     *        the root of the subtree to remove.
      */
     public static void doDetach(ProgramElement root) {
         NonTerminalProgramElement parent = root.getASTParent();
-        if (parent != null) {
-            parent.replaceChild(root, null);
-        }
+        if (parent != null) { parent.replaceChild(root, null); }
     }
 
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Identifier child, NamedProgramElement parent) {
         parent.setIdentifier(child);
@@ -121,15 +121,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Import child, CompilationUnit parent, int index) {
         ASTList<Import> list = parent.getImports();
-        if (list == null) {
-            parent.setImports(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setImports(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -137,8 +138,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(PackageSpecification child, CompilationUnit parent) {
         parent.setPackageSpecification(child);
@@ -148,15 +151,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Statement child, StatementBlock parent, int index) {
         ASTList<Statement> list = parent.getBody();
-        if (list == null) {
-            parent.setBody(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBody(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setStatementContainer(parent);
     }
@@ -164,8 +168,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, MethodDeclaration parent) {
         parent.setBody(child);
@@ -175,8 +181,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, ClassInitializer parent) {
         parent.setBody(child);
@@ -186,15 +194,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Statement child, Case parent, int index) {
         ASTList<Statement> list = parent.getBody();
-        if (list == null) {
-            parent.setBody(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBody(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setStatementContainer(parent);
     }
@@ -202,15 +211,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Statement child, Default parent, int index) {
         ASTList<Statement> list = parent.getBody();
-        if (list == null) {
-            parent.setBody(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBody(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setStatementContainer(parent);
     }
@@ -218,8 +228,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, Catch parent) {
         parent.setBody(child);
@@ -229,8 +241,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, Finally parent) {
         parent.setBody(child);
@@ -240,8 +254,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, Try parent) {
         parent.setBody(child);
@@ -251,8 +267,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Statement child, Then parent) {
         parent.setBody(child);
@@ -262,8 +280,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Statement child, Else parent) {
         parent.setBody(child);
@@ -273,8 +293,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, LoopStatement parent) {
         parent.setBody(child);
@@ -284,8 +306,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Statement child, LabeledStatement parent) {
         parent.setBody(child);
@@ -295,8 +319,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(StatementBlock child, SynchronizedBlock parent) {
         parent.setBody(child);
@@ -308,15 +334,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(TypeDeclaration child, CompilationUnit parent, int index) {
         ASTList<TypeDeclaration> list = parent.getDeclarations();
-        if (list == null) {
-            parent.setDeclarations(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setDeclarations(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -324,15 +351,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(ClassDeclaration child, StatementBlock parent, int index) {
         ASTList<Statement> list = parent.getBody();
-        if (list == null) {
-            parent.setBody(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBody(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -340,8 +368,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ClassDeclaration child, New parent) {
         parent.setClassDeclaration(child);
@@ -351,15 +381,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(MemberDeclaration child, TypeDeclaration parent, int index) {
         ASTList<MemberDeclaration> list = parent.getMembers();
-        if (list == null) {
-            parent.setMembers(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setMembers(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setMemberParent(parent);
     }
@@ -367,16 +398,17 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(ParameterDeclaration child, MethodDeclaration parent, int index) {
 
         ASTList<ParameterDeclaration> list = parent.getParameters();
-        if (list == null) {
-            parent.setParameters(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setParameters(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParameterContainer(parent);
     }
@@ -384,8 +416,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ParameterDeclaration child, Catch parent) {
         parent.setParameterDeclaration(child);
@@ -395,15 +429,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(DeclarationSpecifier child, Declaration parent, int index) {
         ASTList<DeclarationSpecifier> list = parent.getDeclarationSpecifiers();
-        if (list == null) {
-            parent.setDeclarationSpecifiers(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setDeclarationSpecifiers(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -414,8 +449,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Throws child, MethodDeclaration parent) {
         parent.setThrown(child);
@@ -425,8 +462,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Implements child, ClassDeclaration parent) {
         parent.setImplementedTypes(child);
@@ -436,8 +475,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Extends child, ClassDeclaration parent) {
         parent.setExtendedTypes(child);
@@ -447,8 +488,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Extends child, InterfaceDeclaration parent) {
         parent.setExtendedTypes(child);
@@ -458,16 +501,17 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(FieldSpecification child, FieldDeclaration parent, int index) {
 
         ASTList<FieldSpecification> list = parent.getFieldSpecifications();
-        if (list == null) {
-            parent.setFieldSpecifications(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setFieldSpecifications(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -475,17 +519,18 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(VariableSpecification child, LocalVariableDeclaration parent,
             int index) {
 
         ASTList<VariableSpecification> list = parent.getVariableSpecifications();
-        if (list == null) {
-            parent.setVariableSpecifications(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setVariableSpecifications(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -493,8 +538,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(VariableSpecification child, ParameterDeclaration parent) {
         parent.setVariableSpecification(child);
@@ -504,8 +551,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsBody(Statement child, LoopStatement parent) {
         parent.setBody(child);
@@ -515,14 +564,14 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsInitializer(LoopInitializer child, For parent) {
         ASTList<LoopInitializer> list = parent.getInitializers();
-        if (list == null) {
-            parent.setInitializers(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setInitializers(list = new ASTArrayList<>()); }
         list.add(0, child);
         child.setStatementContainer(parent);
     }
@@ -530,8 +579,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsCondition(Expression child, Assert parent) {
         parent.setCondition(child);
@@ -543,8 +594,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsMessage(Expression child, Assert parent) {
         parent.setMessage(child);
@@ -554,8 +607,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsGuard(Expression child, LoopStatement parent) {
         parent.setGuard(child);
@@ -565,15 +620,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsUpdate(ExpressionStatement child, For parent, int index) {
         ASTList<Expression> list = parent.getUpdates();
-        if (list == null) {
-            parent.setUpdates(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setUpdates(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -581,8 +637,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Then child, If parent) {
         parent.setThen(child);
@@ -592,8 +650,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Else child, If parent) {
         parent.setElse(child);
@@ -603,15 +663,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Catch child, Try parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
-        if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBranchList(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -619,15 +680,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Finally child, Try parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
-        if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBranchList(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -635,15 +697,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Case child, Switch parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
-        if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBranchList(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -651,15 +714,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(Default child, Switch parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
-        if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setBranchList(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -667,8 +731,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ReferencePrefix child, ArrayLengthReference parent) {
         parent.setReferencePrefix(child);
@@ -678,8 +744,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsPrefix(ReferencePrefix child, ArrayReference parent) {
         parent.setReferencePrefix(child);
@@ -689,15 +757,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, ArrayReference parent, int index) {
         ASTList<Expression> list = parent.getDimensionExpressions();
-        if (list == null) {
-            parent.setDimensionExpressions(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setDimensionExpressions(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -705,8 +774,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ReferencePrefix child, FieldReference parent) {
         parent.setReferencePrefix(child);
@@ -716,8 +787,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsPrefix(TypeReference child, MetaClassReference parent) {
         parent.setReferencePrefix(child);
@@ -727,8 +800,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsPrefix(ReferencePrefix child, MethodReference parent) {
         parent.setReferencePrefix(child);
@@ -738,15 +813,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, MethodReference parent, int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -756,8 +832,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(PackageReference child, PackageReference parent) {
         parent.setReferencePrefix(child);
@@ -767,8 +845,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ReferencePrefix child, SuperReference parent) {
         parent.setReferencePrefix(child);
@@ -778,8 +858,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(TypeReference child, ThisReference parent) {
         parent.setReferencePrefix(child);
@@ -789,8 +871,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ReferencePrefix child, TypeReference parent) {
         parent.setReferencePrefix(child);
@@ -800,8 +884,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ReferencePrefix child, UncollatedReferenceQualifier parent) {
         parent.setReferencePrefix(child);
@@ -811,8 +897,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(ArrayInitializer child, NewArray parent) {
         parent.setArrayInitializer(child);
@@ -822,15 +910,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttach(ArrayInitializer child, ArrayInitializer parent, int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -838,8 +927,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Expression child, VariableSpecification parent) {
         parent.setInitializer(child);
@@ -849,8 +940,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Expression child, ExpressionJumpStatement parent) {
         parent.setExpression(child);
@@ -860,8 +953,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Expression child, If parent) {
         parent.setExpression(child);
@@ -873,8 +968,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttach(Expression child, Switch parent) {
         parent.setExpression(child);
@@ -884,8 +981,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsLabel(Expression child, Case parent) {
         parent.setExpression(child);
@@ -895,8 +994,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsPrefix(ReferencePrefix child, New parent) {
         parent.setReferencePrefix(child);
@@ -906,15 +1007,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, Operator parent, int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -922,16 +1024,17 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, SpecialConstructorReference parent,
             int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -939,8 +1042,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsArgument(TypeReference child, TypeOperator parent) {
         parent.setTypeReference(child);
@@ -950,14 +1055,14 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsArgument(Expression child, TypeCast parent) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(0, child);
         child.setExpressionContainer(parent);
     }
@@ -965,14 +1070,14 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     public static void doAttachAsArgument(Expression child, Instanceof parent) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(0, child);
         child.setExpressionContainer(parent);
     }
@@ -980,15 +1085,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, New parent, int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -996,15 +1102,16 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     public static void doAttachAsArgument(Expression child, NewArray parent, int index) {
         ASTList<Expression> list = parent.getArguments();
-        if (list == null) {
-            parent.setArguments(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setArguments(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setExpressionContainer(parent);
     }
@@ -1012,8 +1119,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      * @since 0.72
      */
     public static void doAttach(TypeReference child, Import parent) {
@@ -1024,8 +1133,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      * @since 0.72
      */
     public static void doAttach(PackageReference child, Import parent) {
@@ -1038,8 +1149,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      * @since 0.72
      */
     public static void doAttach(PackageReference child, PackageSpecification parent) {
@@ -1050,16 +1163,17 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      * @since 0.72
      */
     public static void doAttach(TypeReference child, InheritanceSpecification parent, int index) {
         ASTList<TypeReference> list = parent.getSupertypes();
-        if (list == null) {
-            parent.setSupertypes(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setSupertypes(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -1067,8 +1181,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      * @since 0.72
      */
     public static void doAttach(TypeReference child, MethodDeclaration parent) {
@@ -1079,8 +1195,10 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      * @since 0.72
      */
     public static void doAttach(TypeReference child, VariableDeclaration parent) {
@@ -1091,16 +1209,17 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node at a given index but does not report this.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      * @since 0.72
      */
     public static void doAttach(TypeReference child, Throws parent, int index) {
         ASTList<TypeReference> list = parent.getExceptions();
-        if (list == null) {
-            parent.setExceptions(list = new ASTArrayList<>());
-        }
+        if (list == null) { parent.setExceptions(list = new ASTArrayList<>()); }
         list.add(index, child);
         child.setParent(parent);
     }
@@ -1112,7 +1231,8 @@ public abstract class Transformation {
     /**
      * Sets the service configuration to use for this transformation.
      *
-     * @param sc the service configuration to use, may not be <CODE>null
+     * @param sc
+     *        the service configuration to use, may not be <CODE>null
      *           </CODE>. UA: thou shalt not forbid public access if others want to inherit!!!
      */
     public void setServiceConfiguration(CrossReferenceServiceConfiguration sc) {
@@ -1222,7 +1342,8 @@ public abstract class Transformation {
     /**
      * Sets the problem report. This should be done by {@link #execute}.
      *
-     * @param report the problem report.
+     * @param report
+     *        the problem report.
      * @return the problem report (passed through).
      */
     protected ProblemReport setProblemReport(ProblemReport report) {
@@ -1238,14 +1359,13 @@ public abstract class Transformation {
      * If this object is a {@link recoder.kit.TwoPassTransformation}, a redo should be possible via
      * a second call to {@link recoder.kit.TwoPassTransformation#transform()}.
      *
-     * @throws NoSuchTransformationException if the given transformation is not known, for instance
+     * @throws NoSuchTransformationException
+     *         if the given transformation is not known, for instance
      *         if it has already been removed.
      * @see recoder.service.ChangeHistory#rollback(Transformation)
      */
     public void rollback() throws NoSuchTransformationException {
-        if (isVisible()) {
-            getChangeHistory().rollback(this);
-        }
+        if (isVisible()) { getChangeHistory().rollback(this); }
     }
 
     /**
@@ -1257,9 +1377,7 @@ public abstract class Transformation {
     public String toString() {
         String result = getClass().getName();
         int ldp = result.lastIndexOf('.');
-        if (ldp > 0) {
-            result = result.substring(ldp + 1);
-        }
+        if (ldp > 0) { result = result.substring(ldp + 1); }
         return result;
     }
 
@@ -1268,21 +1386,17 @@ public abstract class Transformation {
      * change history notification. The method can also handle compilation units properly, but
      * otherwise assumes that the parent link is defined.
      *
-     * @param child the child to remove from its parent.
-     * @param replacement the child to replace its original (must be of appropriate type).
+     * @param child
+     *        the child to remove from its parent.
+     * @param replacement
+     *        the child to replace its original (must be of appropriate type).
      */
     protected final void replace(ProgramElement child, ProgramElement replacement) {
-        if (child == replacement) {
-            return;
-        }
+        if (child == replacement) { return; }
         NonTerminalProgramElement parent = child.getASTParent();
         // compilation units may have a null parent
-        if (parent != null) {
-            parent.replaceChild(child, replacement);
-        }
-        if (isVisible()) {
-            getChangeHistory().replaced(child, replacement);
-        }
+        if (parent != null) { parent.replaceChild(child, replacement); }
+        if (isVisible()) { getChangeHistory().replaced(child, replacement); }
     }
 
     // the other variant of attachment to a case has no index field;
@@ -1293,7 +1407,8 @@ public abstract class Transformation {
      * change history notification. The method can also handle compilation units properly, but
      * otherwise assumes that the parent link is defined.
      *
-     * @param root the root of the subtree to remove.
+     * @param root
+     *        the root of the subtree to remove.
      */
     protected final void detach(ProgramElement root) {
         NonTerminalProgramElement parent = root.getASTParent();
@@ -1304,128 +1419,129 @@ public abstract class Transformation {
         } else {
             position = 0;
         }
-        if (isVisible()) {
-            getChangeHistory().detached(root, position);
-        }
+        if (isVisible()) { getChangeHistory().detached(root, position); }
     }
 
     /**
      * Registers a compilation unit.
      *
-     * @param child the unit to register.
+     * @param child
+     *        the unit to register.
      */
     protected final void attach(CompilationUnit child) {
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Identifier child, NamedProgramElement parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Import child, CompilationUnit parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(PackageSpecification child, CompilationUnit parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Statement child, StatementBlock parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, MethodDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, ClassInitializer parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Statement child, Case parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Statement child, Default parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     // recoder.java.declaration.*
@@ -1433,214 +1549,219 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, Catch parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, Finally parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, Try parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Statement child, Then parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Statement child, Else parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, LoopStatement parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Statement child, LabeledStatement parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(StatementBlock child, SynchronizedBlock parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(TypeDeclaration child, CompilationUnit parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(ClassDeclaration child, StatementBlock parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ClassDeclaration child, New parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(MemberDeclaration child, TypeDeclaration parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(ParameterDeclaration child, MethodDeclaration parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ParameterDeclaration child, Catch parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Modifier child, Declaration parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Throws child, MethodDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     // recoder.java.statement.*
@@ -1648,135 +1769,138 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Implements child, ClassDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Extends child, ClassDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Extends child, InterfaceDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(FieldSpecification child, FieldDeclaration parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(VariableSpecification child, LocalVariableDeclaration parent,
             int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(VariableSpecification child, ParameterDeclaration parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsBody(Statement child, LoopStatement parent) {
         doAttachAsBody(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsInitializer(LoopInitializer child, For parent) {
         doAttachAsInitializer(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsGuard(Expression child, LoopStatement parent) {
         doAttachAsGuard(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsUpdate(ExpressionStatement child, For parent, int index) {
         doAttachAsUpdate(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     // recoder.java.reference.*
@@ -1784,162 +1908,167 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsCondition(Expression child, Assert parent) {
         doAttachAsCondition(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsMessage(Expression child, Assert parent) {
         doAttachAsMessage(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Then child, If parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Else child, If parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Catch child, Try parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Finally child, Try parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Case child, Switch parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(Default child, Switch parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ReferencePrefix child, ArrayLengthReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsPrefix(ReferencePrefix child, ArrayReference parent) {
         doAttachAsPrefix(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, ArrayReference parent, int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ReferencePrefix child, FieldReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     // recoder.java.expression.*
@@ -1947,294 +2076,300 @@ public abstract class Transformation {
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsPrefix(TypeReference child, MetaClassReference parent) {
         doAttachAsPrefix(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsPrefix(ReferencePrefix child, MethodReference parent) {
         doAttachAsPrefix(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, MethodReference parent, int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(PackageReference child, PackageReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ReferencePrefix child, SuperReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(TypeReference child, ThisReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ReferencePrefix child, TypeReference parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ReferencePrefix child, UncollatedReferenceQualifier parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(ArrayInitializer child, NewArray parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attach(ArrayInitializer child, ArrayInitializer parent, int index) {
         doAttach(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Expression child, VariableSpecification parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Expression child, ExpressionJumpStatement parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Expression child, If parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attach(Expression child, Switch parent) {
         doAttach(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsLabel(Expression child, Case parent) {
         doAttachAsLabel(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsPrefix(ReferencePrefix child, New parent) {
         doAttachAsPrefix(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, Operator parent, int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, SpecialConstructorReference parent,
             int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsArgument(TypeReference child, TypeOperator parent) {
         doAttachAsArgument(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
      */
     protected final void attachAsArgument(Expression child, TypeCast parent) {
         doAttachAsArgument(child, parent);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, New parent, int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
     /**
      * Attaches a child node to a parent node at a given index and reports this if necessary.
      *
-     * @param child the child node to attach.
-     * @param parent the parent node to attach the child to.
-     * @param index the requested child position.
+     * @param child
+     *        the child node to attach.
+     * @param parent
+     *        the parent node to attach the child to.
+     * @param index
+     *        the requested child position.
      */
     protected final void attachAsArgument(Expression child, NewArray parent, int index) {
         doAttachAsArgument(child, parent, index);
-        if (isVisible()) {
-            getChangeHistory().attached(child);
-        }
+        if (isVisible()) { getChangeHistory().attached(child); }
     }
 
 }

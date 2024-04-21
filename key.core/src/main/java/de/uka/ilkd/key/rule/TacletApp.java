@@ -92,8 +92,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * collects all bound variables above the occurrence of the schemavariable whose prefix is given
      *
-     * @param prefix the TacletPrefix of the schemavariable
-     * @param instantiations the SVInstantiations so that the find(if)-expression matches
+     * @param prefix
+     *        the TacletPrefix of the schemavariable
+     * @param instantiations
+     *        the SVInstantiations so that the find(if)-expression matches
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
@@ -104,9 +106,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * collects all bound variables above the occurrence of the schemavariable whose prefix is given
      *
-     * @param prefix the TacletPrefix of the schemavariable
-     * @param instantiations the SVInstantiations so that the find(if)-expression matches
-     * @param pos the posInOccurrence describing the position of the schemavariable
+     * @param prefix
+     *        the TacletPrefix of the schemavariable
+     * @param instantiations
+     *        the SVInstantiations so that the find(if)-expression matches
+     * @param pos
+     *        the posInOccurrence describing the position of the schemavariable
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
@@ -114,9 +119,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
-        if (prefix.context()) {
-            result = result.union(collectBoundVarsAbove(pos));
-        }
+        if (prefix.context()) { result = result.union(collectBoundVarsAbove(pos)); }
 
         return result;
     }
@@ -124,8 +127,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * collects all those logic variable that are instances of the variableSV of the given prefix
      *
-     * @param pre the TacletPrefix of a SchemaVariable that is bound
-     * @param instantiations the SVInstantiations to look at
+     * @param pre
+     *        the TacletPrefix of a SchemaVariable that is bound
+     * @param instantiations
+     *        the SVInstantiations to look at
      * @return the set of the logic variables whose elements are the instantiations of a bound
      *         SchemaVariable appearing in the TacletPrefix
      */
@@ -181,7 +186,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * resolves collisions between bound SchemaVariables in an SVInstantiation
      *
-     * @param insts the original SVInstantiations
+     * @param insts
+     *        the original SVInstantiations
      * @return the resolved SVInstantiations
      */
     protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
@@ -209,21 +215,19 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * delivers the term below the (unique) quantifier of a bound SchemaVariable in the given term.
      *
-     * @param varSV the searched Bound Schemavariable
-     * @param term the term to be searched in
+     * @param varSV
+     *        the searched Bound Schemavariable
+     * @param term
+     *        the term to be searched in
      * @return the term below the given quantifier in the given term
      */
     private static Term getTermBelowQuantifier(SchemaVariable varSV, Term term) {
         for (int i = 0; i < term.arity(); i++) {
             for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
-                if (term.varsBoundHere(i).get(j) == varSV) {
-                    return term.sub(i);
-                }
+                if (term.varsBoundHere(i).get(j) == varSV) { return term.sub(i); }
             }
             Term rec = getTermBelowQuantifier(varSV, term.sub(i));
-            if (rec != null) {
-                return rec;
-            }
+            if (rec != null) { return rec; }
         }
         return null;
     }
@@ -232,15 +236,14 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * delivers the term below the (unique) quantifier of a bound SchemaVariable varSV in the find
      * and if-parts of the Taclet
      *
-     * @param varSV the searched bound SchemaVariable
+     * @param varSV
+     *        the searched bound SchemaVariable
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
         for (SequentFormula sequentFormula : taclet.ifSequent()) {
             Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         if (taclet instanceof FindTaclet) {
@@ -253,9 +256,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * returns true iff the instantiation of a bound SchemaVariable contains the given Logicvariable
      *
-     * @param boundVars ImmutableArray<QuantifiableVariable> with the bound SchemaVariables
-     * @param x the LogicVariable that is looked for
-     * @param insts the SVInstantiations where to get the necessary instantiations of the bound
+     * @param boundVars
+     *        ImmutableArray<QuantifiableVariable> with the bound SchemaVariables
+     * @param x
+     *        the LogicVariable that is looked for
+     * @param insts
+     *        the SVInstantiations where to get the necessary instantiations of the bound
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
@@ -263,9 +269,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
             Term instance = (Term) insts.getInstantiation((SchemaVariable) boundVars.get(i));
-            if (instance.op() == x) {
-                return true;
-            }
+            if (instance.op() == x) { return true; }
         }
 
         return false;
@@ -319,8 +323,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal at which the Taclet is applied
-     * @param services the Services encapsulating all java information
+     * @param goal
+     *        the Goal at which the Taclet is applied
+     * @param services
+     *        the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override
@@ -363,9 +369,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = ((RewriteTaclet) taclet).checkPrefix(posInOccurrence(),
                 MatchConditions.EMPTY_MATCHCONDITIONS);
-            if (newConditions == null) {
-                return false;
-            }
+            if (newConditions == null) { return false; }
             ImmutableList<UpdateLabelPair> newUpdCtx =
                 newConditions.getInstantiations().getUpdateContext();
             return oldUpdCtx.equals(newUpdCtx);
@@ -406,9 +410,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             Iterator<SchemaVariable> it = coll.varIterator();
             while (it.hasNext()) {
                 SchemaVariable var = it.next();
-                if (!instantiations().isInstantiated(var)) {
-                    localMissingVars = localMissingVars.add(var);
-                }
+                if (!instantiations().isInstantiated(var)) { localMissingVars = localMissingVars.add(var); }
             }
             missingVars = localMissingVars;
         }
@@ -421,10 +423,14 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with the given term.
      * Sort equality is checked. If the check fails an IllegalArgumentException is thrown.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
-     * @param services the services object
-     * @param interesting whether instantiations for this schema variable should be kept in the list
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
+     * @param services
+     *        the services object
+     * @param interesting
+     *        whether instantiations for this schema variable should be kept in the list
      *        of "interesting" instantiations
      * @return the new TacletApp
      */
@@ -432,7 +438,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add " + "the instantiation of " + sv
-                + " because " + term + " is no variable.");
+                    + " because " + term + " is no variable.");
         }
 
         final MatchConditions newMC =
@@ -441,13 +447,11 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         if (newMC == null) {
             throw new IllegalInstantiationException(
                 "Instantiation " + term + " of " + sv
-                    + " does not satisfy the variable conditions");
+                        + " does not satisfy the variable conditions");
         }
 
         SVInstantiations svInst = newMC.getInstantiations();
-        if (interesting) {
-            svInst = svInst.makeInteresting(sv, services);
-        }
+        if (interesting) { svInst = svInst.makeInteresting(sv, services); }
 
         return addInstantiation(svInst, services);
 
@@ -469,7 +473,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * returns true if the given {@link SchemaVariable} must be explicitly instantiated it does not
      * check whether sv is already instantiated or not
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      * @return true if sv must be instantiated
      */
     public boolean isInstantiationRequired(SchemaVariable sv) {
@@ -488,12 +493,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable usv : uninstantiatedVars()) {
-            if (!(usv instanceof AbstractSV sv)) {
-                continue;
-            }
-            if (sv.arity() != 0) {
-                continue;
-            }
+            if (!(usv instanceof AbstractSV sv)) { continue; }
+            if (sv.arity() != 0) { continue; }
 
             if (sv.sort() == ProgramSVSort.VARIABLE) {
                 String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
@@ -541,9 +542,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    continue;
-                }
+                if (app == null) { continue; }
 
                 String proposal;
                 Collection<String> conflictNames = collectClashNames(sv, services);
@@ -563,9 +562,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         if (app != this) {
             final MatchConditions appMC =
                 app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
-            if (appMC == null) {
-                return null;
-            }
+            if (appMC == null) { return null; }
 
             return app;
         }
@@ -592,12 +589,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable usv : uninstantiatedVars()) {
-            if (!(usv instanceof AbstractSV sv)) {
-                continue;
-            }
-            if (sv.arity() != 0) {
-                continue;
-            }
+            if (!(usv instanceof AbstractSV sv)) { continue; }
+            if (sv.arity() != 0) { continue; }
 
             if (sv.sort() == ProgramSVSort.VARIABLE) {
                 String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
@@ -628,9 +621,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    return null;
-                }
+                if (app == null) { return null; }
 
                 String proposal =
                     VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
@@ -643,9 +634,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    return null;
-                }
+                if (app == null) { return null; }
 
                 String proposal;
                 Collection<String> conflictNames = collectClashNames(sv, services);
@@ -673,9 +662,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             }
         }
 
-        if (!app.complete()) {
-            return null;
-        }
+        if (!app.complete()) { return null; }
         return app;
     }
 
@@ -692,8 +679,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * name), it is vital not to cause confusion with the user.
      * </p>
      *
-     * @param sv the schema variable to instantiate with a fresh variable, not <code>null</code>
-     * @param services the services object, not <code>null</code>
+     * @param sv
+     *        the schema variable to instantiate with a fresh variable, not <code>null</code>
+     * @param services
+     *        the services object, not <code>null</code>
      * @return a fresh created collection of strings in which a freshly created variable name should
      *         not fall.
      */
@@ -703,15 +692,11 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         for (final NotFreeIn nv : taclet().varsNotFreeIn()) {
             if (nv.first() == sv) {
                 Term term = (Term) instantiations.getInstantiation(nv.second());
-                if (term != null) {
-                    term.execPostOrder(vcv);
-                }
+                if (term != null) { term.execPostOrder(vcv); }
             }
         }
 
-        for (QuantifiableVariable var : vcv.vars()) {
-            result.add(var.name().toString());
-        }
+        for (QuantifiableVariable var : vcv.vars()) { result.add(var.name().toString()); }
 
         for (Named progvar : services.getNamespaces().programVariables().allElements()) {
             result.add(progvar.name().toString());
@@ -741,10 +726,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     }
 
     /**
-     * @param services the Services class allowing access to the type model
+     * @param services
+     *        the Services class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
      *         currently otherwise
-     * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
+     * @throws GenericSortException
+     *         iff p_s is a generic sort which is not yet instantiated
      */
     public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
@@ -755,7 +742,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * later (by "createSkolemFunctions") be replaced by a function having the occurring
      * metavariables as arguments
      *
-     * @param services the Services class allowing access to the type model
+     * @param services
+     *        the Services class allowing access to the type model
      */
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv,
             boolean interesting, Services services) {
@@ -782,9 +770,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
-                if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely((JFunction) inst.op());
-                }
+                if (functions.lookup(inst.op().name()) == null) { functions.addSafely((JFunction) inst.op()); }
             }
         }
     }
@@ -792,8 +778,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * adds a new instantiation to this TacletApp
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
@@ -808,9 +796,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * entry <code>(sv, pe)</code> will result in a valid taclet instantiation, you have to use
      * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, Services, boolean)} instead
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
-     * @param interesting a boolean marking if the instantiation of this sv needs to be saved for
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SV is instantiated with
+     * @param interesting
+     *        a boolean marking if the instantiation of this sv needs to be saved for
      *        later proof loading (<code>interesting==true</code>) or if it can be derived
      *        deterministically (e.g. by matching) ( <code>interesting==false</code>)
      * @return a new taclet application equal to this one but including the newly added
@@ -824,16 +815,21 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * resulting instantiation is valid a new taclet application with an extended instantiation
      * mapping is created and returned. Otherwise, an exception is thrown.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
-     * @param services the Services
-     * @param interesting a boolean marking if the instantiation of this sv needs to be saved for
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SV is instantiated with
+     * @param services
+     *        the Services
+     * @param interesting
+     *        a boolean marking if the instantiation of this sv needs to be saved for
      *        later proof loading (<code>interesting==true</code>) or if it can be derived
      *        deterministically (e.g. by matching) ( <code>interesting==false</code>)
      * @return a new taclet application equal to this one but including the newly added
      *         instantiation entry <code>(sv, pe)</code>, if the instantiation results in a valid
      *         taclet application otherwise an exception is thrown
-     * @throws IllegalInstantiationException exception thrown if <code>sv</code> cannot be
+     * @throws IllegalInstantiationException
+     *         exception thrown if <code>sv</code> cannot be
      *         instantiated with <code>pe</code> no matter if in general or due to side conditions
      *         posed by this particular application
      *
@@ -847,12 +843,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         if (cond == null) {
             throw new IllegalInstantiationException(
                 "SchemaVariable " + sv + " could not be matched with program element " + pe
-                    + " under the provided constraints " + matchConditions);
+                        + " under the provided constraints " + matchConditions);
         } else {
             SVInstantiations svInst = cond.getInstantiations();
-            if (interesting) {
-                svInst = svInst.makeInteresting(sv, services);
-            }
+            if (interesting) { svInst = svInst.makeInteresting(sv, services); }
             return addInstantiation(svInst, services);
         }
     }
@@ -866,7 +860,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations
      *
-     * @param svi the SVInstantiations whose entries are the needed instantiations
+     * @param svi
+     *        the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application
      */
     public abstract TacletApp addInstantiation(SVInstantiations svi, Services services);
@@ -875,7 +870,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations and forget the old ones
      *
-     * @param svi the SVInstantiations whose entries are the needed instantiations
+     * @param svi
+     *        the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application
      */
     protected abstract TacletApp setInstantiation(SVInstantiations svi, Services services);
@@ -907,9 +903,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             // So we replace null with nil() here as a bugfix.
             p_list = ImmutableSLList.nil();
         }
-        assert ifInstsCorrectSize(p_list) && ifInstantiations == null
-                : "If instantiations list has wrong size "
-                    + "or the if formulas have already been instantiated";
+        assert ifInstsCorrectSize(p_list) && ifInstantiations == null : "If instantiations list has wrong size "
+                + "or the if formulas have already been instantiated";
 
         MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
 
@@ -919,8 +914,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * Find all possible instantiations of the assumes-sequent formulas within the sequent "seq".
      *
-     * @param seq uninstantiated if sequent from taclet
-     * @param services the {@link Services} to access information about the logic signature or
+     * @param seq
+     *        uninstantiated if sequent from taclet
+     * @param services
+     *        the {@link Services} to access information about the logic signature or
      *        program model
      * @return a list of tacletapps with the found assumes-formula instantiations When the IfSequent
      *         is
@@ -933,9 +930,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         Debug.assertTrue(ifInstantiations == null,
             "The if formulas have already been instantiated");
 
-        if (taclet().ifSequent().isEmpty()) {
-            return ImmutableSLList.<TacletApp>nil().prepend(this);
-        }
+        if (taclet().ifSequent().isEmpty()) { return ImmutableSLList.<TacletApp>nil().prepend(this); }
 
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().ifSequent().succedent()),
@@ -948,16 +943,23 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * Recursive function for matching the remaining tail of an if sequent
      *
-     * @param ruleSuccTail tail of the current uninstantiated semisequent as list (i.e. if
+     * @param ruleSuccTail
+     *        tail of the current uninstantiated semisequent as list (i.e. if
      *        succedent)
-     * @param ruleAntecTail the following uninstantiated semisequent (i.e. if antecedent) or null
-     * @param instSucc list of the formulas to match the current if semisequent formulas with
-     * @param instAntec list of the formulas of the antecedent
-     * @param instAlreadyMatched matched instantiations, for exactly those formulas that are no
+     * @param ruleAntecTail
+     *        the following uninstantiated semisequent (i.e. if antecedent) or null
+     * @param instSucc
+     *        list of the formulas to match the current if semisequent formulas with
+     * @param instAntec
+     *        list of the formulas of the antecedent
+     * @param instAlreadyMatched
+     *        matched instantiations, for exactly those formulas that are no
      *        longer in ruleSuccTail and ruleAntecTail
-     * @param matchCond match conditions until now, i.e. after matching the first formulas of the
+     * @param matchCond
+     *        match conditions until now, i.e. after matching the first formulas of the
      *        assumes-sequent
-     * @param services the {@link Services} to access information about the logic signature or
+     * @param services
+     *        the {@link Services} to access information about the logic signature or
      *        program model
      * @return a list of tacletapps with the found if formula instantiations
      */
@@ -972,9 +974,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             if (ruleAntecTail == null) {
                 // All formulas have been matched, collect the results
                 TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
-                if (res != null) {
-                    return ImmutableSLList.<TacletApp>nil().prepend(res);
-                }
+                if (res != null) { return ImmutableSLList.<TacletApp>nil().prepend(res); }
                 return ImmutableSLList.nil();
             } else {
                 // Change from succedent to antecedent
@@ -1005,9 +1005,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
         ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
-        for (SequentFormula p_s : p_ss) {
-            res = res.prepend(p_s);
-        }
+        for (SequentFormula p_s : p_ss) { res = res.prepend(p_s); }
 
         return res;
     }
@@ -1022,7 +1020,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * otherwise the TacletApp may become invalid. (This happened sometimes during interactive
      * proofs).
      *
-     * @param pos the PosInOccurrence of the newl created PosTacletApp
+     * @param pos
+     *        the PosInOccurrence of the newl created PosTacletApp
      * @return the new TacletApp
      */
     public PosTacletApp setPosInOccurrence(PosInOccurrence pos, Services services) {
@@ -1046,12 +1045,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         final TacletApp s = (TacletApp) o;
         return (s.taclet.equals(taclet) && s.instantiations.equals(instantiations))
                 && (Objects.equals(ifInstantiations, s.ifInstantiations));
@@ -1069,7 +1064,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     @Override
     public String toString() {
         return "Application of Taclet " + taclet() + " with " + instantiations() + " and "
-            + ifFormulaInstantiations();
+                + ifFormulaInstantiations();
     }
 
     /**
@@ -1099,8 +1094,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * variables in the context of the given schema variable and (if the TacletApp's prefix has the
      * context flag set) by adding names of the logic variables of the context.
      *
-     * @param sv the schema variable to be considered
-     * @param var_ns the old variable namespace
+     * @param sv
+     *        the schema variable to be considered
+     * @param var_ns
+     *        the old variable namespace
      * @return the new created variable namespace
      */
     public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
@@ -1112,9 +1109,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             ns.add(var);
         }
         if (taclet().getPrefix(sv).context()) {
-            for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
-                ns.add(quantifiableVariable);
-            }
+            for (QuantifiableVariable quantifiableVariable : contextVars(sv)) { ns.add(quantifiableVariable); }
         }
         return ns;
     }
@@ -1124,7 +1119,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * namespace.
      *
      * @author mulbrich
-     * @param func_ns the original function namespace, not <code>null</code>
+     * @param func_ns
+     *        the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
     public Namespace<JFunction> extendedFunctionNameSpace(Namespace<JFunction> func_ns) {
@@ -1135,9 +1131,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             if (sv instanceof SkolemTermSV) {
                 Term inst = (Term) instantiations.getInstantiation(sv);
                 Operator op = inst.op();
-                assert op instanceof JFunction
-                        : "At this point the skolem instantiation is expected to "
-                            + "be a function symbol, not " + inst;
+                assert op instanceof JFunction : "At this point the skolem instantiation is expected to "
+                        + "be a function symbol, not " + inst;
                 ns.addSafely((JFunction) op);
             }
         }
@@ -1183,7 +1178,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * check whether the number of if instantiations is correct
      *
-     * @param list list of instantiations (non-null)
+     * @param list
+     *        list of instantiations (non-null)
      * @return true iff the list of if instantiations has the correct size
      */
     public boolean ifInstsCorrectSize(ImmutableList<IfFormulaInstantiation> list) {
@@ -1251,10 +1247,13 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * instantiations. The variable conditions is used implicit in the prefix. (Used to calculate
      * the prefix)
      *
-     * @param taclet the Taclet that is tried to be instantiated. A match for the find (or/and if)
+     * @param taclet
+     *        the Taclet that is tried to be instantiated. A match for the find (or/and if)
      *        has been found.
-     * @param instantiations the SVInstantiations so that the find(if) expression matches
-     * @param pos the PosInOccurrence where the Taclet is applied
+     * @param instantiations
+     *        the SVInstantiations so that the find(if) expression matches
+     * @param pos
+     *        the PosInOccurrence where the Taclet is applied
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations,
@@ -1278,7 +1277,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * collects all bound vars that are bound above the subterm described by the given term position
      * information
      *
-     * @param pos the PosInOccurrence describing a subterm in Term
+     * @param pos
+     *        the PosInOccurrence describing a subterm in Term
      * @return a set of logic variables that are bound above the specified subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(PosInOccurrence pos) {
@@ -1290,9 +1290,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         while ((i = it.next()) != -1) {
             vars = it.getSubTerm().varsBoundHere(i);
-            for (i = 0; i < vars.size(); i++) {
-                result = result.add(vars.get(i));
-            }
+            for (i = 0; i < vars.size(); i++) { result = result.add(vars.get(i)); }
         }
 
         return result;
@@ -1300,27 +1298,19 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletApp that)) {
-            return false;
-        }
+        if (!(obj instanceof TacletApp that)) { return false; }
         if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
             that.ifInstantiations)) {
             return false;
         }
-        if (!instantiations.equalsModProofIrrelevancy(that.instantiations)) {
-            return false;
-        }
-        if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
-            return false;
-        }
+        if (!instantiations.equalsModProofIrrelevancy(that.instantiations)) { return false; }
+        if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) { return false; }
         if ((missingVars != null || !that.missingVars.isEmpty())
                 && (!missingVars.isEmpty() || that.missingVars != null)
                 && !Objects.equals(missingVars, that.missingVars)) {
             return false;
         }
-        if (!taclet.equalsModProofIrrelevancy(that.taclet)) {
-            return false;
-        }
+        if (!taclet.equalsModProofIrrelevancy(that.taclet)) { return false; }
         return true;
     }
 

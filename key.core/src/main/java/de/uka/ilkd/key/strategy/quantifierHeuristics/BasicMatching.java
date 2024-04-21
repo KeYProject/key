@@ -22,19 +22,17 @@ class BasicMatching {
     /**
      * matching <code>trigger</code> to <code>targetTerm</code> recursively
      *
-     * @param trigger a uni-trigger
-     * @param targetTerm a gound term
+     * @param trigger
+     *        a uni-trigger
+     * @param targetTerm
+     *        a gound term
      * @return all substitution found from this matching
      */
     static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
-        if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier) {
-            return allsubs;
-        }
+        if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier) { return allsubs; }
         final Substitution subst = match(trigger, targetTerm);
-        if (subst != null) {
-            allsubs = allsubs.add(subst);
-        }
+        if (subst != null) { allsubs = allsubs.add(subst); }
         final Operator op = targetTerm.op();
         if (!(op instanceof Modality || op instanceof UpdateApplication)) {
             for (int i = 0; i < targetTerm.arity(); i++) {
@@ -53,9 +51,7 @@ class BasicMatching {
     private static Substitution match(Term pattern, Term instance) {
         final ImmutableMap<QuantifiableVariable, Term> map =
             matchRec(DefaultImmutableMap.nilMap(), pattern, instance);
-        if (map == null) {
-            return null;
-        }
+        if (map == null) { return null; }
         return new Substitution(map);
     }
 
@@ -70,14 +66,10 @@ class BasicMatching {
             return mapVarWithCheck(varMap, (QuantifiableVariable) patternOp, instance);
         }
 
-        if (patternOp != instance.op()) {
-            return null;
-        }
+        if (patternOp != instance.op()) { return null; }
         for (int i = 0; i < pattern.arity(); i++) {
             varMap = matchRec(varMap, pattern.sub(i), instance.sub(i));
-            if (varMap == null) {
-                return null;
-            }
+            if (varMap == null) { return null; }
         }
         return varMap;
     }
@@ -92,13 +84,9 @@ class BasicMatching {
             ImmutableMap<QuantifiableVariable, Term> varMap, QuantifiableVariable var,
             Term instance) {
         final Term oldTerm = varMap.get(var);
-        if (oldTerm == null) {
-            return varMap.put(var, instance);
-        }
+        if (oldTerm == null) { return varMap.put(var, instance); }
 
-        if (oldTerm.equals(instance)) {
-            return varMap;
-        }
+        if (oldTerm.equals(instance)) { return varMap; }
         return null;
     }
 

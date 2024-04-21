@@ -31,21 +31,21 @@ public class Throw extends ExpressionJumpStatement {
     /**
      * Throw.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public Throw(Expression expr) {
         super(expr);
-        if (expr == null) {
-            throw new IllegalArgumentException("Throw requires one argument");
-        }
+        if (expr == null) { throw new IllegalArgumentException("Throw requires one argument"); }
         makeParentRoleValid();
     }
 
     /**
      * Throw.
      *
-     * @param proto a throw.
+     * @param proto
+     *        a throw.
      */
 
     protected Throw(Throw proto) {

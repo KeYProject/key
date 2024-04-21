@@ -38,7 +38,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Special constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
 
     public SpecialConstructorReference(ASTList<Expression> arguments) {
@@ -48,14 +49,13 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Special constructor reference.
      *
-     * @param proto a special constructor reference.
+     * @param proto
+     *        a special constructor reference.
      */
 
     protected SpecialConstructorReference(SpecialConstructorReference proto) {
         super(proto);
-        if (proto.arguments != null) {
-            arguments = proto.arguments.deepClone();
-        }
+        if (proto.arguments != null) { arguments = proto.arguments.deepClone(); }
     }
 
     /**
@@ -65,9 +65,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (arguments != null) {
-            for (int i = arguments.size() - 1; i >= 0; i -= 1) {
-                arguments.get(i).setExpressionContainer(this);
-            }
+            for (int i = arguments.size() - 1; i >= 0; i -= 1) { arguments.get(i).setExpressionContainer(this); }
         }
     }
 
@@ -94,7 +92,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Set statement container.
      *
-     * @param s a statement container.
+     * @param s
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer s) {
@@ -114,15 +113,15 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -143,9 +142,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
 
     public Expression getExpressionAt(int index) {
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -155,16 +152,17 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (arguments == null) ? 0 : arguments.size();
         for (int i = 0; i < count; i++) {
@@ -195,7 +193,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Set arguments.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {

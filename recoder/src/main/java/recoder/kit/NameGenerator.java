@@ -45,7 +45,8 @@ public class NameGenerator {
     /**
      * Create a generator for names based on the given name using default style.
      *
-     * @param base the base name.
+     * @param base
+     *        the base name.
      */
     public NameGenerator(String base) {
         this(base, DEFAULT_STYLE);
@@ -54,8 +55,10 @@ public class NameGenerator {
     /**
      * Create a generator for names based on the given name and style.
      *
-     * @param base the base name.
-     * @param strategy the style to use.
+     * @param base
+     *        the base name.
+     * @param strategy
+     *        the style to use.
      */
     public NameGenerator(String base, int strategy) {
         guessNames(base, strategy);
@@ -65,12 +68,11 @@ public class NameGenerator {
      * Create a generator for names based on the given type name. Uses short style for primitive
      * types, default style otherwise.
      *
-     * @param type the type to derive a name from.
+     * @param type
+     *        the type to derive a name from.
      */
     public NameGenerator(Type type) {
-        while (type instanceof ArrayType) {
-            type = ((ArrayType) type).getBaseType();
-        }
+        while (type instanceof ArrayType) { type = ((ArrayType) type).getBaseType(); }
         if (type instanceof PrimitiveType) {
             guessNames(type.getName(), SHORT_STYLE);
         } else {
@@ -80,12 +82,8 @@ public class NameGenerator {
 
     private static String[] getLetters(String base) {
         char c = Character.toLowerCase(base.charAt(0));
-        if (c < 'y') {
-            return new String[] { base, "" + (char) (c + 1), "" + (char) (c + 2) };
-        }
-        if (c < 'z') {
-            return new String[] { base, "" + (char) (c + 1) };
-        }
+        if (c < 'y') { return new String[] { base, "" + (char) (c + 1), "" + (char) (c + 2) }; }
+        if (c < 'z') { return new String[] { base, "" + (char) (c + 1) }; }
         return new String[] { base };
     }
 
@@ -117,9 +115,7 @@ public class NameGenerator {
         }
         buf[w].append(base.charAt(len - 1));
         String[] res = new String[w + 1];
-        for (int j = 0; j <= w; j += 1) {
-            res[j] = buf[j].toString();
-        }
+        for (int j = 0; j <= w; j += 1) { res[j] = buf[j].toString(); }
         return res;
     }
 
@@ -131,12 +127,7 @@ public class NameGenerator {
     private static String removeVowels(String str) {
         int len = str.length();
         StringBuilder res = new StringBuilder(len);
-        for (int i = 0; i < len; i += 1) {
-            char c = str.charAt(i);
-            if (!isVowel(c)) {
-                res.append(c);
-            }
-        }
+        for (int i = 0; i < len; i += 1) { char c = str.charAt(i); if (!isVowel(c)) { res.append(c); } }
         return res.toString();
     }
 
@@ -149,9 +140,7 @@ public class NameGenerator {
         // if first letter is upper case, use lower case word
         if (Character.isUpperCase(c0)) {
             String s = base.toLowerCase();
-            if (!Naming.isKeyword(s)) {
-                res[w++] = s;
-            }
+            if (!Naming.isKeyword(s)) { res[w++] = s; }
         }
         if (len > 3) {
             // if length is at least 4 letters and second letter is not a
@@ -159,9 +148,7 @@ public class NameGenerator {
             char c1 = base.charAt(1);
             if (!isVowel(c1)) {
                 String s = base.substring(0, 2).toLowerCase();
-                if (!Naming.isKeyword(s)) {
-                    res[w++] = s;
-                }
+                if (!Naming.isKeyword(s)) { res[w++] = s; }
             }
             // if length is at least 4(5) letters and first letter is not a
             // vowel, and removal of all vowels leads to a two(three) letters
@@ -170,9 +157,7 @@ public class NameGenerator {
                 String bs = removeVowels(base);
                 if (bs.length() == 2 || (bs.length() == 3 && len > 4)) {
                     String s = bs.toLowerCase();
-                    if (!Naming.isKeyword(s)) {
-                        res[w++] = s;
-                    }
+                    if (!Naming.isKeyword(s)) { res[w++] = s; }
                 }
             }
             // if length is at least 5 letters and third letter is not a vowel,
@@ -181,9 +166,7 @@ public class NameGenerator {
                 char c2 = base.charAt(2);
                 if (!isVowel(c2)) {
                     String s = base.substring(0, 3).toLowerCase();
-                    if (!Naming.isKeyword(s)) {
-                        res[w++] = s;
-                    }
+                    if (!Naming.isKeyword(s)) { res[w++] = s; }
                 }
             }
         }
@@ -191,9 +174,7 @@ public class NameGenerator {
         char lc0 = Character.toLowerCase(c0);
         if (len > 1 || Character.isUpperCase(c0)) {
             String s = "" + lc0;
-            if (!Naming.isKeyword(s)) {
-                res[w++] = s;
-            }
+            if (!Naming.isKeyword(s)) { res[w++] = s; }
         }
 
         // sort by length and remove duplicates
@@ -201,14 +182,9 @@ public class NameGenerator {
             String x = res[i];
             int j = i - 1;
             int xlen = x.length();
-            while (j >= 0 && res[j].length() > xlen) {
-                res[j + 1] = res[j];
-                j -= 1;
-            }
+            while (j >= 0 && res[j].length() > xlen) { res[j + 1] = res[j]; j -= 1; }
             if (j >= 0 && res[j].equals(x)) {
-                for (j += 1, w -= 1, i -= 1; j < len; j += 1) {
-                    res[j] = res[j + 1];
-                }
+                for (j += 1, w -= 1, i -= 1; j < len; j += 1) { res[j] = res[j + 1]; }
             } else {
                 res[j + 1] = x;
             }
@@ -241,18 +217,12 @@ public class NameGenerator {
     private void guessNames(String base, int strategy) {
         String[] words = separateWords(base);
         int len = words.length;
-        if (strategy == DEFAULT_STYLE) {
-            strategy = (len >= 4) ? SHORT_STYLE : LONG_STYLE;
-        }
+        if (strategy == DEFAULT_STYLE) { strategy = (len >= 4) ? SHORT_STYLE : LONG_STYLE; }
         String[][] shortCuts = new String[len][];
-        for (int i = 0; i < len; i += 1) {
-            shortCuts[i] = deriveShortCuts(i, words);
-        }
+        for (int i = 0; i < len; i += 1) { shortCuts[i] = deriveShortCuts(i, words); }
         if (strategy == SHORT_STYLE) {
             StringBuilder res = new StringBuilder(len);
-            for (int i = 0; i < len; i += 1) {
-                res.append(shortCuts[i][0]);
-            }
+            for (int i = 0; i < len; i += 1) { res.append(shortCuts[i][0]); }
             if (len == 1) {
                 derivates = getLetters(res.toString());
             } else {
@@ -260,21 +230,15 @@ public class NameGenerator {
             }
         } else {
             int c = 1;
-            for (int i = 0; i < len; i += 1) {
-                c += shortCuts[i].length - 1;
-            }
+            for (int i = 0; i < len; i += 1) { c += shortCuts[i].length - 1; }
             derivates = new String[c];
             c = 0;
             for (int i = 0; i < len; i += 1) {
                 for (int k = shortCuts[i].length - ((i == 0) ? 1 : 2); k >= 0; k -= 1) {
                     StringBuilder buf = new StringBuilder();
-                    for (int j = 0; j < i; j += 1) {
-                        buf.append(shortCuts[j][0]);
-                    }
+                    for (int j = 0; j < i; j += 1) { buf.append(shortCuts[j][0]); }
                     buf.append(shortCuts[i][k]);
-                    for (int j = i + 1; j < len; j += 1) {
-                        buf.append(words[j]);
-                    }
+                    for (int j = i + 1; j < len; j += 1) { buf.append(words[j]); }
                     derivates[c++] = buf.toString();
                 }
             }

@@ -74,8 +74,7 @@ public class ProofStarter {
         }
 
         @Override
-        public void readProblem() throws ProofInputException {
-        }
+        public void readProblem() throws ProofInputException {}
 
 
         private Proof createProof(String proofName) {
@@ -125,7 +124,8 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
+     * @param useAutoSaver
+     *        boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(boolean useAutoSaver) {
         this(null, useAutoSaver);
@@ -134,14 +134,14 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param ptl the ProverTaskListener to be informed about certain events
-     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
+     * @param ptl
+     *        the ProverTaskListener to be informed about certain events
+     * @param useAutoSaver
+     *        boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;
-        if (useAutoSaver) {
-            autoSaver = AutoSaver.getDefaultInstance();
-        }
+        if (useAutoSaver) { autoSaver = AutoSaver.getDefaultInstance(); }
     }
 
     /**
@@ -238,9 +238,7 @@ public class ProofStarter {
 
             GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
             ProverCore prover = new ApplyStrategy(goalChooser);
-            if (ptl != null) {
-                prover.addProverTaskObserver(ptl);
-            }
+            if (ptl != null) { prover.addProverTaskObserver(ptl); }
             if (autoSaver != null) {
                 autoSaver.setProof(proof);
                 prover.addProverTaskObserver(autoSaver);
@@ -258,9 +256,7 @@ public class ProofStarter {
                     result.getException());
             }
 
-            if (ptl != null) {
-                prover.removeProverTaskObserver(ptl);
-            }
+            if (ptl != null) { prover.removeProverTaskObserver(ptl); }
             if (autoSaver != null) {
                 prover.removeProverTaskObserver(autoSaver);
                 autoSaver.setProof(null);

@@ -33,7 +33,8 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Label jump statement.
      *
-     * @param label an identifier.
+     * @param label
+     *        an identifier.
      */
 
     public LabelJumpStatement(Identifier label) {
@@ -44,14 +45,13 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Label jump statement.
      *
-     * @param proto a label jump statement.
+     * @param proto
+     *        a label jump statement.
      */
 
     protected LabelJumpStatement(LabelJumpStatement proto) {
         super(proto);
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
+        if (proto.name != null) { name = proto.name.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -61,9 +61,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (name != null) {
-            name.setParent(this);
-        }
+        if (name != null) { name.setParent(this); }
     }
 
     /**
@@ -89,7 +87,8 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -109,25 +108,21 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (name != null) {
-            if (index == 0) {
-                return name;
-            }
-        }
+        if (name != null) { if (index == 0) { return name; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: label
-        if (name == child) {
-            return 0;
-        }
+        if (name == child) { return 0; }
         return -1;
     }
 
@@ -137,22 +132,21 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         return false;

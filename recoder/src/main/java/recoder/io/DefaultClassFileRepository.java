@@ -40,7 +40,8 @@ public class DefaultClassFileRepository extends AbstractService
     private PathList searchPathList;
 
     /**
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultClassFileRepository(ServiceConfiguration config) {
         super(config);
@@ -76,7 +77,8 @@ public class DefaultClassFileRepository extends AbstractService
     /**
      * Searches for the location of the class file for the given class.
      *
-     * @param classname the name of the class for which the class file should be looked up.
+     * @param classname
+     *        the name of the class for which the class file should be looked up.
      */
     public DataLocation findClassFile(String classname) {
         return getSearchPathList().find(Naming.dot(Naming.makeFilename(classname), "class"));
@@ -84,9 +86,7 @@ public class DefaultClassFileRepository extends AbstractService
 
     public ClassFile getClassFile(String classname) {
         ClassFile result = classname2cf.get(classname);
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
         DataLocation loc = findClassFile(classname);
         if (loc == null) {
             String innername = classname;
@@ -94,15 +94,11 @@ public class DefaultClassFileRepository extends AbstractService
             StringBuilder sb = new StringBuilder(innername);
             while (true) {
                 ldp = innername.lastIndexOf('.', ldp);
-                if (ldp == -1) {
-                    return null;
-                }
+                if (ldp == -1) { return null; }
                 sb.setCharAt(ldp, '$');
                 innername = sb.toString();
                 result = classname2cf.get(innername);
-                if (result != null) {
-                    return result;
-                }
+                if (result != null) { return result; }
                 loc = findClassFile(innername);
                 if (loc != null) {
                     classname = innername;
@@ -130,9 +126,7 @@ public class DefaultClassFileRepository extends AbstractService
     public List<ClassFile> getKnownClassFiles() {
         int n = classname2cf.size();
         List<ClassFile> res = new ArrayList<>(n);
-        for (ClassFile cf : classname2cf.values()) {
-            res.add(cf);
-        }
+        for (ClassFile cf : classname2cf.values()) { res.add(cf); }
         return res;
     }
 

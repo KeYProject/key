@@ -32,8 +32,10 @@ public class ShiftLeft extends Operator {
     /**
      * Shift left.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public ShiftLeft(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class ShiftLeft extends Operator {
     /**
      * Shift left.
      *
-     * @param proto a shift left.
+     * @param proto
+     *        a shift left.
      */
 
     protected ShiftLeft(ShiftLeft proto) {

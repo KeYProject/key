@@ -50,9 +50,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * create a new schema-recoder-to-key converter. It must be associated with a schema
      * recoder2key.
      *
-     * @param rec2key the object to associate to
-     * @param namespaceSet namespaces to resolve entity names
-     * @param services services to be used
+     * @param rec2key
+     *        the object to associate to
+     * @param namespaceSet
+     *        namespaces to resolve entity names
+     * @param services
+     *        services to be used
      */
     public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services,
             NamespaceSet namespaceSet) {
@@ -108,12 +111,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
             for (ProgramSV programSV : svw) {
-                if (programSV.sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = programSV;
-                }
-                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = programSV;
-                }
+                if (programSV.sort() == ProgramSVSort.VARIABLE) { returnSV = programSV; }
+                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) { execSV = programSV; }
             }
             return new MethodCall(execSV, returnSV, list.get(Expression.class));
         } else if ("#evaluate-arguments".equals(mcName)) {
@@ -291,16 +290,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if (lvd.getTypeReference() instanceof TypeSVWrapper) {
             List<recoder.java.declaration.VariableSpecification> rspecs = lvd.getVariables();
             VariableSpecification[] varspecs = new VariableSpecification[rspecs.size()];
-            for (int i = 0; i < rspecs.size(); i++) {
-                varspecs[i] = convertVarSpecWithSVType(rspecs.get(i));
-            }
+            for (int i = 0; i < rspecs.size(); i++) { varspecs[i] = convertVarSpecWithSVType(rspecs.get(i)); }
             SchemaVariable typesv = ((TypeSVWrapper) lvd.getTypeReference()).getSV();
 
             List<recoder.java.declaration.Modifier> mods = lvd.getModifiers();
             Modifier[] modifiers = new Modifier[mods == null ? 0 : mods.size()];
-            for (int i = 0; i < modifiers.length; i++) {
-                modifiers[i] = (Modifier) callConvert(mods.get(i));
-            }
+            for (int i = 0; i < modifiers.length; i++) { modifiers[i] = (Modifier) callConvert(mods.get(i)); }
 
             return new LocalVariableDeclaration(modifiers, (ProgramSV) typesv, varspecs);
         } else {
@@ -395,9 +390,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     @Override
     public Expression convert(recoder.java.reference.FieldReference fr) {
         ReferencePrefix prefix = null;
-        if (fr.getReferencePrefix() != null) {
-            prefix = (ReferencePrefix) callConvert(fr.getReferencePrefix());
-        }
+        if (fr.getReferencePrefix() != null) { prefix = (ReferencePrefix) callConvert(fr.getReferencePrefix()); }
         SchemaVariable suffix = (SchemaVariable) callConvert(fr.getIdentifier());
 
         return new SchematicFieldReference(suffix, prefix);
@@ -429,9 +422,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else {
             keyArgs = new Expression[0];
         }
-        for (int i = 0, sz = keyArgs.length; i < sz; i++) {
-            keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
-        }
+        for (int i = 0, sz = keyArgs.length; i < sz; i++) { keyArgs[i] = (Expression) callConvert(recoderArgs.get(i)); }
 
         return new MethodReference(new ImmutableArray<>(keyArgs), name, prefix);
     }
@@ -439,7 +430,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * converts a For.
      *
-     * @param f the For of recoder
+     * @param f
+     *        the For of recoder
      * @return the For of KeY
      */
     @Override

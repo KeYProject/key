@@ -99,8 +99,7 @@ public class ValueInjectorTest {
 
         @Override
         public void execute(AbstractUserInterfaceControl uiControl, PP args, EngineState stateMap)
-                throws ScriptException, InterruptedException {
-        }
+                throws ScriptException, InterruptedException {}
 
         @Override
         public String getName() {

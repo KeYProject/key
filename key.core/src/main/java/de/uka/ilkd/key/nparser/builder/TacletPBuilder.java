@@ -87,12 +87,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
         enableJavaSchemaMode();
-        if (ctx.RULES() != null) {
-            axiomMode = false;
-        }
-        if (ctx.AXIOMS() != null) {
-            axiomMode = true;
-        }
+        if (ctx.RULES() != null) { axiomMode = false; }
+        if (ctx.AXIOMS() != null) { axiomMode = true; }
         ChoiceExpr choices = accept(ctx.choices);
         this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
         List<Taclet> seq = mapOf(ctx.taclet());
@@ -111,9 +107,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<String> ids = accept(ctx.simple_ident_comma_list());
         String id = accept(ctx.simple_ident());
 
-        for (String s : Objects.requireNonNull(ids)) {
-            modalities = opSVHelper(s, modalities);
-        }
+        for (String s : Objects.requireNonNull(ids)) { modalities = opSVHelper(s, modalities); }
         SchemaVariable osv =
             SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
         schemaVariables().add(osv);
@@ -124,9 +118,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     public TacletBuilder<?> visitTriggers(KeYParser.TriggersContext ctx) {
         String id = (String) ctx.id.accept(this);
         SchemaVariable triggerVar = schemaVariables().lookup(new Name(id));
-        if (triggerVar == null) {
-            semanticError(ctx, "Undeclared schemavariable: " + id);
-        }
+        if (triggerVar == null) { semanticError(ctx, "Undeclared schemavariable: " + id); }
         TacletBuilder<?> b = peekTBuilder();
         Term t = accept(ctx.t);
         List<Term> avoidConditions = mapOf(ctx.avoidCond);
@@ -144,15 +136,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         String name = ctx.name.getText();
         ChoiceExpr ch = accept(ctx.option_list());
         var choices = requiredChoices;
-        if (ch != null) {
-            choices = ChoiceExpr.and(ch, choices);
-        }
+        if (ch != null) { choices = ChoiceExpr.and(ch, choices); }
 
         Term form = accept(ctx.form);
         if (form != null) {
-            if (!axiomMode) {
-                semanticError(ctx, "formula rules are only permitted for \\axioms");
-            }
+            if (!axiomMode) { semanticError(ctx, "formula rules are only permitted for \\axioms"); }
             TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
@@ -175,23 +163,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         setSchemaVariables(new Namespace<>(schemaVariables()));
         mapOf(ctx.one_schema_var_decl());
 
-        if (ctx.ifSeq != null) {
-            ifSeq = accept(ctx.ifSeq);
-        }
+        if (ctx.ifSeq != null) { ifSeq = accept(ctx.ifSeq); }
 
         int applicationRestriction = RewriteTaclet.NONE;
-        if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
-        }
-        if (!ctx.INSEQUENTSTATE().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
-        }
-        if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
-        }
-        if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
-        }
+        if (!ctx.SAMEUPDATELEVEL().isEmpty()) { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
+        if (!ctx.INSEQUENTSTATE().isEmpty()) { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+        if (!ctx.ANTECEDENTPOLARITY().isEmpty()) { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+        if (!ctx.SUCCEDENTPOLARITY().isEmpty()) { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
         @Nullable
         Object find = accept(ctx.find);
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
@@ -430,9 +408,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             qvs.add(qv);
             args[i] = services.getTermFactory().createTerm(qvs.get(i));
 
-            if (argSort.get(i).equals(dt)) {
-                ind.add(tb.subst(qvX, args[i], phi));
-            }
+            if (argSort.get(i).equals(dt)) { ind.add(tb.subst(qvX, args[i], phi)); }
         }
 
         if (ind.isEmpty()) {
@@ -475,9 +451,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             var func = functions().lookup(context.name.getText());
             Term[] args = new Term[context.argName.size()];
-            for (int i = 0; i < args.length; i++) {
-                args[i] = variables.get(context.argName.get(i).getText());
-            }
+            for (int i = 0; i < args.length; i++) { args[i] = variables.get(context.argName.get(i).getText()); }
             Semisequent antec =
                 new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
             Sequent addedSeq = Sequent.createAnteSequent(antec);
@@ -492,13 +466,9 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         List<RuleSet> rs = accept(ctx.rs);
-        if (!ctx.NONINTERACTIVE().isEmpty()) {
-            b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
-        }
+        if (!ctx.NONINTERACTIVE().isEmpty()) { b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable"))); }
 
-        if (rs != null) {
-            rs.forEach(b::addRuleSet);
-        }
+        if (rs != null) { rs.forEach(b::addRuleSet); }
 
         if (ctx.DISPLAYNAME() != null) {// last entry
             b.setDisplayName(accept(ctx.dname));
@@ -549,9 +519,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
 
-        if (types.length != arguments.size()) {
-            return false;
-        }
+        if (types.length != arguments.size()) { return false; }
         try {
             for (int i = 0; i < arguments.size(); i++) {
                 args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
@@ -602,9 +570,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
         Sort s = lookupSort(primitiveName);
-        if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", text);
-        }
+        if (s == null) { semanticError(ctx, "Could not find sort: %s", text); }
 
         if (text.contains("[")) {
             var num = text.indexOf('[') - text.lastIndexOf(']') / 2 + 1;
@@ -615,21 +581,15 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private KeYJavaType getOrCreateJavaType(String sortId, ParserRuleContext ctx) {
         KeYJavaType t = getJavaInfo().getKeYJavaType(sortId);
-        if (t != null) {
-            return t;
-        }
+        if (t != null) { return t; }
         return new KeYJavaType(visitSortId(sortId, ctx));
     }
 
 
     public Object buildTypeResolver(KeYParser.Varexp_argumentContext ctx) {
         SchemaVariable y = accept(ctx.varId());
-        if (ctx.TYPEOF() != null) {
-            return TypeResolver.createElementTypeResolver(y);
-        }
-        if (ctx.CONTAINERTYPE() != null) {
-            return TypeResolver.createContainerTypeResolver(y);
-        }
+        if (ctx.TYPEOF() != null) { return TypeResolver.createElementTypeResolver(y); }
+        if (ctx.CONTAINERTYPE() != null) { return TypeResolver.createContainerTypeResolver(y); }
 
         Sort s = visitSortId(ctx.term().getText(), ctx.term());
         if (s != null) {
@@ -659,9 +619,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Choice visitOption(KeYParser.OptionContext ctx) {
         String choice = ctx.getText();
         Choice c = choices().lookup(choice);
-        if (c == null) {
-            semanticError(ctx, "Could not find choice: %s", choice);
-        }
+        if (c == null) { semanticError(ctx, "Could not find choice: %s", choice); }
         return c;
     }
 
@@ -709,15 +667,11 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         @Nullable
         Object rwObj = accept(ctx.replacewith());
-        if (ctx.add() != null) {
-            addSeq = accept(ctx.add());
-        }
+        if (ctx.add() != null) { addSeq = accept(ctx.add()); }
         if (ctx.addrules() != null) {
             addRList = accept(ctx.addrules()); // modifies goalChoice
         }
-        if (ctx.addprogvar() != null) {
-            addpv = accept(ctx.addprogvar());
-        }
+        if (ctx.addprogvar() != null) { addpv = accept(ctx.addprogvar()); }
         addGoalTemplate(name, rwObj, addSeq, addRList, addpv, soc, ctx);
         return null;
     }
@@ -821,9 +775,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         gt.setName(id);
         b.addTacletGoalTemplate(gt);
-        if (soc != null) {
-            b.addGoal2ChoicesMapping(gt, soc);
-        }
+        if (soc != null) { b.addGoal2ChoicesMapping(gt, soc); }
     }
 
     @Override
@@ -836,12 +788,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     private Operator varId(ParserRuleContext ctx, String id) {
         Name name = new Name(id);
         Operator v = variables().lookup(name);
-        if (v == null) {
-            v = schemaVariables().lookup(name);
-        }
-        if (v == null) {
-            semanticError(ctx, "Could not find Variable %s", id);
-        }
+        if (v == null) { v = schemaVariables().lookup(name); }
+        if (v == null) { semanticError(ctx, "Could not find Variable %s", id); }
         return v;
     }
 
@@ -865,9 +813,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
             ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
             s = parameter != null ? psv.createInstance(parameter) : psv;
-            if (s == null) {
-                semanticError(ctx, "Program SchemaVariable of type '%s' not found.", id);
-            }
+            if (s == null) { semanticError(ctx, "Program SchemaVariable of type '%s' not found.", id); }
         }
         if (ctx.FORMULA() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
@@ -910,9 +856,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             return null;
         }
 
-        if (ctx.sortId() != null) {
-            s = accept(ctx.sortId());
-        }
+        if (ctx.sortId() != null) { s = accept(ctx.sortId()); }
 
         for (String id : Objects.requireNonNull(ids)) {
             declareSchemaVariable(ctx, id, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV,

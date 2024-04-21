@@ -35,7 +35,8 @@ public interface SourceFileRepository extends Service {
      * Returns the location of the source file for the given class or <tt>null</tt> if the file
      * could not be located.
      *
-     * @param classname the name of the class for which the source should be located.
+     * @param classname
+     *        the name of the class for which the source should be located.
      * @return the source file location.
      */
     DataLocation findSourceFile(String classname);
@@ -44,7 +45,8 @@ public interface SourceFileRepository extends Service {
      * Retrieves the AST for the compilation unit containing the class with the given name. This
      * method will not throw ParserExceptions, but pass these to the system error handler.
      *
-     * @param classname the fully qualified classname of the required class.
+     * @param classname
+     *        the fully qualified classname of the required class.
      * @return the AST for that class, if sources are available, <tt>null</tt> otherwise.
      */
     CompilationUnit getCompilationUnit(String classname);
@@ -55,19 +57,23 @@ public interface SourceFileRepository extends Service {
      * given filename may also be absolute - it will then be shortened if a prefix is in the search
      * path, or used to load the file regardless of the search path, otherwise.
      *
-     * @param filename the name of the file to look for
+     * @param filename
+     *        the name of the file to look for
      * @return a compilation unit object for that file, or <CODE>null</CODE> if there was no unit
      *         under this name whatoever.
-     * @throws ParserException if something happened while parsing.
+     * @throws ParserException
+     *         if something happened while parsing.
      */
     CompilationUnit getCompilationUnitFromFile(String filename) throws ParserException;
 
     /**
      * Calls {@link #getCompilationUnitFromFile}for all given file names.
      *
-     * @param filenames the names of the files to look for.
+     * @param filenames
+     *        the names of the files to look for.
      * @return a list of all available compilation units for the given files.
-     * @throws ParserException if something happened while parsing.
+     * @throws ParserException
+     *         if something happened while parsing.
      * @since 0.72
      */
     List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames) throws ParserException;
@@ -86,7 +92,8 @@ public interface SourceFileRepository extends Service {
      * algorithm checks all files in all subdirectories, but this can be narrowed down in the
      * filter.
      *
-     * @param filter a filename filter accepting source files.
+     * @param filter
+     *        a filename filter accepting source files.
      * @return the list of all compilation units obeying the filter and accessible via the search
      *         path.
      */
@@ -97,7 +104,8 @@ public interface SourceFileRepository extends Service {
      * Checks if the given compilation unit is up to date or if it has changed after the last
      * persistant state.
      *
-     * @param cu a compilation unit.
+     * @param cu
+     *        a compilation unit.
      * @return true if the compilation unit does not have to be written back.
      */
     boolean isUpToDate(CompilationUnit cu);
@@ -112,7 +120,8 @@ public interface SourceFileRepository extends Service {
      * Print back all compilation units to their data locations. Can be used to print all units, or
      * only those that are not up to date.
      *
-     * @param always flag to indicate whether all units should be written back ( <CODE>true</CODE>),
+     * @param always
+     *        flag to indicate whether all units should be written back ( <CODE>true</CODE>),
      *        or only these which are not up to date ( <CODE>false</CODE>).
      * @see #print
      * @see #isUpToDate
@@ -129,7 +138,8 @@ public interface SourceFileRepository extends Service {
      * Adds a progress listener for {@link #getAllCompilationUnitsFromPath},
      * {@link #getCompilationUnitsFromFiles}and {@link #printAll}.
      *
-     * @param l a progress listener.
+     * @param l
+     *        a progress listener.
      * @since 0.72
      */
     void addProgressListener(ProgressListener l);
@@ -137,7 +147,8 @@ public interface SourceFileRepository extends Service {
     /**
      * Removes the given progress listener.
      *
-     * @param l a progress listener.
+     * @param l
+     *        a progress listener.
      * @since 0.72
      */
     void removeProgressListener(ProgressListener l);

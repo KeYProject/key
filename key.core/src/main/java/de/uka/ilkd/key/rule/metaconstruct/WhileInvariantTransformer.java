@@ -59,15 +59,17 @@ public final class WhileInvariantTransformer {
 
     private KeYJavaType returnType;
 
-    public WhileInvariantTransformer() {
-    }
+    public WhileInvariantTransformer() {}
 
     /**
      * initialises this meta operator
      *
-     * @param initialPost the instantiated Term passed to the TermTransformer
-     * @param invariantFramingTermination TODO
-     * @param services the Services providing access to signature and type model
+     * @param initialPost
+     *        the instantiated Term passed to the TermTransformer
+     * @param invariantFramingTermination
+     *        TODO
+     * @param services
+     *        the Services providing access to signature and type model
      */
     private void init(Term initialPost, Term invariantFramingTermination, Services services) {
         root = (JavaNonTerminalProgramElement) initialPost.javaBlock().program();
@@ -112,9 +114,7 @@ public final class WhileInvariantTransformer {
             getNewLocalvariable("thrownExc", "java.lang.Throwable", services);
 
         ProgramVariable returnExpression = null;
-        if (returnType != null) {
-            returnExpression = getNewLocalvariable("returnExpr", returnType, services);
-        }
+        if (returnType != null) { returnExpression = getNewLocalvariable("returnExpr", returnType, services); }
 
         Term contFlagTerm = null;
         Term returnFlagTerm = null;
@@ -169,9 +169,7 @@ public final class WhileInvariantTransformer {
             resultSubterms.add(returnCase(termLabelState, returnFlag, returnType, returnExpression,
                 post, rule, ruleApp, goal, applicationPos, services));
 
-            if (returnType != null) {
-                stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType));
-            }
+            if (returnType != null) { stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType)); }
         }
 
         // break case
@@ -224,15 +222,24 @@ public final class WhileInvariantTransformer {
      * Computes the {@link TermLabel} which should be added to the created loop body modality
      * {@link Term}.
      *
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
-     * @param rule The {@link Rule} to apply.
-     * @param goal The {@link Goal} to compute the result for.
-     * @param loopBodyModality The {@link Modality} of the loop body.
-     * @param result The postcondition of the modality.
-     * @param mainJavaBlock The {@link JavaBlock} to execute within the modality.
-     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services}.
+     * @param applicationPos
+     *        The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule
+     *        The {@link Rule} to apply.
+     * @param goal
+     *        The {@link Goal} to compute the result for.
+     * @param loopBodyModality
+     *        The {@link Modality} of the loop body.
+     * @param result
+     *        The postcondition of the modality.
+     * @param mainJavaBlock
+     *        The {@link JavaBlock} to execute within the modality.
+     * @param applicationSequent
+     *        The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the loop body modality {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
@@ -248,9 +255,12 @@ public final class WhileInvariantTransformer {
     /**
      * creates a new program variable
      *
-     * @param varNameBase a String specifying the basename of the new variable
-     * @param varType a String specifying the typename of the new variable
-     * @param services the Services allowing access to the variablenaming facilities
+     * @param varNameBase
+     *        a String specifying the basename of the new variable
+     * @param varType
+     *        a String specifying the typename of the new variable
+     * @param services
+     *        the Services allowing access to the variablenaming facilities
      * @return a new program variable of the given type and a name as near as possible to the given
      *         basename
      */
@@ -264,9 +274,12 @@ public final class WhileInvariantTransformer {
     /**
      * creates a new program variable
      *
-     * @param varNameBase a String specifying the basename of the new variable
-     * @param varType the KeYJavaType of the new variable
-     * @param services the Services allowing access to the variablenaming facilities
+     * @param varNameBase
+     *        a String specifying the basename of the new variable
+     * @param varType
+     *        the KeYJavaType of the new variable
+     * @param services
+     *        the Services allowing access to the variablenaming facilities
      * @return a new program variable of the given type and a name as near as possible to the given
      *         basename
      */
@@ -289,12 +302,8 @@ public final class WhileInvariantTransformer {
             javaInfo == null ? null : javaInfo.getServices());
         w.start();
         instantiations = ImmutableSLList.nil();
-        if (w.innerLabelNeeded()) {
-            instantiations = instantiations.prepend(innerLabel);
-        }
-        if (w.outerLabelNeeded()) {
-            instantiations = instantiations.prepend(outerLabel);
-        }
+        if (w.innerLabelNeeded()) { instantiations = instantiations.prepend(innerLabel); }
+        if (w.outerLabelNeeded()) { instantiations = instantiations.prepend(outerLabel); }
         breakList = w.breakList();
         return instantiations;
     }
@@ -373,15 +382,9 @@ public final class WhileInvariantTransformer {
 
         ArrayList<Term> al = new ArrayList<>();
 
-        if (returnFlagTerm != null) {
-            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
-        }
-        if (breakFlagTerm != null) {
-            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
-        }
-        if (excFlagTerm != null) {
-            al.add(TB.equals(excFlagTerm, TRUE_TERM));
-        }
+        if (returnFlagTerm != null) { al.add(TB.equals(returnFlagTerm, TRUE_TERM)); }
+        if (breakFlagTerm != null) { al.add(TB.equals(breakFlagTerm, TRUE_TERM)); }
+        if (excFlagTerm != null) { al.add(TB.equals(excFlagTerm, TRUE_TERM)); }
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
@@ -397,9 +400,7 @@ public final class WhileInvariantTransformer {
             }
         } else {
             Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
-            if (contFlagTerm != null) {
-                premiss = TB.imp(contFlagTerm, premiss);
-            }
+            if (contFlagTerm != null) { premiss = TB.imp(contFlagTerm, premiss); }
 
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                 services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
@@ -412,14 +413,22 @@ public final class WhileInvariantTransformer {
      * Computes the {@link TermLabel} which should be added to the implication of the normal
      * termination branch of a loop body.
      *
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
-     * @param rule The {@link Rule} to apply.
-     * @param goal The {@link Goal} to compute the result for.
-     * @param operator The {@link Operator} of the new {@link Term}.
-     * @param subs The children of the new {@link Term}.
-     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services}.
+     * @param applicationPos
+     *        The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule
+     *        The {@link Rule} to apply.
+     * @param goal
+     *        The {@link Goal} to compute the result for.
+     * @param operator
+     *        The {@link Operator} of the new {@link Term}.
+     * @param subs
+     *        The children of the new {@link Term}.
+     * @param applicationSequent
+     *        The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the new {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,

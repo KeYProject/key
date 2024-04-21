@@ -25,14 +25,14 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
      * Sets up a new project file IO facility that reads from and/or writes to the specified
      * (.properties) file.
      *
-     * @param system the service configuration to initialize.
-     * @param projectFile the project file to load and/or save.
+     * @param system
+     *        the service configuration to initialize.
+     * @param projectFile
+     *        the project file to load and/or save.
      */
     public DefaultProjectFileIO(ServiceConfiguration system, File projectFile) {
         super(system);
-        if (projectFile == null) {
-            throw new IllegalArgumentException("Null project file");
-        }
+        if (projectFile == null) { throw new IllegalArgumentException("Null project file"); }
         this.file = projectFile;
     }
 
@@ -57,12 +57,8 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             String newValue = props.getProperty(key);
             if (key.equals(OUTPUT_PATH)) {
                 newValue = resolveFilename(file.getParent(), newValue);
-            } else if (key.equals(INPUT_PATH)) {
-                newValue = resolvePathnames(file.getParent(), newValue);
-            }
-            if (!newValue.equals(oldValue)) {
-                ps.setProperty(key, newValue);
-            }
+            } else if (key.equals(INPUT_PATH)) { newValue = resolvePathnames(file.getParent(), newValue); }
+            if (!newValue.equals(oldValue)) { ps.setProperty(key, newValue); }
         }
         // normalize input path and output path and unit paths
         String prop = props.getProperty("units");
@@ -106,9 +102,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         boolean firstToken = true;
         while (paths.hasMoreTokens()) {
             String filename = paths.nextToken();
-            if (!firstToken) {
-                newpath.append(File.pathSeparator);
-            }
+            if (!firstToken) { newpath.append(File.pathSeparator); }
             newpath.append(resolveFilename(parentDir, filename));
             firstToken = false;
         }
@@ -126,9 +120,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         for (int i = 0, s = cus.size(); i < s; i += 1) {
             CompilationUnit cu = cus.get(i);
             units.append(Naming.toCanonicalFilename(cu).replace(File.separatorChar, '/'));
-            if (i < s - 1) {
-                units.append(',');
-            }
+            if (i < s - 1) { units.append(','); }
         }
         Properties properties = getProjectSettings().getProperties();
         properties.put("units", units.toString());

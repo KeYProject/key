@@ -79,20 +79,16 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
 
         @Override
-        public void started() {
-        }
+        public void started() {}
 
         @Override
-        public void resetStatus(Object sender) {
-        }
+        public void resetStatus(Object sender) {}
 
         @Override
-        public void reportStatus(Object sender, String string) {
-        }
+        public void reportStatus(Object sender, String string) {}
 
         @Override
-        public void progressStarted(Object sender) {
-        }
+        public void progressStarted(Object sender) {}
     };
 
     private final InitConfig environmentConfig;
@@ -101,8 +97,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /**
      * Instantiates a new taclet proof obligation input object.
      *
-     * @param tacletName the name of the taclet which is to be created
-     * @param initConfig the initconfig under which the PO is to be examined
+     * @param tacletName
+     *        the name of the taclet which is to be created
+     * @param initConfig
+     *        the initconfig under which the PO is to be examined
      */
     public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
         this.tacletName = tacletName;
@@ -120,12 +118,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
 
-        if (tacletFile != null) {
-            properties.setProperty("tacletFile", tacletFile);
-        }
-        if (definitionFile != null) {
-            properties.setProperty("definitionFile", definitionFile);
-        }
+        if (tacletFile != null) { properties.setProperty("tacletFile", tacletFile); }
+        if (definitionFile != null) { properties.setProperty("definitionFile", definitionFile); }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
                 String name = AXIOM_FILE + (i == 0 ? "" : (i + 1));
@@ -166,7 +160,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         poloader.startSynchronously();
         if (proofObligation == null) {
             throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
-                + tacletName + "'. Is it defined (in the specified tacletFile?)", ex);
+                    + tacletName + "'. Is it defined (in the specified tacletFile?)",
+                ex);
         }
     }
 
@@ -177,9 +172,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private Collection<File> fileCollection(String[] strings) {
         ArrayList<File> result = new ArrayList<>();
-        for (String string : strings) {
-            result.add(new File(baseDir, string));
-        }
+        for (String string : strings) { result.add(new File(baseDir, string)); }
         return result;
     }
 
@@ -200,9 +193,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String tacletName = properties.getProperty(PROPERTY_NAME);
         // This string is parsed by "proveRules.pl"
-        if (java.awt.GraphicsEnvironment.isHeadless()) {
-            LOGGER.info("Proof obligation for taclet: {}", tacletName);
-        }
+        if (java.awt.GraphicsEnvironment.isHeadless()) { LOGGER.info("Proof obligation for taclet: {}", tacletName); }
         TacletProofObligationInput proofOblInput =
             new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);
@@ -231,10 +222,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = new String[axiomFiles.size()];
 
         int i = 0;
-        for (File file : axiomFiles) {
-            this.axiomFiles[i] = file.toString();
-            i++;
-        }
+        for (File file : axiomFiles) { this.axiomFiles[i] = file.toString(); i++; }
     }
 
     /**

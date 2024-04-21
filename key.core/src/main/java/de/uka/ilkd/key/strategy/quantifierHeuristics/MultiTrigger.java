@@ -39,11 +39,7 @@ class MultiTrigger implements Trigger {
         ImmutableSet<Substitution> mulsubs =
             setMultiSubstitution(triggers.iterator(), targetTerms, services);
 
-        for (Substitution sub : mulsubs) {
-            if (sub.isTotalOn(qvs)) {
-                res = res.prepend(sub);
-            }
-        }
+        for (Substitution sub : mulsubs) { if (sub.isTotalOn(qvs)) { res = res.prepend(sub); } }
 
         return DefaultImmutableSet.fromImmutableList(res);
     }
@@ -57,15 +53,11 @@ class MultiTrigger implements Trigger {
             ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms, services);
             if (nextSubs.isEmpty()) {
                 return subi;
-            } else if (subi.isEmpty()) {
-                return nextSubs;
-            }
+            } else if (subi.isEmpty()) { return nextSubs; }
             for (Substitution sub0 : nextSubs) {
                 for (Substitution subiSub : subi) {
                     final Substitution sub1 = unifySubstitution(sub0, subiSub);
-                    if (sub1 != null) {
-                        res = res.prepend(sub1);
-                    }
+                    if (sub1 != null) { res = res.prepend(sub1); }
                 }
 
             }
@@ -84,11 +76,7 @@ class MultiTrigger implements Trigger {
         for (final ImmutableMapEntry<QuantifiableVariable, Term> en : sub0.getVarMap()) {
             QuantifiableVariable key = en.key();
             Term value = en.value();
-            if (varMap1.containsKey(key)) {
-                if (!(varMap1.get(key).equals(value))) {
-                    return null;
-                }
-            }
+            if (varMap1.containsKey(key)) { if (!(varMap1.get(key).equals(value))) { return null; } }
             resMap = resMap.put(key, value);
         }
         return new Substitution(resMap);
@@ -96,9 +84,7 @@ class MultiTrigger implements Trigger {
 
     @Override
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof MultiTrigger a)) {
-            return false;
-        }
+        if (!(arg0 instanceof MultiTrigger a)) { return false; }
 
         return a.triggers.equals(triggers);
     }

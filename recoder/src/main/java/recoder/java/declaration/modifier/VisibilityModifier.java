@@ -23,7 +23,8 @@ public abstract class VisibilityModifier extends recoder.java.declaration.Modifi
     /**
      * Visibility modifier.
      *
-     * @param proto a visibility modifier.
+     * @param proto
+     *        a visibility modifier.
      */
 
     protected VisibilityModifier(VisibilityModifier proto) {

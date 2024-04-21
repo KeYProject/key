@@ -31,7 +31,8 @@ public class Break extends LabelJumpStatement {
     /**
      * Break.
      *
-     * @param label an identifier.
+     * @param label
+     *        an identifier.
      */
 
     public Break(Identifier label) {
@@ -42,7 +43,8 @@ public class Break extends LabelJumpStatement {
     /**
      * Break.
      *
-     * @param proto a break.
+     * @param proto
+     *        a break.
      */
 
     protected Break(Break proto) {

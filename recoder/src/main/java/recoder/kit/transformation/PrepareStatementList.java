@@ -47,15 +47,15 @@ public class PrepareStatementList extends TwoPassTransformation {
      * Creates a new transformation object that wraps a statement with a new statement block if
      * necessary.
      *
-     * @param sc the service configuration to use.
-     * @param s a statement to be wrapped by a new statement block.
+     * @param sc
+     *        the service configuration to use.
+     * @param s
+     *        a statement to be wrapped by a new statement block.
      */
     public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s,
             boolean isVisible) {
         super(sc);
-        if (s == null) {
-            throw new IllegalArgumentException("Missing statement");
-        }
+        if (s == null) { throw new IllegalArgumentException("Missing statement"); }
         this.statement = s;
         this.isVisible = isVisible;
     }
@@ -82,9 +82,7 @@ public class PrepareStatementList extends TwoPassTransformation {
             if (list == null) {
                 NonTerminalProgramElement parent = statement.getASTParent();
                 block = getProgramFactory().createStatementBlock();
-                if (!(parent instanceof StatementContainer)) {
-                    return new IllegalParentContext(parent);
-                }
+                if (!(parent instanceof StatementContainer)) { return new IllegalParentContext(parent); }
                 if (statement instanceof LocalVariableDeclaration) {
                     report = NO_PROBLEM;
                 } else {
@@ -104,9 +102,7 @@ public class PrepareStatementList extends TwoPassTransformation {
         super.transform();
         if (block != null) {
             replace(statement, block);
-            if (isVisible()) {
-                statement = statement.deepClone();
-            }
+            if (isVisible()) { statement = statement.deepClone(); }
             attach(statement, block, 0);
             list = block.getBody();
         }

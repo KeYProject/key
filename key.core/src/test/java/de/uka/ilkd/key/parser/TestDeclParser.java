@@ -209,7 +209,7 @@ public class TestDeclParser {
      */
     private void assertVariableSV(String msg, Object o) {
         assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
-            + o.getClass() + ", but the type SchemaVariable was expected");
+                + o.getClass() + ", but the type SchemaVariable was expected");
 
         assertTrue(o instanceof VariableSV, msg);
     }
@@ -220,7 +220,7 @@ public class TestDeclParser {
     private void assertTermSV(String msg, Object o) {
 
         assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
-            + o.getClass() + ", but the type SchemaVariable was expected");
+                + o.getClass() + ", but the type SchemaVariable was expected");
         assertNotSame(((SchemaVariable) o).sort(), JavaDLTheory.FORMULA,
             "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
@@ -231,10 +231,10 @@ public class TestDeclParser {
      */
     private void assertFormulaSV(String msg, Object o) {
         assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
-            + o.getClass() + ", but the type SchemaVariable was expected");
+                + o.getClass() + ", but the type SchemaVariable was expected");
         assertSame(((SchemaVariable) o).sort(), JavaDLTheory.FORMULA,
             "Only matches to terms of sort FORMULA allowed. " + "But term has sort "
-                + ((SchemaVariable) o).sort());
+                    + ((SchemaVariable) o).sort());
 
 
     }
@@ -363,7 +363,7 @@ public class TestDeclParser {
     public void testSVDecl() {
         evaluateDeclarations(
             "\\sorts { elem; list; } " + "\\schemaVariables {" + "  \\program Statement #s ;"
-                + "  \\term elem x,y ;" + "  \\variables list lv;" + "  \\formula b;}");
+                    + "  \\term elem x,y ;" + "  \\variables list lv;" + "  \\formula b;}");
 
 
         Sort elem = nss.sorts().lookup(new Name("elem"));

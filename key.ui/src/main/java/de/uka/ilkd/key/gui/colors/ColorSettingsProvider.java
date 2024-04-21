@@ -127,9 +127,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2) {
-                return Color.class;
-            }
+            if (columnIndex == 2) { return Color.class; }
             return String.class;
         }
 

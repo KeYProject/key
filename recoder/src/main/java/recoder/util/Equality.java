@@ -36,8 +36,10 @@ public interface Equality {
     /**
      * Compares two objects for equality.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true, if x equals y, false otherwise.
      */
     boolean equals(Object x, Object y);

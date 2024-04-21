@@ -52,14 +52,13 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     /**
      * Array length reference.
      *
-     * @param proto an array length reference.
+     * @param proto
+     *        an array length reference.
      */
 
     protected ArrayLengthReference(ArrayLengthReference proto) {
         super(proto);
-        if (proto.prefix != null) {
-            prefix = (ReferencePrefix) proto.prefix.deepClone();
-        }
+        if (proto.prefix != null) { prefix = (ReferencePrefix) proto.prefix.deepClone(); }
         makeParentRoleValid();
 
     }
@@ -80,9 +79,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (prefix != null) {
-            prefix.setReferenceSuffix(this);
-        }
+        if (prefix != null) { prefix.setReferenceSuffix(this); }
     }
 
     /**
@@ -108,23 +105,21 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (prefix != null && index == 0) {
-            return prefix;
-        }
+        if (prefix != null && index == 0) { return prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
-        if (prefix == child) {
-            return 0;
-        }
+        if (prefix == child) { return 0; }
         return -1;
     }
 
@@ -134,22 +129,21 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (prefix == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             prefix = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         return false;
@@ -168,7 +162,8 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     /**
      * Set reference prefix.
      *
-     * @param prefix a reference prefix.
+     * @param prefix
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix prefix) {
@@ -188,7 +183,8 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param c an expression container.
+     * @param c
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {

@@ -122,15 +122,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
             decls = new ASTArrayList<>();
         }
 
-        if (!ed.isFinal()) {
-            decls.add(f.createFinal());
-        }
+        if (!ed.isFinal()) { decls.add(f.createFinal()); }
 
         //
         // Comments
-        if (ed.getComments() != null) {
-            setComments(ed.getComments().deepClone());
-        }
+        if (ed.getComments() != null) { setComments(ed.getComments().deepClone()); }
 
         //
         // Extends
@@ -139,9 +135,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         //
         // Implements
         Implements implement = ed.getImplementedTypes();
-        if (implement != null) {
-            setImplementedTypes(implement.deepClone());
-        }
+        if (implement != null) { setImplementedTypes(implement.deepClone()); }
 
         //
         // Members
@@ -182,9 +176,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         // values
         StringBuilder sb = new StringBuilder();
         for (EnumConstantDeclaration ecd : getEnumConstantDeclarations()) {
-            if (sb.length() != 0) {
-                sb.append(", ");
-            }
+            if (sb.length() != 0) { sb.append(", "); }
             sb.append(ecd.getEnumConstantSpecification().getIdentifier().getText());
         }
         String valuesString = VALUES_PROTO.replace("$E", getIdentifier().getText());

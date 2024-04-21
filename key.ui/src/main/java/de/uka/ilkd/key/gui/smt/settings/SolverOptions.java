@@ -62,7 +62,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private String createSupportedVersionText() {
         return "The following minimal version is supported: "
-            + solverType.getMinimumSupportedVersion();
+                + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {
@@ -130,14 +130,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(),
-            SMTSettingsProvider.INFO_SOLVER_PARAMETERS, e -> {
-            });
+            SMTSettingsProvider.INFO_SOLVER_PARAMETERS, e -> {});
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command", solverType.getSolverCommand(),
-            SMTSettingsProvider.INFO_SOLVER_COMMAND, e -> {
-            });
+            SMTSettingsProvider.INFO_SOLVER_COMMAND, e -> {});
     }
 
 
@@ -154,8 +152,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
                 // the permission to execute the solver
                 info =
                     "(version: unknown) solver is installed, but trying to access it resulted in an error "
-                        + (re.getCause() != null ? re.getCause().getLocalizedMessage()
-                                : re.getLocalizedMessage());
+                            + (re.getCause() != null ? re.getCause().getLocalizedMessage()
+                                    : re.getLocalizedMessage());
             }
         }
         JTextField txt = addTextField("Installed", info, "", emptyValidator());

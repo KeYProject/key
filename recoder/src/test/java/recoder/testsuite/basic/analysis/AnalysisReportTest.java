@@ -97,9 +97,7 @@ public class AnalysisReportTest {
     protected File getLogFile() {
         File prj = BasicTestsSuite.getProjectFile();
         String name = prj.getPath();
-        if (name.endsWith(".prj") || name.endsWith(".PRJ")) {
-            name = name.substring(0, name.length() - 4);
-        }
+        if (name.endsWith(".prj") || name.endsWith(".PRJ")) { name = name.substring(0, name.length() - 4); }
         name += ".log.gz";
         return new File(name);
     }
@@ -132,9 +130,7 @@ public class AnalysisReportTest {
             BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
         // sort by name
         CompilationUnit[] uarray = new CompilationUnit[units.size()];
-        for (int i = 0; i < uarray.length; i++) {
-            uarray[i] = units.get(i);
-        }
+        for (int i = 0; i < uarray.length; i++) { uarray[i] = units.get(i); }
         Sorting.heapSort(uarray, UNIT_NAME_ORDER);
         SourceInfo si = BasicTestsSuite.getConfig().getSourceInfo();
         Index decl2num = new Index(HashCode.IDENTITY);
@@ -143,9 +139,7 @@ public class AnalysisReportTest {
             TreeWalker tw = new TreeWalker(uarray[i]);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                if (pe instanceof Declaration) {
-                    decl2num.put(pe, n);
-                }
+                if (pe instanceof Declaration) { decl2num.put(pe, n); }
                 n += 1;
             }
         }
@@ -168,13 +162,9 @@ public class AnalysisReportTest {
                 name = name.substring(name.lastIndexOf('.') + 1);
                 for (int k = 0, s = name.length(); k < s; k += 1) {
                     char c = name.charAt(k);
-                    if (Character.isUpperCase(c)) {
-                        line.append(c);
-                    }
+                    if (Character.isUpperCase(c)) { line.append(c); }
                 }
-                if (pe instanceof CompilationUnit) {
-                    line.append(Format.toString(" \"%u\"", pe));
-                }
+                if (pe instanceof CompilationUnit) { line.append(Format.toString(" \"%u\"", pe)); }
                 if (pe instanceof Expression) {
                     Type t = si.getType(pe);
                     if (t != null) {
@@ -199,9 +189,7 @@ public class AnalysisReportTest {
                     dest = si.getVariable((VariableReference) pe);
                 } else if (pe instanceof TypeReference) {
                     dest = si.getType((TypeReference) pe);
-                } else if (pe instanceof PackageReference) {
-                    dest = si.getPackage((PackageReference) pe);
-                }
+                } else if (pe instanceof PackageReference) { dest = si.getPackage((PackageReference) pe); }
                 if (dest != null) {
                     line.append(" ->");
                     if (dest instanceof ProgramElement) {

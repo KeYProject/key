@@ -20,14 +20,14 @@ import org.key_project.util.ExtList;
 public abstract class VisibilityModifier extends Modifier
         implements Comparable<VisibilityModifier> {
 
-    public VisibilityModifier() {
-    }
+    public VisibilityModifier() {}
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
     public VisibilityModifier(ExtList children) {
         super(children);

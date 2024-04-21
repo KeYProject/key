@@ -37,7 +37,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Throws.
      *
-     * @param exception a type reference.
+     * @param exception
+     *        a type reference.
      */
     public Throws(TypeReference exception) {
         this.exceptions = new ImmutableArray<>(exception);
@@ -46,7 +47,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Throws.
      *
-     * @param list a type reference array.
+     * @param list
+     *        a type reference array.
      */
     public Throws(TypeReference[] list) {
         this.exceptions = new ImmutableArray<>(list);
@@ -57,7 +59,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: several of
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: several of
      *        TypeReference (as references to thrown exceptions), Comments
      */
     public Throws(ExtList children) {
@@ -66,9 +69,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     public SourceElement getLastElement() {
-        if (exceptions == null) {
-            return this;
-        }
+        if (exceptions == null) { return this; }
         return exceptions.get(exceptions.size() - 1);
     }
 
@@ -79,23 +80,21 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null) {
-            result += exceptions.size();
-        }
+        if (exceptions != null) { result += exceptions.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
+        if (exceptions != null) { return exceptions.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -128,9 +127,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (exceptions != null) {
-            return exceptions.get(index);
-        }
+        if (exceptions != null) { return exceptions.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -139,7 +136,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnThrows(this);

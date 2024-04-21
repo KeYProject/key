@@ -32,8 +32,10 @@ public class CopyAssignment extends Assignment {
     /**
      * Copy assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public CopyAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class CopyAssignment extends Assignment {
     /**
      * Copy assignment.
      *
-     * @param proto a copy assignment.
+     * @param proto
+     *        a copy assignment.
      */
 
     protected CopyAssignment(CopyAssignment proto) {

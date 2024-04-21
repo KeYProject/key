@@ -42,10 +42,12 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of RECODER ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a
      *        ReferencePrefix (as prefix of the type reference) a ProgramElementName (as name for
      *        the type reference) Comments
-     * @param dim the dimension of this type
+     * @param dim
+     *        the dimension of this type
      */
     public TypeReferenceImp(ExtList children, int dim) {
         super(children);
@@ -82,34 +84,26 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
+        if (prefix != null) { result++; }
+        if (name != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
-        if (name != null) {
-            if (index == 0) {
-                return name;
-            }
-        }
+        if (name != null) { if (index == 0) { return name; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -133,9 +127,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -158,9 +150,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) {
-            return (Expression) prefix;
-        }
+        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -217,7 +207,8 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnTypeReference(this);
@@ -227,9 +218,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         if (!(pe instanceof TypeReference)
-                || ((TypeReference) pe).getDimensions() != getDimensions()) {
-            return null;
-        }
+                || ((TypeReference) pe).getDimensions() != getDimensions()) { return null; }
 
         return super.match(source, matchCond);
     }

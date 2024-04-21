@@ -31,8 +31,10 @@ public class NotEquals extends ComparativeOperator {
     /**
      * Not equals.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public NotEquals(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class NotEquals extends ComparativeOperator {
     /**
      * Not equals.
      *
-     * @param proto a not equals.
+     * @param proto
+     *        a not equals.
      */
 
     protected NotEquals(NotEquals proto) {

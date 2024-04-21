@@ -75,9 +75,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
                 }
             }
         }
-        if (list.isEmpty()) {
-            return IDENTITY;
-        }
+        if (list.isEmpty()) { return IDENTITY; }
         return NO_PROBLEM;
     }
 

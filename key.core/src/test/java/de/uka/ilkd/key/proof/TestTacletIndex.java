@@ -50,7 +50,7 @@ public class TestTacletIndex {
     @BeforeEach
     public void setUp() {
         File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+                + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
         assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
@@ -96,11 +96,7 @@ public class TestTacletIndex {
 
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
-        for (TacletApp aL : l) {
-            if (aL.taclet() == rule.taclet()) {
-                return true;
-            }
-        }
+        for (TacletApp aL : l) { if (aL.taclet() == rule.taclet()) { return true; } }
         return false;
     }
 

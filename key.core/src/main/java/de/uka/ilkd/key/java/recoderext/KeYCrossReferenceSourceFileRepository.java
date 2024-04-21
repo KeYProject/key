@@ -34,14 +34,13 @@ public class KeYCrossReferenceSourceFileRepository extends DefaultSourceFileRepo
      *
      * The super class would have created a location that does not represent the existing sources.
      *
-     * @param cu Compilation unit to create the location for.
+     * @param cu
+     *        Compilation unit to create the location for.
      * @return location(cu) == null ? {@link SpecDataLocation#UNKNOWN_LOCATION} : location(cu)
      */
     protected DataLocation createDataLocation(CompilationUnit cu) {
         DataLocation dataLocation = cu.getDataLocation();
-        if (dataLocation == null) {
-            dataLocation = SpecDataLocation.UNKNOWN_LOCATION;
-        }
+        if (dataLocation == null) { dataLocation = SpecDataLocation.UNKNOWN_LOCATION; }
         return dataLocation;
     }
 

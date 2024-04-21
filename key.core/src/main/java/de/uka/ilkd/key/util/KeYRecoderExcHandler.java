@@ -38,9 +38,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     public List<Throwable> getExceptions() {
         List<Throwable> result = new LinkedList<>();
 
-        if (exceptions != null) {
-            result.addAll(exceptions);
-        }
+        if (exceptions != null) { result.addAll(exceptions); }
 
         return result;
     }
@@ -60,9 +58,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
     @Override
     public final void setErrorThreshold(int maxCount) {
-        if (maxCount < 0) {
-            throw new IllegalArgumentException("Recoder: Threshold should be >= 0");
-        }
+        if (maxCount < 0) { throw new IllegalArgumentException("Recoder: Threshold should be >= 0"); }
         errorThreshold = maxCount;
     }
 
@@ -70,9 +66,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     protected void recoderExitAction() {
         String msg = "Recoder: " + exceptions.size() + " errors have occurred - aborting.";
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
-        if (exceptions != null && !exceptions.isEmpty()) {
-            ex.initCause(exceptions.get(0));
-        }
+        if (exceptions != null && !exceptions.isEmpty()) { ex.initCause(exceptions.get(0)); }
         clear();
 
         throw ex;
@@ -82,21 +76,16 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     @Override
     public void reportError(Exception e) {
         exceptions.add(e);
-        if (exceptions.size() > errorThreshold) {
-            recoderExitAction();
-        }
+        if (exceptions.size() > errorThreshold) { recoderExitAction(); }
     }
 
 
     @Override
-    public void modelUpdating(EventObject event) {
-    }
+    public void modelUpdating(EventObject event) {}
 
 
     @Override
     public void modelUpdated(EventObject event) {
-        if (exceptions.size() > 0) {
-            recoderExitAction();
-        }
+        if (exceptions.size() > 0) { recoderExitAction(); }
     }
 }

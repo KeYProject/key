@@ -80,8 +80,8 @@ public class SMTTermITE extends SMTTerm {
     public String toString(int nestPos) {
         String tab = " ".repeat(Math.max(0, nestPos));
         return tab + "(" + ITE_STRING + "\n" + condition.toString(nestPos + 1) + "\n"
-            + trueCase.toString(nestPos + 1) + "\n" + falseCase.toString(nestPos + 1) + "\n" + tab
-            + ")";
+                + trueCase.toString(nestPos + 1) + "\n" + falseCase.toString(nestPos + 1) + "\n" + tab
+                + ")";
     }
 
     @Override
@@ -91,12 +91,8 @@ public class SMTTermITE extends SMTTerm {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof SMTTermITE that)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!(o instanceof SMTTermITE that)) { return false; }
         return condition.equals(that.condition) && trueCase.equals(that.trueCase)
                 && falseCase.equals(that.falseCase);
     }
@@ -128,21 +124,24 @@ public class SMTTermITE extends SMTTerm {
     }
 
     /**
-     * @param condition the condition to set
+     * @param condition
+     *        the condition to set
      */
     public void setCondition(SMTTerm condition) {
         this.condition = condition;
     }
 
     /**
-     * @param trueCase the trueCase to set
+     * @param trueCase
+     *        the trueCase to set
      */
     public void setTrueCase(SMTTerm trueCase) {
         this.trueCase = trueCase;
     }
 
     /**
-     * @param falseCase the falseCase to set
+     * @param falseCase
+     *        the falseCase to set
      */
     public void setFalseCase(SMTTerm falseCase) {
         this.falseCase = falseCase;

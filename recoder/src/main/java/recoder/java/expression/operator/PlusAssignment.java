@@ -30,8 +30,10 @@ public class PlusAssignment extends Assignment {
     /**
      * Plus assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public PlusAssignment(Expression lhs, Expression rhs) {
@@ -42,7 +44,8 @@ public class PlusAssignment extends Assignment {
     /**
      * Plus assignment.
      *
-     * @param proto a plus assignment.
+     * @param proto
+     *        a plus assignment.
      */
 
     protected PlusAssignment(PlusAssignment proto) {

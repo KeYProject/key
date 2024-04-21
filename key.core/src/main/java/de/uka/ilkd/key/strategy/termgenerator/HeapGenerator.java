@@ -40,9 +40,7 @@ public class HeapGenerator implements TermGenerator {
             MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
-        for (SequentFormula sf : seq) {
-            collectHeaps(sf.formula(), heaps, goal.proof().getServices());
-        }
+        for (SequentFormula sf : seq) { collectHeaps(sf.formula(), heaps, goal.proof().getServices()); }
         return heaps.iterator();
     }
 
@@ -53,9 +51,7 @@ public class HeapGenerator implements TermGenerator {
             if (!includeUpdates && term.op() instanceof UpdateApplication) {
                 collectHeaps(UpdateApplication.getTarget(term), heaps, services);
             } else {
-                for (int i = 0; i < term.arity(); i++) {
-                    collectHeaps(term.sub(i), heaps, services);
-                }
+                for (int i = 0; i < term.arity(); i++) { collectHeaps(term.sub(i), heaps, services); }
             }
         }
     }

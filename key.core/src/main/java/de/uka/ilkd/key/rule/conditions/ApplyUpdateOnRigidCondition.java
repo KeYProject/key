@@ -48,9 +48,12 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     /**
      * Creates an instance of the variable condition.
      *
-     * @param u the schema variable matched against an update
-     * @param phi the schema variable matched against a formula or term
-     * @param result the schema variable containing the result of applying <code>u</code> on
+     * @param u
+     *        the schema variable matched against an update
+     * @param phi
+     *        the schema variable matched against a formula or term
+     * @param result
+     *        the schema variable containing the result of applying <code>u</code> on
      *        <code>phi</code>
      */
     public ApplyUpdateOnRigidCondition(UpdateSV u, SchemaVariable phi, SchemaVariable result) {
@@ -67,9 +70,12 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * {@link #applyUpdateOnRigidClashAware(Term, Term, TermServices)} is
      * called to take care of potential name clashes.
      *
-     * @param u the update applied on <code>phi</code>
-     * @param phi the formula or term the update <code>u</code> is applied on
-     * @param services the {@link TermServices} to help create terms
+     * @param u
+     *        the update applied on <code>phi</code>
+     * @param phi
+     *        the formula or term the update <code>u</code> is applied on
+     * @param services
+     *        the {@link TermServices} to help create terms
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
@@ -78,9 +84,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (u.freeVars().isEmpty()) {
             final TermBuilder tb = services.getTermBuilder();
             final Term[] updatedSubs = new Term[phi.arity()];
-            for (int i = 0; i < updatedSubs.length; i++) {
-                updatedSubs[i] = tb.apply(u, phi.sub(i));
-            }
+            for (int i = 0; i < updatedSubs.length; i++) { updatedSubs[i] = tb.apply(u, phi.sub(i)); }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
                 null);
@@ -99,9 +103,12 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * variables in
      * <code>phi</code>, the names of those problematic bound variables will be changed.
      *
-     * @param u the update applied on <code>phi</code>
-     * @param phi the formula or term the update <code>u</code> is applied on
-     * @param services the {@link TermServices} to help create terms
+     * @param u
+     *        the update applied on <code>phi</code>
+     * @param phi
+     *        the formula or term the update <code>u</code> is applied on
+     * @param services
+     *        the {@link TermServices} to help create terms
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
@@ -109,9 +116,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         final TermBuilder tb = services.getTermBuilder();
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
-        for (QuantifiableVariable freeVar : u.freeVars()) {
-            freeVarNamesInU.add(freeVar.name());
-        }
+        for (QuantifiableVariable freeVar : u.freeVars()) { freeVarNamesInU.add(freeVar.name()); }
 
         final QuantifiableVariable[] boundVarsInPhi =
             phi.boundVars().toArray(new QuantifiableVariable[0]);
@@ -127,18 +132,14 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                 final Term substTerm = tb.var(renamedVar);
 
                 final ClashFreeSubst subst = new ClashFreeSubst(currentBoundVar, substTerm, tb);
-                for (int j = 0; j < updatedSubs.length; j++) {
-                    updatedSubs[j] = subst.apply(updatedSubs[j]);
-                }
+                for (int j = 0; j < updatedSubs.length; j++) { updatedSubs[j] = subst.apply(updatedSubs[j]); }
 
                 // Rename quantifiable variable in list for later term construction
                 boundVarsInPhi[i] = renamedVar;
             }
         }
 
-        for (int i = 0; i < updatedSubs.length; i++) {
-            updatedSubs[i] = tb.apply(u, updatedSubs[i]);
-        }
+        for (int i = 0; i < updatedSubs.length; i++) { updatedSubs[i] = tb.apply(u, updatedSubs[i]); }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
             new ImmutableArray<>(boundVarsInPhi), null);
@@ -152,10 +153,14 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * for collisions. In the future, it might be needed to check for collisions with variable names
      * on higher levels.
      *
-     * @param var the {@link QuantifiableVariable} to get a new {@link Name} for
-     * @param u the update that is checked for variables
-     * @param phi the formula or term that is checked for variables
-     * @param services the {@link TermServices} to help create terms
+     * @param var
+     *        the {@link QuantifiableVariable} to get a new {@link Name} for
+     * @param u
+     *        the update that is checked for variables
+     * @param phi
+     *        the formula or term that is checked for variables
+     * @param services
+     *        the {@link TermServices} to help create terms
      * @return a non-colliding {@link Name} for <code>var</code>
      */
     private static Name createNonCollidingNameFor(QuantifiableVariable var, Term u, Term phi,
@@ -169,10 +174,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         String stem = var.name().toString();
         int i = 1;
         Name newName;
-        do {
-            newName = new Name(stem + i);
-            i++;
-        } while (nameIsAlreadyUsed(newName, usedVars, services));
+        do { newName = new Name(stem + i); i++; } while (nameIsAlreadyUsed(newName, usedVars, services));
         return newName;
     }
 
@@ -181,19 +183,18 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * {@link QuantifiableVariable} in the set
      * <code>qvars</code> or the {@link NamespaceSet}.
      *
-     * @param name the {@link Name} that is checked for occurrence in set <code>qvars</code>
-     * @param qvars the set of {@link QuantifiableVariable}s to be checked for use of
+     * @param name
+     *        the {@link Name} that is checked for occurrence in set <code>qvars</code>
+     * @param qvars
+     *        the set of {@link QuantifiableVariable}s to be checked for use of
      *        <code>name</code>
-     * @param services the {@link TermServices} to help create terms
+     * @param services
+     *        the {@link TermServices} to help create terms
      * @return true iff <code>name</code> is already used in <code>qvars</code>
      */
     private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<QuantifiableVariable> qvars,
             TermServices services) {
-        for (QuantifiableVariable qvar : qvars) {
-            if (qvar.name().equals(name)) {
-                return true;
-            }
-        }
+        for (QuantifiableVariable qvar : qvars) { if (qvar.name().equals(name)) { return true; } }
         return services.getNamespaces().lookupLogicSymbol(name) != null;
     }
 
@@ -204,13 +205,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         Term uInst = (Term) svInst.getInstantiation(u);
         Term phiInst = (Term) svInst.getInstantiation(phi);
         Term resultInst = (Term) svInst.getInstantiation(result);
-        if (uInst == null || phiInst == null) {
-            return mc;
-        }
+        if (uInst == null || phiInst == null) { return mc; }
 
-        if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) {
-            return null;
-        }
+        if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) { return null; }
         Term properResultInst = applyUpdateOnRigid(uInst, phiInst, services);
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);

@@ -76,13 +76,9 @@ public class MasterHandlerTest {
     public static List<Arguments> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
-        }
+        if (url == null) { throw new FileNotFoundException("Cannot find resource 'cases'."); }
 
-        if (!url.getProtocol().equals("file")) {
-            throw new IOException("Resource should be a file URL not " + url);
-        }
+        if (!url.getProtocol().equals("file")) { throw new IOException("Resource should be a file URL not " + url); }
 
         Path directory = Paths.get(url.toURI());
         Assertions.assertTrue(Files.isDirectory(directory));
@@ -95,9 +91,7 @@ public class MasterHandlerTest {
         for (Path file : files) {
             try {
                 final var testData = TestData.create(file);
-                if (testData != null) {
-                    result.add(Arguments.of(testData));
-                }
+                if (testData != null) { result.add(Arguments.of(testData)); }
             } catch (Exception e) {
                 LOGGER.error("Error reading {}", file, e);
                 // make sure faulty test cases fail
@@ -109,58 +103,58 @@ public class MasterHandlerTest {
 
     public record TestData(String name, Path path, LineProperties props, String translation) {
         @Nullable
-            public static TestData create(Path path) throws IOException, ProblemLoaderException {
-                var name = path.getFileName().toString();
-                var props = new LineProperties();
-                try (BufferedReader reader = Files.newBufferedReader(path)) {
-                    props.read(reader);
-                }
-
-                if ("ignore".equals(props.get("state"))) {
-                    LOGGER.info("Test case has been marked ignore");
-                    return null;
-                }
-
-                List<String> sources = props.getLines("sources");
-                List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-                if (!sources.isEmpty()) {
-                    Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-                    Path tmpSrc = srcDir.resolve("src.java");
-                    Files.write(tmpSrc, sources);
-                    lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-                }
-
-                Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-                Files.write(tmpKey, lines);
-
-                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
-
-                Proof proof = env.getLoadedProof();
-                Sequent sequent = proof.root().sequent();
-
-                SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-
-                String updates = props.get("smt-settings");
-                if (updates != null) {
-                    Properties map = new Properties();
-                    map.load(new StringReader(updates));
-                    settings.getNewSettings().readSettings(map);
-                }
-
-                ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-                var translation =
-                        translator.translateProblem(sequent, env.getServices(), settings).toString();
-                return new TestData(name, path, props, translation);
+        public static TestData create(Path path) throws IOException, ProblemLoaderException {
+            var name = path.getFileName().toString();
+            var props = new LineProperties();
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                props.read(reader);
             }
 
-            @Override
-            public String toString() {
-                return name;
+            if ("ignore".equals(props.get("state"))) {
+                LOGGER.info("Test case has been marked ignore");
+                return null;
             }
+
+            List<String> sources = props.getLines("sources");
+            List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+            if (!sources.isEmpty()) {
+                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                Path tmpSrc = srcDir.resolve("src.java");
+                Files.write(tmpSrc, sources);
+                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+            }
+
+            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+            Files.write(tmpKey, lines);
+
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+
+            Proof proof = env.getLoadedProof();
+            Sequent sequent = proof.root().sequent();
+
+            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
+
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                Properties map = new Properties();
+                map.load(new StringReader(updates));
+                settings.getNewSettings().readSettings(map);
+            }
+
+            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
+            return new TestData(name, path, props, translation);
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @ParameterizedTest
     @MethodSource("data")
@@ -216,19 +210,14 @@ public class MasterHandlerTest {
             switch (expectation) {
             case "valid" -> lookFor = "unsat";
             case "fail" -> lookFor = "(sat|timeout)";
-            case "irrelevant" -> {
-            }
+            case "irrelevant" -> {}
             default -> fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {
                 for (String line : response) {
-                    if (line.startsWith("(error ")) {
-                        fail("An error in Z3: " + line);
-                    }
-                    if (line.matches(lookFor)) {
-                        return;
-                    }
+                    if (line.startsWith("(error ")) { fail("An error in Z3: " + line); }
+                    if (line.matches(lookFor)) { return; }
                 }
             }
 
@@ -237,9 +226,7 @@ public class MasterHandlerTest {
                     "This is an extended test (will be run only in strict mode)");
             }
 
-            if (lookFor != null) {
-                fail("Expectation not found");
-            }
+            if (lookFor != null) { fail("Expectation not found"); }
         } catch (Throwable t) {
             LOGGER.error("Z3 input {}", data.translation);
             LOGGER.error("Z3 response: {}", response, t);

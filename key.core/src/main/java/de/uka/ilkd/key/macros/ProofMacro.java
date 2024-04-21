@@ -106,7 +106,8 @@ public interface ProofMacro {
      * Checks whether this {@link ProofMacro} has a parameter named <code>paramName</code>. For use
      * in proof scripts.
      *
-     * @param paramName The name to check.
+     * @param paramName
+     *        The name to check.
      * @return true iff this {@link ProofMacro} has a parameter named <code>paramName</code>.
      */
     boolean hasParameter(String paramName);
@@ -115,9 +116,12 @@ public interface ProofMacro {
      * Sets the parameter named <code>paramName</code> to the given String representation in
      * <code>paramValue</code>. For use in proof scripts.
      *
-     * @param paramName The name of the parameter.
-     * @param paramValue The value of the parameter.
-     * @throws IllegalArgumentException if there is no parameter of that name or the value is
+     * @param paramName
+     *        The name of the parameter.
+     * @param paramValue
+     *        The value of the parameter.
+     * @throws IllegalArgumentException
+     *         if there is no parameter of that name or the value is
      *         incorrectly formatted (e.g., cannot be converted to a number).
      */
     void setParameter(String paramName, String paramValue) throws IllegalArgumentException;
@@ -135,9 +139,12 @@ public interface ProofMacro {
      *
      * This method may be called from within the GUI thread and be compatible with that fact.
      *
-     * @param proof the current {@link Proof} (not <code>null</code>)
-     * @param goals the goals (not <code>null</code>)
-     * @param posInOcc the position in occurrence (may be <code>null</code>)
+     * @param proof
+     *        the current {@link Proof} (not <code>null</code>)
+     * @param goals
+     *        the goals (not <code>null</code>)
+     * @param posInOcc
+     *        the position in occurrence (may be <code>null</code>)
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
@@ -155,8 +162,10 @@ public interface ProofMacro {
      * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with <code>node.proof()</code> as
      * proof and all open goals below <code>node</code>.
      *
-     * @param node the node (not <code>null</code>)
-     * @param posInOcc the position in occurrence (may be <code>null</code>)
+     * @param node
+     *        the node (not <code>null</code>)
+     * @param posInOcc
+     *        the position in occurrence (may be <code>null</code>)
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
@@ -176,12 +185,18 @@ public interface ProofMacro {
      * listener is needed, consider combining them using a single listener object using the
      * composite pattern.
      *
-     * @param uic the {@link UserInterfaceControl} to use
-     * @param proof the current {@link Proof} (not <code>null</code>)
-     * @param goals the goals (not <code>null</code>)
-     * @param posInOcc the position in occurrence (may be <code>null</code>)
-     * @param listener the listener to use for progress reports (may be <code>null</code>)
-     * @throws InterruptedException if the application of the macro has been interrupted.
+     * @param uic
+     *        the {@link UserInterfaceControl} to use
+     * @param proof
+     *        the current {@link Proof} (not <code>null</code>)
+     * @param goals
+     *        the goals (not <code>null</code>)
+     * @param posInOcc
+     *        the position in occurrence (may be <code>null</code>)
+     * @param listener
+     *        the listener to use for progress reports (may be <code>null</code>)
+     * @throws InterruptedException
+     *         if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
@@ -201,11 +216,16 @@ public interface ProofMacro {
      * listener is needed, consider combining them using a single listener object using the
      * composite pattern.
      *
-     * @param uic the {@link UserInterfaceControl} to use
-     * @param node the node (not <code>null</code>)
-     * @param posInOcc the position in occurrence (may be <code>null</code>)
-     * @param listener the listener to use for progress reports (may be <code>null</code>)
-     * @throws InterruptedException if the application of the macro has been interrupted.
+     * @param uic
+     *        the {@link UserInterfaceControl} to use
+     * @param node
+     *        the node (not <code>null</code>)
+     * @param posInOcc
+     *        the position in occurrence (may be <code>null</code>)
+     * @param listener
+     *        the listener to use for progress reports (may be <code>null</code>)
+     * @throws InterruptedException
+     *         if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
             PosInOccurrence posInOcc, ProverTaskListener listener)

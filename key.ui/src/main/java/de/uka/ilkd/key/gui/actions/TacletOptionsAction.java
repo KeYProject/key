@@ -31,7 +31,7 @@ public class TacletOptionsAction extends MainWindowAction {
         if (getMediator().getSelectedProof() == null) {
             mainWindow.notify(new GeneralInformationEvent("No contracts available.",
                 "If you wish to see the available options "
-                    + "for a proof, you have to load one first."));
+                        + "for a proof, you have to load one first."));
         } else {
             new ChoiceSelector(mainWindow, ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
         }

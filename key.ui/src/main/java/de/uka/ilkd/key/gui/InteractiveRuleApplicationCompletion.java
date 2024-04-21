@@ -16,9 +16,12 @@ public interface InteractiveRuleApplicationCompletion {
     /**
      * method called to complete the given builtin rule application
      *
-     * @param app the app to complete
-     * @param goal the goal where the app will be applied
-     * @param forced a boolean indicating if the user shall be bothered if the instantiation is
+     * @param app
+     *        the app to complete
+     * @param goal
+     *        the goal where the app will be applied
+     * @param forced
+     *        a boolean indicating if the user shall be bothered if the instantiation is
      *        unique or can be chosen in a reasonable way as if unique
      * @return the completed app or null if completion was not possible
      */
@@ -27,7 +30,8 @@ public interface InteractiveRuleApplicationCompletion {
     /**
      * checks if this instance is responsible for the given app
      *
-     * @param app the rule app
+     * @param app
+     *        the rule app
      * @return true iff this instance might be able to complete the app
      */
     boolean canComplete(IBuiltInRuleApp app);

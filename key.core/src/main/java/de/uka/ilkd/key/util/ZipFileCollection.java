@@ -67,9 +67,7 @@ public class ZipFileCollection implements FileCollection {
         public Walker(String[] extensions) {
             this.enumeration = zipFile.entries();
             this.extensions = new ArrayList<>();
-            for (String extension : extensions) {
-                this.extensions.add(extension.toLowerCase());
-            }
+            for (String extension : extensions) { this.extensions.add(extension.toLowerCase()); }
         }
 
         public String getCurrentName() {

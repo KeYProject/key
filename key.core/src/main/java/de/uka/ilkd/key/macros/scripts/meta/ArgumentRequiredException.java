@@ -16,8 +16,10 @@ public class ArgumentRequiredException extends InjectionException {
     /**
      * An argument required exception with no cause (to display).
      *
-     * @param message the respective String message to be passed.
-     * @param meta the proof script argument.
+     * @param message
+     *        the respective String message to be passed.
+     * @param meta
+     *        the proof script argument.
      */
     public ArgumentRequiredException(String message, ProofScriptArgument<?> meta) {
         super(message, meta);

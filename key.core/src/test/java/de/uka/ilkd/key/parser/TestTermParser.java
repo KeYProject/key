@@ -254,10 +254,10 @@ public class TestTermParser extends AbstractTestTermParser {
             "\\exists elem y; \\forall list xs; \\forall list ys; ( ys =" + " cons(y,xs))");
         Term t3 =
             parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;" + " {int s = 2;} }\\>" + " true ->"
-                + "\\<{ int p_x = 1;boolean p_y=2<1;" + " while(p_y){ int s=3 ;} }\\>" + " true)");
+                    + "\\<{ int p_x = 1;boolean p_y=2<1;" + " while(p_y){ int s=3 ;} }\\>" + " true)");
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
-                + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
+                    + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
         assertTrue(t3.equalsModProperty(t4, RENAMING_PROPERTY),
             "Terms should be equalModRenaming");
     }
@@ -370,14 +370,14 @@ public class TestTermParser extends AbstractTestTermParser {
             parseProblem(s);
         } catch (Exception re) {
             fail("Fixed bug 216 occured again. The original bug "
-                + "was due to ambigious rules using semantic " + "predicates in a 'wrong' way");
+                    + "was due to ambigious rules using semantic " + "predicates in a 'wrong' way");
         }
     }
 
     static final String COMPILATION_UNIT = "public class T extends " + "java.lang.Object{ "
-        + "private T a;" + "private static T b;" + "T c;" + "static T d;" + "public T e;"
-        + "public static T f;" + "protected T g;" + "protected T h;" + "public T query(){} "
-        + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
+            + "private T a;" + "private static T b;" + "T c;" + "static T d;" + "public T e;"
+            + "public static T f;" + "protected T g;" + "protected T h;" + "public T query(){} "
+            + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
 
 
     public Term testParseQueriesAndAttributes(String expr) throws Exception {
@@ -430,7 +430,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Disabled
     public void testJavaQueryAndAttribute_all() throws Exception {
         String all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
-            + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
+                + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
         testParseQueriesAndAttributes(all);
     }
 

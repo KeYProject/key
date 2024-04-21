@@ -29,21 +29,16 @@ public class RKeYMetaConstructExpression extends Literal
 
     protected RKeYMetaConstructExpression(RKeYMetaConstructExpression proto) {
         super(proto);
-        if (proto.child != null) {
-            child = proto.child.deepClone();
-        }
+        if (proto.child != null) { child = proto.child.deepClone(); }
     }
 
-    public RKeYMetaConstructExpression() {
-    }
+    public RKeYMetaConstructExpression() {}
 
     /**
      * Make parent role valid.
      */
     public void makeParentRoleValid() {
-        if (child != null) {
-            child.setExpressionContainer(this);
-        }
+        if (child != null) { child.setExpressionContainer(this); }
     }
 
     /**
@@ -53,56 +48,44 @@ public class RKeYMetaConstructExpression extends Literal
      */
     public int getChildCount() {
         int result = 0;
-        if (child != null) {
-            result++;
-        }
+        if (child != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (child != null) {
-            if (index == 0) {
-                return child;
-            }
-        }
+        if (child != null) { if (index == 0) { return child; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
 
     public int getChildPositionCode(ProgramElement child0) {
         // role 0: child
-        if (child0 == child) {
-            return 0;
-        }
+        if (child0 == child) { return 0; }
         return -1;
     }
 
     public int getIndexOfChild(ProgramElement pe) {
-        if (pe == child) {
-            return 0;
-        }
+        if (pe == child) { return 0; }
         return -1;
     }
 
     @Deprecated
     public int getIndexOfChild(int posCode) {
-        if (posCode == getChildPositionCode(child)) {
-            return 0;
-        }
+        if (posCode == getChildPositionCode(child)) { return 0; }
         return -1;
     }
 
     public int getRoleOfChild(int i) {
-        if (i == 0) {
-            return getChildPositionCode(child);
-        }
+        if (i == 0) { return getChildPositionCode(child); }
         return -1;
     }
 
@@ -117,9 +100,7 @@ public class RKeYMetaConstructExpression extends Literal
         if (child == p) {
             Expression r = (Expression) q;
             child = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         return false;
@@ -130,7 +111,8 @@ public class RKeYMetaConstructExpression extends Literal
     /**
      * sets a String name of this meta construct like 'unwind-loop'
      *
-     * @param s the String
+     * @param s
+     *        the String
      */
     public void setName(String s) {
         name = s;
@@ -157,7 +139,8 @@ public class RKeYMetaConstructExpression extends Literal
     /**
      * Set child.
      *
-     * @param expression a expression.
+     * @param expression
+     *        a expression.
      */
 
     public void setChild(Expression expression) {
@@ -185,15 +168,12 @@ public class RKeYMetaConstructExpression extends Literal
      */
 
     public Expression getExpressionAt(int index) {
-        if (child != null && index == 0) {
-            return child;
-        }
+        if (child != null && index == 0) { return child; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     // ???
     public Literal deepClone() {

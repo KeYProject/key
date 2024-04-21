@@ -18,8 +18,10 @@ public class CVC5Socket extends AbstractSolverSocket {
     /**
      * Create a new CVC5Socket.
      *
-     * @param name the socket's name (usually "CVC5", but other solvers might also use it).
-     * @param query the ModelExtractor for model interpretation (currently not used by this socket)
+     * @param name
+     *        the socket's name (usually "CVC5", but other solvers might also use it).
+     * @param query
+     *        the ModelExtractor for model interpretation (currently not used by this socket)
      */
     public CVC5Socket(String name, ModelExtractor query) {
         super(name, query);
@@ -28,14 +30,10 @@ public class CVC5Socket extends AbstractSolverSocket {
     @Override
     public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
-        if ("".equals(msg.trim())) {
-            return;
-        }
+        if ("".equals(msg.trim())) { return; }
 
         // used only to steer the interaction with the solver and thus filtered out currently
-        if (!msg.contains("success")) {
-            sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
-        }
+        if (!msg.contains("success")) { sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT); }
 
         if (msg.contains("error") || msg.contains("Error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);

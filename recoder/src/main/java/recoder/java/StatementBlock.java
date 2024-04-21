@@ -61,7 +61,8 @@ public class StatementBlock extends JavaStatement
     /**
      * Statement block.
      *
-     * @param block a statement mutable list.
+     * @param block
+     *        a statement mutable list.
      */
     public StatementBlock(ASTList<Statement> block) {
         setBody(block);
@@ -71,14 +72,13 @@ public class StatementBlock extends JavaStatement
     /**
      * Statement block.
      *
-     * @param proto a statement block.
+     * @param proto
+     *        a statement block.
      */
 
     protected StatementBlock(StatementBlock proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -98,11 +98,7 @@ public class StatementBlock extends JavaStatement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            for (int i = body.size() - 1; i >= 0; i -= 1) {
-                body.get(i).setStatementContainer(this);
-            }
-        }
+        if (body != null) { for (int i = body.size() - 1; i >= 0; i -= 1) { body.get(i).setStatementContainer(this); } }
     }
 
     /**
@@ -118,7 +114,8 @@ public class StatementBlock extends JavaStatement
     /**
      * Set body.
      *
-     * @param list a statement mutable list.
+     * @param list
+     *        a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -131,16 +128,17 @@ public class StatementBlock extends JavaStatement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (body == null) ? 0 : body.size();
         for (int i = 0; i < count; i++) {
@@ -171,17 +169,17 @@ public class StatementBlock extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
             int len = body.size();
-            if (len > index) {
-                return body.get(index);
-            }
+            if (len > index) { return body.get(index); }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -190,9 +188,7 @@ public class StatementBlock extends JavaStatement
         // role 0 (IDX): statements
         if (body != null) {
             int index = body.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
         return -1;
     }
@@ -214,9 +210,7 @@ public class StatementBlock extends JavaStatement
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -230,9 +224,7 @@ public class StatementBlock extends JavaStatement
         int count = 0;
         if (body != null) {
             for (int i = body.size() - 1; i >= 0; i -= 1) {
-                if (body.get(i) instanceof TypeDeclaration) {
-                    count += 1;
-                }
+                if (body.get(i) instanceof TypeDeclaration) { count += 1; }
             }
         }
         return count;
@@ -252,9 +244,7 @@ public class StatementBlock extends JavaStatement
             for (int i = 0; i < s && index >= 0; i += 1) {
                 Statement st = body.get(i);
                 if (st instanceof TypeDeclaration) {
-                    if (index == 0) {
-                        return (TypeDeclaration) st;
-                    }
+                    if (index == 0) { return (TypeDeclaration) st; }
                     index -= 1;
                 }
             }
@@ -278,72 +268,52 @@ public class StatementBlock extends JavaStatement
     }
 
     public List<TypeDeclaration> getTypesInScope() {
-        if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (name2type == null || name2type.isEmpty()) { return new ArrayList<>(0); }
         List<TypeDeclaration> res = new ArrayList<>();
-        for (TypeDeclaration td : name2type.values()) {
-            res.add(td);
-        }
+        for (TypeDeclaration td : name2type.values()) { res.add(td); }
         return res;
     }
 
     public ClassType getTypeInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null) {
-            return null;
-        }
+        if (name2type == null) { return null; }
         return name2type.get(name);
     }
 
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<>();
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { name2type = new HashMap<>(); }
         name2type.put(name, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { return; }
         name2type.remove(name);
     }
 
     public List<VariableSpecification> getVariablesInScope() {
-        if (name2var == null || name2var.isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (name2var == null || name2var.isEmpty()) { return new ArrayList<>(); }
         List<VariableSpecification> res = new ArrayList<>();
-        for (VariableSpecification vs : name2var.values()) {
-            res.add(vs);
-        }
+        for (VariableSpecification vs : name2var.values()) { res.add(vs); }
         return res;
     }
 
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2var == null) {
-            return null;
-        }
+        if (name2var == null) { return null; }
         return name2var.get(name);
     }
 
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            name2var = new HashMap<>();
-        }
+        if (name2var == null || name2var == UNDEFINED_SCOPE) { name2var = new HashMap<>(); }
         name2var.put(var.getName(), var);
     }
 
     public void removeVariableFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2var == null || name2var == UNDEFINED_SCOPE) { return; }
         name2var.remove(name);
     }
 

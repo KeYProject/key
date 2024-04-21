@@ -77,9 +77,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
                 (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             String id = prop.getIdentifier();
             String val = newSMTSettings.get(id);
-            if (val != null) {
-                prop.accept(visitor, new Pair<>(val, component));
-            }
+            if (val != null) { prop.accept(visitor, new Pair<>(val, component)); }
         }
         return this;
     }

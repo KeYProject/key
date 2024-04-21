@@ -39,7 +39,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Assert.
      *
-     * @param cond the condition expression (may not be null).
+     * @param cond
+     *        the condition expression (may not be null).
      */
     public Assert(Expression cond) {
         this(cond, null);
@@ -48,13 +49,13 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Assert.
      *
-     * @param cond the condition expression (may not be null).
-     * @param msg the message expression.
+     * @param cond
+     *        the condition expression (may not be null).
+     * @param msg
+     *        the message expression.
      */
     public Assert(Expression cond, Expression msg) {
-        if (cond == null) {
-            throw new NullPointerException();
-        }
+        if (cond == null) { throw new NullPointerException(); }
         condition = cond;
         message = msg;
         makeParentRoleValid();
@@ -63,16 +64,13 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Assert.
      *
-     * @param proto an assert.
+     * @param proto
+     *        an assert.
      */
     protected Assert(Assert proto) {
         super(proto);
-        if (proto.condition != null) {
-            condition = proto.condition.deepClone();
-        }
-        if (proto.message != null) {
-            message = proto.message.deepClone();
-        }
+        if (proto.condition != null) { condition = proto.condition.deepClone(); }
+        if (proto.message != null) { message = proto.message.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -96,47 +94,35 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (condition != null) {
-            result++;
-        }
-        if (message != null) {
-            result++;
-        }
+        if (condition != null) { result++; }
+        if (message != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (condition != null) {
-            if (index == 0) {
-                return condition;
-            }
+            if (index == 0) { return condition; }
             index--;
         }
-        if (message != null) {
-            if (index == 0) {
-                return message;
-            }
-        }
+        if (message != null) { if (index == 0) { return message; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: condition
         // role 1: message
-        if (condition == child) {
-            return 0;
-        }
-        if (message == child) {
-            return 1;
-        }
+        if (condition == child) { return 0; }
+        if (message == child) { return 1; }
         return -1;
     }
 
@@ -145,12 +131,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (condition != null) {
-            condition.setExpressionContainer(this);
-        }
-        if (message != null) {
-            message.setExpressionContainer(this);
-        }
+        if (condition != null) { condition.setExpressionContainer(this); }
+        if (message != null) { message.setExpressionContainer(this); }
     }
 
     /**
@@ -159,29 +141,26 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (condition == p) {
             Expression r = (Expression) q;
             condition = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         if (message == p) {
             Expression r = (Expression) q;
             message = r;
-            if (r != null) {
-                r.setExpressionContainer(this);
-            }
+            if (r != null) { r.setExpressionContainer(this); }
             return true;
         }
         return false;
@@ -194,12 +173,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getExpressionCount() {
         int c = 0;
-        if (condition != null) {
-            c++;
-        }
-        if (message != null) {
-            c++;
-        }
+        if (condition != null) { c++; }
+        if (message != null) { c++; }
         return c;
     }
 
@@ -210,16 +185,10 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public Expression getExpressionAt(int index) {
         if (condition != null) {
-            if (index == 0) {
-                return condition;
-            }
+            if (index == 0) { return condition; }
             index -= 1;
         }
-        if (message != null) {
-            if (index == 0) {
-                return message;
-            }
-        }
+        if (message != null) { if (index == 0) { return message; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -235,7 +204,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Sets the condition expression.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
     public void setCondition(Expression expr) {
         condition = expr;
@@ -253,7 +223,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Sets the message expression.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
     public void setMessage(Expression expr) {
         message = expr;

@@ -23,7 +23,8 @@ public abstract class JumpStatement extends JavaStatement {
     /**
      * Jump statement.
      *
-     * @param proto a jump statement.
+     * @param proto
+     *        a jump statement.
      */
 
     protected JumpStatement(JumpStatement proto) {

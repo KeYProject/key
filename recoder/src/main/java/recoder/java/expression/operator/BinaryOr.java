@@ -32,8 +32,10 @@ public class BinaryOr extends Operator {
     /**
      * Binary or.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public BinaryOr(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class BinaryOr extends Operator {
     /**
      * Binary or.
      *
-     * @param proto a binary or.
+     * @param proto
+     *        a binary or.
      */
 
     protected BinaryOr(BinaryOr proto) {

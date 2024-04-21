@@ -25,16 +25,15 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         new HashMap<>(256);
 
     /**
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     protected DefaultProgramModelInfo(ServiceConfiguration config) {
         super(config);
     }
 
     private static <T> void removeRange(List<T> list, int from) {
-        if (list.size() > from) {
-            list.subList(from, list.size()).clear();
-        }
+        if (list.size() > from) { list.subList(from, list.size()).clear(); }
     }
 
     private static <T> void removeRange(List<T> list, int from, int to) {
@@ -65,16 +64,10 @@ public abstract class DefaultProgramModelInfo extends AbstractService
      */
     void registerSubtype(ClassType subtype, ClassType supertype) {
         ProgramModelInfo pmi = supertype.getProgramModelInfo();
-        if (pmi != this) {
-            ((DefaultProgramModelInfo) pmi).registerSubtype(subtype, supertype);
-        }
+        if (pmi != this) { ((DefaultProgramModelInfo) pmi).registerSubtype(subtype, supertype); }
         ClassTypeCacheEntry ctce = classTypeCache.get(supertype);
-        if (ctce == null) {
-            classTypeCache.put(supertype, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.subtypes == null) {
-            ctce.subtypes = new HashSet<>();
-        }
+        if (ctce == null) { classTypeCache.put(supertype, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.subtypes == null) { ctce.subtypes = new HashSet<>(); }
         ctce.subtypes.add(subtype);
     }
 
@@ -83,15 +76,9 @@ public abstract class DefaultProgramModelInfo extends AbstractService
      */
     void removeSubtype(ClassType subtype, ClassType supertype) {
         ProgramModelInfo pmi = supertype.getProgramModelInfo();
-        if (pmi != this) {
-            ((DefaultProgramModelInfo) pmi).registerSubtype(subtype, supertype);
-        }
+        if (pmi != this) { ((DefaultProgramModelInfo) pmi).registerSubtype(subtype, supertype); }
         ClassTypeCacheEntry ctce = classTypeCache.get(supertype);
-        if (ctce != null) {
-            if (ctce.subtypes != null) {
-                ctce.subtypes.remove(subtype);
-            }
-        }
+        if (ctce != null) { if (ctce.subtypes != null) { ctce.subtypes.remove(subtype); } }
     }
 
     public List<ClassType> getSubtypes(ClassType ct) {
@@ -103,12 +90,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return pmi.getSubtypes(ct);
         }
         ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-        if (ctce == null) {
-            classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.subtypes == null) {
-            return new ArrayList<>(0);
-        }
+        if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.subtypes == null) { return new ArrayList<>(0); }
         int s = ctce.subtypes.size();
         List<ClassType> result = new ArrayList<>(s);
         result.addAll(ctce.subtypes);
@@ -131,12 +114,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return pmi.getAllSupertypes(ct);
         }
         ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-        if (ctce == null) {
-            classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.allSupertypes == null) {
-            computeAllSupertypes(ct, ctce);
-        }
+        if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.allSupertypes == null) { computeAllSupertypes(ct, ctce); }
         return ctce.allSupertypes;
     }
 
@@ -152,19 +131,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return pmi.getAllFields(ct);
         }
         ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-        if (ctce == null) {
-            classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.allFields == null) {
-            computeAllFields(ct, ctce);
-        }
+        if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.allFields == null) { computeAllFields(ct, ctce); }
         return ctce.allFields;
     }
 
     private void computeAllFields(ClassType ct, ClassTypeCacheEntry ctce) {
-        if (ctce.allSupertypes == null) {
-            computeAllSupertypes(ct, ctce);
-        }
+        if (ctce.allSupertypes == null) { computeAllSupertypes(ct, ctce); }
         List<? extends ClassType> classes = ctce.allSupertypes;
         // if (classes == null) return null;
         int s = classes.size();
@@ -172,17 +145,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         int result_size = 0;
         for (ClassType c : classes) {
             List<? extends Field> fl = c.getFields();
-            if (fl == null) {
-                continue;
-            }
+            if (fl == null) { continue; }
             add_fields: for (Field f : fl) {
                 if (isVisibleFor(f, ct)) {
                     String fname = f.getName();
                     for (int k = 0; k < result_size; k++) {
                         Field rf = result.get(k);
-                        if (Objects.equals(rf.getName(), fname)) {
-                            continue add_fields;
-                        }
+                        if (Objects.equals(rf.getName(), fname)) { continue add_fields; }
                     }
                     result.add(f);
                     result_size++;
@@ -201,19 +170,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return pmi.getAllMethods(ct);
         }
         ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-        if (ctce == null) {
-            classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.allMethods == null) {
-            computeAllMethods(ct, ctce);
-        }
+        if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.allMethods == null) { computeAllMethods(ct, ctce); }
         return ctce.allMethods;
     }
 
     private void computeAllMethods(ClassType ct, ClassTypeCacheEntry ctce) {
-        if (ctce.allSupertypes == null) {
-            computeAllSupertypes(ct, ctce);
-        }
+        if (ctce.allSupertypes == null) { computeAllSupertypes(ct, ctce); }
         List<? extends ClassType> classes = ctce.allSupertypes;
         int s = classes.size();
         ArrayList<Method> result = new ArrayList<>(s * 8);
@@ -221,9 +184,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         int result_size = 0;
         for (ClassType c : classes) {
             List<? extends Method> ml = c.getMethods();
-            if (ml == null) {
-                continue;
-            }
+            if (ml == null) { continue; }
             add_methods: for (Method m : ml) {
                 // if (m.isPublic() || m.isProtected() || c == ct ||
                 // (!m.isPrivate() && c.getPackage() == ct.getPackage())) {
@@ -235,9 +196,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                             if (t instanceof TypeParameter) {
                                 int q = 0;
                                 for (; q < pt.getGenericType().getTypeParameters().size(); q++) {
-                                    if (pt.getGenericType().getTypeParameters().get(q) == t) {
-                                        break;
-                                    }
+                                    if (pt.getGenericType().getTypeParameters().get(q) == t) { break; }
                                 }
                                 if (q < pt.getGenericType().getTypeParameters().size()) {
                                     tmp.add(makeParameterizedType(pt.getTypeArgs().get(q)));
@@ -275,9 +234,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         case Super, Any -> getNameInfo().getJavaLangObject();
         case None, Extends -> getBaseType(ta);
         };
-        if (ta.getTypeArguments() == null || ta.getTypeArguments().isEmpty()) {
-            return bt;
-        }
+        if (ta.getTypeArguments() == null || ta.getTypeArguments().isEmpty()) { return bt; }
         return new ParameterizedType((ClassType) bt, ta.getTypeArguments());
     }
 
@@ -289,28 +246,20 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return pmi.getAllTypes(ct);
         }
         ClassTypeCacheEntry ctce = classTypeCache.get(ct);
-        if (ctce == null) {
-            classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
-        }
-        if (ctce.allMemberTypes == null) {
-            computeAllMemberTypes(ct, ctce);
-        }
+        if (ctce == null) { classTypeCache.put(ct, ctce = new ClassTypeCacheEntry()); }
+        if (ctce.allMemberTypes == null) { computeAllMemberTypes(ct, ctce); }
         return ctce.allMemberTypes;
     }
 
     private void computeAllMemberTypes(ClassType ct, ClassTypeCacheEntry ctce) {
-        if (ctce.allSupertypes == null) {
-            computeAllSupertypes(ct, ctce);
-        }
+        if (ctce.allSupertypes == null) { computeAllSupertypes(ct, ctce); }
         List<? extends ClassType> classes = ctce.allSupertypes;
         int s = classes.size();
         ArrayList<ClassType> result = new ArrayList<>(s);
         int result_size = 0;
         for (ClassType c : classes) {
             List<? extends ClassType> cl = c.getTypes();
-            if (cl == null) {
-                continue;
-            }
+            if (cl == null) { continue; }
             add_ClassTypes: for (ClassType hc : cl) {
                 // hc == ct may occur as it is admissible for a member class
                 // to extend its parent class
@@ -318,9 +267,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     String cname = hc.getName();
                     for (int k = 0; k < result_size; k++) {
                         ClassType rc = result.get(k);
-                        if (Objects.equals(rc.getName(), cname)) {
-                            continue add_ClassTypes;
-                        }
+                        if (Objects.equals(rc.getName(), cname)) { continue add_ClassTypes; }
                     }
                     result.add(hc);
                     result_size++;
@@ -332,71 +279,39 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     public PrimitiveType getPromotedType(PrimitiveType a, PrimitiveType b) {
-        if (a == b) {
-            return a;
-        }
+        if (a == b) { return a; }
         NameInfo ni = getNameInfo();
-        if (a == ni.getBooleanType() || b == ni.getBooleanType()) {
-            return null;
-        }
-        if (a == ni.getDoubleType() || b == ni.getDoubleType()) {
-            return ni.getDoubleType();
-        }
-        if (a == ni.getFloatType() || b == ni.getFloatType()) {
-            return ni.getFloatType();
-        }
-        if (a == ni.getLongType() || b == ni.getLongType()) {
-            return ni.getLongType();
-        }
+        if (a == ni.getBooleanType() || b == ni.getBooleanType()) { return null; }
+        if (a == ni.getDoubleType() || b == ni.getDoubleType()) { return ni.getDoubleType(); }
+        if (a == ni.getFloatType() || b == ni.getFloatType()) { return ni.getFloatType(); }
+        if (a == ni.getLongType() || b == ni.getLongType()) { return ni.getLongType(); }
         return ni.getIntType();
     }
 
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null) {
-            return false;
-        }
+        if (from == null || to == null) { return false; }
         // equal types can be coerced
-        if (from == to) {
-            return true;
-        }
+        if (from == to) { return true; }
         NameInfo ni = getNameInfo();
         // boolean types cannot be coerced into something else
-        if (from == ni.getBooleanType() || to == ni.getBooleanType()) {
-            return false;
-        }
+        if (from == ni.getBooleanType() || to == ni.getBooleanType()) { return false; }
         // everything else can be coerced to a double
-        if (to == ni.getDoubleType()) {
-            return true;
-        }
+        if (to == ni.getDoubleType()) { return true; }
         // but a double cannot be coerced to anything else
-        if (from == ni.getDoubleType()) {
-            return false;
-        }
+        if (from == ni.getDoubleType()) { return false; }
         // everything except doubles can be coerced to a float
-        if (to == ni.getFloatType()) {
-            return true;
-        }
+        if (to == ni.getFloatType()) { return true; }
         // but a float cannot be coerced to anything but float or double
-        if (from == ni.getFloatType()) {
-            return false;
-        }
+        if (from == ni.getFloatType()) { return false; }
         // everything except float or double can be coerced to a long
-        if (to == ni.getLongType()) {
-            return true;
-        }
+        if (to == ni.getLongType()) { return true; }
         // but a long cannot be coerced to anything but float, double or long
-        if (from == ni.getLongType()) {
-            return false;
-        }
+        if (from == ni.getLongType()) { return false; }
         // everything except long, float or double can be coerced to an int
-        if (to == ni.getIntType()) {
-            return true;
-        }
+        if (to == ni.getIntType()) { return true; }
         // but an int cannot be coerced to the remaining byte, char, short
-        if (from == ni.getIntType()) {
-            return false;
-        }
+        if (from == ni.getIntType()) { return false; }
         // between byte, char, short, only one conversion is admissible
         return (from == ni.getByteType() && to == ni.getShortType());
     }
@@ -407,13 +322,9 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     public boolean isWidening(ArrayType from, ArrayType to) {
         Type toBase = to.getBaseType();
-        if (toBase == getNameInfo().getJavaLangObject()) {
-            return true;
-        }
+        if (toBase == getNameInfo().getJavaLangObject()) { return true; }
         Type fromBase = from.getBaseType();
-        if (toBase instanceof PrimitiveType) {
-            return toBase.equals(fromBase);
-        }
+        if (toBase instanceof PrimitiveType) { return toBase.equals(fromBase); }
         return isWidening(fromBase, toBase);
     }
 
@@ -428,22 +339,14 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 return from instanceof NullType && to instanceof ArrayType;
             }
         } else if (from instanceof PrimitiveType) {
-            if (to instanceof PrimitiveType) {
-                return isWidening((PrimitiveType) from, (PrimitiveType) to);
-            }
+            if (to instanceof PrimitiveType) { return isWidening((PrimitiveType) from, (PrimitiveType) to); }
         } else if (from instanceof ArrayType) {
             if (to instanceof ClassType) {
                 NameInfo ni = getNameInfo();
-                if (to == ni.getJavaLangObject()) {
-                    return true;
-                }
-                if (to == ni.getJavaLangCloneable()) {
-                    return true;
-                }
+                if (to == ni.getJavaLangObject()) { return true; }
+                if (to == ni.getJavaLangCloneable()) { return true; }
                 return to == ni.getJavaIoSerializable();
-            } else if (to instanceof ArrayType) {
-                return isWidening((ArrayType) from, (ArrayType) to);
-            }
+            } else if (to instanceof ArrayType) { return isWidening((ArrayType) from, (ArrayType) to); }
         }
         return false;
     }
@@ -472,12 +375,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     int s = superA.size();
                     for (int i = 0; (i < s) && !result; i++) {
                         ClassType sa = superA.get(i);
-                        if (sa == a) {
-                            getErrorHandler().reportError(new CyclicInheritanceException(a));
-                        }
-                        if (isSubtype(sa, b)) {
-                            result = true;
-                        }
+                        if (sa == a) { getErrorHandler().reportError(new CyclicInheritanceException(a)); }
+                        if (isSubtype(sa, b)) { result = true; }
                     }
                 }
             }
@@ -490,9 +389,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     private boolean paramMatches(Type ta, Type tb, boolean allowAutoboxing) {
-        if (ta == tb) {
-            return true;
-        }
+        if (ta == tb) { return true; }
         while (ta instanceof ArrayType && tb instanceof ArrayType) {
             // if we got arrays of parameterized types, this helps avoiding special cases
             ta = ((ArrayType) ta).getBaseType();
@@ -500,13 +397,9 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         }
         if (tb instanceof TypeParameter && ta instanceof ArrayType) {
             TypeParameter tp = (TypeParameter) tb;
-            if (tp.getBoundCount() == 0) {
-                return true;
-            }
+            if (tp.getBoundCount() == 0) { return true; }
             // otherwise, only java.lang.Object is allowed as one and only bound
-            if (tp.getBoundCount() > 1) {
-                return false;
-            }
+            if (tp.getBoundCount() > 1) { return false; }
             return tp.getBoundName(0).equals("java.lang.Object");
         }
         if (tb instanceof TypeParameter && ta instanceof ClassType) {
@@ -527,9 +420,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 // TODO look at this again!!! - T.Gutzmann
                 // if (tp.getBoundTypeArguments(i) != null)
                 // t = new ParameterizedType(t, tp.getBoundTypeArguments(i));
-                if (!isWidening(ta, t)) {
-                    return false;
-                }
+                if (!isWidening(ta, t)) { return false; }
             }
             return true;
         }
@@ -599,9 +490,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         for (int i = 0; i < s; i += 1) {
             Type ta = a.get(i);
             Type tb = b.get(i);
-            if (!paramMatches(ta, tb, allowAutoboxing)) {
-                return false;
-            }
+            if (!paramMatches(ta, tb, allowAutoboxing)) { return false; }
         }
         return true;
     }
@@ -619,35 +508,20 @@ public abstract class DefaultProgramModelInfo extends AbstractService
      * returns the ClassType this primitive type can be boxed to, as specified in Java Language
      * Specification, 3rd edition, 5.1.8
      *
-     * @param unboxedType the unboxed, primitive type
+     * @param unboxedType
+     *        the unboxed, primitive type
      * @return the ClassType this primitive type can be boxed to
      */
     public ClassType getBoxedType(PrimitiveType unboxedType) {
         NameInfo ni = getNameInfo();
-        if (unboxedType == ni.getBooleanType()) {
-            return ni.getJavaLangBoolean();
-        }
-        if (unboxedType == ni.getByteType()) {
-            return ni.getJavaLangByte();
-        }
-        if (unboxedType == ni.getCharType()) {
-            return ni.getJavaLangCharacter();
-        }
-        if (unboxedType == ni.getShortType()) {
-            return ni.getJavaLangShort();
-        }
-        if (unboxedType == ni.getIntType()) {
-            return ni.getJavaLangInteger();
-        }
-        if (unboxedType == ni.getLongType()) {
-            return ni.getJavaLangLong();
-        }
-        if (unboxedType == ni.getFloatType()) {
-            return ni.getJavaLangFloat();
-        }
-        if (unboxedType == ni.getDoubleType()) {
-            return ni.getJavaLangDouble();
-        }
+        if (unboxedType == ni.getBooleanType()) { return ni.getJavaLangBoolean(); }
+        if (unboxedType == ni.getByteType()) { return ni.getJavaLangByte(); }
+        if (unboxedType == ni.getCharType()) { return ni.getJavaLangCharacter(); }
+        if (unboxedType == ni.getShortType()) { return ni.getJavaLangShort(); }
+        if (unboxedType == ni.getIntType()) { return ni.getJavaLangInteger(); }
+        if (unboxedType == ni.getLongType()) { return ni.getJavaLangLong(); }
+        if (unboxedType == ni.getFloatType()) { return ni.getJavaLangFloat(); }
+        if (unboxedType == ni.getDoubleType()) { return ni.getJavaLangDouble(); }
         throw new Error("Unknown primitive type " + unboxedType.getFullName());
     }
 
@@ -655,53 +529,33 @@ public abstract class DefaultProgramModelInfo extends AbstractService
      * return the PrimitiveType this ClassType can be unboxed to, or <code>null</code> if this
      * ClassType cannot be unboxed. Follows the Java Language Specification, 3rd edition, 5.1.8.
      *
-     * @param boxedType the ClassType to be unboxed
+     * @param boxedType
+     *        the ClassType to be unboxed
      * @return The PrimitveType this ClassType can be unboxed to, <code>null</code> if unboxing is
      *         not possible.
      */
     public PrimitiveType getUnboxedType(ClassType boxedType) {
         NameInfo ni = getNameInfo();
-        if (boxedType == ni.getJavaLangBoolean()) {
-            return ni.getBooleanType();
-        }
-        if (boxedType == ni.getJavaLangByte()) {
-            return ni.getByteType();
-        }
-        if (boxedType == ni.getJavaLangCharacter()) {
-            return ni.getCharType();
-        }
-        if (boxedType == ni.getJavaLangShort()) {
-            return ni.getShortType();
-        }
-        if (boxedType == ni.getJavaLangInteger()) {
-            return ni.getIntType();
-        }
-        if (boxedType == ni.getJavaLangLong()) {
-            return ni.getLongType();
-        }
-        if (boxedType == ni.getJavaLangFloat()) {
-            return ni.getFloatType();
-        }
-        if (boxedType == ni.getJavaLangDouble()) {
-            return ni.getDoubleType();
-        }
+        if (boxedType == ni.getJavaLangBoolean()) { return ni.getBooleanType(); }
+        if (boxedType == ni.getJavaLangByte()) { return ni.getByteType(); }
+        if (boxedType == ni.getJavaLangCharacter()) { return ni.getCharType(); }
+        if (boxedType == ni.getJavaLangShort()) { return ni.getShortType(); }
+        if (boxedType == ni.getJavaLangInteger()) { return ni.getIntType(); }
+        if (boxedType == ni.getJavaLangLong()) { return ni.getLongType(); }
+        if (boxedType == ni.getJavaLangFloat()) { return ni.getFloatType(); }
+        if (boxedType == ni.getJavaLangDouble()) { return ni.getDoubleType(); }
         return null;
     }
 
     protected ClassType getOutermostType(ClassType t) {
         ClassTypeContainer c = t;
         ClassTypeContainer cc = t.getContainer();
-        while (cc != null && !(cc instanceof Package)) {
-            c = cc;
-            cc = cc.getContainer();
-        }
+        while (cc != null && !(cc instanceof Package)) { c = cc; cc = cc.getContainer(); }
         return (ClassType) c;
     }
 
     public boolean isVisibleFor(Member m, ClassType t) {
-        if (t instanceof ParameterizedType) {
-            t = ((ParameterizedType) t).getGenericType();
-        }
+        if (t instanceof ParameterizedType) { t = ((ParameterizedType) t).getGenericType(); }
         if (m.isPublic()) {
             // public members are always visible
             return true;
@@ -740,9 +594,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     // TODO Hack and to be removed (i.e., assign ProgramModelInfo to TypeArgument)
     Type getBaseType(TypeArgument ta) {
-        if (ta.getWildcardMode() == WildcardMode.Any) {
-            return getNameInfo().getJavaLangObject();
-        }
+        if (ta.getWildcardMode() == WildcardMode.Any) { return getNameInfo().getJavaLangObject(); }
         if (ta.getWildcardMode() == WildcardMode.Super) {
             // this is sufficient for our needs
             return getNameInfo().getJavaLangObject();
@@ -754,16 +606,12 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     if (tai.getContainingMethodInfo().getTypeParameters() != null) {
                         for (TypeParameterInfo tpi : tai.getContainingMethodInfo()
                                 .getTypeParameters()) {
-                            if (tpi.getName().equals(tai.getTypeName())) {
-                                return tpi;
-                            }
+                            if (tpi.getName().equals(tai.getTypeName())) { return tpi; }
                         }
                     }
                 }
                 for (TypeParameterInfo tpi : tai.getContainingClassFile().getTypeParameters()) {
-                    if (tpi.getName().equals(tai.getTypeName())) {
-                        return tpi;
-                    }
+                    if (tpi.getName().equals(tai.getTypeName())) { return tpi; }
                 }
                 throw new RuntimeException();
             } else {
@@ -780,9 +628,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     protected List<Type> replaceTypeArgs(List<Type> sig, List<? extends TypeArgument> typeArgs,
             List<? extends TypeParameter> typeParams) {
         List<Type> res = new ArrayList<>(sig.size());
-        for (Type type : sig) {
-            res.add(replaceTypeArg(type, typeArgs, typeParams).baseType);
-        }
+        for (Type type : sig) { res.add(replaceTypeArg(type, typeArgs, typeParams).baseType); }
         return res;
     }
 
@@ -814,9 +660,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         while (i < s) {
             Method m = list.get(i);
             // easy/fast computations first
-            if (!name.equals(m.getName()) || !isVisibleFor(m, context)) {
-                break;
-            }
+            if (!name.equals(m.getName()) || !isVisibleFor(m, context)) { break; }
             List<Type> methodSig = m.getSignature();
             if (m.getTypeParameters() != null) {
                 // generic method
@@ -845,9 +689,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             for (i += 1; i < s; i += 1) {
                 Method m = list.get(i);
                 // easy/fast computations first
-                if (!name.equals(m.getName()) || !isVisibleFor(m, context)) {
-                    continue;
-                }
+                if (!name.equals(m.getName()) || !isVisibleFor(m, context)) { continue; }
                 List<Type> methodSig = m.getSignature();
                 if (m.getTypeParameters() != null) {
                     // generic method
@@ -912,9 +754,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     private void internalFilterMostSpecificMethods(List<Method> list, boolean allowAutoboxing,
             boolean allowVarArgs) {
         int size = list.size();
-        if (size <= 1) {
-            return;
-        }
+        if (size <= 1) { return; }
         // cache signatures (avoid multiple allocations)
         @SuppressWarnings("unchecked")
         List<Type>[] signatures = new List[size];
@@ -957,9 +797,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 k = 0;
             }
         }
-        if (k > 0) {
-            removeRange(list, 0, k);
-        }
+        if (k > 0) { removeRange(list, 0, k); }
     }
 
     public List<? extends Constructor> getConstructors(ClassType ct, List<Type> signature,
@@ -978,9 +816,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         List<Method> meths =
             internalGetMostSpecificMethods(ct, name, signature, ct.getConstructors(), typeArgs, ct);
         List<Constructor> result = new ArrayList<>();
-        for (Method meth : meths) {
-            result.add((Constructor) meth);
-        }
+        for (Method meth : meths) { result.add((Constructor) meth); }
         return result;
     }
 
@@ -1026,9 +862,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         applicableMethods.addAll(methods);
         internalFilterApplicableMethods(applicableMethods, name, signature, context, typeArgs,
             true);
-        if (applicableMethods.size() < 2) {
-            return applicableMethods;
-        }
+        if (applicableMethods.size() < 2) { return applicableMethods; }
 
         // applicableMethods now contains correct content. Work on copy of this list, now
         List<Method> result = new ArrayList<>(applicableMethods.size() + 1);
@@ -1037,15 +871,11 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         // for first pass, we need to filter again, but on already reduced set only
         internalFilterApplicableMethods(result, name, signature, context, typeArgs, false);
         filterMostSpecificMethods(result);
-        if (!result.isEmpty()) {
-            return result;
-        }
+        if (!result.isEmpty()) { return result; }
 
         result.addAll(applicableMethods); // result is empty at this point
         filterMostSpecificMethodsPhase2(result);
-        if (!result.isEmpty()) {
-            return result;
-        }
+        if (!result.isEmpty()) { return result; }
         result.addAll(applicableMethods); // once again, result is empty
         filterMostSpecificMethodsPhase3(result);
         return result;
@@ -1062,21 +892,18 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     /**
      * Takes an (Array|Class)Type and adds type arguments to it.
      *
-     * @throws AssertionError if t is neither a Class or Array Type
-     * @throws ClassCastException if t is an array type with a primitive type as base type.
+     * @throws AssertionError
+     *         if t is neither a Class or Array Type
+     * @throws ClassCastException
+     *         if t is an array type with a primitive type as base type.
      */
     protected Type makeParameterizedArrayType(Type t, List<? extends TypeArgument> typeArgs) {
         assert t instanceof ArrayType || t instanceof ClassType;
         Type result = t;
         int dim = 0;
-        while (result instanceof ArrayType) {
-            result = ((ArrayType) result).getBaseType();
-            dim++;
-        }
+        while (result instanceof ArrayType) { result = ((ArrayType) result).getBaseType(); dim++; }
         result = new ParameterizedType((ClassType) result, typeArgs);
-        for (int i = 0; i < dim; i++) {
-            result = getNameInfo().createArrayType(result);
-        }
+        for (int i = 0; i < dim; i++) { result = getNameInfo().createArrayType(result); }
         return result;
     }
 
@@ -1088,66 +915,66 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         return getConstructors(ct, signature, null);
     }
 
-    record ResolvedTypeArgument(WildcardMode wm, Type type,
-                                List<? extends TypeArgument> typeArgs) implements TypeArgument {
+    record ResolvedTypeArgument(
+            WildcardMode wm, Type type,
+            List<? extends TypeArgument> typeArgs) implements TypeArgument {
         ResolvedTypeArgument {
-            if (!(type instanceof ArrayType || type instanceof ClassType)) {
-                throw new IllegalArgumentException();
-            }
+            if (!(type instanceof ArrayType || type instanceof ClassType)) { throw new IllegalArgumentException(); }
         }
 
-    public WildcardMode getWildcardMode() {
-        return wm;
+        public WildcardMode getWildcardMode() {
+            return wm;
+        }
+
+        public String getTypeName() {
+            return type.getFullName();
+        }
+
+        public List<? extends TypeArgument> getTypeArguments() {
+            return typeArgs;
+        }
+
     }
 
-    public String getTypeName() {
-        return type.getFullName();
+
+    static class ClassTypeCacheEntry {
+        List<ClassType> supertypes; // used in specialized services only
+
+        Set<ClassType> subtypes;
+
+        List<ClassType> allSupertypes;
+
+        List<ClassType> allMemberTypes;
+
+        List<Field> allFields;
+
+        List<Method> allMethods;
     }
 
-    public List<? extends TypeArgument> getTypeArguments() {
-        return typeArgs;
+
+    static class SuperTypeTopSort extends ClassTypeTopSort {
+
+        protected final List<ClassType> getAdjacent(ClassType c) {
+            return c.getSupertypes();
+        }
     }
 
+
+    static class ReplaceTypeArgResult {
+        final Type baseType;
+        final WildcardMode wildcardMode;
+
+        ReplaceTypeArgResult(Type t, WildcardMode wm) {
+            this.baseType = t;
+            this.wildcardMode = wm;
+        }
+    }
+
+
+    class SubTypeTopSort extends ClassTypeTopSort {
+
+        protected final List<ClassType> getAdjacent(ClassType c) {
+            return getSubtypes(c);
+        }
+    }
 }
-
-
-static class ClassTypeCacheEntry {
-    List<ClassType> supertypes; // used in specialized services only
-
-    Set<ClassType> subtypes;
-
-    List<ClassType> allSupertypes;
-
-    List<ClassType> allMemberTypes;
-
-    List<Field> allFields;
-
-    List<Method> allMethods;
-}
-
-
-static class SuperTypeTopSort extends ClassTypeTopSort {
-
-    protected final List<ClassType> getAdjacent(ClassType c) {
-        return c.getSupertypes();
-    }
-}
-
-
-static class ReplaceTypeArgResult {
-    final Type baseType;
-    final WildcardMode wildcardMode;
-
-    ReplaceTypeArgResult(Type t, WildcardMode wm) {
-        this.baseType = t;
-        this.wildcardMode = wm;
-    }
-}
-
-
-class SubTypeTopSort extends ClassTypeTopSort {
-
-    protected final List<ClassType> getAdjacent(ClassType c) {
-        return getSubtypes(c);
-    }
-}}

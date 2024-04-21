@@ -34,16 +34,16 @@ public class RenamingProperty implements TermProperty {
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1} modulo bound renaming.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
      * @return true iff {@code term2} has the same values in operator, sort, arity, varsBoundHere
      *         and javaBlock as {@code term1} modulo bound renaming
      */
     @Override
     public Boolean equalsModThisProperty(Term term1, Term term2) {
-        if (term2 == term1) {
-            return true;
-        }
+        if (term2 == term1) { return true; }
         return unifyHelp(term1, term2, ImmutableSLList.nil(),
             ImmutableSLList.nil(), null);
     }
@@ -59,10 +59,14 @@ public class RenamingProperty implements TermProperty {
     /**
      * Compare two quantifiable variables if they are equal modulo renaming.
      *
-     * @param ownVar first QuantifiableVariable to be compared
-     * @param cmpVar second QuantifiableVariable to be compared
-     * @param ownBoundVars variables bound above the current position
-     * @param cmpBoundVars variables bound above the current position
+     * @param ownVar
+     *        first QuantifiableVariable to be compared
+     * @param cmpVar
+     *        second QuantifiableVariable to be compared
+     * @param ownBoundVars
+     *        variables bound above the current position
+     * @param cmpBoundVars
+     *        variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
             QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
@@ -88,35 +92,29 @@ public class RenamingProperty implements TermProperty {
      */
     private static int indexOf(QuantifiableVariable var, ImmutableList<QuantifiableVariable> list) {
         int res = 0;
-        while (!list.isEmpty()) {
-            if (list.head() == var) {
-                return res;
-            }
-            ++res;
-            list = list.tail();
-        }
+        while (!list.isEmpty()) { if (list.head() == var) { return res; } ++res; list = list.tail(); }
         return -1;
     }
 
     /**
      * Compares two terms modulo bound renaming.
      *
-     * @param t0 the first term
-     * @param t1 the second term
-     * @param ownBoundVars variables bound above the current position
-     * @param cmpBoundVars variables bound above the current position
+     * @param t0
+     *        the first term
+     * @param t1
+     *        the second term
+     * @param ownBoundVars
+     *        variables bound above the current position
+     * @param cmpBoundVars
+     *        variables bound above the current position
      * @return <code>true</code> is returned iff the terms are equal modulo bound renaming
      */
     private boolean unifyHelp(Term t0, Term t1, ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
 
-        if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
-            return true;
-        }
+        if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) { return true; }
 
-        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-            return false;
-        }
+        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) { return false; }
 
         final Operator op0 = t0.op();
 
@@ -127,23 +125,15 @@ public class RenamingProperty implements TermProperty {
         final Operator op1 = t1.op();
 
         if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
-            if (mod0.kind() != mod1.kind()) {
-                return false;
-            }
+            if (mod0.kind() != mod1.kind()) { return false; }
             nat = handleJava(mod0.program(), mod1.program(), nat);
-            if (nat == FAILED) {
-                return false;
-            }
-        } else if (!(op0 instanceof ProgramVariable) && op0 != op1) {
-            return false;
-        }
+            if (nat == FAILED) { return false; }
+        } else if (!(op0 instanceof ProgramVariable) && op0 != op1) { return false; }
 
         if (!(op0 instanceof SchemaVariable) && op0 instanceof ProgramVariable pv0) {
             if (op1 instanceof ProgramVariable pv1) {
                 nat = checkNat(nat);
-                if (!pv0.equalsModRenaming(pv1, nat)) {
-                    return false;
-                }
+                if (!pv0.equalsModRenaming(pv1, nat)) { return false; }
             } else {
                 return false;
             }
@@ -170,9 +160,7 @@ public class RenamingProperty implements TermProperty {
             NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
-            if (javaBlocksNotEqualModRenaming(jb0, jb1, nat)) {
-                return FAILED;
-            }
+            if (javaBlocksNotEqualModRenaming(jb0, jb1, nat)) { return FAILED; }
         }
         return nat;
     }
@@ -186,9 +174,12 @@ public class RenamingProperty implements TermProperty {
      * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
      * it is now only a helper method in {@link RenamingProperty}.
      *
-     * @param jb1 the first {@link JavaBlock}
-     * @param jb2 the second {@link JavaBlock}
-     * @param nat the {@link NameAbstractionTable} used for the comparison
+     * @param jb1
+     *        the first {@link JavaBlock}
+     * @param jb2
+     *        the second {@link JavaBlock}
+     * @param nat
+     *        the {@link NameAbstractionTable} used for the comparison
      * @return true if the given {@link JavaBlock}s are NOT equal modulo renaming
      */
     public static boolean javaBlocksNotEqualModRenaming(JavaBlock jb1, JavaBlock jb2,
@@ -197,9 +188,7 @@ public class RenamingProperty implements TermProperty {
         JavaProgramElement pe2 = jb2.program();
         if (pe1 == null && pe2 == null) {
             return false;
-        } else if (pe1 != null && pe2 != null) {
-            return !pe1.equalsModRenaming(pe2, nat);
-        }
+        } else if (pe1 != null && pe2 != null) { return !pe1.equalsModRenaming(pe2, nat); }
         return true;
     }
 
@@ -211,15 +200,11 @@ public class RenamingProperty implements TermProperty {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
             ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
-            if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
-                return false;
-            }
+            if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) { return false; }
             for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
                 final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
                 final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
-                if (ownVar.sort() != cmpVar.sort()) {
-                    return false;
-                }
+                if (ownVar.sort() != cmpVar.sort()) { return false; }
 
                 subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
                 subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
@@ -228,18 +213,14 @@ public class RenamingProperty implements TermProperty {
             boolean newConstraint =
                 unifyHelp(t0.sub(i), t1.sub(i), subOwnBoundVars, subCmpBoundVars, nat);
 
-            if (!newConstraint) {
-                return false;
-            }
+            if (!newConstraint) { return false; }
         }
 
         return true;
     }
 
     private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
-        if (nat == null) {
-            return new NameAbstractionTable();
-        }
+        if (nat == null) { return new NameAbstractionTable(); }
         return nat;
     }
     // end of equals modulo renaming logic

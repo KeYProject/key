@@ -59,12 +59,10 @@ public final class JavaModel {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
         this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + (new File(modelDir)).getName() + "@"
-            + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
+                + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
         StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
-            for (File f : classPathEntries) {
-                sb.append("\"").append(f.getAbsolutePath()).append("\", ");
-            }
+            for (File f : classPathEntries) { sb.append("\"").append(f.getAbsolutePath()).append("\", "); }
             sb.setLength(sb.length() - 2);
         }
         this.classPath = sb.toString();
@@ -74,9 +72,7 @@ public final class JavaModel {
         if (includes != null) {
             List<File> includeList = includes.getFiles();
             if (!includeList.isEmpty()) {
-                for (File f : includeList) {
-                    sb2.append("\"").append(f.getAbsolutePath()).append("\", ");
-                }
+                for (File f : includeList) { sb2.append("\"").append(f.getAbsolutePath()).append("\", "); }
                 sb2.setLength(sb2.length() - 2);
             }
         }
@@ -123,9 +119,7 @@ public final class JavaModel {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         final JavaModel other = (JavaModel) o;
         if (getModelTag() == null) {
             return other.getModelTag() == null;
@@ -148,6 +142,6 @@ public final class JavaModel {
     @Override
     public String toString() {
         return "---Program model---\nModel dir: " + modelDir + "\nModel tag: " + modelTag
-            + "\nDescription: " + descr;
+                + "\nDescription: " + descr;
     }
 }

@@ -96,25 +96,21 @@ public final class SortDependingFunction extends JFunction {
     /**
      * returns the variant for the given sort
      *
-     * @param sort the {@link Sort} for which to retrieve the corresponding variant of this function
-     * @param services the {@link Services}
+     * @param sort
+     *        the {@link Sort} for which to retrieve the corresponding variant of this function
+     * @param services
+     *        the {@link Services}
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
-        if (sort == this.sortDependingOn) {
-            return this;
-        }
+        if (sort == this.sortDependingOn) { return this; }
 
         SortDependingFunction n = (SortDependingFunction) services.getNamespaces()
                 .lookup(instantiateName(getKind(), sort));
 
 
-        if (sort instanceof ProgramSVSort) {
-            throw new AssertionError();
-        }
-        if (sort == AbstractTermTransformer.METASORT) {
-            throw new AssertionError();
-        }
+        if (sort instanceof ProgramSVSort) { throw new AssertionError(); }
+        if (sort == AbstractTermTransformer.METASORT) { throw new AssertionError(); }
 
         final NamespaceSet namespaces = services.getNamespaces();
         Namespace<JFunction> functions = namespaces.functions();
@@ -141,9 +137,7 @@ public final class SortDependingFunction extends JFunction {
                 // Sort depending on functions are to be added to the "root" namespace, however.
                 // Therefore, let's rewind to the root (MU, 2017-03)
                 synchronized (functions) {
-                    while (functions.parent() != null) {
-                        functions = functions.parent();
-                    }
+                    while (functions.parent() != null) { functions = functions.parent(); }
                     synchronized (functions) {
                         functions.addSafely(result);
                     }
@@ -156,12 +150,8 @@ public final class SortDependingFunction extends JFunction {
                 String.format("%s depends on %s (hash %d) but should depend on %s (hash %d)",
                     result, result.getSortDependingOn(), result.hashCode(), sort, sort.hashCode()));
         }
-        if (!isSimilar(result)) {
-            throw new AssertionError(result + " should be similar to " + this);
-        }
-        if (namespaces.lookup(instantiateName(getKind(), sort)) != result) {
-            throw new AssertionError();
-        }
+        if (!isSimilar(result)) { throw new AssertionError(result + " should be similar to " + this); }
+        if (namespaces.lookup(instantiateName(getKind(), sort)) != result) { throw new AssertionError(); }
 
         return result;
     }
@@ -185,7 +175,7 @@ public final class SortDependingFunction extends JFunction {
     // inner classes
     // -------------------------------------------------------------------------
 
-    private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
-            ImmutableArray<Sort> argSorts, boolean unique) {
-    }
+    private record SortDependingFunctionTemplate(
+            GenericSort sortDependingOn, Name kind, Sort sort,
+            ImmutableArray<Sort> argSorts, boolean unique) {}
 }

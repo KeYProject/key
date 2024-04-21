@@ -35,7 +35,8 @@ public class Finally extends Branch {
     /**
      * Finally.
      *
-     * @param body a statement.
+     * @param body
+     *        a statement.
      */
 
     public Finally(StatementBlock body) {
@@ -46,14 +47,13 @@ public class Finally extends Branch {
     /**
      * Finally.
      *
-     * @param proto a finally.
+     * @param proto
+     *        a finally.
      */
 
     protected Finally(Finally proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -73,9 +73,7 @@ public class Finally extends Branch {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     /**
@@ -84,22 +82,21 @@ public class Finally extends Branch {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -113,25 +110,23 @@ public class Finally extends Branch {
 
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -139,9 +134,7 @@ public class Finally extends Branch {
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: body
-        if (body == child) {
-            return 0;
-        }
+        if (body == child) { return 0; }
         return -1;
     }
 
@@ -162,9 +155,7 @@ public class Finally extends Branch {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -181,7 +172,8 @@ public class Finally extends Branch {
     /**
      * Set body; must be a {@link recoder.java.StatementBlock}.
      *
-     * @param statement a StatementBlock.
+     * @param statement
+     *        a StatementBlock.
      */
 
     public void setBody(Statement statement) {
@@ -191,7 +183,8 @@ public class Finally extends Branch {
     /**
      * Set parent.
      *
-     * @param parent a try.
+     * @param parent
+     *        a try.
      */
 
     public void setParent(Try parent) {

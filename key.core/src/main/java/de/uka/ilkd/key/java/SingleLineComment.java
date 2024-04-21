@@ -16,7 +16,8 @@ public class SingleLineComment extends Comment {
     /**
      * Single line comment.
      *
-     * @param text a string.
+     * @param text
+     *        a string.
      */
 
     public SingleLineComment(String text) {

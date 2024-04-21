@@ -26,7 +26,8 @@ public class ProgramVariableSVWrapper extends Identifier implements KeYRecoderEx
     /**
      * sets the schema variable of sort label
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     public void setSV(SchemaVariable sv) {
         this.sv = sv;

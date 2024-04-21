@@ -36,9 +36,7 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     public void setErrorThreshold(int maxCount) {
-        if (maxCount < 0) {
-            throw new IllegalArgumentException("Threshold should be >= 0");
-        }
+        if (maxCount < 0) { throw new IllegalArgumentException("Threshold should be >= 0"); }
         errorThreshold = maxCount;
     }
 
@@ -73,9 +71,7 @@ public class DefaultErrorHandler implements ErrorHandler {
         if (e instanceof UnresolvedReferenceException) {
             ProgramElement unresolvedReference =
                 ((UnresolvedReferenceException) e).getUnresolvedReference();
-            if (isReferingUnavailableCode(unresolvedReference)) {
-                return true;
-            }
+            if (isReferingUnavailableCode(unresolvedReference)) { return true; }
             return isTemplateCode(unresolvedReference);
         }
         return false;
@@ -122,9 +118,7 @@ public class DefaultErrorHandler implements ErrorHandler {
         } else {
             errorCount += 1;
             errorMessage(e);
-            if (errorCount > errorThreshold) {
-                exitAction();
-            }
+            if (errorCount > errorThreshold) { exitAction(); }
         }
     }
 
@@ -133,8 +127,6 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     public void modelUpdated(@SuppressWarnings("unused") EventObject event) {
-        if (errorCount > 0) {
-            exitAction();
-        }
+        if (errorCount > 0) { exitAction(); }
     }
 }

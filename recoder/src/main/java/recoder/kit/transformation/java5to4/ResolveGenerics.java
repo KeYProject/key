@@ -100,9 +100,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                                     }
                                     if (pr.getReferenceSuffix() instanceof MethodReference) {
                                         Type tmp = ci.getType(pr);
-                                        if (!(tmp instanceof ClassType)) {
-                                            break;
-                                        }
+                                        if (!(tmp instanceof ClassType)) { break; }
                                         tmpResolved = (ClassType) tmp;
                                         mr = pr;
                                         pr = (MethodReference) pr.getReferenceSuffix();
@@ -115,9 +113,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                                     || parent instanceof Return) {
                                 Type target;
                                 if (parent instanceof Return) {
-                                    while (!(parent instanceof MethodDeclaration)) {
-                                        parent = parent.getASTParent();
-                                    }
+                                    while (!(parent instanceof MethodDeclaration)) { parent = parent.getASTParent(); }
                                     target = ((MethodDeclaration) parent).getReturnType();
                                 } else {
                                     target = ci.getType(parent);
@@ -152,10 +148,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         repl = tpd.getBounds().get(0).deepClone();
         if (tpd.getBoundCount() > 1) {
             StringBuilder text = new StringBuilder("/*");
-            for (int x = 1; x < tpd.getBoundCount(); x++) {
-                text.append(" & ");
-                text.append(tpd.getBoundName(x));
-            }
+            for (int x = 1; x < tpd.getBoundCount(); x++) { text.append(" & "); text.append(tpd.getBoundName(x)); }
             text.append(" */");
             repl.setComments(new ASTArrayList<>(f.createComment(text.toString(), false)));
         }
@@ -175,15 +168,11 @@ public class ResolveGenerics extends TwoPassTransformation {
             if (pe instanceof TypeDeclaration && !(pe instanceof TypeParameterDeclaration)) {
                 ResolveSingleGenericType p =
                     new ResolveSingleGenericType(getServiceConfiguration(), (TypeDeclaration) pe);
-                if (p.analyze() != IDENTITY) {
-                    parts.add(p);
-                }
+                if (p.analyze() != IDENTITY) { parts.add(p); }
             } else if (pe instanceof MethodDeclaration) {
                 ResolveGenericMethod p =
                     new ResolveGenericMethod(getServiceConfiguration(), (MethodDeclaration) pe);
-                if (p.analyze() != IDENTITY) {
-                    parts.add(p);
-                }
+                if (p.analyze() != IDENTITY) { parts.add(p); }
             } else if (pe instanceof TypeReference tr) {
                 TwoPassTransformation p;
                 if (parent instanceof MethodDeclaration md) {
@@ -193,18 +182,14 @@ public class ResolveGenerics extends TwoPassTransformation {
                     Type t = getSourceInfo().getType(tr);
                     if (t instanceof TypeDeclaration && !(t instanceof TypeParameterDeclaration)) {
                         CompilationUnit tcu = UnitKit.getCompilationUnit((TypeDeclaration) t);
-                        if (tcu == cu) {
-                            continue;
-                        }
+                        if (tcu == cu) { continue; }
                     }
                     p = new ResolveMethodReturnType(getServiceConfiguration(), md);
                 } else if (parent instanceof VariableDeclaration vd) {
                     Type t = getSourceInfo().getType(tr);
                     if (t instanceof TypeDeclaration && !(t instanceof TypeParameterDeclaration)) {
                         CompilationUnit tcu = UnitKit.getCompilationUnit((TypeDeclaration) t);
-                        if (tcu == cu) {
-                            continue;
-                        }
+                        if (tcu == cu) { continue; }
                     }
                     p = new ResolveSingleVariableDeclaration(getServiceConfiguration(), vd);
                 } else if (parent instanceof InheritanceSpecification) {
@@ -213,9 +198,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                     if (t instanceof TypeParameterDeclaration) {
                         continue; // will be taken care of by ResolveSingleGenericType
                     }
-                    if (tr.getTypeArguments() == null) {
-                        continue;
-                    }
+                    if (tr.getTypeArguments() == null) { continue; }
                     // need to introduce type cast in every (inherited) method which
                     // is not defined incurrent CU and has generic return type
                     // TODO fields !!
@@ -225,9 +208,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                         if (m instanceof MethodInfo
                                 || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
                             p = new ResolveMethodReturnType(getServiceConfiguration(), m);
-                            if (p.analyze() != IDENTITY) {
-                                trParts.add(p);
-                            }
+                            if (p.analyze() != IDENTITY) { trParts.add(p); }
                         }
                     }
                     stuffToBeRemoved.addAll(tr.getTypeArguments());
@@ -245,35 +226,23 @@ public class ResolveGenerics extends TwoPassTransformation {
                 } else {
                     continue;
                 }
-                if (p.analyze() != IDENTITY) {
-                    trParts.add(p);
-                }
+                if (p.analyze() != IDENTITY) { trParts.add(p); }
             } else if (pe instanceof New n) {
                 if (n.getTypeReference().getTypeArguments() != null) {
                     stuffToBeRemoved.addAll(n.getTypeReference().getTypeArguments());
                 }
             }
         }
-        if (parts.size() == 0 && stuffToBeRemoved.size() == 0) {
-            return setProblemReport(IDENTITY);
-        }
+        if (parts.size() == 0 && stuffToBeRemoved.size() == 0) { return setProblemReport(IDENTITY); }
         return super.analyze();
     }
 
     @Override
     public void transform() {
         super.transform();
-        for (int i = parts.size() - 1; i >= 0; i--) {
-            parts.get(i).transform();
-        }
-        for (TwoPassTransformation tp : trParts) {
-            tp.transform();
-        }
-        for (ProgramElement pe : stuffToBeRemoved) {
-            if (pe.getASTParent().getIndexOfChild(pe) != -1) {
-                detach(pe);
-            }
-        }
+        for (int i = parts.size() - 1; i >= 0; i--) { parts.get(i).transform(); }
+        for (TwoPassTransformation tp : trParts) { tp.transform(); }
+        for (ProgramElement pe : stuffToBeRemoved) { if (pe.getASTParent().getIndexOfChild(pe) != -1) { detach(pe); } }
     }
 
     private static class IntroduceCast {
@@ -311,9 +280,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         @Override
         public ProblemReport analyze() {
             List<TypeParameterDeclaration> typeParams = td.getTypeParameters();
-            if (typeParams == null || typeParams.size() == 0) {
-                return setProblemReport(IDENTITY);
-            }
+            if (typeParams == null || typeParams.size() == 0) { return setProblemReport(IDENTITY); }
 
             stuffToBeRemoved = new ArrayList<>(100);
             casts = new ArrayList<>();
@@ -328,9 +295,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             List<TypeReference> trl = ci.getReferences(td);
             for (TypeReference tr : trl) {
                 List<TypeArgumentDeclaration> typeArgs = tr.getTypeArguments();
-                if (typeArgs == null || typeArgs.size() == 0) {
-                    continue;
-                }
+                if (typeArgs == null || typeArgs.size() == 0) { continue; }
                 stuffToBeRemoved.addAll(typeArgs);
             }
             // remove type parameters
@@ -342,9 +307,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         @Override
         public void transform() {
             super.transform();
-            if (getProblemReport() == IDENTITY) {
-                return;
-            }
+            if (getProblemReport() == IDENTITY) { return; }
             ProgramFactory f = getProgramFactory();
             for (IntroduceCast c : casts) {
                 MiscKit.unindent(c.toBeCasted);
@@ -381,9 +344,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         @Override
         public ProblemReport analyze() {
             List<TypeParameterDeclaration> typeParams = md.getTypeParameters();
-            if (typeParams == null || typeParams.size() == 0) {
-                return setProblemReport(IDENTITY);
-            }
+            if (typeParams == null || typeParams.size() == 0) { return setProblemReport(IDENTITY); }
 
             ProgramFactory f = getProgramFactory();
 
@@ -400,9 +361,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             for (MemberReference memberReference : mrl) {
                 MethodReference mr = (MethodReference) memberReference;
                 List<TypeArgumentDeclaration> typeArgs = mr.getTypeArguments();
-                if (typeArgs == null || typeArgs.size() == 0) {
-                    continue;
-                }
+                if (typeArgs == null || typeArgs.size() == 0) { continue; }
                 stuffToBeRemoved.addAll(typeArgs);
             }
             // remove type parameters
@@ -414,9 +373,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         @Override
         public void transform() {
             super.transform();
-            if (getProblemReport() == IDENTITY) {
-                return;
-            }
+            if (getProblemReport() == IDENTITY) { return; }
             ProgramFactory f = getProgramFactory();
             for (IntroduceCast c : casts) {
                 MiscKit.unindent(c.toBeCasted);
@@ -448,9 +405,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         public ResolveMethodReturnType(CrossReferenceServiceConfiguration sc, Method md) {
             super(sc);
             this.md = md;
-            if (md instanceof MethodDeclaration) {
-                this.tr = ((MethodDeclaration) md).getTypeReference();
-            }
+            if (md instanceof MethodDeclaration) { this.tr = ((MethodDeclaration) md).getTypeReference(); }
         }
 
         @Override
@@ -464,9 +419,7 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             stuffToBeRemoved = new ArrayList<>();
             if (md instanceof MethodDeclaration) {
-                if (tr.getTypeArguments() != null) {
-                    stuffToBeRemoved.addAll(tr.getTypeArguments());
-                }
+                if (tr.getTypeArguments() != null) { stuffToBeRemoved.addAll(tr.getTypeArguments()); }
             }
 
             casts = new ArrayList<>();
@@ -478,9 +431,7 @@ public class ResolveGenerics extends TwoPassTransformation {
 
                 while (parent instanceof MethodReference) {
                     Type ty = ci.getType((MethodReference) parent);
-                    if (!(ty instanceof ClassType)) {
-                        break;
-                    }
+                    if (!(ty instanceof ClassType)) { break; }
                     if (!(ty instanceof TypeParameter)) {
                         casts.add(new IntroduceCast(vr,
                             TypeKit.createTypeReference(ci, getSourceInfo().getType(vr), parent)));
@@ -504,9 +455,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             }
             if (md instanceof MethodDeclaration) {
                 for (ProgramElement pe : stuffToBeRemoved) {
-                    if (pe.getASTParent().getIndexOfChild(pe) != -1) {
-                        detach(pe);
-                    }
+                    if (pe.getASTParent().getIndexOfChild(pe) != -1) { detach(pe); }
                 }
             }
         }
@@ -527,9 +476,7 @@ public class ResolveGenerics extends TwoPassTransformation {
 
         @Override
         public ProblemReport analyze() {
-            if (tr.getTypeArguments() == null || tr.getTypeArguments().size() == 0) {
-                return IDENTITY;
-            }
+            if (tr.getTypeArguments() == null || tr.getTypeArguments().size() == 0) { return IDENTITY; }
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
@@ -546,9 +493,7 @@ public class ResolveGenerics extends TwoPassTransformation {
 
                     while (parent instanceof MethodReference) {
                         Type ty = ci.getType((MethodReference) parent);
-                        if (!(ty instanceof ClassType)) {
-                            break;
-                        }
+                        if (!(ty instanceof ClassType)) { break; }
                         if (!(ty instanceof TypeParameter)) {
                             casts.add(new IntroduceCast((MethodReference) parent,
                                 TypeKit.createTypeReference(ci, ty, parent)));
@@ -572,9 +517,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                 }
             }
             for (ProgramElement pe : stuffToBeRemoved) {
-                if (pe.getASTParent().getIndexOfChild(pe) != -1) {
-                    detach(pe);
-                }
+                if (pe.getASTParent().getIndexOfChild(pe) != -1) { detach(pe); }
             }
         }
     }

@@ -49,9 +49,12 @@ public class VariableKit {
      * creates a new variable name which does not exist within the given scope using the given
      * <tt>guess</tt> as a name base.
      *
-     * @param si the source information service to be used
-     * @param context the element that defines the scope
-     * @param guess the variable name to be used if possible. If a variable with that name already
+     * @param si
+     *        the source information service to be used
+     * @param context
+     *        the element that defines the scope
+     * @param guess
+     *        the variable name to be used if possible. If a variable with that name already
      *        exists, the method uses suffix numbers.
      * @return a valid variable name within the given scope.
      */
@@ -61,17 +64,17 @@ public class VariableKit {
         String result = guess;
         int i = 0;
         Set vars = collectInnerVariables(context);
-        while (si.getVariable(result, context) != null || vars.contains(result)) {
-            result = guess + (i++);
-        }
+        while (si.getVariable(result, context) != null || vars.contains(result)) { result = guess + (i++); }
         return result;
     }
 
     /**
      * creates a new variable name which does not exist within the given scope.
      *
-     * @param si the source information service to be used
-     * @param context the element that defines the scope
+     * @param si
+     *        the source information service to be used
+     * @param context
+     *        the element that defines the scope
      * @return a valid variable name within the given scope.
      */
     public static String createValidVariableName(SourceInfo si, ProgramElement context) {
@@ -82,11 +85,15 @@ public class VariableKit {
      * Creates a declaration for a new variable with the given type and a name similar to the given
      * guess.
      *
-     * @param sc the service configuration to be used
-     * @param context the element that defines the scope
-     * @param guess the variable name to be used if possible. If a variable with that name already
+     * @param sc
+     *        the service configuration to be used
+     * @param context
+     *        the element that defines the scope
+     * @param guess
+     *        the variable name to be used if possible. If a variable with that name already
      *        exists, the method uses suffix numbers.
-     * @param t the type of the variable to be declared.
+     * @param t
+     *        the type of the variable to be declared.
      * @return a valid variable name within the given scope.
      * @deprecated use createNewVariableName instead
      */
@@ -105,9 +112,12 @@ public class VariableKit {
     /**
      * Creates a new local variable declaration with the given type and a new artificial name.
      *
-     * @param sc the service configuration to be used.
-     * @param context the element that defines the scope.
-     * @param t the type of the variable to be declared.
+     * @param sc
+     *        the service configuration to be used.
+     * @param context
+     *        the element that defines the scope.
+     * @param t
+     *        the type of the variable to be declared.
      * @return a valid variable name within the given scope.
      */
     public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc,
@@ -125,7 +135,8 @@ public class VariableKit {
      * declarations (as in "int i = 0, j = 0;"), only the first one is used. This is no problem with
      * e.g. ParameterDeclarations.
      *
-     * @param decl the declaration to create a reference for.
+     * @param decl
+     *        the declaration to create a reference for.
      * @return a new variable reference to the first specification in the given declaration.
      */
     public static VariableReference createVariableReference(VariableDeclaration decl) {
@@ -139,9 +150,7 @@ public class VariableKit {
     // given context and of inner scopes.
     private static Set<String> collectInnerVariables(ProgramElement context) {
         Set<String> result = new HashSet<>();
-        while (context != null && !(context instanceof VariableScope)) {
-            context = context.getASTParent();
-        }
+        while (context != null && !(context instanceof VariableScope)) { context = context.getASTParent(); }
         if (context != null) {
             TreeWalker tw = new TreeWalker(context);
             while (tw.next()) {
@@ -156,9 +165,12 @@ public class VariableKit {
     /**
      * Query method that finds a name for a new variable with the given type.
      *
-     * @param si the source info service.
-     * @param type the type of the variable to be declared.
-     * @param context the future context of the variable (defines its scope).
+     * @param si
+     *        the source info service.
+     * @param type
+     *        the type of the variable to be declared.
+     * @param context
+     *        the future context of the variable (defines its scope).
      * @return a variable name that is valid in the given context.
      */
     public static String getNewVariableName(SourceInfo si, Type type, ProgramElement context) {
@@ -176,18 +188,19 @@ public class VariableKit {
     /**
      * Query method that finds names for new variables with the given types.
      *
-     * @param si the source info service.
-     * @param types the types of the variables to be declared.
-     * @param context the future context of the variables.
+     * @param si
+     *        the source info service.
+     * @param types
+     *        the types of the variables to be declared.
+     * @param context
+     *        the future context of the variables.
      * @return an array of disjoint variable names that are all valid in the given context.
      */
     public static String[] getNewVariableNames(SourceInfo si, Type[] types,
             ProgramElement context) {
         Debug.assertNonnull(si, types, context);
         // speed up things a little bit
-        while (!(context instanceof VariableScope)) {
-            context = context.getASTParent();
-        }
+        while (!(context instanceof VariableScope)) { context = context.getASTParent(); }
         Set<String> others = collectInnerVariables(context);
         String[] results = new String[types.length];
         for (int i = 0; i < results.length; i += 1) {
@@ -206,11 +219,15 @@ public class VariableKit {
      * Transformation that renames a variable and all known references to it. The new name should
      * not hide another variable.
      *
-     * @param ch the change history (may be <CODE>null</CODE>).
-     * @param xr the cross referencer service.
-     * @param var the variable specification to be renamed; may not be <CODE>
+     * @param ch
+     *        the change history (may be <CODE>null</CODE>).
+     * @param xr
+     *        the cross referencer service.
+     * @param var
+     *        the variable specification to be renamed; may not be <CODE>
      *                null</CODE>.
-     * @param newName the new name for the variable; may not be <CODE>null</CODE> and must denote a
+     * @param newName
+     *        the new name for the variable; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
@@ -224,9 +241,7 @@ public class VariableKit {
         if (!newName.equals(var.getName())) {
             List<? extends VariableReference> refs = xr.getReferences(var);
             MiscKit.rename(ch, var, newName);
-            for (int i = refs.size() - 1; i >= 0; i -= 1) {
-                MiscKit.rename(ch, refs.get(i), newName);
-            }
+            for (int i = refs.size() - 1; i >= 0; i -= 1) { MiscKit.rename(ch, refs.get(i), newName); }
             return true;
         }
         return false;
@@ -238,9 +253,12 @@ public class VariableKit {
      * given context, i.e. from a different type, or hidden by another local variable, or hidden by
      * another inherited field.
      *
-     * @param si the source info service to be used.
-     * @param v the variable to be referred to.
-     * @param context the context to insert the variable reference later on.
+     * @param si
+     *        the source info service to be used.
+     * @param v
+     *        the variable to be referred to.
+     * @param context
+     *        the context to insert the variable reference later on.
      */
     public static VariableReference createVariableReference(SourceInfo si, Variable v,
             ProgramElement context) {
@@ -248,18 +266,14 @@ public class VariableKit {
         String varname = v.getName();
         ProgramFactory f = context.getFactory();
         Variable lookup = si.getVariable(varname, context);
-        if (lookup == null) {
-            return null;
-        }
+        if (lookup == null) { return null; }
         if (lookup == v) {
             VariableReference res = f.createVariableReference(f.createIdentifier(varname));
             res.makeAllParentRolesValid();
             return res;
         }
         // hiding local variables with local variables is forbidden
-        if (!(v instanceof Field)) {
-            return null;
-        }
+        if (!(v instanceof Field)) { return null; }
         ClassType varClass = ((Field) v).getContainingClassType();
         TypeDeclaration ctxClass = MiscKit.getParentTypeDeclaration(context);
         TypeReference prefix = null;
@@ -313,10 +327,14 @@ public class VariableKit {
      * mode is faster if the tree contains more nodes than there are global references to the given
      * variable.
      *
-     * @param xr the cross referencer to use.
-     * @param v a variable.
-     * @param root the root of an arbitrary syntax tree.
-     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>, local cross
+     * @param xr
+     *        the cross referencer to use.
+     * @param v
+     *        a variable.
+     * @param root
+     *        the root of an arbitrary syntax tree.
+     * @param scanTree
+     *        flag indicating the search strategy; if <CODE>true</CODE>, local cross
      *        reference information is build, otherwise the global cross reference information is
      *        filtered.
      * @return the list of references to the given variable in the given tree, can be empty but not
@@ -331,17 +349,11 @@ public class VariableKit {
             TreeWalker tw = new TreeWalker(root);
             while (tw.next(VariableReference.class)) {
                 VariableReference vr = (VariableReference) tw.getProgramElement();
-                if (xr.getVariable(vr) == v) {
-                    result.add(vr);
-                }
+                if (xr.getVariable(vr) == v) { result.add(vr); }
             }
         } else {
             List<? extends VariableReference> refs = xr.getReferences(v);
-            for (VariableReference vr : refs) {
-                if (MiscKit.contains(root, vr)) {
-                    result.add(vr);
-                }
-            }
+            for (VariableReference vr : refs) { if (MiscKit.contains(root, vr)) { result.add(vr); } }
         }
         return result;
     }
@@ -350,8 +362,10 @@ public class VariableKit {
      * Updating query that checks if the given field is a <CODE>
      * serialVersionUID</CODE> constant.
      *
-     * @param ni the NameInfo service to use.
-     * @param f the field to check.
+     * @param ni
+     *        the NameInfo service to use.
+     * @param f
+     *        the field to check.
      * @return <CODE>true</CODE> if the given field is a serial version UID of a type,
      *         <CODE>false</CODE> otherwise.
      */

@@ -56,7 +56,8 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Exec.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public Exec(StatementBlock body) {
@@ -67,8 +68,10 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Exec.
      *
-     * @param body a statement block.
-     * @param branches a branch mutable list.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch mutable list.
      */
     public Exec(StatementBlock body, ASTList<Branch> branches) {
         setBranchList(branches);
@@ -79,19 +82,14 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Exec.
      *
-     * @param proto a Exec.
+     * @param proto
+     *        a Exec.
      */
     protected Exec(Exec proto) {
         super(proto);
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
-        if (proto.branches != null) {
-            branches = proto.branches.deepClone();
-        }
-        if (proto.variableDeclarations != null) {
-            variableDeclarations = proto.variableDeclarations.deepClone();
-        }
+        if (proto.body != null) { body = proto.body.deepClone(); }
+        if (proto.branches != null) { branches = proto.branches.deepClone(); }
+        if (proto.variableDeclarations != null) { variableDeclarations = proto.variableDeclarations.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -111,13 +109,9 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public void makeParentRoleValid() {
         if (variableDeclarations != null) {
-            for (LocalVariableDeclaration vd : variableDeclarations) {
-                vd.setStatementContainer(this);
-            }
+            for (LocalVariableDeclaration vd : variableDeclarations) { vd.setStatementContainer(this); }
         }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
         if (branches != null) {
             for (int i = branches.size() - 1; i >= 0; i -= 1) {
                 Branch b = branches.get(i);
@@ -140,12 +134,8 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (body != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         result += variableDeclarations == null ? 0 : variableDeclarations.size();
         return result;
     }
@@ -153,27 +143,23 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (variableDeclarations != null) {
-            if (index < variableDeclarations.size()) {
-                return variableDeclarations.get(index);
-            }
+            if (index < variableDeclarations.size()) { return variableDeclarations.get(index); }
             index -= variableDeclarations.size();
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -184,18 +170,12 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
         // role 2 (IDX): branch
         if (variableDeclarations != null) {
             int idx = variableDeclarations.indexOf(child);
-            if (idx >= 0) {
-                return (idx << 4);
-            }
+            if (idx >= 0) { return (idx << 4); }
         }
-        if (body == child) {
-            return 1;
-        }
+        if (body == child) { return 1; }
         if (branches != null) {
             int index = branches.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+            if (index >= 0) { return (index << 4) | 2; }
         }
         return -1;
     }
@@ -206,17 +186,18 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         int count;
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         count = (variableDeclarations == null) ? 0 : variableDeclarations.size();
         for (int i = 0; i < count; i++) {
             if (variableDeclarations.get(i) == p) {
@@ -232,9 +213,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         count = (branches == null) ? 0 : branches.size();
@@ -264,7 +243,8 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Set body.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -289,9 +269,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
 
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -308,7 +286,8 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     /**
      * Set branch list.
      *
-     * @param branches a branch mutable list.
+     * @param branches
+     *        a branch mutable list.
      */
     public void setBranchList(ASTList<Branch> branches) {
         this.branches = branches;
@@ -332,9 +311,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
      */
     @Override
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -370,9 +347,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     public List<VariableSpecification> getVariablesInScope() {
         if (variableDeclarations != null) {
             List<VariableSpecification> res = new ArrayList<>();
-            for (LocalVariableDeclaration vd : variableDeclarations) {
-                res.addAll(vd.getVariables());
-            }
+            for (LocalVariableDeclaration vd : variableDeclarations) { res.addAll(vd.getVariables()); }
             return res;
         }
         return Collections.emptyList();
@@ -381,11 +356,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
-        for (VariableSpecification vs : getVariablesInScope()) {
-            if (vs.getName().equals(name)) {
-                return vs;
-            }
-        }
+        for (VariableSpecification vs : getVariablesInScope()) { if (vs.getName().equals(name)) { return vs; } }
         return null;
     }
 

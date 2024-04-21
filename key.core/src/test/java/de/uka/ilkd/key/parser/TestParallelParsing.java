@@ -26,7 +26,8 @@ public class TestParallelParsing {
      * Loads both proof files contained in {@code "examples/_testcase/parser/MultipleRecursion"} in
      * parallel using {@code 4} {@link Thread}s in total.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testLoadingOfTwoDifferentProofFiles() throws Exception {
@@ -38,10 +39,14 @@ public class TestParallelParsing {
     /**
      * Executes the test steps.
      *
-     * @param baseDir The base directory.
-     * @param numOfThreadsPerLocation The number of {@link Thread}s per location.
-     * @param locations The locations to load.
-     * @throws Exception Occurred Exception.
+     * @param baseDir
+     *        The base directory.
+     * @param numOfThreadsPerLocation
+     *        The number of {@link Thread}s per location.
+     * @param locations
+     *        The locations to load.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doParallelTest(File baseDir, int numOfThreadsPerLocation, String... locations)
             throws Exception {
@@ -58,9 +63,7 @@ public class TestParallelParsing {
                 }
             }
             // Start threads
-            for (LoadThread thread : threads) {
-                thread.start();
-            }
+            for (LoadThread thread : threads) { thread.start(); }
             // Wait for threads
             for (LoadThread thread : threads) {
                 try {
@@ -69,11 +72,7 @@ public class TestParallelParsing {
                 }
             }
             // Test results
-            for (LoadThread thread : threads) {
-                if (thread.getException() != null) {
-                    throw thread.getException();
-                }
-            }
+            for (LoadThread thread : threads) { if (thread.getException() != null) { throw thread.getException(); } }
         } finally {
             // Restore original options
             HelperClassForTests.setOneStepSimplificationEnabled(null,
@@ -101,7 +100,8 @@ public class TestParallelParsing {
         /**
          * Constructor.
          *
-         * @param location The location to load.
+         * @param location
+         *        The location to load.
          */
         public LoadThread(File location) {
             this.location = location;

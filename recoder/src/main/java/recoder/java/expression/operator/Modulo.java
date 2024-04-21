@@ -32,8 +32,10 @@ public class Modulo extends Operator {
     /**
      * Modulo.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Modulo(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class Modulo extends Operator {
     /**
      * Modulo.
      *
-     * @param proto a modulo.
+     * @param proto
+     *        a modulo.
      */
 
     protected Modulo(Modulo proto) {

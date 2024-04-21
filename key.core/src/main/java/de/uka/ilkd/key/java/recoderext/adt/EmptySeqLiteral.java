@@ -22,8 +22,7 @@ public final class EmptySeqLiteral extends Literal {
     }
 
     @Override
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
 
     @Override

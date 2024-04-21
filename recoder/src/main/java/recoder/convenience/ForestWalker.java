@@ -25,17 +25,13 @@ public class ForestWalker extends AbstractTreeWalker {
         super(units.size() * 8);
         this.unitList = units;
         unitIndex = 0;
-        if (unitList.size() > 0) {
-            reset(unitList.get(unitIndex));
-        }
+        if (unitList.size() > 0) { reset(unitList.get(unitIndex)); }
     }
 
     public boolean next() {
         if (count == 0) {
             current = null;
-            if (unitIndex >= unitList.size() - 1) {
-                return false;
-            }
+            if (unitIndex >= unitList.size() - 1) { return false; }
             unitIndex += 1;
             reset(unitList.get(unitIndex));
             return next();
@@ -57,12 +53,8 @@ public class ForestWalker extends AbstractTreeWalker {
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof ForestWalker fw)) {
-            return false;
-        }
-        if (!super.equals(x)) {
-            return false;
-        }
+        if (!(x instanceof ForestWalker fw)) { return false; }
+        if (!super.equals(x)) { return false; }
         return (fw.unitIndex == unitIndex && fw.unitList.equals(unitList));
     }
 

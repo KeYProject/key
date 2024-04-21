@@ -13,12 +13,8 @@ public class TypeNameTranslator {
      * "int".
      */
     public static String getBaseType(String t) {
-        if (t == null || !t.startsWith("[")) {
-            return t;
-        }
-        while (t.startsWith("[")) {
-            t = t.substring(1);
-        }
+        if (t == null || !t.startsWith("[")) { return t; }
+        while (t.startsWith("[")) { t = t.substring(1); }
         if (t.startsWith("L")) {
             return t.substring(1);
         } else if (t.startsWith("B")) {
@@ -48,14 +44,9 @@ public class TypeNameTranslator {
      * ArrayType.
      */
     public static int getDimensions(String t) {
-        if (t == null || !t.startsWith("[")) {
-            return 0;
-        }
+        if (t == null || !t.startsWith("[")) { return 0; }
         int i = 0;
-        while (t.startsWith("[")) {
-            t = t.substring(1);
-            i++;
-        }
+        while (t.startsWith("[")) { t = t.substring(1); i++; }
         return i;
     }
 

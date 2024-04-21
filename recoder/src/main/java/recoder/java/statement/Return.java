@@ -31,7 +31,8 @@ public class Return extends ExpressionJumpStatement {
     /**
      * Return.
      *
-     * @param expr an expression.
+     * @param expr
+     *        an expression.
      */
 
     public Return(Expression expr) {
@@ -42,7 +43,8 @@ public class Return extends ExpressionJumpStatement {
     /**
      * Return.
      *
-     * @param proto a return.
+     * @param proto
+     *        a return.
      */
 
     protected Return(Return proto) {

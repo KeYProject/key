@@ -59,9 +59,7 @@ public class Relations {
         }
 
         public boolean equals(Object x, Object y) {
-            if (x == null || y == null) {
-                return false;
-            }
+            if (x == null || y == null) { return false; }
             if (x instanceof NonTerminalProgramElement a) {
                 if (x.getClass() != y.getClass()) {
                     if (x instanceof UncollatedReferenceQualifier) {
@@ -84,29 +82,15 @@ public class Relations {
                 int n = a.getChildCount();
                 int m = b.getChildCount();
                 if ((a instanceof ArrayLengthReference)
-                        && (b instanceof UncollatedReferenceQualifier)) {
-                    m -= 1;
-                }
+                        && (b instanceof UncollatedReferenceQualifier)) { m -= 1; }
                 if ((b instanceof ArrayLengthReference)
-                        && (a instanceof UncollatedReferenceQualifier)) {
-                    n -= 1;
-                }
-                if (n != m) {
-                    return false;
-                }
-                for (int i = 0; i < n; i += 1) {
-                    if (!equals(a.getChildAt(i), b.getChildAt(i))) {
-                        return false;
-                    }
-                }
+                        && (a instanceof UncollatedReferenceQualifier)) { n -= 1; }
+                if (n != m) { return false; }
+                for (int i = 0; i < n; i += 1) { if (!equals(a.getChildAt(i), b.getChildAt(i))) { return false; } }
                 return true;
             } else if (x instanceof TerminalProgramElement) {
-                if (x.getClass() != y.getClass()) {
-                    return false;
-                }
-                if (x instanceof Identifier) {
-                    return ((Identifier) x).getText().equals(((Identifier) y).getText());
-                }
+                if (x.getClass() != y.getClass()) { return false; }
+                if (x instanceof Identifier) { return ((Identifier) x).getText().equals(((Identifier) y).getText()); }
                 if (x instanceof Literal) {
                     if (x instanceof IntLiteral) {
                         return ((IntLiteral) x).getValue().equals(((IntLiteral) y).getValue());
@@ -118,9 +102,7 @@ public class Relations {
                         return ((StringLiteral) x).getValue()
                                 .equals(((StringLiteral) y).getValue());
                     }
-                    if (x instanceof NullLiteral) {
-                        return true;
-                    }
+                    if (x instanceof NullLiteral) { return true; }
                     if (x instanceof CharLiteral) {
                         return ((CharLiteral) x).getValue().equals(((CharLiteral) y).getValue());
                     }
@@ -162,9 +144,7 @@ public class Relations {
         private final String format;
 
         public ModelElementLexicalOrder(String format) {
-            if (format == null) {
-                throw new IllegalArgumentException("Format must not be nulL");
-            }
+            if (format == null) { throw new IllegalArgumentException("Format must not be nulL"); }
             this.format = format;
         }
 

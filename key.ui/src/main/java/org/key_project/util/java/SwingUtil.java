@@ -31,13 +31,13 @@ public final class SwingUtil {
     private static final String NOTIFICATION_ERROR = "failed to show notification ";
 
 
-    private SwingUtil() {
-    }
+    private SwingUtil() {}
 
     /**
      * Wrapper for {@link java.awt.Desktop#browse(URI)} that also works on Linux.
      *
-     * @param uri the URI to be displayed in the user's default browser
+     * @param uri
+     *        the URI to be displayed in the user's default browser
      */
     public static void browse(URI uri) throws IOException {
         try {
@@ -68,10 +68,13 @@ public final class SwingUtil {
      * Find a component of the specified class in the container.
      * This will search the view hierarchy recursively.
      *
-     * @param container container to search in
-     * @param classToFind class to look for
+     * @param container
+     *        container to search in
+     * @param classToFind
+     *        class to look for
      * @return the object if found, otherwise null
-     * @param <T> class of the component
+     * @param <T>
+     *        class of the component
      */
     public static <T> T findComponent(Container container, Class<T> classToFind) {
         for (int i = 0; i < container.getComponentCount(); i++) {
@@ -80,9 +83,7 @@ public final class SwingUtil {
                 return (T) c;
             } else if (c instanceof Container) {
                 var f = findComponent((Container) c, classToFind);
-                if (f != null) {
-                    return f;
-                }
+                if (f != null) { return f; }
             }
         }
         return null;
@@ -93,19 +94,20 @@ public final class SwingUtil {
      * This will search the view hierarchy recursively and is limited
      * to "visible" elements (on screen or on visible tab).
      *
-     * @param container container to search in
-     * @param classToFind class to look for
+     * @param container
+     *        container to search in
+     * @param classToFind
+     *        class to look for
      * @return the object(s) if found (may be empty)
-     * @param <T> class of the component
+     * @param <T>
+     *        class of the component
      */
     public static <T> List<T> findAllComponents(Container container, Class<T> classToFind) {
         List<T> l = new ArrayList<>();
         for (int i = 0; i < container.getComponentCount(); i++) {
             var c = container.getComponent(i);
             // if the docking container is visible, we consider all tabs in the search
-            if (!c.isVisible() && !(c instanceof BasicDockableDisplayer)) {
-                continue;
-            }
+            if (!c.isVisible() && !(c instanceof BasicDockableDisplayer)) { continue; }
 
             if (classToFind.isAssignableFrom(c.getClass())) {
                 l.add((T) c);
@@ -121,15 +123,9 @@ public final class SwingUtil {
                     for (var menu : queue) {
                         for (int j = 0; j < menu.getItemCount(); j++) {
                             var item = menu.getItem(j);
-                            if (item == null) {
-                                continue;
-                            }
-                            if (item instanceof JMenu) {
-                                newQ.add((JMenu) item);
-                            }
-                            if (classToFind.isAssignableFrom(item.getClass())) {
-                                l.add((T) item);
-                            }
+                            if (item == null) { continue; }
+                            if (item instanceof JMenu) { newQ.add((JMenu) item); }
+                            if (classToFind.isAssignableFrom(item.getClass())) { l.add((T) item); }
                         }
                     }
                     queue = newQ;
@@ -149,9 +145,7 @@ public final class SwingUtil {
             var newQ = new HashSet<Window>();
 
             for (var window : q) {
-                if (l.contains(window)) {
-                    continue;
-                }
+                if (l.contains(window)) { continue; }
                 l.add(window);
                 newQ.addAll(Arrays.asList(window.getOwnedWindows()));
             }
@@ -166,11 +160,7 @@ public final class SwingUtil {
         MenuElement[] p = msm.getSelectedPath();
 
         List<JPopupMenu> list = new ArrayList<>();
-        for (MenuElement element : p) {
-            if (element instanceof JPopupMenu) {
-                list.add((JPopupMenu) element);
-            }
-        }
+        for (MenuElement element : p) { if (element instanceof JPopupMenu) { list.add((JPopupMenu) element); } }
         return list;
     }
 
@@ -178,7 +168,8 @@ public final class SwingUtil {
      * Create a scroll pane around the given table.
      * It will always have vertical and horizontal scroll bars.
      *
-     * @param table the table
+     * @param table
+     *        the table
      * @return the scroll pane
      */
     public static JScrollPane createScrollPane(JTable table) {
@@ -196,23 +187,19 @@ public final class SwingUtil {
     /**
      * Set the provided font on the component and recursively on all children components.
      *
-     * @param component the component
-     * @param font the font
+     * @param component
+     *        the component
+     * @param font
+     *        the font
      */
     public static void setFont(JComponent component, Font font) {
-        if (component == null) {
-            return;
-        }
+        if (component == null) { return; }
         component.setFont(font);
         for (int i = 0; i < component.getComponentCount(); i++) {
             Component c = component.getComponent(i);
-            if (c == null) {
-                continue;
-            }
+            if (c == null) { continue; }
             c.setFont(font);
-            if (c instanceof JComponent) {
-                setFont((JComponent) c, font);
-            }
+            if (c instanceof JComponent) { setFont((JComponent) c, font); }
         }
         // JMenu hides its entries in the popup menu
         if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
@@ -223,8 +210,10 @@ public final class SwingUtil {
     /**
      * Show a desktop notification to the user.
      *
-     * @param title title of the notification
-     * @param text text of the notification
+     * @param title
+     *        title of the notification
+     * @param text
+     *        text of the notification
      */
     public static void showNotification(String title, String text) {
         if (System.getProperty("os.name").startsWith("Linux")) {
@@ -266,9 +255,7 @@ public final class SwingUtil {
             } catch (AWTException e) {
                 LOGGER.warn(NOTIFICATION_ERROR, e);
             } finally {
-                if (tray != null && trayIcon != null) {
-                    tray.remove(trayIcon);
-                }
+                if (tray != null && trayIcon != null) { tray.remove(trayIcon); }
             }
         }
     }

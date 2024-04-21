@@ -52,9 +52,7 @@ public class QuantifierHandler implements SMTHandler {
         collectTriggers(term, triggerTerms);
 
         Set<SExpr> triggers = new HashSet<>();
-        for (Term triggerTerm : triggerTerms) {
-            triggers.add(trans.translate(triggerTerm));
-        }
+        for (Term triggerTerm : triggerTerms) { triggers.add(trans.translate(triggerTerm)); }
 
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
@@ -91,9 +89,7 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     private void collectTriggers(Term term, Set<Term> triggers) {
-        if (term.containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) {
-            triggers.add(term);
-        }
+        if (term.containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) { triggers.add(term); }
         term.subs().forEach(x -> collectTriggers(x, triggers));
     }
 
@@ -101,15 +97,10 @@ public class QuantifierHandler implements SMTHandler {
         Operator type = term.op();
         assert type == Quantifier.ALL || type == Quantifier.EX;
         Term current = term.sub(0);
-        if (current.op() != type) {
-            return term;
-        }
+        if (current.op() != type) { return term; }
 
         List<QuantifiableVariable> boundVars = term.boundVars().toList();
-        while (current.op() == type) {
-            boundVars.addAll(current.boundVars().toList());
-            current = current.sub(0);
-        }
+        while (current.op() == type) { boundVars.addAll(current.boundVars().toList()); current = current.sub(0); }
 
         ImmutableArray<Term> subs = new ImmutableArray<>(current);
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);

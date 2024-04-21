@@ -80,9 +80,7 @@ public class EnumDeclaration extends TypeDeclaration {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (implementing != null) {
-            implementing.setParent(this);
-        }
+        if (implementing != null) { implementing.setParent(this); }
     }
 
     public int getChildPositionCode(ProgramElement child) {
@@ -91,77 +89,49 @@ public class EnumDeclaration extends TypeDeclaration {
         // role 2: implements
         // role 3 (IDX): members
         int idx = declarationSpecifiers.indexOf(child);
-        if (idx != -1) {
-            return (idx << 4) | 0;
-        }
-        if (child == name) {
-            return 1;
-        }
-        if (child == implementing) {
-            return 2;
-        }
+        if (idx != -1) { return (idx << 4) | 0; }
+        if (child == name) { return 1; }
+        if (child == implementing) { return 2; }
         idx = members.indexOf(child);
-        if (idx != -1) {
-            return (idx << 4) | 3;
-        }
+        if (idx != -1) { return (idx << 4) | 3; }
         return -1;
     }
 
     public int getChildCount() {
         int res = 0;
-        if (declarationSpecifiers != null) {
-            res += declarationSpecifiers.size();
-        }
-        if (name != null) {
-            res++;
-        }
-        if (implementing != null) {
-            res++;
-        }
-        if (members != null) {
-            res += members.size();
-        }
+        if (declarationSpecifiers != null) { res += declarationSpecifiers.size(); }
+        if (name != null) { res++; }
+        if (implementing != null) { res++; }
+        if (members != null) { res += members.size(); }
         return res;
     }
 
     public ProgramElement getChildAt(int index) {
         if (declarationSpecifiers != null) {
-            if (index < declarationSpecifiers.size()) {
-                return declarationSpecifiers.get(index);
-            }
+            if (index < declarationSpecifiers.size()) { return declarationSpecifiers.get(index); }
             index -= declarationSpecifiers.size();
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (implementing != null) {
-            if (index == 0) {
-                return implementing;
-            }
+            if (index == 0) { return implementing; }
             index--;
         }
         return members.get(index);
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (name == p) {
             name = (Identifier) q;
-            if (name != null) {
-                name.setParent(this);
-            }
+            if (name != null) { name.setParent(this); }
             return true;
         }
         if (implementing == p) {
             implementing = (Implements) q;
-            if (implementing != null) {
-                implementing.setParent(this);
-            }
+            if (implementing != null) { implementing.setParent(this); }
             return true;
         }
         if (declarationSpecifiers != null) {
@@ -266,14 +236,10 @@ public class EnumDeclaration extends TypeDeclaration {
      * @return the enum constants
      */
     public List<EnumConstantDeclaration> getConstants() {
-        if (members == null) {
-            return new ArrayList<>(0);
-        }
+        if (members == null) { return new ArrayList<>(0); }
         List<EnumConstantDeclaration> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
-            if (m instanceof EnumConstantDeclaration) {
-                result.add((EnumConstantDeclaration) m);
-            }
+            if (m instanceof EnumConstantDeclaration) { result.add((EnumConstantDeclaration) m); }
         }
         return result;
     }
@@ -285,15 +251,9 @@ public class EnumDeclaration extends TypeDeclaration {
      * @return a list of the members excluding constants
      */
     public List<MemberDeclaration> getNonConstantMembers() {
-        if (members == null) {
-            return new ArrayList<>(0);
-        }
+        if (members == null) { return new ArrayList<>(0); }
         List<MemberDeclaration> result = new ArrayList<>();
-        for (MemberDeclaration m : members) {
-            if (!(m instanceof EnumConstantDeclaration)) {
-                result.add(m);
-            }
-        }
+        for (MemberDeclaration m : members) { if (!(m instanceof EnumConstantDeclaration)) { result.add(m); } }
         return result;
     }
 }

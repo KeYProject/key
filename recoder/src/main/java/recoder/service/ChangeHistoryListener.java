@@ -15,7 +15,8 @@ public interface ChangeHistoryListener {
     /**
      * Informs the listener that the syntactical model has changed.
      *
-     * @param changes an event containing the changes.
+     * @param changes
+     *        an event containing the changes.
      */
     void modelChanged(ChangeHistoryEvent changes);
 }

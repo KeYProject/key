@@ -36,7 +36,8 @@ public class RemoveUnusedImports extends TwoPassTransformation {
      * Creates a new transformation object that removes unused import statements from all
      * compilation units in the source file repository.
      *
-     * @param sc the service configuration to use.
+     * @param sc
+     *        the service configuration to use.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc) {
         this(sc, sc.getSourceFileRepository().getCompilationUnits());
@@ -45,8 +46,10 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     /**
      * Creates a new transformation object that removes unused import statements.
      *
-     * @param sc the service configuration to use.
-     * @param cu a compilation unit that shall be stripped of imports.
+     * @param sc
+     *        the service configuration to use.
+     * @param cu
+     *        a compilation unit that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
         super(sc);
@@ -59,14 +62,14 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     /**
      * Creates a new transformation object that removes unused import statements.
      *
-     * @param sc the service configuration to use.
-     * @param list the compilation units that shall be stripped of imports.
+     * @param sc
+     *        the service configuration to use.
+     * @param list
+     *        the compilation units that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list) {
         super(sc);
-        if (list == null) {
-            throw new IllegalArgumentException("Missing units");
-        }
+        if (list == null) { throw new IllegalArgumentException("Missing units"); }
         this.units = list;
         imports = new ArrayList<>();
     }
@@ -103,9 +106,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
      */
     public void transform() {
         super.transform();
-        for (int i = imports.size() - 1; i >= 0; i -= 1) {
-            detach(imports.get(i));
-        }
+        for (int i = imports.size() - 1; i >= 0; i -= 1) { detach(imports.get(i)); }
     }
 
     /**

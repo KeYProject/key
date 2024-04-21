@@ -32,9 +32,7 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     protected ElementValueArrayInitializer(ElementValueArrayInitializer proto) {
         super(proto);
-        if (proto.elementValues != null) {
-            this.elementValues = proto.elementValues.deepClone();
-        }
+        if (proto.elementValues != null) { this.elementValues = proto.elementValues.deepClone(); }
     }
 
     /*
@@ -97,9 +95,7 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (elementValues != null) {
-            return elementValues.get(index);
-        }
+        if (elementValues != null) { return elementValues.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -128,13 +124,9 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     public int getChildPositionCode(ProgramElement child) {
         // 0(IDX): elementValues
-        if (elementValues == null) {
-            return -1;
-        }
+        if (elementValues == null) { return -1; }
         int idx = elementValues.indexOf(child);
-        if (idx != -1) {
-            return idx << 4;
-        }
+        if (idx != -1) { return idx << 4; }
         return -1;
     }
 
@@ -145,9 +137,7 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (elementValues == null) ? 0 : elementValues.size();
         for (int i = 0; i < count; i++) {
@@ -167,11 +157,7 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (elementValues != null) {
-            for (Expression e : elementValues) {
-                e.setExpressionContainer(this);
-            }
-        }
+        if (elementValues != null) { for (Expression e : elementValues) { e.setExpressionContainer(this); } }
     }
 
     public ASTList<Expression> getElementValues() {

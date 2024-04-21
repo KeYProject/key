@@ -24,7 +24,8 @@ public abstract class BranchStatement extends JavaStatement implements NonTermin
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
     public BranchStatement(ExtList children) {
         super(children);

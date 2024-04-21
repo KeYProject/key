@@ -59,9 +59,7 @@ public class ReplaceEnums extends TwoPassTransformation {
     @Override
     public void transform() {
         super.transform();
-        for (int i = parts.size() - 1; i >= 0; i--) {
-            parts.get(i).transform();
-        }
+        for (int i = parts.size() - 1; i >= 0; i--) { parts.get(i).transform(); }
     }
 
     public static class ReplaceSingleEnum extends TwoPassTransformation {
@@ -86,12 +84,8 @@ public class ReplaceEnums extends TwoPassTransformation {
             } else {
                 repl.setDeclarationSpecifiers(new ASTArrayList<>(1));
             }
-            if (ed.isFinal()) {
-                repl.getDeclarationSpecifiers().add(f.createFinal());
-            }
-            if (ed.getComments() != null) {
-                repl.setComments(ed.getComments().deepClone());
-            }
+            if (ed.isFinal()) { repl.getDeclarationSpecifiers().add(f.createFinal()); }
+            if (ed.getComments() != null) { repl.setComments(ed.getComments().deepClone()); }
             ASTArrayList<MemberDeclaration> mlist =
                 new ASTArrayList<>(ed.getMembers().size());
             repl.setMembers(mlist);
@@ -107,9 +101,7 @@ public class ReplaceEnums extends TwoPassTransformation {
                     ASTArrayList<DeclarationSpecifier> dsml =
                         new ASTArrayList<>();
                     if (ec.getAnnotations() == null) {
-                        for (AnnotationUseSpecification a : ec.getAnnotations()) {
-                            dsml.add(a.deepClone());
-                        }
+                        for (AnnotationUseSpecification a : ec.getAnnotations()) { dsml.add(a.deepClone()); }
                     }
                     dsml.add(f.createFinal());
                     dsml.add(f.createPublic());
@@ -141,9 +133,7 @@ public class ReplaceEnums extends TwoPassTransformation {
                         int s = ecsargs == null ? 0 : ecsargs.size();
                         ASTArrayList<Expression> args = new ASTArrayList<>(s);
                         e.setArguments(args);
-                        for (int j = 0; j < s; j++) {
-                            args.add(ecsargs.get(j).deepClone());
-                        }
+                        for (int j = 0; j < s; j++) { args.add(ecsargs.get(j).deepClone()); }
                         if (ecs.getConstructorReference().getClassDeclaration() != null) {
                             e.setClassDeclaration(
                                 ecs.getConstructorReference().getClassDeclaration().deepClone());
@@ -282,9 +272,7 @@ public class ReplaceEnums extends TwoPassTransformation {
                 for (int i = 0; i < sw.getBranchCount(); i++) {
                     Branch b = sw.getBranchAt(i);
                     if (b instanceof Default d) {
-                        if (i != sw.getBranchCount() - 1) {
-                            throw new ModelException("case after default is illegal");
-                        }
+                        if (i != sw.getBranchCount() - 1) { throw new ModelException("case after default is illegal"); }
                         ASTArrayList<Statement> defaultStmnt = new ASTArrayList<>();
                         StatementBlock sb2 = f.createStatementBlock(defaultStmnt);
                         LogicalOr cond = f.createLogicalOr(

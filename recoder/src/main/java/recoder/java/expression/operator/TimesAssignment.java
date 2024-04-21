@@ -32,8 +32,10 @@ public class TimesAssignment extends Assignment {
     /**
      * Times assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public TimesAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class TimesAssignment extends Assignment {
     /**
      * Times assignment.
      *
-     * @param proto a times assignment.
+     * @param proto
+     *        a times assignment.
      */
 
     protected TimesAssignment(TimesAssignment proto) {

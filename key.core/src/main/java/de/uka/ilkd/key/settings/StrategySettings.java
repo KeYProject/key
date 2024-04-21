@@ -70,7 +70,8 @@ public class StrategySettings extends AbstractSettings {
     /**
      * sets the maximal amount of heuristic steps before a user interaction is required
      *
-     * @param mSteps maximal amount of heuristic steps
+     * @param mSteps
+     *        maximal amount of heuristic steps
      */
     public void setMaxSteps(int mSteps) {
         var old = maxSteps;
@@ -116,9 +117,10 @@ public class StrategySettings extends AbstractSettings {
                 numSteps = Integer.parseInt(numString);
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
-                    + "with the allowed steps of heuristics applications to int."
-                    + "Use default value 1000 instead."
-                    + "\nThe String that has been tried to convert was {}", numString);
+                        + "with the allowed steps of heuristics applications to int."
+                        + "Use default value 1000 instead."
+                        + "\nThe String that has been tried to convert was {}",
+                    numString);
             }
         }
 
@@ -127,15 +129,14 @@ public class StrategySettings extends AbstractSettings {
                 localTimeout = Long.parseLong(timeoutString);
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
-                    + "with rule application timeout. "
-                    + "\nThe String that has been tried to convert was {}", timeoutString);
+                        + "with rule application timeout. "
+                        + "\nThe String that has been tried to convert was {}",
+                    timeoutString);
             }
         }
 
         // set active strategy
-        if (strategyString != null) {
-            activeStrategy = new Name(strategyString);
-        }
+        if (strategyString != null) { activeStrategy = new Name(strategyString); }
 
         // set strategy options
         setStrategyProperties(StrategyProperties.read(props));
@@ -167,9 +168,7 @@ public class StrategySettings extends AbstractSettings {
             // not defined.
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }
-        if (maxSteps < 0) {
-            setMaxSteps(10000);
-        }
+        if (maxSteps < 0) { setMaxSteps(10000); }
         props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
         props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
         props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
@@ -179,32 +178,30 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         props = props.getSection(CATEGORY);
-        if (props == null) {
-            return;
-        }
+        if (props == null) { return; }
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
-                + "with the allowed steps of heuristics applications to int."
-                + "Use default value 1000 instead."
-                + "\nThe String that has been tried to convert was {}", props.get(STEPS_KEY));
+                    + "with the allowed steps of heuristics applications to int."
+                    + "Use default value 1000 instead."
+                    + "\nThe String that has been tried to convert was {}",
+                props.get(STEPS_KEY));
         }
 
         try {
             setTimeout(props.getInt(TIMEOUT_KEY));
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
-                + "with rule application timeout. "
-                + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
+                    + "with rule application timeout. "
+                    + "\nThe String that has been tried to convert was {}",
+                props.get(TIMEOUT_KEY));
         }
 
         // set active strategy
         var strategy = props.getString(STRATEGY_KEY);
-        if (strategy != null) {
-            activeStrategy = new Name(strategy);
-        }
+        if (strategy != null) { activeStrategy = new Name(strategy); }
 
         setStrategyProperties(StrategyProperties.read(props));
     }
@@ -212,12 +209,8 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         props = props.getOrCreateSection(CATEGORY);
-        if (getStrategy() == null) {
-            setStrategy(JavaCardDLStrategyFactory.NAME);
-        }
-        if (maxSteps < 0) {
-            setMaxSteps(10000);
-        }
+        if (getStrategy() == null) { setStrategy(JavaCardDLStrategyFactory.NAME); }
+        if (maxSteps < 0) { setMaxSteps(10000); }
 
         props.set(STRATEGY_KEY, getStrategy().toString());
         props.set(STEPS_KEY, getMaxSteps());
@@ -255,7 +248,8 @@ public class StrategySettings extends AbstractSettings {
     /**
      * sets the time after which automatic rule application shall be aborted (-1 disables timeout)
      *
-     * @param timeout a long specifying the timeout in ms
+     * @param timeout
+     *        a long specifying the timeout in ms
      */
     public void setTimeout(long timeout) {
         var old = this.timeout;
@@ -298,7 +292,8 @@ public class StrategySettings extends AbstractSettings {
      * Defines the {@link StopCondition} which is used in an {@link ApplyStrategy} to determine
      * after each applied rule if more rules should be applied or not.
      *
-     * @param customApplyStrategyStopCondition The customized {@link StopCondition} to use or
+     * @param customApplyStrategyStopCondition
+     *        The customized {@link StopCondition} to use or
      *        {@code null} to use the default one.
      */
     public void setCustomApplyStrategyStopCondition(
@@ -323,7 +318,8 @@ public class StrategySettings extends AbstractSettings {
      * select the next {@link Goal} to apply a rule on. If no one is defined the default one of the
      * {@link ApplyStrategy}, which is defined by the user interface, is used.
      *
-     * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the
+     * @param customGoalChooser
+     *        The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
     public void setCustomApplyStrategyGoalChooser(GoalChooser customGoalChooser) {

@@ -46,7 +46,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * String literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public StringLiteral(String value) {
@@ -56,7 +57,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * String literal.
      *
-     * @param proto a string literal.
+     * @param proto
+     *        a string literal.
      */
 
     protected StringLiteral(StringLiteral proto) {
@@ -101,7 +103,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -121,7 +124,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

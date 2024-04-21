@@ -24,13 +24,13 @@ public abstract class AbstractIntegerLiteral extends Literal {
     /**
      * Empty default constructor.
      */
-    protected AbstractIntegerLiteral() {
-    }
+    protected AbstractIntegerLiteral() {}
 
     /**
      * Constructor for Recoder2KeY transformation.
      *
-     * @param children the children of this AST element as KeY classes, may contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes, may contain: Comments
      */
     protected AbstractIntegerLiteral(ExtList children) {
         super(children);
@@ -56,9 +56,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o.getClass() == this.getClass())) {
-            return false;
-        }
+        if (!(o.getClass() == this.getClass())) { return false; }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();
     }
 
@@ -84,19 +82,16 @@ public abstract class AbstractIntegerLiteral extends Literal {
      * base of the literal. The base prefix is found even if the String contains a preceding sign
      * ('+' or '-').
      *
-     * @param literalStr the given String to check
+     * @param literalStr
+     *        the given String to check
      * @return true iff the String represents a decimal literal, which means it does neither have a
      *         hexadecimal ("0x"), binary ("0b"), nor octal ("0") prefix. Note that the literal "0"
      *         is decimal too.
      */
     public static boolean representsDecLiteral(String literalStr) {
-        if (literalStr.length() == 0) {
-            throw new NumberFormatException(literalStr + "does not represent a number.");
-        }
+        if (literalStr.length() == 0) { throw new NumberFormatException(literalStr + "does not represent a number."); }
 
-        if (literalStr.charAt(0) == '-' || literalStr.charAt(0) == '+') {
-            literalStr = literalStr.substring(1);
-        }
+        if (literalStr.charAt(0) == '-' || literalStr.charAt(0) == '+') { literalStr = literalStr.substring(1); }
 
         /*
          * we have to remove the char indicating a long literal as the length of the literal is used

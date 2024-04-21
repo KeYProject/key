@@ -12,8 +12,7 @@ public class ConstantTermFeature extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new ConstantTermFeature();
 
-    private ConstantTermFeature() {
-    }
+    private ConstantTermFeature() {}
 
     @Override
     protected boolean filter(Term term, MutableState mState, Services services) {

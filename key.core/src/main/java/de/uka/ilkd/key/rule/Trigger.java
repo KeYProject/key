@@ -9,7 +9,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * @param trigger trigger related information
+ * @param trigger
+ *        trigger related information
  */
 public record Trigger(SchemaVariable triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
 

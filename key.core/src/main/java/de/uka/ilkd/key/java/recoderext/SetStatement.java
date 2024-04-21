@@ -23,7 +23,8 @@ public class SetStatement extends JavaStatement {
     /**
      * Primary constructor
      *
-     * @param context the context of the assignment
+     * @param context
+     *        the context of the assignment
      */
     public SetStatement(SetStatementContext context) {
         this.context = context;
@@ -32,7 +33,8 @@ public class SetStatement extends JavaStatement {
     /**
      * copy constructor
      *
-     * @param proto the orginal JML set statement to copy
+     * @param proto
+     *        the orginal JML set statement to copy
      */
     public SetStatement(SetStatement proto) {
         super(proto);
@@ -69,7 +71,8 @@ public class SetStatement extends JavaStatement {
      *
      * There are no recorder AST children.
      *
-     * @throws IndexOutOfBoundsException always
+     * @throws IndexOutOfBoundsException
+     *         always
      */
     @Override
     public ProgramElement getChildAt(int index) {

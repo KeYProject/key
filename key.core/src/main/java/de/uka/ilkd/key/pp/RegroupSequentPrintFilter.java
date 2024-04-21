@@ -22,8 +22,10 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**
      *
-     * @param lp the logic printer in use
-     * @param regex should the search be treated as a regular expression?
+     * @param lp
+     *        the logic printer in use
+     * @param regex
+     *        should the search be treated as a regular expression?
      */
     public RegroupSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
@@ -41,9 +43,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         }
 
         Pattern p = createPattern();
-        if (p == null) {
-            return;
-        }
+        if (p == null) { return; }
 
         antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();

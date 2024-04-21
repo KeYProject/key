@@ -80,9 +80,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * Compilation unit.
      *
-     * @param pkg a package specification.
-     * @param imports an import mutable list.
-     * @param typeDeclarations a type declaration mutable list.
+     * @param pkg
+     *        a package specification.
+     * @param imports
+     *        an import mutable list.
+     * @param typeDeclarations
+     *        a type declaration mutable list.
      */
 
     public CompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
@@ -96,20 +99,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * Compilation unit. Does not copy the data location.
      *
-     * @param proto a compilation unit.
+     * @param proto
+     *        a compilation unit.
      */
 
     protected CompilationUnit(CompilationUnit proto) {
         super(proto);
-        if (proto.packageSpec != null) {
-            packageSpec = proto.packageSpec.deepClone();
-        }
-        if (proto.imports != null) {
-            imports = proto.imports.deepClone();
-        }
-        if (proto.typeDeclarations != null) {
-            typeDeclarations = proto.typeDeclarations.deepClone();
-        }
+        if (proto.packageSpec != null) { packageSpec = proto.packageSpec.deepClone(); }
+        if (proto.imports != null) { imports = proto.imports.deepClone(); }
+        if (proto.typeDeclarations != null) { typeDeclarations = proto.typeDeclarations.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -129,18 +127,10 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (packageSpec != null) {
-            packageSpec.setParent(this);
-        }
-        if (imports != null) {
-            for (int i = imports.size() - 1; i >= 0; i -= 1) {
-                imports.get(i).setParent(this);
-            }
-        }
+        if (packageSpec != null) { packageSpec.setParent(this); }
+        if (imports != null) { for (int i = imports.size() - 1; i >= 0; i -= 1) { imports.get(i).setParent(this); } }
         if (typeDeclarations != null) {
-            for (int i = typeDeclarations.size() - 1; i >= 0; i -= 1) {
-                typeDeclarations.get(i).setParent(this);
-            }
+            for (int i = typeDeclarations.size() - 1; i >= 0; i -= 1) { typeDeclarations.get(i).setParent(this); }
         }
     }
 
@@ -150,23 +140,22 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         if (packageSpec == p) {
             PackageSpecification r = (PackageSpecification) q;
             packageSpec = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         count = (imports == null) ? 0 : imports.size();
@@ -236,44 +225,34 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null) {
-            result++;
-        }
-        if (imports != null) {
-            result += imports.size();
-        }
-        if (typeDeclarations != null) {
-            result += typeDeclarations.size();
-        }
+        if (packageSpec != null) { result++; }
+        if (imports != null) { result += imports.size(); }
+        if (typeDeclarations != null) { result += typeDeclarations.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0) {
-                return packageSpec;
-            }
+            if (index == 0) { return packageSpec; }
             index--;
         }
         if (imports != null) {
             len = imports.size();
-            if (len > index) {
-                return imports.get(index);
-            }
+            if (len > index) { return imports.get(index); }
             index -= len;
         }
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (typeDeclarations != null) { return typeDeclarations.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -281,20 +260,14 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         // role 0: package spec
         // role 1 (IDX): import
         // role 2 (IDX): declarations
-        if (child == packageSpec) {
-            return 0;
-        }
+        if (child == packageSpec) { return 0; }
         if (imports != null) {
             int index = imports.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
+            if (index >= 0) { return (index << 4) | 1; }
         }
         if (typeDeclarations != null) {
             int index = typeDeclarations.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+            if (index >= 0) { return (index << 4) | 2; }
         }
         return -1;
     }
@@ -313,13 +286,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * Sets the current data location. If the data location has been <CODE>null
      * </CODE>, the location also becomes the new original location.
      *
-     * @param location a data location.
+     * @param location
+     *        a data location.
      */
 
     public void setDataLocation(DataLocation location) {
-        if (this.location == null) {
-            originalLocation = location;
-        }
+        if (this.location == null) { originalLocation = location; }
         this.location = location;
     }
 
@@ -346,7 +318,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * Set imports.
      *
-     * @param list an import mutable list.
+     * @param list
+     *        an import mutable list.
      */
 
     public void setImports(ASTList<Import> list) {
@@ -366,7 +339,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * Set package specification.
      *
-     * @param p a package specification.
+     * @param p
+     *        a package specification.
      */
 
     public void setPackageSpecification(PackageSpecification p) {
@@ -392,9 +366,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (typeDeclarations != null) { return typeDeclarations.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -411,7 +383,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * Set declarations.
      *
-     * @param list a type declaration mutable list.
+     * @param list
+     *        a type declaration mutable list.
      */
 
     public void setDeclarations(ASTList<TypeDeclaration> list) {
@@ -436,9 +409,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
                     break;
                 }
             } else {
-                if (res == null) {
-                    res = t;
-                }
+                if (res == null) { res = t; }
             }
         }
         return res;
@@ -458,37 +429,27 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     }
 
     public List<ClassType> getTypesInScope() {
-        if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (name2type == null || name2type.isEmpty()) { return new ArrayList<>(0); }
         List<ClassType> res = new ArrayList<>();
-        for (ClassType ct : name2type.values()) {
-            res.add(ct);
-        }
+        for (ClassType ct : name2type.values()) { res.add(ct); }
         return res;
     }
 
     public ClassType getTypeInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            return null;
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { return null; }
         return name2type.get(name);
     }
 
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<>();
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { name2type = new HashMap<>(); }
         name2type.put(name, type);
     }
 
     public void removeTypeFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            return;
-        }
+        if (name2type == null || name2type == UNDEFINED_SCOPE) { return; }
         name2type.remove(name);
     }
 

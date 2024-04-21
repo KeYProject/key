@@ -63,12 +63,18 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * Creates a class invariant.
      *
-     * @param name the unique internal name of the invariant
-     * @param displayName the displayed name of the invariant
-     * @param kjt the KeYJavaType to which the invariant belongs
-     * @param visibility the visibility of the invariant (null for default visibility)
-     * @param inv the invariant formula itself
-     * @param selfVar the variable used for the receiver object
+     * @param name
+     *        the unique internal name of the invariant
+     * @param displayName
+     *        the displayed name of the invariant
+     * @param kjt
+     *        the KeYJavaType to which the invariant belongs
+     * @param visibility
+     *        the visibility of the invariant (null for default visibility)
+     * @param inv
+     *        the invariant formula itself
+     * @param selfVar
+     *        the variable used for the receiver object
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,

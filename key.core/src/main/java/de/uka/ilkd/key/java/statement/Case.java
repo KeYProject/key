@@ -36,7 +36,8 @@ public class Case extends BranchImp implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param e an expression.
+     * @param e
+     *        an expression.
      */
     public Case(Expression e) {
         this.expression = e;
@@ -46,8 +47,10 @@ public class Case extends BranchImp implements ExpressionContainer {
     /**
      * Case.
      *
-     * @param e an expression.
-     * @param body a statement mutable list.
+     * @param e
+     *        an expression.
+     * @param body
+     *        a statement mutable list.
      */
     public Case(Expression e, Statement[] body) {
         this.body = new ImmutableArray<>(body);
@@ -58,12 +61,14 @@ public class Case extends BranchImp implements ExpressionContainer {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments a
      *        Statement (as the statement following case) Must NOT contain: an Expression indicating
      *        the condition of the case as there are classes that are Expression and Statement, so
      *        they might get mixed up. Use the second parameter of this constructor for the
      *        expression.
-     * @param expr the expression of the case
+     * @param expr
+     *        the expression of the case
      */
     public Case(ExtList children, Expression expr, PositionInfo pos) {
         super(children, pos);
@@ -78,35 +83,29 @@ public class Case extends BranchImp implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (expression != null) {
-            result++;
-        }
-        if (body != null) {
-            result += body.size();
-        }
+        if (expression != null) { result++; }
+        if (body != null) { result += body.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0) {
-                return expression;
-            }
+            if (index == 0) { return expression; }
             index--;
         }
         if (body != null) {
             len = body.size();
-            if (len > index) {
-                return body.get(index);
-            }
+            if (len > index) { return body.get(index); }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -131,9 +130,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
-            return expression;
-        }
+        if (expression != null && index == 0) { return expression; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -156,9 +153,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -183,7 +178,8 @@ public class Case extends BranchImp implements ExpressionContainer {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCase(this);

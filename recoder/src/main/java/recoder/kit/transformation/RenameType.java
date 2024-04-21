@@ -40,23 +40,20 @@ public class RenameType extends TwoPassTransformation {
      * Creates a new transformation object that renames a type declaration and all known references
      * to that type. The new name should not hide another type in the declaration context.
      *
-     * @param sc the service configuration to use.
-     * @param type the type declaration to be renamed; may not be <CODE>null
+     * @param sc
+     *        the service configuration to use.
+     * @param type
+     *        the type declaration to be renamed; may not be <CODE>null
      *                </CODE> and may not be an anonymous type.
-     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     * @param newName
+     *        the new name for the element; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      */
     public RenameType(CrossReferenceServiceConfiguration sc, TypeDeclaration type, String newName) {
         super(sc);
-        if (type == null) {
-            throw new IllegalArgumentException("Missing type");
-        }
-        if (type.getName() == null) {
-            throw new IllegalArgumentException("May not rename anonymous types");
-        }
-        if (newName == null) {
-            throw new IllegalArgumentException("Missing name");
-        }
+        if (type == null) { throw new IllegalArgumentException("Missing type"); }
+        if (type.getName() == null) { throw new IllegalArgumentException("May not rename anonymous types"); }
+        if (newName == null) { throw new IllegalArgumentException("Missing name"); }
         this.type = type;
         this.newName = newName;
     }
@@ -70,15 +67,11 @@ public class RenameType extends TwoPassTransformation {
      */
     public ProblemReport analyze() {
         refs = new ArrayList<>();
-        if (newName.equals(type.getName())) {
-            return setProblemReport(IDENTITY);
-        }
+        if (newName.equals(type.getName())) { return setProblemReport(IDENTITY); }
         NameInfo ni = getNameInfo();
         refs.addAll(getCrossReferenceSourceInfo().getReferences(type));
         cons = type.getConstructors();
-        if (cons == null) {
-            cons = new ArrayList<>(0);
-        }
+        if (cons == null) { cons = new ArrayList<>(0); }
         Type atype = ni.getArrayType(type);
         while (atype != null) {
             refs.addAll(getCrossReferenceSourceInfo().getReferences(atype));
@@ -91,7 +84,8 @@ public class RenameType extends TwoPassTransformation {
      * Locally renames the type declaration, all type references and constructors collected in the
      * analyzation phase.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

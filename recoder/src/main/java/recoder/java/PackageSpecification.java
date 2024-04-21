@@ -48,7 +48,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Package specification.
      *
-     * @param pkg a package reference.
+     * @param pkg
+     *        a package reference.
      */
 
     public PackageSpecification(PackageReference pkg) {
@@ -59,14 +60,13 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Package specification.
      *
-     * @param proto a package specification.
+     * @param proto
+     *        a package specification.
      */
 
     protected PackageSpecification(PackageSpecification proto) {
         super(proto);
-        if (proto.reference != null) {
-            reference = proto.reference.deepClone();
-        }
+        if (proto.reference != null) { reference = proto.reference.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -88,9 +88,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
         super.makeParentRoleValid();
         reference.setParent(this);
         if (annotations != null) {
-            for (AnnotationUseSpecification annotation : annotations) {
-                annotation.setParent(this);
-            }
+            for (AnnotationUseSpecification annotation : annotations) { annotation.setParent(this); }
         }
     }
 
@@ -116,28 +114,24 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (reference != null) {
-            result++;
-        }
-        if (annotations != null) {
-            result += annotations.size();
-        }
+        if (reference != null) { result++; }
+        if (annotations != null) { result += annotations.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0) {
-                return reference;
-            }
+            if (index == 0) { return reference; }
             index--;
         }
         return annotations.get(index);
@@ -146,14 +140,10 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     public int getChildPositionCode(ProgramElement child) {
         // role 0: reference
         // role 1 (idx): annotation use
-        if (child == reference) {
-            return 0;
-        }
+        if (child == reference) { return 0; }
         if (annotations != null) {
             int idx = annotations.indexOf(child);
-            if (idx != -1) {
-                return (idx << 4) | 1;
-            }
+            if (idx != -1) { return (idx << 4) | 1; }
         }
         return -1;
     }
@@ -164,31 +154,28 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (reference == p) {
             PackageReference r = (PackageReference) q;
             reference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         int idx = annotations.indexOf(p);
         if (idx != -1) {
             AnnotationUseSpecification aus = (AnnotationUseSpecification) q;
             annotations.set(idx, aus);
-            if (aus != null) {
-                aus.setParent(this);
-            }
+            if (aus != null) { aus.setParent(this); }
             return true;
         }
         return false;
@@ -207,7 +194,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Set parent.
      *
-     * @param u a compilation unit.
+     * @param u
+     *        a compilation unit.
      */
 
     public void setParent(CompilationUnit u) {
@@ -227,7 +215,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Set package reference.
      *
-     * @param ref a package reference.
+     * @param ref
+     *        a package reference.
      */
 
     public void setPackageReference(PackageReference ref) {

@@ -48,8 +48,10 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Catch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
 
     public Catch(ParameterDeclaration e, StatementBlock body) {
@@ -62,17 +64,14 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Catch.
      *
-     * @param proto a catch.
+     * @param proto
+     *        a catch.
      */
 
     protected Catch(Catch proto) {
         super(proto);
-        if (proto.parameter != null) {
-            parameter = proto.parameter.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
+        if (proto.parameter != null) { parameter = proto.parameter.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -92,12 +91,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (parameter != null) {
-            parameter.setParameterContainer(this);
-        }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (parameter != null) { parameter.setParameterContainer(this); }
+        if (body != null) { body.setStatementContainer(this); }
     }
 
     public SourceElement getLastElement() {
@@ -112,34 +107,28 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public int getChildCount() {
         int result = 0;
-        if (parameter != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (parameter != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0) {
-                return parameter;
-            }
+            if (index == 0) { return parameter; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -148,12 +137,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     public int getChildPositionCode(ProgramElement child) {
         // role 0: parameter
         // role 1: body
-        if (parameter == child) {
-            return 0;
-        }
-        if (body == child) {
-            return 1;
-        }
+        if (parameter == child) { return 0; }
+        if (body == child) { return 1; }
         return -1;
     }
 
@@ -163,30 +148,27 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         if (parameter == p) {
             ParameterDeclaration r = (ParameterDeclaration) q;
             parameter = r;
-            if (r != null) {
-                r.setParameterContainer(this);
-            }
+            if (r != null) { r.setParameterContainer(this); }
             return true;
         }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         return false;
@@ -209,9 +191,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -233,9 +213,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
      */
 
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameter != null && index == 0) {
-            return parameter;
-        }
+        if (parameter != null && index == 0) { return parameter; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -252,7 +230,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Set body.
      *
-     * @param statement a statement.
+     * @param statement
+     *        a statement.
      */
 
     public void setBody(Statement statement) {
@@ -262,7 +241,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Set parent.
      *
-     * @param parent a try.
+     * @param parent
+     *        a try.
      */
 
     public void setParent(Try parent) {
@@ -282,7 +262,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Set parameter declaration.
      *
-     * @param p a parameter declaration.
+     * @param p
+     *        a parameter declaration.
      */
 
     public void setParameterDeclaration(ParameterDeclaration p) {
@@ -298,9 +279,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     public List<VariableSpecification> getVariablesInScope() {
-        if (parameter != null) {
-            return parameter.getVariables();
-        }
+        if (parameter != null) { return parameter.getVariables(); }
         // TODO EMPTY_LIST ?!
         return new ArrayList<>(0);
     }
@@ -309,9 +288,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
         Debug.assertNonnull(name);
         if (parameter != null) {
             VariableSpecification v = parameter.getVariableSpecification();
-            if (name.equals(v.getName())) {
-                return v;
-            }
+            if (name.equals(v.getName())) { return v; }
         }
         return null;
     }

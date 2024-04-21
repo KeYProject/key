@@ -38,9 +38,7 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == 0) {
-            return expr;
-        }
+        if (index == 0) { return expr; }
         return null;
     }
 

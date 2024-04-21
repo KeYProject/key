@@ -26,7 +26,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Package specification.
      *
-     * @param children an ExtList with children
+     * @param children
+     *        an ExtList with children
      */
 
     public PackageSpecification(ExtList children) {
@@ -48,26 +49,22 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (reference != null) {
-            result++;
-        }
+        if (reference != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (reference != null) {
-            if (index == 0) {
-                return reference;
-            }
-        }
+        if (reference != null) { if (index == 0) { return reference; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -85,7 +82,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPackageSpecification(this);

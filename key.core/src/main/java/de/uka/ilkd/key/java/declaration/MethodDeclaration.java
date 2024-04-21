@@ -56,14 +56,18 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * JML modifiers of a method
      *
-     * @param pure pure
-     * @param strictlyPure strictly pure
-     * @param helper helper
-     * @param specMathMode spec math mode
+     * @param pure
+     *        pure
+     * @param strictlyPure
+     *        strictly pure
+     * @param helper
+     *        helper
+     * @param specMathMode
+     *        spec math mode
      */
-    public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-            SpecMathMode specMathMode) {
-    }
+    public record JMLModifiers(
+            boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {}
 
 
     /**
@@ -76,14 +80,17 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param children an ExtList of children. Must include: a TypeReference (as a reference to the
+     * @param children
+     *        an ExtList of children. Must include: a TypeReference (as a reference to the
      *        return type),
      *        a {@link ProgramElementName} (as Name of the method),
      *        one or more {@link ParameterDeclaration} (as parameters of the declared method),
      *        optionally a {@link StatementBlock} (as body of the declared method),
      *        optionally a {@link Throws} to indicate exceptional behaviour
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
-     * @param voidComments in case of void return type: comments associated with the method
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
+     * @param voidComments
+     *        in case of void return type: comments associated with the method
      */
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             Comment[] voidComments) {
@@ -104,13 +111,20 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param modifiers a modifier array
-     * @param returnType a type reference.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
-     * @param body a statement block.
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param modifiers
+     *        a modifier array
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
      */
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType,
             ProgramElementName name, ParameterDeclaration[] parameters, Throws exceptions,
@@ -123,13 +137,20 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param modifiers a modifier array
-     * @param returnType a type reference.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
-     * @param body a statement block.
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param modifiers
+     *        a modifier array
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
      */
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType,
             ProgramElementName name, ImmutableArray<ParameterDeclaration> parameters,
@@ -170,24 +191,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (returnType != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
-        if (parameters != null) {
-            result += parameters.size();
-        }
-        if (exceptions != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (returnType != null) { result++; }
+        if (name != null) { result++; }
+        if (parameters != null) { result += parameters.size(); }
+        if (exceptions != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
@@ -197,41 +206,27 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0) {
-                return returnType;
-            }
+            if (index == 0) { return returnType; }
             index--;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (parameters != null) {
             len = parameters.size();
-            if (len > index) {
-                return parameters.get(index);
-            }
+            if (len > index) { return parameters.get(index); }
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0) {
-                return exceptions;
-            }
+            if (index == 0) { return exceptions; }
             index--;
         }
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -244,9 +239,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -259,9 +252,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public TypeReference getTypeReferenceAt(int index) {
-        if (returnType != null && index == 0) {
-            return returnType;
-        }
+        if (returnType != null && index == 0) { return returnType; }
         throw new IndexOutOfBoundsException();
     }
 
@@ -274,9 +265,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameters != null) {
-            return parameters.get(index);
-        }
+        if (parameters != null) { return parameters.get(index); }
         throw new IndexOutOfBoundsException();
     }
 
@@ -382,9 +371,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
      * @return true iff so
      */
     public boolean isVarArgMethod() {
-        if (parameters == null || parameters.size() == 0) {
-            return false;
-        }
+        if (parameters == null || parameters.size() == 0) { return false; }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 

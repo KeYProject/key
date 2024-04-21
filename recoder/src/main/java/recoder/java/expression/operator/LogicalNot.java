@@ -32,7 +32,8 @@ public class LogicalNot extends Operator {
     /**
      * Logical not.
      *
-     * @param child an expression.
+     * @param child
+     *        an expression.
      */
 
     public LogicalNot(Expression child) {
@@ -43,7 +44,8 @@ public class LogicalNot extends Operator {
     /**
      * Logical not.
      *
-     * @param proto a logical not.
+     * @param proto
+     *        a logical not.
      */
 
     protected LogicalNot(LogicalNot proto) {

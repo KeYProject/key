@@ -24,9 +24,7 @@ public class ReflectionImport {
 
     private static String[] getTypeNames(Class[] classes) {
         String[] names = new String[classes.length];
-        for (int i = 0; i < names.length; i += 1) {
-            names[i] = getTypeName(classes[i]);
-        }
+        for (int i = 0; i < names.length; i += 1) { names[i] = getTypeName(classes[i]); }
         return names;
     }
 
@@ -49,9 +47,7 @@ public class ReflectionImport {
         cf.setFullName(n);
         cf.setName(getShortName(n));
         Class sup = c.getSuperclass();
-        if (sup != null) {
-            cf.setSuperName(sup.getName());
-        }
+        if (sup != null) { cf.setSuperName(sup.getName()); }
         cf.setAccessFlags(c.getModifiers() | (c.isAnnotation() ? AccessFlags.ANNOTATION : 0)
                 | (c.isEnum() ? AccessFlags.ENUM : 0));
         cf.setInterfaceNames(getTypeNames(c.getInterfaces()));

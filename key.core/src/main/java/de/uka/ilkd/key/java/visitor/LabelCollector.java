@@ -28,15 +28,11 @@ public class LabelCollector extends JavaASTVisitor {
     }
 
     protected void doDefaultAction(SourceElement node) {
-        if (node instanceof Label) {
-            labels.add((Label) node);
-        }
+        if (node instanceof Label) { labels.add((Label) node); }
     }
 
     protected void doAction(ProgramElement node) {
-        if (node instanceof Label) {
-            labels.add((Label) node);
-        }
+        if (node instanceof Label) { labels.add((Label) node); }
     }
 
 }

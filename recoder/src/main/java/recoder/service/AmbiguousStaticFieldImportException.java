@@ -34,10 +34,14 @@ public class AmbiguousStaticFieldImportException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param importStatement1 the first import found to be ambiguous.
-     * @param importStatement2 the second import found to be ambiguous.
-     * @param version1 the first possible field.
-     * @param version2 the second possible field.
+     * @param importStatement1
+     *        the first import found to be ambiguous.
+     * @param importStatement2
+     *        the second import found to be ambiguous.
+     * @param version1
+     *        the first possible field.
+     * @param version2
+     *        the second possible field.
      */
     public AmbiguousStaticFieldImportException(Import importStatement1, Import importStatement2,
             Variable version1, Variable version2) {
@@ -50,11 +54,16 @@ public class AmbiguousStaticFieldImportException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param importStatement1 the first import found to be ambiguous.
-     * @param importStatement2 the second import found to be ambiguous.
-     * @param version1 the first possible type.
-     * @param version2 the second possible type.
+     * @param s
+     *        an explanation.
+     * @param importStatement1
+     *        the first import found to be ambiguous.
+     * @param importStatement2
+     *        the second import found to be ambiguous.
+     * @param version1
+     *        the first possible type.
+     * @param version2
+     *        the second possible type.
      */
     public AmbiguousStaticFieldImportException(String s, Import importStatement1,
             Import importStatement2, Field version1, Field version2) {

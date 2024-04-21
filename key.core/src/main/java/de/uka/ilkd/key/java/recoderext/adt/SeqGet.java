@@ -21,8 +21,10 @@ public class SeqGet extends ADTPrefixConstruct {
     /**
      * Creates a sequence getter operator.
      *
-     * @param seq Sequence to operate on
-     * @param idx Index position (from 0 to length-1)
+     * @param seq
+     *        Sequence to operate on
+     * @param idx
+     *        Index position (from 0 to length-1)
      */
     public SeqGet(Expression seq, Expression idx) {
         super(seq, idx);

@@ -39,8 +39,10 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
         this.children = new ImmutableArray<>(lhs, rhs);
@@ -49,7 +51,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. In this case the order of
+     * @param children
+     *        the children of this AST element as KeY classes. In this case the order of
      *        the children is IMPORTANT. May contain: 2 of Expression (the first Expression as left
      *        hand side, the second as right hand side), Comments
      *
@@ -62,7 +65,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param unaryChild an expression.
+     * @param unaryChild
+     *        an expression.
      */
 
     public Operator(Expression unaryChild) {
@@ -72,7 +76,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Operator.
      *
-     * @param arguments an array of expression.
+     * @param arguments
+     *        an array of expression.
      */
 
     public Operator(Expression[] arguments) {
@@ -117,8 +122,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public SourceElement getFirstElement() {
         return switch (getNotation()) {
-        case INFIX, POSTFIX -> children.get(0).getFirstElement();
-        default -> this;
+            case INFIX, POSTFIX -> children.get(0).getFirstElement();
+            default -> this;
         };
     }
 
@@ -132,8 +137,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public SourceElement getLastElement() {
         return switch (getNotation()) {
-        case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
-        default -> this;
+            case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
+            default -> this;
         };
     }
 
@@ -150,14 +155,14 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -182,9 +187,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Expression getExpressionAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
+        if (children != null) { return children.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -203,7 +206,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
         return super.reuseSignature(services, ec) + "("
-            + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
+                + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
     }
 
     public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);

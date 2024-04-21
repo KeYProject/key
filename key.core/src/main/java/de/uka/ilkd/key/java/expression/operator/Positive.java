@@ -22,7 +22,8 @@ public class Positive extends Operator {
     /**
      * Positive.
      *
-     * @param expr the Expression
+     * @param expr
+     *        the Expression
      */
     public Positive(Expression expr) {
         super(expr);
@@ -31,7 +32,8 @@ public class Positive extends Operator {
     /**
      * Positive.
      *
-     * @param children an ExtList with all children of this node
+     * @param children
+     *        an ExtList with all children of this node
      */
     public Positive(ExtList children) {
         super(children);
@@ -82,7 +84,8 @@ public class Positive extends Operator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPositive(this);

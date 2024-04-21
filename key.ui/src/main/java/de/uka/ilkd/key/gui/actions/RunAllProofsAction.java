@@ -117,9 +117,7 @@ public class RunAllProofsAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         WindowUserInterfaceControl ui = mainWindow.getUserInterface();
 
-        for (int i = 0; i < files.size(); i++) {
-            LOGGER.info("{}: {}\n", i, files.get(i));
-        }
+        for (int i = 0; i < files.size(); i++) { LOGGER.info("{}: {}\n", i, files.get(i)); }
 
         Runnable runnable = () -> {
             for (File absFile : files) {

@@ -32,9 +32,12 @@ public class AmbiguousImportException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param importStatement the import found to be ambiguous.
-     * @param version1 the first possible type.
-     * @param version2 the second possible type.
+     * @param importStatement
+     *        the import found to be ambiguous.
+     * @param version1
+     *        the first possible type.
+     * @param version2
+     *        the second possible type.
      */
     public AmbiguousImportException(Import importStatement, ClassType version1,
             ClassType version2) {
@@ -46,10 +49,14 @@ public class AmbiguousImportException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param importStatement the import found to be ambiguous.
-     * @param version1 the first possible type.
-     * @param version2 the second possible type.
+     * @param s
+     *        an explanation.
+     * @param importStatement
+     *        the import found to be ambiguous.
+     * @param version1
+     *        the first possible type.
+     * @param version2
+     *        the second possible type.
      */
     public AmbiguousImportException(String s, Import importStatement, ClassType version1,
             ClassType version2) {

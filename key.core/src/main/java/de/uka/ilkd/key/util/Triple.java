@@ -9,9 +9,12 @@ import java.util.Objects;
 /**
  * Simple value object to hold three values.
  *
- * @param <T1> type of first element
- * @param <T2> type of second element
- * @param <T3> type of third element
+ * @param <T1>
+ *        type of first element
+ * @param <T2>
+ *        type of second element
+ * @param <T3>
+ *        type of third element
  */
 public class Triple<T1, T2, T3> {
     /**
@@ -31,9 +34,12 @@ public class Triple<T1, T2, T3> {
     /**
      * Construct a new triple containing the provided values.
      *
-     * @param first first element
-     * @param second second element
-     * @param third third element
+     * @param first
+     *        first element
+     * @param second
+     *        second element
+     * @param third
+     *        third element
      */
     public Triple(T1 first, T2 second, T3 third) {
         this.first = first;
@@ -48,9 +54,7 @@ public class Triple<T1, T2, T3> {
 
 
     public boolean equals(Object o) {
-        if (!(o instanceof Triple<?, ?, ?> p)) {
-            return false;
-        }
+        if (!(o instanceof Triple<?, ?, ?> p)) { return false; }
         return Objects.equals(first, p.first) && Objects.equals(second, p.second)
                 && Objects.equals(third, p.third);
     }

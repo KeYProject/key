@@ -47,21 +47,15 @@ public class TestDeclarationProgramVariableCollector {
 
     @BeforeEach
     public void setUp() {
-        if (down != 0) {
-            return;
-        }
+        if (down != 0) { return; }
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
-        for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
-        }
+        for (int i = 0; i < jblocks.length; i++) { test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]); }
     }
 
     @AfterEach
     public void tearDown() {
         down++;
-        if (down < testCases) {
-            return;
-        }
+        if (down < testCases) { return; }
         test_block = null;
     }
 
@@ -90,7 +84,7 @@ public class TestDeclarationProgramVariableCollector {
 
 
             assertTrue(dpvc.result().size() <= expectedVars[i].length, ""
-                + "Too many variables collected. Collected:" + dpvc.result() + " in " + jblocks[i]);
+                    + "Too many variables collected. Collected:" + dpvc.result() + " in " + jblocks[i]);
 
 
             for (int j = 0; j < expectedVars[i].length; j++) {

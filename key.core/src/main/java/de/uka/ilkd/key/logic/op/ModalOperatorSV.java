@@ -27,8 +27,10 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     /**
      * creates a new SchemaVariable that is used as placeholder for modal operators.
      *
-     * @param name the Name of the SchemaVariable
-     * @param modalityKinds modal operators matched by this SV
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param modalityKinds
+     *        modal operators matched by this SV
      */
     ModalOperatorSV(Name name, ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         super(name);
@@ -72,19 +74,11 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
 
     @Override
     public void validTopLevelException(Term term) throws TermCreationException {
-        if (arity() != term.arity()) {
-            throw new TermCreationException(this, term);
-        }
+        if (arity() != term.arity()) { throw new TermCreationException(this, term); }
 
-        if (arity() != term.subs().size()) {
-            throw new TermCreationException(this, term);
-        }
+        if (arity() != term.subs().size()) { throw new TermCreationException(this, term); }
 
-        for (int i = 0; i < arity(); i++) {
-            if (term.sub(i) == null) {
-                throw new TermCreationException(this, term);
-            }
-        }
+        for (int i = 0; i < arity(); i++) { if (term.sub(i) == null) { throw new TermCreationException(this, term); } }
 
         if (!(term.op() instanceof Modality)) {
             throw new TermCreationException("ModalOperatorSV must be contained in a modality");

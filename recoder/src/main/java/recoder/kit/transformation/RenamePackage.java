@@ -32,19 +32,18 @@ public class RenamePackage extends TwoPassTransformation {
      * Creates a new transformation object that renames a package and all references to it. The new
      * name should not conflict with another package.
      *
-     * @param sc the service configuration to use.
-     * @param pkg the package to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     * @param sc
+     *        the service configuration to use.
+     * @param pkg
+     *        the package to be renamed; may not be <CODE>null</CODE>.
+     * @param newName
+     *        the new name for the element; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      */
     public RenamePackage(CrossReferenceServiceConfiguration sc, Package pkg, String newName) {
         super(sc);
-        if (pkg == null) {
-            throw new IllegalArgumentException("Missing package");
-        }
-        if (newName == null) {
-            throw new IllegalArgumentException("Missing name");
-        }
+        if (pkg == null) { throw new IllegalArgumentException("Missing package"); }
+        if (newName == null) { throw new IllegalArgumentException("Missing name"); }
         this.pkg = pkg;
         this.newName = newName;
     }
@@ -62,9 +61,7 @@ public class RenamePackage extends TwoPassTransformation {
             return setProblemReport(IDENTITY);
         }
         Package pkg2 = getNameInfo().getPackage(newName);
-        if (pkg2 != null) {
-            return setProblemReport(new NameConflict(pkg2));
-        }
+        if (pkg2 != null) { return setProblemReport(new NameConflict(pkg2)); }
         List<ClassType> nonTypeDeclarations = PackageKit.getNonSourcePackageTypes(pkg);
         if (!nonTypeDeclarations.isEmpty()) {
             return setProblemReport(new MissingTypeDeclarations(nonTypeDeclarations));
@@ -76,17 +73,15 @@ public class RenamePackage extends TwoPassTransformation {
     /**
      * Locally renames all package references collected in the analyzation phase.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
         super.transform();
         Package p = getNameInfo().createPackage(newName);
         PackageReference pr = PackageKit.createPackageReference(getProgramFactory(), p);
-        for (int i = refs.size() - 1; i >= 0; i--) {
-            PackageReference ref = refs.get(i);
-            replace(ref, pr.deepClone());
-        }
+        for (int i = refs.size() - 1; i >= 0; i--) { PackageReference ref = refs.get(i); replace(ref, pr.deepClone()); }
 
     }
 }

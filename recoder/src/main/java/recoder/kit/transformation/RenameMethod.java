@@ -40,20 +40,19 @@ public class RenameMethod extends TwoPassTransformation {
      * references to them. The new name should not conflict with another method in any of the
      * occurances.
      *
-     * @param sc the service configuration to use.
-     * @param method the method to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     * @param sc
+     *        the service configuration to use.
+     * @param method
+     *        the method to be renamed; may not be <CODE>null</CODE>.
+     * @param newName
+     *        the new name for the element; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      */
     public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method,
             String newName) {
         super(sc);
-        if (method == null) {
-            throw new IllegalArgumentException("Missing method");
-        }
-        if (newName == null) {
-            throw new IllegalArgumentException("Missing name");
-        }
+        if (method == null) { throw new IllegalArgumentException("Missing method"); }
+        if (newName == null) { throw new IllegalArgumentException("Missing name"); }
         this.methodToRename = method;
         this.newName = newName;
     }
@@ -67,9 +66,7 @@ public class RenameMethod extends TwoPassTransformation {
      * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo, Method)
      */
     public ProblemReport analyze() {
-        if (newName.equals(methodToRename.getName())) {
-            return setProblemReport(IDENTITY);
-        }
+        if (newName.equals(methodToRename.getName())) { return setProblemReport(IDENTITY); }
         CrossReferenceSourceInfo xr = getCrossReferenceSourceInfo();
 
         methods = new ArrayList<>();
@@ -80,24 +77,16 @@ public class RenameMethod extends TwoPassTransformation {
             if (m instanceof MethodDeclaration) {
                 methods.add((MethodDeclaration) m);
             } else {
-                if (problems == null) {
-                    problems = new ArrayList<>();
-                }
+                if (problems == null) { problems = new ArrayList<>(); }
                 problems.add(m);
             }
         }
-        if (problems != null) {
-            return setProblemReport(new MissingMethodDeclarations(problems));
-        }
+        if (problems != null) { return setProblemReport(new MissingMethodDeclarations(problems)); }
         refs = new ArrayList<>();
         for (int j = methods.size() - 1; j >= 0; j -= 1) {
             MethodDeclaration mdecl = methods.get(j);
             List<MemberReference> mrefs = xr.getReferences(mdecl);
-            for (MemberReference mr : mrefs) {
-                if (mr instanceof MethodReference) {
-                    refs.add((MethodReference) mr);
-                }
-            }
+            for (MemberReference mr : mrefs) { if (mr instanceof MethodReference) { refs.add((MethodReference) mr); } }
         }
         return setProblemReport(EQUIVALENCE);
     }
@@ -106,7 +95,8 @@ public class RenameMethod extends TwoPassTransformation {
      * Locally renames the method declaration and all method references collected in the analyzation
      * phase.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

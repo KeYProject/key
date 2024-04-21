@@ -117,7 +117,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * extracts all field specifications out of the given list. Therefore it descends into field
      * declarations.
      *
-     * @param list the ArrayOf<MemberDeclaration> with the members of a type declaration
+     * @param list
+     *        the ArrayOf<MemberDeclaration> with the members of a type declaration
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
@@ -125,9 +126,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
-            if (pe instanceof FieldDeclaration) {
-                result = result.append(filterField((FieldDeclaration) pe));
-            }
+            if (pe instanceof FieldDeclaration) { result = result.append(filterField((FieldDeclaration) pe)); }
         }
         return result;
     }
@@ -135,32 +134,30 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /**
      * extracts all fields out of fielddeclaration
      *
-     * @param field the FieldDeclaration of which the field specifications have to be extracted
+     * @param field
+     *        the FieldDeclaration of which the field specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.get(i));
-        }
+        for (int i = spec.size() - 1; i >= 0; i--) { result = result.prepend(spec.get(i)); }
         return result;
     }
 
     /**
      * extracts all implicit field specifications out of the given list
      *
-     * @param list the IList<Field> from which the implicit ones have to be selected
+     * @param list
+     *        the IList<Field> from which the implicit ones have to be selected
      * @return a list with all implicit fields found in 'list'
      */
     private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (Field aList : list) {
             Field field = aList;
-            if (field instanceof ImplicitFieldSpecification) {
-                result = result.append(field);
-            }
+            if (field instanceof ImplicitFieldSpecification) { result = result.append(field); }
         }
         return result;
     }
@@ -168,17 +165,17 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /**
      * retrieves a field with the given name out of the list
      *
-     * @param name a String with the name of the field to be looked for
-     * @param fields the IList<Field> where we have to look for the field
+     * @param name
+     *        a String with the name of the field to be looked for
+     * @param fields
+     *        the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
     private ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
-            if (name.equals(fieldVar.getProgramElementName().getProgramName())) {
-                return fieldVar;
-            }
+            if (name.equals(fieldVar.getProgramElementName().getProgramName())) { return fieldVar; }
         }
         return null;
     }
@@ -257,11 +254,15 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * correct one out of the list, then the arrays length attribute is set followed by a call to
      * {@code <prepare>()} setting the arrays fields on their default value.
      *
-     * @param length the final public ProgramVariable {@code length} of the array
-     * @param fields the ImmutableList with fields of the current array
-     * @param createTransient a boolean indicating if a transient array has
+     * @param length
+     *        the final public ProgramVariable {@code length} of the array
+     * @param fields
+     *        the ImmutableList with fields of the current array
+     * @param createTransient
+     *        a boolean indicating if a transient array has
      *        to be created (this is special to JavaCard)
-     * @param transientType a ProgramVariable identifying the kind of transient
+     * @param transientType
+     *        a ProgramVariable identifying the kind of transient
      * @return the StatementBlock which is the method's body <br>
      *         </br>
      *
@@ -349,9 +350,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the default value of the given type according to JLS \S 4.5.5
      */
     private Expression getDefaultValue(Type type) {
-        if (type instanceof PrimitiveType) {
-            return type.getDefaultValue();
-        }
+        if (type instanceof PrimitiveType) { return type.getDefaultValue(); }
         return NullLiteral.NULL;
     }
 

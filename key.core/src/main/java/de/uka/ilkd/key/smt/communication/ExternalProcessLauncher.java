@@ -42,8 +42,10 @@ public class ExternalProcessLauncher {
     /**
      * Creates the external process launcher.
      *
-     * @param session the store for the messages send to and received from the process
-     * @param messageDelimiters delimiters which separate the messages
+     * @param session
+     *        the store for the messages send to and received from the process
+     * @param messageDelimiters
+     *        delimiters which separate the messages
      */
     public ExternalProcessLauncher(@NonNull SolverCommunication session,
             @NonNull String[] messageDelimiters) {
@@ -55,8 +57,10 @@ public class ExternalProcessLauncher {
      * Main procedure of the class. Starts the external process and connects the pipe to it. stderr
      * and stdout of the process are merged.
      *
-     * @param command command (program and arguments) which is used to start the external process
-     * @throws IOException if an I/O error occurs
+     * @param command
+     *        command (program and arguments) which is used to start the external process
+     * @throws IOException
+     *         if an I/O error occurs
      */
     public void launch(final String[] command) throws IOException {
         try {

@@ -30,9 +30,7 @@ public class RuleSetDispatchFeature implements Feature {
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        if (!(app instanceof TacletApp)) {
-            return NumberRuleAppCost.getZeroCost();
-        }
+        if (!(app instanceof TacletApp)) { return NumberRuleAppCost.getZeroCost(); }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
@@ -47,9 +45,7 @@ public class RuleSetDispatchFeature implements Feature {
             final Feature partialF = rulesetToFeature.get(rs);
             if (partialF != null) {
                 res = res.add(partialF.computeCost(app, pos, goal, mState));
-                if (res instanceof TopRuleAppCost) {
-                    break;
-                }
+                if (res instanceof TopRuleAppCost) { break; }
 
             }
         }
@@ -81,7 +77,8 @@ public class RuleSetDispatchFeature implements Feature {
     /**
      * Returns the used {@link Feature} for the given {@link RuleSet}.
      *
-     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @param ruleSet
+     *        The {@link RuleSet} to get its {@link Feature}.
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */

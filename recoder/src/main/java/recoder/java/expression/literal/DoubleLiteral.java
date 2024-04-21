@@ -36,7 +36,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param value a double value.
+     * @param value
+     *        a double value.
      */
 
     public DoubleLiteral(double value) {
@@ -46,7 +47,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public DoubleLiteral(String value) {
@@ -56,7 +58,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param proto a double literal.
+     * @param proto
+     *        a double literal.
      */
 
     protected DoubleLiteral(DoubleLiteral proto) {
@@ -87,7 +90,8 @@ public class DoubleLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

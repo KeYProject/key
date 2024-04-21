@@ -56,7 +56,8 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
      * Creates a new transformation object that removes redundant type references from
      * extends/implements and throws clauses and removes unnecessary type casts.
      *
-     * @param sc the service configuration to use.
+     * @param sc
+     *        the service configuration to use.
      */
     public RemoveRedundantTypeReferences(CrossReferenceServiceConfiguration sc) {
         this(sc, sc.getSourceFileRepository().getCompilationUnits(), true, true, true);
@@ -66,19 +67,22 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
      * Creates a new transformation object that removes redundant type references from
      * extends/implements and throws clauses.
      *
-     * @param sc the service configuration to use.
-     * @param list the compilation units that shall be stripped of references.
-     * @param removeInterfaces switch that allows removal of superfluously inherited interface.
-     * @param removeExceptions switch that allows removal of superfluously declared exceptions.
-     * @param removeTypeCasts switch that allows removal of superfluously declared type casts.
+     * @param sc
+     *        the service configuration to use.
+     * @param list
+     *        the compilation units that shall be stripped of references.
+     * @param removeInterfaces
+     *        switch that allows removal of superfluously inherited interface.
+     * @param removeExceptions
+     *        switch that allows removal of superfluously declared exceptions.
+     * @param removeTypeCasts
+     *        switch that allows removal of superfluously declared type casts.
      */
     public RemoveRedundantTypeReferences(CrossReferenceServiceConfiguration sc,
             List<CompilationUnit> list, boolean removeInterfaces, boolean removeExceptions,
             boolean removeTypeCasts) {
         super(sc);
-        if (list == null) {
-            throw new IllegalArgumentException("Missing units");
-        }
+        if (list == null) { throw new IllegalArgumentException("Missing units"); }
         this.units = list;
         references = new ArrayList<>();
         this.removeInterfaces = removeInterfaces;
@@ -122,13 +126,9 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
                             || parent instanceof Operator) {
                         // might want to find out if there is overloading...
                         // this also applies to Operators!
-                        if (te == td) {
-                            references.add(tc.getTypeReference());
-                        }
+                        if (te == td) { references.add(tc.getTypeReference()); }
                     } else {
-                        if (si.isWidening(te, td)) {
-                            references.add(tc.getTypeReference());
-                        }
+                        if (si.isWidening(te, td)) { references.add(tc.getTypeReference()); }
                     }
                 }
             }

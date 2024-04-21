@@ -32,8 +32,10 @@ public class MinusAssignment extends Assignment {
     /**
      * Minus assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public MinusAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class MinusAssignment extends Assignment {
     /**
      * Minus assignment.
      *
-     * @param proto a minus assignment.
+     * @param proto
+     *        a minus assignment.
      */
 
     protected MinusAssignment(MinusAssignment proto) {

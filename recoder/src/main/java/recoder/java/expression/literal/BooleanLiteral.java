@@ -32,7 +32,8 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param value a boolean value.
+     * @param value
+     *        a boolean value.
      */
 
     public BooleanLiteral(boolean value) {
@@ -42,7 +43,8 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     protected BooleanLiteral(String value) {
@@ -58,7 +60,8 @@ public class BooleanLiteral extends Literal {
     /**
      * Boolean literal.
      *
-     * @param proto a boolean literal.
+     * @param proto
+     *        a boolean literal.
      */
 
     protected BooleanLiteral(BooleanLiteral proto) {
@@ -89,7 +92,8 @@ public class BooleanLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param b a boolean value.
+     * @param b
+     *        a boolean value.
      */
 
     public void setValue(boolean b) {

@@ -34,7 +34,8 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
     public SuperConstructorReference(Expression[] arguments) {
         super(arguments);
@@ -44,8 +45,10 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param accessPath a reference prefix.
-     * @param arguments an expression mutable list.
+     * @param accessPath
+     *        a reference prefix.
+     * @param arguments
+     *        an expression mutable list.
      */
     public SuperConstructorReference(ReferencePrefix accessPath, Expression[] arguments) {
         super(arguments);
@@ -56,8 +59,10 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Super constructor reference.
      *
-     * @param accessPath a reference prefix.
-     * @param arguments an expression mutable list.
+     * @param accessPath
+     *        a reference prefix.
+     * @param arguments
+     *        an expression mutable list.
      */
     public SuperConstructorReference(ReferencePrefix accessPath,
             ImmutableArray<Expression> arguments) {
@@ -70,8 +75,10 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
-     * @param accessPath a ReferencePrefix of the array reference. May contain: several of
+     * @param children
+     *        the children of this AST element as KeY classes.
+     * @param accessPath
+     *        a ReferencePrefix of the array reference. May contain: several of
      *        Expression (as initializers of the array), Comments. Must contain: execution context
      *        MUST NOT CONTAIN: the ReferencePrefix for the accessPath because Expression and
      *        ReferencePrefix might not be disjunct.
@@ -86,8 +93,10 @@ public class SuperConstructorReference extends SpecialConstructorReference
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
-     * @param accessPath a ReferencePrefix of the array reference. May contain: several of
+     * @param children
+     *        the children of this AST element as KeY classes.
+     * @param accessPath
+     *        a ReferencePrefix of the array reference. May contain: several of
      *        Expression (as initializers of the array), Comments. Must contain: execution context
      *        MUST NOT CONTAIN: the ReferencePrefix for the accessPath because Expression and
      *        ReferencePrefix might not be disjunct.

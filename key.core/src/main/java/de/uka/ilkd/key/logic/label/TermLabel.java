@@ -158,9 +158,11 @@ public interface TermLabel extends Named {
      * <p>
      * A term label may have structure, i.e. can be parameterized.
      *
-     * @param i the number of the parameter to retrieve ( {@code 0 <= i < getChildCount()})
+     * @param i
+     *        the number of the parameter to retrieve ( {@code 0 <= i < getChildCount()})
      * @return the selected parameter
-     * @throws IndexOutOfBoundsException if the given parameter number <tt>i</tt> is negative or
+     * @throws IndexOutOfBoundsException
+     *         if the given parameter number <tt>i</tt> is negative or
      *         greater-or-equal the number of parameters returned by {@link #getChildCount()}
      */
     Object getChild(int i);

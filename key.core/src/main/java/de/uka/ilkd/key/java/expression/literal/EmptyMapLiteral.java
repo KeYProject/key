@@ -18,8 +18,7 @@ public class EmptyMapLiteral extends Literal {
 
     public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral();
 
-    private EmptyMapLiteral() {
-    }
+    private EmptyMapLiteral() {}
 
     @Override
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {

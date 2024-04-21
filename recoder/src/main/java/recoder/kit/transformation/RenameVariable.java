@@ -35,20 +35,19 @@ public class RenameVariable extends TwoPassTransformation {
      * Creates a new transformation object that renames a variable and all references to it. The new
      * name should not conflict with another variable.
      *
-     * @param sc the service configuration to use.
-     * @param vs the variable to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the element; may not be <CODE>null</CODE> and must denote a
+     * @param sc
+     *        the service configuration to use.
+     * @param vs
+     *        the variable to be renamed; may not be <CODE>null</CODE>.
+     * @param newName
+     *        the new name for the element; may not be <CODE>null</CODE> and must denote a
      *        valid identifier name.
      */
     public RenameVariable(CrossReferenceServiceConfiguration sc, VariableSpecification vs,
             String newName) {
         super(sc);
-        if (vs == null) {
-            throw new IllegalArgumentException("Missing variable");
-        }
-        if (newName == null) {
-            throw new IllegalArgumentException("Missing name");
-        }
+        if (vs == null) { throw new IllegalArgumentException("Missing variable"); }
+        if (newName == null) { throw new IllegalArgumentException("Missing name"); }
         this.vs = vs;
         this.newName = newName;
     }
@@ -60,9 +59,7 @@ public class RenameVariable extends TwoPassTransformation {
      */
     public ProblemReport analyze() {
         refs = new ArrayList<>();
-        if (newName.equals(vs.getName())) {
-            return setProblemReport(IDENTITY);
-        }
+        if (newName.equals(vs.getName())) { return setProblemReport(IDENTITY); }
         refs.addAll(getCrossReferenceSourceInfo().getReferences(vs));
         return setProblemReport(EQUIVALENCE);
     }
@@ -70,7 +67,8 @@ public class RenameVariable extends TwoPassTransformation {
     /**
      * Locally renames all variable references collected in the analyzation phase.
      *
-     * @throws IllegalStateException if the analyzation has not been called.
+     * @throws IllegalStateException
+     *         if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

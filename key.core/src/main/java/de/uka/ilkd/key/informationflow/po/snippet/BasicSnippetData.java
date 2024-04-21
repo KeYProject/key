@@ -236,9 +236,7 @@ class BasicSnippetData {
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (ProgramVariable v : vars) {
-            result = result.append(tb.var(v));
-        }
+        for (ProgramVariable v : vars) { result = result.append(tb.var(v)); }
         return result;
     }
 

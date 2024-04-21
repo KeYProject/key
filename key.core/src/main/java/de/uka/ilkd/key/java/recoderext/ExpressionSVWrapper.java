@@ -43,14 +43,14 @@ public class ExpressionSVWrapper extends Literal
     /**
      * Make parent role valid.
      */
-    public void makeParentRoleValid() {
-    }
+    public void makeParentRoleValid() {}
 
 
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     public void setSV(SchemaVariable sv) {
         this.sv = sv;
@@ -63,8 +63,7 @@ public class ExpressionSVWrapper extends Literal
 
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     public ExpressionSVWrapper deepClone() {
         return new ExpressionSVWrapper(sv);
@@ -82,7 +81,8 @@ public class ExpressionSVWrapper extends Literal
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
     public void setStatementContainer(StatementContainer c) {
         statementParent = c;
@@ -96,7 +96,8 @@ public class ExpressionSVWrapper extends Literal
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
     public void setReferenceSuffix(ReferenceSuffix path) {
         suff = path;

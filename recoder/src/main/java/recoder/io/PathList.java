@@ -55,7 +55,8 @@ public class PathList {
     /**
      * creates a path list from the given path string
      *
-     * @param pathStr a single path string, e.g. the content of <tt>CLASSPATH</tt>
+     * @param pathStr
+     *        a single path string, e.g. the content of <tt>CLASSPATH</tt>
      */
     public PathList(String pathStr) {
         add(pathStr);
@@ -65,12 +66,11 @@ public class PathList {
      * creates a path list from the given strings. The single strings are interpreted as path
      * strings.
      *
-     * @param paths the array of path strings to be added
+     * @param paths
+     *        the array of path strings to be added
      */
     public PathList(String[] paths) {
-        for (String path : paths) {
-            add(path);
-        }
+        for (String path : paths) { add(path); }
     }
 
     /**
@@ -92,15 +92,14 @@ public class PathList {
             } catch (IOException ioe) {
                 /* ignore this file */
             }
-        } else if (f.isDirectory()) {
-            paths.add(f);
-        }
+        } else if (f.isDirectory()) { paths.add(f); }
     }
 
     /**
      * adds the given paths to the list.
      *
-     * @param pathStr the string containing the paths
+     * @param pathStr
+     *        the string containing the paths
      * @return the number of paths added from the path string
      */
     public int add(String pathStr) {
@@ -110,9 +109,7 @@ public class PathList {
             result = split_paths.length;
             for (int i = 0; i < result; i++) {
                 String path = split_paths[i].trim();
-                if (!path.isEmpty()) {
-                    addPath(path);
-                }
+                if (!path.isEmpty()) { addPath(path); }
             }
             notFound.clear(); // clear the buffer of illegal requests
         }
@@ -138,9 +135,7 @@ public class PathList {
         File result = knownDirs.get(attempt);
         if (result == null) {
             result = attempt;
-            if (!result.exists()) {
-                result = NO_FILE;
-            }
+            if (!result.exists()) { result = NO_FILE; }
             knownDirs.put(attempt, result);
         }
         return (result == NO_FILE) ? null : result;
@@ -153,22 +148,16 @@ public class PathList {
             } else {
                 // archives use unix-paths
                 String hs = relativeName.replace(File.separatorChar, '/');
-                if (zf.getEntry(hs) != null) {
-                    return new ArchiveDataLocation(zf, hs);
-                }
+                if (zf.getEntry(hs) != null) { return new ArchiveDataLocation(zf, hs); }
             }
         } else if (p instanceof File dir) {
             int sep = relativeName.lastIndexOf(File.separatorChar);
             if (sep >= 0) {
                 dir = getDir(dir, relativeName.substring(0, sep));
-                if (dir == null) {
-                    return null;
-                }
+                if (dir == null) { return null; }
                 relativeName = relativeName.substring(sep + 1);
             }
-            if (getContents(dir).contains(relativeName)) {
-                return new DataFileLocation(new File(dir, relativeName));
-            }
+            if (getContents(dir).contains(relativeName)) { return new DataFileLocation(new File(dir, relativeName)); }
         }
         return null;
     }
@@ -178,7 +167,8 @@ public class PathList {
      * according location object. If no such file can be found within the paths, the method returns
      * <tt>null</tt>.
      *
-     * @param relativeName the relative name of the file
+     * @param relativeName
+     *        the relative name of the file
      * @return the location object or <tt>null</tt> if the file could not be found.
      */
     public DataLocation find(String relativeName) {
@@ -202,7 +192,8 @@ public class PathList {
      * this path list, a "." is returned. In any other case, the absolute file name is passed
      * through.
      *
-     * @param absoluteFilename an absolute file name.
+     * @param absoluteFilename
+     *        an absolute file name.
      * @return a name for this file, possibly relative to this search path.
      */
     public String getRelativeName(String absoluteFilename) {
@@ -212,9 +203,7 @@ public class PathList {
                     String pathfilename = p.getAbsolutePath();
                     if (absoluteFilename.startsWith(pathfilename)) {
                         int pathfilenamelen = pathfilename.length();
-                        if (absoluteFilename.length() == pathfilenamelen) {
-                            return ".";
-                        }
+                        if (absoluteFilename.length() == pathfilenamelen) { return "."; }
                         if (pathfilename.charAt(pathfilenamelen - 1) != File.separatorChar) {
                             pathfilenamelen += 1; // cut one more
                         }
@@ -231,7 +220,8 @@ public class PathList {
      * containing the full path names of each match. If no file could be located, this method
      * returns an empty array.
      *
-     * @param relativeName the relative name of the file
+     * @param relativeName
+     *        the relative name of the file
      * @return an array containing the full paths of all matching files
      */
     public DataLocation[] findAll(String relativeName) {
@@ -239,9 +229,7 @@ public class PathList {
         int count = 0;
         for (Object path : paths) {
             DataLocation dl = getLocation(path, relativeName);
-            if (dl != null) {
-                tmpRes[count++] = dl;
-            }
+            if (dl != null) { tmpRes[count++] = dl; }
         }
         // create the result array
         DataLocation[] result = new DataLocation[count];

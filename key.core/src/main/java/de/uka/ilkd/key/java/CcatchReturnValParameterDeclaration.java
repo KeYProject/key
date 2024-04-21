@@ -50,15 +50,15 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (delegate != null && index == 0) {
-            return delegate;
-        }
+        if (delegate != null && index == 0) { return delegate; }
 
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -85,9 +85,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
 
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int idx) {
-        if (delegate != null && idx == 0) {
-            return delegate;
-        }
+        if (delegate != null && idx == 0) { return delegate; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

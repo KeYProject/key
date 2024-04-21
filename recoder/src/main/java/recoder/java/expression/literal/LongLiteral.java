@@ -37,7 +37,8 @@ public class LongLiteral extends Literal {
     /**
      * Long literal.
      *
-     * @param value a long value.
+     * @param value
+     *        a long value.
      */
 
     public LongLiteral(long value) {
@@ -47,7 +48,8 @@ public class LongLiteral extends Literal {
     /**
      * Long literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public LongLiteral(String value) {
@@ -57,7 +59,8 @@ public class LongLiteral extends Literal {
     /**
      * Long literal.
      *
-     * @param proto a long literal.
+     * @param proto
+     *        a long literal.
      */
 
     protected LongLiteral(LongLiteral proto) {
@@ -88,7 +91,8 @@ public class LongLiteral extends Literal {
     /**
      * Set value.
      *
-     * @param str a string value.
+     * @param str
+     *        a string value.
      */
 
     public void setValue(String str) {

@@ -83,29 +83,21 @@ public class ParseException extends recoder.ParserException {
      * printing of the final stack trace, and hence the correct error message gets displayed.
      */
     public String getMessage() {
-        if (!specialConstructor) {
-            return super.getMessage();
-        }
+        if (!specialConstructor) { return super.getMessage(); }
         StringBuilder expected = new StringBuilder();
         int maxSize = 0;
         for (int[] expectedTokenSequence : expectedTokenSequences) {
-            if (maxSize < expectedTokenSequence.length) {
-                maxSize = expectedTokenSequence.length;
-            }
+            if (maxSize < expectedTokenSequence.length) { maxSize = expectedTokenSequence.length; }
             for (int j = 0; j < expectedTokenSequence.length; j++) {
                 expected.append(tokenImage[expectedTokenSequence[j]]).append(" ");
             }
-            if (expectedTokenSequence[expectedTokenSequence.length - 1] != 0) {
-                expected.append("...");
-            }
+            if (expectedTokenSequence[expectedTokenSequence.length - 1] != 0) { expected.append("..."); }
             expected.append(eol).append("    ");
         }
         StringBuilder retval = new StringBuilder("Encountered \"");
         Token tok = currentToken.next;
         for (int i = 0; i < maxSize; i++) {
-            if (i != 0) {
-                retval.append(" ");
-            }
+            if (i != 0) { retval.append(" "); }
             if (tok.kind == 0) {
                 retval.append(tokenImage[0]);
                 break;

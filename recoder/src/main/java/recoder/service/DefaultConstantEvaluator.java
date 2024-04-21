@@ -685,7 +685,8 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     /**
      * Create a new constant evaluator.
      *
-     * @param config the configuration this services becomes part of.
+     * @param config
+     *        the configuration this services becomes part of.
      */
     public DefaultConstantEvaluator(ServiceConfiguration config) {
         super(config);
@@ -695,30 +696,14 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Map primitive type objects to internal integral encoding.
      */
     static int translateType(PrimitiveType t, NameInfo ni) {
-        if (t == ni.getIntType()) {
-            return INT_TYPE;
-        }
-        if (t == ni.getBooleanType()) {
-            return BOOLEAN_TYPE;
-        }
-        if (t == ni.getLongType()) {
-            return LONG_TYPE;
-        }
-        if (t == ni.getFloatType()) {
-            return FLOAT_TYPE;
-        }
-        if (t == ni.getDoubleType()) {
-            return DOUBLE_TYPE;
-        }
-        if (t == ni.getByteType()) {
-            return BYTE_TYPE;
-        }
-        if (t == ni.getCharType()) {
-            return CHAR_TYPE;
-        }
-        if (t == ni.getShortType()) {
-            return SHORT_TYPE;
-        }
+        if (t == ni.getIntType()) { return INT_TYPE; }
+        if (t == ni.getBooleanType()) { return BOOLEAN_TYPE; }
+        if (t == ni.getLongType()) { return LONG_TYPE; }
+        if (t == ni.getFloatType()) { return FLOAT_TYPE; }
+        if (t == ni.getDoubleType()) { return DOUBLE_TYPE; }
+        if (t == ni.getByteType()) { return BYTE_TYPE; }
+        if (t == ni.getCharType()) { return CHAR_TYPE; }
+        if (t == ni.getShortType()) { return SHORT_TYPE; }
         return -1;
     }
 
@@ -947,18 +932,14 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                 case 'u' -> {
                     // skip an arbitrary number of u's
                     i += 1;
-                    while (text.charAt(i) == 'u') {
-                        i += 1;
-                    }
+                    while (text.charAt(i) == 'u') { i += 1; }
                     // the following must be a 4-digit hex value
                     buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
                     i += 4;
                 }
                 case '0', '1', '2', '3', '4', '5', '6', '7' -> {
                     int j = i + 1;
-                    while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
-                        j += 1;
-                    }
+                    while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') { j += 1; }
                     buf.append((char) Integer.parseInt(text.substring(i, j), 8));
                     i = j;
                 }
@@ -971,12 +952,8 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static void doPrimitiveTypeCast(int newType, ConstantEvaluator.EvaluationResult res) {
         int oldType = res.getTypeCode();
-        if (oldType == newType) {
-            return;
-        }
-        if (oldType == BOOLEAN_TYPE || newType == BOOLEAN_TYPE) {
-            throw new ModelException("Cast not allowed");
-        }
+        if (oldType == newType) { return; }
+        if (oldType == BOOLEAN_TYPE || newType == BOOLEAN_TYPE) { throw new ModelException("Cast not allowed"); }
         switch (oldType) {
         case BYTE_TYPE -> {
             switch (newType) {
@@ -1064,14 +1041,13 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Java language specification, or <CODE>null
      * </CODE> if it is not.
      *
-     * @param expr the expression to evaluate.
+     * @param expr
+     *        the expression to evaluate.
      * @return the type of the expression, or <CODE>null</CODE> if the expression is not constant.
      */
     public Type getCompileTimeConstantType(Expression expr) {
         ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
-        if (!isCompileTimeConstant(expr, res)) {
-            return null;
-        }
+        if (!isCompileTimeConstant(expr, res)) { return null; }
         return res.getPrimitiveType(getNameInfo());
     }
 
@@ -1079,7 +1055,8 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Checks if the given expression is a compile-time constant as defined in the Java language
      * specification.
      *
-     * @param expr the expression to evaluate.
+     * @param expr
+     *        the expression to evaluate.
      * @return <CODE>true</CODE>, if the expression is a compile-time constant, <CODE>false</CODE>
      *         otherwise.
      */
@@ -1091,8 +1068,10 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Checks if the given expression is a compile-time constant as defined in the Java language
      * specification, and derives the result.
      *
-     * @param expr the expression to evaluate.
-     * @param res the result of the evaluation; contains the type encoding and the result value.
+     * @param expr
+     *        the expression to evaluate.
+     * @param res
+     *        the result of the evaluation; contains the type encoding and the result value.
      * @return <CODE>true</CODE>, if the expression is a compile-time constant, <CODE>false</CODE>
      *         otherwise.
      */
@@ -1138,9 +1117,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
             if (op instanceof TypeOperator) {
                 if (op instanceof TypeCast) {
-                    if (!isCompileTimeConstant(((TypeCast) expr).getExpressionAt(0), res)) {
-                        return false;
-                    }
+                    if (!isCompileTimeConstant(((TypeCast) expr).getExpressionAt(0), res)) { return false; }
                     int newType = -1;
                     Type to = getSourceInfo().getType(((TypeCast) expr).getTypeReference());
                     if (to instanceof PrimitiveType) {
@@ -1161,9 +1138,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                 return false;
             }
 
-            if (op instanceof ParenthesizedExpression) {
-                return isCompileTimeConstant(op.getExpressionAt(0), res);
-            }
+            if (op instanceof ParenthesizedExpression) { return isCompileTimeConstant(op.getExpressionAt(0), res); }
 
             // normalize: widen numerical types shorter than int
             // this is also necessary for unary operations (e.g. unary plus!)
@@ -1182,23 +1157,17 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             switch (op.getArity()) {
             case 1 -> { // unary operations
 
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) { return false; }
                 if (op instanceof Positive) {
                     uno = POSITIVE;
                 } else if (op instanceof Negative) {
                     uno = NEGATIVE;
                 } else if (op instanceof BinaryNot) {
                     uno = BINARY_NOT;
-                } else if (op instanceof LogicalNot) {
-                    ubo = LOGICAL_NOT;
-                }
+                } else if (op instanceof LogicalNot) { ubo = LOGICAL_NOT; }
             }
             case 2 -> { // binary operations
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) { return false; }
                 // widen type
                 lhs = res;
                 promoteNumericTypeToInt(lhs);
@@ -1209,9 +1178,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                  */
                 rhs = new EvaluationResult();
                 // evaluate right-hand side; finish if not constant
-                if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
-                    return false;
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) { return false; }
                 // widen numerical types shorter than int
                 promoteNumericTypeToInt(rhs);
 
@@ -1232,9 +1199,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                         bbo = LESS_OR_EQUALS;
                     } else if (op instanceof LogicalAnd) {
                         bbo = LOGICAL_AND;
-                    } else if (op instanceof LogicalOr) {
-                        bbo = LOGICAL_OR;
-                    }
+                    } else if (op instanceof LogicalOr) { bbo = LOGICAL_OR; }
                 } else if (op instanceof Plus) {
                     bno = PLUS;
                 } else if (op instanceof Minus) {
@@ -1259,29 +1224,19 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                     bno = BINARY_XOR;
                 } else if (op instanceof LogicalAnd) {
                     bbo = LOGICAL_AND;
-                } else if (op instanceof LogicalOr) {
-                    bbo = LOGICAL_OR;
-                }
+                } else if (op instanceof LogicalOr) { bbo = LOGICAL_OR; }
             }
             case 3 -> {
                 // this must be the conditional (?:)
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                if (res.getTypeCode() != BOOLEAN_TYPE) {
-                    throw new ModelException("No boolean expression in ?:");
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) { return false; }
+                if (res.getTypeCode() != BOOLEAN_TYPE) { throw new ModelException("No boolean expression in ?:"); }
                 boolean cond = res.getBoolean();
                 // evaluate both sides; finish if not constant
 
                 lhs = res; // overwrite old values
-                if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
-                    return false;
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) { return false; }
                 rhs = new EvaluationResult();
-                if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
-                    return false;
-                }
+                if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) { return false; }
                 matchConditionalTypes(lhs, rhs);
                 switch (lhs.getTypeCode()) { // matches type of rhs
                 case BOOLEAN_TYPE -> res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
@@ -1375,42 +1330,28 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             Variable v = getSourceInfo().getVariable((VariableReference) expr);
             // unknown vars are not our problem
             // constants must be final (and static if they are fields)
-            if (v == null || !v.isFinal() || (v instanceof Field && !((Field) v).isStatic())) {
-                return false;
-            }
+            if (v == null || !v.isFinal() || (v instanceof Field && !((Field) v).isStatic())) { return false; }
             // get type of constant - we are not interested in all types.
             int vtype = -1;
             Type vt = v.getType();
             if (vt instanceof PrimitiveType) {
                 vtype = translateType((PrimitiveType) vt, getNameInfo());
-            } else if (vt == getNameInfo().getJavaLangString()) {
-                vtype = STRING_TYPE;
-            }
-            if (vtype == -1) {
-                return false;
-            }
-            if (visitedVariableReferences.contains(expr)) {
-                return false;
-            }
+            } else if (vt == getNameInfo().getJavaLangString()) { vtype = STRING_TYPE; }
+            if (vtype == -1) { return false; }
+            if (visitedVariableReferences.contains(expr)) { return false; }
             visitedVariableReferences.push(expr);
             try {
                 ProgramModelInfo qs = v.getProgramModelInfo();
                 if (qs instanceof SourceInfo ais) {
                     expr = ais.getVariableSpecification(v).getInitializer();
-                    if (expr == null) {
-                        return false;
-                    }
-                    if (!isCompileTimeConstant(expr, res)) {
-                        return false;
-                    }
+                    if (expr == null) { return false; }
+                    if (!isCompileTimeConstant(expr, res)) { return false; }
                     // cast to type of constant variable
                     doPrimitiveTypeCast(vtype, res);
                     return true;
                 } else if (qs instanceof ByteCodeInfo bis) {
                     String val = bis.getFieldInfo((Field) v).getConstantValue();
-                    if (val == null) {
-                        return false;
-                    }
+                    if (val == null) { return false; }
                     switch (vtype) {
                     case BOOLEAN_TYPE -> res.setBoolean(Integer.parseInt(val) != 0);
                     case BYTE_TYPE -> res.setByte((byte) Integer.parseInt(val));

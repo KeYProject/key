@@ -30,8 +30,10 @@ public class AmbiguousReferenceException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param r the ambiguous reference.
-     * @param choices the possible resolutions.
+     * @param r
+     *        the ambiguous reference.
+     * @param choices
+     *        the possible resolutions.
      */
     public AmbiguousReferenceException(Reference r, List<? extends ProgramModelElement> choices) {
         reference = r;
@@ -41,9 +43,12 @@ public class AmbiguousReferenceException extends ModelException {
     /**
      * Constructor without explanation text.
      *
-     * @param r the ambiguous reference.
-     * @param choice1 one possible resolution.
-     * @param choice2 a second possible resolution.
+     * @param r
+     *        the ambiguous reference.
+     * @param choice1
+     *        one possible resolution.
+     * @param choice2
+     *        a second possible resolution.
      */
     public AmbiguousReferenceException(Reference r, ProgramModelElement choice1,
             ProgramModelElement choice2) {
@@ -57,9 +62,12 @@ public class AmbiguousReferenceException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param r the ambiguous reference.
-     * @param choices the possible resolutions.
+     * @param s
+     *        an explanation.
+     * @param r
+     *        the ambiguous reference.
+     * @param choices
+     *        the possible resolutions.
      */
     public AmbiguousReferenceException(String s, Reference r,
             List<? extends ProgramModelElement> choices) {
@@ -71,10 +79,14 @@ public class AmbiguousReferenceException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s an explanation.
-     * @param r the ambiguous reference.
-     * @param choice1 one possible resolution.
-     * @param choice2 a second possible resolution.
+     * @param s
+     *        an explanation.
+     * @param r
+     *        the ambiguous reference.
+     * @param choice1
+     *        one possible resolution.
+     * @param choice2
+     *        a second possible resolution.
      */
     public AmbiguousReferenceException(String s, Reference r, ProgramModelElement choice1,
             ProgramModelElement choice2) {

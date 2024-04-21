@@ -31,8 +31,10 @@ public class GreaterThan extends ComparativeOperator {
     /**
      * Greater than.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public GreaterThan(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class GreaterThan extends ComparativeOperator {
     /**
      * Greater than.
      *
-     * @param proto a greater than.
+     * @param proto
+     *        a greater than.
      */
 
     protected GreaterThan(GreaterThan proto) {

@@ -37,7 +37,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     /**
      * Java declaration.
      *
-     * @param mods a modifier mutable list.
+     * @param mods
+     *        a modifier mutable list.
      */
 
     public JavaDeclaration(ASTList<DeclarationSpecifier> mods) {
@@ -48,14 +49,13 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     /**
      * Java declaration.
      *
-     * @param proto a java declaration.
+     * @param proto
+     *        a java declaration.
      */
 
     protected JavaDeclaration(JavaDeclaration proto) {
         super(proto);
-        if (proto.declarationSpecifiers != null) {
-            declarationSpecifiers = proto.declarationSpecifiers.deepClone();
-        }
+        if (proto.declarationSpecifiers != null) { declarationSpecifiers = proto.declarationSpecifiers.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -66,14 +66,10 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      *         reflect changes on the AST!
      */
     public List<Modifier> getModifiers() {
-        if (declarationSpecifiers == null) {
-            return new ArrayList<>(0);
-        }
+        if (declarationSpecifiers == null) { return new ArrayList<>(0); }
         List<Modifier> mml = new ArrayList<>();
         for (DeclarationSpecifier ds : declarationSpecifiers) {
-            if (ds instanceof Modifier) {
-                mml.add((Modifier) ds);
-            }
+            if (ds instanceof Modifier) { mml.add((Modifier) ds); }
         }
         return mml;
     }
@@ -82,16 +78,12 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * @return a list of annotations
      */
     public List<AnnotationUseSpecification> getAnnotations() {
-        if (declarationSpecifiers == null) {
-            return new ArrayList<>(0);
-        }
+        if (declarationSpecifiers == null) { return new ArrayList<>(0); }
         List<AnnotationUseSpecification> result =
             new ArrayList<>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
         for (DeclarationSpecifier ds : declarationSpecifiers) {
-            if (ds instanceof AnnotationUseSpecification) {
-                result.add((AnnotationUseSpecification) ds);
-            }
+            if (ds instanceof AnnotationUseSpecification) { result.add((AnnotationUseSpecification) ds); }
         }
         return result;
     }
@@ -110,25 +102,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      */
 
     public VisibilityModifier getVisibilityModifier() {
-        if (declarationSpecifiers == null) {
-            return null;
-        }
+        if (declarationSpecifiers == null) { return null; }
         for (int i = declarationSpecifiers.size() - 1; i >= 0; i -= 1) {
             DeclarationSpecifier m = declarationSpecifiers.get(i);
-            if (m instanceof VisibilityModifier) {
-                return (VisibilityModifier) m;
-            }
+            if (m instanceof VisibilityModifier) { return (VisibilityModifier) m; }
         }
         return null;
     }
 
     final boolean containsModifier(Class type) {
         int s = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
-        for (int i = 0; i < s; i += 1) {
-            if (type.isInstance(declarationSpecifiers.get(i))) {
-                return true;
-            }
-        }
+        for (int i = 0; i < s; i += 1) { if (type.isInstance(declarationSpecifiers.get(i))) { return true; } }
         return false;
     }
 

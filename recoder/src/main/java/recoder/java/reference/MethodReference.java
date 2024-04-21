@@ -76,7 +76,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Method reference.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
 
     public MethodReference(Identifier name) {
@@ -87,8 +88,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Method reference.
      *
-     * @param accessPath a reference prefix.
-     * @param name an identifier.
+     * @param accessPath
+     *        a reference prefix.
+     * @param name
+     *        an identifier.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name) {
@@ -100,8 +103,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Method reference.
      *
-     * @param name an identifier.
-     * @param args an expression mutable list.
+     * @param name
+     *        an identifier.
+     * @param args
+     *        an expression mutable list.
      */
 
     public MethodReference(Identifier name, ASTList<Expression> args) {
@@ -113,9 +118,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Method reference.
      *
-     * @param accessPath a reference prefix.
-     * @param name an identifier.
-     * @param args an expression mutable list.
+     * @param accessPath
+     *        a reference prefix.
+     * @param name
+     *        an identifier.
+     * @param args
+     *        an expression mutable list.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
@@ -137,20 +145,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Method reference.
      *
-     * @param proto a method reference.
+     * @param proto
+     *        a method reference.
      */
 
     protected MethodReference(MethodReference proto) {
         super(proto);
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.arguments != null) {
-            arguments = proto.arguments.deepClone();
-        }
+        if (proto.accessPath != null) { accessPath = (ReferencePrefix) proto.accessPath.deepClone(); }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.arguments != null) { arguments = proto.arguments.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -170,22 +173,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
-        if (name != null) {
-            name.setParent(this);
-        }
+        if (accessPath != null) { accessPath.setReferenceSuffix(this); }
+        if (name != null) { name.setParent(this); }
         if (arguments != null) {
-            for (int i = arguments.size() - 1; i >= 0; i -= 1) {
-                arguments.get(i).setExpressionContainer(this);
-            }
+            for (int i = arguments.size() - 1; i >= 0; i -= 1) { arguments.get(i).setExpressionContainer(this); }
         }
-        if (typeArguments != null) {
-            for (TypeArgumentDeclaration ta : typeArguments) {
-                ta.setParent(this);
-            }
-        }
+        if (typeArguments != null) { for (TypeArgumentDeclaration ta : typeArguments) { ta.setParent(this); } }
     }
 
     public SourceElement getFirstElement() {
@@ -222,7 +215,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set reference prefix.
      *
-     * @param qualifier a reference prefix.
+     * @param qualifier
+     *        a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix qualifier) {
@@ -242,7 +236,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set reference suffix.
      *
-     * @param path a reference suffix.
+     * @param path
+     *        a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -264,7 +259,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set statement container.
      *
-     * @param parent a statement container.
+     * @param parent
+     *        a statement container.
      */
 
     public void setStatementContainer(StatementContainer parent) {
@@ -286,7 +282,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set expression container.
      *
-     * @param parent an expression container.
+     * @param parent
+     *        an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer parent) {
@@ -303,54 +300,40 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
-        if (typeArguments != null) {
-            result += typeArguments.size();
-        }
+        if (accessPath != null) { result++; }
+        if (name != null) { result++; }
+        if (arguments != null) { result += arguments.size(); }
+        if (typeArguments != null) { result += typeArguments.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (accessPath != null) {
-            if (index == 0) {
-                return accessPath;
-            }
+            if (index == 0) { return accessPath; }
             index--;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (arguments != null) {
             int len = arguments.size();
-            if (len > index) {
-                return arguments.get(index);
-            }
+            if (len > index) { return arguments.get(index); }
             index -= len;
         }
         if (typeArguments != null) {
             int len = typeArguments.size();
-            if (len > index) {
-                return typeArguments.get(index);
-            }
+            if (len > index) { return typeArguments.get(index); }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -361,23 +344,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
         // role 1: name
         // role 2 (IDX): parameters
         // role 3 (IDX): type arguments
-        if (accessPath == child) {
-            return 0;
-        }
-        if (name == child) {
-            return 1;
-        }
+        if (accessPath == child) { return 0; }
+        if (name == child) { return 1; }
         if (arguments != null) {
             int index = arguments.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+            if (index >= 0) { return (index << 4) | 2; }
         }
         if (typeArguments != null) {
             int index = typeArguments.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 3;
-            }
+            if (index >= 0) { return (index << 4) | 3; }
         }
         return -1;
     }
@@ -388,31 +363,28 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         if (accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
             accessPath = r;
-            if (r != null) {
-                r.setReferenceSuffix(this);
-            }
+            if (r != null) { r.setReferenceSuffix(this); }
             return true;
         }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         count = (arguments == null) ? 0 : arguments.size();
@@ -460,9 +432,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (accessPath instanceof TypeReference && index == 0) {
-            return (TypeReference) accessPath;
-        }
+        if (accessPath instanceof TypeReference && index == 0) { return (TypeReference) accessPath; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -474,12 +444,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getExpressionCount() {
         int result = 0;
-        if (accessPath instanceof Expression) {
-            result += 1;
-        }
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (accessPath instanceof Expression) { result += 1; }
+        if (arguments != null) { result += arguments.size(); }
         return result;
     }
 
@@ -491,14 +457,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public Expression getExpressionAt(int index) {
         if (accessPath instanceof Expression) {
-            if (index == 0) {
-                return (Expression) accessPath;
-            }
+            if (index == 0) { return (Expression) accessPath; }
             index -= 1;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -525,7 +487,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -545,7 +508,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Set arguments.
      *
-     * @param list an expression mutable list.
+     * @param list
+     *        an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {

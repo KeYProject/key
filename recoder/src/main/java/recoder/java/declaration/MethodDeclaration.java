@@ -90,11 +90,16 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Method declaration.
      *
-     * @param modifiers a modifier mutable list.
-     * @param returnType a type reference.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
+     * @param modifiers
+     *        a modifier mutable list.
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
      */
 
     public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
@@ -110,12 +115,18 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Method declaration.
      *
-     * @param modifiers a modifier mutable list.
-     * @param returnType a type reference.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
-     * @param body a statement block.
+     * @param modifiers
+     *        a modifier mutable list.
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
      */
 
     public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
@@ -133,29 +144,18 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Method declaration.
      *
-     * @param proto a method declaration.
+     * @param proto
+     *        a method declaration.
      */
 
     protected MethodDeclaration(MethodDeclaration proto) {
         super(proto);
-        if (proto.returnType != null) {
-            returnType = proto.returnType.deepClone();
-        }
-        if (proto.name != null) {
-            name = proto.name.deepClone();
-        }
-        if (proto.parameters != null) {
-            parameters = proto.parameters.deepClone();
-        }
-        if (proto.exceptions != null) {
-            exceptions = proto.exceptions.deepClone();
-        }
-        if (proto.body != null) {
-            body = proto.body.deepClone();
-        }
-        if (proto.typeParameters != null) {
-            typeParameters = proto.typeParameters.deepClone();
-        }
+        if (proto.returnType != null) { returnType = proto.returnType.deepClone(); }
+        if (proto.name != null) { name = proto.name.deepClone(); }
+        if (proto.parameters != null) { parameters = proto.parameters.deepClone(); }
+        if (proto.exceptions != null) { exceptions = proto.exceptions.deepClone(); }
+        if (proto.body != null) { body = proto.body.deepClone(); }
+        if (proto.typeParameters != null) { typeParameters = proto.typeParameters.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -179,31 +179,17 @@ public class MethodDeclaration extends JavaDeclaration
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (returnType != null) {
-            returnType.setParent(this);
-        }
-        if (name != null) {
-            name.setParent(this);
-        }
-        if (exceptions != null) {
-            exceptions.setParent(this);
-        }
+        if (returnType != null) { returnType.setParent(this); }
+        if (name != null) { name.setParent(this); }
+        if (exceptions != null) { exceptions.setParent(this); }
         if (parameters != null) {
-            for (int i = parameters.size() - 1; i >= 0; i -= 1) {
-                parameters.get(i).setParameterContainer(this);
-            }
+            for (int i = parameters.size() - 1; i >= 0; i -= 1) { parameters.get(i).setParameterContainer(this); }
         }
-        if (body != null) {
-            body.setStatementContainer(this);
-        }
+        if (body != null) { body.setStatementContainer(this); }
         // if (isVarArg != null) {
         // isVarArg.setParent(this);
         // }
-        if (typeParameters != null) {
-            for (TypeParameterDeclaration tpd : typeParameters) {
-                tpd.setParent(this);
-            }
-        }
+        if (typeParameters != null) { for (TypeParameterDeclaration tpd : typeParameters) { tpd.setParent(this); } }
     }
 
     public int getChildPositionCode(ProgramElement child) {
@@ -218,36 +204,22 @@ public class MethodDeclaration extends JavaDeclaration
         // role 8: default value (AnnotationPropertyDeclaration only)
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (returnType == child) {
-            return 1;
-        }
-        if (name == child) {
-            return 2;
-        }
+        if (returnType == child) { return 1; }
+        if (name == child) { return 2; }
         if (parameters != null) {
             int index = parameters.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 3;
-            }
+            if (index >= 0) { return (index << 4) | 3; }
         }
-        if (exceptions == child) {
-            return 4;
-        }
-        if (body == child) {
-            return 5;
-        }
+        if (exceptions == child) { return 4; }
+        if (body == child) { return 5; }
         // if (isVarArg == child) {
         // return 6;
         // }
         if (typeParameters != null) {
             int index = typeParameters.indexOf(child);
-            if (index != -1) {
-                return (index << 4) | 7;
-            }
+            if (index != -1) { return (index << 4) | 7; }
         }
         return -1;
     }
@@ -286,7 +258,8 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Set member parent.
      *
-     * @param decl a type declaration.
+     * @param decl
+     *        a type declaration.
      */
 
     public void setMemberParent(TypeDeclaration decl) {
@@ -301,85 +274,59 @@ public class MethodDeclaration extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (returnType != null) {
-            result++;
-        }
-        if (name != null) {
-            result++;
-        }
-        if (parameters != null) {
-            result += parameters.size();
-        }
-        if (exceptions != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (returnType != null) { result++; }
+        if (name != null) { result++; }
+        if (parameters != null) { result += parameters.size(); }
+        if (exceptions != null) { result++; }
+        if (body != null) { result++; }
         // if (isVarArg != null)
         // result++;
-        if (typeParameters != null) {
-            result += typeParameters.size();
-        }
+        if (typeParameters != null) { result += typeParameters.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index) {
-                return typeParameters.get(index);
-            }
+            if (len > index) { return typeParameters.get(index); }
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0) {
-                return returnType;
-            }
+            if (index == 0) { return returnType; }
             index--;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (parameters != null) {
             len = parameters.size();
-            if (len > index) {
-                return parameters.get(index);
-            }
+            if (len > index) { return parameters.get(index); }
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0) {
-                return exceptions;
-            }
+            if (index == 0) { return exceptions; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         // if (isVarArg != null) {
@@ -407,9 +354,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -419,16 +364,17 @@ public class MethodDeclaration extends JavaDeclaration
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -446,17 +392,13 @@ public class MethodDeclaration extends JavaDeclaration
         if (returnType == p) {
             TypeReference r = (TypeReference) q;
             returnType = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (name == p) {
             Identifier r = (Identifier) q;
             name = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         count = (parameters == null) ? 0 : parameters.size();
@@ -475,17 +417,13 @@ public class MethodDeclaration extends JavaDeclaration
         if (exceptions == p) {
             Throws r = (Throws) q;
             exceptions = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
         if (body == p) {
             StatementBlock r = (StatementBlock) q;
             body = r;
-            if (r != null) {
-                r.setStatementContainer(this);
-            }
+            if (r != null) { r.setStatementContainer(this); }
             return true;
         }
         if (typeParameters != null) {
@@ -521,9 +459,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (returnType != null && index == 0) {
-            return returnType;
-        }
+        if (returnType != null && index == 0) { return returnType; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -545,9 +481,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameters != null) {
-            return parameters.get(index);
-        }
+        if (parameters != null) { return parameters.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -592,7 +526,8 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Set identifier.
      *
-     * @param id an identifier.
+     * @param id
+     *        an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -612,7 +547,8 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Set parameters.
      *
-     * @param list a parameter declaration mutable list.
+     * @param list
+     *        a parameter declaration mutable list.
      */
 
     public void setParameters(ASTList<ParameterDeclaration> list) {
@@ -632,7 +568,8 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Set thrown.
      *
-     * @param exceptions a throws.
+     * @param exceptions
+     *        a throws.
      */
 
     public void setThrown(Throws exceptions) {
@@ -652,7 +589,8 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Set body.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -822,27 +760,19 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public List<VariableSpecification> getVariablesInScope() {
-        if (parameters == null || parameters.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (parameters == null || parameters.isEmpty()) { return new ArrayList<>(0); }
         int s = parameters.size();
         List<VariableSpecification> res = new ArrayList<>(s);
-        for (ParameterDeclaration parameter : parameters) {
-            res.add(parameter.getVariableSpecification());
-        }
+        for (ParameterDeclaration parameter : parameters) { res.add(parameter.getVariableSpecification()); }
         return res;
     }
 
     public VariableSpecification getVariableInScope(String tname) {
         Debug.assertNonnull(tname);
-        if (parameters == null) {
-            return null;
-        }
+        if (parameters == null) { return null; }
         for (ParameterDeclaration parameter : parameters) {
             VariableSpecification res = parameter.getVariableSpecification();
-            if (tname.equals(res.getName())) {
-                return res;
-            }
+            if (tname.equals(res.getName())) { return res; }
         }
         return null;
     }
@@ -862,9 +792,7 @@ public class MethodDeclaration extends JavaDeclaration
     public boolean isVarArgMethod() {
         // //return isVarArg != null;
         // return isVarArg;
-        if (parameters == null || parameters.size() == 0) {
-            return false;
-        }
+        if (parameters == null || parameters.size() == 0) { return false; }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
@@ -893,32 +821,20 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeParameters == null) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (typeParameters == null) { throw new IndexOutOfBoundsException(); }
         return typeParameters.get(index);
     }
 
     public List<TypeDeclaration> getTypesInScope() {
-        if (typeParameters == null || typeParameters.isEmpty()) {
-            return new ArrayList<>(0);
-        }
+        if (typeParameters == null || typeParameters.isEmpty()) { return new ArrayList<>(0); }
         List<TypeDeclaration> ctl = new ArrayList<>(typeParameters.size());
-        for (TypeParameterDeclaration t : typeParameters) {
-            ctl.add(t);
-        }
+        for (TypeParameterDeclaration t : typeParameters) { ctl.add(t); }
         return ctl;
     }
 
     public ClassType getTypeInScope(String typename) {
-        if (typeParameters == null) {
-            return null;
-        }
-        for (TypeParameterDeclaration tpd : typeParameters) {
-            if (typename.equals(tpd.getName())) {
-                return tpd;
-            }
-        }
+        if (typeParameters == null) { return null; }
+        for (TypeParameterDeclaration tpd : typeParameters) { if (typename.equals(tpd.getName())) { return tpd; } }
         return null;
     }
 

@@ -27,7 +27,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      *       several ParameterDeclaration (as parameters of the declared method), a StatementBlock
      *       (as body of the declared method), several Modifier (taken as modifiers of the
      *       declaration), a Comment
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
      */
     public ConstructorDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration, null);
@@ -37,12 +38,18 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     /**
      * Constructor declaration.
      *
-     * @param modifiers a modifier array.
-     * @param name an identifier.
-     * @param parameters a parameter declaration mutable list.
-     * @param exceptions a throws.
-     * @param body a statement block.
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param modifiers
+     *        a modifier array.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
      */
     @Deprecated
     public ConstructorDeclaration(Modifier[] modifiers, ProgramElementName name,

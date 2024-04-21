@@ -49,8 +49,10 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param typeRef a type reference.
-     * @param name an identifier.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
      */
 
     public FieldDeclaration(TypeReference typeRef, Identifier name) {
@@ -64,10 +66,14 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param name an identifier.
-     * @param init an expression.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param init
+     *        an expression.
      */
 
     public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
@@ -83,9 +89,12 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param vars a variable specification mutable list.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param vars
+     *        a variable specification mutable list.
      */
 
     public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
@@ -99,14 +108,13 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param proto a field declaration.
+     * @param proto
+     *        a field declaration.
      */
 
     protected FieldDeclaration(FieldDeclaration proto) {
         super(proto);
-        if (proto.fieldSpecs != null) {
-            fieldSpecs = proto.fieldSpecs.deepClone();
-        }
+        if (proto.fieldSpecs != null) { fieldSpecs = proto.fieldSpecs.deepClone(); }
         makeParentRoleValid();
     }
 
@@ -143,7 +151,8 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Set member parent.
      *
-     * @param p a type declaration.
+     * @param p
+     *        a type declaration.
      */
 
     public void setMemberParent(TypeDeclaration p) {
@@ -157,9 +166,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (fieldSpecs != null) {
-            for (int i = fieldSpecs.size() - 1; i >= 0; i -= 1) {
-                fieldSpecs.get(i).setParent(this);
-            }
+            for (int i = fieldSpecs.size() - 1; i >= 0; i -= 1) { fieldSpecs.get(i).setParent(this); }
         }
     }
 
@@ -183,44 +190,34 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null) {
-            result += declarationSpecifiers.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (fieldSpecs != null) {
-            result += fieldSpecs.size();
-        }
+        if (declarationSpecifiers != null) { result += declarationSpecifiers.size(); }
+        if (typeReference != null) { result++; }
+        if (fieldSpecs != null) { result += fieldSpecs.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (declarationSpecifiers != null) {
             len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+            if (len > index) { return declarationSpecifiers.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (fieldSpecs != null) {
-            return fieldSpecs.get(index);
-        }
+        if (fieldSpecs != null) { return fieldSpecs.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -230,18 +227,12 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         // role 2 (IDX): var specs
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+            if (index >= 0) { return (index << 4) | 0; }
         }
-        if (typeReference == child) {
-            return 1;
-        }
+        if (typeReference == child) { return 1; }
         if (fieldSpecs != null) {
             int index = fieldSpecs.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+            if (index >= 0) { return (index << 4) | 2; }
         }
         return -1;
     }
@@ -252,16 +243,17 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @throws ClassCastException if the new child cannot take over the role of the old one.
+     * @throws ClassCastException
+     *         if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
+        if (p == null) { throw new NullPointerException(); }
         int count;
         count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < count; i++) {
@@ -279,9 +271,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         if (typeReference == p) {
             TypeReference r = (TypeReference) q;
             typeReference = r;
-            if (r != null) {
-                r.setParent(this);
-            }
+            if (r != null) { r.setParent(this); }
             return true;
         }
 

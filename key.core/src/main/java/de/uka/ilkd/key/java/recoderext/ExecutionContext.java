@@ -43,9 +43,12 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     /**
      * creates an execution context reference
      *
-     * @param classContext the TypeReference referring to the next enclosing class
-     * @param methodContext the method signature representing the currently active method
-     * @param runtimeInstance a ReferencePrefix to the object that is currently active/executed
+     * @param classContext
+     *        the TypeReference referring to the next enclosing class
+     * @param methodContext
+     *        the method signature representing the currently active method
+     * @param runtimeInstance
+     *        a ReferencePrefix to the object that is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, MethodSignature methodContext,
             ReferencePrefix runtimeInstance) {
@@ -62,42 +65,32 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int count = 0;
-        if (runtimeInstance != null) {
-            count++;
-        }
-        if (classContext != null) {
-            count++;
-        }
-        if (methodContext != null) {
-            count++;
-        }
+        if (runtimeInstance != null) { count++; }
+        if (classContext != null) { count++; }
+        if (methodContext != null) { count++; }
         return count;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (classContext != null) {
-            if (index == 0) {
-                return classContext;
-            }
+            if (index == 0) { return classContext; }
             index--;
         }
         if (methodContext != null) {
-            if (index == 0) {
-                return methodContext;
-            }
+            if (index == 0) { return methodContext; }
             index--;
         }
         if (runtimeInstance != null) {
-            if (index == 0) {
-                return runtimeInstance;
-            }
+            if (index == 0) { return runtimeInstance; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -106,33 +99,25 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     /**
      * Returns the positional code of the given child
      *
-     * @param child the exact child to look for.
+     * @param child
+     *        the exact child to look for.
      * @return the positional code of the given child, or <CODE>-1</CODE>.
      */
     public int getChildPositionCode(ProgramElement child) {
         int idx = 0;
         if (classContext != null) {
-            if (child == classContext) {
-                return idx;
-            }
+            if (child == classContext) { return idx; }
             idx++;
         }
         if (methodContext != null) {
-            if (child == methodContext) {
-                return idx;
-            }
+            if (child == methodContext) { return idx; }
             idx++;
         }
-        if (runtimeInstance != null) {
-            if (child == runtimeInstance) {
-                return idx;
-            }
-        }
+        if (runtimeInstance != null) { if (child == runtimeInstance) { return idx; } }
         return -1;
     }
 
-    public void accept(SourceVisitor visitor) {
-    }
+    public void accept(SourceVisitor visitor) {}
 
     public ExecutionContext deepClone() {
         return new ExecutionContext(classContext, methodContext, runtimeInstance);
@@ -164,19 +149,13 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (classContext != null) {
-            classContext.setParent(this);
-        }
-        if (runtimeInstance != null) {
-            ((Expression) runtimeInstance).setExpressionContainer(this);
-        }
+        if (classContext != null) { classContext.setParent(this); }
+        if (runtimeInstance != null) { ((Expression) runtimeInstance).setExpressionContainer(this); }
     }
 
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (classContext != null && index == 0) {
-            return classContext;
-        }
+        if (classContext != null && index == 0) { return classContext; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -187,9 +166,7 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
 
 
     public Expression getExpressionAt(int index) {
-        if (runtimeInstance != null && index == 0) {
-            return (Expression) runtimeInstance;
-        }
+        if (runtimeInstance != null && index == 0) { return (Expression) runtimeInstance; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -226,6 +203,5 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         return runtimeInstance;
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-    }
+    public void prettyPrint(PrettyPrinter p) {}
 }

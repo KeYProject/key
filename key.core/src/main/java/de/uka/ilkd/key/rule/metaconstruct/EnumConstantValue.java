@@ -35,7 +35,8 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * If the program variable is the nextToCreate-field resolve it to the number of enum constants
      * of the container. Otherwise result in the index of the constant.
      *
-     * @throws IllegalArgumentException if the pv is neither a constant nor ntc.
+     * @throws IllegalArgumentException
+     *         if the pv is neither a constant nor ntc.
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
@@ -56,9 +57,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
             } else {
                 // enum constant
                 value = EnumClassDeclaration.indexOf(pv);
-                if (value == -1) {
-                    throw new IllegalArgumentException(term + " is not an enum constant");
-                }
+                if (value == -1) { throw new IllegalArgumentException(term + " is not an enum constant"); }
             }
 
             final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);

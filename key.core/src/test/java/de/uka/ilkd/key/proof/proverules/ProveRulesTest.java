@@ -60,12 +60,12 @@ public class ProveRulesTest {
         assertNotNull(proofFile,
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile
-            + " claims that it contains a proof for taclet " + tacletName
-            + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
+                + " claims that it contains a proof for taclet " + tacletName
+                + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
         assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
             "Found a taclet proof for taclet " + tacletName
-                + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
-                + "adding annotation \\lemma to the declaration of the taclet.");
+                    + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
+                    + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
@@ -81,15 +81,12 @@ public class ProveRulesTest {
     }
 
     private static List<File> getFilesRecursive(File directory) {
-        assert directory.isDirectory()
-                : "Expecting a directory as input parameter but found: " + directory;
+        assert directory.isDirectory() : "Expecting a directory as input parameter but found: " + directory;
         List<File> list = new LinkedList<>();
         for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (file.isFile()) {
                 String fileName = file.getName();
-                if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) {
-                    list.add(file);
-                }
+                if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) { list.add(file); }
             } else {
                 list.addAll(getFilesRecursive(file));
             }

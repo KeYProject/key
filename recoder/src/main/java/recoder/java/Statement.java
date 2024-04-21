@@ -22,7 +22,8 @@ public interface Statement extends ProgramElement {
     /**
      * Set statement container.
      *
-     * @param c a statement container.
+     * @param c
+     *        a statement container.
      */
     void setStatementContainer(StatementContainer c);
 

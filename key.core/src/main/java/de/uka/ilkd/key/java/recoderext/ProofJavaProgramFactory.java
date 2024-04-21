@@ -82,10 +82,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         if (!c.isPrefixed()) {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
-            if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++) {
-                }
-            }
+            if (ppe != null) { for (; ppe.getChildAt(i) != dest; i++) {} }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
             } else {
@@ -93,9 +90,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 while (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
-                    if (i == 0) {
-                        break;
-                    }
+                    if (i == 0) { break; }
                     dest = ppe.getChildAt(i - 1);
                 }
             }
@@ -108,9 +103,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             }
         }
         ASTList<Comment> cml = dest.getComments();
-        if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<>());
-        }
+        if (cml == null) { dest.setComments(cml = new ASTArrayList<>()); }
         cml.add(c);
     }
 
@@ -123,9 +116,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             Comment current = comments.get(commentIndex);
             Position cpos = current.getStartPosition();
 
-            if (endPos != null && cpos.compareTo(endPos) > 0) {
-                return commentIndex;
-            }
+            if (endPos != null && cpos.compareTo(endPos) > 0) { return commentIndex; }
 
             if (!current.getText().contains("@")) {
                 // "pure" comment without @ (we only need JML annotations)
@@ -138,9 +129,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
             ProgramElement pe = last;
             while (pe.getEndPosition().compareTo(cpos) < 0) {
-                if (pe.getASTParent() == null) {
-                    return commentIndex;
-                }
+                if (pe.getASTParent() == null) { return commentIndex; }
                 pe = pe.getASTParent();
             }
             if (!(pe instanceof StatementBlock block)) {
@@ -181,9 +170,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         ProgramElement pe = pePrev;
         Position endPos = ZERO_POSITION;
         while (pe != null) {
-            if (pe.getEndPosition().compareTo(startPos) > 0) {
-                return endPos;
-            }
+            if (pe.getEndPosition().compareTo(startPos) > 0) { return endPos; }
             endPos = pe.getEndPosition();
             pe = pe.getASTParent();
         }
@@ -194,9 +181,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         TreeWalker tw = new TreeWalker(programElem);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement) pe).makeParentRoleValid();
-            }
+            if (pe instanceof NonTerminalProgramElement) { ((NonTerminalProgramElement) pe).makeParentRoleValid(); }
         }
     }
 
@@ -209,9 +194,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         List<Comment> comments = ProofJavaParser.getComments();
         int commentIndex = 0;
         int commentCount = comments.size();
-        if (commentCount == 0) {
-            return;
-        }
+        if (commentCount == 0) { return; }
         Comment current = comments.get(commentIndex);
         Position cpos = current.getFirstElement().getStartPosition();
 
@@ -234,9 +217,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             Position endPos = getPrevBlockEnd(pePrev, peNext);
 
             commentIndex = appendComments(pePrev, comments, commentIndex, endPos);
-            if (commentIndex == commentCount) {
-                return;
-            }
+            if (commentIndex == commentCount) { return; }
             current = comments.get(commentIndex);
             cpos = current.getFirstElement().getStartPosition();
             while ((commentIndex < commentCount) && startPos.compareTo(cpos) > 0) {
@@ -244,9 +225,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 current.setPrefixed(true);
                 attachComment(current, peNext);
                 commentIndex += 1;
-                if (commentIndex == commentCount) {
-                    return;
-                }
+                if (commentIndex == commentCount) { return; }
                 current = comments.get(commentIndex);
                 cpos = current.getFirstElement().getStartPosition();
             }
@@ -259,13 +238,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             // -- conservative with old behovior of this method ---
             // Attach all still remaining comments to the compilation unit
             ProgramElement pe = peNext;
-            while (pe.getASTParent() != null) {
-                pe = pe.getASTParent();
-            }
+            while (pe.getASTParent() != null) { pe = pe.getASTParent(); }
             ASTList<Comment> cml = pe.getComments();
-            if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<>());
-            }
+            if (cml == null) { pe.setComments(cml = new ASTArrayList<>()); }
             do {
                 current = comments.get(commentIndex);
                 current.setPrefixed(false);
@@ -447,9 +422,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             try {
                 ProofJavaParser.initialize(in);
                 ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
-                for (Statement re : res) {
-                    postWork(re);
-                }
+                for (Statement re : res) { postWork(re); }
                 return res;
             } catch (ParseException e) {
                 throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
@@ -536,7 +509,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * Create a comment.
      *
-     * @param text comment text
+     * @param text
+     *        comment text
      */
     @Override
     public Comment createComment(String text) {
@@ -546,7 +520,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * Create a comment.
      *
-     * @param text comment text
+     * @param text
+     *        comment text
      */
     @Override
     public Comment createComment(String text, boolean prefixed) {

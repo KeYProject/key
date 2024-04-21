@@ -18,11 +18,15 @@ public class ContextInstantiationEntry
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param pi the PosInProgram describing the position of the first statement after the prefix
-     * @param omega the PosInProgram describing the position of the statement just before the suffix
+     * @param pi
+     *        the PosInProgram describing the position of the first statement after the prefix
+     * @param omega
+     *        the PosInProgram describing the position of the statement just before the suffix
      *        starts
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      */
     ContextInstantiationEntry(PosInProgram pi, PosInProgram omega,
             ExecutionContext activeStatementContext, ProgramElement pe) {

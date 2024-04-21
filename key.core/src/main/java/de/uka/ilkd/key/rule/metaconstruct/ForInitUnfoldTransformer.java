@@ -27,14 +27,16 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ForInitUnfoldTransformer extends ProgramTransformer {
     /**
-     * @param loopInit A loop initializer if called for a concrete program.
+     * @param loopInit
+     *        A loop initializer if called for a concrete program.
      */
     public ForInitUnfoldTransformer(LoopInit loopInit) {
         super("forInitUnfoldTransformer", loopInit);
     }
 
     /**
-     * @param programSV A {@link ProgramSV} if called while parsing a taclet.
+     * @param programSV
+     *        A {@link ProgramSV} if called while parsing a taclet.
      */
     public ForInitUnfoldTransformer(ProgramSV programSV) {
         super("forInitUnfoldTransformer", programSV);

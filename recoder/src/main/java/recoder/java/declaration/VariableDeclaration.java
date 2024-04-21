@@ -37,8 +37,10 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {
@@ -50,14 +52,13 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      *
-     * @param proto a variable declaration.
+     * @param proto
+     *        a variable declaration.
      */
 
     protected VariableDeclaration(VariableDeclaration proto) {
         super(proto);
-        if (proto.typeReference != null) {
-            typeReference = proto.typeReference.deepClone();
-        }
+        if (proto.typeReference != null) { typeReference = proto.typeReference.deepClone(); }
         // makeParentRoleValid() called by subclasses' constructors
     }
 
@@ -67,9 +68,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (typeReference != null) {
-            typeReference.setParent(this);
-        }
+        if (typeReference != null) { typeReference.setParent(this); }
     }
 
     public SourceElement getFirstElement() {
@@ -97,9 +96,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -116,7 +113,8 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Set type reference.
      *
-     * @param t a type reference.
+     * @param t
+     *        a type reference.
      */
 
     public void setTypeReference(TypeReference t) {

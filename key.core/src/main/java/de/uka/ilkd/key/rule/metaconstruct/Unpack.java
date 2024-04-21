@@ -16,7 +16,8 @@ public class Unpack extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param loop the instance of expression contained by the meta construct
+     * @param loop
+     *        the instance of expression contained by the meta construct
      */
     public Unpack(For loop) {
         super("unpack", loop);

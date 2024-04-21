@@ -47,7 +47,8 @@ public interface SourceElement {
      * Sets the start position of the primary token of this element. To set the start position of
      * the syntactical first token, call the corresponding method of <CODE>getFirstElement()</CODE>.
      *
-     * @param p the start position of the primary token.
+     * @param p
+     *        the start position of the primary token.
      */
     void setStartPosition(Position p);
 
@@ -65,7 +66,8 @@ public interface SourceElement {
      * Sets the end position of the primary token of this element. To set the end position of the
      * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
      *
-     * @param p the end position of the primary token.
+     * @param p
+     *        the end position of the primary token.
      */
     void setEndPosition(Position p);
 
@@ -85,7 +87,8 @@ public interface SourceElement {
      * corresponding method of <CODE>
      * getFirstElement()</CODE>.
      *
-     * @param p the relative position of the primary token.
+     * @param p
+     *        the relative position of the primary token.
      */
     void setRelativePosition(Position p);
 
@@ -99,7 +102,8 @@ public interface SourceElement {
     /**
      * Receive a visitor, for instance a pretty printer.
      *
-     * @param v a source visitor.
+     * @param v
+     *        a source visitor.
      */
     void accept(SourceVisitor v);
 
@@ -167,8 +171,10 @@ public interface SourceElement {
         /**
          * Constructs a new source code position object.
          *
-         * @param line the line number.
-         * @param column the column number.
+         * @param line
+         *        the line number.
+         * @param column
+         *        the column number.
          */
 
         public Position(int line, int column) {
@@ -188,17 +194,14 @@ public interface SourceElement {
         /**
          * Sets the line number of this position.
          *
-         * @param line the future line number for this position (may not be negative).
+         * @param line
+         *        the future line number for this position (may not be negative).
          */
 
         public void setLine(int line) {
-            if (line < 0) {
-                throw new IllegalArgumentException("Negative line position " + line);
-            }
+            if (line < 0) { throw new IllegalArgumentException("Negative line position " + line); }
             this.line = line;
-            if (column < 0) {
-                column = 0;
-            }
+            if (column < 0) { column = 0; }
         }
 
         /**
@@ -214,33 +217,28 @@ public interface SourceElement {
         /**
          * Sets the column number of this position.
          *
-         * @param column the future column number for this position (may not be negative).
+         * @param column
+         *        the future column number for this position (may not be negative).
          */
 
         public void setColumn(int column) {
-            if (column < 0) {
-                throw new IllegalArgumentException("Negative column position " + column);
-            }
+            if (column < 0) { throw new IllegalArgumentException("Negative column position " + column); }
             this.column = column;
-            if (line < 0) {
-                line = 0;
-            }
+            if (line < 0) { line = 0; }
         }
 
         /**
          * Sets the line and column number of this position.
          *
-         * @param line the future lkine number for this position (may not be negative).
-         * @param column the future column number for this position (may not be negative).
+         * @param line
+         *        the future lkine number for this position (may not be negative).
+         * @param column
+         *        the future column number for this position (may not be negative).
          */
 
         public void setPosition(int line, int column) {
-            if (line < 0) {
-                throw new IllegalArgumentException("Negative line position " + line);
-            }
-            if (column < 0) {
-                throw new IllegalArgumentException("Negative column position " + column);
-            }
+            if (line < 0) { throw new IllegalArgumentException("Negative line position " + line); }
+            if (column < 0) { throw new IllegalArgumentException("Negative column position " + column); }
             this.line = line;
             this.column = column;
         }
@@ -263,12 +261,8 @@ public interface SourceElement {
          */
 
         public boolean equals(Object x) {
-            if (x == this) {
-                return true;
-            }
-            if (!(x instanceof Position p)) {
-                return false;
-            }
+            if (x == this) { return true; }
+            if (!(x instanceof Position p)) { return false; }
             return line == p.line && column == p.column;
         }
 
@@ -276,7 +270,8 @@ public interface SourceElement {
          * Compares this position with the given object for order. An undefined position is less
          * than any defined position.
          *
-         * @param x the position object to compare with.
+         * @param x
+         *        the position object to compare with.
          * @return a negative number, zero, or a positive number, if this position is lower than,
          *         equals to, or higher than the given one.
          */
@@ -289,7 +284,8 @@ public interface SourceElement {
          * Compares this position with the given object for order. An undefined position is less
          * than any defined position.
          *
-         * @param p the position to compare with.
+         * @param p
+         *        the position to compare with.
          * @return a negative number, zero, or a positive number, if this position is lower than,
          *         equals to, or higher than the given one.
          */

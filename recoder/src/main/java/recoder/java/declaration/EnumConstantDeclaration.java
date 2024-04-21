@@ -96,9 +96,7 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
     }
 
     public EnumConstantSpecification getEnumConstantSpecification() {
-        if (fieldSpecs == null || fieldSpecs.size() == 0) {
-            return null;
-        }
+        if (fieldSpecs == null || fieldSpecs.size() == 0) { return null; }
         return (EnumConstantSpecification) fieldSpecs.get(0);
     }
 
@@ -106,9 +104,7 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
      * @param spec
      */
     public void setEnumConstantSpecification(EnumConstantSpecification spec) {
-        if (fieldSpecs == null) {
-            fieldSpecs = new ASTArrayList<>(1);
-        }
+        if (fieldSpecs == null) { fieldSpecs = new ASTArrayList<>(1); }
         fieldSpecs.add(spec);
     }
 
@@ -136,23 +132,23 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
             for (DeclarationSpecifier ds : declarationSpecifiers) {
                 if (!(ds instanceof AnnotationUse)) {
                     throw new ModelException("EnumConstantDeclaration may not contain modifiers in "
-                        + parent.getFullName());
+                            + parent.getFullName());
                 }
             }
         }
         if (!(parent instanceof EnumDeclaration)) {
             throw new ModelException("Illegal parent type (" + parent.getClass().getCanonicalName()
-                + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
+                    + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
         }
         if (fieldSpecs.size() != 1) {
             throw new ModelException(
                 "Only one EnumConstantSpecification per EnumConstantDeclaration allowed in "
-                    + parent.getFullName());
+                        + parent.getFullName());
         }
         if (!(fieldSpecs.get(0) instanceof EnumConstantSpecification)) {
             throw new ModelException(
                 "child of EnumConstantDeclaration is not an EnumConstantSpecification in "
-                    + parent.getFullName());
+                        + parent.getFullName());
         }
     }
 

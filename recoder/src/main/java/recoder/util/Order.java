@@ -26,7 +26,8 @@ package recoder.util;
  *
  * <pre>
  * {@code
- * lessOrEquals(x,y)==(less(x,y) || equals(x,y))}
+ * lessOrEquals(x, y) == (less(x, y) || equals(x, y))
+ * }
  * ,
  * </pre>
  *
@@ -70,8 +71,10 @@ public interface Order extends Equality {
     /**
      * Check if both objects can be related.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true if both objects can be compared, false otherwise.
      */
     boolean isComparable(Object x, Object y);
@@ -81,8 +84,10 @@ public interface Order extends Equality {
      * <CODE>less(x,&nbsp;y)</CODE> implies <CODE>!equals(x,&nbsp;y)
      * </CODE>.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true if the first object is less than the second one.
      */
     boolean less(Object x, Object y);
@@ -92,8 +97,10 @@ public interface Order extends Equality {
      * <CODE>greater(x,&nbsp;y)</CODE> implies <CODE>
      * !equals(x,&nbsp;y)</CODE>.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true if the first object is greater than the second one.
      */
     boolean greater(Object x, Object y);
@@ -101,8 +108,10 @@ public interface Order extends Equality {
     /**
      * Check if the first object is less than or equals the second one.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true if the first object is less than or equals the second one.
      */
     boolean lessOrEquals(Object x, Object y);
@@ -110,8 +119,10 @@ public interface Order extends Equality {
     /**
      * Check if the first object is greater than or equals the second one.
      *
-     * @param x the first object.
-     * @param y the second object.
+     * @param x
+     *        the first object.
+     * @param y
+     *        the second object.
      * @return true if the first object is greater than or equals the second one.
      */
     boolean greaterOrEquals(Object x, Object y);
@@ -176,8 +187,10 @@ public interface Order extends Equality {
         /**
          * compares the given objects using there identity hash code
          *
-         * @param x the first object.
-         * @param y the second object.
+         * @param x
+         *        the first object.
+         * @param y
+         *        the second object.
          * @return true if the identity hash code of the first object is less than that of the
          *         second object
          */
@@ -188,8 +201,10 @@ public interface Order extends Equality {
         /**
          * compares the given objects using there identity hash code
          *
-         * @param x the first object.
-         * @param y the second object.
+         * @param x
+         *        the first object.
+         * @param y
+         *        the second object.
          * @return true if the identity hash code of the first object is greater than that of the
          *         second object
          */
@@ -200,8 +215,10 @@ public interface Order extends Equality {
         /**
          * compares the given objects using there identity hash code
          *
-         * @param x the first object.
-         * @param y the second object.
+         * @param x
+         *        the first object.
+         * @param y
+         *        the second object.
          * @return true if the identity hash code of the first object is less or equal than
          *         that of the second object
          */
@@ -212,8 +229,10 @@ public interface Order extends Equality {
         /**
          * compares the given objects using there identity hash code
          *
-         * @param x the first object.
-         * @param y the second object.
+         * @param x
+         *        the first object.
+         * @param y
+         *        the second object.
          * @return true if the identity hash code of the first object is greater or equal than
          *         that of the second object
          */
@@ -248,9 +267,7 @@ public interface Order extends Equality {
             for (int i = 0, m = Math.min(len1, len2); i < m; i++) {
                 char c1 = s1.charAt(i);
                 char c2 = s2.charAt(i);
-                if (c1 != c2) {
-                    return c1 - c2;
-                }
+                if (c1 != c2) { return c1 - c2; }
             }
             return len1 - len2;
         }

@@ -20,8 +20,10 @@ public interface SkeletonGenerator {
     /**
      * Override this method to introduce a translating mechanism for taclets.
      *
-     * @param t taclet to be translated.
-     * @param services TODO
+     * @param t
+     *        taclet to be translated.
+     * @param services
+     *        TODO
      * @return returns the translation of the taclet.
      */
     Term translate(Taclet t, TermServices services) throws IllegalTacletException;
@@ -39,8 +41,10 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * And(s): conjunction between all formulae in set s. Or(s): disjunction between all formulae in
      * set s.
      *
-     * @param s The sequent to be translated.
-     * @param services TODO
+     * @param s
+     *        The sequent to be translated.
+     * @param services
+     *        TODO
      * @return the resulting term of the translation or <code>null</code> if both antecedent and
      *         succendent are empty.
      */
@@ -50,15 +54,9 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
         ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
         ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
 
-        if (ante.size() == 0 && succ.size() == 0) {
-            return null;
-        }
-        if (succ.size() == 0) {
-            return builder.not(builder.and(ante));
-        }
-        if (ante.size() == 0) {
-            return builder.or(succ);
-        }
+        if (ante.size() == 0 && succ.size() == 0) { return null; }
+        if (succ.size() == 0) { return builder.not(builder.and(ante)); }
+        if (ante.size() == 0) { return builder.or(succ); }
 
         return builder.imp(builder.and(ante), builder.or(succ));
     }
@@ -67,14 +65,13 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
     /**
      * Collects all formulae of a semisequent in a set.
      *
-     * @param s Semisequent.
+     * @param s
+     *        Semisequent.
      * @return A list of all formulae of the semisequent <code>s </code>.
      */
     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
-        for (SequentFormula cf : s) {
-            terms = terms.append(cf.formula());
-        }
+        for (SequentFormula cf : s) { terms = terms.append(cf.formula()); }
         return terms;
 
     }

@@ -24,9 +24,7 @@ public class AttachChange extends TreeChange {
 
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        if (isMinor()) {
-            buf.append("Minor ");
-        }
+        if (isMinor()) { buf.append("Minor "); }
         buf.append("Attached: ");
         if (getChangeRoot() instanceof CompilationUnit) {
             buf.append(Format.toString("%c %u", getChangeRoot()));

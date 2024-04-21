@@ -43,9 +43,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
 
     void setSuperName(String superName) {
         this.superName = superName;
-        if (superName != null) {
-            this.superName = superName.intern();
-        }
+        if (superName != null) { this.superName = superName.intern(); }
     }
 
     public final String getTypeName() {
@@ -67,9 +65,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     void setInterfaceNames(String[] interfaceNames) {
         this.interfaceNames = interfaceNames;
         if (interfaceNames != null) {
-            for (int i = 0; i < interfaceNames.length; i++) {
-                interfaceNames[i] = interfaceNames[i].intern();
-            }
+            for (int i = 0; i < interfaceNames.length; i++) { interfaceNames[i] = interfaceNames[i].intern(); }
         }
     }
 
@@ -96,9 +92,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     void setInnerClassNames(String[] innerClassNames) {
         this.innerClasses = innerClassNames;
         if (innerClasses != null) {
-            for (int i = 0; i < innerClassNames.length; i++) {
-                innerClassNames[i] = innerClassNames[i].intern();
-            }
+            for (int i = 0; i < innerClassNames.length; i++) { innerClassNames[i] = innerClassNames[i].intern(); }
         }
     }
 

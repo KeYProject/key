@@ -81,14 +81,14 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Process a list of {@link TestFile}s in a separate subprocess.
      *
-     * @param testFiles files to be tested
-     * @param pathToTempDir a path to the temporary data directory
+     * @param testFiles
+     *        files to be tested
+     * @param pathToTempDir
+     *        a path to the temporary data directory
      */
     public static List<TestResult> processTestFiles(List<TestFile> testFiles, Path pathToTempDir)
             throws Exception {
-        if (testFiles.isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (testFiles.isEmpty()) { return new ArrayList<>(); }
         ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
         writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
@@ -98,14 +98,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
             new ProcessBuilder("java", "-classpath", System.getProperty("java.class.path"),
                 // pass through the value of key.disregardSettings
                 "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "="
-                    + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
+                        + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
         String forkMemory = settings.getForkMemory();
-        if (forkMemory != null) {
-            command.add("-Xmx" + forkMemory);
-        }
+        if (forkMemory != null) { command.add("-Xmx" + forkMemory); }
 
         String debugPort = settings.getForkDebugPort();
         if (debugPort != null) {
@@ -191,9 +189,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             }
         }
 
-        if (error) {
-            fail("Exception during the execution of proofs. See log for more details.");
-        }
+        if (error) { fail("Exception during the execution of proofs. See log for more details."); }
     }
 
     /**
@@ -204,16 +200,15 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * <p>
      * If no timeout has been specified, no thread is launched.
      *
-     * @param settings the (non-null) settings to take the timeout from.
+     * @param settings
+     *        the (non-null) settings to take the timeout from.
      * @param tempDirectory
      */
     private static void installTimeoutWatchdog(ProofCollectionSettings settings,
             final Path tempDirectory) {
 
         String timeoutString = settings.getForkTimeout();
-        if (timeoutString == null) {
-            return;
-        }
+        if (timeoutString == null) { return; }
 
         final boolean verbose = settings.getVerboseOutput();
 
@@ -234,17 +229,13 @@ public abstract class ForkedTestFileRunner implements Serializable {
             @Override
             public void run() {
                 try {
-                    if (verbose) {
-                        LOGGER.info("Timeout watcher launched (" + timeout + " secs.)");
-                    }
+                    if (verbose) { LOGGER.info("Timeout watcher launched (" + timeout + " secs.)"); }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
                         new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
-                    if (verbose) {
-                        LOGGER.info("Process timed out");
-                    }
+                    if (verbose) { LOGGER.info("Process timed out"); }
                     System.exit(0);
                 } catch (Exception ex) {
                     LOGGER.warn("The watchdog has been interrupted or failed. Timeout cancelled.",

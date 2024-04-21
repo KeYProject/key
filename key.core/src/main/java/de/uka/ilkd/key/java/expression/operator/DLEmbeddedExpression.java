@@ -83,9 +83,7 @@ public class DLEmbeddedExpression extends Operator {
 
     public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
 
-        if (functionSymbol == null) {
-            throw new ConvertException("null function symbol");
-        }
+        if (functionSymbol == null) { throw new ConvertException("null function symbol"); }
 
         int expected = functionSymbol.arity();
         int actual = children.size();
@@ -93,13 +91,11 @@ public class DLEmbeddedExpression extends Operator {
         // by one
         int implicitOffset = 0;
 
-        if (actual == expected - 1 && functionSymbol.argSort(0) == getHeapSort(javaServ)) {
-            implicitOffset = 1;
-        }
+        if (actual == expected - 1 && functionSymbol.argSort(0) == getHeapSort(javaServ)) { implicitOffset = 1; }
 
         if (expected != actual + implicitOffset) {
             throw new ConvertException("Function symbol " + functionSymbol + " requires " + expected
-                + " arguments, but received only " + actual);
+                    + " arguments, but received only " + actual);
         }
 
         String name = containingClass.getSort().name().toString();
@@ -121,7 +117,7 @@ public class DLEmbeddedExpression extends Operator {
             if (kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException(
                     "Received " + child + " as argument " + i + " for function " + functionSymbol
-                        + ". Was expecting type " + kjtExpected + ", but received " + kjtActual);
+                            + ". Was expecting type " + kjtExpected + ", but received " + kjtActual);
             }
         }
     }

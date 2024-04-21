@@ -30,7 +30,8 @@ public class Private extends VisibilityModifier {
     /**
      * Private.
      *
-     * @param proto a private.
+     * @param proto
+     *        a private.
      */
 
     protected Private(Private proto) {

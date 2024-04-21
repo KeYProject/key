@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ContractFactoryTest {
     /** the filename of the key file which is needed to create Services and JavaInfo */
     private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+            + "speclang" + File.separator + "testFile.key";
 
     /** JavaInfo containing information about the available datatypes and methods */
     private JavaInfo javaInfo;
@@ -70,7 +70,8 @@ public class ContractFactoryTest {
      * Checks that two equal assignable clauses are combined correctly, i.e., without
      * if-expressions.
      *
-     * @throws SLTranslationException is not thrown if the test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if the test succeeds
      */
     @Test
     public void testCombineEqualAssignable() throws SLTranslationException {
@@ -96,7 +97,8 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly: \nothing and
      * \strictly_nothing should be combined to empty (w/o if-then-else).
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
     public void testCombineEmptyAssignable() throws SLTranslationException {
@@ -122,7 +124,8 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly, i.e. using intersection
      * and if-expressions with preconditions of the original contracts in their conditions.
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
     public void testCombineDifferentAssignable() throws SLTranslationException {
@@ -142,18 +145,21 @@ public class ContractFactoryTest {
                 @*/""";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
-            + "allLocs))", woLabels.toString());
+                + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+                + "allLocs))",
+            woLabels.toString());
     }
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
      * returns the modifies term of the resulting combined contract (with origin labels removed).
      *
-     * @param contractStr the string containing the contracts for method m
+     * @param contractStr
+     *        the string containing the contracts for method m
      * @return the combined modifies term of the contracts in the input string, without origin
      *         labels
-     * @throws SLTranslationException should not be thrown
+     * @throws SLTranslationException
+     *         should not be thrown
      */
     private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
@@ -173,10 +179,7 @@ public class ContractFactoryTest {
 
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];
         int i = 0;
-        for (Contract c : contractSet) {
-            cs[i] = (FunctionalOperationContract) c;
-            i++;
-        }
+        for (Contract c : contractSet) { cs[i] = (FunctionalOperationContract) c; i++; }
 
         // combine exceptional with normal contract
         ContractFactory cf = new ContractFactory(services);

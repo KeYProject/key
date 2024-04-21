@@ -172,23 +172,16 @@ public class FloatHandler implements SMTHandler {
 
             List<SExpr> translatedSubs = new LinkedList<>();
 
-            if (roundingOperators.contains(fpOp)) {
-                translatedSubs.add(new SExpr(ROUNDING_MODE));
-            }
+            if (roundingOperators.contains(fpOp)) { translatedSubs.add(new SExpr(ROUNDING_MODE)); }
 
-            for (Term t : subs) {
-                Type type = getType(t.sort());
-                translatedSubs.add(trans.translate(t, type));
-            }
+            for (Term t : subs) { Type type = getType(t.sort()); translatedSubs.add(trans.translate(t, type)); }
 
             return new SExpr(fpOp, exprType, translatedSubs);
         }
 
         if (op == doubleLDT.getDoubleSymbol()) {
             return doubleLiteralToSMT(term, services);
-        } else if (op == floatLDT.getFloatSymbol()) {
-            return floatLiteralToSMT(term, services);
-        }
+        } else if (op == floatLDT.getFloatSymbol()) { return floatLiteralToSMT(term, services); }
 
         throw new SMTTranslationException("Unhandled case: " + term);
     }
@@ -210,7 +203,8 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a float literal of sort "float" in FP notation to an SMTLIB fp literal
      *
-     * @param term an application of FP
+     * @param term
+     *        an application of FP
      * @return A string containing the translated literal
      */
     public static SExpr floatLiteralToSMT(Term term, Services services) {
@@ -228,7 +222,8 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a double literal of sort "double" in DFP notation to an SMTLIB fp literal
      *
-     * @param term an application of DFP
+     * @param term
+     *        an application of DFP
      * @return An sexpr containing the translated literal
      */
     public static SExpr doubleLiteralToSMT(Term term, Services services) {
@@ -245,10 +240,7 @@ public class FloatHandler implements SMTHandler {
     private static String extractBits(long value, int fromBit, int count) {
         StringBuilder sb = new StringBuilder();
         value = value >>> fromBit;
-        for (int i = 0; i < count; i++) {
-            sb.insert(0, (value & 1) == 1 ? "1" : "0");
-            value >>>= 1;
-        }
+        for (int i = 0; i < count; i++) { sb.insert(0, (value & 1) == 1 ? "1" : "0"); value >>>= 1; }
         return sb.toString();
     }
 

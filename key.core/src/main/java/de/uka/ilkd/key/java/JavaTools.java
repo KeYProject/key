@@ -57,9 +57,12 @@ public final class JavaTools {
     /**
      * Returns the passed java block with `statement` replaced with `with`.
      *
-     * @param jb the block
-     * @param statement the statement to replace
-     * @param with what to replace with. If this is null, the statement will be removed
+     * @param jb
+     *        the block
+     * @param statement
+     *        the statement to replace
+     * @param with
+     *        what to replace with. If this is null, the statement will be removed
      * @return the modified block
      */
     public static JavaBlock replaceStatement(JavaBlock jb, Services services,
@@ -80,9 +83,7 @@ public final class JavaTools {
                 if (!done && node == statement) {
                     done = true;
                     stack.pop();
-                    if (with != null) {
-                        addToTopOfStack(with);
-                    }
+                    if (with != null) { addToTopOfStack(with); }
                     changed();
                 } else {
                     super.doAction(node);
@@ -103,9 +104,7 @@ public final class JavaTools {
             private MethodFrame res;
 
             protected void doDefaultAction(SourceElement node) {
-                if (node instanceof MethodFrame && res == null) {
-                    res = (MethodFrame) node;
-                }
+                if (node instanceof MethodFrame && res == null) { res = (MethodFrame) node; }
             }
 
             public MethodFrame run() {

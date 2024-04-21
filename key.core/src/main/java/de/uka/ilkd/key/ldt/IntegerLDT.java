@@ -164,9 +164,7 @@ public final class IntegerLDT extends LDT {
 
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
-        for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, String.valueOf(i));
-        }
+        for (int i = 0; i < 10; i++) { numberSymbol[i] = addFunction(services, String.valueOf(i)); }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
         assert sharp.sort() == numbers.argSort(0);
@@ -658,7 +656,8 @@ public final class IntegerLDT extends LDT {
     /**
      * in bounds for specification
      *
-     * @param t the type
+     * @param t
+     *        the type
      * @return in range function
      */
     public JFunction getSpecInBounds(Type t) {
@@ -680,7 +679,8 @@ public final class IntegerLDT extends LDT {
     /**
      * Finds the cast to type `t`. This is intended for creating specification only.
      *
-     * @param t the type
+     * @param t
+     *        the type
      * @return the cast
      */
     public JFunction getSpecCast(Type t) {
@@ -777,31 +777,21 @@ public final class IntegerLDT extends LDT {
     public String toNumberString(Term t) {
         StringBuilder sb = new StringBuilder();
         Operator f = t.op();
-        while (isNumberLiteral(f)) {
-            sb.insert(0, f.name().toString().charAt(0));
-            t = t.sub(0);
-            f = t.op();
-        }
+        while (isNumberLiteral(f)) { sb.insert(0, f.name().toString().charAt(0)); t = t.sub(0); f = t.op(); }
 
-        if (f != sharp) {
-            throw new RuntimeException("IntegerLDT: This is not a numeral literal: " + t);
-        }
+        if (f != sharp) { throw new RuntimeException("IntegerLDT: This is not a numeral literal: " + t); }
 
         return sb.toString();
     }
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (!containsFunction((Function) t.op())) {
-            return null;
-        }
+        if (!containsFunction((Function) t.op())) { return null; }
         JFunction f = (JFunction) t.op();
         if (isNumberLiteral(f) || f == numbers || f == charID) {
 
             Term it = t;
-            if (f == charID || f == numbers) {
-                it = it.sub(0);
-            }
+            if (f == charID || f == numbers) { it = it.sub(0); }
 
             return new IntLiteral(toNumberString(it)); // TODO: what if number too large for int?
         }

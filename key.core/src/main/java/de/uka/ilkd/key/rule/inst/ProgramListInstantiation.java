@@ -16,7 +16,8 @@ public class ProgramListInstantiation extends InstantiationEntry<ImmutableArray<
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param pes the ProgramElement array the SchemaVariable is instantiated with
+     * @param pes
+     *        the ProgramElement array the SchemaVariable is instantiated with
      */
     ProgramListInstantiation(ImmutableArray<ProgramElement> pes) {
         super(pes);

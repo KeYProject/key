@@ -93,9 +93,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final ImmutableList<MergePartner> mergePartners =
             MergeRule.findPotentialMergePartners(goal, pio);
 
-        if (mergePartners.isEmpty()) {
-            return this;
-        }
+        if (mergePartners.isEmpty()) { return this; }
 
         final MergePointStatement mps = (MergePointStatement) JavaTools
                 .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());

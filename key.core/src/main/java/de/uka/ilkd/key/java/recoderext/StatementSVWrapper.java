@@ -22,8 +22,7 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
         super(proto);
     }
 
-    public StatementSVWrapper() {
-    }
+    public StatementSVWrapper() {}
 
     public StatementSVWrapper(SchemaVariable sv) {
         this.sv = sv;
@@ -49,9 +48,11 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         throw new ArrayIndexOutOfBoundsException();
@@ -69,10 +70,13 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
      * effectively removed. The parent role of the new child is validated, while the parent link of
      * the replaced child is left untouched.
      *
-     * @param p the old child.
-     * @param q the new child.
+     * @param p
+     *        the old child.
+     * @param q
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over the role of the old one.
+     * @exception ClassCastException
+     *            if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -83,7 +87,8 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     public void setSV(SchemaVariable sv) {
         this.sv = sv;
@@ -121,8 +126,7 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
     public StatementSVWrapper deepClone() {
         return new StatementSVWrapper(sv);

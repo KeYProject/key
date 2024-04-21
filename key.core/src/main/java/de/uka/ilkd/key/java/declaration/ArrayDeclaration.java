@@ -60,7 +60,8 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     /**
      * ArrayDeclaration
      *
-     * @param children an ExtList with the basetype and member declarations of this type
+     * @param children
+     *        an ExtList with the basetype and member declarations of this type
      */
     public ArrayDeclaration(ExtList children, TypeReference baseType, KeYJavaType superType) {
         this(children, baseType, createName(baseType), superType);
@@ -73,18 +74,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (name != null) {
-            result++;
-        }
-        if (basetype != null) {
-            result++;
-        }
-        if (members != null) {
-            result += members.size();
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (name != null) { result++; }
+        if (basetype != null) { result++; }
+        if (members != null) { result += members.size(); }
         return result;
     }
 
@@ -95,34 +88,28 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (basetype != null) {
-            if (index == 0) {
-                return basetype;
-            }
+            if (index == 0) { return basetype; }
             index--;
         }
-        if (members != null) {
-            return members.get(index);
-        }
+        if (members != null) { return members.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -244,7 +231,8 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnArrayDeclaration(this);

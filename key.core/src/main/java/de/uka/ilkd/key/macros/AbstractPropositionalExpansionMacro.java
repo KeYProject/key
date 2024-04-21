@@ -63,9 +63,12 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     /**
      * Checks whether the application of the passed rule is ok in the given context.
      *
-     * @param ruleApp rule to be applied
-     * @param pio context
-     * @param goal context
+     * @param ruleApp
+     *        rule to be applied
+     * @param pio
+     *        context
+     * @param goal
+     *        context
      * @return true if rule may be applied
      */
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
@@ -124,8 +127,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

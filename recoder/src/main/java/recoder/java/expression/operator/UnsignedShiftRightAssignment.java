@@ -32,8 +32,10 @@ public class UnsignedShiftRightAssignment extends Assignment {
     /**
      * Unsigned shift right assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public UnsignedShiftRightAssignment(Expression lhs, Expression rhs) {
@@ -44,7 +46,8 @@ public class UnsignedShiftRightAssignment extends Assignment {
     /**
      * Unsigned shift right assignment.
      *
-     * @param proto an unsigned shift right assignment.
+     * @param proto
+     *        an unsigned shift right assignment.
      */
 
     protected UnsignedShiftRightAssignment(UnsignedShiftRightAssignment proto) {

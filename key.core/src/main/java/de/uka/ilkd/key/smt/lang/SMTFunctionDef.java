@@ -16,9 +16,7 @@ public class SMTFunctionDef extends SMTFunction {
     public SMTFunctionDef(String id, List<SMTTermVariable> vars, SMTSort image, SMTTerm sub) {
 
         List<SMTSort> domain = new LinkedList<>();
-        for (SMTTermVariable v : vars) {
-            domain.add(v.getSort());
-        }
+        for (SMTTermVariable v : vars) { domain.add(v.getSort()); }
 
         this.id = Util.processName(id);
         this.domainSorts = domain;

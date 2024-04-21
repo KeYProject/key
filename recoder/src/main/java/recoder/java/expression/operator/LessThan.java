@@ -31,8 +31,10 @@ public class LessThan extends ComparativeOperator {
     /**
      * Less than.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public LessThan(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class LessThan extends ComparativeOperator {
     /**
      * Less than.
      *
-     * @param proto a less than.
+     * @param proto
+     *        a less than.
      */
 
     protected LessThan(LessThan proto) {

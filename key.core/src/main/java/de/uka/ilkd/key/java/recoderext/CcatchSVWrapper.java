@@ -20,7 +20,8 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
     /**
      * sets the schema variable of sort statement
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     @Override
     public void setSV(SchemaVariable sv) {

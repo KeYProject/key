@@ -31,12 +31,8 @@ public interface TypeParameter extends ClassType {
      */
     class EqualsImplementor {
         public static boolean equals(TypeParameter t1, Object o) {
-            if (t1 == o) {
-                return true;
-            }
-            if (!(o instanceof TypeParameter t2)) {
-                return false;
-            }
+            if (t1 == o) { return true; }
+            if (!(o instanceof TypeParameter t2)) { return false; }
             ClassType c1 = t1.getContainingClassType();
             ClassType c2 = t2.getContainingClassType();
 
@@ -50,12 +46,8 @@ public interface TypeParameter extends ClassType {
             if (pmi.isSubtype(c1, c2)) {
                 List<ClassType> tl = c1.getSupertypes();
                 for (ClassType superCT : tl) {
-                    if (superCT.getTypeParameters() == null) {
-                        continue;
-                    }
-                    if (!(superCT instanceof ParameterizedType)) {
-                        continue;
-                    }
+                    if (superCT.getTypeParameters() == null) { continue; }
+                    if (!(superCT instanceof ParameterizedType)) { continue; }
                     TypeParameter tryUpwards = null;
                     {
                         // find ridx
@@ -69,18 +61,12 @@ public interface TypeParameter extends ClassType {
                                 break;
                             }
                         }
-                        if (ridx == -1) {
-                            continue;
-                        }
+                        if (ridx == -1) { continue; }
                         tryUpwards = superCT.getTypeParameters().get(ridx);
                     }
-                    if (equals(tryUpwards, t2)) {
-                        return true;
-                    }
+                    if (equals(tryUpwards, t2)) { return true; }
                 }
-            } else if (pmi.isSubtype(c2, c1)) {
-                return equals((TypeParameter) o, t1);
-            } /* else false */
+            } else if (pmi.isSubtype(c2, c1)) { return equals((TypeParameter) o, t1); } /* else false */
             return false;
         }
 

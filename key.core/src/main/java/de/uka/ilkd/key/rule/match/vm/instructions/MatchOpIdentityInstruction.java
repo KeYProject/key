@@ -14,7 +14,8 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
  * the <strong>same</strong>(identical) operator like the one for which this instruction has been
  * instantiated
  *
- * @param <T> the type of the operator used as template
+ * @param <T>
+ *        the type of the operator used as template
  */
 public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T>
         implements MatchOperatorInstruction {
@@ -29,9 +30,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
     @Override
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
             Services services) {
-        if (instantiationCandidate.op() == op) {
-            return matchConditions;
-        }
+        if (instantiationCandidate.op() == op) { return matchConditions; }
         return null;
     }
 
@@ -41,9 +40,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             Services services) {
-        if (instantiationCandidate == op) {
-            return matchConditions;
-        }
+        if (instantiationCandidate == op) { return matchConditions; }
         return null;
     }
 
@@ -54,9 +51,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), matchConditions, services);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
+        if (result != null) { termPosition.gotoNext(); }
         return result;
     }
 

@@ -23,7 +23,8 @@ public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExt
     /**
      * sets the schema variable of sort label
      *
-     * @param sv the SchemaVariable
+     * @param sv
+     *        the SchemaVariable
      */
     public void setSV(SchemaVariable sv) {
         this.sv = sv;
@@ -41,8 +42,7 @@ public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExt
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {
-    }
+    public void accept(SourceVisitor v) {}
 
 
 }

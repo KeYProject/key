@@ -58,7 +58,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     }
 
     /**
-     * @param predicates the abstraction predicates for this domain element to set.
+     * @param predicates
+     *        the abstraction predicates for this domain element to set.
      */
     public void setPredicates(ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
@@ -71,22 +72,16 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      */
     @Override
     public Name name() {
-        if (topElem) {
-            return new Name("TOP");
-        }
+        if (topElem) { return new Name("TOP"); }
 
-        if (predicates.size() == 0) {
-            return new Name("BOTTOM");
-        }
+        if (predicates.size() == 0) { return new Name("BOTTOM"); }
 
         StringBuilder result = new StringBuilder();
         int i = 1;
         for (AbstractionPredicate pred : predicates) {
             result.append(pred.name());
 
-            if (i++ < predicates.size()) {
-                result.append(getPredicateNameCombinationString());
-            }
+            if (i++ < predicates.size()) { result.append(getPredicateNameCombinationString()); }
         }
 
         return new Name(result.toString());
@@ -107,13 +102,9 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     public Term getDefiningAxiom(Term varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (topElem) {
-            return tb.tt();
-        }
+        if (topElem) { return tb.tt(); }
 
-        if (predicates.size() == 0) {
-            return tb.ff();
-        }
+        if (predicates.size() == 0) { return tb.ff(); }
 
         Term result = null;
         for (AbstractionPredicate pred : predicates) {
@@ -131,9 +122,12 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     /**
      * Combines the given predicate terms (classically using AND or OR).
      *
-     * @param preds Term with all previous predicates.
-     * @param newPred The new predicate to combine preds with.
-     * @param services The services object.
+     * @param preds
+     *        Term with all previous predicates.
+     * @param newPred
+     *        The new predicate to combine preds with.
+     * @param services
+     *        The services object.
      * @return The combination of preds with newPred.
      */
     protected abstract Term combinePredicates(Term preds, Term newPred, Services services);
@@ -156,9 +150,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
         final Iterator<AbstractionPredicate> it = getPredicates().iterator();
         while (it.hasNext()) {
             sb.append(it.next().toParseableString(services));
-            if (it.hasNext()) {
-                sb.append(getPredicateNameCombinationString());
-            }
+            if (it.hasNext()) { sb.append(getPredicateNameCombinationString()); }
         }
 
         return sb.toString();

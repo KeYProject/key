@@ -46,8 +46,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     private UserInterfaceControl uic = null;
 
-    public FinishSymbolicExecutionUntilMergePointMacro() {
-    }
+    public FinishSymbolicExecutionUntilMergePointMacro() {}
 
     public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
         this.blockElems = blockElems;
@@ -66,7 +65,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
-            + "merge point is reached or there is no more modality in the sequent.";
+                + "merge point is reached or there is no more modality in the sequent.";
     }
 
     @Override
@@ -98,9 +97,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         for (Goal goal : proof.openEnabledGoals()) {
 
-            if (!hasBreakPoint(goal.sequent().succedent())) {
-                continue;
-            }
+            if (!hasBreakPoint(goal.sequent().succedent())) { continue; }
 
             Node lastNode = goal.node();
             do {
@@ -133,20 +130,18 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
      */
     private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {
         @Override
-        public void taskProgress(int position) {
-        }
+        public void taskProgress(int position) {}
 
         @Override
-        public void taskStarted(TaskStartedInfo info) {
-        }
+        public void taskStarted(TaskStartedInfo info) {}
 
         @Override
-        public void taskFinished(TaskFinishedInfo info) {
-        }
+        public void taskFinished(TaskFinishedInfo info) {}
     };
 
     /**
-     * @param succedent Succedent of a sequent.
+     * @param succedent
+     *        Succedent of a sequent.
      * @return true iff the given succedent has one formula with a break point statement.
      */
     private boolean hasBreakPoint(Semisequent succedent) {
@@ -181,17 +176,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!modalityCache.hasModality(goal.node().sequent())) {
-                return false;
-            }
+            if (!modalityCache.hasModality(goal.node().sequent())) { return false; }
 
-            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) {
-                return false;
-            }
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) { return false; }
 
-            if (hasBreakPoint(goal.sequent().succedent())) {
-                return false;
-            }
+            if (hasBreakPoint(goal.sequent().succedent())) { return false; }
 
             if (pio != null) {
                 JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
@@ -204,9 +193,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     // statement block multiple times. However, we have
                     // to consider it if it is a break point, of course.
                     return super.isApprovedApp(app, pio, goal);
-                } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
-                    alreadySeen.add(theJavaBlock);
-                }
+                } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) { alreadySeen.add(theJavaBlock); }
 
                 // Find break points
                 blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock.program(),
@@ -229,7 +216,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * Returns a set of merge points for the given statement block. A merge point is the
          * statement in a program directly after an if-then-else or a try-catch-finally block.
          *
-         * @param toSearch The statement block to search for merge points.
+         * @param toSearch
+         *        The statement block to search for merge points.
          * @return A set of merge points for the given statement block.
          */
         private HashSet<ProgramElement> findMergePoints(StatementBlock toSearch,
@@ -245,9 +233,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                 // method frame.
                 SourceElement stmt = stmts.get(0);
                 while (!stmt.getFirstElement().equals(stmt)) {
-                    for (StatementBlock body : getBodies(stmt)) {
-                        result.addAll(findMergePoints(body, services));
-                    }
+                    for (StatementBlock body : getBodies(stmt)) { result.addAll(findMergePoints(body, services)); }
                     stmt = stmt.getFirstElement();
                 }
             }
@@ -272,9 +258,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     FindBreakVisitor visitor =
                         new FindBreakVisitor(getBodies(stmt).element(), services);
                     visitor.start();
-                    if (visitor.containsBreak()) {
-                        result.add(stmts.get(i + 1));
-                    }
+                    if (visitor.containsBreak()) { result.add(stmts.get(i + 1)); }
                 }
             }
 
@@ -300,8 +284,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             @Override
-            protected void doDefaultAction(SourceElement node) {
-            }
+            protected void doDefaultAction(SourceElement node) {}
 
             @Override
             public void performActionOnBreak(Break x) {
@@ -313,7 +296,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * Returns the bodies for various compound statements like if, try, case, etc. If there is
          * no body, an empty list is returned.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(SourceElement elem) {
@@ -350,16 +334,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * Returns the bodies for an If element. NOTE: This includes the bodies for the Then *and*
          * the Else part!
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(If elem) {
 
             LinkedList<StatementBlock> result = new LinkedList<>(getBodies(elem.getThen()));
 
-            if (elem.getElse() != null) {
-                result.addAll(getBodies(elem.getElse()));
-            }
+            if (elem.getElse() != null) { result.addAll(getBodies(elem.getElse())); }
 
             return result;
         }
@@ -367,16 +350,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a Then element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Then elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) {
-                result.add((StatementBlock) thenBody);
-            }
+            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
 
             return result;
         }
@@ -384,16 +366,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for an Else element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Else elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement elseBody = elem.getBody();
-            if (elseBody instanceof StatementBlock) {
-                result.add((StatementBlock) elseBody);
-            }
+            if (elseBody instanceof StatementBlock) { result.add((StatementBlock) elseBody); }
 
             return result;
         }
@@ -402,7 +383,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * Returns the bodies for a Try element. NOTE: This includes the bodies for Try *and* for
          * the branches!
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Try elem) {
@@ -410,14 +392,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             if (elem instanceof Try) {
                 StatementBlock tryBody = elem.getBody();
-                if (tryBody instanceof StatementBlock) {
-                    result.add(tryBody);
-                }
+                if (tryBody instanceof StatementBlock) { result.add(tryBody); }
 
                 ImmutableArray<Branch> branches = elem.getBranchList();
-                for (Branch branch : branches) {
-                    result.addAll(getBodies(branch));
-                }
+                for (Branch branch : branches) { result.addAll(getBodies(branch)); }
             }
 
             return result;
@@ -426,16 +404,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a Catch element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Catch elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock catchBody = elem.getBody();
-            if (catchBody instanceof StatementBlock) {
-                result.add(catchBody);
-            }
+            if (catchBody instanceof StatementBlock) { result.add(catchBody); }
 
             return result;
         }
@@ -443,16 +420,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a Finally element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Finally elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock finallyBody = elem.getBody();
-            if (finallyBody instanceof StatementBlock) {
-                result.add(finallyBody);
-            }
+            if (finallyBody instanceof StatementBlock) { result.add(finallyBody); }
 
             return result;
         }
@@ -460,16 +436,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a MethodFrame element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(MethodFrame elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock methodFrameBody = elem.getBody();
-            if (methodFrameBody instanceof StatementBlock) {
-                result.add(methodFrameBody);
-            }
+            if (methodFrameBody instanceof StatementBlock) { result.add(methodFrameBody); }
 
             return result;
         }
@@ -477,7 +452,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the bodies for a Case element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Case elem) {
@@ -485,9 +461,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             ImmutableArray<Statement> caseBodies = elem.getBody();
             for (Statement body : caseBodies) {
-                if (body instanceof StatementBlock) {
-                    result.add((StatementBlock) body);
-                }
+                if (body instanceof StatementBlock) { result.add((StatementBlock) body); }
             }
 
             return result;
@@ -496,16 +470,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a CatchAllStatement element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement catchBody = elem.getBody();
-            if (catchBody instanceof StatementBlock) {
-                result.add((StatementBlock) catchBody);
-            }
+            if (catchBody instanceof StatementBlock) { result.add((StatementBlock) catchBody); }
 
             return result;
         }
@@ -513,16 +486,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a LabeledStatement element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) {
-                result.add((StatementBlock) thenBody);
-            }
+            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
 
             return result;
         }
@@ -530,16 +502,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a LoopStatement element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LoopStatement elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) {
-                result.add((StatementBlock) thenBody);
-            }
+            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
 
             return result;
         }
@@ -547,16 +518,15 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /**
          * Returns the body for a SynchronizedBlock element.
          *
-         * @param elem The element to return the bodies for.
+         * @param elem
+         *        The element to return the bodies for.
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) {
-                result.add(thenBody);
-            }
+            if (thenBody instanceof StatementBlock) { result.add(thenBody); }
 
             return result;
         }

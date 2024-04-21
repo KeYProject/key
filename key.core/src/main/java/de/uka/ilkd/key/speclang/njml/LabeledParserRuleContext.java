@@ -24,18 +24,14 @@ public class LabeledParserRuleContext {
     public final TermLabel second;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
-        }
+        if (first == null) { throw new IllegalArgumentException("ParserRuleContext is null"); }
         this.first = first;
         this.second = second;
     }
 
 
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
-        }
+        if (first == null) { throw new IllegalArgumentException("ParserRuleContext is null"); }
         this.first = first;
         second = null;
     }

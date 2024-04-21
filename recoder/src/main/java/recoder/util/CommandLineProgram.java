@@ -84,9 +84,7 @@ public abstract class CommandLineProgram {
             registerOptions();
             String[] remainingArgs = parseArgs(args);
             setVariables();
-            if (showHelp) {
-                usage(true, 0);
-            }
+            if (showHelp) { usage(true, 0); }
             run(remainingArgs);
         } catch (OptionException oe) {
             handleOptionException(oe);
@@ -166,9 +164,7 @@ public abstract class CommandLineProgram {
 
     public void usage(boolean detailed, int exitcode) {
         om.showUsage("java " + getClass().getName(), getArgsDescription(), detailed);
-        if (exitcode > -1) {
-            System.exit(exitcode);
-        }
+        if (exitcode > -1) { System.exit(exitcode); }
     }
 
     private String[] parseArgs(String[] args) throws Exception {
@@ -179,9 +175,7 @@ public abstract class CommandLineProgram {
         for (String s : vars.keySet()) {
             Field f = vars.get(s);
             Object val = om.getValue(s);
-            if (val != null) {
-                f.set(this, val);
-            }
+            if (val != null) { f.set(this, val); }
         }
     }
 

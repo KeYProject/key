@@ -31,8 +31,10 @@ public class GreaterOrEquals extends ComparativeOperator {
     /**
      * Greater or equals.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public GreaterOrEquals(Expression lhs, Expression rhs) {
@@ -43,7 +45,8 @@ public class GreaterOrEquals extends ComparativeOperator {
     /**
      * Greater or equals.
      *
-     * @param proto a greater or equals.
+     * @param proto
+     *        a greater or equals.
      */
 
     protected GreaterOrEquals(GreaterOrEquals proto) {

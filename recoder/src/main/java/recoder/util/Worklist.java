@@ -39,7 +39,8 @@ public class Worklist {
     /**
      * creates a new empty worklist.
      *
-     * @param allowDuplicates indicates whether or not to allow duplicate items
+     * @param allowDuplicates
+     *        indicates whether or not to allow duplicate items
      */
     public Worklist(boolean allowDuplicates) {
         this.allowDuplicates = allowDuplicates;
@@ -57,7 +58,8 @@ public class Worklist {
      * adds the given item to the worklist. If the worklist does not allow duplicates and the item
      * is already contained, it is ignored.
      *
-     * @param todo the item to be added
+     * @param todo
+     *        the item to be added
      */
     public void addItem(Object todo) {
         addItem(todo, allowDuplicates);
@@ -66,16 +68,16 @@ public class Worklist {
     /**
      * adds the given item to the worklist, overriding the default duplicate handling strategy.
      *
-     * @param todo the item to be added
-     * @param allowDuplicates indicates whether there may be duplicates of the item or not
+     * @param todo
+     *        the item to be added
+     * @param allowDuplicates
+     *        indicates whether there may be duplicates of the item or not
      */
     public void addItem(Object todo, @SuppressWarnings("hiding") boolean allowDuplicates) {
         if (allowDuplicates || !contains(todo)) {
             impl.enqueue(todo);
             int len = size();
-            if (len > maxLen) {
-                maxLen = len;
-            }
+            if (len > maxLen) { maxLen = len; }
         }
     }
 

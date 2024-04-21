@@ -52,9 +52,7 @@ public abstract class MainWindowAction extends KeyAction {
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         boolean trigger = getAcceleratorKey() == null;
         putValue(ACCELERATOR_KEY, keyStroke);
-        if (trigger) {
-            lookupAcceleratorKey();
-        }
+        if (trigger) { lookupAcceleratorKey(); }
     }
 
     protected KeYMediator getMediator() {
@@ -65,9 +63,7 @@ public abstract class MainWindowAction extends KeyAction {
         private final Collection<MainWindowAction> actions = new ArrayList<>();
 
         private void addAction(MainWindowAction action) {
-            if (actions.isEmpty()) {
-                action.getMediator().addKeYSelectionListener(this);
-            }
+            if (actions.isEmpty()) { action.getMediator().addKeYSelectionListener(this); }
             actions.add(action);
         }
 

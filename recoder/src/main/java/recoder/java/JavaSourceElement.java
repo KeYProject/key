@@ -41,13 +41,12 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     /**
      * Java source element.
      *
-     * @param proto a java source element.
+     * @param proto
+     *        a java source element.
      */
 
     protected JavaSourceElement(JavaSourceElement proto) {
-        if (proto == null) {
-            throw new NullPointerException("Cannot create something from a null prototype.");
-        }
+        if (proto == null) { throw new NullPointerException("Cannot create something from a null prototype."); }
         positionBits = proto.positionBits;
     }
 
@@ -90,9 +89,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
 
     public final Position getStartPosition() {
         int lc = (int) (positionBits >> 40L) & 0xFFFFFF;
-        if (lc == 0xFFFFFF) {
-            return Position.UNDEFINED;
-        }
+        if (lc == 0xFFFFFF) { return Position.UNDEFINED; }
         return new Position(lc >> 8, lc & 0xFF);
     }
 
@@ -100,7 +97,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * Sets the start position of the primary token of this element. To set the start position of
      * the syntactical first token, call the corresponding method of <CODE>getFirstElement()</CODE>.
      *
-     * @param p the start position of the primary token.
+     * @param p
+     *        the start position of the primary token.
      */
 
     public final void setStartPosition(Position p) {
@@ -122,9 +120,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
 
     public final Position getEndPosition() {
         int lc = (int) (positionBits >> 16L) & 0xFFFFFF;
-        if (lc == 0xFFFFFF) {
-            return Position.UNDEFINED;
-        }
+        if (lc == 0xFFFFFF) { return Position.UNDEFINED; }
         return new Position(lc >> 8, lc & 0xFF);
     }
 
@@ -132,7 +128,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * Sets the end position of the primary token of this element. To set the end position of the
      * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
      *
-     * @param p the end position of the primary token.
+     * @param p
+     *        the end position of the primary token.
      */
 
     public final void setEndPosition(Position p) {
@@ -156,9 +153,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
 
     public final Position getRelativePosition() {
         int lc = (int) positionBits & 0xFFFF;
-        if (lc == 0xFFFF) {
-            return Position.UNDEFINED;
-        }
+        if (lc == 0xFFFF) { return Position.UNDEFINED; }
         return new Position(lc >> 8, lc & 0xFF);
     }
 
@@ -168,7 +163,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * corresponding method of <CODE>
      * getFirstElement()</CODE>.
      *
-     * @param p the relative position of the primary token.
+     * @param p
+     *        the relative position of the primary token.
      */
 
     public final void setRelativePosition(Position p) {

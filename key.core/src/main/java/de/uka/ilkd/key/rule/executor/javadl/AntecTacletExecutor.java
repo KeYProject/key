@@ -23,7 +23,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * Executes a Taclet which matches on a formula in the antecedent
  *
  * @author Richard Bubel
- * @param <TacletKind> the kind of taclet this executor is responsible for
+ * @param <TacletKind>
+ *        the kind of taclet this executor is responsible for
  */
 public class AntecTacletExecutor<TacletKind extends AntecTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -60,20 +61,29 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     /**
      * applies the {@code add}-expressions of taclet goal descriptions
      *
-     * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added
+     * @param add
+     *        the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added
      *        to the goal's sequent
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param currentSequent
+     *        the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
-     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@code null} if it
+     * @param whereToAdd
+     *        the {@link PosInOccurrence} where to add the sequent or {@code null} if it
      *        should just be added to the head of the sequent (otherwise it will be tried to add the
      *        new formulas close to that position)
-     * @param posOfFind the {@link PosInOccurrence} providing the position information where the
+     * @param posOfFind
+     *        the {@link PosInOccurrence} providing the position information where the
      *        match took place
-     * @param matchCond the {@link MatchConditions} with all required instantiations
-     * @param goal the Goal where the taclet is applied to
-     * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
-     * @param services the {@link Services} encapsulating all Java model information
+     * @param matchCond
+     *        the {@link MatchConditions} with all required instantiations
+     * @param goal
+     *        the Goal where the taclet is applied to
+     * @param ruleApp
+     *        the {@link TacletApp} describing the current ongoing taclet application
+     * @param services
+     *        the {@link Services} encapsulating all Java model information
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
