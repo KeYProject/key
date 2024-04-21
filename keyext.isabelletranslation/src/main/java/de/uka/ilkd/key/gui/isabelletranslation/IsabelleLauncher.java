@@ -46,9 +46,12 @@ public class IsabelleLauncher {
             LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
             throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
         }
-        //thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
+        thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
         LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
-        List<SledgehammerResult> results = problems.stream().map((problem) -> problem.try0ThenSledgehammer(isabelle, thy0, settings, timeout_seconds)).toList();
+        List<SledgehammerResult> results = new ArrayList<>();
+        for (IsabelleProblem problem : problems) {
+            results.add(problem.try0ThenSledgehammer(isabelle, thy0, timeout_seconds));
+        }
         LOGGER.info("Completed all problems");
         isabelle.destroy();
         return results;
