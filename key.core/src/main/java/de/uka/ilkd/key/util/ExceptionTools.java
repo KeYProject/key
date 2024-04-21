@@ -5,11 +5,13 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.InputMismatchException;

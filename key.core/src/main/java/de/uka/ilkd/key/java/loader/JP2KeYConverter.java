@@ -334,8 +334,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @NonNull
     private <T> T accept(@NonNull Node check) {
-        // noinspection unchecked
         return Objects.requireNonNull((T) check.accept(this, null));
+    }
+
+    @Nullable
+    private <T> T acceptn(@Nullable Node check) {
+        return check != null ? (T) accept(check) : null;
     }
 
     private boolean parentIsInterface(@NonNull Node n) {
@@ -660,11 +664,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
             var isModel = n.hasModifier(Modifier.Keyword.MODEL);
+            var isGhost = n.hasModifier(Modifier.Keyword.GHOST);
             // This is really odd, some interfaces have represents clauses. Those should be abstract
             // classes...
             // Normal fields of interfaces are implicitly static...
+
+            // TODO javaparser clarify the following condition. static model/ghost fields?
             var isStatic = !isModel && n.isStatic();
-            var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel);
+            var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel, isGhost);
             final var fs = visitFieldSpecification(decl);
             varsList.add(fs);
             mapping.put(v, fs);
@@ -1356,9 +1363,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(Modifier n, Void arg) {
-        var pi=createPositionInfo(n);var c=createComments(n);var k=n.getKeyword();return switch(k){case PUBLIC->new Public(pi,c);case PROTECTED->new Protected(pi,c);case PRIVATE->new Private(pi,c);case ABSTRACT->new Abstract(pi,c);case STATIC->new Static(pi,c);case FINAL->new Final(pi,c);case TRANSIENT->new Transient(pi,c);case VOLATILE->new Volatile(pi,c);case SYNCHRONIZED->new Synchronized(pi,c);case NATIVE->new Native(pi,c);case STRICTFP->new StrictFp(pi,c);
-            case GHOST->new Ghost(pi,c);
-            case MODEL->new Model(pi,c);case TWO_STATE->new TwoState(pi,c);case NO_STATE->new NoState(pi,c);default->{reportUnsupportedElement(n);yield null;}};
+        var pi=createPositionInfo(n);var c=createComments(n);var k=n.getKeyword();return switch(k){case PUBLIC->new Public(pi,c);case PROTECTED->new Protected(pi,c);case PRIVATE->new Private(pi,c);case ABSTRACT->new Abstract(pi,c);case STATIC->new Static(pi,c);case FINAL->new Final(pi,c);case TRANSIENT->new Transient(pi,c);case VOLATILE->new Volatile(pi,c);case SYNCHRONIZED->new Synchronized(pi,c);case NATIVE->new Native(pi,c);case STRICTFP->new StrictFp(pi,c);case GHOST->new Ghost(pi,c);case MODEL->new Model(pi,c);case TWO_STATE->new TwoState(pi,c);case NO_STATE->new NoState(pi,c);default->{reportUnsupportedElement(n);yield null;}};
     }
 
 
@@ -1681,7 +1686,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case "#forInitUnfoldTransformer" -> new ForInitUnfoldTransformer((ProgramSV) accept(n.getChild()));
             case "#for-to-while" -> new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
             case "#enhancedfor-elim" -> {
-                EnhancedFor efor = accept(n.getChild());
+                EnhancedFor efor = acceptn(n.getChild());
                 if (efor == null) {
 
     yield reportError(n,
@@ -1725,7 +1730,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyPassiveExpression n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        // TODO weigl remove after fix of https://github.com/wadoon/key-javaparser/issues/2
+        // TODO javaparser weigl remove after fix of https://github.com/wadoon/key-javaparser/issues/2
         n.getExpr().setParentNode(n);
         return new PassiveExpression(pi, c, accept(n.getExpr()));
     }
@@ -1948,7 +1953,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private record FullVariableDeclarator(VariableDeclarator decl, boolean isFinal,
-            boolean isStatic, boolean isModel) {
+            boolean isStatic, boolean isModel, boolean isGhost) {
     }
 
 }

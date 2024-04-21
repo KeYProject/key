@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -116,5 +118,23 @@ public class SetStatementTest {
         JmlParser.Set_statementContext context = statement.getAssignment();
         Term assignee = jmlIO.translateTerm(context.assignee);
         return jsf.checkSetStatementAssignee(assignee);
+    }
+
+
+
+    @Test
+    void preservationOfGhostFlag() throws ProblemLoaderException {
+        var input = """
+                class Foo {
+                    //@ ghost int x;
+                }
+                """;
+        var env = HelperClassForTests.createKeYEnvironment();
+        var js = env.getServices().getJavaService();
+        var cu = js.readCompilationUnit(input);
+        var fields = cu.getDeclarations().get(0).getAllFields(env.getServices());
+        var fieldX = fields.stream().filter(it -> "Foo::x".equals(it.getName())).findFirst().get();
+
+        Assertions.assertTrue(fieldX.getProgramVariable().isRigid());
     }
 }

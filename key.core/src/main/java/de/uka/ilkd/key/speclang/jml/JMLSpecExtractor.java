@@ -106,7 +106,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             } else {
                 lineOffset = pos.line() - last.line();
                 columnOffset = pos.column();
-                }
+            }
             StringUtil.appendRepeated(sb, '\n', Math.max(0, lineOffset));
             StringUtil.appendRepeated(sb, ' ', Math.max(0, columnOffset));
             sb.append(" ".repeat(Math.max(0, columnOffset)));
