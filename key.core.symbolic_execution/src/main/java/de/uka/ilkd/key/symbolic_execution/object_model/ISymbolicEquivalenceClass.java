@@ -24,7 +24,8 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
     /**
      * Checks if a {@link Term} is contained.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} {@link Term} is contained, {@code false} {@link Term} is not contained.
      */
     boolean containsTerm(Term term);

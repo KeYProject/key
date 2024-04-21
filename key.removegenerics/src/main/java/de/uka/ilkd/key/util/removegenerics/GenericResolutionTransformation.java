@@ -49,7 +49,8 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * expression once had type <code>V</code> for some (unbound) type variable it will then have
      * <code>java.lang.Object</code> etc.
      *
-     * @param t the type to be resolved
+     * @param t
+     *        the type to be resolved
      * @return the coresponding type in the generic-free environment
      */
     protected Type targetType(Type t) {
@@ -57,10 +58,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
         boolean changed = false;
         Type origType = t;
 
-        while (t instanceof ArrayType) {
-            t = ((ArrayType) t).getBaseType();
-            dimension++;
-        }
+        while (t instanceof ArrayType) { t = ((ArrayType) t).getBaseType(); dimension++; }
 
         if (t instanceof ParameterizedType) {
             t = ((ParameterizedType) t).getGenericType();
@@ -77,9 +75,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
             int boundNo = typeParameter.getBoundCount();
             if (boundNo == 0) {
                 t = getNameInfo().getJavaLangObject();
-                if (t == null) {
-                    throw new IllegalStateException("java.lang.Object not known");
-                }
+                if (t == null) { throw new IllegalStateException("java.lang.Object not known"); }
             } else {
                 String bound = typeParameter.getBoundName(0);
                 if (typeParameter instanceof TypeParameterDeclaration tdecl) {
@@ -94,9 +90,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
         }
 
         if (changed) {
-            if (dimension > 0) {
-                t = getNameInfo().createArrayType(t, dimension);
-            }
+            if (dimension > 0) { t = getNameInfo().createArrayType(t, dimension); }
             return t;
         } else {
             return origType;
@@ -109,8 +103,10 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * First the message-head is printed followed by a ':', followed by a ;-separated list of the
      * arguments. Each argument is converted to a string using the {@link #toString(Object)}.
      *
-     * @param msg the message's head
-     * @param arg 0 or more objects that will be expanded to a ;-separated list after the message
+     * @param msg
+     *        the message's head
+     * @param arg
+     *        0 or more objects that will be expanded to a ;-separated list after the message
      */
 
     public static void debugOut(String msg, Object... arg) {
@@ -118,9 +114,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
             var args = new StringBuilder();
             if (arg.length > 0) {
                 args.append(":");
-                for (int i = 1; i < arg.length; i++) {
-                    args.append("; ").append(toString(arg[i]));
-                }
+                for (int i = 1; i < arg.length; i++) { args.append("; ").append(toString(arg[i])); }
             }
             LOGGER.debug(msg + args);
         }
@@ -137,22 +131,19 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * <li>{@link Collection} - which handle each element with toString</li> Anything else will be
      * transoformed using {@link Object#toString()}.
      *
-     * @param object the object to be transformed, may be null
+     * @param object
+     *        the object to be transformed, may be null
      * @return a String representing the object.
      */
     public static String toString(Object object) {
 
-        if (object instanceof MethodDeclaration md) {
-            return md.getFullName() + toString(md.getSignature());
-        }
+        if (object instanceof MethodDeclaration md) { return md.getFullName() + toString(md.getSignature()); }
 
         if (object instanceof NamedModelElement ne) {
             String name = ne.getName();
             if (object instanceof NamedProgramElement) {
                 ProgramElement parent = ((NamedProgramElement) ne).getASTParent();
-                if (parent instanceof NamedModelElement p) {
-                    return p.getName() + "::" + name;
-                }
+                if (parent instanceof NamedModelElement p) { return p.getName() + "::" + name; }
             } else {
                 return name;
             }
@@ -160,15 +151,11 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
 
         if (object instanceof Collection<?> coll) {
             StringBuilder ret = new StringBuilder("[ ");
-            for (Object o : coll) {
-                ret.append(toString(o)).append(" ");
-            }
+            for (Object o : coll) { ret.append(toString(o)).append(" "); }
             return ret + "]";
         }
 
-        if (object == null) {
-            return "(null)";
-        }
+        if (object == null) { return "(null)"; }
 
         return object.toString();
     }

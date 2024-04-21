@@ -57,11 +57,16 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param arrayIndex The array index.
-     * @param value The value {@link Term}.
-     * @param condition The optional condition under which this value is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param arrayIndex
+     *        The array index.
+     * @param value
+     *        The value {@link Term}.
+     * @param condition
+     *        The optional condition under which this value is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, Term arrayIndex, Term value, Term condition,
             IModelSettings settings) {
@@ -80,13 +85,20 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param arrayIndex The array index.
-     * @param arrayStartIndex The array start index or {@code null} if not used.
-     * @param arrayEndIndex The array end index or {@code null} if not used.
-     * @param value The value {@link Term}.
-     * @param condition The optional condition under which this value is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param arrayIndex
+     *        The array index.
+     * @param arrayStartIndex
+     *        The array start index or {@code null} if not used.
+     * @param arrayEndIndex
+     *        The array end index or {@code null} if not used.
+     * @param value
+     *        The value {@link Term}.
+     * @param condition
+     *        The optional condition under which this value is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, Term arrayIndex, Term arrayStartIndex,
             Term arrayEndIndex, Term value, Term condition, IModelSettings settings) {
@@ -105,11 +117,16 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param programVariable The {@link IProgramVariable}.
-     * @param value The value {@link Term}.
-     * @param condition The optional condition under which this value is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param programVariable
+     *        The {@link IProgramVariable}.
+     * @param value
+     *        The value {@link Term}.
+     * @param condition
+     *        The optional condition under which this value is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, IProgramVariable programVariable, Term value,
             Term condition, IModelSettings settings) {
@@ -138,9 +155,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
                 sb.append(" >= ");
                 sb.append(getArrayStartIndexString());
             }
-            if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
-                sb.append(" and ");
-            }
+            if (getArrayStartIndex() != null && getArrayEndIndex() != null) { sb.append(" and "); }
             if (getArrayEndIndex() != null) {
                 sb.append(getArrayIndexString());
                 sb.append(" <= ");

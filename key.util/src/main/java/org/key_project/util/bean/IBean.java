@@ -20,30 +20,36 @@ public interface IBean {
     /**
      * Adds the given listener.
      *
-     * @param listener The listener to add.
+     * @param listener
+     *        The listener to add.
      */
     void addPropertyChangeListener(PropertyChangeListener listener);
 
     /**
      * Adds the given listener for the given property only.
      *
-     * @param propertyName The property to observe.
-     * @param listener The listener to add.
+     * @param propertyName
+     *        The property to observe.
+     * @param listener
+     *        The listener to add.
      */
     void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
     /**
      * Removes the given listener.
      *
-     * @param listener The listener to remove.
+     * @param listener
+     *        The listener to remove.
      */
     void removePropertyChangeListener(PropertyChangeListener listener);
 
     /**
      * Removes the given listener from the given property.
      *
-     * @param propertyName The property to no longer observe.
-     * @param listener The listener to remove.
+     * @param propertyName
+     *        The property to no longer observe.
+     * @param listener
+     *        The listener to remove.
      */
     void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
@@ -57,7 +63,8 @@ public interface IBean {
     /**
      * Returns all listeners of the given property.
      *
-     * @param propertyName The property.
+     * @param propertyName
+     *        The property.
      * @return The listeners of the given property.
      */
     PropertyChangeListener[] getPropertyChangeListeners(String propertyName);
@@ -72,7 +79,8 @@ public interface IBean {
     /**
      * Checks if listeners are available for the given property.
      *
-     * @param propertyName The property name.
+     * @param propertyName
+     *        The property name.
      * @return {@code true} listeners available for the property, {@code false} no listeners are
      *         available for the property.
      */
@@ -81,7 +89,8 @@ public interface IBean {
     /**
      * Checks if the given listener is already available.
      *
-     * @param listener The listener to check.
+     * @param listener
+     *        The listener to check.
      * @return {@code true} listener is available, {@code false} listener is not available.
      */
     boolean hasListener(PropertyChangeListener listener);
@@ -89,8 +98,10 @@ public interface IBean {
     /**
      * Checks if the given listener is available for the given property.
      *
-     * @param propertyName The property.
-     * @param listener The listener to check.
+     * @param propertyName
+     *        The property.
+     * @param listener
+     *        The listener to check.
      * @return {@code true} listener is available for the property, {@code false} listener is not
      *         available for the property.
      */

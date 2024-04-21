@@ -80,8 +80,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private ModalitySideProofRule() {
-    }
+    private ModalitySideProofRule() {}
 
     /**
      * {@inheritDoc}
@@ -91,20 +90,14 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
         boolean applicable = false;
         if (pio != null && pio.isTopLevel()) {
             // abort if inside of transformer
-            if (Transformer.inTransformer(pio)) {
-                return false;
-            }
+            if (Transformer.inTransformer(pio)) { return false; }
             Term term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
             if (term.op() instanceof Modality
                     && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
                 Term equalityTerm = term.sub(0);
-                if (equalityTerm.op() == Junctor.IMP) {
-                    equalityTerm = equalityTerm.sub(0);
-                }
-                if (equalityTerm.op() == Junctor.NOT) {
-                    equalityTerm = equalityTerm.sub(0);
-                }
+                if (equalityTerm.op() == Junctor.IMP) { equalityTerm = equalityTerm.sub(0); }
+                if (equalityTerm.op() == Junctor.NOT) { equalityTerm = equalityTerm.sub(0); }
                 if (equalityTerm.op() == Equality.EQUALS) {
                     if (equalityTerm.sub(0).op() instanceof IProgramVariable
                             || equalityTerm.sub(1).op() instanceof IProgramVariable) {
@@ -203,9 +196,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             if (inImplication) {
                 // Change implication
                 Term newCondition = tb.or(resultTerms);
-                if (negation) {
-                    newCondition = tb.not(newCondition);
-                }
+                if (negation) { newCondition = tb.not(newCondition); }
                 Term newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
                 Term newImplicationWithUpdates = tb.applySequential(updates, newImplication);
                 resultGoal.addFormula(new SequentFormula(newImplicationWithUpdates),

@@ -99,9 +99,7 @@ public abstract class AbstractGenericRemover {
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
                 processDirectory(f);
-            } else if (f.getName().toLowerCase().endsWith(".java")) {
-                processFile(f);
-            }
+            } else if (f.getName().toLowerCase().endsWith(".java")) { processFile(f); }
         }
 
     }

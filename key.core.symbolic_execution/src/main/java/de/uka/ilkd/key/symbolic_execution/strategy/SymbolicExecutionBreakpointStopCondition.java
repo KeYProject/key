@@ -32,13 +32,12 @@ public class SymbolicExecutionBreakpointStopCondition extends
     /**
      * Creates a new {@link SymbolicExecutionBreakpointStopCondition}.
      *
-     * @param breakpoints The {@link IBreakpoint} to use.
+     * @param breakpoints
+     *        The {@link IBreakpoint} to use.
      */
     public SymbolicExecutionBreakpointStopCondition(IBreakpoint... breakpoints) {
         super(Integer.MAX_VALUE);
-        if (breakpoints != null) {
-            Collections.addAll(this.breakpoints, breakpoints);
-        }
+        if (breakpoints != null) { Collections.addAll(this.breakpoints, breakpoints); }
     }
 
     /**
@@ -80,10 +79,14 @@ public class SymbolicExecutionBreakpointStopCondition extends
     /**
      * Checks if a breakpoint is hit.
      *
-     * @param activeStatement the activeStatement of the node
-     * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
-     * @param node the current node
+     * @param activeStatement
+     *        the activeStatement of the node
+     * @param ruleApp
+     *        the applied {@link RuleApp}
+     * @param proof
+     *        the current proof
+     * @param node
+     *        the current node
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */

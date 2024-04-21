@@ -54,16 +54,12 @@ public class OracleMethod {
         for (OracleVariable var : args) {
             argString.append(var.sort().name()).append(" ").append(var.name()).append(",");
         }
-        if (!args.isEmpty()) {
-            argString = new StringBuilder(argString.substring(0, argString.length() - 1));
-        }
+        if (!args.isEmpty()) { argString = new StringBuilder(argString.substring(0, argString.length() - 1)); }
 
         String retType = "boolean";
-        if (returnType != null) {
-            retType = returnType.name().toString();
-        }
+        if (returnType != null) { retType = returnType.name().toString(); }
         return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-            + body + "\n" + tab + "}";
+                + body + "\n" + tab + "}";
 
     }
 }

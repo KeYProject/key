@@ -25,24 +25,18 @@ public class PropertiesUtil {
         while ((line = br.readLine()) != null) {
             if (line.startsWith("#")) {
             } else if (line.startsWith(" ") || line.startsWith("\t")) {
-                if (sb.length() > 0) {
-                    sb.append("\n");
-                }
+                if (sb.length() > 0) { sb.append("\n"); }
                 sb.append(line.trim());
             } else {
                 if (sb.length() > 0) {
-                    if (currentKey == null) {
-                        throw new IOException("No key defined");
-                    }
+                    if (currentKey == null) { throw new IOException("No key defined"); }
                     properties.put(currentKey, sb.toString());
                     sb.setLength(0);
                 }
             }
         }
         if (sb.length() > 0) {
-            if (currentKey == null) {
-                throw new IOException("No key defined");
-            }
+            if (currentKey == null) { throw new IOException("No key defined"); }
             properties.put(currentKey, sb.toString());
             sb.setLength(0);
         }

@@ -22,14 +22,14 @@ public class NumberUtil {
     /**
      * Forbid instances.
      */
-    private NumberUtil() {
-    }
+    private NumberUtil() {}
 
     /**
      * Converts the number into a {@link String} including the algebraic sign and the maximal number
      * of leading zeros.
      *
-     * @param number The number to convert.
+     * @param number
+     *        The number to convert.
      * @return The number as full {@link String}.
      */
     public static String toFullString(int number) {
@@ -50,7 +50,8 @@ public class NumberUtil {
      * Converts the number into a {@link String} including the algebraic sign and the maximal number
      * of leading zeros.
      *
-     * @param number The number to convert.
+     * @param number
+     *        The number to convert.
      * @return The number as full {@link String}.
      */
     public static String toFullString(long number) {
@@ -70,7 +71,8 @@ public class NumberUtil {
     /**
      * Returns the algebraic sign.
      *
-     * @param number The number.
+     * @param number
+     *        The number.
      * @return {@code '+'} for zero and positive numbers, {@code '-'} for negative numbers.
      */
     public static char getAlgebraicSign(long number) {
@@ -84,7 +86,8 @@ public class NumberUtil {
     /**
      * Returns the algebraic sign.
      *
-     * @param number The number.
+     * @param number
+     *        The number.
      * @return {@code '+'} for zero and positive numbers, {@code '-'} for negative numbers.
      */
     public static char getAlgebraicSign(int number) {
@@ -98,7 +101,8 @@ public class NumberUtil {
     /**
      * Returns the number of digits of the given number ignoring the algebraic sign (+/-).
      *
-     * @param number The number to compute the number of its digits.
+     * @param number
+     *        The number to compute the number of its digits.
      * @return The number.
      */
     public static byte numberOfDigits(int number) {
@@ -106,10 +110,7 @@ public class NumberUtil {
             return 1;
         } else {
             byte digits = 0;
-            while (number != 0) {
-                digits++;
-                number = number / 10;
-            }
+            while (number != 0) { digits++; number = number / 10; }
             return digits;
         }
     }
@@ -117,7 +118,8 @@ public class NumberUtil {
     /**
      * Returns the number of digits of the given number ignoring the algebraic sign (+/-).
      *
-     * @param number The number to compute the number of its digits.
+     * @param number
+     *        The number to compute the number of its digits.
      * @return The number.
      */
     public static byte numberOfDigits(long number) {
@@ -125,10 +127,7 @@ public class NumberUtil {
             return 1;
         } else {
             byte digits = 0;
-            while (number != 0) {
-                digits++;
-                number = number / 10;
-            }
+            while (number != 0) { digits++; number = number / 10; }
             return digits;
         }
     }
@@ -136,14 +135,13 @@ public class NumberUtil {
     /**
      * Parses the given full text.
      *
-     * @param text The full text.
+     * @param text
+     *        The full text.
      * @return The int value.
      */
     public static int parseFullInt(String text) {
         if (text != null) {
-            if (text.startsWith("+")) {
-                text = text.substring(1);
-            }
+            if (text.startsWith("+")) { text = text.substring(1); }
             return Integer.parseInt(text);
         } else {
             throw new NumberFormatException("Text not defined.");
@@ -153,14 +151,13 @@ public class NumberUtil {
     /**
      * Parses the given full text.
      *
-     * @param text The full text.
+     * @param text
+     *        The full text.
      * @return The long value.
      */
     public static long parseFullLong(String text) {
         if (text != null) {
-            if (text.startsWith("+")) {
-                text = text.substring(1);
-            }
+            if (text.startsWith("+")) { text = text.substring(1); }
             return Long.parseLong(text);
         } else {
             throw new NumberFormatException("Text not defined.");

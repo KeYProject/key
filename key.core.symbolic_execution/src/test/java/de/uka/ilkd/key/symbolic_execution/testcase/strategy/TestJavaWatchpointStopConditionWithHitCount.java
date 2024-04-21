@@ -51,9 +51,7 @@ public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymboli
             CompoundStopCondition allBreakpoints = new CompoundStopCondition();
             KeYJavaType containerType = null;
             for (KeYJavaType kjt : env.getProof().getJavaInfo().getAllKeYJavaTypes()) {
-                if (kjt.getSort().toString().equals("GlobalAccessesAndModifications")) {
-                    containerType = kjt;
-                }
+                if (kjt.getSort().toString().equals("GlobalAccessesAndModifications")) { containerType = kjt; }
             }
 
             FieldWatchpoint firstBreakpoint = new FieldWatchpoint(true, 2, "access", true, false,
@@ -104,9 +102,7 @@ public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymboli
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 }

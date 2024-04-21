@@ -71,8 +71,10 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionOperationContract(ITreeSettings settings, Node proofNode) {
@@ -118,8 +120,8 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                     KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                     if (inst.staticType != selfType) {
                         throw new ProofInputException("Type \"" + inst.staticType
-                            + "\" expected but found \"" + selfType
-                            + "\", implementation of UseOperationContractRule might has changed!");
+                                + "\" expected but found \"" + selfType
+                                + "\", implementation of UseOperationContractRule might has changed!");
                     }
                 } else {
                     selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap,
@@ -140,9 +142,12 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Tries to find the self {@link Term} of the given {@link KeYJavaType}.
      *
-     * @param term The {@link Term} to start search in.
-     * @param staticType The expected {@link KeYJavaType}.
-     * @param services The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to start search in.
+     * @param staticType
+     *        The expected {@link KeYJavaType}.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found self {@link Term} or {@code null} if not available.
      */
     protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType,
@@ -268,9 +273,12 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Searches the result {@link Term}.
      *
-     * @param contract The {@link FunctionalOperationContract}.
-     * @param inst The {@link Instantiation}.
-     * @param services The {@link Services}.
+     * @param contract
+     *        The {@link FunctionalOperationContract}.
+     * @param inst
+     *        The {@link Instantiation}.
+     * @param services
+     *        The {@link Services}.
      * @return The found result {@link Term} or {@code null} otherwise.
      */
     protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
@@ -292,9 +300,11 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Extracts the result variable from the given post branch.
      *
-     * @param node The {@link Node} which is the post or exceptional post branch of an applied
+     * @param node
+     *        The {@link Node} which is the post or exceptional post branch of an applied
      *        {@link ContractRuleApp}.
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found {@link LocationVariable} or {@code null} if not found.
      */
     protected static LocationVariable extractResultVariableFromPostBranch(Node node,
@@ -304,13 +314,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
         SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());
-        if (!(firstElement instanceof CopyAssignment assignment)) {
-            return null;
-        }
+        if (!(firstElement instanceof CopyAssignment assignment)) { return null; }
         ProgramElement rightChild = assignment.getChildAt(1);
-        if (!(rightChild instanceof LocationVariable)) {
-            return null;
-        }
+        if (!(rightChild instanceof LocationVariable)) { return null; }
         return (LocationVariable) rightChild;
     }
 
@@ -357,9 +363,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     @Override
     public boolean isPreconditionComplied() {
         boolean complied = false;
-        if (getProofNode().childrenCount() >= 3) {
-            complied = getProofNode().child(2).isClosed();
-        }
+        if (getProofNode().childrenCount() >= 3) { complied = getProofNode().child(2).isClosed(); }
         return complied;
     }
 

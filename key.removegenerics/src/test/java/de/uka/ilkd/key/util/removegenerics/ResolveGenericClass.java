@@ -25,8 +25,10 @@ public class ResolveGenericClass {
     /**
      * parse 2 comp. units transform the first and return whether the result is equal to the first.
      *
-     * @param string1 first comp unit as string
-     * @param string2 snd comp unit as string
+     * @param string1
+     *        first comp unit as string
+     * @param string2
+     *        snd comp unit as string
      * @throws Exception
      */
     public void equalCU(String string1, String string2) throws Exception {
@@ -46,9 +48,7 @@ public class ResolveGenericClass {
 
             String diff = firstDifferentChar(cu1.toSource(), string2);
 
-            if (diff != null) {
-                throw new IllegalStateException("not equal, difference at: " + diff);
-            }
+            if (diff != null) { throw new IllegalStateException("not equal, difference at: " + diff); }
         } catch (Exception ex) {
             StringBuilder sb = new StringBuilder();
             if (cu1before != null) {
@@ -56,9 +56,7 @@ public class ResolveGenericClass {
             } else {
                 sb.append("CU1 (source): ").append(string1).append("\n");
             }
-            if (cu1 != null) {
-                sb.append("CU1 (after) : ").append(cu1.toSource()).append("\n");
-            }
+            if (cu1 != null) { sb.append("CU1 (after) : ").append(cu1.toSource()).append("\n"); }
             sb.append("CU2         : ").append(string2).append("\n");
             throw new Exception(sb.toString(), ex);
         }
@@ -82,13 +80,13 @@ public class ResolveGenericClass {
         for (int i = 0; i < minlength; i++) {
             if (s1.charAt(i) != s2.charAt(i)) {
                 return "'" + s1.substring(i, Math.min(i + 10, s1.length())) + "' vs. '"
-                    + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
+                        + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
             }
         }
 
         if (s1.length() != s2.length()) {
             return "'" + s1.substring(minlength) + "' vs. '" + s2.substring(minlength) + "' @"
-                + (minlength + 1);
+                    + (minlength + 1);
         } else {
             return null;
         }

@@ -143,16 +143,18 @@ public final class SymbolicExecutionUtil {
     /**
      * Forbid instances.
      */
-    private SymbolicExecutionUtil() {
-    }
+    private SymbolicExecutionUtil() {}
 
     /**
      * Simplifies the given {@link Term} in a side proof.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param term The {@link Term} to simplify.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param term
+     *        The {@link Term} to simplify.
      * @return The simplified {@link Term}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term simplify(InitConfig initConfig, Term term) throws ProofInputException {
         return simplify(initConfig, null, term);
@@ -161,10 +163,13 @@ public final class SymbolicExecutionUtil {
     /**
      * Simplifies the given {@link Term} in a side proof.
      *
-     * @param parentProof The parent {@link Proof}.
-     * @param term The {@link Term} to simplify.
+     * @param parentProof
+     *        The parent {@link Proof}.
+     * @param term
+     *        The {@link Term} to simplify.
      * @return The simplified {@link Term}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term simplify(Proof parentProof, Term term) throws ProofInputException {
         assert !parentProof.isDisposed();
@@ -174,11 +179,15 @@ public final class SymbolicExecutionUtil {
     /**
      * Simplifies the given {@link Term} in a side proof.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param parentProof The parent {@link Proof} which provides the {@link StrategySettings}.
-     * @param term The {@link Term} to simplify.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param parentProof
+     *        The parent {@link Proof} which provides the {@link StrategySettings}.
+     * @param term
+     *        The {@link Term} to simplify.
      * @return The simplified {@link Term}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term simplify(InitConfig initConfig, Proof parentProof, Term term)
             throws ProofInputException {
@@ -218,8 +227,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Converts the given {@link Sequent} into an implication.
      *
-     * @param sequent The {@link Sequent} to convert.
-     * @param services The {@link Services} to use.
+     * @param sequent
+     *        The {@link Sequent} to convert.
+     * @param services
+     *        The {@link Services} to use.
      * @return The created implication.
      */
     public static Term sequentToImplication(Sequent sequent, Services services) {
@@ -239,16 +250,13 @@ public final class SymbolicExecutionUtil {
     /**
      * Lists the {@link Term}s contained in the given {@link Semisequent}.
      *
-     * @param semisequent The {@link Semisequent} to list terms of.
+     * @param semisequent
+     *        The {@link Semisequent} to list terms of.
      * @return The list with all contained {@link Term}s.
      */
     public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
-        if (semisequent != null) {
-            for (SequentFormula sf : semisequent) {
-                terms = terms.append(sf.formula());
-            }
-        }
+        if (semisequent != null) { for (SequentFormula sf : semisequent) { terms = terms.append(sf.formula()); } }
         return terms;
     }
 
@@ -278,8 +286,10 @@ public final class SymbolicExecutionUtil {
      * <li>{@code !a < b} => {@code a >= b}</li>
      * </ul>
      *
-     * @param term The {@link Term} to improve.
-     * @param services The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to improve.
+     * @param services
+     *        The {@link Services} to use.
      * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
      */
     public static Term improveReadability(Term term, Services services) {
@@ -293,9 +303,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Helper method of {@link #improveReadability(Term, Services)}.
      *
-     * @param term The {@link Term} to improve.
-     * @param services The {@link Services} to use.
-     * @param integerLDT The {@link IntegerLDT} to use.
+     * @param term
+     *        The {@link Term} to improve.
+     * @param services
+     *        The {@link Services} to use.
+     * @param integerLDT
+     *        The {@link IntegerLDT} to use.
      * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
      */
     private static Term improveReadabilityRecursive(Term term, Services services,
@@ -324,9 +337,7 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isOne(subOne.sub(0), integerLDT)) {
                     term = tb.leq(term.sub(0), subOne.sub(1));
-                } else if (isOne(subOne.sub(1), integerLDT)) {
-                    term = tb.leq(term.sub(0), subOne.sub(0));
-                }
+                } else if (isOne(subOne.sub(1), integerLDT)) { term = tb.leq(term.sub(0), subOne.sub(0)); }
             }
         }
         // Improve readability: a >= 1 + b, a >= b + 1
@@ -335,9 +346,7 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isOne(subOne.sub(0), integerLDT)) {
                     term = tb.gt(term.sub(0), subOne.sub(1));
-                } else if (isOne(subOne.sub(1), integerLDT)) {
-                    term = tb.gt(term.sub(0), subOne.sub(0));
-                }
+                } else if (isOne(subOne.sub(1), integerLDT)) { term = tb.gt(term.sub(0), subOne.sub(0)); }
             }
         }
         // Improve readability: a <= -1 + b, a <= 1 + -b, a <= 1 - b
@@ -346,13 +355,9 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isMinusOne(subOne.sub(0), integerLDT)) {
                     term = tb.lt(term.sub(0), subOne.sub(1));
-                } else if (isMinusOne(subOne.sub(1), integerLDT)) {
-                    term = tb.lt(term.sub(0), subOne.sub(0));
-                }
+                } else if (isMinusOne(subOne.sub(1), integerLDT)) { term = tb.lt(term.sub(0), subOne.sub(0)); }
             } else if (subOne.op() == integerLDT.getSub()) {
-                if (isOne(subOne.sub(1), integerLDT)) {
-                    term = tb.lt(term.sub(0), subOne.sub(0));
-                }
+                if (isOne(subOne.sub(1), integerLDT)) { term = tb.lt(term.sub(0), subOne.sub(0)); }
             }
         }
         // Improve readability: a > -1 + b, a > 1 + -b, a > 1 - b
@@ -361,13 +366,9 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isMinusOne(subOne.sub(0), integerLDT)) {
                     term = tb.geq(term.sub(0), subOne.sub(1));
-                } else if (isMinusOne(subOne.sub(1), integerLDT)) {
-                    term = tb.geq(term.sub(0), subOne.sub(0));
-                }
+                } else if (isMinusOne(subOne.sub(1), integerLDT)) { term = tb.geq(term.sub(0), subOne.sub(0)); }
             } else if (subOne.op() == integerLDT.getSub()) {
-                if (isOne(subOne.sub(1), integerLDT)) {
-                    term = tb.geq(term.sub(0), subOne.sub(0));
-                }
+                if (isOne(subOne.sub(1), integerLDT)) { term = tb.geq(term.sub(0), subOne.sub(0)); }
             }
         }
         // Improve readability: !a >= b, !a > b, !a <= b, !a < b
@@ -379,9 +380,7 @@ public final class SymbolicExecutionUtil {
                 term = tb.geq(sub.sub(0), sub.sub(1));
             } else if (sub.op() == integerLDT.getGreaterOrEquals()) {
                 term = tb.lt(sub.sub(0), sub.sub(1));
-            } else if (sub.op() == integerLDT.getGreaterThan()) {
-                term = tb.leq(sub.sub(0), sub.sub(1));
-            }
+            } else if (sub.op() == integerLDT.getGreaterThan()) { term = tb.leq(sub.sub(0), sub.sub(1)); }
         }
         return term;
     }
@@ -389,8 +388,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given term represent the number one
      *
-     * @param subOne the term to be checked
-     * @param integerLDT the LDT for integers
+     * @param subOne
+     *        the term to be checked
+     * @param integerLDT
+     *        the LDT for integers
      * @return true if the term represents the one
      */
     private static boolean isOne(Term subOne, IntegerLDT integerLDT) {
@@ -400,8 +401,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} represents the integer constant {@code -1}.
      *
-     * @param term The {@link Term} to check.
-     * @param integerLDT The {@link IntegerLDT} to use.
+     * @param term
+     *        The {@link Term} to check.
+     * @param integerLDT
+     *        The {@link IntegerLDT} to use.
      * @return {@code true} {@link Term} represents {@code -1}, {@code false} {@link Term} is
      *         something else.
      */
@@ -423,15 +426,22 @@ public final class SymbolicExecutionUtil {
      * Creates a {@link Sequent} which can be used in site proofs to extract the return value of the
      * given {@link IProgramVariable} from the sequent of the given {@link Node}.
      *
-     * @param services The {@link Services} to use.
-     * @param contextObjectType The type of the current object (this reference).
-     * @param contextMethod The current method.
-     * @param contextObject The current object (this reference).
-     * @param methodReturnNode The method return {@link Node} which provides the sequent to extract
+     * @param services
+     *        The {@link Services} to use.
+     * @param contextObjectType
+     *        The type of the current object (this reference).
+     * @param contextMethod
+     *        The current method.
+     * @param contextObject
+     *        The current object (this reference).
+     * @param methodReturnNode
+     *        The method return {@link Node} which provides the sequent to extract
      *        updates and return expression from.
-     * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to
+     * @param methodCallEmptyNode
+     *        The method call empty {@link Node} which provides the sequent to
      *        start site proof in.
-     * @param variable The {@link IProgramVariable} of the value which is interested.
+     * @param variable
+     *        The {@link IProgramVariable} of the value which is interested.
      * @return The created {@link SiteProofVariableValueInput} with the created sequent and the
      *         predicate which will contain the value.
      */
@@ -451,14 +461,19 @@ public final class SymbolicExecutionUtil {
      * Creates a {@link Sequent} which can be used in site proofs to extract the return value of the
      * given {@link IProgramVariable} from the sequent of the given {@link Node}.
      *
-     * @param services The {@link Services} to use.
-     * @param context The {@link IExecutionContext} that defines the current object (this
+     * @param services
+     *        The {@link Services} to use.
+     * @param context
+     *        The {@link IExecutionContext} that defines the current object (this
      *        reference).
-     * @param methodReturnNode The method return {@link Node} which provides the sequent to extract
+     * @param methodReturnNode
+     *        The method return {@link Node} which provides the sequent to extract
      *        updates and return expression from.
-     * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to
+     * @param methodCallEmptyNode
+     *        The method call empty {@link Node} which provides the sequent to
      *        start site proof in.
-     * @param variable The {@link IProgramVariable} of the value which is interested.
+     * @param variable
+     *        The {@link IProgramVariable} of the value which is interested.
      * @return The created {@link SiteProofVariableValueInput} with the created sequent and the
      *         predicate which will contain the value.
      */
@@ -501,11 +516,16 @@ public final class SymbolicExecutionUtil {
      * Creates a {@link Sequent} which can be used in site proofs to extract the value of the given
      * {@link IProgramVariable} from the sequent of the given {@link Node}.
      *
-     * @param services The {@link Services} to use.
-     * @param node The original {@link Node} which provides the sequent to extract from.
-     * @param pio The {@link PosInOccurrence} of the SE modality.
-     * @param additionalConditions Optional additional conditions.
-     * @param variable The {@link IProgramVariable} of the value which is interested.
+     * @param services
+     *        The {@link Services} to use.
+     * @param node
+     *        The original {@link Node} which provides the sequent to extract from.
+     * @param pio
+     *        The {@link PosInOccurrence} of the SE modality.
+     * @param additionalConditions
+     *        Optional additional conditions.
+     * @param variable
+     *        The {@link IProgramVariable} of the value which is interested.
      * @return The created {@link SiteProofVariableValueInput} with the created sequent and the
      *         predicate which will contain the value.
      */
@@ -532,12 +552,18 @@ public final class SymbolicExecutionUtil {
      * Creates a {@link Sequent} which can be used in site proofs to extract the value of the given
      * {@link IProgramVariable} from the sequent of the given {@link Node}.
      *
-     * @param sideProofServices The {@link Services} of the side proof to use.
-     * @param node The original {@link Node} which provides the sequent to extract from.
-     * @param pio The {@link PosInOccurrence} of the modality or its updates.
-     * @param additionalConditions Additional conditions to add to the antecedent.
-     * @param term The new succedent term.
-     * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
+     * @param sideProofServices
+     *        The {@link Services} of the side proof to use.
+     * @param node
+     *        The original {@link Node} which provides the sequent to extract from.
+     * @param pio
+     *        The {@link PosInOccurrence} of the modality or its updates.
+     * @param additionalConditions
+     *        Additional conditions to add to the antecedent.
+     * @param term
+     *        The new succedent term.
+     * @param keepUpdates
+     *        {@code true} keep updates, {@code false} throw updates away.
      * @return The created {@link SiteProofVariableValueInput} with the created sequent and the
      *         predicate which will contain the value.
      */
@@ -586,8 +612,10 @@ public final class SymbolicExecutionUtil {
         /**
          * Constructor.
          *
-         * @param sequentToProve he sequent to prove.
-         * @param operator The {@link Operator} which is the predicate that contains the value
+         * @param sequentToProve
+         *        he sequent to prove.
+         * @param operator
+         *        The {@link Operator} which is the predicate that contains the value
          *        interested in.
          */
         public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
@@ -621,8 +649,10 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Term} represents a heap update, in particular a store or create
      * operation on a heap.
      *
-     * @param services The {@link Services} to use.
-     * @param term The {@link Term} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is heap update, {@code false} is something else.
      */
     public static boolean isHeapUpdate(Services services, Term term) {
@@ -644,11 +674,14 @@ public final class SymbolicExecutionUtil {
      * Checks if it is right now possible to compute the variables of the given
      * {@link IExecutionNode} via {@link IExecutionNode#getVariables()}.
      *
-     * @param node The {@link IExecutionNode} to check.
-     * @param services The {@link Services} to use.
+     * @param node
+     *        The {@link IExecutionNode} to check.
+     * @param services
+     *        The {@link Services} to use.
      * @return {@code true} right now it is possible to compute variables, {@code false} it is not
      *         possible to compute variables.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static boolean canComputeVariables(IExecutionNode<?> node, Services services)
             throws ProofInputException {
@@ -659,7 +692,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates for the given {@link IExecutionNode} the contained {@link IExecutionConstraint}s.
      *
-     * @param node The {@link IExecutionNode} to create constraints for.
+     * @param node
+     *        The {@link IExecutionNode} to create constraints for.
      * @return The created {@link IExecutionConstraint}s.
      */
     public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode<?> node) {
@@ -689,22 +723,18 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link Term} or one of its sub terms contains a symbolic execution label.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained
      *         at all.
      */
     public static boolean containsSymbolicExecutionLabel(Term term) {
         boolean hasModality = false;
         term = TermBuilder.goBelowUpdates(term);
-        if (term.op() instanceof Modality) {
-            hasModality = hasSymbolicExecutionLabel(term);
-        }
+        if (term.op() instanceof Modality) { hasModality = hasSymbolicExecutionLabel(term); }
         if (!hasModality) {
             int i = 0;
-            while (!hasModality && i < term.arity()) {
-                hasModality = containsSymbolicExecutionLabel(term.sub(i));
-                i++;
-            }
+            while (!hasModality && i < term.arity()) { hasModality = containsSymbolicExecutionLabel(term.sub(i)); i++; }
         }
         return hasModality;
     }
@@ -712,7 +742,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates for the given {@link IExecutionNode} the contained root {@link IExecutionVariable}s.
      *
-     * @param node The {@link IExecutionNode} to create variables for.
+     * @param node
+     *        The {@link IExecutionNode} to create variables for.
      * @return The created {@link IExecutionVariable}s.
      * @throws ProofInputException
      */
@@ -724,8 +755,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates for the given {@link IExecutionNode} the contained root {@link IExecutionVariable}s.
      *
-     * @param node The {@link IExecutionNode} to create variables for.
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param node
+     *        The {@link IExecutionNode} to create variables for.
+     * @param condition
+     *        A {@link Term} specifying some additional constraints to consider.
      * @return The created {@link IExecutionVariable}s.
      * @throws ProofInputException
      */
@@ -742,10 +775,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates for the given {@link IExecutionNode} the contained root {@link IExecutionVariable}s.
      *
-     * @param node The {@link IExecutionNode} to create variables for.
-     * @param proofNode The proof {@link Node} to work with.
-     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param node
+     *        The {@link IExecutionNode} to create variables for.
+     * @param proofNode
+     *        The proof {@link Node} to work with.
+     * @param modalityPIO
+     *        The {@link PosInOccurrence} of the modality of interest.
+     * @param condition
+     *        A {@link Term} specifying some additional constraints to consider.
      * @return The created {@link IExecutionVariable}s.
      * @throws ProofInputException
      */
@@ -764,10 +801,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates for the given {@link IExecutionNode} the contained root {@link IExecutionVariable}s.
      *
-     * @param node The {@link IExecutionNode} to create variables for.
-     * @param proofNode The proof {@link Node} to work with.
-     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param node
+     *        The {@link IExecutionNode} to create variables for.
+     * @param proofNode
+     *        The proof {@link Node} to work with.
+     * @param modalityPIO
+     *        The {@link PosInOccurrence} of the modality of interest.
+     * @param condition
+     *        A {@link Term} specifying some additional constraints to consider.
      * @return The created {@link IExecutionVariable}s.
      */
     public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node,
@@ -776,27 +817,21 @@ public final class SymbolicExecutionUtil {
             List<IProgramVariable> variables = new LinkedList<>();
             // Add self variable
             IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
-            if (selfVar != null) {
-                variables.add(selfVar);
-            }
+            if (selfVar != null) { variables.add(selfVar); }
             // Add method parameters
             Node callNode = findMethodCallNode(proofNode, modalityPIO);
             if (callNode != null
                     && callNode.getNodeInfo()
                             .getActiveStatement() instanceof MethodBodyStatement mbs) {
                 for (Expression e : mbs.getArguments()) {
-                    if (e instanceof IProgramVariable) {
-                        variables.add((IProgramVariable) e);
-                    }
+                    if (e instanceof IProgramVariable) { variables.add((IProgramVariable) e); }
                 }
             }
             // Collect variables from updates
             List<IProgramVariable> variablesFromUpdates =
                 collectAllElementaryUpdateTerms(proofNode);
             for (IProgramVariable variable : variablesFromUpdates) {
-                if (!variables.contains(variable)) {
-                    variables.add(variable);
-                }
+                if (!variables.contains(variable)) { variables.add(variable); }
             }
             IExecutionVariable[] result = new IExecutionVariable[variables.size()];
             int i = 0;
@@ -813,7 +848,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects all {@link IProgramVariable} used in {@link ElementaryUpdate}s.
      *
-     * @param node The {@link Node} to search in.
+     * @param node
+     *        The {@link Node} to search in.
      * @return The found {@link IProgramVariable} which are used in {@link ElementaryUpdate}s.
      */
     public static List<IProgramVariable> collectAllElementaryUpdateTerms(Node node) {
@@ -836,9 +872,12 @@ public final class SymbolicExecutionUtil {
      * Utility method of {@link #collectAllElementaryUpdateTerms(Node)} which collects all
      * {@link IProgramVariable}s of {@link ElementaryUpdate}s and static field manipulations.
      *
-     * @param services The {@link Services} to use.
-     * @param result The result {@link List} to fill.
-     * @param term The current term to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param result
+     *        The result {@link List} to fill.
+     * @param term
+     *        The current term to analyze.
      */
     private static void internalCollectAllElementaryUpdateTerms(Services services,
             List<IProgramVariable> result, Term term) {
@@ -852,14 +891,10 @@ public final class SymbolicExecutionUtil {
                 } else {
                     // Local variable
                     ElementaryUpdate eu = (ElementaryUpdate) term.op();
-                    if (eu.lhs() instanceof IProgramVariable) {
-                        result.add((IProgramVariable) eu.lhs());
-                    }
+                    if (eu.lhs() instanceof IProgramVariable) { result.add((IProgramVariable) eu.lhs()); }
                 }
             } else {
-                for (Term sub : term.subs()) {
-                    internalCollectAllElementaryUpdateTerms(services, result, sub);
-                }
+                for (Term sub : term.subs()) { internalCollectAllElementaryUpdateTerms(services, result, sub); }
             }
         }
     }
@@ -868,9 +903,12 @@ public final class SymbolicExecutionUtil {
      * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, Term)}
      * which collects static field manipulations on the given heap update.
      *
-     * @param services The {@link Services} to use.
-     * @param result The result {@link List} to fill.
-     * @param term The current term to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param result
+     *        The result {@link List} to fill.
+     * @param term
+     *        The current term to analyze.
      */
     private static void internalCollectStaticProgramVariablesOnHeap(Services services,
             Set<IProgramVariable> result, Term term) {
@@ -883,24 +921,18 @@ public final class SymbolicExecutionUtil {
                     Term locationTerm =
                         innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                     ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
-                    if (attribute != null && attribute.isStatic()) {
-                        result.add(attribute);
-                    }
+                    if (attribute != null && attribute.isStatic()) { result.add(attribute); }
                 }
             }
         } catch (Exception e) {
             // Can go wrong, nothing to do
         }
-        for (Term sub : term.subs()) {
-            internalCollectStaticProgramVariablesOnHeap(services, result, sub);
-        }
+        for (Term sub : term.subs()) { internalCollectStaticProgramVariablesOnHeap(services, result, sub); }
     }
 
     private static Term findInnerMostSelect(Term term, Services services) {
         if (isSelect(services, term)) {
-            while (isSelect(services, term.sub(1))) {
-                term = term.sub(1);
-            }
+            while (isSelect(services, term.sub(1))) { term = term.sub(1); }
             return term;
         } else {
             return null;
@@ -910,9 +942,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the {@link ProgramVariable} defined by the given {@link Term}.
      *
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} to use.
-     * @param locationTerm The {@link Term} to extract {@link ProgramVariable} from.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} to use.
+     * @param locationTerm
+     *        The {@link Term} to extract {@link ProgramVariable} from.
      * @return The {@link Term}s {@link ProgramVariable} or {@code null} if not available.
      */
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
@@ -935,9 +970,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the array index defined by the given {@link Term}.
      *
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} to use.
-     * @param arrayIndexTerm The {@link Term} to extract the array index from.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} to use.
+     * @param arrayIndexTerm
+     *        The {@link Term} to extract the array index from.
      * @return The array index or {@code null} if the term defines no array index.
      */
     public static Term getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
@@ -952,8 +990,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Searches the {@link IProgramVariable} of the current {@code this}/{@code self} reference.
      *
-     * @param node The {@link Node} to search in.
-     * @param pio The {@link PosInOccurrence} describing the location of the modality of interest.
+     * @param node
+     *        The {@link Node} to search in.
+     * @param pio
+     *        The {@link PosInOccurrence} describing the location of the modality of interest.
      * @return The found {@link IProgramVariable} with the current {@code this}/{@code self}
      *         reference or {@code null} if no one is available.
      */
@@ -978,9 +1018,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as method call.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The statement ({@link SourceElement}).
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The statement ({@link SourceElement}).
      * @return {@code true} represent node as method call, {@code false} represent node as something
      *         else.
      */
@@ -991,10 +1034,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as method call.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The statement ({@link SourceElement}).
-     * @param allowImpliciteMethods {@code true} implicit methods are included, {@code false}
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The statement ({@link SourceElement}).
+     * @param allowImpliciteMethods
+     *        {@code true} implicit methods are included, {@code false}
      *        implicit methods are outfiltered.
      * @return {@code true} represent node as method call, {@code false} represent node as something
      *         else.
@@ -1021,8 +1068,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link IProgramMethod} is not implicit.
      *
-     * @param services The {@link Services} to use.
-     * @param pm The {@link IProgramMethod} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param pm
+     *        The {@link IProgramMethod} to check.
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     public static boolean isNotImplicit(Services services, IProgramMethod pm) {
@@ -1045,10 +1094,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as branch statement.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The statement ({@link SourceElement}).
-     * @param posInfo The {@link PositionInfo}.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The statement ({@link SourceElement}).
+     * @param posInfo
+     *        The {@link PositionInfo}.
      * @return {@code true} represent node as branch statement, {@code false} represent node as
      *         something else.
      */
@@ -1061,10 +1114,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as loop statement.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The statement ({@link SourceElement}).
-     * @param posInfo The {@link PositionInfo}.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The statement ({@link SourceElement}).
+     * @param posInfo
+     *        The {@link PositionInfo}.
      * @return {@code true} represent node as loop statement, {@code false} represent node as
      *         something else.
      */
@@ -1077,10 +1134,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as statement.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The statement ({@link SourceElement}).
-     * @param posInfo The {@link PositionInfo}.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The statement ({@link SourceElement}).
+     * @param posInfo
+     *        The {@link PositionInfo}.
      * @return {@code true} represent node as statement, {@code false} represent node as something
      *         else.
      */
@@ -1096,8 +1157,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as termination.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as termination, {@code false} represent node as something
      *         else.
      */
@@ -1108,8 +1171,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as operation contract.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as operation contract, {@code false} represent node as
      *         something else.
      */
@@ -1130,8 +1195,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as block/loop contract.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as block contract, {@code false} represent node as
      *         something else.
      */
@@ -1142,8 +1209,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as loop invariant.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as use loop invariant, {@code false} represent node as
      *         something else.
      */
@@ -1154,8 +1223,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as method return.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as method return, {@code false} represent node as
      *         something else.
      */
@@ -1169,8 +1240,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as exceptional method return.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as exceptional method return, {@code false} represent
      *         node as something else.
      */
@@ -1182,9 +1255,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Node} has a loop condition.
      *
-     * @param node The {@link Node} to check.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-     * @param statement The actual statement ({@link SourceElement}).
+     * @param node
+     *        The {@link Node} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
+     * @param statement
+     *        The actual statement ({@link SourceElement}).
      * @return {@code true} has loop condition, {@code false} has no loop condition.
      */
     public static boolean hasLoopCondition(Node node, RuleApp ruleApp, SourceElement statement) {
@@ -1198,7 +1274,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a
      * {@link SymbolicExecutionTermLabel}.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is
      *         {@code null}.
@@ -1221,7 +1298,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a
      * {@link SymbolicExecutionTermLabel}.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is
      *         {@code null}.
@@ -1239,7 +1317,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a
      * {@link SymbolicExecutionTermLabel}.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is
      *         {@code null}.
@@ -1251,7 +1330,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the contained {@link SymbolicExecutionTermLabel} if available.
      *
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no
      *         {@link SymbolicExecutionTermLabel} is provided.
      */
@@ -1266,7 +1346,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} contains a {@link SymbolicExecutionTermLabel}.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link Term} is
      *         {@code null}.
@@ -1278,7 +1359,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the contained {@link SymbolicExecutionTermLabel} if available.
      *
-     * @param term The {@link Term} to search in.
+     * @param term
+     *        The {@link Term} to search in.
      * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no
      *         {@link SymbolicExecutionTermLabel} is provided.
      */
@@ -1297,7 +1379,8 @@ public final class SymbolicExecutionUtil {
      * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
-     * @param sequent The {@link Sequent} to search in.
+     * @param sequent
+     *        The {@link Sequent} to search in.
      * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null}
      *         otherwise.
      */
@@ -1330,8 +1413,10 @@ public final class SymbolicExecutionUtil {
      * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
      * {@link SymbolicExecutionTermLabel#id()} in the given {@link Semisequent}.
      *
-     * @param semisequent The {@link Semisequent} to search in.
-     * @param inAntec {@code true} antecedent, {@code false} succedent.
+     * @param semisequent
+     *        The {@link Semisequent} to search in.
+     * @param inAntec
+     *        {@code true} antecedent, {@code false} succedent.
      * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
      */
     public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(
@@ -1360,7 +1445,8 @@ public final class SymbolicExecutionUtil {
      * Searches the modality {@link PosInTerm} with the maximal {@link SymbolicExecutionTermLabel}
      * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
-     * @param term The {@link Term} to search in.
+     * @param term
+     *        The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
      *         otherwise.
      */
@@ -1380,7 +1466,8 @@ public final class SymbolicExecutionUtil {
      * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Sequent}.
      *
-     * @param sequent The {@link Sequent} to search in.
+     * @param sequent
+     *        The {@link Sequent} to search in.
      * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null}
      *         otherwise.
      */
@@ -1414,8 +1501,10 @@ public final class SymbolicExecutionUtil {
      * {@link SymbolicExecutionTermLabel} ID {@link SymbolicExecutionTermLabel#id()} in the given
      * {@link Semisequent}.
      *
-     * @param semisequent The {@link Semisequent} to search in.
-     * @param inAntec {@code true} antecedent, {@code false} succedent.
+     * @param semisequent
+     *        The {@link Semisequent} to search in.
+     * @param inAntec
+     *        {@code true} antecedent, {@code false} succedent.
      * @return The modality {@link PosInOccurrence} with the minimal ID if available or {@code null}
      *         otherwise.
      */
@@ -1445,7 +1534,8 @@ public final class SymbolicExecutionUtil {
      * Searches the modality {@link PosInTerm} with the minimal {@link SymbolicExecutionTermLabel}
      * ID {@link SymbolicExecutionTermLabel#id()} in the given {@link Term}.
      *
-     * @param term The {@link Term} to search in.
+     * @param term
+     *        The {@link Term} to search in.
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
      *         otherwise.
      */
@@ -1493,7 +1583,8 @@ public final class SymbolicExecutionUtil {
         /**
          * Constructor.
          *
-         * @param maximum {@code true} search maximal ID, {@code false} search minimal ID.
+         * @param maximum
+         *        {@code true} search maximal ID, {@code false} search minimal ID.
          */
         public FindModalityWithSymbolicExecutionLabelId(boolean maximum) {
             this.maximum = maximum;
@@ -1555,8 +1646,10 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Node} in KeY's proof tree represents also a {@link Node} in a
      * symbolic execution tree.
      *
-     * @param node The {@link Node} of KeY's proof tree to check.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The {@link Node} of KeY's proof tree to check.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a
      *         symbolic execution tree.
      */
@@ -1595,7 +1688,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link RuleApp} should be ignored or checked for possible symbolic
      * execution tree node representation.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp}
      *         represents a symbolic execution tree node.
      */
@@ -1608,8 +1702,10 @@ public final class SymbolicExecutionUtil {
      * Checks if the currently executed code is in an implicit method
      * ({@link IProgramMethod#isImplicit()} is {@code true}).
      *
-     * @param node The {@link Node} of KeY's proof tree to check.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The {@link Node} of KeY's proof tree to check.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} is in implicit method, {@code false} is not in implicit method.
      */
     public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
@@ -1625,7 +1721,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Compute the stack size of the given {@link Term} described by the given {@link RuleApp}.
      *
-     * @param ruleApp The {@link RuleApp} which defines the {@link Term} to compute its stack size.
+     * @param ruleApp
+     *        The {@link RuleApp} which defines the {@link Term} to compute its stack size.
      * @return The stack size.
      */
     public static int computeStackSize(RuleApp ruleApp) {
@@ -1657,8 +1754,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link SourceElement} is a do while loop.
      *
-     * @param node The {@link Node} to check.
-     * @param statement The actual statement ({@link SourceElement}).
+     * @param node
+     *        The {@link Node} to check.
+     * @param statement
+     *        The actual statement ({@link SourceElement}).
      * @return {@code true} is do while loop, {@code false} is something else.
      */
     public static boolean isDoWhileLoopCondition(Node node, SourceElement statement) {
@@ -1668,8 +1767,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link SourceElement} is a for loop.
      *
-     * @param node The {@link Node} to check.
-     * @param statement The actual statement ({@link SourceElement}).
+     * @param node
+     *        The {@link Node} to check.
+     * @param statement
+     *        The actual statement ({@link SourceElement}).
      * @return {@code true} is for loop, {@code false} is something else.
      */
     public static boolean isForLoopCondition(Node node, SourceElement statement) {
@@ -1679,7 +1780,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects all {@link Goal}s in the subtree of the given {@link IExecutionElement}.
      *
-     * @param executionElement The {@link IExecutionElement} to collect {@link Goal}s in.
+     * @param executionElement
+     *        The {@link IExecutionElement} to collect {@link Goal}s in.
      * @return The found {@link Goal}s.
      */
     public static ImmutableList<Goal> collectGoalsInSubtree(IExecutionElement executionElement) {
@@ -1693,7 +1795,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects all {@link Goal}s in the subtree of the given {@link Node}.
      *
-     * @param node The {@link Node} to collect {@link Goal}s in.
+     * @param node
+     *        The {@link Node} to collect {@link Goal}s in.
      * @return The found {@link Goal}s.
      */
     public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
@@ -1705,8 +1808,10 @@ public final class SymbolicExecutionUtil {
      * Searches for the given {@link Node} the parent node which also represents a symbolic
      * execution tree node (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
      *
-     * @param node The {@link Node} to start search in.
-     * @param pio The {@link PosInOccurrence} of the modality.
+     * @param node
+     *        The {@link Node} to start search in.
+     * @param pio
+     *        The {@link PosInOccurrence} of the modality.
      * @return The parent {@link Node} of the given {@link Node} which is also a set node or
      *         {@code null} if no parent node was found.
      */
@@ -1744,7 +1849,8 @@ public final class SymbolicExecutionUtil {
      * Searches for the given {@link Node} the parent node which also represents a symbolic
      * execution tree node (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
      *
-     * @param node The {@link Node} to start search in.
+     * @param node
+     *        The {@link Node} to start search in.
      * @return The parent {@link Node} of the given {@link Node} which is also a set node or
      *         {@code null} if no parent node was found.
      */
@@ -1768,13 +1874,17 @@ public final class SymbolicExecutionUtil {
     /**
      * Computes the branch condition of the given {@link Node}.
      *
-     * @param node The {@link Node} to compute its branch condition.
-     * @param simplify {@code true} simplify condition in a side proof, {@code false} do not
+     * @param node
+     *        The {@link Node} to compute its branch condition.
+     * @param simplify
+     *        {@code true} simplify condition in a side proof, {@code false} do not
      *        simplify condition.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed branch condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term computeBranchCondition(Node node, boolean simplify,
             boolean improveReadability) throws ProofInputException {
@@ -1793,7 +1903,7 @@ public final class SymbolicExecutionUtil {
                 improveReadability);
         } else {
             throw new ProofInputException("Unsupported RuleApp in branch computation \""
-                + parent.getAppliedRuleApp() + "\".");
+                    + parent.getAppliedRuleApp() + "\".");
         }
     }
 
@@ -1827,14 +1937,19 @@ public final class SymbolicExecutionUtil {
      * </ul>
      * </p>
      *
-     * @param parent The parent {@link Node} of the given one.
-     * @param node The {@link Node} to compute its branch condition.
-     * @param simplify {@code true} simplify condition in a side proof, {@code false} do not
+     * @param parent
+     *        The parent {@link Node} of the given one.
+     * @param node
+     *        The {@link Node} to compute its branch condition.
+     * @param simplify
+     *        {@code true} simplify condition in a side proof, {@code false} do not
      *        simplify condition.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed branch condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static Term computeContractRuleAppBranchCondition(Node parent, Node node,
             boolean simplify, boolean improveReadability) throws ProofInputException {
@@ -1843,7 +1958,7 @@ public final class SymbolicExecutionUtil {
         if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
             throw new ProofInputException(
                 "Only ContractRuleApp is allowed in branch computation but rule \""
-                    + parent.getAppliedRuleApp() + "\" was found.");
+                        + parent.getAppliedRuleApp() + "\" was found.");
         }
         int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
         if (childIndex >= 3) {
@@ -1855,12 +1970,12 @@ public final class SymbolicExecutionUtil {
             Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
             if (workingTerm == null) {
                 throw new ProofInputException("Term not find in precondition branch, implementation"
-                    + " of UseOperationContractRule might have changed!");
+                        + " of UseOperationContractRule might have changed!");
             }
             workingTerm = TermBuilder.goBelowUpdates(workingTerm);
             if (workingTerm.op() != Junctor.AND) {
                 throw new ProofInputException("And operation expected, implementation of "
-                    + "UseOperationContractRule might have changed!");
+                        + "UseOperationContractRule might have changed!");
             }
             Term preconditions = workingTerm.sub(0);
             return services.getTermBuilder().not(preconditions);
@@ -1895,20 +2010,20 @@ public final class SymbolicExecutionUtil {
                 callerNotNullTerm = TermBuilder.goBelowUpdates(callerNotNullTerm);
                 if (callerNotNullTerm.op() != Junctor.NOT) {
                     throw new ProofInputException("Not operation expected, implementation of "
-                        + "UseOperationContractRule might have changed!");
+                            + "UseOperationContractRule might have changed!");
                 }
                 if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
                     throw new ProofInputException("Equals operation expected, implementation of "
-                        + "UseOperationContractRule might have changed!");
+                            + "UseOperationContractRule might have changed!");
                 }
                 if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
                     throw new ProofInputException("ProgramVariable expected, implementation of "
-                        + "UseOperationContractRule might have changed!");
+                            + "UseOperationContractRule might have changed!");
                 }
                 if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(),
                     parent.proof().getServices())) {
                     throw new ProofInputException("Null expected, implementation of "
-                        + "UseOperationContractRule might have changed!");
+                            + "UseOperationContractRule might have changed!");
                 }
                 result = services.getTermBuilder().and(callerNotNullTerm, result);
             }
@@ -1923,7 +2038,7 @@ public final class SymbolicExecutionUtil {
                     createSequentToProveWithNewSuccedent(parent, null, result, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Operation contract branch condition computation on node "
-                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             } else {
                 // Add updates (in the simplify branch the updates are added during side proof
@@ -1931,9 +2046,7 @@ public final class SymbolicExecutionUtil {
                 condition = services.getTermBuilder()
                         .applyParallel(search.getUpdatesAndTerm().first, result);
             }
-            if (improveReadability) {
-                condition = improveReadability(condition, services);
-            }
+            if (improveReadability) { condition = improveReadability(condition, services); }
             return condition;
         }
     }
@@ -1941,11 +2054,16 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects the preconditions of an applied operation contract.
      *
-     * @param services The {@link Services} to use.
-     * @param search The {@link ContractPostOrExcPostExceptionVariableResult}.
-     * @param normalConditions The {@link List} with the normal case conditions to fill.
-     * @param exceptinalConditions The {@link List} with the exceptional case conditions to fill.
-     * @throws ProofInputException Occurred Exception.
+     * @param services
+     *        The {@link Services} to use.
+     * @param search
+     *        The {@link ContractPostOrExcPostExceptionVariableResult}.
+     * @param normalConditions
+     *        The {@link List} with the normal case conditions to fill.
+     * @param exceptinalConditions
+     *        The {@link List} with the exceptional case conditions to fill.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static void collectContractPreconditions(Services services,
             ContractPostOrExcPostExceptionVariableResult search, List<Term> normalConditions,
@@ -1953,7 +2071,7 @@ public final class SymbolicExecutionUtil {
         // Treat general conditions
         if (search.getWorkingTerm().op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of "
-                + "UseOperationContractRule might have changed!");
+                    + "UseOperationContractRule might have changed!");
         }
         Term specificationCasesTerm = search.getWorkingTerm().sub(1);
         Term excDefinition = search.getExceptionDefinition();
@@ -1973,12 +2091,18 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects recursively the preconditions of specification cases.
      *
-     * @param normalExcDefinition The normal exception equality.
-     * @param exceptionalExcDefinition The exceptional equality.
-     * @param term The current {@link Term}.
-     * @param normalConditions The {@link List} with the normal case conditions to fill.
-     * @param exceptinalConditions The {@link List} with the exceptional case conditions to fill.
-     * @throws ProofInputException Occurred Exception.
+     * @param normalExcDefinition
+     *        The normal exception equality.
+     * @param exceptionalExcDefinition
+     *        The exceptional equality.
+     * @param term
+     *        The current {@link Term}.
+     * @param normalConditions
+     *        The {@link List} with the normal case conditions to fill.
+     * @param exceptinalConditions
+     *        The {@link List} with the exceptional case conditions to fill.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static void collectSpecifcationCasesPreconditions(Term normalExcDefinition,
             Term exceptionalExcDefinition, Term term, List<Term> normalConditions,
@@ -2036,9 +2160,7 @@ public final class SymbolicExecutionUtil {
                 } else {
                     Term excCondition = rightTerm;
                     // Check if right child is exception definition
-                    if (excCondition.op() == Junctor.AND) {
-                        excCondition = excCondition.sub(excCondition.arity() - 1);
-                    }
+                    if (excCondition.op() == Junctor.AND) { excCondition = excCondition.sub(excCondition.arity() - 1); }
                     if (excCondition.equalsModProperty(normalExcDefinition,
                         IRRELEVANT_TERM_LABELS_PROPERTY)) {
                         normalConditions.add(leftTerm);
@@ -2059,12 +2181,12 @@ public final class SymbolicExecutionUtil {
                                 exceptinalConditions.add(leftTerm);
                             } else {
                                 throw new ProofInputException("Exeptional condition expected, "
-                                    + "implementation of UseOperationContractRule might have "
-                                    + "changed!");
+                                        + "implementation of UseOperationContractRule might have "
+                                        + "changed!");
                             }
                         } else {
                             throw new ProofInputException("Exeptional condition expected, "
-                                + "implementation of UseOperationContractRule might have changed!");
+                                    + "implementation of UseOperationContractRule might have changed!");
                         }
                     }
                 }
@@ -2076,11 +2198,14 @@ public final class SymbolicExecutionUtil {
      * Searches the used exception variable in the post or exceptional post branch of an applied
      * {@link ContractRuleApp} on the parent of the given {@link Node}.
      *
-     * @param node The {@link Node} which is the post or exceptional post branch of an applied
+     * @param node
+     *        The {@link Node} which is the post or exceptional post branch of an applied
      *        {@link ContractRuleApp}.
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The result.
-     * @throws ProofInputException Occurred exception if something is not as expected.
+     * @throws ProofInputException
+     *         Occurred exception if something is not as expected.
      */
     public static ContractPostOrExcPostExceptionVariableResult searchContractPostOrExcPostExceptionVariable(
             Node node, Services services) throws ProofInputException {
@@ -2091,7 +2216,7 @@ public final class SymbolicExecutionUtil {
         workingTerm = updatesAndTerm.second;
         if (workingTerm.op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of "
-                + "UseOperationContractRule might have changed!");
+                    + "UseOperationContractRule might have changed!");
         }
         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is
                                           // the combination of all normal and exceptional
@@ -2101,7 +2226,7 @@ public final class SymbolicExecutionUtil {
         Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
         if (exceptionDefinition == null) {
             throw new ProofInputException("Exception definition not found, implementation of "
-                + "UseOperationContractRule might have changed!");
+                    + "UseOperationContractRule might have changed!");
         }
         // Make sure that exception equality was found
         Term exceptionEquality =
@@ -2114,8 +2239,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Searches the exception definition.
      *
-     * @param term The {@link Term} to start search in.
-     * @param services the {@link Services} to use.
+     * @param term
+     *        The {@link Term} to start search in.
+     * @param services
+     *        the {@link Services} to use.
      * @return The found exception definition or {@code null} if not available.
      */
     private static Term searchExceptionDefinition(Term term, Services services) {
@@ -2129,10 +2256,7 @@ public final class SymbolicExecutionUtil {
         } else {
             Term result = null;
             int i = term.arity() - 1;
-            while (result == null && i >= 0) {
-                result = searchExceptionDefinition(term.sub(i), services);
-                i--;
-            }
+            while (result == null && i >= 0) { result = searchExceptionDefinition(term.sub(i), services); i--; }
             return result;
         }
     }
@@ -2167,10 +2291,14 @@ public final class SymbolicExecutionUtil {
         /**
          * Constructor.
          *
-         * @param workingTerm The working {@link Term}.
-         * @param updatesAndTerm The updates.
-         * @param exceptionDefinition The exception definition.
-         * @param exceptionEquality The equality which contains the equality.
+         * @param workingTerm
+         *        The working {@link Term}.
+         * @param updatesAndTerm
+         *        The updates.
+         * @param exceptionDefinition
+         *        The exception definition.
+         * @param exceptionEquality
+         *        The equality which contains the equality.
          */
         public ContractPostOrExcPostExceptionVariableResult(Term workingTerm,
                 Pair<ImmutableList<Term>, Term> updatesAndTerm, Term exceptionDefinition,
@@ -2231,14 +2359,19 @@ public final class SymbolicExecutionUtil {
      * </ul>
      * </p>
      *
-     * @param parent The parent {@link Node} of the given one.
-     * @param node The {@link Node} to compute its branch condition.
-     * @param simplify {@code true} simplify condition in a side proof, {@code false} do not
+     * @param parent
+     *        The parent {@link Node} of the given one.
+     * @param node
+     *        The {@link Node} to compute its branch condition.
+     * @param simplify
+     *        {@code true} simplify condition in a side proof, {@code false} do not
      *        simplify condition.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed branch condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent, Node node,
             boolean simplify, boolean improveReadability) throws ProofInputException {
@@ -2246,7 +2379,7 @@ public final class SymbolicExecutionUtil {
         if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
             throw new ProofInputException(
                 "Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \""
-                    + parent.getAppliedRuleApp() + "\" was found.");
+                        + parent.getAppliedRuleApp() + "\" was found.");
         }
         // Make sure that branch is supported
         int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
@@ -2313,14 +2446,12 @@ public final class SymbolicExecutionUtil {
                     modalityTerm, pair.first, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Loop invariant branch condition computation on node "
-                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             } else {
                 condition = services.getTermBuilder().applySequential(pair.first, modalityTerm);
             }
-            if (improveReadability) {
-                condition = improveReadability(condition, services);
-            }
+            if (improveReadability) { condition = improveReadability(condition, services); }
             return condition;
         } else {
             throw new ProofInputException(
@@ -2341,21 +2472,26 @@ public final class SymbolicExecutionUtil {
      * </ul>
      * </p>
      *
-     * @param parent The parent {@link Node} of the given one.
-     * @param node The {@link Node} to compute its branch condition.
-     * @param simplify {@code true} simplify condition in a side proof, {@code false} do not
+     * @param parent
+     *        The parent {@link Node} of the given one.
+     * @param node
+     *        The {@link Node} to compute its branch condition.
+     * @param simplify
+     *        {@code true} simplify condition in a side proof, {@code false} do not
      *        simplify condition.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed branch condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node,
             boolean simplify, boolean improveReadability) throws ProofInputException {
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
             throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in "
-                + "branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+                    + "branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
         }
 
         RuleApp app = parent.getAppliedRuleApp();
@@ -2381,12 +2517,10 @@ public final class SymbolicExecutionUtil {
                     condition, null, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Block contract branch condition computation on node "
-                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             }
-            if (improveReadability) {
-                condition = improveReadability(condition, services);
-            }
+            if (improveReadability) { condition = improveReadability(condition, services); }
             return condition;
         } else {
             throw new ProofInputException(
@@ -2398,9 +2532,12 @@ public final class SymbolicExecutionUtil {
      * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original
      * {@link Node} in the {@link Node} to apply on.
      *
-     * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
-     * @param pio The given {@link PosInOccurrence}.
-     * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence} on.
+     * @param original
+     *        The original {@link Node} on which the given {@link PosInOccurrence} works.
+     * @param pio
+     *        The given {@link PosInOccurrence}.
+     * @param toApplyOn
+     *        The new {@link Node} to apply the {@link PosInOccurrence} on.
      * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence}
      *         or {@code null} if not available.
      */
@@ -2418,10 +2555,13 @@ public final class SymbolicExecutionUtil {
      * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original
      * {@link Sequent} in the {@link Sequent} to apply on.
      *
-     * @param original The original {@link Sequent} on which the given {@link PosInOccurrence}
+     * @param original
+     *        The original {@link Sequent} on which the given {@link PosInOccurrence}
      *        works.
-     * @param pio The given {@link PosInOccurrence}.
-     * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
+     * @param pio
+     *        The given {@link PosInOccurrence}.
+     * @param toApplyOn
+     *        The new {@link Sequent} to apply the {@link PosInOccurrence} on.
      * @return The {@link Term} in the other {@link Sequent} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
@@ -2439,9 +2579,12 @@ public final class SymbolicExecutionUtil {
      * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the
      * original {@link Node} in the {@link Node} to apply too.
      *
-     * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
-     * @param pio The given {@link PosInOccurrence}.
-     * @param toApplyTo The new {@link Node} to apply the {@link PosInOccurrence} to.
+     * @param original
+     *        The original {@link Node} on which the given {@link PosInOccurrence} works.
+     * @param pio
+     *        The given {@link PosInOccurrence}.
+     * @param toApplyTo
+     *        The new {@link Node} to apply the {@link PosInOccurrence} to.
      * @return The {@link PosInOccurrence} in the other {@link Node} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
@@ -2458,10 +2601,13 @@ public final class SymbolicExecutionUtil {
      * Returns the {@link PosInOccurrence} described by the given {@link PosInOccurrence} of the
      * original {@link Sequent} in the {@link Sequent} to apply too.
      *
-     * @param original The original {@link Sequent} on which the given {@link PosInOccurrence}
+     * @param original
+     *        The original {@link Sequent} on which the given {@link PosInOccurrence}
      *        works.
-     * @param pio The given {@link PosInOccurrence}.
-     * @param toApplyTo The new {@link Sequent} to apply the {@link PosInOccurrence} to.
+     * @param pio
+     *        The given {@link PosInOccurrence}.
+     * @param toApplyTo
+     *        The new {@link Sequent} to apply the {@link PosInOccurrence} to.
      * @return The {@link PosInOccurrence} in the other {@link Sequent} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
@@ -2493,21 +2639,26 @@ public final class SymbolicExecutionUtil {
      * Computes the branch condition of the given {@link Node} which was constructed by a
      * {@link TacletApp}.
      *
-     * @param parent The parent {@link Node} of the given one.
-     * @param node The {@link Node} to compute its branch condition.
-     * @param simplify {@code true} simplify condition in a side proof, {@code false} do not
+     * @param parent
+     *        The parent {@link Node} of the given one.
+     * @param node
+     *        The {@link Node} to compute its branch condition.
+     * @param simplify
+     *        {@code true} simplify condition in a side proof, {@code false} do not
      *        simplify condition.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed branch condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify,
             boolean improveReadability) throws ProofInputException {
         if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
-                    + parent.getAppliedRuleApp() + "\" was found.");
+                        + parent.getAppliedRuleApp() + "\" was found.");
         }
         Services services = node.proof().getServices();
         // List new sequent formulas in the child node.
@@ -2571,7 +2722,7 @@ public final class SymbolicExecutionUtil {
                     // Make sure that an PosTacletApp was applied
                     if (!(app instanceof PosTacletApp)) {
                         throw new ProofInputException("Only PosTacletApp are allowed with a replace"
-                            + " term in branch computation but rule \"" + app + "\" was found.");
+                                + " term in branch computation but rule \"" + app + "\" was found.");
                     }
                     // Create new lists
                     ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
@@ -2604,8 +2755,8 @@ public final class SymbolicExecutionUtil {
                 }
             } else if (goalTemplate.replaceWithExpressionAsObject() != null) {
                 throw new ProofInputException("Expected replacement as Sequent or Term during "
-                    + "branch condition computation but is \""
-                    + goalTemplate.replaceWithExpressionAsObject() + "\".");
+                        + "branch condition computation but is \""
+                        + goalTemplate.replaceWithExpressionAsObject() + "\".");
             }
         }
         // Compute branch condition
@@ -2625,36 +2776,30 @@ public final class SymbolicExecutionUtil {
                 newLeftAndRight, true);
             condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                 RESULT_LABEL, "Taclet branch condition computation on node " + parent.serialNr()
-                    + " for branch " + node.serialNr() + ".",
+                        + " for branch " + node.serialNr() + ".",
                 StrategyProperties.SPLITTING_OFF);
         } else {
             condition = newLeftAndRight;
         }
-        if (improveReadability) {
-            condition = improveReadability(condition, services);
-        }
+        if (improveReadability) { condition = improveReadability(condition, services); }
         return condition;
     }
 
     /**
      * Lists the {@link Term}s of all new {@link SequentFormula} in the child {@link Semisequent}.
      *
-     * @param parent The parent {@link Semisequent}.
-     * @param child The child {@link Semisequent}.
+     * @param parent
+     *        The parent {@link Semisequent}.
+     * @param child
+     *        The child {@link Semisequent}.
      * @return An {@link ImmutableList} with all new {@link Term}s.
      */
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
         Set<SequentFormula> parentSFs = new HashSet<>();
-        for (SequentFormula sf : parent) {
-            parentSFs.add(sf);
-        }
+        for (SequentFormula sf : parent) { parentSFs.add(sf); }
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (SequentFormula sf : child) {
-            if (!parentSFs.contains(sf)) {
-                result = result.append(sf.formula());
-            }
-        }
+        for (SequentFormula sf : child) { if (!parentSFs.contains(sf)) { result = result.append(sf.formula()); } }
         return result;
     }
 
@@ -2662,9 +2807,12 @@ public final class SymbolicExecutionUtil {
      * Searches the by {@link Rule} application instantiated replace {@link Term} which is equal
      * modulo labels to the given replace {@link Term}.
      *
-     * @param semisequent The available candidates created by {@link Rule} application.
-     * @param posInOccurrence The {@link PosInOccurrence} on which the rule was applied.
-     * @param replaceTerm The {@link Term} to find.
+     * @param semisequent
+     *        The available candidates created by {@link Rule} application.
+     * @param posInOccurrence
+     *        The {@link PosInOccurrence} on which the rule was applied.
+     * @param replaceTerm
+     *        The {@link Term} to find.
      * @return The found {@link Term} or {@code null} if not available.
      */
     private static Term findReplacement(Semisequent semisequent,
@@ -2677,9 +2825,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given replace {@link Term} is equal module labels to the {@link Term} to check.
      *
-     * @param toCheck The {@link Term} to check.
-     * @param posInOccurrence The {@link PosInOccurrence} of the {@link Rule} application.
-     * @param replaceTerm The {@link Term} to compare with.
+     * @param toCheck
+     *        The {@link Term} to check.
+     * @param posInOccurrence
+     *        The {@link PosInOccurrence} of the {@link Rule} application.
+     * @param replaceTerm
+     *        The {@link Term} to compare with.
      * @return {@code true} equal modulo labels, {@code false} not equal at all.
      */
     private static boolean checkReplaceTerm(Term toCheck, PosInOccurrence posInOccurrence,
@@ -2696,8 +2847,10 @@ public final class SymbolicExecutionUtil {
      * Returns the sub {@link Term} at the given {@link PosInOccurrence} but on the given
      * {@link Term} instead of the one contained in the {@link PosInOccurrence}.
      *
-     * @param posInOccurrence The {@link PosInOccurrence} which defines the sub term position.
-     * @param term The {@link Term} to work with.
+     * @param posInOccurrence
+     *        The {@link PosInOccurrence} which defines the sub term position.
+     * @param term
+     *        The {@link Term} to work with.
      * @return The found sub {@link Term} or {@code null} if the {@link PosInOccurrence} is not
      *         compatible.
      */
@@ -2718,10 +2871,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Instantiates the given {@link Term} of the applied {@link TacletApp}.
      *
-     * @param node The current {@link Node}.
-     * @param term The {@link Term} to instantiate.
-     * @param tacletApp The {@link TacletApp} to consider.
-     * @param services The {@link Services} to use.
+     * @param node
+     *        The current {@link Node}.
+     * @param term
+     *        The {@link Term} to instantiate.
+     * @param tacletApp
+     *        The {@link TacletApp} to consider.
+     * @param services
+     *        The {@link Services} to use.
      * @return The instantiated {@link Term} or {@code null} if no {@link Term} was given.
      */
     public static Term instantiateTerm(Node node, Term term, TacletApp tacletApp,
@@ -2740,14 +2897,21 @@ public final class SymbolicExecutionUtil {
     /**
      * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
      *
-     * @param services The {@link Services} to use.
-     * @param proof The {@link Proof} from on which the side proof si performed.
-     * @param sequentToProve The {@link Sequent} to prove in a side proof.
-     * @param label The {@link TermLabel} which is used to compute the result.
-     * @param description The side proof description.
-     * @param splittingOption The splitting options to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param proof
+     *        The {@link Proof} from on which the side proof si performed.
+     * @param sequentToProve
+     *        The {@link Sequent} to prove in a side proof.
+     * @param label
+     *        The {@link TermLabel} which is used to compute the result.
+     * @param description
+     *        The side proof description.
+     * @param splittingOption
+     *        The splitting options to use.
      * @return The result {@link Term}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     private static Term evaluateInSideProof(Services services, Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
@@ -2788,7 +2952,8 @@ public final class SymbolicExecutionUtil {
      * is called before a proof is instantiated the first time. It can be checked via
      * {@link #isChoiceSettingInitialised()}.
      *
-     * @param key The choice key.
+     * @param key
+     *        The choice key.
      * @return The choice value.
      */
     public static String getChoiceSetting(String key) {
@@ -2802,8 +2967,10 @@ public final class SymbolicExecutionUtil {
      * first proof is instantiated in KeY. Otherwise the default settings are not loaded. If default
      * settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
      *
-     * @param key The choice key to modify.
-     * @param value The new choice value to set.
+     * @param key
+     *        The choice key to modify.
+     * @param value
+     *        The new choice value to set.
      */
     public static void setChoiceSetting(String key, String value) {
         var settings =
@@ -2816,12 +2983,16 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}
-     * @param additionalAntecedent An additional antecedent.
-     * @param newSuccedent The {@link Term} to check.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}
+     * @param additionalAntecedent
+     *        An additional antecedent.
+     * @param newSuccedent
+     *        The {@link Term} to check.
      * @return {@code true} {@link Term} was evaluated to null, {@code false} {@link Term} was not
      *         evaluated to null.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public static boolean isNull(Node node, Term additionalAntecedent, Term newSuccedent)
             throws ProofInputException {
@@ -2832,12 +3003,16 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Term} is not null in the {@link Sequent} of the given
      * {@link Node}.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}
-     * @param additionalAntecedent An additional antecedent.
-     * @param newSuccedent The {@link Term} to check.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}
+     * @param additionalAntecedent
+     *        An additional antecedent.
+     * @param newSuccedent
+     *        The {@link Term} to check.
      * @return {@code true} {@link Term} was evaluated to not null, {@code false} {@link Term} was
      *         not evaluated to not null.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public static boolean isNotNull(Node node, Term additionalAntecedent, Term newSuccedent)
             throws ProofInputException {
@@ -2848,14 +3023,19 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Term} is null or not in the {@link Sequent} of the given
      * {@link Node}.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}
-     * @param additionalAntecedent An additional antecedent.
-     * @param newSuccedent The {@link Term} to check.
-     * @param nullExpected {@code true} expect that {@link Term} is null, {@code false} expect that
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}
+     * @param additionalAntecedent
+     *        An additional antecedent.
+     * @param newSuccedent
+     *        The {@link Term} to check.
+     * @param nullExpected
+     *        {@code true} expect that {@link Term} is null, {@code false} expect that
      *        term is not null.
      * @return {@code true} term is null value matches the expected nullExpected value,
      *         {@code false} otherwise.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     private static boolean checkNull(Node node, Term additionalAntecedent, Term newSuccedent,
             boolean nullExpected) throws ProofInputException {
@@ -2889,8 +3069,10 @@ public final class SymbolicExecutionUtil {
      * Creates a new {@link Sequent} which is a modification from the {@link Sequent} of the given
      * {@link Node} which contains the same information but a different succedent.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}.
-     * @param newSuccedent The new succedent.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}.
+     * @param newSuccedent
+     *        The new succedent.
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
@@ -2902,9 +3084,12 @@ public final class SymbolicExecutionUtil {
      * Creates a new {@link Sequent} which is a modification from the {@link Sequent} of the given
      * {@link Node} which contains the same information but a different succedent.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}.
-     * @param additionalAntecedent An optional additional antecedents.
-     * @param newSuccedent The new succedent.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}.
+     * @param additionalAntecedent
+     *        An optional additional antecedents.
+     * @param newSuccedent
+     *        The new succedent.
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node, Term additionalAntecedent,
@@ -2918,9 +3103,12 @@ public final class SymbolicExecutionUtil {
      * Creates a new {@link Sequent} which is a modification from the {@link Sequent} of the given
      * {@link Node} which contains the same information but a different succedent.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}.
-     * @param additionalAntecedent An optional additional antecedents.
-     * @param newSuccedent The new succedent.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}.
+     * @param additionalAntecedent
+     *        An optional additional antecedents.
+     * @param newSuccedent
+     *        The new succedent.
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
@@ -2946,7 +3134,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Computes the initial {@link ElementaryUpdate}s on the given root {@link Node}.
      *
-     * @param root The root {@link Node} of the {@link Proof}.
+     * @param root
+     *        The root {@link Node} of the {@link Proof}.
      * @return The found initial {@link ElementaryUpdate}s.
      */
     public static ImmutableList<Term> computeRootElementaryUpdates(Node root) {
@@ -2954,9 +3143,7 @@ public final class SymbolicExecutionUtil {
         Sequent sequent = root.sequent();
         for (SequentFormula sf : sequent.succedent()) {
             Term term = sf.formula();
-            if (Junctor.IMP.equals(term.op())) {
-                result = result.prepend(collectElementaryUpdates(term.sub(1)));
-            }
+            if (Junctor.IMP.equals(term.op())) { result = result.prepend(collectElementaryUpdates(term.sub(1))); }
         }
         return result;
     }
@@ -2964,7 +3151,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects the {@link ElementaryUpdate}s in the given {@link Term}.
      *
-     * @param term The {@link Term} to collect its updates.
+     * @param term
+     *        The {@link Term} to collect its updates.
      * @return The found {@link ElementaryUpdate}s.
      */
     public static ImmutableList<Term> collectElementaryUpdates(Term term) {
@@ -2973,9 +3161,7 @@ public final class SymbolicExecutionUtil {
             return collectElementaryUpdates(updateTerm);
         } else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
             ImmutableList<Term> result = ImmutableSLList.nil();
-            for (int i = 0; i < term.arity(); i++) {
-                result = result.prepend(collectElementaryUpdates(term.sub(i)));
-            }
+            for (int i = 0; i < term.arity(); i++) { result = result.prepend(collectElementaryUpdates(term.sub(i))); }
             return result;
         } else if (term.op() instanceof ElementaryUpdate) {
             return ImmutableSLList.<Term>nil().prepend(term);
@@ -2988,10 +3174,14 @@ public final class SymbolicExecutionUtil {
      * Creates a new {@link Sequent} which is a modification from the {@link Sequent} of the given
      * {@link Node} which contains the same information but a different succedent.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}.
-     * @param additionalAntecedent An optional additional antecedents.
-     * @param newSuccedent The new succedent.
-     * @param updates The updates to use.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}.
+     * @param additionalAntecedent
+     *        An optional additional antecedents.
+     * @param newSuccedent
+     *        The new succedent.
+     * @param updates
+     *        The updates to use.
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node, Term additionalAntecedent,
@@ -3005,10 +3195,14 @@ public final class SymbolicExecutionUtil {
      * Creates a new {@link Sequent} which is a modification from the {@link Sequent} of the given
      * {@link Node} which contains the same information but a different succedent.
      *
-     * @param node The {@link Node} which provides the original {@link Sequent}.
-     * @param additionalAntecedent An optional additional antecedents.
-     * @param newSuccedent The new succedent.
-     * @param updates The updates to use.
+     * @param node
+     *        The {@link Node} which provides the original {@link Sequent}.
+     * @param additionalAntecedent
+     *        An optional additional antecedents.
+     * @param newSuccedent
+     *        The new succedent.
+     * @param updates
+     *        The updates to use.
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
@@ -3059,9 +3253,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
      *
-     * @param sequent The {@link Sequent} to modify.
-     * @param constantsToLabel The skolem constants to label.
-     * @param factory The {@link TermFactory} to use.
+     * @param sequent
+     *        The {@link Sequent} to modify.
+     * @param constantsToLabel
+     *        The skolem constants to label.
+     * @param factory
+     *        The {@link TermFactory} to use.
      * @return The modified {@link Sequent}.
      */
     private static Sequent labelSkolemConstants(
@@ -3109,16 +3306,17 @@ public final class SymbolicExecutionUtil {
     /**
      * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
      *
-     * @param tf The {@link TermFactory} to use.
-     * @param term The {@link Term} to add label to.
-     * @param label The {@link TermLabel} to add.
+     * @param tf
+     *        The {@link TermFactory} to use.
+     * @param term
+     *        The {@link Term} to add label to.
+     * @param label
+     *        The {@link TermLabel} to add.
      * @return A new {@link Term} with the given {@link TermLabel}.
      */
     private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
         List<Term> newSubs = new LinkedList<>();
-        for (Term oldSub : term.subs()) {
-            newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
-        }
+        for (Term oldSub : term.subs()) { newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label)); }
         if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
             // Do not label skolem equality and skolem terms
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
@@ -3126,9 +3324,7 @@ public final class SymbolicExecutionUtil {
         } else {
             /// Label term which is not a skolem equality and not a skolem term
             List<TermLabel> newLabels = new LinkedList<>();
-            for (TermLabel oldLabel : term.getLabels()) {
-                newLabels.add(oldLabel);
-            }
+            for (TermLabel oldLabel : term.getLabels()) { newLabels.add(oldLabel); }
             newLabels.add(label);
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
                 new ImmutableArray<>(newLabels));
@@ -3138,26 +3334,23 @@ public final class SymbolicExecutionUtil {
     /**
      * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
      *
-     * @param tf The {@link TermFactory} to use.
-     * @param term The {@link Term} to remove label from.
-     * @param label The {@link TermLabel} to remove.
+     * @param tf
+     *        The {@link TermFactory} to use.
+     * @param term
+     *        The {@link Term} to remove label from.
+     * @param label
+     *        The {@link TermLabel} to remove.
      * @return A new {@link Term} without the given {@link TermLabel}.
      */
     public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
         // Update children
         List<Term> newSubs = new LinkedList<>();
         ImmutableArray<Term> oldSubs = term.subs();
-        for (Term oldSub : oldSubs) {
-            newSubs.add(removeLabelRecursive(tf, oldSub, label));
-        }
+        for (Term oldSub : oldSubs) { newSubs.add(removeLabelRecursive(tf, oldSub, label)); }
         // Update label
         List<TermLabel> newLabels = new LinkedList<>();
         ImmutableArray<TermLabel> oldLabels = term.getLabels();
-        for (TermLabel oldLabel : oldLabels) {
-            if (oldLabel != label) {
-                newLabels.add(oldLabel);
-            }
-        }
+        for (TermLabel oldLabel : oldLabels) { if (oldLabel != label) { newLabels.add(oldLabel); } }
         return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
             new ImmutableArray<>(newLabels));
     }
@@ -3166,8 +3359,10 @@ public final class SymbolicExecutionUtil {
      * Collects all contained skolem {@link Term}s which fulfill {@link #isSkolemConstant(Term)} as
      * well as the skolem constants used in the find once recursive.
      *
-     * @param sequent The {@link Sequent} which provides the skolem equalities.
-     * @param term The {@link Term} to start collection in.
+     * @param sequent
+     *        The {@link Sequent} which provides the skolem equalities.
+     * @param term
+     *        The {@link Term} to start collection in.
      * @return The found skolem {@link Term}s.
      */
     private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
@@ -3182,9 +3377,7 @@ public final class SymbolicExecutionUtil {
                 for (Term replacement : replacements) {
                     Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
                     for (Term checkConstant : checkResult) {
-                        if (result.add(checkConstant)) {
-                            toCheck.add(checkConstant);
-                        }
+                        if (result.add(checkConstant)) { toCheck.add(checkConstant); }
                     }
                 }
             }
@@ -3197,7 +3390,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects all contained skolem {@link Term}s which fulfill {@link #isSkolemConstant(Term)}.
      *
-     * @param term The {@link Term} to collect in.
+     * @param term
+     *        The {@link Term} to collect in.
      * @return The found skolem {@link Term}s.
      */
     private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
@@ -3205,9 +3399,7 @@ public final class SymbolicExecutionUtil {
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-                if (isSkolemConstant(visited)) {
-                    result.add(visited);
-                }
+                if (isSkolemConstant(visited)) { result.add(visited); }
             }
         });
         return result;
@@ -3217,7 +3409,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Term} is a skolem {@link Term} meaning that it has the
      * {@link ParameterlessTermLabel#SELECT_SKOLEM_LABEL}.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
      */
     public static boolean isSkolemConstant(Term term) {
@@ -3228,8 +3421,10 @@ public final class SymbolicExecutionUtil {
      * Removes all {@link SequentFormula}s with a skolem equality from the given {@link Sequent} if
      * the skolem {@link Term} is not contained in the given {@link Collection}.
      *
-     * @param sequent The {@link Sequent} to modify.
-     * @param skolemConstants The allowed skolem {@link Term}s.
+     * @param sequent
+     *        The {@link Sequent} to modify.
+     * @param skolemConstants
+     *        The allowed skolem {@link Term}s.
      * @return The modified {@link Sequent} in which all not listed skolem {@link Term} equalites
      *         are removed.
      */
@@ -3249,10 +3444,14 @@ public final class SymbolicExecutionUtil {
      * Helper method of {@link #removeAllUnusedSkolemEqualities(Sequent, Collection)} which removes
      * the given {@link SequentFormula} if required.
      *
-     * @param sequent The {@link Sequent} to modify.
-     * @param sf The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
-     * @param antecedent {@code true} antecedent, {@code false} succedent.
-     * @param skolemConstants The allowed skolem {@link Term}s.
+     * @param sequent
+     *        The {@link Sequent} to modify.
+     * @param sf
+     *        The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
+     * @param antecedent
+     *        {@code true} antecedent, {@code false} succedent.
+     * @param skolemConstants
+     *        The allowed skolem {@link Term}s.
      * @return The modified {@link Sequent} in which the {@link SequentFormula} might be removed.
      */
     private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, SequentFormula sf,
@@ -3260,12 +3459,8 @@ public final class SymbolicExecutionUtil {
         Term term = sf.formula();
         boolean remove = false;
         if (term.op() == Equality.EQUALS) {
-            if (isSkolemConstant(term.sub(0))) {
-                remove = !skolemConstants.contains(term.sub(0));
-            }
-            if (!remove && isSkolemConstant(term.sub(1))) {
-                remove = !skolemConstants.contains(term.sub(1));
-            }
+            if (isSkolemConstant(term.sub(0))) { remove = !skolemConstants.contains(term.sub(0)); }
+            if (!remove && isSkolemConstant(term.sub(1))) { remove = !skolemConstants.contains(term.sub(1)); }
         }
         if (remove) {
             return sequent
@@ -3279,7 +3474,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link SequentFormula} is a skolem equality.
      *
-     * @param sf The {@link SequentFormula} to check.
+     * @param sf
+     *        The {@link SequentFormula} to check.
      * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1}
      *         right side of skolem equality.
      */
@@ -3290,18 +3486,15 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} is a skolem equality.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1}
      *         right side of skolem equality.
      */
     public static int checkSkolemEquality(Term term) {
         if (term.op() == Equality.EQUALS) {
-            if (isSkolemConstant(term.sub(0))) {
-                return -1;
-            }
-            if (isSkolemConstant(term.sub(1))) {
-                return 1;
-            }
+            if (isSkolemConstant(term.sub(0))) { return -1; }
+            if (isSkolemConstant(term.sub(1))) { return 1; }
         }
         return 0;
     }
@@ -3309,9 +3502,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Replaces all skolem constants in the given {@link Term}.
      *
-     * @param sequent The {@link Sequent} which provides the skolem equalities.
-     * @param term The {@link Term} to replace its skolem constants.
-     * @param services The {@link Services} to use.
+     * @param sequent
+     *        The {@link Sequent} which provides the skolem equalities.
+     * @param term
+     *        The {@link Term} to replace its skolem constants.
+     * @param services
+     *        The {@link Services} to use.
      * @return The skolem constant free {@link Term}.
      */
     public static Term replaceSkolemConstants(Sequent sequent, Term term, Services services) {
@@ -3322,9 +3518,7 @@ public final class SymbolicExecutionUtil {
             if (!replacements.isEmpty()) {
                 Term other = term.sub(1);
                 List<Term> newTerms = new LinkedList<>();
-                for (Term replacement : replacements) {
-                    newTerms.add(tb.equals(replacement, other));
-                }
+                for (Term replacement : replacements) { newTerms.add(tb.equals(replacement, other)); }
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
@@ -3337,9 +3531,7 @@ public final class SymbolicExecutionUtil {
             if (!replacements.isEmpty()) {
                 Term other = term.sub(0);
                 List<Term> newTerms = new LinkedList<>();
-                for (Term replacement : replacements) {
-                    newTerms.add(tb.equals(other, replacement));
-                }
+                for (Term replacement : replacements) { newTerms.add(tb.equals(other, replacement)); }
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
@@ -3361,9 +3553,7 @@ public final class SymbolicExecutionUtil {
                 for (int i = 0; i < term.arity(); i++) {
                     Term oldChild = term.sub(i);
                     Term newChild = replaceSkolemConstants(sequent, oldChild, services);
-                    if (newChild != oldChild) {
-                        changed = true;
-                    }
+                    if (newChild != oldChild) { changed = true; }
                     newChildren.add(newChild);
                 }
                 if (changed) {
@@ -3373,27 +3563,21 @@ public final class SymbolicExecutionUtil {
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().not(newChildren.get(0));
-                        if (term.hasLabels()) {
-                            result = services.getTermBuilder().label(result, term.getLabels());
-                        }
+                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
                         return result;
                     } else if (term.op() == Junctor.OR) {
                         // Create new OR term using build in simplification of TermBuilder.
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().or(newChildren);
-                        if (term.hasLabels()) {
-                            result = services.getTermBuilder().label(result, term.getLabels());
-                        }
+                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
                         return result;
                     } else if (term.op() == Junctor.AND) {
                         // Create new AND term using build in simplification of TermBuilder.
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().and(newChildren);
-                        if (term.hasLabels()) {
-                            result = services.getTermBuilder().label(result, term.getLabels());
-                        }
+                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
                         return result;
                     } else if (term.op() == Junctor.IMP) {
                         // Create new IMP term using build in simplification of TermBuilder.
@@ -3419,9 +3603,12 @@ public final class SymbolicExecutionUtil {
      * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to find all
      * equality parts of the given skolem constant.
      *
-     * @param sequent The {@link Sequent} which provides the skolem equalities.
-     * @param skolemConstant The skolem constant to solve.
-     * @param skolemEquality The optional skolem equality to ignore.
+     * @param sequent
+     *        The {@link Sequent} which provides the skolem equalities.
+     * @param skolemConstant
+     *        The skolem constant to solve.
+     * @param skolemEquality
+     *        The optional skolem equality to ignore.
      * @return The equality parts of the given skolem equality.
      */
     private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant,
@@ -3451,8 +3638,10 @@ public final class SymbolicExecutionUtil {
      * Checks if the given {@link Sort} represents a {@code null} value in the given
      * {@link Services}.
      *
-     * @param sort The {@link Sort} to check.
-     * @param services The {@link Services} to use.
+     * @param sort
+     *        The {@link Sort} to check.
+     * @param services
+     *        The {@link Services} to use.
      * @return {@code true} is Null-Sort, {@code false} is something else.
      */
     public static boolean isNullSort(Sort sort, Services services) {
@@ -3472,16 +3661,15 @@ public final class SymbolicExecutionUtil {
     /**
      * Collects all {@link IProgramVariable}s of the given {@link FieldDeclaration}.
      *
-     * @param fd The given {@link FieldDeclaration}.
+     * @param fd
+     *        The given {@link FieldDeclaration}.
      * @return The found {@link IProgramVariable}s for the given {@link FieldDeclaration}.
      */
     public static Set<IProgramVariable> getProgramVariables(FieldDeclaration fd) {
         Set<IProgramVariable> result = new LinkedHashSet<>();
         if (fd != null) {
             ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
-            for (FieldSpecification spec : specifications) {
-                result.add(spec.getProgramVariable());
-            }
+            for (FieldSpecification spec : specifications) { result.add(spec.getProgramVariable()); }
         }
         return result;
     }
@@ -3489,13 +3677,17 @@ public final class SymbolicExecutionUtil {
     /**
      * Computes the path condition of the given {@link Node}.
      *
-     * @param node The {@link Node} to compute its path condition.
-     * @param simplify {@code true} simplify each branch condition in a side proof, {@code false} do
+     * @param node
+     *        The {@link Node} to compute its path condition.
+     * @param simplify
+     *        {@code true} simplify each branch condition in a side proof, {@code false} do
      *        not simplify branch conditions.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed path condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term computePathCondition(Node node, boolean simplify, boolean improveReadability)
             throws ProofInputException {
@@ -3505,14 +3697,19 @@ public final class SymbolicExecutionUtil {
     /**
      * Computes the path condition between the given {@link Node}s.
      *
-     * @param parentNode The {@link Node} to stop path condition computation at.
-     * @param childNode The {@link Node} to compute its path condition back to the parent.
-     * @param simplify {@code true} simplify each branch condition in a side proof, {@code false} do
+     * @param parentNode
+     *        The {@link Node} to stop path condition computation at.
+     * @param childNode
+     *        The {@link Node} to compute its path condition back to the parent.
+     * @param simplify
+     *        {@code true} simplify each branch condition in a side proof, {@code false} do
      *        not simplify branch conditions.
-     * @param improveReadability {@code true} improve readability, {@code false} do not improve
+     * @param improveReadability
+     *        {@code true} improve readability, {@code false} do not improve
      *        readability.
      * @return The computed path condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Term computePathCondition(Node parentNode, Node childNode, boolean simplify,
             boolean improveReadability) throws ProofInputException {
@@ -3542,8 +3739,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link Sort} of the given {@link Term} is a reference type.
      *
-     * @param services The {@link Services} to use.
-     * @param term The {@link Term} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is reference sort, {@code false} is no reference sort.
      */
     public static boolean hasReferenceSort(Services services, Term term) {
@@ -3557,8 +3756,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link Sort} of the given {@link IProgramVariable} is a reference type.
      *
-     * @param services The {@link Services} to use.
-     * @param var The {@link IProgramVariable} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param var
+     *        The {@link IProgramVariable} to check.
      * @return {@code true} is reference sort, {@code false} is no reference sort.
      */
     public static boolean hasReferenceSort(Services services, IProgramVariable var) {
@@ -3572,8 +3773,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link Sort} is a reference type.
      *
-     * @param services The {@link Services} to use.
-     * @param sort The {@link Sort} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param sort
+     *        The {@link Sort} to check.
      * @return {@code true} is reference sort, {@code false} is no reference sort.
      */
     public static boolean hasReferenceSort(Services services, Sort sort) {
@@ -3596,7 +3799,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the human readable name of the given {@link IProgramVariable}.
      *
-     * @param pv The {@link IProgramVariable} to get its name.
+     * @param pv
+     *        The {@link IProgramVariable} to get its name.
      * @return The human readable name of the given {@link IProgramVariable}.
      */
     public static String getDisplayString(IProgramVariable pv) {
@@ -3618,15 +3822,14 @@ public final class SymbolicExecutionUtil {
     /**
      * Returns the root of the given {@link IExecutionNode}.
      *
-     * @param executionNode The {@link IExecutionNode} to get the root of its symbolic execution
+     * @param executionNode
+     *        The {@link IExecutionNode} to get the root of its symbolic execution
      *        tree.
      * @return The root of the given {@link IExecutionNode}.
      */
     public static IExecutionNode<?> getRoot(IExecutionNode<?> executionNode) {
         if (executionNode != null) {
-            while (executionNode.getParent() != null) {
-                executionNode = executionNode.getParent();
-            }
+            while (executionNode.getParent() != null) { executionNode = executionNode.getParent(); }
             return executionNode;
         } else {
             return null;
@@ -3637,7 +3840,8 @@ public final class SymbolicExecutionUtil {
      * Extracts the exception variable which is used to check if the executed program in proof
      * terminates normally.
      *
-     * @param proof The {@link Proof} to extract variable from.
+     * @param proof
+     *        The {@link Proof} to extract variable from.
      * @return The extract variable.
      */
     public static IProgramVariable extractExceptionVariable(Proof proof) {
@@ -3655,9 +3859,7 @@ public final class SymbolicExecutionUtil {
                 Iterator<? extends Statement> iter = updateContentBody.iterator();
                 while (tryStatement == null && iter.hasNext()) {
                     Statement next = iter.next();
-                    if (next instanceof Try) {
-                        tryStatement = (Try) next;
-                    }
+                    if (next instanceof Try) { tryStatement = (Try) next; }
                 }
                 if (tryStatement != null) {
                     if (tryStatement.getBranchCount() == 1
@@ -3668,9 +3870,7 @@ public final class SymbolicExecutionUtil {
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody()
                                             .get(0) instanceof Assignment assignment) {
-                                if (assignment.getFirstElement() instanceof IProgramVariable var) {
-                                    return var;
-                                }
+                                if (assignment.getFirstElement() instanceof IProgramVariable var) { return var; }
                             }
                         }
                     }
@@ -3683,13 +3883,18 @@ public final class SymbolicExecutionUtil {
     /**
      * Configures the proof to use the given settings.
      *
-     * @param proof The {@link Proof} to configure.
-     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand
+     * @param proof
+     *        The {@link Proof} to configure.
+     * @param useOperationContracts
+     *        {@code true} use operation contracts, {@code false} expand
      *        methods.
-     * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param useLoopInvariants
+     *        {@code true} use loop invariants, {@code false} expand loops.
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecksImmediately {@code true} immediately alias checks, {@code false} alias
+     * @param aliasChecksImmediately
+     *        {@code true} immediately alias checks, {@code false} alias
      *        checks
      *        never.
      */
@@ -3723,8 +3928,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Configures the proof to use the given {@link StrategyProperties}.
      *
-     * @param proof The {@link Proof} to configure.
-     * @param sp The {@link StrategyProperties} to set.
+     * @param proof
+     *        The {@link Proof} to configure.
+     * @param sp
+     *        The {@link StrategyProperties} to set.
      */
     public static void updateStrategySettings(Proof proof, StrategyProperties sp) {
         if (proof != null && !proof.isDisposed()) {
@@ -3746,8 +3953,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given node should be represented as loop body termination.
      *
-     * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param node
+     *        The current {@link Node} in the proof tree of KeY.
+     * @param ruleApp
+     *        The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} represent node as loop body termination, {@code false} represent node as
      *         something else.
      */
@@ -3777,8 +3986,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Operator} is a heap.
      *
-     * @param op The {@link Operator} to check.
-     * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+     * @param op
+     *        The {@link Operator} to check.
+     * @param heapLDT
+     *        The {@link HeapLDT} which provides the available heaps.
      * @return {@code true} {@link Operator} is heap, {@code false} {@link Operator} is something
      *         else.
      */
@@ -3795,8 +4006,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Operator} is the base heap.
      *
-     * @param op The {@link Operator} to check.
-     * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+     * @param op
+     *        The {@link Operator} to check.
+     * @param heapLDT
+     *        The {@link HeapLDT} which provides the available heaps.
      * @return {@code true} {@link Operator} is the base heap, {@code false} {@link Operator} is
      *         something else.
      */
@@ -3807,8 +4020,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Term} is a select on a heap.
      *
-     * @param services The {@link Services} to use.
-     * @param term The {@link Term} to check.
+     * @param services
+     *        The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is select, {@code false} is something else.
      */
     public static boolean isSelect(Services services, Term term) {
@@ -3824,7 +4039,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Operator} is a number.
      *
-     * @param op The {@link Operator} to check.
+     * @param op
+     *        The {@link Operator} to check.
      * @return {@code true} is number, {@code false} is something else.
      */
     public static boolean isNumber(Operator op) {
@@ -3842,7 +4058,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link Operator} is a boolean.
      *
-     * @param op The {@link Operator} to check.
+     * @param op
+     *        The {@link Operator} to check.
      * @return {@code true} is boolean, {@code false} is something else.
      */
     public static boolean isBoolean(Services services, Operator op) {
@@ -3868,11 +4085,15 @@ public final class SymbolicExecutionUtil {
      * allows to set custom settings.
      * </p>
      *
-     * @param term The {@link Term} to convert.
-     * @param services The {@link Services} to use.
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param term
+     *        The {@link Term} to convert.
+     * @param services
+     *        The {@link Services} to use.
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
      * @return The {@link String} representation of the given {@link Term}.
      */
@@ -3902,7 +4123,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Defines if pretty printing is enabled or not.
      *
-     * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty
+     * @param usePrettyPrinting
+     *        {@code true} pretty printing is enabled, {@code false} pretty
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
@@ -3912,7 +4134,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link Goal} has applicable rules.
      *
-     * @param goal The {@link Goal} to check.
+     * @param goal
+     *        The {@link Goal} to check.
      * @return {@code true} has applicable rules, {@code false} no rules are applicable.
      */
     public static boolean hasApplicableRules(Goal goal) {
@@ -3923,7 +4146,8 @@ public final class SymbolicExecutionUtil {
      * Computes the call stack size and the second statement similar to
      * {@link NodeInfo#computeActiveStatement(SourceElement)}.
      *
-     * @param ruleApp The {@link RuleApp}.
+     * @param ruleApp
+     *        The {@link RuleApp}.
      * @return The computed call stack size and the second statement if available.
      */
     public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
@@ -3933,9 +4157,7 @@ public final class SymbolicExecutionUtil {
             Deque<StatementBlock> blocks = new LinkedList<>();
             int methodFrameCount = 0;
             if (firstStatement != null) {
-                if (firstStatement instanceof StatementBlock) {
-                    blocks.addFirst((StatementBlock) firstStatement);
-                }
+                if (firstStatement instanceof StatementBlock) { blocks.addFirst((StatementBlock) firstStatement); }
                 SourceElement lastStatement = null;
                 while (firstStatement instanceof ProgramPrefix && lastStatement != firstStatement) {
                     lastStatement = firstStatement;
@@ -3944,16 +4166,12 @@ public final class SymbolicExecutionUtil {
                         blocks.clear(); // Only block of inner most method frames are of interest.
                         methodFrameCount++;
                     }
-                    if (firstStatement instanceof StatementBlock) {
-                        blocks.addFirst((StatementBlock) firstStatement);
-                    }
+                    if (firstStatement instanceof StatementBlock) { blocks.addFirst((StatementBlock) firstStatement); }
                 }
             }
             // Compute second statement
             StatementBlock block = null;
-            while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) {
-                block = blocks.removeFirst();
-            }
+            while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) { block = blocks.removeFirst(); }
             if (block != null && block.getChildCount() >= 2) {
                 return new Pair<>(methodFrameCount, block.getChildAt(1));
             } else {
@@ -3967,8 +4185,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Compares the given {@link SourceElement}s including their {@link PositionInfo}s.
      *
-     * @param first The first {@link SourceElement}.
-     * @param second The second {@link SourceElement}.
+     * @param first
+     *        The first {@link SourceElement}.
+     * @param second
+     *        The second {@link SourceElement}.
      * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false}
      *         otherwise.
      */
@@ -3996,9 +4216,12 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the given {@link ProgramElement} contains the given {@link SourceElement}.
      *
-     * @param toSearchIn The {@link ProgramElement} to search in.
-     * @param toSearch The {@link SourceElement} to search.
-     * @param services The {@link Services} to use.
+     * @param toSearchIn
+     *        The {@link ProgramElement} to search in.
+     * @param toSearch
+     *        The {@link SourceElement} to search.
+     * @param services
+     *        The {@link Services} to use.
      * @return {@code true} contained, {@code false} not contained.
      */
     public static boolean containsStatement(ProgramElement toSearchIn, SourceElement toSearch,
@@ -4017,7 +4240,8 @@ public final class SymbolicExecutionUtil {
      * Creates recursive a term which can be used to determine the value of
      * {@link IExecutionVariable#getProgramVariable()}.
      *
-     * @param variable the variable whose value shall be determined
+     * @param variable
+     *        the variable whose value shall be determined
      * @return The created term.
      */
     public static Term createSelectTerm(IExecutionVariable variable) {
@@ -4060,7 +4284,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates the {@link NotationInfo} for the given {@link IExecutionElement}.
      *
-     * @param element The {@link IExecutionElement} to create its {@link NotationInfo}.
+     * @param element
+     *        The {@link IExecutionElement} to create its {@link NotationInfo}.
      * @return The created {@link NotationInfo}.
      */
     public static NotationInfo createNotationInfo(IExecutionElement element) {
@@ -4071,7 +4296,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates the {@link NotationInfo} for the given {@link Node}.
      *
-     * @param node The {@link Node} to create its {@link NotationInfo}.
+     * @param node
+     *        The {@link Node} to create its {@link NotationInfo}.
      * @return The created {@link NotationInfo}.
      */
     public static NotationInfo createNotationInfo(Node node) {
@@ -4082,14 +4308,13 @@ public final class SymbolicExecutionUtil {
     /**
      * Creates the {@link NotationInfo} for the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to create its {@link NotationInfo}.
+     * @param proof
+     *        The {@link Proof} to create its {@link NotationInfo}.
      * @return The created {@link NotationInfo}.
      */
     public static NotationInfo createNotationInfo(Proof proof) {
         NotationInfo notationInfo = new NotationInfo();
-        if (proof != null && !proof.isDisposed()) {
-            notationInfo.setAbbrevMap(proof.abbreviations());
-        }
+        if (proof != null && !proof.isDisposed()) { notationInfo.setAbbrevMap(proof.abbreviations()); }
         return notationInfo;
     }
 
@@ -4115,9 +4340,7 @@ public final class SymbolicExecutionUtil {
                                 .search(leaf.sequent().succedent(),
                                     element -> Operator.opEquals(toSearch.op(),
                                         element.formula().op()));
-                        if (topLevelPredicate == null) {
-                            verified = false;
-                        }
+                        if (topLevelPredicate == null) { verified = false; }
                     }
                 }
                 return verified;
@@ -4148,15 +4371,11 @@ public final class SymbolicExecutionUtil {
                     Node leaf = leafsIter.next();
                     if (!leaf.isClosed()) {
                         final Set<Operator> additinalOperatos = new HashSet<>();
-                        for (Term term : additinalPredicates) {
-                            additinalOperatos.add(term.op());
-                        }
+                        for (Term term : additinalPredicates) { additinalOperatos.add(term.op()); }
                         SequentFormula topLevelPredicate =
                             CollectionUtil.search(leaf.sequent().succedent(),
                                 element -> additinalOperatos.contains(element.formula().op()));
-                        if (topLevelPredicate == null) {
-                            verified = false;
-                        }
+                        if (topLevelPredicate == null) { verified = false; }
                     }
                 }
                 return verified;
@@ -4171,8 +4390,10 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if is an exceptional termination.
      *
-     * @param node the node which is used for computation.
-     * @param exceptionVariable the exception variable which is used to check if the executed
+     * @param node
+     *        the node which is used for computation.
+     * @param exceptionVariable
+     *        the exception variable which is used to check if the executed
      *        program in proof terminates normally.
      * @return {@code true} exceptional termination, {@code false} normal termination.
      */
@@ -4188,8 +4409,10 @@ public final class SymbolicExecutionUtil {
      * is called the
      * first time.
      *
-     * @param node the node which is user for computation.
-     * @param exceptionVariable the exception variable which is used to check if the executed
+     * @param node
+     *        the node which is user for computation.
+     * @param exceptionVariable
+     *        the exception variable which is used to check if the executed
      *        program in proof terminates normally.
      * @return The exception {@link Sort}.
      */
@@ -4207,9 +4430,7 @@ public final class SymbolicExecutionUtil {
                 }
             }
             // An exceptional termination is found if the exceptional variable is not null
-            if (value != null && value.size() == 1) {
-                result = value.get(0).sort();
-            }
+            if (value != null && value.size() == 1) { result = value.get(0).sort(); }
         }
         return result;
     }
@@ -4218,8 +4439,10 @@ public final class SymbolicExecutionUtil {
      * Utility method to extract the value of the {@link IProgramVariable} from the given update
      * term.
      *
-     * @param term The given update term.
-     * @param variable The {@link IProgramVariable} for that the value is needed.
+     * @param term
+     *        The given update term.
+     * @param variable
+     *        The {@link IProgramVariable} for that the value is needed.
      * @return The found value or {@code null} if it is not defined in the given update term.
      */
     private static ImmutableArray<Term> extractValueFromUpdate(
@@ -4227,14 +4450,10 @@ public final class SymbolicExecutionUtil {
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate update) {
-            if (Objects.equals(variable, update.lhs())) {
-                result = term.subs();
-            }
+            if (Objects.equals(variable, update.lhs())) { result = term.subs(); }
         } else if (term.op() instanceof UpdateJunctor) {
             Iterator<Term> iter = term.subs().iterator();
-            while (result == null && iter.hasNext()) {
-                result = extractValueFromUpdate(iter.next(), variable);
-            }
+            while (result == null && iter.hasNext()) { result = extractValueFromUpdate(iter.next(), variable); }
         }
         return result;
     }
@@ -4243,7 +4462,8 @@ public final class SymbolicExecutionUtil {
      * Initializes the {@link Proof} of the given {@link SymbolicExecutionTreeBuilder} so that the
      * correct {@link Strategy} is used.
      *
-     * @param builder The {@link SymbolicExecutionTreeBuilder} to initialize.
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} to initialize.
      */
     public static void initializeStrategy(SymbolicExecutionTreeBuilder builder) {
         Proof proof = builder.getProof();
@@ -4262,7 +4482,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the modality at the applied rule represents the validity branch of an applied block
      * contract.
      *
-     * @param appliedRuleApp The {@link RuleApp} to check.
+     * @param appliedRuleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} validitiy branch, {@code false} otherwise.
      */
     public static boolean isBlockContractValidityBranch(RuleApp appliedRuleApp) {
@@ -4274,7 +4495,8 @@ public final class SymbolicExecutionUtil {
      * Checks if the modality at the given {@link PosInOccurrence} represents the validity branch of
      * an applied block contract.
      *
-     * @param pio The {@link PosInOccurrence} to check.
+     * @param pio
+     *        The {@link PosInOccurrence} to check.
      * @return validitiy branch, {@code false} otherwise.
      */
     public static boolean isBlockContractValidityBranch(PosInOccurrence pio) {
@@ -4289,7 +4511,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link MergeRuleBuiltInRuleApp} is applied.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} is {@link MergeRuleBuiltInRuleApp}, {@code false} otherwise.
      */
     public static boolean isJoin(RuleApp ruleApp) {
@@ -4300,7 +4523,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the {@link CloseAfterMergeRuleBuiltInRuleApp} is applied.
      *
-     * @param ruleApp The {@link RuleApp} to check.
+     * @param ruleApp
+     *        The {@link RuleApp} to check.
      * @return {@code true} is {@link CloseAfterMergeRuleBuiltInRuleApp}, {@code false} otherwise.
      */
     public static boolean isCloseAfterJoin(RuleApp ruleApp) {
@@ -4310,7 +4534,8 @@ public final class SymbolicExecutionUtil {
     /**
      * Checks if the weakening goal is enabled or not.
      *
-     * @param proof The {@link Proof} to check.
+     * @param proof
+     *        The {@link Proof} to check.
      * @return {@code true} enabled, {@code false} disabled.
      */
     public static boolean isWeakeningGoalEnabled(Proof proof) {

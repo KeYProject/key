@@ -33,8 +33,10 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionStart(ITreeSettings settings, Node proofNode) {
@@ -76,12 +78,11 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Registers the given {@link IExecutionTermination}.
      *
-     * @param termination The {@link IExecutionTermination} to register.
+     * @param termination
+     *        The {@link IExecutionTermination} to register.
      */
     public void addTermination(IExecutionTermination termination) {
-        if (termination != null) {
-            terminations = terminations.append(termination);
-        }
+        if (termination != null) { terminations = terminations.append(termination); }
     }
 
     /**
@@ -106,7 +107,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Removes the given termination.
      *
-     * @param termination The termination to be deleted.
+     * @param termination
+     *        The termination to be deleted.
      * @author Anna Filighera
      */
     public void removeTermination(IExecutionTermination termination) {

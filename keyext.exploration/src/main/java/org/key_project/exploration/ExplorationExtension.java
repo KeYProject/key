@@ -111,9 +111,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {
                     leftPanel.setProof(newProof);
-                    if (oldProof != null) {
-                        oldProof.removeProofTreeListener(proofTreeListener);
-                    }
+                    if (oldProof != null) { oldProof.removeProofTreeListener(proofTreeListener); }
                     if (newProof != null) {
                         newProof.addProofTreeListener(proofTreeListener);
                         newProof.addProofDisposedListener(extension);
@@ -136,18 +134,14 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     @Override
     public Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
-        if (leftPanel == null) {
-            initLeftPanel(window);
-        }
+        if (leftPanel == null) { initLeftPanel(window); }
 
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) {
-            initLeftPanel(MainWindow.getInstance());
-        }
+        if (leftPanel == null) { initLeftPanel(MainWindow.getInstance()); }
 
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
@@ -160,9 +154,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        if (e.getSource() == leftPanel.getProof()) {
-            leftPanel.setProof(null);
-        }
+        if (e.getSource() == leftPanel.getProof()) { leftPanel.setProof(null); }
     }
 
     @Override

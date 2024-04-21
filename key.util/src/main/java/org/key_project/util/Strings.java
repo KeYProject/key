@@ -21,8 +21,10 @@ public class Strings {
      * Checks whether a string contains another one as a whole word (i.e., separated by whitespaces
      * or a semicolon at the end).
      *
-     * @param s string to search in
-     * @param word string to be searched for
+     * @param s
+     *        string to search in
+     * @param word
+     *        string to be searched for
      */
     public static boolean containsWholeWord(String s, String word) {
         Pattern p = Pattern.compile("\\b" + word + "\\b");
@@ -62,13 +64,19 @@ public class Strings {
      * outputs the collection represented by the iterator in the format
      * <code> open element1 sep element2 sep element3 close</code>
      *
-     * @param it the Iterable to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
-     * @param mapper a Function that maps the elements of type S to their String representation
+     * @param it
+     *        the Iterable to be printed
+     * @param open
+     *        the String used to open the list
+     * @param sep
+     *        the String separating the different elements
+     * @param close
+     *        the String used to close the list
+     * @param mapper
+     *        a Function that maps the elements of type S to their String representation
      * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
+     * @param <S>
+     *        the type of the elements of the iterated collection
      */
     public static <S, T> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close,
@@ -82,12 +90,17 @@ public class Strings {
      * outputs the collection represented by the iterator in the format
      * <code> open element1 sep element2 sep element3 close</code>
      *
-     * @param it the Iterable to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
+     * @param it
+     *        the Iterable to be printed
+     * @param open
+     *        the String used to open the list
+     * @param sep
+     *        the String separating the different elements
+     * @param close
+     *        the String used to close the list
      * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
+     * @param <S>
+     *        the type of the elements of the iterated collection
      */
     public static <S> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close) {

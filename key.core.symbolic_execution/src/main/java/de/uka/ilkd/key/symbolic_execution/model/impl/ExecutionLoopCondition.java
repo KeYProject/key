@@ -25,8 +25,10 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Java
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionLoopCondition(ITreeSettings settings, Node proofNode) {

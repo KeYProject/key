@@ -97,14 +97,22 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     /**
      * Executes the test steps of test methods.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
-     * @param useContracts Use method contracts or inline method bodies instead?
-     * @param analysts The {@link IProofReferencesAnalyst} to use.
-     * @param expectedReferences The expected proof references.
-     * @throws Exception Occurred Exception.
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
+     * @param useContracts
+     *        Use method contracts or inline method bodies instead?
+     * @param analysts
+     *        The {@link IProofReferencesAnalyst} to use.
+     * @param expectedReferences
+     *        The expected proof references.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doAPITest(File baseDir, String javaPathInBaseDir, String containerTypeName,
             String methodFullName, boolean useContracts,

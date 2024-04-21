@@ -29,7 +29,8 @@ public class Location {
     /**
      * Constructor.
      *
-     * @param accesses The {@link Access} path.
+     * @param accesses
+     *        The {@link Access} path.
      */
     public Location(ImmutableList<Access> accesses) {
         assert accesses != null;
@@ -39,7 +40,8 @@ public class Location {
     /**
      * Constructor.
      *
-     * @param accesses The {@link Access} path.
+     * @param accesses
+     *        The {@link Access} path.
      */
     public Location(Access... accesses) {
         assert accesses != null;
@@ -107,7 +109,8 @@ public class Location {
     /**
      * Creates a new {@link Location} in which the sub is appended.
      *
-     * @param sub The {@link Location} to append.
+     * @param sub
+     *        The {@link Location} to append.
      * @return The new {@link Location}.
      */
     public Location append(Location sub) {
@@ -117,7 +120,8 @@ public class Location {
     /**
      * Creates a new {@link Location} in which the sub is appended.
      *
-     * @param sub The {@link Access} to append.
+     * @param sub
+     *        The {@link Access} to append.
      * @return The new {@link Location}.
      */
     public Location append(Access sub) {
@@ -127,7 +131,8 @@ public class Location {
     /**
      * Converts this {@link Location} into a {@link Term}.
      *
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The created {@link Term}.
      */
     public Term toTerm(Services services) {

@@ -19,7 +19,8 @@ public abstract class GraphNode {
     /**
      * Store the branch location of this graph node.
      *
-     * @param branchLocation branch location
+     * @param branchLocation
+     *        branch location
      */
     protected GraphNode(BranchLocation branchLocation) {
         this.branchLocation = branchLocation;
@@ -42,8 +43,10 @@ public abstract class GraphNode {
     /**
      * Construct a human-friendly representation of this graph node.
      *
-     * @param abbreviated whether any text should be abbreviated
-     * @param omitBranch do not include branch info
+     * @param abbreviated
+     *        whether any text should be abbreviated
+     * @param omitBranch
+     *        do not include branch info
      * @return textual representation of this object
      */
     public abstract String toString(boolean abbreviated, boolean omitBranch);

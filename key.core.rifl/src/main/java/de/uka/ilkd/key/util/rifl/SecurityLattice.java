@@ -36,7 +36,8 @@ public class SecurityLattice {
      * Creates a new security domain and adds it to the lattice. The new domain is a direct
      * subdomain of top and direct super-domain of bottom.
      *
-     * @param name name of the new domain (must not be "top" or "bottom")
+     * @param name
+     *        name of the new domain (must not be "top" or "bottom")
      * @return the new domain
      */
     SecurityDomain addDomain(String name) {
@@ -72,11 +73,17 @@ public class SecurityLattice {
         sup.putSubDomain(sub);
     }
 
-    public SecurityDomain top() { return top; }
+    public SecurityDomain top() {
+        return top;
+    }
 
-    public SecurityDomain bottom() { return bottom; }
+    public SecurityDomain bottom() {
+        return bottom;
+    }
 
-    public boolean contains(SecurityDomain d) { return hash.contains(d); }
+    public boolean contains(SecurityDomain d) {
+        return hash.contains(d);
+    }
 
 
     /**
@@ -105,14 +112,8 @@ public class SecurityLattice {
          */
         // TODO: do we really want strict super-elements??
         public boolean isSuperDomain(SecurityDomain other) {
-            if (other == this) {
-                return false;
-            }
-            for (SecurityDomain sub : subDomains) {
-                if (sub == other || sub.isSuperDomain(other)) {
-                    return true;
-                }
-            }
+            if (other == this) { return false; }
+            for (SecurityDomain sub : subDomains) { if (sub == other || sub.isSuperDomain(other)) { return true; } }
             return false;
         }
 
@@ -120,22 +121,20 @@ public class SecurityLattice {
          * Returns whether this domain is strictly lower in the hierarchy than the other one.
          */
         public boolean isSubDomain(SecurityDomain other) {
-            if (other == this) {
-                return false;
-            }
-            for (SecurityDomain sup : superDomains) {
-                if (sup == other || sup.isSubDomain(other)) {
-                    return true;
-                }
-            }
+            if (other == this) { return false; }
+            for (SecurityDomain sup : superDomains) { if (sup == other || sup.isSubDomain(other)) { return true; } }
             return false;
         }
 
         @Override
-        public String toString() { return name; }
+        public String toString() {
+            return name;
+        }
 
         // ensures unique names
         @Override
-        public int hashCode() { return name.hashCode(); }
+        public int hashCode() {
+            return name.hashCode();
+        }
     }
 }

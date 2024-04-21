@@ -64,10 +64,13 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
+     * @param methodCall
+     *        The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
@@ -112,9 +115,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             getMethodCall().getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodCall().getMethodReference().toString();
-        if (call.endsWith(";")) {
-            call = call.substring(0, call.length() - 1);
-        }
+        if (call.endsWith(";")) { call = call.substring(0, call.length() - 1); }
         return call;
     }
 
@@ -123,9 +124,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     @Override
     public String getNameIncludingReturnValue() throws ProofInputException {
-        if (nameIncludingReturnValue == null) {
-            nameIncludingReturnValue = lazyComputeNameIncludingReturnValue();
-        }
+        if (nameIncludingReturnValue == null) { nameIncludingReturnValue = lazyComputeNameIncludingReturnValue(); }
         return nameIncludingReturnValue;
     }
 
@@ -209,9 +208,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     @Override
     public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
-        if (returnValues == null) {
-            returnValues = lazyComputeReturnValues();
-        }
+        if (returnValues == null) { returnValues = lazyComputeReturnValues(); }
         return returnValues;
     }
 
@@ -227,7 +224,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Computes the return value lazily when {@link #getReturnValues()} is called the first time.
      *
      * @return The return value.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
@@ -327,7 +325,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     } finally {
                         SymbolicExecutionSideProofUtil
                                 .disposeOrStore("Return value computation on method return node "
-                                    + methodReturnNode.serialNr() + ".", info);
+                                        + methodReturnNode.serialNr() + ".",
+                                    info);
                     }
                 } else {
                     return new IExecutionMethodReturnValue[0];
@@ -344,7 +343,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Searches from the given {@link Node} the parent which applies the rule "methodCallReturn" in
      * the same modality.
      *
-     * @param node The {@link Node} to start search from.
+     * @param node
+     *        The {@link Node} to start search from.
      * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was
      *         found.
      */
@@ -357,9 +357,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
                     SymbolicExecutionTermLabel currentLabel =
                         SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
-                    if (origianlLabel.equals(currentLabel)) {
-                        resultNode = node;
-                    }
+                    if (origianlLabel.equals(currentLabel)) { resultNode = node; }
                 }
                 node = node.parent();
             }
@@ -370,15 +368,17 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Creates the human readable name which is shown in {@link IExecutionMethodReturn} instances.
      *
-     * @param returnValue The return value.
-     * @param methodName The name of the method that is completely executed.
+     * @param returnValue
+     *        The return value.
+     * @param methodName
+     *        The name of the method that is completely executed.
      * @return The created human readable name.
      */
     public static String createMethodReturnName(Object returnValue, String methodName) {
         return INTERNAL_NODE_NAME_START + "return"
-            + (returnValue != null ? " " + returnValue + "as result" : "")
-            + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
-            + INTERNAL_NODE_NAME_END;
+                + (returnValue != null ? " " + returnValue + "as result" : "")
+                + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
+                + INTERNAL_NODE_NAME_END;
     }
 
     /**

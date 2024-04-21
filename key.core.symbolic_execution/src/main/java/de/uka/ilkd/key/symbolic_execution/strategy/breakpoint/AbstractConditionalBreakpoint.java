@@ -97,15 +97,23 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after
      * calling the constructor!
      *
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param pm
+     *        the {@link IProgramMethod} representing the Method which the Breakpoint is located
      *        at
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param enabled flag if the Breakpoint is enabled
-     * @param conditionEnabled flag if the condition is enabled
-     * @param methodStart the line the containing method of this breakpoint starts at
-     * @param methodEnd the line the containing method of this breakpoint ends at
-     * @param containerType the type of the element containing the breakpoint
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param conditionEnabled
+     *        flag if the condition is enabled
+     * @param methodStart
+     *        the line the containing method of this breakpoint starts at
+     * @param methodEnd
+     *        the line the containing method of this breakpoint ends at
+     * @param containerType
+     *        the type of the element containing the breakpoint
      */
     public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
             boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd,
@@ -129,9 +137,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         if (goal != null) {
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-            if (getVarsForCondition() != null && ruleApp != null && node != null) {
-                refreshVarMaps(ruleApp, node);
-            }
+            if (getVarsForCondition() != null && ruleApp != null && node != null) { refreshVarMaps(ruleApp, node); }
         }
     }
 
@@ -193,11 +199,15 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * put relevant values from the current nodes renamings in toKeep and variableNamingMap
      *
-     * @param varForCondition the variable that might be relevant for the condition
-     * @param node the current
-     * @param inScope the flag to determine if the current statement is in the scope of the
+     * @param varForCondition
+     *        the variable that might be relevant for the condition
+     * @param node
+     *        the current
+     * @param inScope
+     *        the flag to determine if the current statement is in the scope of the
      *        breakpoint
-     * @param oldMap the oldMap variableNamings
+     * @param oldMap
+     *        the oldMap variableNamings
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
             Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
@@ -257,8 +267,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Modifies toKeep and variableNamingMap to hold the correct parameters after execution of the
      * given ruleApp on the given node
      *
-     * @param ruleApp the applied rule app
-     * @param node the current node
+     * @param ruleApp
+     *        the applied rule app
+     * @param node
+     *        the current node
      */
     protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
@@ -280,13 +292,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Computes the Term that can be evaluated, from the user given condition
      *
-     * @param condition the condition given by the user
+     * @param condition
+     *        the condition given by the user
      * @return the {@link Term} that represents the condition
      */
     private Term computeTermForCondition(String condition) {
-        if (condition == null) {
-            return getProof().getServices().getTermBuilder().tt();
-        }
+        if (condition == null) { return getProof().getServices().getTermBuilder().tt(); }
         // collect all variables needed to parse the condition
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
@@ -307,9 +318,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                 new ProgramVariableCollector(result, getProof().getServices());
             variableCollector.start();
             Set<LocationVariable> undeclaredVariables = variableCollector.result();
-            for (LocationVariable x : undeclaredVariables) {
-                varsForCondition = saveAddVariable(x, varsForCondition);
-            }
+            for (LocationVariable x : undeclaredVariables) { varsForCondition = saveAddVariable(x, varsForCondition); }
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
         ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
@@ -343,9 +352,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Checks if the condition, that was given by the user, evaluates to true with the current of
      * the proof
      *
-     * @param ruleApp the {@link RuleApp} to be executed next
-     * @param proof the current {@link Proof}
-     * @param node the current {@link Node}
+     * @param ruleApp
+     *        the {@link RuleApp} to be executed next
+     * @param proof
+     *        the current {@link Proof}
+     * @param node
+     *        the current {@link Node}
      * @return true if the condition evaluates to true
      */
     protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
@@ -359,9 +371,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             // put values into map which have to be replaced
-            if (ec != null) {
-                getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
-            }
+            if (ec != null) { getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance()); }
             // replace renamings etc.
             OpReplacer replacer =
                 new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
@@ -401,7 +411,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that
      * contains all lines before the line the Breakpoint is at, including the line itself.
      *
-     * @param statementContainer the {@link StatementContainer} to build the block from
+     * @param statementContainer
+     *        the {@link StatementContainer} to build the block from
      * @return the {@link StatementBlock} representing the container without the line below the
      *         Breakpoint
      */
@@ -410,7 +421,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
      *
-     * @param node the {@link Node} to be checked
+     * @param node
+     *        the {@link Node} to be checked
      * @return true if the node represents a statement in the scope of this breakpoint.
      */
     protected abstract boolean isInScope(Node node);
@@ -418,7 +430,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
      *
-     * @param node the {@link Node} to be checked
+     * @param node
+     *        the {@link Node} to be checked
      * @return true if the node represents a statement in the scope of this breakpoint.
      */
     protected abstract boolean isInScopeForCondition(Node node);
@@ -432,16 +445,15 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                 break;
             }
         }
-        if (!contains && !x.isMember()) {
-            varsForCondition = varsForCondition.append(x);
-        }
+        if (!contains && !x.isMember()) { varsForCondition = varsForCondition.append(x); }
         return varsForCondition;
     }
 
     /**
      * Sets the new conditionEnabled value.
      *
-     * @param conditionEnabled the new value
+     * @param conditionEnabled
+     *        the new value
      */
     public void setConditionEnabled(boolean conditionEnabled) {
         this.conditionEnabled = conditionEnabled;
@@ -468,8 +480,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Sets the condition to the Term that is parsed from the given String.
      *
-     * @param condition the String to be parsed
-     * @throws SLTranslationException if the parsing failed
+     * @param condition
+     *        the String to be parsed
+     * @throws SLTranslationException
+     *         if the parsing failed
      */
     public void setCondition(String condition) throws SLTranslationException {
         this.conditionString = condition;
@@ -503,7 +517,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param variableNamingMap the variableNamingMap to set
+     * @param variableNamingMap
+     *        the variableNamingMap to set
      */
     public void setVariableNamingMap(Map<SVSubstitute, SVSubstitute> variableNamingMap) {
         this.variableNamingMap = variableNamingMap;
@@ -517,7 +532,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param selfVar the selfVar to set
+     * @param selfVar
+     *        the selfVar to set
      */
     public void setSelfVar(ProgramVariable selfVar) {
         this.selfVar = selfVar;
@@ -531,7 +547,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param varsForCondition the varsForCondition to set
+     * @param varsForCondition
+     *        the varsForCondition to set
      */
     public void setVarsForCondition(ImmutableList<ProgramVariable> varsForCondition) {
         this.varsForCondition = varsForCondition;
@@ -545,7 +562,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param pm the pm to set
+     * @param pm
+     *        the pm to set
      */
     public void setPm(IProgramMethod pm) {
         this.pm = pm;

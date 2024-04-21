@@ -80,16 +80,15 @@ public class CollectionUtilTest {
     /**
      * Ensures that the given {@link List} contains the expected elements.
      *
-     * @param actual The actual {@link List}.
-     * @param expected The expected elements.
+     * @param actual
+     *        The actual {@link List}.
+     * @param expected
+     *        The expected elements.
      */
     protected static <T> void assertList(List<T> actual, String... expected) {
         assertEquals(expected.length, actual.size());
         int i = 0;
-        for (T actualElement : actual) {
-            assertEquals(expected[i], actualElement);
-            i++;
-        }
+        for (T actualElement : actual) { assertEquals(expected[i], actualElement); i++; }
     }
 
     /**
@@ -571,6 +570,7 @@ public class CollectionUtilTest {
             CollectionUtil.toString(collection));
         collection.add("D");
         assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C"
-            + CollectionUtil.SEPARATOR + "D", CollectionUtil.toString(collection));
+                + CollectionUtil.SEPARATOR + "D",
+            CollectionUtil.toString(collection));
     }
 }

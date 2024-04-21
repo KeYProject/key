@@ -82,10 +82,14 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Construct a new dialog.
      *
-     * @param mediator KeY mediator
-     * @param window main window
-     * @param analyzeCallback function that provides analysis results on the last loaded proof
-     * @param sliceButton function that slices the last loaded proof
+     * @param mediator
+     *        KeY mediator
+     * @param window
+     *        main window
+     * @param analyzeCallback
+     *        function that provides analysis results on the last loaded proof
+     * @param sliceButton
+     *        function that slices the last loaded proof
      */
     public SliceToFixedPointDialog(KeYMediator mediator, Window window,
             Function<Void, AnalysisResults> analyzeCallback,
@@ -146,7 +150,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * Wrap the provided analyze callback such that results of the callback will first be recorded
      * in {@link #tableRows}.
      *
-     * @param analyzeCallback callback to provide analysis results
+     * @param analyzeCallback
+     *        callback to provide analysis results
      * @return function that provides analysis results
      */
     private Function<Void, AnalysisResults> wrapAnalysisCallback(
@@ -166,13 +171,9 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                         Node node = queue.pop();
                         node.childrenIterator().forEachRemaining(queue::add);
                         if (node.getAppliedRuleApp() == null
-                                || results.usefulSteps.contains(node)) {
-                            continue;
-                        }
+                                || results.usefulSteps.contains(node)) { continue; }
                         String name = node.getAppliedRuleApp().rule().displayName();
-                        if (node.childrenCount() > 1) {
-                            name = name + "*";
-                        }
+                        if (node.childrenCount() > 1) { name = name + "*"; }
                         slicedAway.compute(
                             name,
                             (k, v) -> v == null ? 1 : v + 1);
@@ -221,11 +222,11 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Start analyzing and slicing the currently selected proof.
      *
-     * @param proof the currently selected proof
+     * @param proof
+     *        the currently selected proof
      */
     void start(Proof proof) {
-        worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {
-        });
+        worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {});
         worker.execute();
     }
 
@@ -238,8 +239,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
             }
             // pass previously sliced proof to worker, so that it is disposed of later
             worker = new SliceToFixedPointWorker(e.getSource().getSelectedProof(),
-                worker.getSlicedProof(), analyzeButton, sliceButton, () -> {
-                });
+                worker.getSlicedProof(), analyzeButton, sliceButton, () -> {});
             worker.execute();
         }
     }

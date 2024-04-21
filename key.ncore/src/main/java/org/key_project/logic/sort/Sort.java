@@ -21,7 +21,8 @@ public interface Sort extends Named, HasOrigin {
     }
 
     /**
-     * @param s some sort.
+     * @param s
+     *        some sort.
      * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
     boolean extendsTrans(Sort s);
@@ -38,5 +39,7 @@ public interface Sort extends Named, HasOrigin {
      * parser, who captures the documentation comments.
      */
     @Nullable
-    default String getDocumentation() { return null; }
+    default String getDocumentation() {
+        return null;
+    }
 }

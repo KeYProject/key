@@ -29,8 +29,10 @@ public final class MapUtil {
      * allows {@code null} values.
      * </p>
      *
-     * @param keyMapper map function for the key set.
-     * @param valueMapper map function for the value set.
+     * @param keyMapper
+     *        map function for the key set.
+     * @param valueMapper
+     *        map function for the value set.
      * @return a collector for maps.
      */
     public static <E, K, V> Collector<E, Map<K, V>, Map<K, V>> collector(

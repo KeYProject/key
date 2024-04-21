@@ -80,7 +80,8 @@ public interface IExecutionElement {
      * Returns a human readable name which describes this element.
      *
      * @return The human readable name which describes this element.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getName() throws ProofInputException;
 

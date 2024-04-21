@@ -39,9 +39,7 @@ public class SingleLineCommentRepairer {
                         Position relpos = first.getRelativePosition();
                         if (relpos == null || relpos == Position.UNDEFINED) {
                             relpos = new Position(1, 0);
-                        } else if (relpos.getLine() < 1) {
-                            relpos.setLine(1);
-                        }
+                        } else if (relpos.getLine() < 1) { relpos.setLine(1); }
                         first.setRelativePosition(relpos);
                     }
                 }

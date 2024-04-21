@@ -30,9 +30,12 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param name The name.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param name
+     *        The name.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicObject(Services services, Term name, IModelSettings settings) {
         super(settings);

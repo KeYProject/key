@@ -16,7 +16,7 @@ public class TestMemberReference extends ResolveGenericClass {
         registerCU(
             "package java.lang; public class Object { public String toString() {}; protected final Object clone(); }");
         registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } "
-            + "E[][] n() { return null; } } " + "class B { void bb(); }");
+                + "E[][] n() { return null; } } " + "class B { void bb(); }");
     }
 
     @Test
@@ -156,10 +156,10 @@ public class TestMemberReference extends ResolveGenericClass {
     public void testStortArray() throws Exception {
         String before =
             "class Arrays { public static <T> void sort(T[] a, Comparator<? super T> c) {"
-                + "T[] aux = (T[])a.clone(); } }";
+                    + "T[] aux = (T[])a.clone(); } }";
         String after =
             "class Arrays { public static void sort(java.lang.Object[] a, Comparator c) {"
-                + "java.lang.Object[] aux = (java.lang.Object[])a.clone(); } }";
+                    + "java.lang.Object[] aux = (java.lang.Object[])a.clone(); } }";
         equalCU(before, after);
     }
 }

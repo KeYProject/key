@@ -15,15 +15,17 @@ import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 public class ProofBundleMerger {
-    private ProofBundleMerger() {
-    }
+    private ProofBundleMerger() {}
 
     /**
      * This method merges n proof bundles into a single one.
      *
-     * @param inputs the paths to the input bundles to merge
-     * @param output the target path (will be zipped)
-     * @throws ProofManagementException if any of the files can not be accessed
+     * @param inputs
+     *        the paths to the input bundles to merge
+     * @param output
+     *        the target path (will be zipped)
+     * @throws ProofManagementException
+     *         if any of the files can not be accessed
      */
     public static void merge(List<Path> inputs, Path output, boolean force, Logger logger)
             throws ProofManagementException {
@@ -31,21 +33,19 @@ public class ProofBundleMerger {
         boolean consistent = FilesChecker.listOfPathsConsistent(inputs);
         if (consistent) {
             logger.print(LogLevel.INFO, "All files in the bundles are consistent. Continuing the"
-                + " merge ...");
+                    + " merge ...");
         } else if (force) {
             logger.print(LogLevel.WARNING, "Some files in the bundles are inconsistent. Forcing the"
-                + " merge ...");
+                    + " merge ...");
         } else {
             logger.print(LogLevel.ERROR, "Some files in the bundles are inconsistent. If you want "
-                + "to merge nonetheless, use the \"--force\" option.");
+                    + "to merge nonetheless, use the \"--force\" option.");
         }
 
         if (consistent || force) {
             try {
                 // TODO: at the moment, if the target file already exists, we silently overwrite it
-                if (Files.exists(output)) {
-                    Files.delete(output);
-                }
+                if (Files.exists(output)) { Files.delete(output); }
 
                 final Path absZipOutput = output.toAbsolutePath().normalize();
 

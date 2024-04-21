@@ -34,9 +34,7 @@ class ResolveMethodDeclaration extends GenericResolutionTransformation {
     @Override
     public void transform() {
 
-        if (getProblemReport() == IDENTITY) {
-            return;
-        }
+        if (getProblemReport() == IDENTITY) { return; }
 
         declaration.setTypeParameters(null);
 

@@ -13,9 +13,11 @@ public interface IFilterWithException<T, E extends Throwable> {
     /**
      * Checks if the given element should be selected.
      *
-     * @param element The element to test.
+     * @param element
+     *        The element to test.
      * @return {@code true} handle element, {@code false} ignore element.
-     * @throws E An occurred exception.
+     * @throws E
+     *         An occurred exception.
      */
     boolean select(T element) throws E;
 }

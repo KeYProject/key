@@ -12,8 +12,8 @@ public class TestMultipleBounds extends ResolveGenericClass {
     protected void setUp() throws Exception {
         registerCU("package java.lang; class Object {}");
         registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } "
-            + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }"
-            + "class C { void mC() {} int attrC; }");
+                + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }"
+                + "class C { void mC() {} int attrC; }");
     }
 
     @Test

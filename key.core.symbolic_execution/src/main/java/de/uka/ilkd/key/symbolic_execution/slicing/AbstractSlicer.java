@@ -47,9 +47,12 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode The seed {@link Node} to start slicing at.
-     * @param term The seed {@link Term}.
-     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode
+     *        The seed {@link Node} to start slicing at.
+     * @param term
+     *        The seed {@link Term}.
+     * @param sec
+     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     public ImmutableArray<Node> slice(Node seedNode, Term term,
@@ -60,9 +63,12 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode The seed {@link Node} to start slicing at.
-     * @param seedLocation The seed {@link ReferencePrefix}.
-     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode
+     *        The seed {@link Node} to start slicing at.
+     * @param seedLocation
+     *        The seed {@link ReferencePrefix}.
+     * @param sec
+     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation,
@@ -82,9 +88,12 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode The seed {@link Node} to start slicing at.
-     * @param seedLocation The seed {@link ReferencePrefix}.
-     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode
+     *        The seed {@link Node} to start slicing at.
+     * @param seedLocation
+     *        The seed {@link ReferencePrefix}.
+     * @param sec
+     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     public ImmutableArray<Node> slice(Node seedNode, Location seedLocation,
@@ -102,7 +111,7 @@ public abstract class AbstractSlicer {
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
             throw new IllegalStateException("Modality at applied rule does not have the "
-                + SymbolicExecutionTermLabel.NAME + " term label.");
+                    + SymbolicExecutionTermLabel.NAME + " term label.");
         }
         // Perform slicing
         return doSlicing(seedNode, seedLocation, sec);
@@ -111,9 +120,12 @@ public abstract class AbstractSlicer {
     /**
      * Performs the slicing.
      *
-     * @param seedNode The seed {@link Node} to start slicing at.
-     * @param seedLocation The seed {@link Location}.
-     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode
+     *        The seed {@link Node} to start slicing at.
+     * @param seedLocation
+     *        The seed {@link Location}.
+     * @param sec
+     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation,
@@ -148,8 +160,10 @@ public abstract class AbstractSlicer {
         /**
          * Constructor.
          *
-         * @param aliases The found aliases.
-         * @param thisReference The this-reference if available.
+         * @param aliases
+         *        The found aliases.
+         * @param thisReference
+         *        The this-reference if available.
          */
         public SequentInfo(Map<Location, SortedSet<Location>> aliases,
                 Map<ProgramVariable, Term> localValues, ExecutionContext executionContext,
@@ -203,7 +217,8 @@ public abstract class AbstractSlicer {
      * Computes the aliases specified by the updates of the current {@link Node} at the application
      * {@link PosInOccurrence} and computes the current {@code this} reference.
      *
-     * @param node The {@link Node} to analyze.
+     * @param node
+     *        The {@link Node} to analyze.
      * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not
      *         supported.
      */
@@ -237,10 +252,14 @@ public abstract class AbstractSlicer {
     /**
      * Analyzes the given {@link ISymbolicEquivalenceClass}es.
      *
-     * @param services The {@link Services} to use.
-     * @param sec The {@link ISymbolicEquivalenceClass} to analyze.
-     * @param aliases The alias {@link Map} to fill.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param sec
+     *        The {@link ISymbolicEquivalenceClass} to analyze.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeEquivalenceClasses(Services services,
@@ -253,9 +272,7 @@ public abstract class AbstractSlicer {
                 for (Term term : terms) {
                     if (SymbolicExecutionUtil.hasReferenceSort(services, term)) {
                         Location location = toLocation(services, term);
-                        if (location != null) {
-                            locations.add(location);
-                        }
+                        if (location != null) { locations.add(location); }
                     }
                 }
                 if (locations.size() >= 2) {
@@ -275,19 +292,21 @@ public abstract class AbstractSlicer {
     /**
      * Analyzes the given {@link Sequent} for equalities specified by top level formulas.
      *
-     * @param services The {@link Services} to use.
-     * @param sequent The {@link Sequent} to analyze.
-     * @param aliases The alias {@link Map} to fill.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param sequent
+     *        The {@link Sequent} to analyze.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
             Term term = sf.formula();
-            if (Equality.EQUALS == term.op()) {
-                analyzeEquality(services, term, aliases, thisReference);
-            }
+            if (Equality.EQUALS == term.op()) { analyzeEquality(services, term, aliases, thisReference); }
         }
         for (SequentFormula sf : sequent.succedent()) {
             Term term = sf.formula();
@@ -303,10 +322,14 @@ public abstract class AbstractSlicer {
     /**
      * Analyzes the given equality {@link Term} for aliased locations.
      *
-     * @param services The {@link Services} to use.
-     * @param equality The equality {@link Term} to analyze.
-     * @param aliases The alias {@link Map} to fill.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param equality
+     *        The equality {@link Term} to analyze.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeEquality(Services services, Term equality,
@@ -317,22 +340,27 @@ public abstract class AbstractSlicer {
                 && SymbolicExecutionUtil.hasReferenceSort(services, secondSub)) {
             Location first = toLocation(services, firstSub);
             Location second = toLocation(services, secondSub);
-            if (first != null && second != null) {
-                updateAliases(services, first, second, aliases, thisReference);
-            }
+            if (first != null && second != null) { updateAliases(services, first, second, aliases, thisReference); }
         }
     }
 
     /**
      * Utility method used by {@link #analyzeSequent} to analyze the given updates.
      *
-     * @param updates The update {@link Term}s to analyze.
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
-     * @param aliases The alias {@link Map} to fill.
-     * @param localValues The local values to fill.
-     * @param ec The current {@link ExecutionContext}.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param updates
+     *        The update {@link Term}s to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} of the {@link Services}.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param localValues
+     *        The local values to fill.
+     * @param ec
+     *        The current {@link ExecutionContext}.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeUpdates(ImmutableList<Term> updates, Services services, HeapLDT heapLDT,
@@ -347,13 +375,20 @@ public abstract class AbstractSlicer {
      * Recursive utility method used by
      * {@link #analyzeUpdates} to analyze a given update.
      *
-     * @param term The update {@link Term} to analyze.
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
-     * @param aliases The alias {@link Map} to fill.
-     * @param localValues The local values to fill.
-     * @param ec The current {@link ExecutionContext}.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term
+     *        The update {@link Term} to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} of the {@link Services}.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param localValues
+     *        The local values to fill.
+     * @param ec
+     *        The current {@link ExecutionContext}.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeUpdate(Term term, Services services, HeapLDT heapLDT,
@@ -370,9 +405,7 @@ public abstract class AbstractSlicer {
             if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
                 analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
             } else {
-                if (target instanceof ProgramVariable) {
-                    localValues.put((ProgramVariable) target, term.sub(0));
-                }
+                if (target instanceof ProgramVariable) { localValues.put((ProgramVariable) target, term.sub(0)); }
                 Location sourceLocation = toLocation(services, term.sub(0));
                 if (target instanceof ReferencePrefix && sourceLocation != null) {
                     Location targetLocation =
@@ -389,11 +422,16 @@ public abstract class AbstractSlicer {
      * Recursive utility method used by {@link #analyzeUpdate} to
      * analyze a given update.
      *
-     * @param term The heap update {@link Term} to analyze.
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
-     * @param aliases The alias {@link Map} to fill.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term
+     *        The heap update {@link Term} to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} of the {@link Services}.
+     * @param aliases
+     *        The alias {@link Map} to fill.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeHeapUpdate(Term term, Services services, HeapLDT heapLDT,
@@ -429,12 +467,18 @@ public abstract class AbstractSlicer {
     /**
      * Recursive method to list all modified {@link Location}s in the given {@link Term}.
      *
-     * @param term The update {@link Term} to analyze.
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
-     * @param listToFill The result {@link List} with {@link Location}s to fill.
-     * @param ec The current {@link ExecutionContext}.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term
+     *        The update {@link Term} to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} of the {@link Services}.
+     * @param listToFill
+     *        The result {@link List} with {@link Location}s to fill.
+     * @param ec
+     *        The current {@link ExecutionContext}.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void listModifiedLocations(Term term, Services services, HeapLDT heapLDT,
@@ -467,11 +511,16 @@ public abstract class AbstractSlicer {
      * {@link #listModifiedLocations} to analyze a
      * given update.
      *
-     * @param term The heap update {@link Term} to analyze.
-     * @param services The {@link Services} to use.
-     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
-     * @param listToFill The result {@link List} with {@link Location}s to fill.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term
+     *        The heap update {@link Term} to analyze.
+     * @param services
+     *        The {@link Services} to use.
+     * @param heapLDT
+     *        The {@link HeapLDT} of the {@link Services}.
+     * @param listToFill
+     *        The result {@link List} with {@link Location}s to fill.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void listModifiedHeapLocations(Term term, Services services, HeapLDT heapLDT,
@@ -552,9 +601,7 @@ public abstract class AbstractSlicer {
                                     goal.sequent(), operatorTerm.sub(i), services);
                                 if (valueTerm.arity() >= 1) {
                                     Term heap = valueTerm.sub(0);
-                                    if (anonHeap.equals(heap)) {
-                                        listToFill.add(resultLocations.get(i));
-                                    }
+                                    if (anonHeap.equals(heap)) { listToFill.add(resultLocations.get(i)); }
                                 }
                             }
                         }
@@ -642,11 +689,16 @@ public abstract class AbstractSlicer {
      * {@link Map}. If required, all participating entries in the {@link Map} are updated to ensure
      * consistency.
      *
-     * @param services The {@link Services} to use.
-     * @param first The first alias.
-     * @param second The second alias.
-     * @param aliases The alias {@link Map} to update.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param first
+     *        The first alias.
+     * @param second
+     *        The second alias.
+     * @param aliases
+     *        The alias {@link Map} to update.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void updateAliases(Services services, Location first, Location second,
@@ -667,9 +719,7 @@ public abstract class AbstractSlicer {
             aliases.put(first, values);
         } else if (firstValues != null && secondValues != null) { // both are not null
             values = firstValues;
-            for (Location existingLocation : secondValues) {
-                aliases.put(existingLocation, values);
-            }
+            for (Location existingLocation : secondValues) { aliases.put(existingLocation, values); }
             values.addAll(secondValues);
         } else {
             // Can not happen!
@@ -707,9 +757,12 @@ public abstract class AbstractSlicer {
     /**
      * Returns the representative alias for the given {@link ReferencePrefix}.
      *
-     * @param services The {@link Services} to use.
-     * @param referencePrefix The {@link ReferencePrefix}.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
+     * @param referencePrefix
+     *        The {@link ReferencePrefix}.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
     protected Location normalizeAlias(Services services, ReferencePrefix referencePrefix,
@@ -722,17 +775,18 @@ public abstract class AbstractSlicer {
     /**
      * Returns the representative alias for the given {@link Location}.
      *
-     * @param services The {@link Services} to use.
-     * @param location The {@link Location}.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
+     * @param location
+     *        The {@link Location}.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
     protected Location normalizeAlias(Services services, Location location, SequentInfo info) {
         ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
         for (Access access : location.getAccesses()) {
-            if (access.isArrayIndex()) {
-                access = normalizeArrayIndex(access, info);
-            }
+            if (access.isArrayIndex()) { access = normalizeArrayIndex(access, info); }
             normalizedAccesses = normalizedAccesses.append(access);
             Location oldLocation = new Location(normalizedAccesses);
             Location newLocation = computeRepresentativeAlias(oldLocation, info.getAliases());
@@ -746,8 +800,10 @@ public abstract class AbstractSlicer {
     /**
      * Normalizes the given array index.
      *
-     * @param access The {@link Access} representing an array index.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param access
+     *        The {@link Access} representing an array index.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return The normalized array access.
      */
     protected Access normalizeArrayIndex(Access access, SequentInfo info) {
@@ -757,9 +813,7 @@ public abstract class AbstractSlicer {
             Term oldTerm = oldTerms.get(i);
             if (oldTerm.op() instanceof ProgramVariable) {
                 Term value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
-                if (value != null) {
-                    oldTerm = value;
-                }
+                if (value != null) { oldTerm = value; }
             }
             newTerms[i] = oldTerm;
         }
@@ -769,8 +823,10 @@ public abstract class AbstractSlicer {
     /**
      * Computes the representative alias of the given {@link Location}.
      *
-     * @param location The given {@link Location}.
-     * @param aliases The available aliases.
+     * @param location
+     *        The given {@link Location}.
+     * @param aliases
+     *        The available aliases.
      * @return The representative alias.
      */
     protected Location computeRepresentativeAlias(Location location,
@@ -786,7 +842,8 @@ public abstract class AbstractSlicer {
     /**
      * Computes the {@link ReferencePrefix} of the given {@link SourceElement}.
      *
-     * @param sourceElement The {@link SourceElement} to work with.
+     * @param sourceElement
+     *        The {@link SourceElement} to work with.
      * @return The {@link ReferencePrefix} or {@code null} if the {@link SourceElement} can't be
      *         represented as {@link ReferencePrefix}.
      */
@@ -813,10 +870,14 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link SourceElement} is directly or indirectly contained (aliased) in
      * the {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services The {@link Services} to use.
-     * @param sourceElement The {@link SourceElement} to check.
-     * @param relevantLocations The {@link Set} with locations of interest.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
+     * @param sourceElement
+     *        The {@link SourceElement} to check.
+     * @param relevantLocations
+     *        The {@link Set} with locations of interest.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -830,10 +891,14 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link Location} is directly or indirectly contained (aliased) in the
      * {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services The {@link Services} to use.
-     * @param location The {@link Location} to check.
-     * @param relevantLocations The {@link Set} with locations of interest.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
+     * @param location
+     *        The {@link Location} to check.
+     * @param relevantLocations
+     *        The {@link Set} with locations of interest.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -847,10 +912,14 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link Location} is directly or indirectly contained (aliased) in the
      * {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services The {@link Services} to use.
-     * @param normalized The {@link Location} to check.
-     * @param relevantLocations The {@link Set} with locations of interest.
-     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
+     * @param normalized
+     *        The {@link Location} to check.
+     * @param relevantLocations
+     *        The {@link Set} with locations of interest.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -872,10 +941,14 @@ public abstract class AbstractSlicer {
     /**
      * Converts the given {@link ReferencePrefix} into a {@link Location}.
      *
-     * @param services The {@link Services} to use.
-     * @param prefix The {@link ReferencePrefix} to convert.
-     * @param ec The current {@link ExecutionContext}.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param prefix
+     *        The {@link ReferencePrefix} to convert.
+     * @param ec
+     *        The current {@link ExecutionContext}.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      * @return The {@link Location} representing the given {@link ReferencePrefix}.
      */
@@ -890,12 +963,17 @@ public abstract class AbstractSlicer {
      * Utility method used by {@link #toLocation} to
      * recursively extract the {@link Access} instances.
      *
-     * @param services The {@link Services} to use.
-     * @param prefix The {@link ReferencePrefix} to work with.
-     * @param ec The current {@link ExecutionContext}.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param prefix
+     *        The {@link ReferencePrefix} to work with.
+     * @param ec
+     *        The current {@link ExecutionContext}.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
-     * @param children The already known child {@link Access}s.
+     * @param children
+     *        The already known child {@link Access}s.
      * @return An {@link ImmutableList} containing all {@link Access}s of the
      *         {@link ReferencePrefix} in the order of access.
      */
@@ -933,28 +1011,31 @@ public abstract class AbstractSlicer {
     /**
      * Converts the given {@link Expression}s into {@link Term}s.
      *
-     * @param services The {@link Services} to use.
-     * @param expressions The {@link Expression}s to convert.
-     * @param ec The current {@link ExecutionContext}.
+     * @param services
+     *        The {@link Services} to use.
+     * @param expressions
+     *        The {@link Expression}s to convert.
+     * @param ec
+     *        The current {@link ExecutionContext}.
      * @return The created {@link Term}s.
      */
     public static ImmutableArray<Term> toTerm(Services services,
             ImmutableArray<Expression> expressions, ExecutionContext ec) {
         Term[] terms = new Term[expressions.size()];
         int i = 0;
-        for (Expression expression : expressions) {
-            terms[i] = AbstractSlicer.toTerm(services, expression, ec);
-            i++;
-        }
+        for (Expression expression : expressions) { terms[i] = AbstractSlicer.toTerm(services, expression, ec); i++; }
         return new ImmutableArray<>(terms);
     }
 
     /**
      * Converts the given {@link Expression} into a {@link Term}.
      *
-     * @param services The {@link Services} to use.
-     * @param expression The {@link Expression} to convert.
-     * @param ec The current {@link ExecutionContext}.
+     * @param services
+     *        The {@link Services} to use.
+     * @param expression
+     *        The {@link Expression} to convert.
+     * @param ec
+     *        The current {@link ExecutionContext}.
      * @return The created {@link Term}.
      */
     public static Term toTerm(Services services, Expression expression, ExecutionContext ec) {
@@ -964,8 +1045,10 @@ public abstract class AbstractSlicer {
     /**
      * Converts the given {@link Term} into a {@link Location}.
      *
-     * @param services The {@link Services} to use.
-     * @param term The {@link Term} to convert.
+     * @param services
+     *        The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to convert.
      * @return The {@link Location} or {@code null} if the {@link Term} could not be represented as
      *         {@link Location}.
      */
@@ -1007,8 +1090,10 @@ public abstract class AbstractSlicer {
     /**
      * Returns the first found alternative which is still valid.
      *
-     * @param oldAlternatives The old alternatives.
-     * @param newAlternatives The new alternatives.
+     * @param oldAlternatives
+     *        The old alternatives.
+     * @param newAlternatives
+     *        The new alternatives.
      * @return The found alternative or {@code null} if not available.
      */
     protected Location findNewAlternative(final SortedSet<Location> oldAlternatives,
@@ -1020,8 +1105,10 @@ public abstract class AbstractSlicer {
     /**
      * Computes the length of a common prefix.
      *
-     * @param candidates The possible candidates.
-     * @param toCheck The {@link ImmutableList} to check.
+     * @param candidates
+     *        The possible candidates.
+     * @param toCheck
+     *        The {@link ImmutableList} to check.
      * @return The common prefix length which is {@code 0} if no elements are common.
      */
     public static <T> int computeFirstCommonPrefixLength(ImmutableList<ImmutableList<T>> candidates,
@@ -1030,9 +1117,7 @@ public abstract class AbstractSlicer {
         Iterator<ImmutableList<T>> iter = candidates.iterator();
         while (commonLength < 1 && iter.hasNext()) {
             ImmutableList<T> next = iter.next();
-            if (startsWith(toCheck, next)) {
-                commonLength = next.size();
-            }
+            if (startsWith(toCheck, next)) { commonLength = next.size(); }
         }
         return commonLength;
     }
@@ -1040,8 +1125,10 @@ public abstract class AbstractSlicer {
     /**
      * Checks if the given {@link ImmutableList} starts with the given prefix.
      *
-     * @param list The {@link List} to check.
-     * @param prefix The prefix to check.
+     * @param list
+     *        The {@link List} to check.
+     * @param prefix
+     *        The prefix to check.
      * @return {@code true} the first elements in the {@link ImmutableList} are the prefix,
      *         {@code false} if the first elements are not equal to the prefix.
      */
@@ -1053,9 +1140,7 @@ public abstract class AbstractSlicer {
             while (same && prefixIter.hasNext()) {
                 T listNext = listIter.next();
                 T prefixNext = prefixIter.next();
-                if (!Objects.equals(listNext, prefixNext)) {
-                    same = false;
-                }
+                if (!Objects.equals(listNext, prefixNext)) { same = false; }
             }
             return same;
         } else {

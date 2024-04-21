@@ -44,7 +44,7 @@ public class Modifier implements Named {
         if (MODIFIERS.containsKey(bitMask)) {
             throw new IllegalArgumentException(
                 "Modifier with bitmask '" + bitMask + "' already declared with name: "
-                    + MODIFIERS.get(bitMask).name);
+                        + MODIFIERS.get(bitMask).name);
         }
         this.bitMask = bitMask;
         this.name = new Name(name);
@@ -64,7 +64,8 @@ public class Modifier implements Named {
     /**
      * Creates a new combined modifier.
      *
-     * @param that The midifier to add to the current one.
+     * @param that
+     *        The midifier to add to the current one.
      * @return A modifier that has all properties of `this` and `that`.
      */
     public Modifier combine(Modifier that) {
@@ -74,7 +75,8 @@ public class Modifier implements Named {
     /**
      * Checks whether `m` is a subset of the current modifier.
      *
-     * @param m The bitmask to check against.
+     * @param m
+     *        The bitmask to check against.
      * @return Whether all set bits of `m` are also set on `this`.
      */
     public boolean match(Modifier m) {

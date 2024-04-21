@@ -99,9 +99,7 @@ public class SpecificationInjector extends SourceVisitor {
         String getRespects(Set<Entry<String, Type>> oneRespect, final Type t) {
             var r = oneRespect.stream().filter(p -> p.getValue() == t).map(Entry::getKey)
                     .collect(Collectors.joining(", "));
-            if (r.isEmpty()) {
-                return " \\nothing";
-            }
+            if (r.isEmpty()) { return " \\nothing"; }
             return r;
         }
 
@@ -123,18 +121,14 @@ public class SpecificationInjector extends SourceVisitor {
                     final Set<Entry<String, Type>> es = respects.get(flowsFrom);
                     if (es != null) { // sources
                         for (final Entry<String, Type> e : es) {
-                            if (e.getValue() == Type.SOURCE) {
-                                oneRespects.add(e.getKey());
-                            }
+                            if (e.getValue() == Type.SOURCE) { oneRespects.add(e.getKey()); }
                         }
                     }
                 }
                 final Set<Entry<String, Type>> es = respects.get(domain);
                 if (es != null) { // sources
                     for (final Entry<String, Type> reflFlow : es) {
-                        if (reflFlow.getValue() == Type.SOURCE) {
-                            oneRespects.add(reflFlow.getKey());
-                        }
+                        if (reflFlow.getValue() == Type.SOURCE) { oneRespects.add(reflFlow.getKey()); }
                     }
                 }
 
@@ -164,13 +158,9 @@ public class SpecificationInjector extends SourceVisitor {
         }
 
         private void put(String key, Entry<String, Type> value) {
-            if (key == null) {
-                return;
-            }
+            if (key == null) { return; }
             Set<Entry<String, Type>> target = respects.get(key);
-            if (target == null) {
-                target = new LinkedHashSet<>();
-            }
+            if (target == null) { target = new LinkedHashSet<>(); }
             target.add(value);
             respects.put(key, target);
         }
@@ -201,16 +191,12 @@ public class SpecificationInjector extends SourceVisitor {
     // ////////////////////////////////////////////////////////////
 
     private void accessChildren(JavaNonTerminalProgramElement pe) {
-        for (int i = 0; i < pe.getChildCount(); i++) {
-            pe.getChildAt(i).accept(this);
-        }
+        for (int i = 0; i < pe.getChildCount(); i++) { pe.getChildAt(i).accept(this); }
     }
 
     private void addComment(JavaProgramElement se, String comment) {
         // remember which methods were specified and generate po files only for them
-        if (se instanceof MethodDeclaration) {
-            specifiedMethodDeclarations.add((MethodDeclaration) se);
-        }
+        if (se instanceof MethodDeclaration) { specifiedMethodDeclarations.add((MethodDeclaration) se); }
 
         // fixes issue with Recoder that it writes comments _after_ the element
         final NonTerminalProgramElement parent = se.getASTParent();
@@ -224,12 +210,8 @@ public class SpecificationInjector extends SourceVisitor {
 
         final ASTArrayList<Comment> commentList = new ASTArrayList<>();
         final ASTList<Comment> oldComments = se.getComments();
-        if (oldComments != null) {
-            commentList.addAll(oldComments);
-        }
-        if (comment != null && !comment.isEmpty()) {
-            commentList.add(new Comment(comment));
-        }
+        if (oldComments != null) { commentList.addAll(oldComments); }
+        if (comment != null && !comment.isEmpty()) { commentList.add(new Comment(comment)); }
         se.setComments(commentList);
     }
 
@@ -295,8 +277,6 @@ public class SpecificationInjector extends SourceVisitor {
         }
         // only add comment for methods for which we generated a specification
         String comment = factory.getSpecification();
-        if (comment != null) {
-            addComment(md, factory.getSpecification());
-        }
+        if (comment != null) { addComment(md, factory.getSpecification()); }
     }
 }

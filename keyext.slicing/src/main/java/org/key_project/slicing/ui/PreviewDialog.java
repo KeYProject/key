@@ -33,8 +33,10 @@ public class PreviewDialog extends JDialog implements WindowListener {
      * Create a new preview dialog to show the graph provided in DOT syntax.
      * Automatically starts dot, displays resulting image once complete.
      *
-     * @param window parent window
-     * @param dot graph in DOT format
+     * @param window
+     *        parent window
+     * @param dot
+     *        graph in DOT format
      */
     public PreviewDialog(Window window, String dot) {
         super(window, "Preview");
@@ -77,9 +79,7 @@ public class PreviewDialog extends JDialog implements WindowListener {
     }
 
     private void stopWorker() {
-        if (worker != null) {
-            worker.cancel(true);
-        }
+        if (worker != null) { worker.cancel(true); }
     }
 
     private void workerDone(GraphvizResult result) {

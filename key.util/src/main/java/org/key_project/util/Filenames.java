@@ -42,24 +42,18 @@ public class Filenames {
             int j = filename.indexOf(sep, i);
             if (j == -1) { // no slash anymore
                 final String s = filename.substring(i);
-                if (!s.equals(".")) {
-                    res.add(s);
-                }
+                if (!s.equals(".")) { res.add(s); }
                 break;
             }
             if (i == j) {
                 // empty string between slashes
                 if (i == 0)
                 // leading slash
-                {
-                    res.add("");
-                }
+                { res.add(""); }
             } else {
                 // contains "/./"
                 final String s = filename.substring(i, j);
-                if (!s.equals(".")) {
-                    res.add(s);
-                }
+                if (!s.equals(".")) { res.add(s); }
             }
             i = j + 1;
         }
@@ -98,7 +92,7 @@ public class Filenames {
         if (a[0].isEmpty()) { // not already relative
             if (!b[0].isEmpty()) {
                 throw new RuntimeException("\"" + toFilename
-                    + "\" is a relative path. Please use absolute paths to make others relative to them.");
+                        + "\" is a relative path. Please use absolute paths to make others relative to them.");
             }
 
             // remove ".." from paths
@@ -111,29 +105,21 @@ public class Filenames {
             boolean diff = false;
             while (i < b.length) {
                 // shared until i
-                if (i >= a.length || !a[i].equals(b[i])) {
-                    diff = true;
-                }
+                if (i >= a.length || !a[i].equals(b[i])) { diff = true; }
                 // add ".." for each remaining element in b
                 // and collect the remaining elements of a
                 if (diff) {
                     s.append("../");
-                    if (i < a.length) {
-                        t.append(a[i].isEmpty() ? "" : "/").append(a[i]);
-                    }
+                    if (i < a.length) { t.append(a[i].isEmpty() ? "" : "/").append(a[i]); }
                 }
                 i++;
             }
         } else {
             i = 0;
         }
-        while (i < a.length) {
-            t.append(a[i].isEmpty() ? "" : "/").append(a[i++]);
-        }
+        while (i < a.length) { t.append(a[i].isEmpty() ? "" : "/").append(a[i++]); }
         // strip leading slash
-        if (t.length() > 0 && t.charAt(0) == '/') {
-            t = new StringBuilder(t.substring(1));
-        }
+        if (t.length() > 0 && t.charAt(0) == '/') { t = new StringBuilder(t.substring(1)); }
         // strip ending slash
         t.insert(0, s);
         if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
@@ -153,9 +139,7 @@ public class Filenames {
                 j++;
             }
         }
-        if (!a[a.length - 1].equals("..")) {
-            newa[k++] = a[a.length - 1];
-        }
+        if (!a[a.length - 1].equals("..")) { newa[k++] = a[a.length - 1]; }
         return Arrays.copyOf(newa, k);
     }
 

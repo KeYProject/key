@@ -98,10 +98,14 @@ public class Bean implements IBean {
     /**
      * Fires the event to all available listeners.
      *
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The property name.
+     * @param index
+     *        The changed index.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue,
             boolean newValue) {
@@ -111,10 +115,14 @@ public class Bean implements IBean {
     /**
      * Fires the event to all available listeners.
      *
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The property name.
+     * @param index
+     *        The changed index.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue,
             int newValue) {
@@ -124,10 +132,14 @@ public class Bean implements IBean {
     /**
      * Fires the event to all available listeners.
      *
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The property name.
+     * @param index
+     *        The changed index.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue,
             Object newValue) {
@@ -137,7 +149,8 @@ public class Bean implements IBean {
     /**
      * Fires the event to all listeners.
      *
-     * @param evt The event to fire.
+     * @param evt
+     *        The event to fire.
      */
     protected void firePropertyChange(PropertyChangeEvent evt) {
         pcs.firePropertyChange(evt);
@@ -146,9 +159,12 @@ public class Bean implements IBean {
     /**
      * Fires the event to all listeners.
      *
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The changed property.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
@@ -157,9 +173,12 @@ public class Bean implements IBean {
     /**
      * Fires the event to all listeners.
      *
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The changed property.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
@@ -168,9 +187,12 @@ public class Bean implements IBean {
     /**
      * Fires the event to all listeners.
      *
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
+     * @param propertyName
+     *        The changed property.
+     * @param oldValue
+     *        The old value.
+     * @param newValue
+     *        The new value.
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);

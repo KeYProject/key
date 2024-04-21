@@ -72,7 +72,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                     throw new IllegalStateException(
                         "Use Loop Invariant/Operation Contract rule implementation has changed at node "
-                            + node.serialNr() + ".");
+                                + node.serialNr() + ".");
                 }
                 Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
                 while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -84,9 +84,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 }
                 // Check modified locations
                 for (Location location : modifiedLocations) {
-                    if (removeRelevant(services, location, relevantLocations, info)) {
-                        accept = true;
-                    }
+                    if (removeRelevant(services, location, relevantLocations, info)) { accept = true; }
                 }
             }
             return accept;

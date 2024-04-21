@@ -12,9 +12,7 @@ public class TestImmutables {
     @Test
     public void testRemoveDuplicatesLarge() {
         ImmutableList<Integer> l = ImmutableSLList.nil();
-        for (int i = 0; i < 100; i++) {
-            l = l.prepend((i * 2) % 160);
-        }
+        for (int i = 0; i < 100; i++) { l = l.prepend((i * 2) % 160); }
 
         assertEquals(100, l.size());
         assertFalse(Immutables.isDuplicateFree(l));
@@ -25,10 +23,7 @@ public class TestImmutables {
         assertTrue(Immutables.isDuplicateFree(cleaned));
 
         l = cleaned;
-        for (int i = 79; i >= 0; i--) {
-            assertEquals(i * 2, l.head().intValue());
-            l = l.tail();
-        }
+        for (int i = 79; i >= 0; i--) { assertEquals(i * 2, l.head().intValue()); l = l.tail(); }
     }
 
     @Test
@@ -85,9 +80,7 @@ public class TestImmutables {
 
     private static void assertDeepEquals(Object[] expected, Object[] array) {
         assertEquals(expected.length, array.length);
-        for (int i = 0; i < array.length; i++) {
-            assertEquals(expected[i], array[i]);
-        }
+        for (int i = 0; i < array.length; i++) { assertEquals(expected[i], array[i]); }
     }
 
     @Test
@@ -171,9 +164,7 @@ public class TestImmutables {
         // With the original tail recursive implementation, this would give
         // an overflow --> made it a loop.
         ImmutableList<Integer> l = ImmutableSLList.nil();
-        for (int i = 0; i < 1_000_000; i++) {
-            l = l.prepend(i);
-        }
+        for (int i = 0; i < 1_000_000; i++) { l = l.prepend(i); }
 
         ImmutableList<Integer> filtered = Immutables.filter(l, n -> n % 2 == 0);
         assertEquals(500_000, filtered.size());
@@ -191,9 +182,7 @@ public class TestImmutables {
         // With the original tail recursive implementation, this would give
         // an overflow --> made it a loop.
         ImmutableList<Integer> l = ImmutableSLList.nil();
-        for (int i = 0; i < 1_000_000; i++) {
-            l = l.prepend(i);
-        }
+        for (int i = 0; i < 1_000_000; i++) { l = l.prepend(i); }
 
         ImmutableList<Boolean> mapped = Immutables.map(l, n -> n % 2 == 0);
         assertEquals(1_000_000, mapped.size());
@@ -204,9 +193,7 @@ public class TestImmutables {
         // With a tail recursive implementation, this would give
         // an overflow --> it is a loop.
         ImmutableList<Integer> l = ImmutableSLList.nil();
-        for (int i = 0; i < 1_000_000; i++) {
-            l = l.prepend(i);
-        }
+        for (int i = 0; i < 1_000_000; i++) { l = l.prepend(i); }
 
         boolean result = l.exists(x -> x == 999_998);
         assertTrue(result);

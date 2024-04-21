@@ -82,9 +82,7 @@ public final class CheckerData implements Logger {
         }
         // if there is a proof for this contract, set its state to unproven
         ProofEntry entry = getProofEntryByContract(c);
-        if (entry != null) {
-            entry.dependencyState = DependencyState.UNPROVEN_DEP;
-        }
+        if (entry != null) { entry.dependencyState = DependencyState.UNPROVEN_DEP; }
     }
 
     ////////////////////////////////// results from settings checker
@@ -108,7 +106,8 @@ public final class CheckerData implements Logger {
      * In addition, an entry in the map for id lookup is added ({@link #addChoices(Map)} is
      * called).
      *
-     * @param choices the reference choices to add
+     * @param choices
+     *        the reference choices to add
      */
     public void addReferenceChoices(Map<String, String> choices) {
         int nextId = referenceChoices.size();
@@ -123,7 +122,8 @@ public final class CheckerData implements Logger {
      * Adds a mapping to a reference choices id for the given choices. Use only if an equal
      * reference choices object has already been added via {@link #addReferenceChoices(Map)}.
      *
-     * @param choices the choices to add a mapping
+     * @param choices
+     *        the choices to add a mapping
      */
     public void addChoices(Map<String, String> choices) {
         // if no id is found, a NPE is thrown
@@ -292,11 +292,7 @@ public final class CheckerData implements Logger {
     }
 
     public ProofEntry getProofEntryByContract(Contract contract) {
-        for (ProofEntry p : proofEntries) {
-            if (p.contract.equals(contract)) {
-                return p;
-            }
-        }
+        for (ProofEntry p : proofEntries) { if (p.contract.equals(contract)) { return p; } }
         return null;
     }
 
@@ -325,10 +321,7 @@ public final class CheckerData implements Logger {
         if (level.compareTo(minLogLevel) >= 0) {
             // for multiline strings, every line should have correct prefix
             String[] lines = message.split("\\r?\\n");
-            for (String l : lines) {
-                messages.add(level + l);
-                System.out.println(level + l);
-            }
+            for (String l : lines) { messages.add(level + l); System.out.println(level + l); }
         }
     }
 
@@ -498,9 +491,7 @@ public final class CheckerData implements Logger {
     }
 
     public List<Path> getProofPaths() throws ProofManagementException {
-        if (proofPaths == null) {
-            proofPaths = pbh.getProofFiles();
-        }
+        if (proofPaths == null) { proofPaths = pbh.getProofFiles(); }
         return proofPaths;
     }
 

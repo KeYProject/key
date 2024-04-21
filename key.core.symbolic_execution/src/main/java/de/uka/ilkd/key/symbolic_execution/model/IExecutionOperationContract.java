@@ -69,7 +69,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The result {@link Term} in which the result of the applied {@link Contract} is
      *         stored.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     Term getResultTerm() throws ProofInputException;
 
@@ -79,7 +80,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The exception {@link Term} in which a by the {@link Contract} thrown
      *         {@link Exception} is stored.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     Term getExceptionTerm() throws ProofInputException;
 
@@ -87,7 +89,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * Returns the self {@link Term} of the called method for which a {@link Contract} is applied.
      *
      * @return The self {@link Term} or {@code null} if not available.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     Term getSelfTerm() throws ProofInputException;
 
@@ -95,7 +98,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * Returns the parameters of the called method for which a {@link Contract} is applied.
      *
      * @return The parameters of the called method for which a {@link Contract} is applied.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     ImmutableList<Term> getContractParams() throws ProofInputException;
 
@@ -105,7 +109,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The human readable result {@link Term} in which the result of the applied
      *         {@link Contract} is stored.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getFormatedResultTerm() throws ProofInputException;
 
@@ -115,7 +120,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The human readable exception {@link Term} in which a by the {@link Contract} thrown
      *         {@link Exception} is stored.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getFormatedExceptionTerm() throws ProofInputException;
 
@@ -124,7 +130,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * {@link Contract} is applied.
      *
      * @return The human readable self {@link Term} or {@code null} if not available.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getFormatedSelfTerm() throws ProofInputException;
 
@@ -134,7 +141,8 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The human readable parameters of the called method for which a {@link Contract} is
      *         applied.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getFormatedContractParams() throws ProofInputException;
 }

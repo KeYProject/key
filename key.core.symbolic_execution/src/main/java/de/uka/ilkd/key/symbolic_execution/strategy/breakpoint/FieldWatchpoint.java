@@ -32,13 +32,20 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
     /**
      * Creates a new {@link FieldWatchpoint}.
      *
-     * @param enabled flag if the Breakpoint is enabled
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param fieldName the field to watch
-     * @param isAcces flag to watch for accesses
-     * @param isModification flag to watch for modifications
-     * @param containerKJT the type of the element containing the breakpoint
-     * @param proof the {@link Proof} that will be executed and should stop
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param fieldName
+     *        the field to watch
+     * @param isAcces
+     *        flag to watch for accesses
+     * @param isModification
+     *        flag to watch for modifications
+     * @param containerKJT
+     *        the type of the element containing the breakpoint
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
      */
     public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces,
             boolean isModification, KeYJavaType containerKJT, Proof proof) {
@@ -85,9 +92,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
                 if (childElement instanceof FieldReference field && ((FieldReference) childElement)
                         .getProgramVariable().name().toString().equals(fullFieldName)) {
                     ProgramVariable progVar = field.getProgramVariable();
-                    if (fullFieldName.equals(progVar.toString())) {
-                        return isAccess;
-                    }
+                    if (fullFieldName.equals(progVar.toString())) { return isAccess; }
                 } else if (childElement instanceof NonTerminalProgramElement) {
                     found = found || checkChildrenOfSourceElement(childElement);
                 }
@@ -98,9 +103,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
                 if (childElement instanceof FieldReference field && ((FieldReference) childElement)
                         .getProgramVariable().name().toString().equals(fullFieldName)) {
                     ProgramVariable progVar = field.getProgramVariable();
-                    if (fullFieldName.equals(progVar.toString())) {
-                        return isAccess;
-                    }
+                    if (fullFieldName.equals(progVar.toString())) { return isAccess; }
                 } else if (childElement instanceof NonTerminalProgramElement) {
                     found = found || checkChildrenOfSourceElement(childElement);
                 }
@@ -117,7 +120,8 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
     }
 
     /**
-     * @param isAccess the isAccess to set
+     * @param isAccess
+     *        the isAccess to set
      */
     public void setAccess(boolean isAccess) {
         this.isAccess = isAccess;
@@ -131,7 +135,8 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
     }
 
     /**
-     * @param isModification the isModification to set
+     * @param isModification
+     *        the isModification to set
      */
     public void setModification(boolean isModification) {
         this.isModification = isModification;

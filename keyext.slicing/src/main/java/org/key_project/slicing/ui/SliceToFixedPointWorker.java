@@ -48,12 +48,17 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * Construct a new worker.
      *
-     * @param proofToSlice the proof to slice
-     * @param proofToDispose the proof to dispose after successfully analyzing and slicing the
+     * @param proofToSlice
+     *        the proof to slice
+     * @param proofToDispose
+     *        the proof to dispose after successfully analyzing and slicing the
      *        current proof
-     * @param analyzeButton callback that provides analysis results
-     * @param sliceButton callback to slice the proof
-     * @param doneCallback called if the proof can not be sliced further
+     * @param analyzeButton
+     *        callback that provides analysis results
+     * @param sliceButton
+     *        callback to slice the proof
+     * @param doneCallback
+     *        called if the proof can not be sliced further
      */
     public SliceToFixedPointWorker(Proof proofToSlice,
             Proof proofToDispose,

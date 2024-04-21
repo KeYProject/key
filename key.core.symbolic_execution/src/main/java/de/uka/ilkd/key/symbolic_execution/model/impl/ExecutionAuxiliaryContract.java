@@ -43,8 +43,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionAuxiliaryContract(ITreeSettings settings, Node proofNode) {
@@ -85,19 +87,16 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             }
         }
         Node usageNode = getProofNode().child(2);
-        assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel())
-                : "Block Contract Rule has changed.";
+        assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel()) : "Block Contract Rule has changed.";
         Term usagePrecondition = usageNode.sequent().antecedent()
                 .get(usageNode.sequent().antecedent().size() - 1).formula();
         // Find remembrance heaps and local variables
         while (applicationTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-            assert applicationTerm.sub(0) == usagePrecondition.sub(0)
-                    : "Block Contract Rule has changed.";
+            assert applicationTerm.sub(0) == usagePrecondition.sub(0) : "Block Contract Rule has changed.";
             applicationTerm = applicationTerm.sub(1);
             usagePrecondition = usagePrecondition.sub(1);
         }
-        assert usagePrecondition.op() == UpdateApplication.UPDATE_APPLICATION
-                : "Block Contract Rule has changed.";
+        assert usagePrecondition.op() == UpdateApplication.UPDATE_APPLICATION : "Block Contract Rule has changed.";
         Map<LocationVariable, Term> remembranceHeaps = new LinkedHashMap<>();
         Map<LocationVariable, Term> remembranceLocalVariables =
             new LinkedHashMap<>();
@@ -105,8 +104,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             remembranceLocalVariables);
         // Find remaining information
         Node validitiyNode = getProofNode().child(0);
-        assert "Validity".equals(validitiyNode.getNodeInfo().getBranchLabel())
-                : "Block Contract Rule has changed.";
+        assert "Validity".equals(validitiyNode.getNodeInfo().getBranchLabel()) : "Block Contract Rule has changed.";
         Term validitiyModalityTerm = TermBuilder.goBelowUpdates(SymbolicExecutionUtil
                 .posInOccurrenceInOtherNode(getProofNode(), getModalityPIO(), validitiyNode));
         MethodFrame mf =
@@ -127,9 +125,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             }
         }
         Term exception = null;
-        if (variables.exception != null) {
-            exception = declaredVariableAsTerm(sb, statementIndex);
-        }
+        if (variables.exception != null) { exception = declaredVariableAsTerm(sb, statementIndex); }
         // getPlainText() does not use breakFlags, continueFlags, returnFlag,
         // remembranceLocalVariables, outerRemembrancevariables
         AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, null, returnFlag,
@@ -142,15 +138,16 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Returns the variable declared by the statement at the given index as {@link Term}.
      *
-     * @param sb The {@link StatementBlock} which contains all variable declarations.
-     * @param statementIndex The index in the {@link StatementBlock} with the variable declaration
+     * @param sb
+     *        The {@link StatementBlock} which contains all variable declarations.
+     * @param statementIndex
+     *        The index in the {@link StatementBlock} with the variable declaration
      *        of interest.
      * @return The variable as {@link Term}.
      */
     protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
         Statement resultInitStatement = sb.getStatementAt(statementIndex);
-        assert resultInitStatement instanceof LocalVariableDeclaration
-                : "Block Contract Rule has changed.";
+        assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";
         Named var = ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0)
                 .getProgramVariable();
         assert var != null : "Block Contract Rule has changed.";
@@ -160,9 +157,12 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Collects recursive all remembrance variables.
      *
-     * @param term The {@link Term} to start collecting.
-     * @param remembranceHeaps The {@link Map} to fill.
-     * @param remembranceLocalVariables The {@link Map} to fill.
+     * @param term
+     *        The {@link Term} to start collecting.
+     * @param remembranceHeaps
+     *        The {@link Map} to fill.
+     * @param remembranceLocalVariables
+     *        The {@link Map} to fill.
      */
     protected void collectRemembranceVariables(Term term,
             Map<LocationVariable, Term> remembranceHeaps,

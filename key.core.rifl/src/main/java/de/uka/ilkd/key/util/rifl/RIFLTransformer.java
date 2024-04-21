@@ -72,9 +72,12 @@ public class RIFLTransformer {
     /**
      * Transforms plain Java files + RIFL specification to Java+JML* specifications.
      *
-     * @param riflFilename path to a RIFL file
-     * @param javaSource path to Java sources (should be a directory)
-     * @param savePath custom save path
+     * @param riflFilename
+     *        path to a RIFL file
+     * @param javaSource
+     *        path to Java sources (should be a directory)
+     * @param savePath
+     *        custom save path
      * @param kexh
      */
     public static boolean transform(File riflFilename, File javaSource, File savePath,
@@ -106,7 +109,8 @@ public class RIFLTransformer {
     /**
      * Returns the default save path for transformed Java files.
      *
-     * @param origSourcePath path to a directory or single Java file
+     * @param origSourcePath
+     *        path to a directory or single Java file
      * @return path to the transformed directory
      */
     public static File getDefaultSavePath(File origSourcePath) {
@@ -136,9 +140,7 @@ public class RIFLTransformer {
         while (walker.step()) {
             final File javaFile = new File(walker.getCurrentName());
             // debug
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("[RIFL] Read file: {}", javaFile);
-            }
+            if (Debug.ENABLE_DEBUG) { LOGGER.info("[RIFL] Read file: {}", javaFile); }
 
             final CompilationUnit cu;
 
@@ -199,7 +201,7 @@ public class RIFLTransformer {
                 sb.append(formatAsList(mdecl.getParameters(), "", ",", ""));
 
                 String poname = clazz.getFullName() + "[" + clazz.getFullName() + "\\\\:\\\\:"
-                    + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
+                        + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
 
                 File problemFileName = new File(javaRoot.getParent(),
                     riflFilename.getName() + "_" + counter++ + ".key");
@@ -232,9 +234,7 @@ public class RIFLTransformer {
             new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
                 Writer fw =
                     new BufferedWriter(new FileWriter(problemFileName, StandardCharsets.UTF_8))) {
-            while ((tmp = br.readLine()) != null) {
-                blueprint.append(tmp).append("\n");
-            }
+            while ((tmp = br.readLine()) != null) { blueprint.append(tmp).append("\n"); }
 
             fw.write(blueprint.toString().replace("%%JAVA_SOURCE%%", newJavaFolder)
                     .replace("%%PO_NAME%%", poname));

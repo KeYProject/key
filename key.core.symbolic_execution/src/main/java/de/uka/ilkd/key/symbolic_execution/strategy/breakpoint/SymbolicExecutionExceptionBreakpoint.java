@@ -60,14 +60,21 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.
      *
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param exceptionName the name of the exception to watch for
-     * @param caught flag to tell if caught exceptions lead to a stop
-     * @param uncaught flag to tell if uncaught exceptions lead to a stop
-     * @param suspendOnSubclasses flag to tell if the execution should suspend on subclasses of the
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param exceptionName
+     *        the name of the exception to watch for
+     * @param caught
+     *        flag to tell if caught exceptions lead to a stop
+     * @param uncaught
+     *        flag to tell if uncaught exceptions lead to a stop
+     * @param suspendOnSubclasses
+     *        flag to tell if the execution should suspend on subclasses of the
      *        exception aswell
-     * @param enabled flag if the Breakpoint is enabled
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
      */
     public SymbolicExecutionExceptionBreakpoint(Proof proof, String exceptionName, boolean caught,
             boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount) {
@@ -121,8 +128,10 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * Checks if the given node is a parent of the other given node.
      *
-     * @param node The {@link Node} to start search in.
-     * @param parent The {@link Node} that is thought to be the parent.
+     * @param node
+     *        The {@link Node} to start search in.
+     * @param parent
+     *        The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
     public boolean isParentNode(Node node, Node parent) {
@@ -149,11 +158,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
             Node node) {
         Node parent = null;
-        for (Node parents : exceptionNodes) {
-            if (isParentNode(node, parents)) {
-                parent = parents;
-            }
-        }
+        for (Node parents : exceptionNodes) { if (isParentNode(node, parents)) { parent = parents; } }
         if (parent != null && SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)
                 && !exceptionParentNodes.isEmpty()) {
             if (SymbolicExecutionUtil.isTerminationNode(node, ruleApp) && uncaught) {
@@ -180,7 +185,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param isCaught the isCaught to set
+     * @param isCaught
+     *        the isCaught to set
      */
     public void setCaught(boolean isCaught) {
         this.caught = isCaught;
@@ -194,7 +200,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param isUncaught the isUncaught to set
+     * @param isUncaught
+     *        the isUncaught to set
      */
     public void setUncaught(boolean isUncaught) {
         this.uncaught = isUncaught;
@@ -208,7 +215,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param suspendOnSubclasses the suspendOnSubclasses to set
+     * @param suspendOnSubclasses
+     *        the suspendOnSubclasses to set
      */
     public void setSuspendOnSubclasses(boolean suspendOnSubclasses) {
         this.suspendOnSubclasses = suspendOnSubclasses;

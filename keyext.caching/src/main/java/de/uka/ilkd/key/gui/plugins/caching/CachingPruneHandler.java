@@ -37,7 +37,8 @@ public class CachingPruneHandler implements ProofTreeListener {
     /**
      * Create a new handler.
      *
-     * @param mediator the KeY mediator
+     * @param mediator
+     *        the KeY mediator
      */
     public CachingPruneHandler(KeYMediator mediator) {
         this.mediator = mediator;
@@ -50,9 +51,7 @@ public class CachingPruneHandler implements ProofTreeListener {
         for (Proof p : mediator.getCurrentlyOpenedProofs()) {
             for (Goal g : p.closedGoals()) {
                 ClosedBy c = g.node().lookup(ClosedBy.class);
-                if (c == null || c.proof() != proofToBePruned) {
-                    continue;
-                }
+                if (c == null || c.proof() != proofToBePruned) { continue; }
                 var commonAncestor = e.getNode().commonAncestor(c.node());
                 if (commonAncestor == c.node()) {
                     boolean copySteps = CachingSettingsProvider.getCachingSettings().getPrune()
@@ -68,7 +67,8 @@ public class CachingPruneHandler implements ProofTreeListener {
                                 c.nodesToSkip());
                         } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
                             LOGGER.warn("failed to copy referenced proof that" +
-                                "is about to be pruned", ex);
+                                    "is about to be pruned",
+                                ex);
                             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
                         }
                     }

@@ -37,17 +37,14 @@ public class ExtList extends LinkedList<Object> {
     /**
      * collects (non-null) elements of the classtype cl and returns a typed array
      *
-     * @param cl Class the type of the elements that are selected
+     * @param cl
+     *        Class the type of the elements that are selected
      * @return array with type cl
      */
     @SuppressWarnings("unchecked")
     public <T> T[] collect(Class<T> cl) {
         LinkedList<T> colls = new LinkedList<>();
-        for (Object next : this) {
-            if (cl.isInstance(next) && (next != null)) {
-                colls.add((T) next);
-            }
-        }
+        for (Object next : this) { if (cl.isInstance(next) && (next != null)) { colls.add((T) next); } }
 
         return toArray(cl, colls);
 
@@ -56,16 +53,13 @@ public class ExtList extends LinkedList<Object> {
     /**
      * returns first element in list of type cl
      *
-     * @param cl the type to be searched in list
+     * @param cl
+     *        the type to be searched in list
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> cl) {
-        for (Object next : this) {
-            if (cl.isInstance(next) && (next != null)) {
-                return (T) next;
-            }
-        }
+        for (Object next : this) { if (cl.isInstance(next) && (next != null)) { return (T) next; } }
 
         return null;
     }
@@ -74,7 +68,8 @@ public class ExtList extends LinkedList<Object> {
      * returns first element in list of type cl and removes the found element from the list if the
      * elemnt has not been found <tt>null</tt> is returned
      *
-     * @param cl the type to be searched in list
+     * @param cl
+     *        the type to be searched in list
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")

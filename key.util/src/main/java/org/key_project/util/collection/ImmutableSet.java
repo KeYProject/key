@@ -33,15 +33,14 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /**
      * Creates an ImmutableSet from a Set.
      *
-     * @param set a Set.
+     * @param set
+     *        a Set.
      * @return an ImmutableSet containing the same elements as the specified set.
      */
     static <T> ImmutableSet<T> fromSet(Set<T> set) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
 
-        for (T el : set) {
-            result = result.add(el);
-        }
+        for (T el : set) { result = result.add(el); }
 
         return result;
     }
@@ -91,7 +90,8 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /**
      * return true if predicate is fullfilled for at least one element
      *
-     * @param predicate the predicate
+     * @param predicate
+     *        the predicate
      * @return true if predicate is fullfilled for at least one element
      */
     boolean exists(Predicate<T> predicate);
@@ -123,8 +123,10 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /**
      * adds an element, barfs if the element is already present
      *
-     * @param element of type <T> that has to be added to this set
-     * @throws NotUniqueException if the element is already present
+     * @param element
+     *        of type <T> that has to be added to this set
+     * @throws NotUniqueException
+     *         if the element is already present
      */
     ImmutableSet<T> addUnique(T element) throws NotUniqueException;
 
@@ -135,9 +137,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     default ImmutableSet<T> add(Iterable<T> seq) {
         ImmutableSet<T> cur = this;
-        for (T item : seq) {
-            cur = cur.add(item);
-        }
+        for (T item : seq) { cur = cur.add(item); }
         return cur;
     }
 }

@@ -36,20 +36,20 @@ public class TestClassDeclaration extends ResolveGenericClass {
     @Test
     public void testOverriddenMethods() throws Exception {
         String before = "class A<E> { E m(E e) { return null; } }"
-            + "class B extends A<C> { C m(C e) { return e.methodC(); } }";
+                + "class B extends A<C> { C m(C e) { return e.methodC(); } }";
         String after = "class A { java.lang.Object m(java.lang.Object e) { return null; } } "
-            + "class B extends A { "
-            + "//--- This method has been created due to generics removal\n"
-            + "  C m(java.lang.Object arg1) {  return this.m((C)arg1); } "
-            + "  C m(C e) { return e.methodC(); } }";
+                + "class B extends A { "
+                + "//--- This method has been created due to generics removal\n"
+                + "  C m(java.lang.Object arg1) {  return this.m((C)arg1); } "
+                + "  C m(C e) { return e.methodC(); } }";
         equalCU(before, after);
     }
 
     @Test
     public void testOveriddenMethods2() throws Exception {
         String before = "class C1 { }" + "class C2 extends C1 { }"
-            + "interface I1<E extends C1> { void m(E e); }" + "interface I2<E> { void m(E e); }"
-            + "class D implements I1<C2>, I2<C2> { public void m(C2 e) { } }";
+                + "interface I1<E extends C1> { void m(E e); }" + "interface I2<E> { void m(E e); }"
+                + "class D implements I1<C2>, I2<C2> { public void m(C2 e) { } }";
 
         String after =
             """
@@ -65,11 +65,11 @@ public class TestClassDeclaration extends ResolveGenericClass {
     @Test
     public void testComparable() throws Exception {
         String before = "class ReverseComparator<T> implements Comparator<Comparable<Object>> {"
-            + "   public int compare(Comparable<Object> c1, Comparable<Object> c2) { return c2.compareTo(c1); } }";
+                + "   public int compare(Comparable<Object> c1, Comparable<Object> c2) { return c2.compareTo(c1); } }";
         String after = "class ReverseComparator implements Comparator { "
-            + "//--- This method has been created due to generics removal\n"
-            + "   public int compare(java.lang.Object arg1, java.lang.Object arg2) { return this.compare((java.lang.Comparable)arg1, (java.lang.Comparable)arg2); }"
-            + "   public int compare(Comparable c1, Comparable c2) { return c2.compareTo(c1); } }";
+                + "//--- This method has been created due to generics removal\n"
+                + "   public int compare(java.lang.Object arg1, java.lang.Object arg2) { return this.compare((java.lang.Comparable)arg1, (java.lang.Comparable)arg2); }"
+                + "   public int compare(Comparable c1, Comparable c2) { return c2.compareTo(c1); } }";
         equalCU(before, after);
     }
 

@@ -59,9 +59,7 @@ public class KeYCollections {
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
             final U value = m1.get(e.getValue());
-            if (value != null) {
-                res.put(e.getKey(), value);
-            }
+            if (value != null) { res.put(e.getKey(), value); }
         }
         return res;
     }
@@ -73,8 +71,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null collection
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null collection
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -88,8 +88,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null array of objects
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null array of objects
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -104,7 +106,8 @@ public class KeYCollections {
      * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
      * are removed.
      *
-     * @param string an arbitrary string
+     * @param string
+     *        an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
      * @author mattias ulbrich
      */
@@ -112,9 +115,7 @@ public class KeYCollections {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-                res.append(c);
-            }
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) { res.append(c); }
         }
         return res.toString();
     }

@@ -24,9 +24,12 @@ public abstract class SpecificationEntity {
         /**
          * Creates a new specification element for a field.
          *
-         * @param n name of the field
-         * @param p package name of the class where the field is declared
-         * @param c name of the class where the field is declared
+         * @param n
+         *        name of the field
+         * @param p
+         *        package name of the class where the field is declared
+         * @param c
+         *        name of the class where the field is declared
          */
         Field(String n, String p, String c, Type t) {
             super(p, c, t);
@@ -62,10 +65,14 @@ public abstract class SpecificationEntity {
         /**
          * Creates a new specification element for a method parameter.
          *
-         * @param pos the index within the sequence of parameters
-         * @param m name of the method with parameter types in parentheses
-         * @param p package name of the class where the method is declared
-         * @param c name of the class where the method is declared
+         * @param pos
+         *        the index within the sequence of parameters
+         * @param m
+         *        name of the method with parameter types in parentheses
+         * @param p
+         *        package name of the class where the method is declared
+         * @param c
+         *        name of the class where the method is declared
          */
         Parameter(int pos, String m, String p, String c, Type t) {
             super(p, c, t);
@@ -78,11 +85,16 @@ public abstract class SpecificationEntity {
         /**
          * Creates a new specification element for a method parameter.
          *
-         * @param pos the index within the sequence of parameters
-         * @param m name of the method
-         * @param pt names of the parameter types of the method
-         * @param p package name of the class where the method is declared
-         * @param c name of the class where the method is declared
+         * @param pos
+         *        the index within the sequence of parameters
+         * @param m
+         *        name of the method
+         * @param pt
+         *        names of the parameter types of the method
+         * @param p
+         *        package name of the class where the method is declared
+         * @param c
+         *        name of the class where the method is declared
          */
         Parameter(int pos, String m, String[] pt, String p, String c, Type t) {
             super(p, c, t);
@@ -111,15 +123,11 @@ public abstract class SpecificationEntity {
         @Override
         public String qualifiedName() {
             final StringBuilder sb = new StringBuilder();
-            if (!"".equals(inPackage)) {
-                sb.append(inPackage).append(".");
-            }
+            if (!"".equals(inPackage)) { sb.append(inPackage).append("."); }
             sb.append(inClass).append("#").append(methodName).append("(");
             int i = 1;
             for (final String p : paramTypes) {
-                if (i++ == position) {
-                    sb.append(position).append(":");
-                }
+                if (i++ == position) { sb.append(position).append(":"); }
                 sb.append(p);
                 sb.append(',');
             }
@@ -137,10 +145,14 @@ public abstract class SpecificationEntity {
         /**
          * Creates a new specification element for a method return.
          *
-         * @param m name of the method with parameter types in parentheses
-         * @param p package name of the class where the method is declared
-         * @param c name of the class where the method is declared
-         * @param t a type
+         * @param m
+         *        name of the method with parameter types in parentheses
+         * @param p
+         *        package name of the class where the method is declared
+         * @param c
+         *        name of the class where the method is declared
+         * @param t
+         *        a type
          */
         ReturnValue(String m, String p, String c, Type t) {
             super(p, c, t);
@@ -152,10 +164,14 @@ public abstract class SpecificationEntity {
         /**
          * Creates a new specification element for a method return.
          *
-         * @param m name of the method
-         * @param pt names of the parameter types of the method
-         * @param p package name of the class where the method is declared
-         * @param c name of the class where the method is declared
+         * @param m
+         *        name of the method
+         * @param pt
+         *        names of the parameter types of the method
+         * @param p
+         *        package name of the class where the method is declared
+         * @param c
+         *        name of the class where the method is declared
          */
         ReturnValue(String m, String[] pt, String p, String c, Type t) {
             super(p, c, t);
@@ -182,14 +198,9 @@ public abstract class SpecificationEntity {
         @Override
         public String qualifiedName() {
             final StringBuilder sb = new StringBuilder();
-            if (!"".equals(inPackage)) {
-                sb.append(inPackage).append(".");
-            }
+            if (!"".equals(inPackage)) { sb.append(inPackage).append("."); }
             sb.append(inClass).append("#").append(methodName).append("(");
-            for (final String p : paramTypes) {
-                sb.append(p);
-                sb.append(',');
-            }
+            for (final String p : paramTypes) { sb.append(p); sb.append(','); }
             sb.deleteCharAt(sb.length() - 1);
             sb.append(')');
             return sb.toString();

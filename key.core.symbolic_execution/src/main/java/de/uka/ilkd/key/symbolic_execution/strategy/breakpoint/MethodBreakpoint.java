@@ -51,20 +51,33 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * Creates a new {@link LineBreakpoint}.
      *
-     * @param classPath the path of the class the associated Breakpoint lies within
-     * @param lineNumber the line where the associated Breakpoint is located in the class
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
+     * @param classPath
+     *        the path of the class the associated Breakpoint lies within
+     * @param lineNumber
+     *        the line where the associated Breakpoint is located in the class
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param pm
+     *        the {@link IProgramMethod} representing the Method which the Breakpoint is located
      *        at
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param condition the condition as given by the user
-     * @param enabled flag if the Breakpoint is enabled
-     * @param conditionEnabled flag if the condition is enabled
-     * @param methodStart the line the containing method of this breakpoint starts at
-     * @param methodEnd the line the containing method of this breakpoint ends at
-     * @param isEntry flag to tell whether to stop on method entry
-     * @param isExit flag to tell whether to stop on method exit
-     * @throws SLTranslationException if the condition could not be parsed to a valid Term
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param condition
+     *        the condition as given by the user
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param conditionEnabled
+     *        flag if the condition is enabled
+     * @param methodStart
+     *        the line the containing method of this breakpoint starts at
+     * @param methodEnd
+     *        the line the containing method of this breakpoint ends at
+     * @param isEntry
+     *        flag to tell whether to stop on method entry
+     * @param isExit
+     *        flag to tell whether to stop on method exit
+     * @throws SLTranslationException
+     *         if the condition could not be parsed to a valid Term
      */
     public MethodBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
             Proof proof, String condition, boolean enabled, boolean conditionEnabled,
@@ -91,8 +104,10 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param node to check
-     * @param ruleApp the applied rule app
+     * @param node
+     *        to check
+     * @param ruleApp
+     *        the applied rule app
      * @return true if the node represents a method call
      */
     private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
@@ -114,8 +129,10 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param node to check
-     * @param ruleApp the applied rule app
+     * @param node
+     *        to check
+     * @param ruleApp
+     *        the applied rule app
      * @return true if the node represents a method return
      */
     private boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
@@ -208,7 +225,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param classPath the classPath to set
+     * @param classPath
+     *        the classPath to set
      */
     public void setClassPath(String classPath) {
         this.classPath = classPath;

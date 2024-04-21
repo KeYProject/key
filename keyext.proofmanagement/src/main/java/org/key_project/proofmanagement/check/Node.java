@@ -9,7 +9,8 @@ import java.util.TreeSet;
 /**
  * Represents a vertex/node of a tree.
  *
- * @param <T> the type of the content contained by the node
+ * @param <T>
+ *        the type of the content contained by the node
  * @author Wolfram Pfeifer
  */
 public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
@@ -25,8 +26,10 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
     /**
      * Create a new Node with given parent and content.
      *
-     * @param parent the parent node
-     * @param element the content to store inside this node
+     * @param parent
+     *        the parent node
+     * @param element
+     *        the content to store inside this node
      */
     public Node(Node<T> parent, T element) {
         this.parent = parent;
@@ -48,7 +51,8 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
     /**
      * Adds a node to the set of children.
      *
-     * @param child the node to add as a child
+     * @param child
+     *        the node to add as a child
      */
     public void addChild(Node<T> child) {
         children.add(child);

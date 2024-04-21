@@ -62,7 +62,8 @@ public class GenericRemover extends AbstractGenericRemover {
      *
      * For some reason {@link PackageReference#toSource()} does not work here.
      *
-     * @param packageReference reference to make string of, not null
+     * @param packageReference
+     *        reference to make string of, not null
      * @return a string, possibly with dots.
      */
     private String toString(PackageReference packageReference) {

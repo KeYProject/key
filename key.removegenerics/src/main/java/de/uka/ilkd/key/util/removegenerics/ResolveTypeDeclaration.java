@@ -77,9 +77,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
             List<Type> ungenericSignature = getUngenericSignature(signature);
 
             // ignore static methods
-            if (method.isStatic()) {
-                continue;
-            }
+            if (method.isStatic()) { continue; }
 
             debugOut("---");
             debugOut("Method", method);
@@ -117,9 +115,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         // has always been there
         for (Method m : getSourceInfo().getAllMethods(declaration)) {
             List<Type> mdSig = m.getSignature();
-            if (m.getName().equals(name) && signature.equals(mdSig)) {
-                return true;
-            }
+            if (m.getName().equals(name) && signature.equals(mdSig)) { return true; }
         }
 
         //
@@ -127,9 +123,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         int i = 0;
         for (MethodDeclaration md : methodsToAdd) {
             List<Type> mdSig = signaturesToAdd.get(i++);
-            if (md.getName().equals(name) && signature.equals(mdSig)) {
-                return true;
-            }
+            if (md.getName().equals(name) && signature.equals(mdSig)) { return true; }
         }
 
         return false;
@@ -156,7 +150,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * The method in class B does not override the one in A. Instead, a method
      *
      * <pre>
-     * void m(Object arg1, Object arg2) { m((Object) arg1, (Integer) arg2); }
+     * void m(Object arg1, Object arg2) {
+     *     m((Object) arg1, (Integer) arg2);
+     * }
      * </pre>
      *
      * has to be introduced.
@@ -165,9 +161,12 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      *
      * TODO What if a method is static in a subclass
      *
-     * @param origMethod some onformation (visibility, return type, ...) is taken from here
-     * @param localSign this is the signature of the method after removal of TV
-     * @param superSig this is the target signature of the supertype.
+     * @param origMethod
+     *        some onformation (visibility, return type, ...) is taken from here
+     * @param localSign
+     *        this is the signature of the method after removal of TV
+     * @param superSig
+     *        this is the target signature of the supertype.
      */
     private void addMethod(Method origMethod, List<Type> localSign, List<Type> superSig) {
         ProgramFactory programFactory = getProgramFactory();
@@ -258,25 +257,15 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     private ASTList<DeclarationSpecifier> getDeclarationSpecifiers(Method origMethod) {
         ASTList<DeclarationSpecifier> ret = new ASTArrayList<>();
         ProgramFactory programFactory = getProgramFactory();
-        if (origMethod.isFinal()) {
-            ret.add(programFactory.createFinal());
-        }
+        if (origMethod.isFinal()) { ret.add(programFactory.createFinal()); }
 
-        if (origMethod.isPrivate()) {
-            ret.add(programFactory.createPrivate());
-        }
+        if (origMethod.isPrivate()) { ret.add(programFactory.createPrivate()); }
 
-        if (origMethod.isProtected()) {
-            ret.add(programFactory.createProtected());
-        }
+        if (origMethod.isProtected()) { ret.add(programFactory.createProtected()); }
 
-        if (origMethod.isPublic()) {
-            ret.add(programFactory.createPublic());
-        }
+        if (origMethod.isPublic()) { ret.add(programFactory.createPublic()); }
 
-        if (origMethod.isFinal()) {
-            ret.add(programFactory.createFinal());
-        }
+        if (origMethod.isFinal()) { ret.add(programFactory.createFinal()); }
 
         return ret;
     }
@@ -284,20 +273,17 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     /**
      * given a list of classtypes create throws clause out of them
      *
-     * @param exceptions a list of exception
+     * @param exceptions
+     *        a list of exception
      * @return a newly created throws-clause, or null if either null exceptions or empty list
      */
     private Throws createThrows(List<ClassType> exceptions) {
 
-        if (exceptions == null || exceptions.isEmpty()) {
-            return null;
-        }
+        if (exceptions == null || exceptions.isEmpty()) { return null; }
 
         ASTList<TypeReference> tr = new ASTArrayList<>(exceptions.size());
 
-        for (ClassType exc : exceptions) {
-            tr.add(TypeKit.createTypeReference(getProgramFactory(), exc));
-        }
+        for (ClassType exc : exceptions) { tr.add(TypeKit.createTypeReference(getProgramFactory(), exc)); }
 
         return getProgramFactory().createThrows(tr);
     }
@@ -306,9 +292,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         List<Type> newSignature = new ArrayList<>(signature.size());
 
-        for (Type type : signature) {
-            newSignature.add(targetType(type));
-        }
+        for (Type type : signature) { newSignature.add(targetType(type)); }
 
         return newSignature;
     }
@@ -343,9 +327,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
             ((InterfaceDeclaration) declaration).setTypeParameters(null);
         }
 
-        for (MethodDeclaration methodDecl : methodsToAdd) {
-            attach(methodDecl, declaration, 0);
-        }
+        for (MethodDeclaration methodDecl : methodsToAdd) { attach(methodDecl, declaration, 0); }
 
     }
 

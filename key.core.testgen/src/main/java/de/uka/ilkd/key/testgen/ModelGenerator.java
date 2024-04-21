@@ -124,7 +124,8 @@ public class ModelGenerator implements SolverLauncherListener {
      * we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ... are integer constants we change the
      * term t to the following form: t & !(c1=v1 & c2 = v2 & ...)
      *
-     * @param m the model
+     * @param m
+     *        the model
      * @return true if the term has been changed
      */
     private boolean addModelToTerm(Model m) {
@@ -159,15 +160,12 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private void finish() {
         LOGGER.info("Finished: found {}", models.size());
-        for (Model m : models) {
-            LOGGER.info("\t{}", m.toString());
-        }
+        for (Model m : models) { LOGGER.info("\t{}", m.toString()); }
     }
 
     @Override
     public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
-            SolverLauncher launcher) {
-    }
+            SolverLauncher launcher) {}
 
     public Term sequentToTerm(Sequent s) {
 
@@ -175,15 +173,11 @@ public class ModelGenerator implements SolverLauncherListener {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
-        }
+        for (SequentFormula f : s.antecedent()) { ante = ante.append(f.formula()); }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
-        }
+        for (SequentFormula f : s.succedent()) { succ = succ.append(f.formula()); }
 
         return tb.imp(tb.and(ante), tb.or(succ));
 

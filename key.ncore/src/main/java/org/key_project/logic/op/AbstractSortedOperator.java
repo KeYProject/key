@@ -24,9 +24,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, modifier);
-        if (sort == null) {
-            throw new NullPointerException("Given sort is null");
-        }
+        if (sort == null) { throw new NullPointerException("Given sort is null"); }
         this.argSorts = argSorts == null ? getEmptySortList() : argSorts;
         this.sort = sort;
     }

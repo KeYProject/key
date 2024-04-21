@@ -52,9 +52,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** creates new map with mapping entry */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry) {
-        if (entry == null) {
-            throw new RuntimeException("'null' is not allowed as entry");
-        }
+        if (entry == null) { throw new RuntimeException("'null' is not allowed as entry"); }
         this.entry = entry;
         this.parent = DefaultImmutableMap.nilMap();
         this.size = 1;
@@ -62,9 +60,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** creates new map with mapping entry and parent map */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry, DefaultImmutableMap<S, T> parent) {
-        if (entry == null) {
-            throw new IllegalArgumentException("'null' is not allowed as entry");
-        }
+        if (entry == null) { throw new IllegalArgumentException("'null' is not allowed as entry"); }
         this.entry = entry;
         this.parent = parent;
         this.size = parent.size + 1;
@@ -76,8 +72,10 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      * entry has
      * to be removed {@code null} is not allowed for key or value.
      *
-     * @param key a S to be used as key
-     * @param value a T to be stored as value
+     * @param key
+     *        a S to be used as key
+     * @param value
+     *        a T to be stored as value
      * @return a ImmutableMap including the {@code <key, value>}-pair and all other pairs of the
      *         current map
      *         with keys different from the given key
@@ -95,9 +93,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             final ImmutableMapEntry<S, T> e = queue.entry;
 
             final S entryKey = e.key();
-            if (entryKey == key || entryKey.equals(key)) {
-                return e.value();
-            }
+            if (entryKey == key || entryKey.equals(key)) { return e.value(); }
 
             queue = queue.parent;
         }
@@ -120,9 +116,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
             final S entryKey = e.key();
-            if (entryKey == key || entryKey.equals(key)) {
-                return true;
-            }
+            if (entryKey == key || entryKey.equals(key)) { return true; }
 
             queue = queue.parent;
         }
@@ -135,9 +129,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
             final T entryVal = e.value();
-            if (entryVal == value || entryVal.equals(value)) {
-                return true;
-            }
+            if (entryVal == value || entryVal.equals(value)) { return true; }
             queue = queue.parent;
 
         }
@@ -147,9 +139,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     private DefaultImmutableMap<S, T> createMap(ImmutableMapEntry<S, T>[] stack, int counter,
             DefaultImmutableMap<S, T> p_parent) {
         DefaultImmutableMap<S, T> result = p_parent;
-        for (int i = 0; i < counter; i++) {
-            result = new DefaultImmutableMap<>(stack[i], result);
-        }
+        for (int i = 0; i < counter; i++) { result = new DefaultImmutableMap<>(stack[i], result); }
         return result;
     }
 
@@ -168,9 +158,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
             final S entryKey = e.key();
 
-            if (entryKey == key || entryKey.equals(key)) {
-                return createMap(stack, counter, queue.parent);
-            }
+            if (entryKey == key || entryKey.equals(key)) { return createMap(stack, counter, queue.parent); }
 
 
             stack[counter] = e;
@@ -231,38 +219,26 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
-        if (!(o instanceof ImmutableMap)) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
+        if (!(o instanceof ImmutableMap)) { return false; }
+        if (o == this) { return true; }
 
         ImmutableMap<S, T> o1 = null;
         try {
             o1 = (ImmutableMap<S, T>) o;
-            if (o1.size() != size()) {
-                return false;
-            }
+            if (o1.size() != size()) { return false; }
         } catch (ClassCastException cce) {
             return false;
         }
 
 
-        for (ImmutableMapEntry<S, T> e : this) {
-            if (!e.value().equals(o1.get(e.key()))) {
-                return false;
-            }
-        }
+        for (ImmutableMapEntry<S, T> e : this) { if (!e.value().equals(o1.get(e.key()))) { return false; } }
 
         return true;
     }
 
     public int hashCode() {
         int hashCode = 1;
-        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
-            hashCode += 7 * stImmutableMapEntry.hashCode();
-        }
+        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) { hashCode += 7 * stImmutableMapEntry.hashCode(); }
         return hashCode;
     }
 
@@ -277,8 +253,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
          */
         private static final long serialVersionUID = 412820308341055305L;
 
-        private NILMap() {
-        }
+        private NILMap() {}
 
         public ImmutableMap<S, T> put(S key, T value) {
             return new DefaultImmutableMap<>(new MapEntry<>(key, value));
@@ -335,137 +310,132 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     /**
      * inner class for the entries
      *
-     * @param key   the key
-     * @param value the value
+     * @param key
+     *        the key
+     * @param value
+     *        the value
      */
-        private record MapEntry<S,T>(
-    S key, T value)implements ImmutableMapEntry<S,T>
-    {
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6785625761293313622L;
+    private record MapEntry<S, T>(
+            S key, T value) implements ImmutableMapEntry<S, T> {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -6785625761293313622L;
 
-    /**
-     * creates a new map entry that contains key and value
-     */
-    private MapEntry
-    {
-    }
+        /**
+         * creates a new map entry that contains key and value
+         */
+        private MapEntry {}
 
-    /**
-     * @return the key stored in this entry
-     */
-    @Override
-    public S key() {
-        return key;
-    }
-
-    /**
-     * @return the value stored in this entry
-     */
-    @Override
-    public T value() {
-        return value;
-    }
-
-    /**
-     * @return true iff both objects have equal pairs of key and value
-     */
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
+        /**
+         * @return the key stored in this entry
+         */
+        @Override
+        public S key() {
+            return key;
         }
-        if (!(obj instanceof ImmutableMapEntry)) {
-            return false;
+
+        /**
+         * @return the value stored in this entry
+         */
+        @Override
+        public T value() {
+            return value;
         }
-        @SuppressWarnings("unchecked")
-        final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
-        final S cmpKey = cmp.key();
-        final T cmpVal = cmp.value();
-        return (key == cmpKey && value == cmpVal)
-                || (key.equals(cmpKey) && value.equals(cmpVal));
+
+        /**
+         * @return true iff both objects have equal pairs of key and value
+         */
+        public boolean equals(Object obj) {
+            if (obj == this) { return true; }
+            if (!(obj instanceof ImmutableMapEntry)) { return false; }
+            @SuppressWarnings("unchecked")
+            final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
+            final S cmpKey = cmp.key();
+            final T cmpVal = cmp.value();
+            return (key == cmpKey && value == cmpVal)
+                    || (key.equals(cmpKey) && value.equals(cmpVal));
+        }
+
+        public String toString() {
+            return key + "->" + value;
+        }
     }
 
-    public String toString() {
-        return key + "->" + value;
-    }
-}
 
+    /** iterator for the values */
+    private static abstract class MapIterator<S, T> {
+        // stores the entry iterator
+        private DefaultImmutableMap<S, T> map;
 
-/** iterator for the values */
-private static abstract class MapIterator<S, T> {
-    // stores the entry iterator
-    private DefaultImmutableMap<S, T> map;
+        // creates the iterator
+        MapIterator(DefaultImmutableMap<S, T> map) {
+            this.map = map;
+        }
 
-    // creates the iterator
-    MapIterator(DefaultImmutableMap<S, T> map) {
-        this.map = map;
-    }
+        /** @return true iff there are more elements */
+        public boolean hasNext() {
+            return !map.isEmpty();
+        }
 
-    /** @return true iff there are more elements */
-    public boolean hasNext() {
-        return !map.isEmpty();
-    }
+        /** @return next value in list */
+        protected final ImmutableMapEntry<S, T> nextEntry() {
+            final ImmutableMapEntry<S, T> entry = map.entry;
+            map = map.parent;
+            return entry;
+        }
 
-    /** @return next value in list */
-    protected final ImmutableMapEntry<S, T> nextEntry() {
-        final ImmutableMapEntry<S, T> entry = map.entry;
-        map = map.parent;
-        return entry;
-    }
-
-    /**
-     * throws an unsupported operation exception as removing elements is not allowed on
-     * immutable maps
-     */
-    public void remove() {
-        throw new UnsupportedOperationException(
-            "Removing elements via an iterator" + " is not supported for immutable maps.");
-    }
-}
-
-
-/** iterator for the values */
-private static final class MapEntryIterator<S, T> extends MapIterator<S, T>
-        implements Iterator<ImmutableMapEntry<S, T>> {
-
-    MapEntryIterator(DefaultImmutableMap<S, T> map) {
-        super(map);
+        /**
+         * throws an unsupported operation exception as removing elements is not allowed on
+         * immutable maps
+         */
+        public void remove() {
+            throw new UnsupportedOperationException(
+                "Removing elements via an iterator" + " is not supported for immutable maps.");
+        }
     }
 
-    /** @return next value in list */
-    public ImmutableMapEntry<S, T> next() {
-        return nextEntry();
-    }
-}
 
+    /** iterator for the values */
+    private static final class MapEntryIterator<S, T> extends MapIterator<S, T>
+            implements Iterator<ImmutableMapEntry<S, T>> {
 
-private static final class MapValueIterator<S, T> extends MapIterator<S, T>
-        implements Iterator<T> {
+        MapEntryIterator(DefaultImmutableMap<S, T> map) {
+            super(map);
+        }
 
-    MapValueIterator(DefaultImmutableMap<S, T> map) {
-        super(map);
-    }
-
-    /** @return next value in list */
-    public T next() {
-        return nextEntry().value();
-    }
-}
-
-
-private static final class MapKeyIterator<S, T> extends MapIterator<S, T>
-        implements Iterator<S> {
-
-    MapKeyIterator(DefaultImmutableMap<S, T> map) {
-        super(map);
+        /** @return next value in list */
+        public ImmutableMapEntry<S, T> next() {
+            return nextEntry();
+        }
     }
 
-    /** @return next value in list */
-    public S next() {
-        return nextEntry().key();
+
+    private static final class MapValueIterator<S, T> extends MapIterator<S, T>
+            implements Iterator<T> {
+
+        MapValueIterator(DefaultImmutableMap<S, T> map) {
+            super(map);
+        }
+
+        /** @return next value in list */
+        public T next() {
+            return nextEntry().value();
+        }
     }
-}
+
+
+    private static final class MapKeyIterator<S, T> extends MapIterator<S, T>
+            implements Iterator<S> {
+
+        MapKeyIterator(DefaultImmutableMap<S, T> map) {
+            super(map);
+        }
+
+        /** @return next value in list */
+        public S next() {
+            return nextEntry().key();
+        }
+    }
 
 }

@@ -35,7 +35,8 @@ public class Main {
     /**
      * The program entry point.
      *
-     * @param args The start parameters.
+     * @param args
+     *        The start parameters.
      */
     public static void main(String[] args) {
         File location = args.length == 1 ? new File(args[0]) : new File("example");
@@ -52,10 +53,12 @@ public class Main {
     /**
      * sets up the environment with the Java project described by its location
      *
-     * @param location the File with the path to the source directory of the Java project
+     * @param location
+     *        the File with the path to the source directory of the Java project
      *        to be verified
      * @return the {@KeYEnvironment} that provides the context for all following verification tasks
-     * @throws ProblemLoaderException if the setup fails
+     * @throws ProblemLoaderException
+     *         if the setup fails
      */
     private static KeYEnvironment<?> setupEnvironment(File location) throws ProblemLoaderException {
         List<File> classPaths = null; // Optionally: Additional specifications for API classes
@@ -83,15 +86,14 @@ public class Main {
     /**
      * proves every specification for which KeY knows how to generate a contract
      *
-     * @param env the {@link KeYEnvironment} to beverified
+     * @param env
+     *        the {@link KeYEnvironment} to beverified
      */
     private static void proveEnvironmemt(KeYEnvironment<?> env) {
         try {
             final List<Contract> proofContracts = getContracts(env);
 
-            for (Contract contract : proofContracts) {
-                proveContract(env, contract);
-            }
+            for (Contract contract : proofContracts) { proveContract(env, contract); }
         } finally {
             env.dispose(); // Ensure always that all instances of KeYEnvironment are disposed
         }
@@ -100,7 +102,8 @@ public class Main {
     /**
      * Collect all contracts (proof obligations) for the given environment
      *
-     * @param env the {@link KeYEnvironment} to look for contracts
+     * @param env
+     *        the {@link KeYEnvironment} to look for contracts
      * @return list of {@link Contract}s to be proven
      */
     private static List<Contract> getContracts(KeYEnvironment<?> env) {
@@ -115,9 +118,7 @@ public class Main {
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
                         env.getSpecificationRepository().getContracts(type, target);
-                    for (Contract contract : contracts) {
-                        proofContracts.add(contract);
-                    }
+                    for (Contract contract : contracts) { proofContracts.add(contract); }
                 }
             }
         }
@@ -127,8 +128,10 @@ public class Main {
     /**
      * tries to prove the given contract in the specified environment
      *
-     * @param env the {@link KeYEnvironment} in which to prove the contract
-     * @param contract the {@link Contract} to be proven
+     * @param env
+     *        the {@link KeYEnvironment} in which to prove the contract
+     * @param contract
+     *        the {@link Contract} to be proven
      */
     private static void proveContract(KeYEnvironment<?> env, Contract contract) {
         Proof proof = null;
@@ -163,8 +166,8 @@ public class Main {
             // Show proof result
             boolean closed = proof.openGoals().isEmpty();
             LOGGER.info("Contract '" + contract.getDisplayName() + "' of "
-                + contract.getTarget() + " is " + (closed ? "verified" : "still open")
-                + ".");
+                    + contract.getTarget() + " is " + (closed ? "verified" : "still open")
+                    + ".");
         } catch (ProofInputException e) {
             LOGGER.error("Exception at {} of {}", contract.getDisplayName(),
                 contract.getTarget());

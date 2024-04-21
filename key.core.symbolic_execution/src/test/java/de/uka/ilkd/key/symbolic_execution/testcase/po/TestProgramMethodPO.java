@@ -136,9 +136,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
             // Restore original options
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 }

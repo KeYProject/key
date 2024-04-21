@@ -85,9 +85,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
         // we have to transform if there are explicit type arguments.
         if (reference instanceof MethodReference methRef) {
             ASTList<TypeArgumentDeclaration> typeArguments = methRef.getTypeArguments();
-            if (typeArguments != null && typeArguments.size() > 0) {
-                setProblemReport(EQUIVALENCE);
-            }
+            if (typeArguments != null && typeArguments.size() > 0) { setProblemReport(EQUIVALENCE); }
         }
 
         SourceInfo sourceInfo = getSourceInfo();
@@ -98,9 +96,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
         // kernelType = formalType with [][]...[] stripped
         Type kernelType = declarationType;
-        while (kernelType instanceof ArrayType) {
-            kernelType = ((ArrayType) kernelType).getBaseType();
-        }
+        while (kernelType instanceof ArrayType) { kernelType = ((ArrayType) kernelType).getBaseType(); }
 
         NonTerminalProgramElement parent = reference.getASTParent();
         boolean isTypeParameter = kernelType instanceof TypeParameter;
@@ -159,9 +155,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      */
     private static boolean isLHS(Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
-        if (parent instanceof Assignment ass) {
-            return ass.getExpressionAt(0) == reference;
-        } // else if
+        if (parent instanceof Assignment ass) { return ass.getExpressionAt(0) == reference; } // else if
 
         return false;
     }
@@ -241,9 +235,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             Method meth = getSourceInfo().getMethod(methRef);
             int index = -1;
             ASTList<Expression> args = methRef.getArguments();
-            if (args != null) {
-                index = args.indexOf(reference);
-            }
+            if (args != null) { index = args.indexOf(reference); }
             if (index == -1) {
                 // not an argument --> must be prefix
                 Type classType = meth.getContainingClassType();
@@ -274,9 +266,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             VariableDeclaration decl = (VariableDeclaration) parent.getASTParent();
             Type varType = targetType(getSourceInfo().getType(decl.getTypeReference()));
             int dimensions = varSpec.getDimensions();
-            if (dimensions > 0) {
-                varType = getNameInfo().createArrayType(varType, dimensions);
-            }
+            if (dimensions > 0) { varType = getNameInfo().createArrayType(varType, dimensions); }
 
             return varType;
         }
@@ -290,9 +280,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     }
 
     private static MethodDeclaration getEnclosingMethod(NonTerminalProgramElement pe) {
-        while (!(pe instanceof MethodDeclaration)) {
-            pe = pe.getASTParent();
-        }
+        while (!(pe instanceof MethodDeclaration)) { pe = pe.getASTParent(); }
         return (MethodDeclaration) pe;
     }
 
@@ -300,9 +288,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     public void transform() {
 
         // remove explicit type arguments - if there are any
-        if (reference instanceof MethodReference methRef) {
-            methRef.setTypeArguments(null);
-        }
+        if (reference instanceof MethodReference methRef) { methRef.setTypeArguments(null); }
 
         if (typeToReference != null) {
             ProgramFactory programFactory = getServiceConfiguration().getProgramFactory();
@@ -310,9 +296,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
                 programFactory.createTypeCast((Expression) reference.deepClone(), typeToReference);
             ParenthesizedExpression replaceWith =
                 programFactory.createParenthesizedExpression(cast);
-            if (replaceWith != null) {
-                replace(reference, replaceWith);
-            }
+            if (replaceWith != null) { replace(reference, replaceWith); }
         }
     }
 

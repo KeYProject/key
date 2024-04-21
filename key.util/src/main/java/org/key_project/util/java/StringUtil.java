@@ -67,13 +67,13 @@ public final class StringUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private StringUtil() {
-    }
+    private StringUtil() {}
 
     /**
      * Checks if the {@link String} is empty.
      *
-     * @param text The text to check.
+     * @param text
+     *        The text to check.
      * @return {@code true} = text is {@code null} or empty, {@code false} = text is not empty.
      */
     public static boolean isEmpty(String text) {
@@ -83,7 +83,8 @@ public final class StringUtil {
     /**
      * Checks if the trimmed {@link String} is empty.
      *
-     * @param text The text to check.
+     * @param text
+     *        The text to check.
      * @return {@code true} = text is {@code null} or trimmed empty, {@code false} = text is not
      *         empty.
      */
@@ -94,7 +95,8 @@ public final class StringUtil {
     /**
      * Nullpointer save execution of {@link String#trim()}
      *
-     * @param text The text.
+     * @param text
+     *        The text.
      * @return The trimmed text.
      */
     public static String trim(String text) {
@@ -104,7 +106,8 @@ public final class StringUtil {
     /**
      * Nullpointer save execution of {@link String#toLowerCase()}.
      *
-     * @param text The text to convert.
+     * @param text
+     *        The text to convert.
      * @return The text in lower case or {@code null} if the given text is {@code null}.
      */
     public static String toLowerCase(String text) {
@@ -133,8 +136,10 @@ public final class StringUtil {
     /**
      * Creates a line which consists of the given text.
      *
-     * @param text The text to repeat.
-     * @param repetitions The number of repetitions.
+     * @param text
+     *        The text to repeat.
+     * @param repetitions
+     *        The number of repetitions.
      * @return The created line.
      */
     public static String repeat(String text, int repetitions) {
@@ -149,8 +154,10 @@ public final class StringUtil {
      * <b>Attention:</b> The empty string is contained in every string.
      * </p>
      *
-     * @param string The string that should contain the substring.
-     * @param substring The substring to check.
+     * @param string
+     *        The string that should contain the substring.
+     * @param substring
+     *        The substring to check.
      * @return {@code true} strings are not {@code null} and the string contains the substring,
      *         {@code false} if at least one string is {@code null} or the string does not contain
      *         the substring.
@@ -164,8 +171,10 @@ public final class StringUtil {
      * {@code length} characters long. If there are no spaces within {@code length} characters, then
      * the long strings will not be broken and lines may be longer.
      *
-     * @param string the string to break. May contain spaces and newline characters
-     * @param length a positive number
+     * @param string
+     *        the string to break. May contain spaces and newline characters
+     * @param length
+     *        a positive number
      * @return a string of the same length as the input in which some ' ' have been replaced by '\n'
      *
      * @author Mattias Ulbrich (under GPL)
@@ -181,7 +190,8 @@ public final class StringUtil {
      * 100 characters long. If there are no spaces within 100 characters, then the long strings will
      * not be broken and lines may be longer.
      *
-     * @param string the string to break. May contain spaces and newline characters
+     * @param string
+     *        the string to break. May contain spaces and newline characters
      * @return a string of the same length as the input in which some ' ' have been replaced by '\n'
      *
      * @author Mattias Ulbrich (under GPL)
@@ -194,7 +204,8 @@ public final class StringUtil {
      * Converts the optional multi lined {@link String} in a single lined {@link String} by
      * replacing all line breaks and tabs with a space.
      *
-     * @param text The text to convert.
+     * @param text
+     *        The text to convert.
      * @return The single lined text.
      */
     public static String toSingleLinedString(String text) {
@@ -204,9 +215,12 @@ public final class StringUtil {
     /**
      * Replaces all occurrences of a search sign with the replacement sign.
      *
-     * @param text The text to search and replace in.
-     * @param toSearch The signs to search.
-     * @param toReplace The sign to replace with.
+     * @param text
+     *        The text to search and replace in.
+     * @param toSearch
+     *        The signs to search.
+     * @param toReplace
+     *        The sign to replace with.
      * @return The new created {@link String}.
      */
     public static String replaceAll(String text, char[] toSearch, char toReplace) {
@@ -217,9 +231,7 @@ public final class StringUtil {
             char[] signs = text.toCharArray();
             for (int i = 0; i < signs.length; i++) {
                 int index = Arrays.binarySearch(toSearch, signs[i]);
-                if (index >= 0) {
-                    signs[i] = toReplace;
-                }
+                if (index >= 0) { signs[i] = toReplace; }
             }
             return new String(signs);
         } else {
@@ -230,8 +242,10 @@ public final class StringUtil {
     /**
      * Checks the equality of the given {@link String}s ignoring whitespace.
      *
-     * @param first The first {@link String}.
-     * @param second The second {@link String}.
+     * @param first
+     *        The first {@link String}.
+     * @param second
+     *        The second {@link String}.
      * @return {@code true} equal ignoring whitespace, {@code false} different.
      */
     public static boolean equalIgnoreWhiteSpace(String first, String second) {
@@ -256,9 +270,7 @@ public final class StringUtil {
                         && secondIndex < secondContent.length) {
                     // Compare content
                     if (firstIndex < firstContent.length && secondIndex < secondContent.length) {
-                        if (firstContent[firstIndex] != secondContent[secondIndex]) {
-                            equal = false;
-                        }
+                        if (firstContent[firstIndex] != secondContent[secondIndex]) { equal = false; }
                     } else {
                         if (firstIndex < firstContent.length - 1
                                 || secondIndex < secondContent.length - 1) {
@@ -291,11 +303,15 @@ public final class StringUtil {
     /**
      * Fills the given text with the leading character until it has the defined length.
      *
-     * @param text The text to fill.
-     * @param leadingCharacter The leading character to use.
-     * @param length The length to fill up to.
+     * @param text
+     *        The text to fill.
+     * @param leadingCharacter
+     *        The leading character to use.
+     * @param length
+     *        The length to fill up to.
      * @return The created text.
-     * @throws IllegalArgumentException If the text is already longer as the given length
+     * @throws IllegalArgumentException
+     *         If the text is already longer as the given length
      */
     public static String fillString(String text, char leadingCharacter, int length)
             throws IllegalArgumentException {
@@ -317,16 +333,15 @@ public final class StringUtil {
     /**
      * Performs a trim only on the right side.
      *
-     * @param text The text to trim its right side.
+     * @param text
+     *        The text to trim its right side.
      * @return The trimmed text.
      */
     public static String trimRight(String text) {
         if (text != null) {
             char[] content = text.toCharArray();
             int newLength = content.length;
-            while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) {
-                newLength--;
-            }
+            while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) { newLength--; }
             return newLength == text.length() ? text : text.substring(0, newLength);
         } else {
             return null;
@@ -336,8 +351,10 @@ public final class StringUtil {
     /**
      * Chops the given text if required.
      *
-     * @param text The text to check.
-     * @param maxLength The maximal length to ensure.
+     * @param text
+     *        The text to check.
+     * @param maxLength
+     *        The maximal length to ensure.
      * @return The text considering the maximal length.
      */
     public static String chop(String text, int maxLength) {
@@ -361,8 +378,10 @@ public final class StringUtil {
     /**
      * Checks if the given {@link Object} is a {@link String} which starts with the given prefix.
      *
-     * @param obj The {@link Object} to check.
-     * @param prefix The prefix to check for.
+     * @param obj
+     *        The {@link Object} to check.
+     * @param prefix
+     *        The prefix to check for.
      * @return {@code true} {@link Object} is {@link String} with given prefix, {@code false}
      *         otherwise.
      */
@@ -393,12 +412,8 @@ public final class StringUtil {
         int last = text.length() - 1;
         char[] value = text.toCharArray();
 
-        while (first < last && predicate.test(value[first])) {
-            ++first;
-        }
-        while (first <= last && predicate.test(value[last])) {
-            --last;
-        }
+        while (first < last && predicate.test(value[first])) { ++first; }
+        while (first <= last && predicate.test(value[last])) { --last; }
         return (first < last + 1) ? text.substring(first, last + 1) : "";
     }
 
@@ -425,8 +440,10 @@ public final class StringUtil {
     /**
      * Replaces newlines.
      *
-     * @param text the text
-     * @param with with
+     * @param text
+     *        the text
+     * @param with
+     *        with
      * @return the normalized text.
      */
     public static String replaceNewlines(String text, String with) {
@@ -437,10 +454,14 @@ public final class StringUtil {
      * Count occurences of character x in text, starting at beginIndex and ending at endIndex
      * (exclusive).
      *
-     * @param text text
-     * @param beginIndex start index (inclusive)
-     * @param endIndex end index (exclusive)
-     * @param x character to search for
+     * @param text
+     *        text
+     * @param beginIndex
+     *        start index (inclusive)
+     * @param endIndex
+     *        end index (exclusive)
+     * @param x
+     *        character to search for
      * @return number of times x is present
      */
     public static int count(String text, int beginIndex, int endIndex, char x) {

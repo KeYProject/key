@@ -48,9 +48,7 @@ class RIFLHandler extends DefaultHandler {
 
         private String getParseExceptionInfo(SAXParseException spe) {
             String systemId = spe.getSystemId();
-            if (systemId == null) {
-                systemId = "null";
-            }
+            if (systemId == null) { systemId = "null"; }
             return "URI=" + systemId + " Line=" + spe.getLineNumber() + ": " + spe.getMessage();
         }
 
@@ -68,10 +66,7 @@ class RIFLHandler extends DefaultHandler {
     private static String printAttributes(Attributes a) {
         final var sb = new StringBuilder();
         sb.append('[');
-        for (int i = 0; i < a.getLength(); i++) {
-            sb.append(a.getValue(i));
-            sb.append(';');
-        }
+        for (int i = 0; i < a.getLength(); i++) { sb.append(a.getValue(i)); sb.append(';'); }
         sb.append(']');
         return sb.toString();
     }
@@ -92,8 +87,7 @@ class RIFLHandler extends DefaultHandler {
     private String category = DEFAULT_CATEGORY;
 
 
-    public RIFLHandler() {
-    }
+    public RIFLHandler() {}
 
     private void assignHandle(Attributes attributes) {
         final String handle = attributes.getValue("handle").intern();
@@ -197,9 +191,7 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void checkFlows() {
-        for (var p : categories2domains.entrySet()) {
-            assert domains.contains(categories2domains.get(p.getKey()));
-        }
+        for (var p : categories2domains.entrySet()) { assert domains.contains(categories2domains.get(p.getKey())); }
     }
 
     @Override
@@ -208,7 +200,7 @@ class RIFLHandler extends DefaultHandler {
         case "sourcedompair", "source" -> startSources();
         case "sinkdompair", "sink" -> startSinks();
         case "category" -> // TODO: different semantics in "domains" and "sinkdompair"
-            setCategory(attributes);
+                setCategory(attributes);
         case "assign" -> assignHandle(attributes);
 
         // case "domainassignment":
@@ -232,8 +224,7 @@ class RIFLHandler extends DefaultHandler {
         // case "domainhierarchy":
         // TODO
         // case "flowpolicy":
-        default -> {
-        }
+        default -> {}
         }
     }
 
@@ -245,8 +236,7 @@ class RIFLHandler extends DefaultHandler {
         case "domains" -> checkDomains();
         case "domainassignment" -> checkDomainAssignmentsWithFlows();
         case "flowrelation" -> checkFlows();
-        default -> {
-        }
+        default -> {}
         }
     }
 

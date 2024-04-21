@@ -35,7 +35,8 @@ public enum LogLevel {
     /**
      * Creates a new LogLevel with the given prefix
      *
-     * @param prefix print prefix of the log level
+     * @param prefix
+     *        print prefix of the log level
      */
     LogLevel(String prefix) {
         this.prefix = prefix;

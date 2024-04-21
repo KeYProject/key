@@ -22,8 +22,10 @@ public final class FindResources {
      * List directory contents for a resource folder. Not recursive. This is basically a brute-force
      * implementation. Works for regular files and also JARs.
      *
-     * @param clazz Any java class that lives in the same place as the resources you want.
-     * @param path Should end with "/", but not start with one.
+     * @param clazz
+     *        Any java class that lives in the same place as the resources you want.
+     * @param path
+     *        Should end with "/", but not start with one.
      * @return Just the name of each member item, not the full paths.
      * @throws URISyntaxException
      * @throws IOException
@@ -48,9 +50,7 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null) {
-            return null;
-        }
+        if (dirURL == null) { return null; }
 
         if ("jar".equals(dirURL.getProtocol())) {
             /* A JAR path */
@@ -74,9 +74,7 @@ public final class FindResources {
     public static <T> Path getResource(String path, Class<T> clazz)
             throws URISyntaxException, IOException {
         URL dirURL = clazz.getClassLoader().getResource(path);
-        if (dirURL != null && dirURL.getProtocol().equals("file")) {
-            return new File(dirURL.toURI()).toPath();
-        }
+        if (dirURL != null && dirURL.getProtocol().equals("file")) { return new File(dirURL.toURI()).toPath(); }
 
         if (dirURL == null) {
             /*
@@ -87,9 +85,7 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null) {
-            return null;
-        }
+        if (dirURL == null) { return null; }
 
         if (dirURL.getProtocol().equals("jar")) {
             /* A JAR path */
@@ -125,25 +121,21 @@ public final class FindResources {
      * You can specify whether the folder should exists or not. If the should exists the method
      * could return null.
      *
-     * @param property a key for {@link System#getProperty(String)}
-     * @param exists flag whether the folder should exists
-     * @param candidates a list of candidates, used if <code>propertyName</code> is not set by the
+     * @param property
+     *        a key for {@link System#getProperty(String)}
+     * @param exists
+     *        flag whether the folder should exists
+     * @param candidates
+     *        a list of candidates, used if <code>propertyName</code> is not set by the
      *        user
      * @return
      */
     public static File findFolder(boolean exists, String property, String... candidates) {
         if (System.getProperty(property) != null) {
             File f = new File(System.getProperty(property));
-            if (f.exists() || !exists) {
-                return f;
-            }
+            if (f.exists() || !exists) { return f; }
         }
-        for (String c : candidates) {
-            File f = new File(c);
-            if (f.exists() || !exists) {
-                return f;
-            }
-        }
+        for (String c : candidates) { File f = new File(c); if (f.exists() || !exists) { return f; } }
         return null;
     }
 

@@ -34,9 +34,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
                 field2domain.put((Field) e.getKey(), e.getValue());
             } else if (e.getKey() instanceof Parameter) {
                 param2domain.put((Parameter) e.getKey(), e.getValue());
-            } else if (e.getKey() instanceof ReturnValue) {
-                return2domain.put((ReturnValue) e.getKey(), e.getValue());
-            }
+            } else if (e.getKey() instanceof ReturnValue) { return2domain.put((ReturnValue) e.getKey(), e.getValue()); }
         }
         this.flow.addAll(flow2);
     }
@@ -44,7 +42,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public String toString() {
         return "Fields: " + field2domain + "\nParameters: " + param2domain + "\nReturns: "
-            + return2domain + "\nFlows: " + flow;
+                + return2domain + "\nFlows: " + flow;
     }
 
     private String[] extractParamTypes(recoder.java.declaration.MethodDeclaration md) {
@@ -103,11 +101,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public Set<String> flows(String domain) {
         Set<String> result = new LinkedHashSet<>();
-        for (final Entry<String, String> e : flow) {
-            if (e.getValue().equals(domain)) {
-                result.add(e.getKey());
-            }
-        }
+        for (final Entry<String, String> e : flow) { if (e.getValue().equals(domain)) { result.add(e.getKey()); } }
         return result;
     }
 }

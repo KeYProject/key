@@ -40,8 +40,10 @@ public class ResolveGenerics extends TwoPassTransformation {
     /**
      * make a new generic resolver for a single compilation unit
      *
-     * @param sc Services to use (cross references!)
-     * @param cu the unit under test
+     * @param sc
+     *        Services to use (cross references!)
+     * @param cu
+     *        the unit under test
      */
     public ResolveGenerics(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
         super(sc);
@@ -122,9 +124,7 @@ public class ResolveGenerics extends TwoPassTransformation {
      */
     @Override
     public void transform() {
-        for (TwoPassTransformation tpt : transformations) {
-            tpt.transform();
-        }
+        for (TwoPassTransformation tpt : transformations) { tpt.transform(); }
     }
 
     public CompilationUnit getCU() {

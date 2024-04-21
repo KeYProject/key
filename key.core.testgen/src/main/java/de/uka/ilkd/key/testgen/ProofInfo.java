@@ -48,9 +48,7 @@ public class ProofInfo {
     }
 
     public KeYJavaType getTypeOfClassUnderTest() {
-        if (getMUT() == null) {
-            return null;
-        }
+        if (getMUT() == null) { return null; }
         return getMUT().getContainerType();
     }
 
@@ -110,17 +108,13 @@ public class ProofInfo {
             vars.add(TermLabelManager.removeIrrelevantLabels(t, services));
         }
 
-        for (Term sub : t.subs()) {
-            getProgramVariables(sub, vars);
-        }
+        for (Term sub : t.subs()) { getProgramVariables(sub, vars); }
     }
 
     private boolean isRelevantConstant(Term c) {
         Operator op = c.op();
 
-        if (isTrueConstant(op) || isFalseConstant(op)) {
-            return false;
-        }
+        if (isTrueConstant(op) || isFalseConstant(op)) { return false; }
 
         Sort s = c.sort();
 
@@ -129,9 +123,7 @@ public class ProofInfo {
         Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 
-        if (s.equals(nullSort)) {
-            return false;
-        }
+        if (s.equals(nullSort)) { return false; }
 
         return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
 
@@ -155,9 +147,7 @@ public class ProofInfo {
             return processUpdate(UpdateApplication.getUpdate(t));
         } else {
             StringBuilder result = new StringBuilder();
-            for (Term s : t.subs()) {
-                result.append(getUpdate(s));
-            }
+            for (Term s : t.subs()) { result.append(getUpdate(s)); }
             return result.toString();
         }
 
@@ -167,16 +157,12 @@ public class ProofInfo {
     private String processUpdate(Term update) {
         if (update.op() instanceof ElementaryUpdate up) {
             if (up.lhs().sort()
-                    .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
-                return "";
-            }
+                    .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) { return ""; }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
-                + ";";
+                    + ";";
         }
         StringBuilder result = new StringBuilder();
-        for (Term sub : update.subs()) {
-            result.append(processUpdate(sub));
-        }
+        for (Term sub : update.subs()) { result.append(processUpdate(sub)); }
         return result.toString();
     }
 
@@ -185,11 +171,7 @@ public class ProofInfo {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();
             } else {
-                for (Term s : t.subs()) {
-                    if (s.containsJavaBlockRecursive()) {
-                        return getJavaBlock(s);
-                    }
-                }
+                for (Term s : t.subs()) { if (s.containsJavaBlockRecursive()) { return getJavaBlock(s); } }
             }
         }
         return null;

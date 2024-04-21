@@ -47,20 +47,18 @@ import de.uka.ilkd.key.util.removegenerics.monitor.ConsoleGenericRemoverMonitor;
  */
 public class Main {
     // hide constructor
-    private Main() {
-    }
+    private Main() {}
 
     /**
      * @param args
-     * @throws Exception if something goes wrong like opening a file etc.
+     * @throws Exception
+     *         if something goes wrong like opening a file etc.
      */
     public static void main(String[] args) throws Exception {
 
         System.out.println("Version - 071019 - 1546");
 
-        if (args.length == 0) {
-            usage();
-        }
+        if (args.length == 0) { usage(); }
 
         GenericRemover remover = new GenericRemover(new ConsoleGenericRemoverMonitor());
         for (int i = 0; i < args.length; i++) {
@@ -69,9 +67,7 @@ public class Main {
                 if (args[i].equals("-d")) {
                     remover.setOutDir(new File(args[++i].trim()));
                 } else if (args[i].equals("-classpath") || args[i].equals("-cp")) {
-                    for (String s : args[++i].split(File.pathSeparator)) {
-                        remover.addSearchPath(s);
-                    }
+                    for (String s : args[++i].split(File.pathSeparator)) { remover.addSearchPath(s); }
                 } else if (args[i].startsWith("@")) {
                     List<String> files = addLinesFromFile(args[i].substring(1));
                     remover.addSourceFiles(files);
@@ -127,12 +123,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8));
 
         String line = br.readLine();
-        while (line != null) {
-            line = line.trim();
-            if (!line.startsWith("#")) {
-                files.add(line);
-            }
-        }
+        while (line != null) { line = line.trim(); if (!line.startsWith("#")) { files.add(line); } }
         br.close();
         return files;
     }

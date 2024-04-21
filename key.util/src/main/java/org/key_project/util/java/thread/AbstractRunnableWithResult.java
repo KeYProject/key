@@ -33,7 +33,8 @@ public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWith
     /**
      * Sets the result.
      *
-     * @param result The result to set.
+     * @param result
+     *        The result to set.
      */
     protected void setResult(T result) {
         this.result = result;

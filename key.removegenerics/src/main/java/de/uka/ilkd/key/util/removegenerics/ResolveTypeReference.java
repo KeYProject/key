@@ -40,9 +40,7 @@ public class ResolveTypeReference extends GenericResolutionTransformation {
     @Override
     public ProblemReport analyze() {
         ASTList<TypeArgumentDeclaration> typeArguments = reference.getTypeArguments();
-        if (typeArguments != null && !typeArguments.isEmpty()) {
-            return EQUIVALENCE;
-        }
+        if (typeArguments != null && !typeArguments.isEmpty()) { return EQUIVALENCE; }
 
         Type type = sourceInfo.getType(reference);
 

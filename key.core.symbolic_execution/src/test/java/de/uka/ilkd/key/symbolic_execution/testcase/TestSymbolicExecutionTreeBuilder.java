@@ -405,9 +405,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             assertTrue(nodesCount >= 100); // Currently 105 nodes are needed, +-5 are acceptable
             assertTrue(nodesCount < 110); // Currently 105 nodes are needed, +-5 are acceptable
         } finally {
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 
@@ -440,12 +438,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/PrunedIf.xml",
                 testCaseDirectory);
         } finally {
-            if (env.getProof() != null) {
-                env.getProof().dispose();
-            }
-            if (env != null) {
-                env.dispose();
-            }
+            if (env.getProof() != null) { env.getProof().dispose(); }
+            if (env != null) { env.dispose(); }
         }
     }
 
@@ -466,24 +460,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
 
             Iterator<Node> iter = env.getProof().root().subtreeIterator();
             Node node = null;
-            while (iter.hasNext()) {
-                node = iter.next();
-                if (node.childrenCount() == 2) {
-                    break;
-                }
-            }
+            while (iter.hasNext()) { node = iter.next(); if (node.childrenCount() == 2) { break; } }
             assertEquals(2, node.childrenCount(),
                 "They prooftree does not contain nodes it should.");
             env.getBuilder().prune(node.child(0));
             assertSetTreeAfterStep(env.getBuilder(), "/set/complexIf/oracle/BranchPrunedIf.xml",
                 testCaseDirectory);
         } finally {
-            if (env.getProof() != null) {
-                env.getProof().dispose();
-            }
-            if (env != null) {
-                env.dispose();
-            }
+            if (env.getProof() != null) { env.getProof().dispose(); }
+            if (env != null) { env.dispose(); }
         }
     }
 
@@ -509,12 +494,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             int branchesCount = 0;
             while (iter.hasNext()) {
                 node = iter.next();
-                if (node.childrenCount() == 2) {
-                    branchesCount++;
-                }
-                if (branchesCount == 2) {
-                    break;
-                }
+                if (node.childrenCount() == 2) { branchesCount++; }
+                if (branchesCount == 2) { break; }
             }
             assertEquals(2, node.childrenCount(),
                 "They prooftree does not contain nodes it should.");
@@ -525,12 +506,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             assertSetTreeAfterStep(env.getBuilder(),
                 "/set/complexIf/oracle/Branch1InBranchPrunedIf.xml", testCaseDirectory);
         } finally {
-            if (env.getProof() != null) {
-                env.getProof().dispose();
-            }
-            if (env != null) {
-                env.dispose();
-            }
+            if (env.getProof() != null) { env.getProof().dispose(); }
+            if (env != null) { env.dispose(); }
         }
     }
 
@@ -615,9 +592,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             // Restore original options
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 
@@ -643,9 +618,12 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     /**
      * Loads an existing proof file performed in the {@link JavaProfile}.
      *
-     * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @throws Exception Occurred Exception.
+     * @param proofFilePathInBaseDir
+     *        The path to the proof file inside the base directory.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doJavaProfileTest(String proofFilePathInBaseDir, String oraclePathInBaseDirFile)
             throws Exception {

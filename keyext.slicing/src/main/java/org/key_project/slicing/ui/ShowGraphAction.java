@@ -33,9 +33,12 @@ public class ShowGraphAction extends MainWindowAction {
     /**
      * Construct a new action.
      *
-     * @param mw main window
-     * @param tracker dependency tracker of the active proof
-     * @param node the graph node to show a graph around
+     * @param mw
+     *        main window
+     * @param tracker
+     *        dependency tracker of the active proof
+     * @param node
+     *        the graph node to show a graph around
      */
     public ShowGraphAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);

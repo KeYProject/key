@@ -125,8 +125,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private QuerySideProofRule() {
-    }
+    private QuerySideProofRule() {}
 
     /**
      * {@inheritDoc}
@@ -136,9 +135,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
         boolean applicable = false;
         if (pio != null) {
             // abort if inside of transformer
-            if (Transformer.inTransformer(pio)) {
-                return false;
-            }
+            if (Transformer.inTransformer(pio)) { return false; }
             Term term = pio.subTerm();
             if (term != null) {
                 if (term.op() == Equality.EQUALS) {
@@ -154,9 +151,12 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * Checks if the query term is supported. The functionality is identical to
      * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
      *
-     * @param goal The {@link Goal}.
-     * @param pmTerm The {@link Term} to with the query to check.
-     * @param pio The {@link PosInOccurrence} in the {@link Goal}.
+     * @param goal
+     *        The {@link Goal}.
+     * @param pmTerm
+     *        The {@link Term} to with the query to check.
+     * @param pio
+     *        The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
     private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
@@ -168,9 +168,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
                     Term focus = it.getSubTerm();
-                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
-                        return false;
-                    }
+                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) { return false; }
                 }
                 return true;
             }
@@ -244,9 +242,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                             : tb.equals(conditionsAndResult.first, varTerm);
                     Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, newEqualityTerm)
                             : tb.and(conditionTerm, newEqualityTerm);
-                    if (queryConditionTerm != null) {
-                        resultTerm = tb.imp(queryConditionTerm, resultTerm);
-                    }
+                    if (queryConditionTerm != null) { resultTerm = tb.imp(queryConditionTerm, resultTerm); }
                     resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                 }
             } else {
