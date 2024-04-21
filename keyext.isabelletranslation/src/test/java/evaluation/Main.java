@@ -621,7 +621,7 @@ public class Main {
         StrategyProperties properties = new StrategyProperties();
         Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
         proof.setActiveStrategy(strategy);
-        proof.getSettings().getStrategySettings().setMaxSteps(1000000);
+        proof.getSettings().getStrategySettings().setMaxSteps(Integer.MAX_VALUE);
         proof.getSettings().getStrategySettings().setTimeout(timeoutSeconds * 1000);
 
         for (Goal g : goals) {
@@ -752,6 +752,7 @@ public class Main {
 
 
         class TimedListener implements IsabelleSolverListener {
+            private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolverListener.class);
             long sledgehammerTime = 0L;
             long parsingTime = 0L;
             long buildingTime = 0L;
@@ -801,6 +802,7 @@ public class Main {
             @Override
             public void processStarted(IsabelleProblem problem) {
                 totalTime = System.currentTimeMillis();
+                LOGGER.info("Started on goal {} of contract {} in file {}", goalNumber, contractName, input);
             }
 
             @Override
@@ -822,6 +824,8 @@ public class Main {
                     String isabelleProof = problem.getResult().getSuccessfulTactic();
                     updateIsabelleProof(input, contractName, goal, isabelleProof);
                 }
+
+                LOGGER.info("Result: {}", problem.getResult());
             }
 
             @Override
