@@ -476,7 +476,8 @@ public class ContractFactory {
                     // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
                     if (uniformModifiable.containsKey(h)) {
-                        if (!uniformModifiable.get(h).equalsModProperty(modifiable2, TERM_LABELS_PROPERTY)) {
+                        if (!uniformModifiable.get(h).equalsModProperty(modifiable2,
+                            TERM_LABELS_PROPERTY)) {
                             uniformModifiable.remove(h);
                         } else {
                             // merge term labels (in particular origin labels) of both modifiable

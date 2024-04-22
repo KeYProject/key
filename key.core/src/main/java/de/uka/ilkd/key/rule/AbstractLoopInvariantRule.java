@@ -509,14 +509,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
             if (strictlyNothing.equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                if (strictlyNothing.equalsModProperty(freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(freeModifiable,
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame =
                         tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
-                if (strictlyNothing.equalsModProperty(freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(freeModifiable,
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(

@@ -94,7 +94,8 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             final Term modifiable = modifiables.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            if (tb.strictlyNothing().equalsModProperty(modifiable,
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), modifiable);

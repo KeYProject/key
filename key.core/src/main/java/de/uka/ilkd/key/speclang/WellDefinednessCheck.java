@@ -741,7 +741,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void combineModifiable(Term modifiables1, Term modifiables2,
-                                 TermServices services) {
+            TermServices services) {
         if (modifiables1 == null || TB.strictlyNothing().equalsModProperty(
             modifiables1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setModifiable(modifiables2, services);
@@ -1008,9 +1008,11 @@ public abstract class WellDefinednessCheck implements Contract {
             Term anonHeap, TermServices services) {
         assert modifiable != null;
         assert anonHeap != null
-                || TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY);
+                || TB.strictlyNothing().equalsModProperty(modifiable,
+                    IRRELEVANT_TERM_LABELS_PROPERTY);
         final Term havocUpd =
-            TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.skip()
+            TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)
+                    ? TB.skip()
                     : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
