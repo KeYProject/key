@@ -34,8 +34,6 @@ public class TranslationAction extends MainWindowAction {
         KeYMediator mediator = getMediator();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
-        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/Translation.thy");
-        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/TranslationPreamble.thy");
         IsabelleProblem translation;
         try {
             translation = translator.translateProblem(mediator.getSelectedGoal());
@@ -44,15 +42,7 @@ public class TranslationAction extends MainWindowAction {
             return;
         }
 
-        try {
-            Files.createDirectories(translationFile.toPath().getParent());
-            Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
-            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
-            LOGGER.info("Saved to: " + translationFile.toPath() + " and " + translationPreambleFile.toPath());
-        } catch (IOException e) {
-            LOGGER.error("Failed to save translation", e);
-            return;
-        }
+        writeTranslationFiles(translation);
 
         SledgehammerResult result = translation.sledgehammer(30);
 
@@ -80,5 +70,19 @@ public class TranslationAction extends MainWindowAction {
             Thread isabelleJEdit = new Thread(() -> Isabelle.jedit(setup, pathSeq));
 
             isabelleJEdit.start();*/
+    }
+
+    protected static void writeTranslationFiles(IsabelleProblem translation) {
+        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/Translation.thy");
+        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/TranslationPreamble.thy");
+        try {
+            Files.createDirectories(translationFile.toPath().getParent());
+            Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
+            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
+            LOGGER.info("Saved to: " + translationFile.toPath() + " and " + translationPreambleFile.toPath());
+        } catch (IOException e) {
+            LOGGER.error("Failed to save translation", e);
+            return;
+        }
     }
 }
