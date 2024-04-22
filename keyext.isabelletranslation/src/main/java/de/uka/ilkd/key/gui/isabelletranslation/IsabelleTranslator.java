@@ -130,9 +130,9 @@ public class IsabelleTranslator {
         StringBuilder distinctFieldLemma = new StringBuilder();
         distinctFieldLemma.append("\"(distinct [");
         distinctFieldLemma.append(commaSeparatedFields);
-        distinctFieldLemma.append("]) \\<and> (({");
+        distinctFieldLemma.append(", created]) \\<and> (({");
         distinctFieldLemma.append(commaSeparatedFields);
-        distinctFieldLemma.append("} \\<inter> image arr (UNIV::int set)) = {})\"");
+        distinctFieldLemma.append(", created} \\<inter> image arr (UNIV::int set)) = {})\"");
         return distinctFieldLemma;
     }
 
