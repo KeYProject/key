@@ -41,7 +41,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final String baseName;
     final String name;
     final KeYJavaType kjt;
-    final IProgramMethod pm;
+    public final IProgramMethod pm;
     final KeYJavaType specifiedIn;
     final Modality modality;
     /**
