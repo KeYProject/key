@@ -85,8 +85,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         String sessionDocument = sessionDocumentReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
         try {
-            Files.write(sessionRootPath, sessionRoot.getBytes());
             Files.createDirectories(sessionDocumentPath.getParent());
+            Files.write(sessionRootPath, sessionRoot.getBytes());
             Files.write(sessionDocumentPath, sessionDocument.getBytes());
             LOGGER.info("Created Isabelle session files at: {}", translationPath);
             return sessionFilesPresent = true;
