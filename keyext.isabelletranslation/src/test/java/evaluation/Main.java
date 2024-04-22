@@ -129,7 +129,7 @@ public class Main {
             return;
         }
         for (String s : pathStrings) {
-            Path p = Paths.get(s);
+            Path p = Path.of(System.getProperty("user.home"), s);
             VALID_SET.add(p);
             processFile(p, true, true, true);
             saveStatisticsCSVFile(p);
