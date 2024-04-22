@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class IsabelleLauncher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
@@ -72,5 +74,38 @@ public class IsabelleLauncher {
         return begin_theory.apply(topDir, header, header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
                         Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()))
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
+    }
+
+    public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int coreCount) throws IOException {
+        ExecutorService executorService = new ThreadPoolExecutor(coreCount, coreCount, 0L, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+        Collection<Callable<SledgehammerResult>> tasks = new LinkedBlockingDeque<>();
+
+        if (problems.isEmpty()) {
+            return;
+        }
+        TranslationAction.writeTranslationFiles(problems.get(0));
+        ArrayList<Path> sessionRoots = new ArrayList<>();
+        sessionRoots.add(settings.getTranslationPath());
+        try {
+            Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
+                    JIsabelle.setupSetSessionRoots(sessionRoots,
+                            JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
+                                    JIsabelle.setup(settings.getIsabellePath()))));
+            isabelle = new Isabelle(setup);
+        } catch (Exception e) {
+            LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
+            throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
+        }
+        thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
+        LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
+
+        List<SledgehammerResult> results = new ArrayList<>();
+        problems.forEach((IsabelleProblem problem) -> tasks.add(() -> problem.try0ThenSledgehammer(isabelle, thy0, timeoutSeconds)));
+
+        try {
+            executorService.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
