@@ -52,7 +52,7 @@ public class Main {
                     && it.getName().equals("Z3"))
             .findFirst().orElse(null);
 
-    private static final Path VALID_LIST_PATH = Paths.get(System.getenv("user.home"), "/tmp/valid_list.txt");
+    private static final Path VALID_LIST_PATH = Path.of(System.getProperty("user.home"), "/tmp/valid_list.txt");
 
     private static final Set<Path> VALID_SET = new HashSet<>();
 
@@ -102,7 +102,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        outDir = Paths.get(System.getenv("user.home"), "/tmp/benchmark"
+        outDir = Path.of(System.getProperty("user.home"), "/tmp/benchmark"
                 + System.currentTimeMillis());
         try {
             Files.createDirectories(outDir);
