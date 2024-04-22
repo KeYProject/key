@@ -1039,11 +1039,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
             try {
                 return processJmlBuiltInFunction(fullyQualifiedName, accept(ctx.expressionlist()));
             } catch (Exception e) {
-                // weigl: only log error. There is no reason why a method should not start with a \\
-                // in JML.
-                // The next version will have, e.g., \seq and \map classes.
+                // weigl: only log error. There is no reason why a method should not
+                // start with a "\" in JML. The next version will have, e.g., \seq and \map classes.
                 addWarning(ctx,
-                    "%s was not understand as a JML built-in function. I assume it to be a method or class."
+                    "%s is not known as a JML built-in function. I assume it to be a method or class."
                             .formatted(fullyQualifiedName));
             }
         }
@@ -1076,6 +1075,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         // at some point in life, we may want to have a customizable map here.
         return switch (name) {
         case "\\array2seq" -> termFactory.translateToJDLTerm(name.substring(1), params);
+        case "\\seq_upd" -> termFactory.translateToJDLTerm("seqUpd", params);
         case "\\seq_put" -> termFactory.translateToJDLTerm("seqUpd", params);
         default -> throw new IllegalStateException("Unexpected value: " + name);
         };
@@ -1356,76 +1356,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.reachLocs(t, e1, e2, e3);
     }
 
-    /*
-     * @Override
-     * public Object visitFieldarrayaccess(JmlParser.FieldarrayaccessContext ctx) {
-     * SLExpression base = oneOf(ctx.ident(), ctx.super_(), ctx.this_());
-     * String backupFullyQualifiedName = fullyQualifiedName;
-     * fullyQualifiedName = ctx.start.getText();
-     * for (JmlParser.Fieldarrayaccess_suffixContext suffx : ctx.fieldarrayaccess_suffix()) {
-     * base = visitFieldarrayaccess_suffix(base, suffx);
-     * }
-     * fullyQualifiedName = backupFullyQualifiedName;
-     * return base;
-     * }
-     */
-    /*
-     * public SLExpression visitFieldarrayaccess_suffix(SLExpression base,
-     * JmlParser.Fieldarrayaccess_suffixContext ctx) {
-     * if (ctx.DOT() != null) {
-     * String lookupName;
-     * if (ctx.ident() != null) {
-     * String id = ctx.ident().getText();
-     * if (base == null) {
-     * // Receiver was only a package/classname prefix
-     * lookupName = fullyQualifiedName + "." + id;
-     * } else {
-     * lookupName = id;
-     * }
-     * fullyQualifiedName = fullyQualifiedName + "." + id;
-     * try {
-     * return lookupIdentifier(lookupName, base, null, ctx);
-     * } catch (Exception e) {
-     * return lookupIdentifier(fullyQualifiedName, null, null, ctx);
-     * }
-     * }
-     *
-     * if(ctx.field_all()!=null) { //example: x.*
-     * return ;
-     * }
-     *
-     * if (ctx.TRANSIENT() != null) {
-     * return lookupIdentifier("<transient>", base, null, ctx);
-     * }
-     *
-     * if (ctx.this_() != null) {
-     * return new SLExpression(
-     * services.getTypeConverter().findThisForSort(base.getType().getSort(),
-     * tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true),
-     * base.getType());
-     * }
-     *
-     * if (ctx.inv() != null) {
-     * return termFactory.createInv(base.getTerm(), base.getType());
-     * }
-     *
-     * if (ctx.inv_free() != null) {
-     * return termFactory.createInvFree(base.getTerm(), base.getType());
-     * }
-     *
-     * } else { // Array access with a number or a star.
-     * if(ctx.array_all()!=null){
-     *
-     * }else {
-     * SLExpression index = accept(ctx.expression());
-     * return termFactory.arrayRef(base, fullyQualifiedName, index, null);
-     * }
-     * }
-     * assert false;
-     * return null;
-     * }
-     */
-
     @Override
     public SLExpression visitPrimaryCreateLocsetSingleton(
             JmlParser.PrimaryCreateLocsetSingletonContext ctx) {
@@ -1441,23 +1371,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         return null;
     }
-
-    /*
-     * @Override
-     * public SLExpression visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
-     * List<SLExpression> aa = mapOf(ctx.fieldarrayaccess());
-     * List<Term> seq = aa.stream().map(termFactory::createStoreRef).collect(Collectors.toList());
-     * Term ret = null;
-     * if (seq.isEmpty()) {
-     * raiseError(ctx, "empty!");
-     * } else if (seq.size() == 1) {
-     * ret = seq.get(0);
-     * } else {
-     * ret = tb.union(seq);
-     * }
-     * return new SLExpression(ret, javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET));
-     * }
-     */
 
     @Override
     public Object visitPrimaryDuration(JmlParser.PrimaryDurationContext ctx) {
