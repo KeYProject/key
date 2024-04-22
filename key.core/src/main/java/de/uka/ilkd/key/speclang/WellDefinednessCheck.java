@@ -35,6 +35,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * A contract for checking the well-definedness of a jml specification element (i.e. a class
  * invariant, a method contract, a model field or any jml statement), consisting of precondition,
@@ -390,8 +392,9 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getModifiable() != null && showSig) {
             String printModifiables = LogicPrinter.quickPrintTerm(
-                getModifiable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
-                        : this.getModifiable(null),
+                getModifiable(null).equalsModProperty(TB.strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.empty()
+                            : this.getModifiable(null),
                 services);
             modifiables += (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
                 + (includeHtmlMarkup ? "</b> " : ": ")
@@ -721,24 +724,32 @@ public abstract class WellDefinednessCheck implements Contract {
         this.requires = split(req);
     }
 
-    final void setModifiable(Term ass, TermServices services) {
-        this.modifiable = ass;
-        if (ass == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass)
-                || TB.FALSE().equalsModIrrelevantTermLabels(ass)) {
+    final void setModifiable(Term modifiables, TermServices services) {
+        this.modifiable = modifiables;
+        if (modifiables == null
+                || TB.strictlyNothing().equalsModProperty(
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)
+                || TB.FALSE().equalsModProperty(
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.modifiable = TB.strictlyNothing();
-        } else if (TB.tt().equalsModIrrelevantTermLabels(ass)
-                || TB.TRUE().equalsModIrrelevantTermLabels(ass)) {
+        } else if (TB.tt().equalsModProperty(
+            modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)
+                || TB.TRUE().equalsModProperty(
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             this.modifiable = TB.allLocs();
         }
     }
 
-    final void combineModifiable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass1)) {
-            setModifiable(ass2, services);
-        } else if (ass2 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass2)) {
-            setModifiable(ass1, services);
+    final void combineModifiable(Term modifiables1, Term modifiables2,
+                                 TermServices services) {
+        if (modifiables1 == null || TB.strictlyNothing().equalsModProperty(
+            modifiables1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            setModifiable(modifiables2, services);
+        } else if (modifiables2 == null || TB.strictlyNothing().equalsModProperty(
+            modifiables2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            setModifiable(modifiables1, services);
         } else {
-            setModifiable(TB.union(ass1, ass2), services);
+            setModifiable(TB.union(modifiables1, modifiables2), services);
         }
     }
 
@@ -996,9 +1007,10 @@ public abstract class WellDefinednessCheck implements Contract {
     public final Term getUpdates(Term modifiable, LocationVariable heap, ProgramVariable heapAtPre,
             Term anonHeap, TermServices services) {
         assert modifiable != null;
-        assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable);
+        assert anonHeap != null
+                || TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY);
         final Term havocUpd =
-            TB.strictlyNothing().equalsModIrrelevantTermLabels(modifiable) ? TB.skip()
+            TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.skip()
                     : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();

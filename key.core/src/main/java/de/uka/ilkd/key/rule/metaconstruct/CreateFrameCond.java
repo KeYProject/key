@@ -23,6 +23,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * Creates the frame condition (aka "modifiable clause") for the given loop. Also accepts the
  * pre-state update and extracts the symbols from there. New symbols in the pre-state update (like
@@ -92,7 +94,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             final Term modifiable = modifiables.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(modifiable)) {
+            if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), modifiable);

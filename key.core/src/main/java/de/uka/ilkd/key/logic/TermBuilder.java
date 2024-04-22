@@ -2051,6 +2051,11 @@ public class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
 
+    public Term seqUpd(Term seq, Term idx, Term value) {
+        return func(services.getTypeConverter().getSeqLDT().getSeqUpd(), seq, idx, value);
+    }
+
+
     public Term seqReverse(Term s) {
         return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }

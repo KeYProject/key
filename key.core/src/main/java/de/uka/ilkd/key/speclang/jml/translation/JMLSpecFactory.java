@@ -57,6 +57,8 @@ import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES;
@@ -650,7 +652,8 @@ public class JMLSpecFactory {
                     .atPres(atPres).atBefore(atBefores).translateTerm(expr, specType);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                         "\"assignable \\strictly_nothing\" cannot be joined with other "
@@ -804,7 +807,8 @@ public class JMLSpecFactory {
                 new JmlIO(services).context(context).parameters(paramVars).translateTerm(expr);
 
             // less than nothing is marked by some special term
-            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
+            if (translated.equalsModProperty(tb.strictlyNothing(),
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return true;
             }
         }
@@ -1004,13 +1008,14 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModRenaming(tb.allLocs())) {
+            if (clauses.accessibles.get(heap).equalsModProperty(tb.allLocs(),
+                RENAMING_PROPERTY)) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
                 if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModRenaming(tb.allLocs())) {
+                        .equalsModProperty(tb.allLocs(), RENAMING_PROPERTY)) {
                     createContract = false;
                     break;
                 }

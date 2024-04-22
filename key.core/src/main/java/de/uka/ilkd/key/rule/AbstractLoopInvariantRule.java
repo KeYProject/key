@@ -29,6 +29,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
  * {@link #doPreparations(Goal, Services, RuleApp)} directly at the beginning of the
@@ -441,7 +443,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(modifiable)) {
+        if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, modifiable, anonHeapTerm);
@@ -506,15 +508,15 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final Term freeModifiable = freeModifiables.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
-            if (strictlyNothing.equalsModIrrelevantTermLabels(modifiable)) {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
+            if (strictlyNothing.equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame =
                         tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
+                if (strictlyNothing.equalsModProperty(freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(
@@ -549,7 +551,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * A container for an instantiation of this {@link LoopScopeInvariantRule} application; contains
      * the update, the program with post condition, the {@link While} loop the
-     * {@link LoopScopeInvariantRule} should be applied to, the {@link LoopSpecification}, the the
+     * {@link LoopScopeInvariantRule} should be applied to, the {@link LoopSpecification}, the
      * self {@link Term}.
      *
      * @param innermostExecutionContext TODO Removed this field; was however used in old invariant rule. Could be needed for the information flow validity goal.

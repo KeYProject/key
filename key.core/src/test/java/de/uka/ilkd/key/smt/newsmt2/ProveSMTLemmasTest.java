@@ -33,6 +33,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * This test case makes sure that all KeY formulas which are translated to axioms in SMT can
  * actually be proved in KeY.
@@ -90,7 +92,7 @@ public class ProveSMTLemmasTest {
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     Term parsedLemma = io.parseExpression(lemmaString);
                     Term actual = loadedProof.root().sequent().succedent().get(0).formula();
-                    if (!actual.equalsModRenaming(parsedLemma)) {
+                    if (!actual.equalsModProperty(parsedLemma, RENAMING_PROPERTY)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);
                         Assertions.fail("The proven lemma is different from the stored one.");

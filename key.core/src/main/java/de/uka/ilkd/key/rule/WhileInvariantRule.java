@@ -63,6 +63,8 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 public final class WhileInvariantRule implements BuiltInRule {
     /**
      * The hint used to refactor the initial invariant.
@@ -263,7 +265,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(modifiable)) {
+        if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, modifiable, anonHeapTerm);
@@ -828,15 +830,18 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term freeModifiable = freeModifiables.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
-            if (strictlyNothing.equalsModIrrelevantTermLabels(modifiable)) {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
+            if (strictlyNothing.equalsModProperty(
+                modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(
+                    freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame =
                         tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeModifiable)) {
+                if (strictlyNothing.equalsModProperty(
+                    freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(

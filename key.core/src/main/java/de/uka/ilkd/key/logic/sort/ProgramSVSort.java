@@ -483,7 +483,7 @@ public abstract class ProgramSVSort extends SortImpl {
                     || pe instanceof SetMinus || pe instanceof AllFields || pe instanceof AllObjects
                     || pe instanceof SeqSingleton || pe instanceof SeqConcat
                     || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
-                    || pe instanceof SeqSub || pe instanceof SeqReverse) {
+                    || pe instanceof SeqSub || pe instanceof SeqReverse || pe instanceof SeqPut) {
                 if (pe instanceof NonTerminalProgramElement npe) {
                     for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
                         if (!canStandFor(npe.getChildAt(i), services)) {

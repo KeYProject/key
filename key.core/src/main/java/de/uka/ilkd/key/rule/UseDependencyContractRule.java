@@ -32,6 +32,8 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 
 public final class UseDependencyContractRule implements BuiltInRule {
 
@@ -208,7 +210,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
+            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), IRRELEVANT_TERM_LABELS_PROPERTY)
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }
