@@ -116,6 +116,7 @@ public class Main {
             }
             updateZ3ProvableList();
         } else {
+            Runtime.getRuntime().addShutdownHook(new Thread(Main::saveStatisticsCSV));
             run();
         }
     }
@@ -751,7 +752,7 @@ public class Main {
             return null;
         }));
 
-        ExecutorService executorService = new ThreadPoolExecutor(3, 3, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        ExecutorService executorService = new ThreadPoolExecutor(6, 6, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
         try {
             executorService.invokeAll(launcherRunnables);
         } catch (InterruptedException e) {
@@ -891,7 +892,7 @@ public class Main {
 
             problems.add(problem);
         });
-        launcher.try0ThenSledgehammerAll(problems, timeoutSeconds);
+        launcher.try0ThenSledgehammerAllPooled(problems, timeoutSeconds, 2);
     }
 
     private static void saveFlaggedTranslations() {
