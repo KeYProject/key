@@ -28,7 +28,7 @@ public class CloseAllByReference extends KeyAction {
      */
     private final CachingExtension cachingExtension;
     /**
-     * The mediator.
+     * The KeY mediator.
      */
     private final KeYMediator mediator;
     /**
@@ -39,15 +39,16 @@ public class CloseAllByReference extends KeyAction {
     /**
      * Construct new action.
      *
-     * @param mediator the mediator
-     * @param proof the proof
+     * @param cachingExtension the caching extension
+     * @param mediator the KeY mediator
+     * @param proof the proof to work on
      */
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
             Proof proof) {
         this.cachingExtension = cachingExtension;
         this.mediator = mediator;
         this.proof = proof;
-        setName("Run proof caching search for open goals");
+        setName("Run proof caching search on open goals");
         setEnabled(!proof.closed());
         setMenuPath("Proof Caching");
     }
@@ -70,12 +71,16 @@ public class CloseAllByReference extends KeyAction {
             }
         }
         if (matches > 0) {
-            cachingExtension.updateGUIState(proof);
+            cachingExtension.updateGUIState();
             // since e.getSource() is the popup menu, it is better to use the MainWindow
             // instance here as a parent
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
                 "Successfully closed " + matches + " open goal(s) by cache",
-                "Proof Caching info", JOptionPane.INFORMATION_MESSAGE);
+                "Proof Caching", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                "Failed to find any matches",
+                "Proof Caching", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

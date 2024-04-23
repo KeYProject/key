@@ -537,6 +537,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         result.getErrorList().get(0));
                 }
             }
+            getMediator().fireProofInitialized(proofList.getFirstProof());
         }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {

@@ -119,8 +119,8 @@ public class LogicPrinter {
         return layouter;
     }
 
-    public static SequentViewLogicPrinter quickPrinter(Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    private static SequentViewLogicPrinter quickPrinter(Services services,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean printLabels) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
@@ -129,7 +129,9 @@ public class LogicPrinter {
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
-        return SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
+        var visibilityManager = new TermLabelVisibilityManager();
+        visibilityManager.setShowLabels(printLabels);
+        return SequentViewLogicPrinter.purePrinter(ni, services, visibilityManager);
     }
 
     /**
@@ -141,7 +143,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, true);
     }
 
     /**
@@ -151,11 +153,12 @@ public class LogicPrinter {
      * @param services services.
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
+     * @param printLabels whether to print labels.
      * @return the printed term.
      */
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
-        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+            boolean useUnicodeSymbols, boolean printLabels) {
+        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, printLabels);
         p.printTerm(t);
         return p.result();
     }
@@ -169,7 +172,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, true);
         p.printSemisequent(s);
         return p.result();
     }
@@ -183,7 +186,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSequent(Sequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, true);
         p.printSequent(s);
         return p.result();
     }

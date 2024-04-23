@@ -73,8 +73,8 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
             formula.formula(),
             services,
             true, // pretty print
-            true // using unicode symbols
-        ).trim();
+            true, // using unicode symbols
+            true).trim();
         if (!omitBranch) {
             term = term + branchLocation.toString();
         }

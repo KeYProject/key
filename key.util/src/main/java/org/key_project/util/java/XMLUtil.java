@@ -3,8 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.w3c.dom.Node;
 
 /**
  * Provides static methods to work with XML.
@@ -305,5 +309,38 @@ public final class XMLUtil {
      */
     public static void appendNewLine(StringBuilder sb) {
         sb.append(StringUtil.NEW_LINE);
+    }
+
+    /**
+     * Find all elements with the specified tag name in the document sub-tree rooted
+     * at <code>node</code>.
+     *
+     * @param node node
+     * @param tagName tag name
+     * @return matching elements
+     */
+    public static List<Node> findElementsByTagName(Node node, String tagName) {
+        var list = new ArrayList<Node>();
+        var children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            var child = children.item(i);
+            if (child.getNodeName().equals(tagName)) {
+                list.add(child);
+            } else {
+                list.addAll(findElementsByTagName(child, tagName));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get the value of the attribute on the node.
+     *
+     * @param node node
+     * @param attributeName attribute
+     * @return value
+     */
+    public static String getAttribute(Node node, String attributeName) {
+        return node.getAttributes().getNamedItem(attributeName).getNodeValue();
     }
 }

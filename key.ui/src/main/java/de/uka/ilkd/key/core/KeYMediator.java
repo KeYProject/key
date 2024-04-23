@@ -77,6 +77,7 @@ public class KeYMediator {
      * @see #fireProofLoaded(Proof)
      */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
+    private final Collection<Consumer<Proof>> proofInitializedListeners = new ArrayList<>();
 
     private TacletFilter filterForInteractiveProving;
 
@@ -127,6 +128,25 @@ public class KeYMediator {
      */
     public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
         proofLoadListeners.add(listener);
+    }
+
+    /**
+     * Register a proof initialized listener. Will be called whenever a new proof is loaded, after
+     * it is replayed. The listener MUST be able to accept the same proof twice!
+     *
+     * @param listener callback
+     */
+    public synchronized void registerProofInitializedListener(Consumer<Proof> listener) {
+        proofInitializedListeners.add(listener);
+    }
+
+    /**
+     * Deregister a proof initialized listener.
+     *
+     * @param listener callback
+     */
+    public synchronized void deregisterProofInitializedListener(Consumer<Proof> listener) {
+        proofInitializedListeners.remove(listener);
     }
 
     /**
@@ -425,6 +445,20 @@ public class KeYMediator {
     }
 
     /**
+     * Fire the proof initialized event.
+     *
+     * @param p the proof that was just loaded and replayed
+     */
+    public synchronized void fireProofInitialized(Proof p) {
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofInitializedListeners) {
+            listener.accept(p);
+        }
+    }
+
+    /**
      * returns the current selected proof
      *
      * @return the current selected proof
@@ -531,7 +565,7 @@ public class KeYMediator {
      *
      * @param proof the {@link Proof} to be worked on
      * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactove or automatic use
+     * @param interactive whether the needed taclet index is for interactive or automatic use
      *        (normally false)
      */
     public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {

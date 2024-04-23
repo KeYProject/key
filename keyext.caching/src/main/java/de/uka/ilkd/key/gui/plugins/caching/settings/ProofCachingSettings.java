@@ -11,7 +11,15 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
  * @author Arne Keller
  */
 public class ProofCachingSettings extends AbstractPropertiesSettings {
+    /**
+     * When disposing a proof that is referenced elsewhere,
+     * copy the steps to the references.
+     */
     public static final String DISPOSE_COPY = "Copy steps into new proof";
+    /**
+     * When disposing a proof that is referenced elsewhere,
+     * simply reopen the branches elsewhere.
+     */
     public static final String DISPOSE_REOPEN = "Reopen proof";
     public static final String PRUNE_COPY = "Copy steps just before prune";
     public static final String PRUNE_REOPEN = "Reopen cached goal(s)";
@@ -28,6 +36,10 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      * Key ID for {@link #prune}.
      */
     private static final String PRUNE_KEY = "Prune";
+    /**
+     * Key ID for {@link #autoAddClosedProofs}.
+     */
+    private static final String AUTO_ADD_CLOSED_KEY = "AutoAddClosed";
 
 
     /**
@@ -45,6 +57,11 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      */
     private final AbstractPropertiesSettings.PropertyEntry<String> prune =
         createStringProperty(PRUNE_KEY, "");
+    /**
+     * Whether to automatically add closed proofs to the proof cache.
+     */
+    private final AbstractPropertiesSettings.PropertyEntry<Boolean> autoAddClosedProofs =
+        createBooleanProperty(AUTO_ADD_CLOSED_KEY, false);
 
     public ProofCachingSettings() {
         super("ProofCaching");
@@ -94,5 +111,21 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      */
     public void setPrune(String operation) {
         prune.set(operation);
+    }
+
+    /**
+     * @return whether closed proofs should automatically be added to the proof caching database
+     */
+    public boolean getAutoAddClosedProofs() {
+        return autoAddClosedProofs.get();
+    }
+
+    /**
+     * Set whether proofs should automatically be added to the proof caching database.
+     *
+     * @param value whether to enable auto-caching
+     */
+    public void setAutoAddClosedProofs(boolean value) {
+        autoAddClosedProofs.set(value);
     }
 }

@@ -78,7 +78,7 @@ public final class CloseByReference extends KeyAction {
             }
         }
         if (!nodes.isEmpty()) {
-            cachingExtension.updateGUIState(nodes.get(0).proof());
+            cachingExtension.updateGUIState();
         }
         if (!mismatches.isEmpty()) {
             // since e.getSource() is the popup menu, it is better to use the MainWindow

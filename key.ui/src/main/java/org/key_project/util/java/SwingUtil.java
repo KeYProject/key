@@ -5,6 +5,7 @@ package org.key_project.util.java;
 
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -218,6 +221,50 @@ public final class SwingUtil {
         if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
             setFont(((JMenu) component).getPopupMenu(), font);
         }
+    }
+
+    /**
+     * Resize the columns in the provided table to match their content.
+     * Will keep 20 pixels of padding between columns.
+     *
+     * @param table the table
+     */
+    public static void resizeTableColumns(JTable table) {
+        // https://stackoverflow.com/a/31977776/5837178
+
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            TableColumn tableColumn = table.getColumnModel().getColumn(column);
+            int preferredWidth = tableColumn.getMinWidth();
+            int maxWidth = tableColumn.getMaxWidth();
+
+            for (int row = 0; row < table.getRowCount(); row++) {
+                TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
+                Component c = table.prepareRenderer(cellRenderer, row, column);
+                int width = c.getPreferredSize().width + table.getIntercellSpacing().width + 20;
+                preferredWidth = Math.max(preferredWidth, width);
+
+                // We've exceeded the maximum width, no need to check other rows
+
+                if (preferredWidth >= maxWidth) {
+                    preferredWidth = maxWidth;
+                    break;
+                }
+            }
+
+            tableColumn.setPreferredWidth(preferredWidth);
+        }
+    }
+
+    /**
+     * Register an event listener that will close the dialog when the user presses
+     * the escape key.
+     *
+     * @param dialog the dialog
+     */
+    public static void closeDialogOnEscape(JDialog dialog) {
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        dialog.getRootPane().registerKeyboardAction(e -> dialog.dispose(), stroke,
+            JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**

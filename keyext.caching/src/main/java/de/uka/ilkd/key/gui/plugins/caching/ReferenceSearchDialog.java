@@ -95,7 +95,8 @@ public class ReferenceSearchDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
 
-        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null
+                || g.node().lookup(CachedProofBranch.class) != null)) {
             getApplyButton().setEnabled(true);
         }
 
@@ -142,6 +143,10 @@ public class ReferenceSearchDialog extends JDialog {
         return closeDialog;
     }
 
+    public void setProgressBarString(String title) {
+        progressBar.setString(title);
+    }
+
     /**
      * Set the maximum value of the progress bar.
      * Also resets progress to zero.
@@ -151,7 +156,6 @@ public class ReferenceSearchDialog extends JDialog {
     public void setMaximum(int total) {
         progressBar.setMaximum(total);
         progressBar.setValue(0);
-        progressBar.setString("Working...");
     }
 
     /**

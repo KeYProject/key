@@ -229,4 +229,18 @@ public class ChoiceSettings extends AbstractSettings {
         result = 31 * result + (category2Choices != null ? category2Choices.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        var keys = new ArrayList<>(category2Default.keySet());
+        Collections.sort(keys);
+        for (var key : keys) {
+            sb.append(key);
+            sb.append("=");
+            sb.append(category2Default.get(key));
+            sb.append(";");
+        }
+        return sb.toString();
+    }
 }

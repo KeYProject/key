@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,6 +18,9 @@ import de.uka.ilkd.key.gui.plugins.caching.actions.CloseByReference;
 import de.uka.ilkd.key.gui.plugins.caching.actions.CopyReferencedProof;
 import de.uka.ilkd.key.gui.plugins.caching.actions.GotoReferenceAction;
 import de.uka.ilkd.key.gui.plugins.caching.actions.RemoveCachingInformationAction;
+import de.uka.ilkd.key.gui.plugins.caching.database.AutoAddClosedProofs;
+import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabase;
+import de.uka.ilkd.key.gui.plugins.caching.database.CachingDatabaseDialog;
 import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
 import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.gui.plugins.caching.toolbar.CachingToggleAction;
@@ -35,13 +35,13 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.PathConfig;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -79,23 +79,31 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
+    /**
+     * The reference search button in the status bar.
+     */
     private ReferenceSearchButton referenceSearchButton;
+    /**
+     * The toggle action to quickly enable/disable proof caching.
+     */
     private CachingToggleAction toggleAction = null;
+    /**
+     * A handler for referenced proofs that get pruned.
+     */
     private CachingPruneHandler cachingPruneHandler = null;
+    /**
+     * A handler that automatically adds closed proofs to the database.
+     */
+    private AutoAddClosedProofs autoAddClosedProofs = null;
+    /**
+     * The external caching database (singleton instance).
+     */
+    private CachingDatabase database = null;
 
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {
             toggleAction = new CachingToggleAction(mainWindow);
         }
-    }
-
-    /**
-     * Update the GUI state of the status line button.
-     *
-     * @param proof the currently open proof
-     */
-    public void updateGUIState(Proof proof) {
-        referenceSearchButton.updateState(proof);
     }
 
     @Override
@@ -111,7 +119,7 @@ public class CachingExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         initActions(mainWindow);
-        return List.of(toggleAction);
+        return List.of(toggleAction, CachingDatabaseDialog.getOpenAction(getDatabase()));
     }
 
     public boolean getProofCachingEnabled() {
@@ -119,7 +127,7 @@ public class CachingExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         if (p == null || trackedProofs.contains(p)) {
             return;
@@ -128,6 +136,7 @@ public class CachingExtension
         p.addRuleAppListener(this);
         p.addProofDisposedListener(this);
         p.addProofTreeListener(cachingPruneHandler);
+        p.addProofTreeListener(autoAddClosedProofs);
     }
 
     @Override
@@ -160,9 +169,17 @@ public class CachingExtension
         }
         for (Goal goal : newGoals) {
             ClosedBy c = null;
+            CachedProofBranch cachedProofBranch = null;
             try {
                 c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                     goal.node());
+                if (c == null) {
+                    var cachedProofBranches = database.findMatching(
+                        p.getSettings().getChoiceSettings(), goal.sequent(), p.getServices());
+                    if (!cachedProofBranches.isEmpty()) {
+                        cachedProofBranch = cachedProofBranches.iterator().next();
+                    }
+                }
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search ", exception);
             }
@@ -174,6 +191,11 @@ public class CachingExtension
                 c.proof()
                         .addProofDisposedListenerFirst(
                             new CopyBeforeDispose(mediator, c.proof(), p));
+            }
+            if (cachedProofBranch != null) {
+                goal.setEnabled(false);
+
+                goal.node().register(cachedProofBranch, CachedProofBranch.class);
             }
         }
     }
@@ -187,7 +209,9 @@ public class CachingExtension
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
+        Runtime.getRuntime().addShutdownHook(new Thread(getDatabase()::shutdown));
         cachingPruneHandler = new CachingPruneHandler(mediator);
+        autoAddClosedProofs = new AutoAddClosedProofs(database);
     }
 
     @Override
@@ -210,12 +234,14 @@ public class CachingExtension
             actions.add(new CloseByReference(this, mediator, node));
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
+            actions.add(new SearchInDatabaseAction(this, node));
             actions.add(new RemoveCachingInformationAction(mediator, node));
             return actions;
         } else if (kind.getType() == Proof.class) {
             Proof proof = (Proof) underlyingObject;
             List<Action> actions = new ArrayList<>();
             actions.add(new CloseAllByReference(this, mediator, proof));
+            actions.add(new AddToDatabaseAction(database, proof));
             return actions;
         }
         return new ArrayList<>();
@@ -223,7 +249,7 @@ public class CachingExtension
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        referenceSearchButton = new ReferenceSearchButton(mediator);
+        referenceSearchButton = new ReferenceSearchButton(this, mediator);
         return List.of(referenceSearchButton);
     }
 
@@ -251,11 +277,14 @@ public class CachingExtension
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }
-        // unmark interactive goals
+        // unmark interactive goals previously marked in ruleApplied above
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null
+                        || goal.node().lookup(CachedProofBranch.class) != null)) {
             // mark goals as automatic again
-            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
+            p.openGoals().stream()
+                    .filter(goal -> goal.node().lookup(ClosedBy.class) != null
+                            || goal.node().lookup(CachedProofBranch.class) != null)
                     .forEach(g -> {
                         g.setEnabled(true);
                         g.proof().closeGoal(g);
@@ -306,7 +335,7 @@ public class CachingExtension
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.initiateAutoMode(newProof, true, false);
                 try {
-                    CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
+                    newProof.copyCachedGoals(referencedProof, null, null);
                 } finally {
                     mediator.finishAutoMode(newProof, true, true,
                         /* do not select a different node */ () -> {
@@ -329,8 +358,24 @@ public class CachingExtension
         }
     }
 
+    /**
+     * Update the GUI state of this extension.
+     * This will update the button in the status bar.
+     */
+    public void updateGUIState() {
+        referenceSearchButton.updateState(mediator.getSelectedProof());
+    }
+
     @Override
     public SettingsProvider getSettings() {
         return new CachingSettingsProvider();
+    }
+
+    public CachingDatabase getDatabase() {
+        if (database == null) {
+            database =
+                new CachingDatabase(PathConfig.getCacheIndex(), PathConfig.getCacheDirectory());
+        }
+        return database;
     }
 }

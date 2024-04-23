@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -1185,6 +1187,41 @@ public class Proof implements Named {
      */
     public void setProofFile(File proofFile) {
         this.proofFile = proofFile;
+    }
+
+    public void saveToFile(File file) throws IOException {
+        ProofSaver saver = new ProofSaver(this, file);
+        saver.save();
+    }
+
+    /**
+     * Save this proof to the specified file with a modified header.
+     * The header has to be compatible with the actual problem header of this proof!
+     *
+     * @param file the file
+     * @param problemHeader the problem header
+     */
+    public void saveToFileWithHeader(File file, String problemHeader) {
+        String oldProofHeader = this.problemHeader;
+        try {
+            this.problemHeader = problemHeader;
+            ProofSaver saver = new ProofSaver(this, file);
+            saver.save();
+        } finally {
+            this.problemHeader = oldProofHeader;
+        }
+    }
+
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @throws IOException on any I/O error
+     */
+    public void saveProofObligationToFile(File file) throws IOException {
+        ProofSaver saver = new ProofSaver(this, file, false);
+        saver.save();
     }
 
     /**

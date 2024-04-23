@@ -30,6 +30,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import de.uka.ilkd.key.gui.plugins.caching.CachedProofBranch;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -1106,7 +1107,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             if (goal == null || leaf.isClosed()) {
                 ClosedBy c = leaf.lookup(ClosedBy.class);
-                if (c != null) {
+                CachedProofBranch c2 = leaf.lookup(CachedProofBranch.class);
+                if (c != null || c2 != null) {
                     style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
                 } else {
                     style.icon = IconFactory.keyHoleClosed(iconHeight);
@@ -1115,6 +1117,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 toolTipText = "A closed goal";
                 if (c != null) {
                     toolTipText += " (by reference to other proof)";
+                }
+                if (c2 != null) {
+                    toolTipText += " (by reference to other saved proof)";
                 }
             } else if (goal.isLinked()) {
                 style.foreground = PINK_COLOR.get();
