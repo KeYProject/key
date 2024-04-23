@@ -1,10 +1,7 @@
-package org.key_project.prompts;
+package org.key_project.llmsynth.prompts;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.theokanning.openai.service.OpenAiService;
 import com.theokanning.openai.completion.chat.*;
-import com.theokanning.openai.service.FunctionExecutor;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -13,22 +10,17 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import io.reactivex.Flowable;
-import org.key_project.Task;
-import org.key_project.UnclosedProof;
-import org.key_project.Utility;
+import org.key_project.llmsynth.UnclosedProof;
+import org.key_project.llmsynth.Utility;
 import org.key_project.util.collection.ImmutableList;
-import recoder.kit.Problem;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;

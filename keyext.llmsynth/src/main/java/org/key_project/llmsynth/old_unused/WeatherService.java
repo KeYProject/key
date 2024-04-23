@@ -1,4 +1,4 @@
-package org.key_project.old_unused;
+package org.key_project.llmsynth.old_unused;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;

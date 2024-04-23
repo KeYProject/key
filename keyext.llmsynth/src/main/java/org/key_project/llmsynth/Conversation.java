@@ -1,4 +1,4 @@
-package org.key_project;
+package org.key_project.llmsynth;
 
 import com.theokanning.openai.service.OpenAiService;
 

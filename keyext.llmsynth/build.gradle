@@ -11,5 +11,5 @@ dependencies {
 }
 
 application {
-    mainClassName = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "org.key_project.Main"
+    mainClassName = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "org.key_project.llmsynth.Main"
 }

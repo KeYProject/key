@@ -1,4 +1,4 @@
-package org.key_project;
+package org.key_project.llmsynth;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -6,23 +6,12 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.old_unused.WeatherService;
-import org.key_project.prompts.Gpt3Prompt;
+import org.key_project.llmsynth.prompts.Gpt3Prompt;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

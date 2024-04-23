@@ -1,7 +1,4 @@
-package org.key_project;
-
-import javax.swing.*;
-import java.util.function.Function;
+package org.key_project.llmsynth;
 
 public enum Actions {
     LOAD("load", "load a file to prove", c -> {

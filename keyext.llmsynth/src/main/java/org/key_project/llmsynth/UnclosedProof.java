@@ -1,4 +1,4 @@
-package org.key_project;
+package org.key_project.llmsynth;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
