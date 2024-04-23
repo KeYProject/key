@@ -240,6 +240,10 @@ public class Main {
         sb.append(",");
         sb.append("KeY_state");
         sb.append(",");
+        sb.append("Isabelle_state");
+        sb.append(",");
+        sb.append("Z3_State");
+        sb.append(",");
         sb.append("KeY_time");
         sb.append(",");
         sb.append("KeY_proof_nodes");
@@ -249,8 +253,6 @@ public class Main {
         sb.append("transl_+_Z3_time");
         sb.append(",");
         sb.append("Z3_proof_lines");
-        sb.append(",");
-        sb.append("Z3_State");
         sb.append(",");
         sb.append("Isabelle_build_time");
         sb.append(",");
@@ -263,8 +265,6 @@ public class Main {
         sb.append("Isabelle_translation_lines");
         sb.append(",");
         sb.append("Isabelle_proof");
-        sb.append(",");
-        sb.append("Isabelle_state");
         sb.append(System.lineSeparator());
 
         for (Map<String, Map<Goal, StatEntry>> contractMap : STATS.values()) {
@@ -914,7 +914,7 @@ public class Main {
         if (stats == null) {
             stats = new StatEntry(input);
         }
-        stats.isabelleProofTactic = isabelleProof;
+        stats.isabelleProofTactic = isabelleProof.replace(",", " ").replace(System.lineSeparator(), "  ");
         STATS.get(input).get(contractName).put(goal, stats);
     }
 
