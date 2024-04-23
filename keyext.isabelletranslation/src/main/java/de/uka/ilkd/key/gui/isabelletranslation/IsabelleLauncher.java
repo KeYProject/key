@@ -32,26 +32,6 @@ public class IsabelleLauncher {
         this.settings = settings;
     }
 
-    public List<SledgehammerResult> try0ThenSledgehammerAll(List<IsabelleProblem> problems, long timeout_seconds) throws IOException {
-        if (problems.isEmpty()) {
-            return new ArrayList<>();
-        }
-        TranslationAction.writeTranslationFiles(problems.get(0));
-        Isabelle isabelle = startIsabelleInstance();
-        Thread destroyIsabelle = new Thread(isabelle::destroy);
-        Runtime.getRuntime().addShutdownHook(destroyIsabelle);
-        Theory thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
-        LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
-        List<SledgehammerResult> results = new ArrayList<>();
-        for (IsabelleProblem problem : problems) {
-            results.add(problem.try0ThenSledgehammer(isabelle, thy0, timeout_seconds));
-        }
-        LOGGER.info("Completed all problems");
-        isabelle.destroy();
-        Runtime.getRuntime().removeShutdownHook(destroyIsabelle);
-        return results;
-    }
-
     private Theory beginTheory(String thyText, Path source, Isabelle isabelle) {
         MLFunction3<Path, TheoryHeader, scala.collection.immutable.List<Theory>, Theory> begin_theory =
                 MLValue.compileFunction("fn (path, header, parents) => Resources.begin_theory path header parents", isabelle,
