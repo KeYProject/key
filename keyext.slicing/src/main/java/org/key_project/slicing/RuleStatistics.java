@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.rule.Rule;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.rule.Rule;
 
 /**
  * Simple data object to store a mapping of rules to various counters.
@@ -40,7 +40,8 @@ public class RuleStatistics {
 
         StatisticEntry entry =
             map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
-        map.put(name, new StatisticEntry(entry.numberOfApplications + 1, entry.numberOfUselessApplications, entry.numberOfInitialUselessApplications));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications, entry.numberOfInitialUselessApplications));
     }
 
     /**
@@ -55,7 +56,8 @@ public class RuleStatistics {
 
         StatisticEntry entry =
             map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
-        map.put(name, new StatisticEntry(entry.numberOfApplications + 1, entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications));
     }
 
     /**
@@ -70,7 +72,8 @@ public class RuleStatistics {
 
         StatisticEntry entry =
             map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
-        map.put(name, new StatisticEntry(entry.numberOfApplications + 1, entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications + 1));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications + 1));
     }
 
     /**
@@ -83,8 +86,10 @@ public class RuleStatistics {
      */
     public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
         return map.entrySet().stream()
-                .map(entry -> new RuleStatisticEntry(entry.getKey(), entry.getValue().numberOfApplications,
-                    entry.getValue().numberOfUselessApplications, entry.getValue().numberOfInitialUselessApplications))
+                .map(entry -> new RuleStatisticEntry(entry.getKey(),
+                    entry.getValue().numberOfApplications,
+                    entry.getValue().numberOfUselessApplications,
+                    entry.getValue().numberOfInitialUselessApplications))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
@@ -100,21 +105,25 @@ public class RuleStatistics {
     /**
      * Usage statistic of a rule.
      * <p>
-     * TODO weigl: refactoring task, combine {@link RuleStatisticEntry} with {@link StatisticEntry} to avoid repetition.
+     * TODO weigl: refactoring task, combine {@link RuleStatisticEntry} with {@link StatisticEntry}
+     * to avoid repetition.
      *
      * @param ruleName
      * @param numberOfApplications
      * @param numberOfUselessApplications
      * @param numberOfInitialUselessApplications
      */
-    public record RuleStatisticEntry(String ruleName, int numberOfApplications, int numberOfUselessApplications, int numberOfInitialUselessApplications) {
+    public record RuleStatisticEntry(String ruleName, int numberOfApplications,
+            int numberOfUselessApplications, int numberOfInitialUselessApplications) {
     }
 
     /**
      * Usage statistic of a rule.
+     *
      * @param numberOfApplications
      * @param numberOfUselessApplications
      * @param numberOfInitialUselessApplications
      */
-    public record StatisticEntry(int numberOfApplications, int numberOfUselessApplications, int numberOfInitialUselessApplications){}
+    public record StatisticEntry(int numberOfApplications, int numberOfUselessApplications,
+            int numberOfInitialUselessApplications) {}
 }

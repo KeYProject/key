@@ -83,7 +83,7 @@ public class ProofDifference {
         return current;
     }
 
-    public record QueueEntry(int idxLeft, int idxRight, int distance){}
+    public record QueueEntry(int idxLeft, int idxRight, int distance) {}
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());

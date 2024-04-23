@@ -35,7 +35,8 @@ import org.key_project.util.collection.ImmutableArray;
  * @see StrategyPropertyValueDefinition
  */
 public class StrategySettingsDefinition {
-    public record StategySettingEntry(String name, int order, IDefaultStrategyPropertiesFactory factory){}
+    public record StategySettingEntry(String name, int order,
+            IDefaultStrategyPropertiesFactory factory) {}
 
     private static final ArrayList<StategySettingEntry> STD_FURTHER_DEFAULTS;
 

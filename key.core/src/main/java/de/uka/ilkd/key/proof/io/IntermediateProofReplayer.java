@@ -111,7 +111,7 @@ public class IntermediateProofReplayer {
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<>();
 
-    public record PartnerNode(Node first, PosInOccurrence second, NodeIntermediate third){}
+    public record PartnerNode(Node first, PosInOccurrence second, NodeIntermediate third) {}
 
     /** Maps join node IDs to previously seen join partners */
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
@@ -265,7 +265,7 @@ public class IntermediateProofReplayer {
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<PartnerNode> partnerNodesInfo =
-                                    joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
+                                joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
@@ -804,12 +804,12 @@ public class IntermediateProofReplayer {
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
         for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            var  ownSEState =
+            var ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
             var partnerSEState =
                 sequentToSETriple(partnerNodeInfo.first, partnerNodeInfo.second, services);
 
-            assert ownSEState.third().equals(partnerSEState.third())
+            assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(

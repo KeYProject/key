@@ -204,7 +204,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
-    public record Abbreviation(LabeledParserRuleContext first, LabeledParserRuleContext second, LabeledParserRuleContext thrid){}
+    public record Abbreviation(LabeledParserRuleContext typeName,
+            LabeledParserRuleContext abbrevName,
+            LabeledParserRuleContext abbreviatedTerm) {}
 
     public Abbreviation[] getAbbreviations() {
         /* weigl: prepare for future use of generated abbreviations from JML specifications */
