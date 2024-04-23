@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.prooftree;
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
 
+import java.util.List;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
@@ -17,9 +18,19 @@ import org.jspecify.annotations.NonNull;
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     private GUIAbstractTreeNode[] children;
+    private final boolean leaf;
 
-    public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
+    /**
+     * This constructor should only be called by the {@link GUIProofTreeModel}!
+     * Use {@link GUIProofTreeModel#getProofTreeNode(Node)} to get the nodes.
+     *
+     * @param tree the proof tree
+     * @param node the node
+     * @param leaf whether the node is a leaf
+     */
+    GUIProofTreeNode(GUIProofTreeModel tree, Node node, boolean leaf) {
         super(tree, node);
+        this.leaf = leaf;
     }
 
     public TreeNode getChildAt(int childIndex) {
@@ -37,6 +48,13 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         if (n == null) {
             return null;
         }
+        if (n.isHideInProofTree()) {
+            // "parent" TreeNode is another proof node
+            while (n.parent() != null && n.getGroup() == null) {
+                n = n.parent();
+            }
+            return getProofTreeModel().getProofTreeNode(n);
+        }
         while (n.parent() != null && findChild(n.parent()) != null) {
             n = n.parent();
         }
@@ -52,6 +70,9 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         // the proof tree in ProofTreeView.java
         Node n = getNode();
         if (n != null) {
+            if (n.getExtraNodeLabel() != null) {
+                return n.serialNr() + ":" + n.getExtraNodeLabel();
+            }
             return n.serialNr() + ":" + n.name();
         } else {
             return "Invalid WeakReference";
@@ -66,6 +87,10 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
      */
     private void ensureChildrenArray() {
         if (children == null) {
+            if (leaf) {
+                children = new GUIAbstractTreeNode[0];
+                return;
+            }
             Node node = getNode();
             if (node != null
                     && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp ruleApp) {
@@ -79,6 +104,13 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                     }
                     return;
                 }
+            } else if (node != null && node.getGroup() != null) {
+                List<Node> group = node.getGroup();
+                children = new GUIAbstractTreeNode[group.size() - 1];
+                for (int i = 1; i < group.size(); i++) {
+                    children[i - 1] = getProofTreeModel().getProofTreeNode(group.get(i));
+                }
+                return;
             }
 
             // otherwise

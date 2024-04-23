@@ -487,7 +487,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     public synchronized GUIAbstractTreeNode getProofTreeNode(Node n) {
         GUIAbstractTreeNode res = find(n);
         if (res == null) {
-            res = new GUIProofTreeNode(this, n);
+            res = new GUIProofTreeNode(this, n, false);
             proofTreeNodes.put(n, res);
         }
         return res;

@@ -11,10 +11,13 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.proof.FunctionTracker;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -32,7 +35,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
+import org.key_project.logic.op.Function;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -167,6 +172,39 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
                 input.add(new Pair<>(formula, removed.contains(in)));
+            }
+        }
+
+        // determine for each instantiated schema variable which node first introduced that variable
+        if (ruleApp instanceof TacletApp t) {
+            var it = t.instantiations().pairIterator();
+            while (it.hasNext()) {
+                var x = it.next();
+                InstantiationEntry<?> y = x.value();
+                Object z = y.getInstantiation();
+                if (z instanceof Term term) {
+                    z = term.op();
+                }
+                if (z instanceof Function finalZ) {
+                    // skip if z is contained in any of the other inputs
+                    if (input.stream().anyMatch(form -> {
+                        var graphNode = form.first;
+                        if (graphNode instanceof TrackedFormula tf) {
+                            OpCollector op = new OpCollector();
+                            tf.formula.formula().execPreOrder(op);
+                            return op.contains(finalZ);
+                        }
+                        return false;
+                    })) {
+                        continue;
+                    }
+
+                    var a = FunctionTracker.getIntroducedBy(((Function) z));
+                    if (a != null && a != n) {
+                        input.add(new Pair<>(
+                            graph.getFunctionNode(finalZ, a.getBranchLocation()), false));
+                    }
+                }
             }
         }
 

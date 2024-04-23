@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
+import org.key_project.util.collection.DirectedGraph;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -34,6 +35,51 @@ public final class DotExporter {
     }
 
     private DotExporter() {
+    }
+
+    /**
+     * Convert the given dependency graph into a text representation (DOT format).
+     * If analysis results are given, useless nodes and edges are marked in red.
+     * If <code>abbreviateFormulas</code> is true, node labels are shortened.
+     *
+     * @param graph dependency graph to show
+     * @return string representing the dependency graph
+     */
+    public static String exportDot2(DirectedGraph<GraphNode, AnnotatedEdge> graph) {
+        StringBuilder buf = new StringBuilder();
+        buf.append("digraph {\n");
+        // expected direction in output rendering is reverse internal order
+        buf.append("edge [dir=\"back\"];\n");
+
+        for (AnnotatedEdge in : graph.edgeSet()) {
+            var src = in.getSource();
+            var dst = in.getTarget();
+            String inString = src.toString(false, false);
+            String outString = dst.toString(false, false);
+            var label = in.getProofStep().lookup(DependencyNodeData.class).label;
+            buf
+                    .append('"')
+                    .append(inString)
+                    .append("\" -> \"")
+                    .append(outString)
+                    .append("\" [label=\"")
+                    .append(label)
+                    .append("\"]\n");
+            // make sure the formulas are drawn with the correct shape
+            String shape = SHAPES.get(src.getClass());
+            if (shape != null) {
+                buf.append('"').append(inString).append("\" [shape=\"").append(shape)
+                        .append("\"]\n");
+            }
+            shape = SHAPES.get(dst.getClass());
+            if (shape != null) {
+                buf.append('"').append(outString).append("\" [shape=\"").append(shape)
+                        .append("\"]\n");
+            }
+        }
+
+        buf.append('}');
+        return buf.toString();
     }
 
     /**

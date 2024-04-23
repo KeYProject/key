@@ -14,7 +14,7 @@ import java.util.Set;
  * @param <T1> type of first element
  * @param <T2> type of second element
  */
-public class Pair<T1, T2> {
+public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
     /**
      * First element.
      */
@@ -96,5 +96,19 @@ public class Pair<T1, T2> {
             res.add(p.second);
         }
         return res;
+    }
+
+    @Override
+    public int compareTo(Pair<T1, T2> other) {
+        if (this == other) {
+            return 0;
+        }
+        var a = (Comparable<T1>) this.first;
+        var b = (Comparable<T2>) this.second;
+        var value = a.compareTo(other.first);
+        if (value != 0) {
+            return value;
+        }
+        return b.compareTo(other.second);
     }
 }

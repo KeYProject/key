@@ -12,7 +12,7 @@ import org.key_project.util.collection.DefaultEdge;
  *
  * @author Arne Keller
  */
-public class AnnotatedEdge extends DefaultEdge {
+public class AnnotatedEdge extends DefaultEdge<GraphNode> {
     /**
      * The node that added this edge to the dependency graph.
      */

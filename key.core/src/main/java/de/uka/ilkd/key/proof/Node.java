@@ -33,7 +33,7 @@ import org.key_project.util.lookup.Lookup;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class Node implements Iterable<Node> {
+public class Node implements Iterable<Node>, Comparable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -112,6 +112,10 @@ public class Node implements Iterable<Node> {
 
     @Nullable
     private Lookup userData = null;
+
+    private List<Node> group = null;
+    private boolean hideInProofTree = false;
+    private String extraNodeLabel = null;
 
 
     /**
@@ -836,5 +840,43 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    public Node getFirstInBranch() {
+        Node candidate = this;
+        while (candidate.parent != null
+                && candidate.parent.getBranchLocation().equals(candidate.getBranchLocation())) {
+            candidate = candidate.parent;
+        }
+        return candidate;
+    }
+
+    public List<Node> getGroup() {
+        return group;
+    }
+
+    public void setGroup(List<Node> group) {
+        this.group = group;
+    }
+
+    public String getExtraNodeLabel() {
+        return extraNodeLabel;
+    }
+
+    public void setExtraNodeLabel(String extraNodeLabel) {
+        this.extraNodeLabel = extraNodeLabel;
+    }
+
+    public boolean isHideInProofTree() {
+        return hideInProofTree;
+    }
+
+    public void setHideInProofTree(boolean hideInProofTree) {
+        this.hideInProofTree = hideInProofTree;
+    }
+
+    @Override
+    public int compareTo(Node node) {
+        return Integer.compare(this.serialNr, node.serialNr);
     }
 }

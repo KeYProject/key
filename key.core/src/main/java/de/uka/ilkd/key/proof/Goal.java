@@ -30,6 +30,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -657,6 +658,9 @@ public final class Goal {
         boolean first = true;
         for (Goal goal : goalList) {
             goal.node().addLocalProgVars(newProgVars);
+            for (Function f : newFunctions) {
+                FunctionTracker.setIntroducedBy(f, goal.node.parent());
+            }
             goal.node().addLocalFunctions(newFunctions);
 
             if (first) {
