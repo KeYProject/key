@@ -41,6 +41,9 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -600,6 +603,17 @@ public final class IssueDialog extends JDialog {
             String message = exception.getMessage();
             String info = sw.toString();
 
+            if (exception instanceof ParseCancellationException) {
+                exception = exception.getCause();
+            }
+
+            if (exception instanceof InputMismatchException ime) {
+                message = ExceptionTools.getNiceMessage(ime);
+            }
+            if (exception instanceof NoViableAltException nvae) {
+                message = ExceptionTools.getNiceMessage(nvae);
+            }
+
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
                 String causeMessage = exception.getCause().getMessage();
@@ -730,7 +744,8 @@ public final class IssueDialog extends JDialog {
     }
 
     private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
+        // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
+        return fileName != null && fileName.endsWith(".java");
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

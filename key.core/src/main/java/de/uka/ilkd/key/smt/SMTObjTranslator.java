@@ -10,15 +10,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -1124,7 +1127,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof Function fun) {
+        } else if (op instanceof JFunction fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {
@@ -1157,7 +1160,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private SMTSort translateSort(Sort s) throws IllegalFormulaException {
         if (s.equals(boolSort)) {
             return SMTSort.BOOL;
-        } else if (s.equals(Sort.FORMULA)) {
+        } else if (s.equals(JavaDLTheory.FORMULA)) {
             return SMTSort.BOOL;
         } else if (s.equals(integerSort)) {
             return sorts.get(BINT_SORT);
@@ -1167,7 +1170,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return sorts.get(FIELD_SORT);
         } else if (s.equals(locsetSort)) {
             return sorts.get(LOCSET_SORT);
-        } else if (s.equals(Sort.ANY)) {
+        } else if (s.equals(JavaDLTheory.ANY)) {
             return sorts.get(ANY_SORT);
         } else if (s.equals(seqSort)) {
             return sorts.get(SEQ_SORT);
@@ -1219,7 +1222,8 @@ public class SMTObjTranslator implements SMTTranslator {
             return;
         }
         // Do not specify constraint for these sorts:
-        if (s == Sort.ANY || s.equals(objectSort) || s.name().toString().equalsIgnoreCase("Null")) {
+        if (s == JavaDLTheory.ANY || s.equals(objectSort)
+                || s.name().toString().equalsIgnoreCase("Null")) {
             return;
         }
         /*

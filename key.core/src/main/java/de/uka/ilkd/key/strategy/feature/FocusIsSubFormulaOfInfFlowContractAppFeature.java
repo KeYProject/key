@@ -16,6 +16,8 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 
 /**
  * Checks whether the focus of the ruleApp is contained in one of the formulas added by information
@@ -68,7 +70,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private static class SubFormulaVisitor extends DefaultVisitor {
+    private static class SubFormulaVisitor implements DefaultVisitor {
 
         final Term potentialSub;
 
@@ -82,7 +84,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            isSubFormula |= visited.equalsModRenaming(potentialSub);
+            isSubFormula |= visited.equalsModProperty(potentialSub, RENAMING_PROPERTY);
         }
 
 

@@ -65,7 +65,7 @@ public final class WhileInvariantTransformer {
     /**
      * initialises this meta operator
      *
-     * @param initialPost TODO
+     * @param initialPost the instantiated Term passed to the TermTransformer
      * @param invariantFramingTermination TODO
      * @param services the Services providing access to signature and type model
      */
@@ -204,17 +204,19 @@ public final class WhileInvariantTransformer {
             resSta = s;
         }
 
-        Modality loopBodyModality = modality;
-        final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION
-                || loopBodyModality == Modality.BOX_TRANSACTION);
+        Modality.JavaModalityKind loopBodyModalityKind = modality.kind();
+        final boolean transaction =
+            (loopBodyModalityKind == Modality.JavaModalityKind.DIA_TRANSACTION
+                    || loopBodyModalityKind == Modality.JavaModalityKind.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
                         de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
                 : new StatementBlock(resSta));
-        return services.getTermBuilder().prog(loopBodyModality, mainJavaBlock, result,
+        return services.getTermBuilder().prog(loopBodyModalityKind, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
-                goal, loopBodyModality, result, mainJavaBlock, applicationSequent,
+                goal, Modality.getModality(loopBodyModalityKind, mainJavaBlock), result,
+                mainJavaBlock, applicationSequent,
                 initialPost.getLabels()));
     }
 
@@ -240,7 +242,7 @@ public final class WhileInvariantTransformer {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null,
             tf.createTerm(loopBodyModality,
-                new ImmutableArray<>(result), null, mainJavaBlock, newTermOriginalLabels));
+                new ImmutableArray<>(result), null, newTermOriginalLabels));
     }
 
     /**
@@ -323,12 +325,12 @@ public final class WhileInvariantTransformer {
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        Term executeReturn = services.getTermBuilder().prog(modality, returnJavaBlock, post,
+        Term executeReturn = services.getTermBuilder().prog(modality.kind(), returnJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
-                tf.createTerm(modality,
+                tf.createTerm(Modality.getModality(modality.kind(), returnJavaBlock),
                     new ImmutableArray<>(post),
-                    null, returnJavaBlock, post.getLabels())));
+                    null, post.getLabels())));
 
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag),
@@ -350,11 +352,12 @@ public final class WhileInvariantTransformer {
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
             new StatementBlock(breakIfCascade.toArray(new Statement[0])));
-        Term executeBreak = services.getTermBuilder().prog(modality, executeJavaBlock, post,
+        Term executeBreak = services.getTermBuilder().prog(modality.kind(), executeJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "BreakCaseModality", null,
-                tf.createTerm(modality, new ImmutableArray<>(post),
-                    null, executeJavaBlock, post.getLabels())));
+                tf.createTerm(Modality.getModality(modality.kind(), executeJavaBlock),
+                    new ImmutableArray<>(post),
+                    null, post.getLabels())));
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag),
                     typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
@@ -424,7 +427,7 @@ public final class WhileInvariantTransformer {
             Goal goal, Operator operator, ImmutableArray<Term> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,
-            tf.createTerm(operator, subs, null, null, post.getLabels()));
+            tf.createTerm(operator, subs, null, post.getLabels()));
     }
 
     private Term throwCase(TermLabelState termLabelState, ProgramVariable excFlag,
@@ -433,10 +436,12 @@ public final class WhileInvariantTransformer {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
-        Term throwException = TB.prog(modality, throwJavaBlock, post,
+        // TODO: can we simplify this? Why create same term twice? Can `prog` be used?
+        Term throwException = TB.prog(modality.kind(), throwJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ThrowCaseModality", null,
-                tf.createTerm(modality, new ImmutableArray<>(post), null, throwJavaBlock,
+                tf.createTerm(Modality.getModality(modality.kind(), throwJavaBlock),
+                    new ImmutableArray<>(post), null,
                     post.getLabels())));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
             typeConv.getBooleanLDT().getTrueTerm()), throwException);

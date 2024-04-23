@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+
+import org.key_project.logic.Named;
 
 /**
  * Interface for creating Strategy instances. The strategy name and the name of the strategy factory

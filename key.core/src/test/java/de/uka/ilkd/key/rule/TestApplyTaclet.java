@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -738,7 +740,7 @@ public class TestApplyTaclet {
         Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
         Term correctFormula = correctSeq.getFormulabyNr(1).formula();
 
-        assertTrue(resultFormula.equalsModRenaming(correctFormula),
+        assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_PROPERTY),
             "Wrong result. Expected:"
                 + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
                 + ProofSaver.printAnything(resultFormula, TacletForTests.services()));

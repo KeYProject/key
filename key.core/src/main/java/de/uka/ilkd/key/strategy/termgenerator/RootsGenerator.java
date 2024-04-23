@@ -23,6 +23,8 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 
 /**
  * Term generator for inferring the range of values that a variable can have from a given non-linear
@@ -90,7 +92,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModIrrelevantTermLabels(tb.ff())) {
+        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();

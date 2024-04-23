@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -25,6 +25,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -567,9 +569,9 @@ public abstract class AbstractUpdateExtractor {
             sorts[i] = arguments[i].sort();
         }
         // Create predicate which will be used in formulas to store the value interested in.
-        Function newPredicate =
-            new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
-                Sort.FORMULA, sorts);
+        JFunction newPredicate =
+            new JFunction(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
+                JavaDLTheory.FORMULA, sorts);
         // Create formula which contains the value interested in.
         Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
         return newTerm;
@@ -788,12 +790,13 @@ public abstract class AbstractUpdateExtractor {
                 OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
             this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
             TermBuilder tb = getServices().getTermBuilder();
-            Function constantFunction = new Function(
+            JFunction constantFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
-            Function notAValueFunction = new Function(
-                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
+            JFunction notAValueFunction = new JFunction(
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
+                JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
         }
 
@@ -939,11 +942,11 @@ public abstract class AbstractUpdateExtractor {
                 } else {
                     if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                         // Special handling for length attribute of arrays
-                        Function function =
+                        JFunction function =
                             getServices().getTypeConverter().getHeapLDT().getLength();
                         return tb.func(function, createPreParentTerm());
                     } else {
-                        Function function =
+                        JFunction function =
                             getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) programVariable, getServices());
                         return tb.dot(programVariable.sort(), createPreParentTerm(), function);
@@ -951,7 +954,7 @@ public abstract class AbstractUpdateExtractor {
                 }
             } else {
                 if (programVariable.isStatic()) {
-                    Function function = getServices().getTypeConverter().getHeapLDT()
+                    JFunction function = getServices().getTypeConverter().getHeapLDT()
                             .getFieldSymbolForPV((LocationVariable) programVariable, getServices());
                     return tb.staticDot(programVariable.sort(), function);
                 } else {

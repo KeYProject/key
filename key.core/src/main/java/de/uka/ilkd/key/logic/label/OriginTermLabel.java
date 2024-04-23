@@ -9,16 +9,19 @@ import java.util.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
@@ -57,6 +60,7 @@ public class OriginTermLabel implements TermLabel {
      * @see #getChildCount()
      */
     public final static int CHILD_COUNT = 2;
+    public static final Sort[] EMPTY_SORTS = new Sort[0];
 
 
     /**
@@ -218,9 +222,9 @@ public class OriginTermLabel implements TermLabel {
         final JavaInfo ji = services.getJavaInfo();
 
         if (op.arity() == 0) {
-            Sort sort = op.sort(new ImmutableArray<>());
+            Sort sort = op.sort(EMPTY_SORTS);
 
-            if (sort.extendsTrans(Sort.FORMULA)) {
+            if (sort.extendsTrans(JavaDLTheory.FORMULA)) {
                 return true;
             } else if (op instanceof ProgramVariable) {
                 return !sort.extendsTrans(tc.getHeapLDT().targetSort())
@@ -231,8 +235,8 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof Function) || (op.getClass().equals(Function.class)
-                    && ((Function) op).sort().extendsTrans(Sort.FORMULA));
+            return !(op instanceof JFunction) || (op.getClass().equals(JFunction.class)
+                    && ((Function) op).sort().extendsTrans(JavaDLTheory.FORMULA));
         }
     }
 
@@ -289,7 +293,7 @@ public class OriginTermLabel implements TermLabel {
             newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
         }
 
-        return tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(),
+        return tf.createTerm(term.op(), newSubs, term.boundVars(),
             new ImmutableArray<>(labels));
     }
 
@@ -416,7 +420,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * This method transforms a term in such a way that every {@link OriginTermLabel} contains all
-     * of the correct {@link #getSubtermOrigins()}.
+     * the correct {@link #getSubtermOrigins()}.
      *
      * @param term the term to transform.
      * @param services services.
@@ -432,7 +436,7 @@ public class OriginTermLabel implements TermLabel {
             computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
 
         return services.getTermFactory().createTerm(term.op(), newSubs.terms, term.boundVars(),
-            term.javaBlock(), labels);
+            labels);
     }
 
     @Override

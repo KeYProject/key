@@ -11,7 +11,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
  */
-public interface TermTransformer extends SortedOperator {
+public interface TermTransformer extends org.key_project.logic.op.SortedOperator, Operator {
 
     /**
      * initiates term transformation of <tt>term</tt>. Note the top level operator of of parameter

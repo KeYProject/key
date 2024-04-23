@@ -5,9 +5,8 @@ package org.key_project.slicing;
 
 import java.util.List;
 
-import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.Test;
 

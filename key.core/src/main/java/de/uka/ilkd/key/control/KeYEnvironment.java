@@ -21,10 +21,11 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.Pair;
 
 import org.key_project.util.collection.ImmutableSet;
 

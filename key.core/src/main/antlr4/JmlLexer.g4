@@ -280,7 +280,7 @@ SEQCONCAT: '\\seq_concat';  //KeY extension, not official JML
 SEQDEF: '\\seq_def';  //KeY extension, not official JML
 SEQEMPTY: '\\seq_empty';  //KeY extension, not official JML
 SEQGET: '\\seq_get';  //KeY extension, not official JML
-SEQREPLACE: '\\seq_put';  //KeY extension, not official JML
+SEQREPLACE: '\\seq_upd';  //KeY extension, not official JML
 SEQREVERSE: '\\seq_reverse';  //KeY extension, not official JML
 SEQSINGLETON: '\\seq_singleton';  //KeY extension, not official JML
 SEQSUB: '\\seq_sub';  //KeY extension, not official JML

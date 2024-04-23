@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -23,13 +25,13 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     private static Sort[] createUpdateSortArray(int arity) {
         Sort[] result = new Sort[arity];
         for (int i = 0; i < arity; i++) {
-            result[i] = Sort.UPDATE;
+            result[i] = JavaDLTheory.UPDATE;
         }
         return result;
     }
 
 
     private UpdateJunctor(Name name, int arity) {
-        super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
+        super(name, createUpdateSortArray(arity), JavaDLTheory.UPDATE, false);
     }
 }
