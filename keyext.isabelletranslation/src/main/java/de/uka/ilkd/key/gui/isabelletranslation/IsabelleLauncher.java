@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,14 +31,14 @@ public class IsabelleLauncher {
         this.settings = settings;
     }
 
-    private Theory beginTheory(String thyText, Path source, Isabelle isabelle) {
+    private Theory beginTheory(Path source, Isabelle isabelle) {
         MLFunction3<Path, TheoryHeader, scala.collection.immutable.List<Theory>, Theory> begin_theory =
                 MLValue.compileFunction("fn (path, header, parents) => Resources.begin_theory path header parents", isabelle,
                         Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()), Implicits.theoryConverter());
         MLFunction2<String, Position, TheoryHeader> header_read = MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle,
                 de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter(), Implicits.theoryHeaderConverter());
 
-        TheoryHeader header = header_read.apply(thyText, Position.none(isabelle), isabelle, de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter())
+        TheoryHeader header = header_read.apply("theory Translation imports Main KeYTranslations.TranslationPreamble begin", Position.none(isabelle), isabelle, de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter())
                 .retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
         Path topDir = source.getParent();
         return begin_theory.apply(topDir, header, header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
@@ -68,7 +67,7 @@ public class IsabelleLauncher {
 
         for (int i = 0; i < coreCount; i++) {
             Isabelle isabelle = startIsabelleInstance();
-            Theory thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
+            Theory thy0 = beginTheory(settings.getTranslationPath(), isabelle);
             resourceInstances.add(new Pair<>(isabelle, thy0));
 
             tasks.add(()-> {
