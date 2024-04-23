@@ -13,6 +13,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.jspecify.annotations.NullMarked;
 
 /**
+ * Loader for proof obligation arises by function operation contract.
+ *
  * @author Alexander Weigl
  * @version 1 (28.12.23)
  */
@@ -21,7 +23,7 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already loaded {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.

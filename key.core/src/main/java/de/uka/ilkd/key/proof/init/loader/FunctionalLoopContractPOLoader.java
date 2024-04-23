@@ -10,6 +10,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import org.jspecify.annotations.NullMarked;
 
 /**
+ * Loader for proof obligation arises from functional loop contracts.
+ *
  * @author Alexander Weigl
  * @version 1 (28.12.23)
  */

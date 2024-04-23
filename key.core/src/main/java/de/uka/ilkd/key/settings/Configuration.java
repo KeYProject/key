@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A container to hold parsed configurations. Configurations are a mapping between a property name
- * and a value plus additional meta information (line number, documentation etc.).
+ * and a values plus additional meta-information (line number, documentation, etc.).
  * <p>
  * Helper functions allow to accesss the values in a type safe fashion.
  * Note that configuration are also nested, use {@link #getTable(String)} to receive a sub
@@ -54,7 +54,7 @@ public class Configuration {
     /**
      * Loads a configuration using the given char stream.
      *
-     * @param file existsing file path
+     * @param input existing file path
      * @return a configuration based on the file contents
      * @throws IOException i/o error on the steram
      */
@@ -129,7 +129,7 @@ public class Configuration {
      * Returns an integer or {@code null} if not such entry exists.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link java.lang.Long}
      * @throw NullPointerException if no such value entry exists
      */
     public int getInt(String name) {
@@ -141,7 +141,7 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public int getInt(String name, int defaultValue) {
@@ -152,7 +152,7 @@ public class Configuration {
      * Returns a long value for the given name. {@code null} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
@@ -163,7 +163,7 @@ public class Configuration {
      * Returns a long value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
@@ -175,7 +175,7 @@ public class Configuration {
      * Returns a boolean value for the given name.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
@@ -186,7 +186,7 @@ public class Configuration {
      * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name, boolean defaultValue) {
@@ -198,7 +198,7 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {

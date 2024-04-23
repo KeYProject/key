@@ -3,12 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init.loader;
 
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.DependencyContractPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
-
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
+/**
+ * Loader for proof obligation arises from dependency contracts.
+ * @author Alexander Weigl
+ */
 @NullMarked
 public class DependencyContractPOLoader implements ProofObligationLoader {
     /**
@@ -19,8 +27,8 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
      * @return The instantiated proof obligation.
      */
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
-            Configuration properties) {
-        String contractName = properties.getString("contract");
+                                                     Configuration properties) {
+        String contractName = Objects.requireNonNull(properties.getString("contract"));
         int proofNum = 0;
         String baseContractName;
         int ind = -1;
@@ -43,7 +51,7 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
             throw new RuntimeException("Contract not found: " + baseContractName);
         } else {
             return new IPersistablePO.LoadedPOContainer(
-                contract.createProofObl(initConfig, contract), proofNum);
+                    contract.createProofObl(initConfig, contract), proofNum);
         }
     }
 

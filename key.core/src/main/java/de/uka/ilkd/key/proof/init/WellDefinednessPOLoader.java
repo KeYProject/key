@@ -10,6 +10,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import org.jspecify.annotations.NullMarked;
 
 /**
+ * Loader for proof obligation arises from well definedness.
  * @author Alexander Weigl
  * @version 1 (29.12.23)
  */
@@ -18,7 +19,7 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already loaded {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
