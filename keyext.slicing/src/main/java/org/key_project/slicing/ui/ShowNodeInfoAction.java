@@ -15,11 +15,12 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.graph.AnnotatedEdge;
+import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.slicing.graph.DependencyGraph.IncomingEdge;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
 
@@ -72,17 +73,17 @@ public class ShowNodeInfoAction extends MainWindowAction {
         List<GraphNode> graphNodes = new ArrayList<>();
         List<Node> proofSteps = new ArrayList<>();
         AnalysisResults analysisResults = tracker.getAnalysisResults();
-        Function<Triple<Node, GraphNode, AnnotatedEdge>, Collection<String>> nodeToTableRow = n -> {
-            proofSteps.add(n.first);
-            graphNodes.add(n.second);
-            var ruleName = n.first.getAppliedRuleApp().rule().displayName();
+        Function<IncomingEdge, Collection<String>> nodeToTableRow = n -> {
+            proofSteps.add(n.first());
+            graphNodes.add(n.second());
+            var ruleName = n.first().getAppliedRuleApp().rule().displayName();
             return List.of(
-                Integer.toString(n.first.serialNr()),
-                analysisResults != null && !analysisResults.usefulSteps.contains(n.first)
+                Integer.toString(n.first().serialNr()),
+                analysisResults != null && !analysisResults.usefulSteps.contains(n.first())
                         ? "<strike>" + ruleName + "</strike>"
                         : ruleName,
-                n.third.replacesInputNode() ? "yes" : "no",
-                n.second.toString(false, false));
+                n.third().replacesInputNode() ? "yes" : "no",
+                n.second().toString(false, false));
         };
         var idxFactory = new IndexFactory();
 
@@ -99,7 +100,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
             HtmlFactory.generateTable(headers2, clickable, Optional.empty(), outgoing, idxFactory);
         var useful = analysisResults != null
                 ? tracker.getDependencyGraph().outgoingGraphEdgesOf(node)
-                        .filter(t -> analysisResults.usefulSteps.contains(t.first)).count()
+                        .filter(t -> analysisResults.usefulSteps.contains(t.first())).count()
                 : -1;
         var extraInfo = useful != -1 ? "<h2>" + useful + " useful rule apps</h2>" : "";
         var previousDerivations = 0;
