@@ -77,7 +77,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param initConfig The loaded project.
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-                          @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
+            @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;

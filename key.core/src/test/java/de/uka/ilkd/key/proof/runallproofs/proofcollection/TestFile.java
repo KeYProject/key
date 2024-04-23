@@ -262,7 +262,7 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            ProofScriptEntry script) throws Exception {
+            ProofScriptEntry script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
