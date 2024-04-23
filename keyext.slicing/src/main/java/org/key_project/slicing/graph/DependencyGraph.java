@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
@@ -120,16 +119,18 @@ public class DependencyGraph {
         return graph.incomingEdgesOf(node).stream().map(AnnotatedEdge::getProofStep);
     }
 
+    public record IncomingEdge(Node first, GraphNode second, AnnotatedEdge third){}
+
     /**
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
+    public Stream<IncomingEdge> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.incomingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeSource(edge), edge));
+                .map(edge -> new IncomingEdge(edge.getProofStep(), graph.getEdgeSource(edge), edge));
     }
 
     /**
@@ -147,12 +148,12 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
+    public Stream<IncomingEdge> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
+                .map(edge -> new IncomingEdge(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
     /**
