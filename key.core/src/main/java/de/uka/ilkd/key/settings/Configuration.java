@@ -275,13 +275,14 @@ public class Configuration {
      *
      * @param name property name
      * @param clazz the class type of the elements
-     * @throws ClassCastException if the entry is not a {@link List} or contains elements of the wrong type
+     * @throws ClassCastException if the entry is not a {@link List} or contains elements of the
+     *         wrong type
      * @throws NoSuchElementException if no such value entry exists
      */
     @SuppressWarnings("unchecked")
     public <T> @Nullable List<T> getList(String name, Class<T> clazz) {
         List<?> result = get(name, List.class);
-        if(result == null) {
+        if (result == null) {
             throw new NoSuchElementException();
         }
         if (!result.stream().allMatch(clazz::isInstance)) {
@@ -293,7 +294,8 @@ public class Configuration {
     /**
      * Returns a list of strings for the given name.
      *
-     * In contrast to the other methods, this method does not throw an exception if the entry does not
+     * In contrast to the other methods, this method does not throw an exception if the entry does
+     * not
      * exist in the configuration. Instead, it returns an empty list.
      *
      * @param name property name
@@ -302,7 +304,7 @@ public class Configuration {
     @SuppressWarnings("unchecked")
     public @NonNull List<String> getStringList(String name) {
         List<?> result = get(name, List.class);
-        if(result == null) {
+        if (result == null) {
             return Collections.emptyList();
         }
         if (!result.stream().allMatch(String.class::isInstance)) {
@@ -339,7 +341,7 @@ public class Configuration {
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> @NonNull T getEnum(String name, @NonNull T defaultValue) {
         Class<T> clazz = (Class<T>) defaultValue.getClass();
-        if(!clazz.isEnum()) {
+        if (!clazz.isEnum()) {
             throw new IllegalArgumentException(clazz + " is not an enum type.");
         }
         var idx = getString(name);
@@ -389,7 +391,8 @@ public class Configuration {
         return data.put(name, obj);
     }
 
-    // TODO Why do these setters exist? They delegate to set(String, Object) and do not add any value.
+    // TODO Why do these setters exist? They delegate to set(String, Object) and do not add any
+    // value.
     public Object set(String name, Boolean obj) {
         return set(name, (Object) obj);
     }

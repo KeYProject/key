@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.loader;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
+
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -42,7 +43,8 @@ public interface ProofObligationLoader {
     /**
      * Receiving an identifier (traditionally the fully qualified class name), this method decides
      * whether it can handle the current situation.
-     * Currently, the identifier corresponds to the {@code class} entry in the {@code \proofObligation} entry in the
+     * Currently, the identifier corresponds to the {@code class} entry in the
+     * {@code \proofObligation} entry in the
      * {@link de.uka.ilkd.key.proof.init.KeYUserProblemFile}.
      *
      * @param identifier non-null string

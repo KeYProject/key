@@ -11,6 +11,7 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * Loader for proof obligation arises from well definedness.
+ *
  * @author Alexander Weigl
  * @version 1 (29.12.23)
  */
