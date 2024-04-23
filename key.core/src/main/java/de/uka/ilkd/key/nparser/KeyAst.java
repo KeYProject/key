@@ -89,7 +89,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 Location location = new Location(url,
-                        Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
 
                 String text = pctx.ps.getText();
                 return new ProofScriptEntry(StringUtil.trim(text, '"'), location);

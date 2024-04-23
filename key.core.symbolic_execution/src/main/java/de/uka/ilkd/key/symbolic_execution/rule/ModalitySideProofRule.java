@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.rule;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -11,15 +15,13 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import org.jspecify.annotations.NonNull;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -179,8 +181,9 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             Set<Term> resultTerms = new LinkedHashSet<>();
             for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
                 Term conditionTerm = tb.and(conditionsAndResult.conditions());
-                Term resultEqualityTerm = varFirst ? tb.equals(conditionsAndResult.result(), otherTerm)
-                        : tb.equals(otherTerm, conditionsAndResult.result());
+                Term resultEqualityTerm =
+                    varFirst ? tb.equals(conditionsAndResult.result(), otherTerm)
+                            : tb.equals(otherTerm, conditionsAndResult.result());
                 Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, resultEqualityTerm)
                         : tb.and(conditionTerm, resultEqualityTerm);
                 resultTerms.add(resultTerm);
