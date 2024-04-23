@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -15,7 +17,6 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.java.StringUtil;
 
@@ -84,12 +85,14 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable ProofScriptEntry findProofScript(URI url) {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
+                Location location = new Location(url,
+                        Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                    pctx.ps.getCharPositionInLine());
+                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
             }
             return null;
         }

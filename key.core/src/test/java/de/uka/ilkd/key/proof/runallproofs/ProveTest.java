@@ -10,6 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
@@ -197,7 +198,7 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
