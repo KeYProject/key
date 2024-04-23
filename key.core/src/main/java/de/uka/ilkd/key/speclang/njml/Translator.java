@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -25,8 +22,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
 import de.uka.ilkd.key.speclang.njml.JmlParser.PrimaryFloatingPointContext;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
@@ -59,7 +58,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Note, that this translator does not construct any contracts. In particular, clauses are
  * translated into a corresponding {@link Term} and are attached in
- * {@link de.uka.ilkd.key.speclang.jml.JMLSpecExtractor} into the correct contract.
+ * {@link JMLSpecExtractor} into the correct contract.
  *
  * @author Alexander Weigl
  * @version 1 (5/10/20)
@@ -233,14 +232,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (signature == null || signature.isEmpty()) {
             return "";
         }
-        StringBuilder sigString = new StringBuilder();
-
-        for (SLExpression expr : signature) {
-            final KeYJavaType t = expr.getType();
-            sigString.append(t == null ? "<unknown type>" : t.getFullName()).append(", ");
-        }
-
-        return sigString.substring(0, sigString.length() - 2);
+        return String.join(", ", signature
+                .map(SLExpression::getType)
+                .filter(Objects::nonNull)
+                .map(KeYJavaType::getFullName));
     }
 
     // region expression
@@ -685,7 +680,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = null;
         for (int i = 1; i < expressions.size(); i++) {
             Token opToken = ctx.op.get(i - 1);
-            JMLOperator jop = JMLOperator.get(opToken.getText());
+            JMLOperator jop = get(opToken.getText());
             SLExpression left = expressions.get(i - 1);
             SLExpression right = expressions.get(i);
             try {
@@ -711,7 +706,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 1; i < e.size(); i++) {
             String opToken = ctx.op.get(i - 1).getText();
             SLExpression expr = e.get(i);
-            JMLOperator op = JMLOperator.get(opToken);
+            JMLOperator op = get(opToken);
             try {
                 result = termFactory.binary(op, result, expr);
             } catch (RuntimeException ex) {
@@ -728,7 +723,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
             String opToken = ctx.op.get(i - 1).getText();
-            JMLOperator op = JMLOperator.get(opToken);
+            JMLOperator op = get(opToken);
             try {
                 result = termFactory.binary(op, result, expr);
             } catch (RuntimeException ex) {
@@ -1038,6 +1033,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError(ctx, e);
             }
         }
+
+        // support JML built-ins
+        if (fullyQualifiedName.startsWith("\\")) {
+            try {
+                return processJmlBuiltInFunction(fullyQualifiedName, accept(ctx.expressionlist()));
+            } catch (Exception e) {
+                // weigl: only log error. There is no reason why a method should not
+                // start with a "\" in JML. The next version will have, e.g., \seq and \map classes.
+                addWarning(ctx,
+                    "%s is not known as a JML built-in function. I assume it to be a method or class."
+                            .formatted(fullyQualifiedName));
+            }
+        }
+
         SLParameters params = visitParameters(ctx.expressionlist());
 
         lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
@@ -1059,6 +1068,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 ctx);
         }
         return result;
+    }
+
+    private SLExpression processJmlBuiltInFunction(String name,
+            ImmutableList<SLExpression> params) {
+        // at some point in life, we may want to have a customizable map here.
+        return switch (name) {
+        case "\\array2seq" -> termFactory.translateToJDLTerm(name.substring(1), params);
+        case "\\seq_upd" -> termFactory.translateToJDLTerm("seqUpd", params);
+        case "\\seq_put" -> termFactory.translateToJDLTerm("seqUpd", params);
+        default -> throw new IllegalStateException("Unexpected value: " + name);
+        };
     }
 
     private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
@@ -1337,58 +1357,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFieldarrayaccess(JmlParser.FieldarrayaccessContext ctx) {
-        SLExpression base = oneOf(ctx.ident(), ctx.super_(), ctx.this_());
-        String backupFullyQualifiedName = fullyQualifiedName;
-        fullyQualifiedName = ctx.start.getText();
-        for (JmlParser.Fieldarrayaccess_suffixContext suffx : ctx.fieldarrayaccess_suffix()) {
-            base = visitFieldarrayaccess_suffix(base, suffx);
-        }
-        fullyQualifiedName = backupFullyQualifiedName;
-        return base;
-    }
-
-    public SLExpression visitFieldarrayaccess_suffix(SLExpression base,
-            JmlParser.Fieldarrayaccess_suffixContext ctx) {
-        if (ctx.DOT() != null) {
-            String lookupName;
-            if (ctx.ident() != null) {
-                String id = ctx.ident().getText();
-                if (base == null) {
-                    // Receiver was only a package/classname prefix
-                    lookupName = fullyQualifiedName + "." + id;
-                } else {
-                    lookupName = id;
-                }
-                fullyQualifiedName = fullyQualifiedName + "." + id;
-                try {
-                    return lookupIdentifier(lookupName, base, null, ctx);
-                } catch (Exception e) {
-                    return lookupIdentifier(fullyQualifiedName, null, null, ctx);
-                }
-            }
-            if (ctx.TRANSIENT() != null) {
-                return lookupIdentifier("<transient>", base, null, ctx);
-            }
-            if (ctx.this_() != null) {
-                return new SLExpression(
-                    services.getTypeConverter().findThisForSort(base.getType().getSort(),
-                        tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true),
-                    base.getType());
-            }
-            if (ctx.INV() != null) {
-                return termFactory.createInv(base.getTerm(), base.getType());
-            }
-        } else {
-            // Array access
-            SLExpression index = accept(ctx.expression());
-            return termFactory.arrayRef(base, fullyQualifiedName, index, null);
-        }
-        assert false;
-        return null;
-    }
-
-    @Override
     public SLExpression visitPrimaryCreateLocsetSingleton(
             JmlParser.PrimaryCreateLocsetSingletonContext ctx) {
         SLExpression e = accept(ctx.expression());
@@ -1402,21 +1370,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(ctx, "The given expression %s is not a valid reference.", e);
         }
         return null;
-    }
-
-    @Override
-    public SLExpression visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
-        List<SLExpression> aa = mapOf(ctx.fieldarrayaccess());
-        List<Term> seq = aa.stream().map(termFactory::createStoreRef).collect(Collectors.toList());
-        Term ret = null;
-        if (seq.isEmpty()) {
-            raiseError(ctx, "empty!");
-        } else if (seq.size() == 1) {
-            ret = seq.get(0);
-        } else {
-            ret = tb.union(seq);
-        }
-        return new SLExpression(ret, javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
 
     @Override
@@ -2086,7 +2039,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public de.uka.ilkd.key.speclang.Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
+    public Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
         this.mods = accept(ctx.modifiers());
         contractClauses = new ContractClauses();
         accept(ctx.spec_body());
