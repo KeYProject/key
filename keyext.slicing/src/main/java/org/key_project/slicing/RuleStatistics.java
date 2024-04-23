@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.util.Triple;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Simple data object to store a mapping of rules to various counters.
@@ -83,10 +82,9 @@ public class RuleStatistics {
      * @param comparator custom comparator
      * @return list of rule names + counters
      */
-    public List<Quadruple<String, Integer, Integer, Integer>> sortBy(
-            Comparator<Quadruple<String, Integer, Integer, Integer>> comparator) {
+    public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
         return map.entrySet().stream()
-                .map(entry -> new Quadruple<>(entry.getKey(), entry.getValue().first,
+                .map(entry -> new RuleStatisticEntry(entry.getKey(), entry.getValue().first,
                     entry.getValue().second, entry.getValue().third))
                 .sorted(comparator)
                 .collect(Collectors.toList());
@@ -98,5 +96,15 @@ public class RuleStatistics {
      */
     public boolean branches(String rule) {
         return ruleBranched.get(rule);
+    }
+
+    /**
+     * Usage statistic of a rule.
+     * @param ruleName
+     * @param numberOfApplications
+     * @param numberOfUselessApplications
+     * @param numberOfInitialUselessApplications
+     */
+    public record RuleStatisticEntry(String ruleName, int numberOfApplications, int numberOfUselessApplications, int numberOfInitialUselessApplications) {
     }
 }
