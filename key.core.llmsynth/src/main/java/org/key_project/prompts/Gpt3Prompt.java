@@ -57,7 +57,8 @@ public class Gpt3Prompt {
             "You do not add commentary strings.";
     final static ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), BOT_DESCRIPTION);
 
-    final static String PTN_METHOD_OLD = "(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])";
+    //final static String PTN_METHOD_OLD = "(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])";
+    final static String PTN_METHOD_OLD = "(public|protected|private|static) +[\\w\\<\\>\\[\\],\\s]+\\s+(\\w+) *\\([^\\)]*\\) *(\\{?|[^;])";
     final static String PTN_METHOD = "^[ \\t]*(?:(?:public|protected|private)\\s+)?(?:(static|final|native|synchronized|abstract|threadsafe|transient|(?:<[?\\w\\[\\] ,&]+>)|(?:<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>)|(?:<[^<]*<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>[^>]*>))\\s+){0,}(?!return)\\b([\\w.]+)\\b(?:|(?:<[?\\w\\[\\] ,&]+>)|(?:<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>)|(?:<[^<]*<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>[^>]*>))((?:\\[\\]){0,})\\s+\\b\\w+\\b\\s*\\(\\s*(?:\\b([\\w.]+)\\b(?:|(?:<[?\\w\\[\\] ,&]+>)|(?:<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>)|(?:<[^<]*<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>[^>]*>))((?:\\[\\]){0,})(\\.\\.\\.)?\\s+(\\w+)\\b(?![>\\[])\\s*(?:,\\s+\\b([\\w.]+)\\b(?:|(?:<[?\\w\\[\\] ,&]+>)|(?:<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>)|(?:<[^<]*<[^<]*<[?\\w\\[\\] ,&]+>[^>]*>[^>]*>))((?:\\[\\]){0,})(\\.\\.\\.)?\\s+(\\w+)\\b(?![>\\[])\\s*){0,})?\\s*\\)(?:\\s*throws [\\w.]+(\\s*,\\s*[\\w.]+))?\\s*(?:\\{|;)[ \\t]*$";
 
     final static String PTN_JML = "@";
@@ -309,13 +310,13 @@ public class Gpt3Prompt {
         }
     }
 
-    private static Triple<Boolean, FailureReason, ProblemLoaderException> tryKeyValidation(List<String> classLines, String methodName, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
+    private static Triple<Boolean, FailureReason, ProblemLoaderException> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
         if (errSoFar != FailureReason.NONE)
             return new Triple<>(false, errSoFar, null); // todo: this is hacky, but an easy way to short-circuit for now
 
         int ml = 0;
         try {
-            ml = isInvariant ? lineOfFirstInvariantPlaceInMethod(classLines, methodName) : lineOfMethod(classLines, methodName);
+            ml = isInvariant ? lineOfFirstInvariantPlaceInMethod(classLines, methodName) : (subfun == null) ? lineOfMethod(classLines, methodName) : lineOfMethod(classLines, subfun);
         } catch (RuntimeException e) {
             return new Triple<>(false, FailureReason.UNKNOWN, null);
         }
@@ -446,15 +447,17 @@ public class Gpt3Prompt {
                 {
 //                    key_result = tryKeyValidation(classLines, methodName, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
-                    int timeout = 10;
+                    int timeout = 100;
                     TimeUnit tou = TimeUnit.SECONDS;
                     Future<Triple<Boolean, FailureReason, ProblemLoaderException>> fut = executor.submit((Callable) () -> {
-                        return tryKeyValidation(classLines, methodName, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
+                        return tryKeyValidation(classLines, methodName, subfun, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
                     });
                     try {
                         var kr = fut.get(timeout, tou);
                         key_result = new Triple<>(kr.x.booleanValue(), kr.y, kr.z);
                     } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
+                        System.out.println(e);
+                        System.out.println(e.getStackTrace());
                         key_result = new Triple<>(false, FailureReason.INVALID_JAVA, null);
                     } finally {
                         executor.shutdown();

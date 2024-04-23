@@ -44,7 +44,7 @@ public class Main {
         String pwd = System.getProperty("user.dir");
         System.out.println(pwd);
         String home = System.getProperty("user.home");
-        Path location = Path.of(args.length == 1 ? (args[0]) : ("./example/Demo.java"));
+        Path location = Path.of(args.length == 1 ? (args[0]) : ("./example/DemoTwo.java"));
         Path tmpFile = Path.of(home + "/uni/prak-gpt/tmp/working.java");
 
         String bench_folder = "/home/pat/uni/prak-gpt/data/case/";
@@ -79,7 +79,7 @@ public class Main {
 
         try {
             List<String> classLines = Files.readAllLines(location);
-            Gpt3Prompt.specifyFunction(token, classLines, "g", false, null, false, 5, tmpFile);
+            Gpt3Prompt.specifyFunction(token, classLines, "g", false, "f", false, 5, tmpFile);
         } catch (Exception e) {
             System.out.println(e);
         }
