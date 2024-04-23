@@ -755,7 +755,7 @@ public class Main {
             return null;
         }));
 
-        ExecutorService executorService = new ThreadPoolExecutor(6, 6, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        ExecutorService executorService = Executors.newFixedThreadPool(8);
         try {
             executorService.invokeAll(launcherRunnables);
         } catch (InterruptedException e) {
