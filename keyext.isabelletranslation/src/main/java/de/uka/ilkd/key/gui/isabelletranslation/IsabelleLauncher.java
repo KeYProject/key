@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.isabelletranslation;
 
+import de.uka.ilkd.key.util.Pair;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.ListConverter;
@@ -26,8 +27,6 @@ public class IsabelleLauncher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
 
     private final IsabelleTranslationSettings settings;
-    private Isabelle isabelle;
-    private Theory thy0;
 
     public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) throws IOException {
         this.settings = settings;
@@ -38,19 +37,10 @@ public class IsabelleLauncher {
             return new ArrayList<>();
         }
         TranslationAction.writeTranslationFiles(problems.get(0));
-        ArrayList<Path> sessionRoots = new ArrayList<>();
-        sessionRoots.add(settings.getTranslationPath());
-        try {
-            Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
-                    JIsabelle.setupSetSessionRoots(sessionRoots,
-                            JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
-                                    JIsabelle.setup(settings.getIsabellePath()))));
-            isabelle = new Isabelle(setup);
-        } catch (Exception e) {
-            LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
-            throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
-        }
-        thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
+        Isabelle isabelle = startIsabelleInstance();
+        Thread destroyIsabelle = new Thread(isabelle::destroy);
+        Runtime.getRuntime().addShutdownHook(destroyIsabelle);
+        Theory thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
         LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
         List<SledgehammerResult> results = new ArrayList<>();
         for (IsabelleProblem problem : problems) {
@@ -58,6 +48,7 @@ public class IsabelleLauncher {
         }
         LOGGER.info("Completed all problems");
         isabelle.destroy();
+        Runtime.getRuntime().removeShutdownHook(destroyIsabelle);
         return results;
     }
 
@@ -77,15 +68,56 @@ public class IsabelleLauncher {
     }
 
     public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int coreCount) throws IOException {
-        ExecutorService executorService = new ThreadPoolExecutor(coreCount, coreCount, 0L, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
-        Collection<Callable<SledgehammerResult>> tasks = new LinkedBlockingDeque<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(coreCount);
+        Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
+        LinkedBlockingDeque<Pair<Isabelle, Theory>> resourceInstances = new LinkedBlockingDeque<>();
+        LinkedBlockingDeque<IsabelleProblem> problemsQueue = new LinkedBlockingDeque<>(problems);
+
+        Thread shutdownResources = new Thread(() -> {
+            for (Pair<Isabelle, Theory> resources : resourceInstances) {
+                resources.first.destroy();
+            }
+            executorService.shutdown();
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownResources);
 
         if (problems.isEmpty()) {
             return;
         }
         TranslationAction.writeTranslationFiles(problems.get(0));
+
+        for (int i = 0; i < coreCount; i++) {
+            Isabelle isabelle = startIsabelleInstance();
+            Theory thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
+            resourceInstances.add(new Pair<>(isabelle, thy0));
+
+            tasks.add(()-> {
+                IsabelleProblem problem;
+                Pair<Isabelle, Theory> resources;
+                while ((problem = problemsQueue.poll()) != null && (resources = resourceInstances.poll()) != null) {
+                    problem.try0ThenSledgehammer(resources.first, resources.second, timeoutSeconds);
+                    resourceInstances.add(resources);
+                }
+                return null;
+            });
+        }
+
+        LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
+
+        try {
+            executorService.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            shutdownResources.start();
+            Runtime.getRuntime().removeShutdownHook(shutdownResources);
+        }
+    }
+
+    private Isabelle startIsabelleInstance() throws IOException {
         ArrayList<Path> sessionRoots = new ArrayList<>();
         sessionRoots.add(settings.getTranslationPath());
+        Isabelle isabelle;
         try {
             Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
                     JIsabelle.setupSetSessionRoots(sessionRoots,
@@ -96,16 +128,6 @@ public class IsabelleLauncher {
             LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
             throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
         }
-        thy0 = beginTheory("theory Translation imports Main KeYTranslations.TranslationPreamble begin", settings.getTranslationPath(), isabelle);
-        LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
-
-        List<SledgehammerResult> results = new ArrayList<>();
-        problems.forEach((IsabelleProblem problem) -> tasks.add(() -> problem.try0ThenSledgehammer(isabelle, thy0, timeoutSeconds)));
-
-        try {
-            executorService.invokeAll(tasks);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return isabelle;
     }
 }
