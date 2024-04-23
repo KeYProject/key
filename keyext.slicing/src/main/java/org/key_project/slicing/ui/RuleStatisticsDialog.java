@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import org.key_project.slicing.RuleStatistics;
-import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
-import org.key_project.slicing.analysis.AnalysisResults;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
 import java.util.*;
+import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+
+import org.key_project.slicing.RuleStatistics;
+import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
+import org.key_project.slicing.analysis.AnalysisResults;
 
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
@@ -58,7 +59,7 @@ public class RuleStatisticsDialog extends JDialog {
         statisticsPane.setBackground(MainWindow.getInstance().getBackground());
         statisticsPane.setSize(new Dimension(10, 360));
         statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
+            new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
 
         JScrollPane scrollPane = new JScrollPane(statisticsPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -66,7 +67,7 @@ public class RuleStatisticsDialog extends JDialog {
         Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
         if (myFont != null) {
             statisticsPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-                    Boolean.TRUE);
+                Boolean.TRUE);
             statisticsPane.setFont(myFont);
         }
 
@@ -77,17 +78,17 @@ public class RuleStatisticsDialog extends JDialog {
 
         int w = 50
                 + Math.max(
-                scrollPane.getPreferredSize().width,
-                buttonPane.getPreferredSize().width);
+                    scrollPane.getPreferredSize().width,
+                    buttonPane.getPreferredSize().width);
         int h = scrollPane.getPreferredSize().height
                 + buttonPane.getPreferredSize().height
                 + 100;
         setSize(w, h);
 
         statisticsPane.setText(genTable(
-                statistics.sortBy(
-                        Comparator.comparing(RuleStatisticEntry::numberOfApplications)
-                                .reversed())));
+            statistics.sortBy(
+                Comparator.comparing(RuleStatisticEntry::numberOfApplications)
+                        .reversed())));
         statisticsPane.setCaretPosition(0);
         setLocationRelativeTo(window);
     }
@@ -109,25 +110,29 @@ public class RuleStatisticsDialog extends JDialog {
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                    statistics.sortBy(Comparator.comparing(RuleStatisticEntry::ruleName))));
+                statistics.sortBy(Comparator.comparing(RuleStatisticEntry::ruleName))));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton2 = new JButton("Sort by total");
         sortButton2.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                    statistics.sortBy(Comparator.comparing(RuleStatisticEntry::numberOfApplications).reversed())));
+                statistics.sortBy(
+                    Comparator.comparing(RuleStatisticEntry::numberOfApplications).reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                    statistics.sortBy(Comparator.comparing(RuleStatisticEntry::numberOfUselessApplications).reversed())));
+                statistics.sortBy(Comparator
+                        .comparing(RuleStatisticEntry::numberOfUselessApplications).reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                    statistics.sortBy(Comparator.comparing(RuleStatisticEntry::numberOfInitialUselessApplications).reversed())));
+                statistics.sortBy(
+                    Comparator.comparing(RuleStatisticEntry::numberOfInitialUselessApplications)
+                            .reversed())));
             statisticsPane.setCaretPosition(0);
         });
 
@@ -158,26 +163,31 @@ public class RuleStatisticsDialog extends JDialog {
      */
     private String genTable(List<RuleStatisticEntry> rules) {
         List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
-                "Initial useless applications");
+            "Initial useless applications");
 
         List<Collection<String>> rows = new ArrayList<>();
         // summary row
         int uniqueRules = rules.size();
         int totalSteps = rules.stream().mapToInt(RuleStatisticEntry::numberOfApplications).sum();
-        int uselessSteps = rules.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
-        int initialUseless = rules.stream().mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
+        int uselessSteps =
+            rules.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
+        int initialUseless =
+            rules.stream().mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
         rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps),
-                Integer.toString(uselessSteps), Integer.toString(initialUseless)));
+            Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
         List<RuleStatisticEntry> rulesBranching =
-                rules.stream().filter(it -> statistics.branches(it.ruleName())).toList();
+            rules.stream().filter(it -> statistics.branches(it.ruleName())).toList();
         int uniqueRules2 = rulesBranching.size();
-        totalSteps = rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfApplications).sum();
-        uselessSteps = rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
-        initialUseless = rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
+        totalSteps =
+            rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfApplications).sum();
+        uselessSteps =
+            rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
+        initialUseless = rulesBranching.stream()
+                .mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
         rows.add(List.of(String.format("(%d branching rules)", uniqueRules2),
-                Integer.toString(totalSteps), Integer.toString(uselessSteps),
-                Integer.toString(initialUseless)));
+            Integer.toString(totalSteps), Integer.toString(uselessSteps),
+            Integer.toString(initialUseless)));
         rules.forEach(a -> {
             String name = a.ruleName();
             Integer all = a.numberOfApplications();
@@ -186,7 +196,7 @@ public class RuleStatisticsDialog extends JDialog {
             rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
         });
 
-        return HtmlFactory.generateTable(columns, new boolean[]{false, false, false, false},
-                Optional.of(new String[]{null, "right", "right", "right"}), rows, null);
+        return HtmlFactory.generateTable(columns, new boolean[] { false, false, false, false },
+            Optional.of(new String[] { null, "right", "right", "right" }), rows, null);
     }
 }

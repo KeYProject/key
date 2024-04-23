@@ -165,7 +165,8 @@ public class MergeRule implements BuiltInRule {
 
         // The merge loop
         SymbolicExecutionState mergedState =
-            new SymbolicExecutionState(thisSEState.first(), thisSEState.second(), newGoal.node());
+            new SymbolicExecutionState(thisSEState.symbolicState(), thisSEState.pathCondition(),
+                newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
@@ -183,7 +184,7 @@ public class MergeRule implements BuiltInRule {
             mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
 
             MergeStateEntry mergeResult =
-                mergeStates(mergeRule, mergedState, state, thisSEState.third(),
+                mergeStates(mergeRule, mergedState, state, thisSEState.programCounter(),
                     mergeRuleApp.getDistinguishingFormula(), services);
             newNames.addAll(mergeResult.second);
             sideConditionsToProve.addAll(mergeResult.third);
@@ -206,7 +207,7 @@ public class MergeRule implements BuiltInRule {
         for (MergePartner mergePartner : mergePartners) {
             closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(), mergePartner.getPio(),
                 mergedState, mergePartnerNodesToStates.get(mergePartner.getGoal().node()),
-                thisSEState.third(), newNames);
+                thisSEState.programCounter(), newNames);
         }
 
         // Delete previous sequents
@@ -239,7 +240,7 @@ public class MergeRule implements BuiltInRule {
         }
 
         // Add new succedent (symbolic state & program counter)
-        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.third());
+        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
         final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
@@ -294,14 +295,14 @@ public class MergeRule implements BuiltInRule {
      * <p>
      * Override this method for special merge procedures.
      *
-     * @param mergeRule             The merge procedure to use for the merge.
-     * @param state1                First state to merge.
-     * @param state2                Second state to merge.
-     * @param programCounter        The formula \&lt;{ ... }\&gt; phi consisting of the common program
-     *                              counter and the post condition.
+     * @param mergeRule The merge procedure to use for the merge.
+     * @param state1 First state to merge.
+     * @param state2 Second state to merge.
+     * @param programCounter The formula \&lt;{ ... }\&gt; phi consisting of the common program
+     *        counter and the post condition.
      * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
-     *                              automatic generation).
-     * @param services              The services object.
+     *        automatic generation).
+     * @param services The services object.
      * @return A new merged SE state (U*,C*) which is a weakening of the original states.
      */
     @SuppressWarnings("unused")
@@ -675,7 +676,8 @@ public class MergeRule implements BuiltInRule {
 
         final ImmutableList<Goal> allGoals = services.getProof().openGoals();
 
-        final SymbolicExecutionStateWithProgCnt ownSEState = sequentToSETriple(goal.node(), pio, services);
+        final SymbolicExecutionStateWithProgCnt ownSEState =
+            sequentToSETriple(goal.node(), pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
@@ -694,7 +696,7 @@ public class MergeRule implements BuiltInRule {
                         final SymbolicExecutionStateWithProgCnt partnerSEState =
                             sequentToSETriple(g.node(), gPio, services);
 
-                        if (ownSEState.third().equals(partnerSEState.third())) {
+                        if (ownSEState.programCounter().equals(partnerSEState.programCounter())) {
 
                             potentialPartners =
                                 potentialPartners.prepend(new MergePartner(g, gPio));
@@ -714,5 +716,5 @@ public class MergeRule implements BuiltInRule {
     }
 
     public record MergeStateEntry(SymbolicExecutionState first, LinkedHashSet<Name> second,
-                                   LinkedHashSet<Term> third) {}
+            LinkedHashSet<Term> third) {}
 }

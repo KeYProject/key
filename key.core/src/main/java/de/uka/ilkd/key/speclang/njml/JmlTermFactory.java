@@ -1048,7 +1048,7 @@ public final class JmlTermFactory {
                 + ", given" + lhs.getTerm().sub(0).op());
         }
 
-        return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
+        return new TranslatedDependencyContract((IObserverFunction) lhs.getTerm().op(), rhs,
             mby == null ? null : mby.getTerm());
     }
 

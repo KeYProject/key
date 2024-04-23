@@ -236,8 +236,9 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             if (pio.isTopLevel() || queryConditionTerm != null) {
                 for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
                     Term conditionTerm = tb.and(conditionsAndResult.conditions());
-                    Term newEqualityTerm = varFirst ? tb.equals(varTerm, conditionsAndResult.result())
-                            : tb.equals(conditionsAndResult.result(), varTerm);
+                    Term newEqualityTerm =
+                        varFirst ? tb.equals(varTerm, conditionsAndResult.result())
+                                : tb.equals(conditionsAndResult.result(), varTerm);
                     Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, newEqualityTerm)
                             : tb.and(conditionTerm, newEqualityTerm);
                     if (queryConditionTerm != null) {

@@ -15,6 +15,20 @@ import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Position;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipFile;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
@@ -36,29 +50,17 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
-import org.antlr.runtime.MismatchedTokenException;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.reflection.ClassLoaderUtil;
+
+import org.antlr.runtime.MismatchedTokenException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipFile;
 
 /**
  * <p>
@@ -212,7 +214,7 @@ public abstract class AbstractProblemLoader {
         // format: (expected, found)
         mismatchErrors = new HashMap<>();
         mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
-                "there may be only one declaration per line");
+            "there may be only one declaration per line");
 
         missedErrors = new HashMap<>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
@@ -238,19 +240,19 @@ public abstract class AbstractProblemLoader {
      *        the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
-                                 List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
-                                 ProblemLoaderControl control,
-                                 boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                                 Properties poPropertiesToForce) {
+            List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            ProblemLoaderControl control,
+            boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+            Properties poPropertiesToForce) {
         this.file = file;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
         this.profileOfNewProofs =
-                profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
         this.includes = includes;
     }
@@ -318,14 +320,14 @@ public abstract class AbstractProblemLoader {
         LOGGER.info("Loading environment from " + file);
         envInput = createEnvInput(fileRepo);
         LOGGER.debug(
-                "Environment load took " + PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
+            "Environment load took " + PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
         var beforeInitConfig = System.nanoTime();
         LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
         LOGGER.debug(
-                "Init config took " + PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
+            "Init config took " + PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
         if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
@@ -391,18 +393,18 @@ public abstract class AbstractProblemLoader {
                     final String readable = missedErrors.get(mte.expecting);
                     final String token = readable == null ? "token id " + mte.expecting : readable;
                     final String msg = "Syntax error: missing " + token
-                            + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                            + mte.input.getSourceName() + ":" + mte.line + ")";
+                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
+                        + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
                     // TODO other ANTLR exceptions
                 } else {
                     final org.antlr.runtime.MismatchedTokenException mte =
-                            (MismatchedTokenException) c0;
+                        (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
-                            mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
+                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
                     final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                            + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
+                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
                 }
             }
@@ -451,7 +453,7 @@ public abstract class AbstractProblemLoader {
                 ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
                 ret = new SLEnvInput(file.getParentFile().getAbsolutePath(), classPath,
-                        bootClassPath, profileOfNewProofs, includes);
+                    bootClassPath, profileOfNewProofs, includes);
             }
             ret.setJavaFile(file.getAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
@@ -511,26 +513,26 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                    fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
-                    filename.endsWith(".proof.gz"));
+                filename.endsWith(".proof.gz"));
         } else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
             return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
-                    includes);
+                includes);
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension '"
-                        + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
-                        + filename + ". Allowed extensions are: .key, .proof, .java or "
-                        + "complete directories.");
+                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
+                    + filename + ". Allowed extensions are: .key, .proof, .java or "
+                    + "complete directories.");
             } else {
                 throw new FileNotFoundException(
-                        "File or directory\n\t " + filename + "\n not found.");
+                    "File or directory\n\t " + filename + "\n not found.");
             }
         }
     }
@@ -652,7 +654,7 @@ public abstract class AbstractProblemLoader {
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
-                problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+            problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
             // register proof
@@ -707,7 +709,7 @@ public abstract class AbstractProblemLoader {
             assert envInput instanceof KeYUserProblemFile;
 
             IntermediatePresentationProofFileParser parser =
-                    new IntermediatePresentationProofFileParser(proof);
+                new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
             parserResult = parser.getResult();
 
@@ -718,14 +720,14 @@ public abstract class AbstractProblemLoader {
             // able to load proofs that used it even if the user has currently
             // turned OSS off.
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             replayer = new IntermediateProofReplayer(this, proof, parserResult);
             replayResult =
-                    replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
+                replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
 
             lastTouchedNode = replayResult.getLastSelectedGoal() != null
                     ? replayResult.getLastSelectedGoal().node()
@@ -746,13 +748,13 @@ public abstract class AbstractProblemLoader {
             }
             status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
                     + (replayResult != null ? replayResult.getStatus()
-                    : "Error while loading proof.");
+                            : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
 
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);

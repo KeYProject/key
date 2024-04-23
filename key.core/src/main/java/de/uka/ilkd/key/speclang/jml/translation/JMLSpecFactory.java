@@ -605,12 +605,11 @@ public class JMLSpecFactory {
      */
     private ImmutableList<Term> registerAbbreviationVariables(TextualJMLSpecCase textualSpecCase,
             Context context, ProgramVariableCollection progVars, ContractClauses clauses) {
-        for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase
-                .getAbbreviations()) {
+        for (TextualJMLSpecCase.Abbreviation abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT =
-                services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
+                services.getJavaInfo().getKeYJavaType(abbrv.typeName().first.getText());
             final ProgramElementName abbrVarName =
-                new ProgramElementName(abbrv.second.first.getText());
+                new ProgramElementName(abbrv.abbrevName().first.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -619,7 +618,7 @@ public class JMLSpecFactory {
             // parameter
             Term rhs = new JmlIO(services).context(context).parameters(progVars.paramVars)
                     .atPres(progVars.atPres).atBefore(progVars.atBefores)
-                    .translateTerm(abbrv.third);
+                    .translateTerm(abbrv.abbreviatedTerm());
             clauses.abbreviations =
                 clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -1232,9 +1231,8 @@ public class JMLSpecFactory {
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
-        Triple<IObserverFunction, Term, Term> dep =
-            new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
+        var dep = new JmlIO(services).context(context).translateDependencyContract(originalDep);
+        return cf.dep(kjt, targetHeap, dep, dep.first().isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1507,8 +1505,7 @@ public class JMLSpecFactory {
     }
 
     public @Nullable String checkSetStatementAssignee(Term assignee) {
-        if (assignee.op() instanceof LocationVariable) {
-            var variable = (LocationVariable) assignee.op();
+        if (assignee.op() instanceof LocationVariable variable) {
             if (variable.isGhost()) {
                 return null;
             } else {
