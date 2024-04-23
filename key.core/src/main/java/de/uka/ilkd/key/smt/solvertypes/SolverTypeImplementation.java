@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidAlgorithmParameterException;
 import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Services;
@@ -294,12 +293,12 @@ public final class SolverTypeImplementation implements SolverType {
         String[] paths = path.split(File.pathSeparator);
         for (String parent : paths) {
             Path parentPath = Paths.get(parent);
-                Path childPath = Paths.get(cmd);
-                Path completePath = parentPath.resolve(childPath);
-                if (checkPath(completePath)) {
-                    return true;
-                }
+            Path childPath = Paths.get(cmd);
+            Path completePath = parentPath.resolve(childPath);
+            if (checkPath(completePath)) {
+                return true;
             }
+        }
 
         return false;
     }
@@ -307,15 +306,15 @@ public final class SolverTypeImplementation implements SolverType {
 
 
     private static String getOSDefaultExtension() {
-        final String windowsDefaultExt= ".exe";
+        final String windowsDefaultExt = ".exe";
         final String linuxDefaultExt = "";
         final String maxDefaultExt = "";
 
-        if(osIsWindows()){
+        if (osIsWindows()) {
             return windowsDefaultExt;
         }
 
-        if(osIsLinux()) {
+        if (osIsLinux()) {
             return linuxDefaultExt;
         }
         return maxDefaultExt;
