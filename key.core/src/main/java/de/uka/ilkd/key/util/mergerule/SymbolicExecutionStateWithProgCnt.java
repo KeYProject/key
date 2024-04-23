@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Triple;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A symbolic execution state with program counter is a triple of a symbolic state in form of a
@@ -17,10 +17,8 @@ import de.uka.ilkd.key.util.Triple;
  *
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
-
-    private Node correspondingNode = null;
-
+public record SymbolicExecutionStateWithProgCnt(Term first, Term second, Term third,
+                                                @Nullable Node correspondingNode) {
     /**
      * @param symbolicState The symbolic state (parallel update).
      * @param pathCondition The path condition (formula).

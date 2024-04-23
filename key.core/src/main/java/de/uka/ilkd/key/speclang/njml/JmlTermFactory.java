@@ -27,7 +27,6 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -1030,8 +1029,7 @@ public final class JmlTermFactory {
         return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
     }
 
-    public Triple<IObserverFunction, Term, Term> depends(SLExpression lhs, Term rhs,
-            SLExpression mby) {
+    public TranslatedDependencyContract depends(SLExpression lhs, Term rhs, SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
         if (!lhs.isTerm()) {
