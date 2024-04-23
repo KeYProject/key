@@ -1,9 +1,7 @@
-package org.key_project;
+package org.key_project.llmsynth;
 
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.smt.lang.Util;
-import io.reactivex.internal.queue.SpscArrayQueue;
-import org.key_project.prompts.Gpt3Prompt;
+import org.key_project.llmsynth.prompts.Gpt3Prompt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package org.key_project.old_unused;
+package org.key_project.llmsynth.old_unused;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

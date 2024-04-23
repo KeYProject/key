@@ -1,4 +1,4 @@
-package org.key_project;
+package org.key_project.llmsynth;
 
 public enum Task {
     SPECIFY_TOP,
