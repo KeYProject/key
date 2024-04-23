@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
@@ -87,7 +86,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
             Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
@@ -133,5 +132,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
+    }
+
+    public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
     }
 }

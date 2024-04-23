@@ -46,7 +46,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
@@ -899,7 +898,7 @@ public class JMLSpecFactory {
     }
 
     public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
-        return ((!(customName == null) && customName.length() > 0) ? customName
+        return ((!(customName == null) && !customName.isEmpty()) ? customName
                 : getContractName(pm, originalBehavior));
     }
 
