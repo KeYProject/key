@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.isabelletranslation.IllegalFormulaException;
 import de.uka.ilkd.key.gui.isabelletranslation.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
+import de.uka.ilkd.key.macros.PropositionalExpansionWithSimplificationMacro;
 import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -524,7 +525,7 @@ public class Main {
                 UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
-                FullPropositionalExpansionMacro expansionMacro = new FullPropositionalExpansionMacro();
+                PropositionalExpansionWithSimplificationMacro expansionMacro = new PropositionalExpansionWithSimplificationMacro();
                 if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
                     try {
                         smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
@@ -540,6 +541,7 @@ public class Main {
                     LOGGER.info("No open goals found after Preparation");
                     return;
                 }
+                proof.setStepIndices();
                 ImmutableList<Goal> goals = proof.openGoals();
 
 
@@ -584,7 +586,7 @@ public class Main {
 
 
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
-        FullPropositionalExpansionMacro expansionMacro = new FullPropositionalExpansionMacro();
+        PropositionalExpansionWithSimplificationMacro expansionMacro = new PropositionalExpansionWithSimplificationMacro();
         if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
             try {
                 smtMacro.applyTo(uic, proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null, null);
@@ -600,6 +602,7 @@ public class Main {
             LOGGER.info("No open goals found after Preparation");
             return;
         }
+        proof.setStepIndices();
         ImmutableList<Goal> goals = proof.openGoals();
 
         STATS.computeIfAbsent(input, k -> new HashMap<>());
