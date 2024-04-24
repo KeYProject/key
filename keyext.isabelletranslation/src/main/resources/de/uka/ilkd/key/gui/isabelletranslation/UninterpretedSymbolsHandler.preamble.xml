@@ -213,11 +213,11 @@ typedef Seq = "UNIV::any list set"
   by auto
 
 consts
-  getSeqOutside::any
+  seqGetOutside::any
 
 setup_lifting type_definition_Seq
 lift_definition seqLen::"Seq\&lt;Rightarrow&gt;int" is "int \&lt;circ&gt; List.length".
-lift_definition seqGet::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a::any" is "\&lt;lambda&gt;s i. (if (0::int)\&lt;le&gt;i\&lt;and&gt;i&lt;(int (length s)) then cast (s ! (nat i)) else cast getSeqOutside)".
+lift_definition seqGet::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a::any" is "\&lt;lambda&gt;s i. (if (0::int)\&lt;le&gt;i\&lt;and&gt;i&lt;(int (length s)) then cast (s ! (nat i)) else cast seqGetOutside)".
 lift_definition seqDef::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;(int\&lt;Rightarrow&gt;any)\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;le ri e. map e [le..ri - 1]".
 lift_definition seqEmpty::"Seq" is "[]".
 lift_definition seqSingleton::"any\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;x. [x]".
