@@ -209,8 +209,25 @@ abbreviation "Null2java_lang_Object\&lt;equiv&gt;any2java_lang_Object \&lt;circ&
 
 declare [[coercion Null2java_lang_Object]]
 
+fun instanceof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
+  where "instanceof x type = typeof x type"
+
 typedef Seq = "UNIV::any list set"
   by auto
+
+axiomatization Seq2any any2Seq Seq_UNIV
+  where Seq_sub_any:"type_definition (Seq2any::Seq\&lt;Rightarrow&gt;any) (any2Seq::any\&lt;Rightarrow&gt;Seq) (Seq_UNIV::any set)"
+
+declare [[coercion Seq2any]]
+
+instantiation Seq::any
+begin
+fun to_any_Seq where "to_any_Seq (x::Seq) = Seq2any x"
+fun cast_Seq where "cast_Seq (x::any) = any2Seq x"
+instance by standard
+end
+
+definition Seq_type::"javaDL_type" where "Seq_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::Seq set)"
 
 consts
   seqGetOutside::any
@@ -231,27 +248,28 @@ fun seqNPerm::"Seq\&lt;Rightarrow&gt;bool"
 fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
   "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
 
-primrec listIndexOf::"any list\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" where
+primrec listIndexOf::"'a list\&lt;Rightarrow&gt;'a\&lt;Rightarrow&gt;nat" where
   "listIndexOf [] a = undefined" |
   "listIndexOf (x#xs) a = (if (x=a) then 0 else Suc (listIndexOf xs a))"
 
 lift_definition seqIndexOf::"Seq\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;nat" is listIndexOf.
 
-axiomatization Seq2any any2Seq Seq_UNIV
-  where Seq_sub_any:"type_definition (Seq2any::Seq\&lt;Rightarrow&gt;any) (any2Seq::any\&lt;Rightarrow&gt;Seq) (Seq_UNIV::any set)"
+fun listSwap::"'a list\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a list"
+  where "listSwap l i j = 
+(if \&lt;not&gt;(0\&lt;le&gt;i \&lt;and&gt; i&lt;int (length l) \&lt;and&gt; 0\&lt;le&gt;j \&lt;and&gt; i&lt;int (length l)) 
+then l 
+else list_update (list_update l (nat i) (l ! (nat j))) (nat j) (l ! (nat i)))"
 
-declare [[coercion Seq2any]]
+lift_definition seqSwap::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" is listSwap.
 
-instantiation Seq::any
-begin
-fun to_any_Seq where "to_any_Seq (x::Seq) = Seq2any x"
-fun cast_Seq where "cast_Seq (x::any) = any2Seq x"
-instance by standard
-end
+fun listRemove::"'a list\&lt;Rightarrow&gt;nat\&lt;Rightarrow&gt;'a list"
+  where "listRemove [] _ = []"
+  | "listRemove (x#xs) 0 = xs"
+  | "listRemove (x#xs) (Suc k) = x # (listRemove xs k)"
+
+lift_definition seqRemove::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;s i. (if \&lt;not&gt;(0\&lt;le&gt;i \&lt;and&gt; i&lt;int (length l)) then l else listRemove s (nat i))"
 
 
-fun instanceof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
-  where "instanceof x type = typeof x type"
 
 consts
   exactInstance::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool"
@@ -303,18 +321,18 @@ lemma induct_sum_upper_limit[simp]:
   assumes "lower&lt;upper"
   shows "(\&lt;Sum&gt;(i::int) = lower..&lt;upper. f i) = (\&lt;Sum&gt;(i::int) = lower..&lt;upper - 1. f i) + f (upper - 1)"
 proof -
-    have "{lower..&lt;upper} = {lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}"
-      using assms by auto
-    have "{upper-1..&lt;upper} = {upper - 1}"
-      by auto
-    then have "sum f ({lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}) = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i) - sum f ({lower..&lt;upper-1} \&lt;inter&gt; {upper-1..&lt;upper})"
-      by (subst sum.union_inter [symmetric]) (auto simp add: algebra_simps)
-    then have "sum f {lower..&lt;upper} = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i) - sum f ({lower..&lt;upper-1} \&lt;inter&gt; {upper-1..&lt;upper})"
-      using \&lt;open&gt;{lower..&lt;upper} = {lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}\&lt;close&gt; by presburger
-    also have "... = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i)"
-      by simp
-    finally show ?thesis
-      using \&lt;open&gt;{upper-1..&lt;upper} = {upper - 1}\&lt;close&gt; by auto
+  have "{lower..&lt;upper} = {lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}"
+    using assms by auto
+  have "{upper-1..&lt;upper} = {upper - 1}"
+    by auto
+  then have "sum f ({lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}) = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i) - sum f ({lower..&lt;upper-1} \&lt;inter&gt; {upper-1..&lt;upper})"
+    by (subst sum.union_inter [symmetric]) (auto simp add: algebra_simps)
+  then have "sum f {lower..&lt;upper} = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i) - sum f ({lower..&lt;upper-1} \&lt;inter&gt; {upper-1..&lt;upper})"
+    using \&lt;open&gt;{lower..&lt;upper} = {lower..&lt;upper-1} \&lt;union&gt; {upper-1..&lt;upper}\&lt;close&gt; by presburger
+  also have "... = (\&lt;Sum&gt;(i::int) = lower..&lt;upper-1. f i) + (\&lt;Sum&gt;(i::int) = upper-1..&lt;upper. f i)"
+    by simp
+  finally show ?thesis
+    using \&lt;open&gt;{upper-1..&lt;upper} = {upper - 1}\&lt;close&gt; by auto
 qed
     </entry>
 </properties>
