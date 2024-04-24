@@ -9,6 +9,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.isabelletranslation.IllegalFormulaException;
 import de.uka.ilkd.key.gui.isabelletranslation.*;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.PropositionalExpansionWithSimplificationMacro;
@@ -663,7 +664,7 @@ public class Main {
 
         Proof proof = goals.stream().findFirst().get().proof();
 
-        ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
+        ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings();
         piSettings.setTimeout(timeoutSeconds * 1000);
         SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(), piSettings,
                 proof.getSettings().getNewSMTSettings(), proof);
