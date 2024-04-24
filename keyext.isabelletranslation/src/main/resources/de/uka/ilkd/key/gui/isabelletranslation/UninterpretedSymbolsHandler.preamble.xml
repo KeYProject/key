@@ -225,6 +225,9 @@ lift_definition seqConcat::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;Seq" is 
 lift_definition seqReverse::"Seq\&lt;Rightarrow&gt;Seq" is List.rev.
 lift_definition seqPerm::"Seq\&lt;Rightarrow&gt;Seq\&lt;Rightarrow&gt;bool" is List_Permutation.perm.
 
+fun seqNPerm::"Seq\&lt;Rightarrow&gt;bool" 
+  where "seqNPerm s = seqPerm s (seqDef 0 (seqLen s - 1) (to_any))"
+
 fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
   "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
 
