@@ -38,6 +38,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         definedFunctions.put("seqConcat", "seqConcat");
         definedFunctions.put("seqSub", "seqSub");
         definedFunctions.put("seqPerm", "seqPerm");
+        definedFunctions.put("seqNPerm", "seqNPerm");
         definedFunctions.put("seqSwap", "seqSwap");
         definedFunctions.put("seqRemove", "seqRemove");
         definedFunctions.put("seqReverse", "seqReverse");
