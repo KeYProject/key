@@ -267,8 +267,7 @@ fun listRemove::"'a list\&lt;Rightarrow&gt;nat\&lt;Rightarrow&gt;'a list"
   | "listRemove (x#xs) 0 = xs"
   | "listRemove (x#xs) (Suc k) = x # (listRemove xs k)"
 
-lift_definition seqRemove::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;s i. (if \&lt;not&gt;(0\&lt;le&gt;i \&lt;and&gt; i&lt;int (length l)) then l else listRemove s (nat i))"
-
+lift_definition seqRemove::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" is "\&lt;lambda&gt;s (i::int). (if \&lt;not&gt;(0\&lt;le&gt;i \&lt;and&gt; i&lt;int (length s)) then s else listRemove s (nat i))".
 
 
 consts
