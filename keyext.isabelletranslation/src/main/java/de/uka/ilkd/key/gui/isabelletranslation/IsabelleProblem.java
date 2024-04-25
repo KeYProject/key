@@ -183,8 +183,14 @@ public class IsabelleProblem {
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
-            Boolean tryResultSuccess = (Boolean) try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
-                    .retrieveNow(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            Future<Object> tryResultSuccessF = try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
+                    .retrieve(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            Boolean tryResultSuccess = false;
+            try {
+                tryResultSuccess = (Boolean) Await.result(tryResultSuccessF, Duration.create(timeout_seconds, TimeUnit.SECONDS));
+            } catch (TimeoutException e){
+                tryResultSuccess = false;
+            }
             if (tryResultSuccess) {
                 tryResult = new SledgehammerResult(Option.apply(new Tuple2<>("some", "try0")));
                 this.result = tryResult;
@@ -312,7 +318,14 @@ public class IsabelleProblem {
         notifySledgehammerStarted();
         try {
             Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())).retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
-            Boolean tryResultSuccess = (Boolean) try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter()).retrieveNow(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            Future<Object> tryResultSuccessF = try_function.apply(toplevel, isabelle, Implicits.toplevelStateConverter())
+                    .retrieve(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), isabelle);
+            Boolean tryResultSuccess;
+            try {
+                tryResultSuccess = (Boolean) Await.result(tryResultSuccessF, Duration.create(timeout_seconds, TimeUnit.SECONDS));
+            } catch (TimeoutException e){
+                tryResultSuccess = false;
+            }
             if (tryResultSuccess) {
                 tryResult = new SledgehammerResult(Option.apply(new Tuple2<>("some", "try0")));
                 this.result = tryResult;
