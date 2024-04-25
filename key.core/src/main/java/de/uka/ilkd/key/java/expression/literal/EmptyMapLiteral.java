@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
 
 public class EmptyMapLiteral extends Literal {
 
@@ -21,7 +20,7 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
+    public boolean equals(Object o) {
         return o == this;
     }
 

@@ -16,10 +16,15 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All proof irrelevant attributes are ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
-public class ProofIrrelevancyProperty implements TermProperty {
+public class ProofIrrelevancyProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -28,17 +33,15 @@ public class ProofIrrelevancyProperty implements TermProperty {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is used as a
-     * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * can be accessed through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is
+     * used as a parameter for
+     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private ProofIrrelevancyProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
-     * that
-     * are not relevant for the purpose of these terms in the proof.
+     * that are not relevant for the purpose of these terms in the proof.
      * <p>
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
@@ -46,11 +49,13 @@ public class ProofIrrelevancyProperty implements TermProperty {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
+     * @param v should not be used for this equality check
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
+     * @param <V> is not needed for this equality check
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }
@@ -85,13 +90,6 @@ public class ProofIrrelevancyProperty implements TermProperty {
             }
         }
 
-        // This would be the only new thing from LabeledTermImpl, but this doesn't seem right
-        if (term1.hasLabels() && term2.hasLabels()) {
-            if (term2.getLabels().size() != term1.getLabels().size()) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -107,27 +105,17 @@ public class ProofIrrelevancyProperty implements TermProperty {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        int hashcode2 = -1; // this line is just so the code compiles
-        // part from TermImpl
-        if (hashcode2 == -1) {
-            // compute into local variable first to be thread-safe.
-            hashcode2 = Objects.hash(term.op(),
-                EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY,
-                    term.subs()),
-                EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
-            if (hashcode2 == -1) {
-                hashcode2 = 0;
-            }
-        }
+        int hashcode = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+
         // part from LabeledTermImpl
         final ImmutableArray<TermLabel> labels = term.getLabels();
-        final int numOfLabels = labels.size();
-        for (int i = 0; i < numOfLabels; i++) {
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
             if (currentLabel.isProofRelevant()) {
-                hashcode2 += 7 * currentLabel.hashCode();
+                hashcode += 7 * currentLabel.hashCode();
             }
         }
-        return hashcode2;
+        return hashcode;
     }
 }

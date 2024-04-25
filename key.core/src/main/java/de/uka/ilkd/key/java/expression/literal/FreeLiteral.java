@@ -9,16 +9,25 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FreeLDT;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
 
 public class FreeLiteral extends Literal {
 
     public final static FreeLiteral INSTANCE = new FreeLiteral();
 
+    private FreeLiteral() {
+        super();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
+    }
+
     @Override
     public void visit(Visitor v) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

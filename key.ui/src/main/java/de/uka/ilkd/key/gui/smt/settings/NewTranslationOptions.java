@@ -21,7 +21,8 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.IntegerProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerPropertyVisitor;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
@@ -68,7 +69,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {

@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
@@ -18,10 +17,10 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Assertions;
@@ -186,7 +185,7 @@ class EndToEndTests {
     void sliceSimpleSMT() throws Exception {
         // only run this test if at least one SMT solver is available
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                .getUsableSolverUnions(Main.isExperimentalMode()).isEmpty()) {
+                .getUsableSolverUnions().isEmpty()) {
             return;
         }
         sliceProof("/simpleSMT.proof", 1, 1, true, false);

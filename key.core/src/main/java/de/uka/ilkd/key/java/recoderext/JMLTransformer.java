@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.recoderext;
 import java.net.URI;
 import java.util.*;
 
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -29,7 +30,6 @@ import recoder.io.DataLocation;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.statement.EmptyStatement;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
@@ -92,13 +92,32 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
         for (int i = 1; i < comments.length; i++) {
-            Position relativePos = comments[i].getRelativePosition();
-            for (int j = 0; j < relativePos.getLine(); j++) {
-                sb.append("\n");
-            }
-            for (int j = 0; j < relativePos.getColumn(); j++) {
-                sb.append(" ");
-            }
+            Position previousStart = comments[i - 1].getStartPosition();
+
+            // this also includes // or /* ... */
+            String previousText = comments[i - 1].getText();
+
+            int previousEndLine = previousStart.getLine() +
+                    (int) previousText.chars().filter(x -> x == '\n').count();
+
+            // /*ab*/ => length: 6, lastIndex: -1, so we get 6
+            // /*\nb*/ => length: 6, lastIndex: 2, so we get 3
+            int previousEndColumn = previousStart.getColumn() - 1 +
+                    previousText.length() - (previousText.lastIndexOf('\n') + 1);
+
+            Position currentStart = comments[i].getStartPosition();
+
+            int insertRows = currentStart.getLine() - previousEndLine;
+
+            // the columns are starting at 1 and not at 0
+            int insertColumns = insertRows > 0 ? // line break between the comments
+                    currentStart.getColumn() - 1
+                    : (currentStart.getColumn() - 1) - previousEndColumn;
+
+            assert insertRows >= 0 && insertColumns >= 0;
+
+            sb.append("\n".repeat(insertRows));
+            sb.append(" ".repeat(insertColumns));
             sb.append(comments[i].getText());
         }
 
@@ -407,18 +426,18 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
-        ParserRuleContext ctx = stat.getContext().first;
+        var ctx = stat.getContext();
 
-        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromToken(ctx.start);
+        de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         final Kind kind = stat.getKind();
-        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext());
+        JmlAssert jmlAssert = new JmlAssert(kind, ctx);
         try {
             updatePositionInformation(jmlAssert, pos);
             doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
                 String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
-                Location.fromToken(ctx.start), e);
+                ctx.getStartLocation(), e);
         }
     }
 
@@ -430,16 +449,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
+        var statement = new KeyAst.SetStatementContext(stat.getAssignment());
+
         // parse statement, attach to AST
         de.uka.ilkd.key.java.Position pos =
             de.uka.ilkd.key.java.Position.fromToken(stat.getAssignment().start);
         try {
-            String assignment = getFullText(stat.getAssignment()).substring(3);
-            List<Statement> stmtList = services.getProgramFactory().parseStatements(assignment);
-            assert stmtList.size() == 1;
-            CopyAssignment assignStmt = (CopyAssignment) stmtList.get(0);
-            updatePositionInformation(assignStmt, pos);
-            doAttach(assignStmt, astParent, childIndex);
+            var set = new SetStatement(statement);
+            updatePositionInformation(set, pos);
+            doAttach(set, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
                 Location.fromToken(stat.getAssignment().start), e);

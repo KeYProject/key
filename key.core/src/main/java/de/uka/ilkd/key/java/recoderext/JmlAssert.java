@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -19,27 +19,22 @@ import recoder.java.statement.JavaStatement;
 public class JmlAssert extends JavaStatement {
 
     /**
-     * The kind of this statment either ASSERT or ASSUME
+     * The kind of this statement either ASSERT or ASSUME
      */
     private final TextualJMLAssertStatement.Kind kind;
 
-    /*
-     * condition should be an Expression, but as KeY doesn't support some jml Expressions as
-     * Expression Objects e.g. \forall keep this as the parse tree for now (blockcontracts seem to
-     * handle this similar)
-     */
+
     /**
      * The condition of this statement in parse tree form
      */
     // this isn't serializable, but that shouldn't be a problem for KeY
-    private final LabeledParserRuleContext condition;
+    private final KeyAst.Expression condition;
 
     /**
-     *
-     * @param kind the kind of this statment
+     * @param kind the kind of this statement
      * @param condition the condition for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition) {
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition) {
         this.kind = kind;
         this.condition = condition;
     }
@@ -47,7 +42,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * copy constructor
      *
-     * @param proto the orginal JML assert statement to copy
+     * @param proto the original JML assert a statement to copy
      */
     public JmlAssert(JmlAssert proto) {
         super(proto);
@@ -59,7 +54,7 @@ public class JmlAssert extends JavaStatement {
         return kind;
     }
 
-    public LabeledParserRuleContext getCondition() {
+    public KeyAst.Expression getCondition() {
         return condition;
     }
 

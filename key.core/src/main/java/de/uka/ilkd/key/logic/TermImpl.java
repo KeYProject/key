@@ -6,13 +6,13 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.logic.equality.TermProperty;
+import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Visitor;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -52,7 +52,6 @@ class TermImpl implements Term {
     private final Operator op;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
-    private final JavaBlock javaBlock;
 
     // caches
     private enum ThreeValuedTruth {
@@ -69,10 +68,8 @@ class TermImpl implements Term {
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
-    /**
-     * Cached hash value.
-     */
-    private int hashcode2 = -1;
+
+    private Sort sort;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
@@ -94,23 +91,21 @@ class TermImpl implements Term {
      * @param subs the sub terms of the constructed term (whose type is constrained by the used
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
-     * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
         this.origin = origin;
     }
 
     TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
-        this(op, subs, boundVars, javaBlock, "");
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        this(op, subs, boundVars, "");
     }
 
     /**
@@ -206,7 +201,11 @@ class TermImpl implements Term {
 
     @Override
     public @NonNull JavaBlock javaBlock() {
-        return javaBlock;
+        if (op instanceof Modality mod) {
+            return mod.program();
+        } else {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
     }
 
 
@@ -218,7 +217,14 @@ class TermImpl implements Term {
 
     @Override
     public Sort sort() {
-        return op.sort(subs);
+        if (sort == null) {
+            Sort[] sorts = new Sort[subs.size()];
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
+            sort = op.sort(sorts);
+        }
+        return sort;
     }
 
 
@@ -309,7 +315,9 @@ class TermImpl implements Term {
         final TermImpl t = (TermImpl) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
-                && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
+                && boundVars.equals(t.boundVars)
+                // TODO (DD): below is no longer necessary
+                && javaBlock().equals(t.javaBlock());
     }
 
     @Override
@@ -339,7 +347,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public boolean equalsModProperty(Object o, TermProperty property) {
+    public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
         if (!(o instanceof Term other)) {
             return false;
         }
@@ -347,7 +355,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public int hashCodeModProperty(TermProperty property) {
+    public int hashCodeModProperty(Property<Term> property) {
         return property.hashCodeModThisProperty(this);
     }
 
@@ -358,13 +366,14 @@ class TermImpl implements Term {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (!javaBlock.isEmpty()) {
-            if (op() == Modality.DIA) {
-                sb.append("\\<").append(javaBlock).append("\\> ");
-            } else if (op() == Modality.BOX) {
-                sb.append("\\[").append(javaBlock).append("\\] ");
+        if (!javaBlock().isEmpty()) {
+            var op = (Modality) op();
+            if (op.kind() == Modality.JavaModalityKind.DIA) {
+                sb.append("\\<").append(javaBlock()).append("\\> ");
+            } else if (op.kind() == Modality.JavaModalityKind.BOX) {
+                sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
-                sb.append(op()).append("\\[").append(javaBlock).append("\\] ");
+                sb.append(op()).append("\\[").append(javaBlock()).append("\\] ");
             }
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
@@ -415,7 +424,7 @@ class TermImpl implements Term {
     public boolean containsJavaBlockRecursive() {
         if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (javaBlock != null && !javaBlock.isEmpty()) {
+            if (!javaBlock().isEmpty()) {
                 result = ThreeValuedTruth.TRUE;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {

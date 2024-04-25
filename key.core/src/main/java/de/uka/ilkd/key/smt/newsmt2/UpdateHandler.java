@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 /**
@@ -40,7 +40,7 @@ public class UpdateHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) {
 
         Term update = term.sub(0);
-        assert update.sort() == Sort.UPDATE;
+        assert update.sort() == JavaDLTheory.UPDATE;
 
         List<SExpr> individualUpdates = new ArrayList<>();
         collectUpdates(update, individualUpdates, trans);

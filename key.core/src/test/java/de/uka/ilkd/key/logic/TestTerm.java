@@ -5,12 +5,15 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.logic.equality.RenamingProperty;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -30,17 +33,18 @@ public class TestTerm {
     private final Sort sort3 = new SortImpl(new Name("S3"));
 
 
-    private final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    private final JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     private final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
     // q(:Whatever):BOOL
     private final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
     private final LogicVariable zz = new LogicVariable(new Name("zz"), sort1); // zz:S1
-    private final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    private final JFunction r =
+        new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     private final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    private final Function f = new Function(new Name("f"), sort1, sort3);
+    private final JFunction f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); // pv0:S1
@@ -110,10 +114,11 @@ public class TestTerm {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
         assertTrue(
-            match1.sub(0).equalsModProperty(match2, RenamingProperty.RENAMING_TERM_PROPERTY),
+            match1.sub(0).equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming (0).");
         assertTrue(
-            match1.sub(0).equalsModProperty(match1.sub(1), RenamingProperty.RENAMING_TERM_PROPERTY),
+            match1.sub(0).equalsModProperty(match1.sub(1),
+                RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming (1).");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
         assertNotEquals(match1, match3, "Terms should not be equal.");
@@ -124,15 +129,15 @@ public class TestTerm {
     public void testEqualsModRenamingWithLabels() {
         Term match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
-        assertTrue(match1.equalsModProperty(match2, RenamingProperty.RENAMING_TERM_PROPERTY),
+        assertTrue(match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
         Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");
-        assertTrue(match3.equalsModProperty(match4, RenamingProperty.RENAMING_TERM_PROPERTY),
+        assertTrue(match3.equalsModProperty(match4, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
         Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-        assertTrue(match5.equalsModProperty(match6, RenamingProperty.RENAMING_TERM_PROPERTY),
+        assertTrue(match5.equalsModProperty(match6, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
     }
 
@@ -145,7 +150,7 @@ public class TestTerm {
         final Term pz = tf.createTerm(p, new Term[] { tf.createTerm(z) }, null, null);
         final Term quant2 = tb.all(z, tb.all(z, tb.all(z, pz)));
 
-        assertTrue(quant1.equalsModProperty(quant2, RenamingProperty.RENAMING_TERM_PROPERTY),
+        assertTrue(quant1.equalsModProperty(quant2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms " + quant1 + " and " + quant2 + " should be equal mod renaming");
 
     }
@@ -197,7 +202,9 @@ public class TestTerm {
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
+        Term withJB =
+            tf.createTerm(Modality.getModality(Modality.JavaModalityKind.DIA, javaBlock),
+                new ImmutableArray<>(noJB), null, null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         assertFalse(noJB.containsJavaBlockRecursive());

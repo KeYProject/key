@@ -32,7 +32,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         super();
         setHeaderText(getDescription());
         setSubHeaderText(
-            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
+            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE_NEW.getAbsolutePath());
         add(new JScrollPane(tblColors));
     }
 
@@ -42,7 +42,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
                 .map(it -> new ColorPropertyData(it, it.get())).collect(Collectors.toList());
 

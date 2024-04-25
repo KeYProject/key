@@ -7,6 +7,8 @@ package de.uka.ilkd.key.util;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
+import org.key_project.util.collection.Pair;
+
 /**
  * A union type contains a value that can be one of two types. It is also called
  * the "sum" type sometimes. Union containers are immutable.

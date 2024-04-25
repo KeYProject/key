@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -23,6 +22,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.logic.sort.Sort;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -44,12 +45,12 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             final Term[] subs = new Term[term.arity()];
             term.subs().arraycopy(0, subs, 0, term.arity());
 
-            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm, services);
+            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm);
             subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with, termLabelState,
                 labelHint, posOfFind, it, mc, newMaxSort, goal, services, ruleApp);
 
             return services.getTermFactory().createTerm(term.op(), subs, term.boundVars(),
-                term.javaBlock(), term.getLabels());
+                term.getLabels());
         }
 
         with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp,

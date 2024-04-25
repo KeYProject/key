@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Represents a node in the class hierarchy. Each SortNode contains a Sort and links to SortNodes

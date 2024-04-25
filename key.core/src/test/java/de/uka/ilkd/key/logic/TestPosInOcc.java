@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +31,8 @@ public class TestPosInOcc {
     public void testIterator() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        Function f = new Function(new Name("f"), sort1, sort1);
-        Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+        JFunction f = new JFunction(new Name("f"), sort1, sort1);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
 
         Term[] terms = new Term[3];
@@ -73,9 +76,9 @@ public class TestPosInOcc {
     public void testReplaceConstrainedFormula() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        Function c = new Function(new Name("c"), sort1, new Sort[] {});
-        Function f = new Function(new Name("f"), sort1, sort1);
-        Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+        JFunction c = new JFunction(new Name("c"), sort1, new Sort[] {});
+        JFunction f = new JFunction(new Name("f"), sort1, sort1);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
         Term[] terms = new Term[3];
         terms[0] = TB.var(x);

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -25,7 +26,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -847,7 +849,9 @@ public class TestApplyTaclet {
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
         // FIXME weigl: This test case is spurious:
         // actual.toString() == expected.toString() but internally there is a difference.
-        assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
+        assertTrue(
+            expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
+                new NameAbstractionTable()),
             "Expected:" + expected + "\n but was:" + is);
     }
 
@@ -881,7 +885,9 @@ public class TestApplyTaclet {
 
         ProgramElement is =
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
-        assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
+        assertTrue(
+            expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
+                new NameAbstractionTable()),
             "Expected:" + expected + "\n but was:" + is);
     }
 
