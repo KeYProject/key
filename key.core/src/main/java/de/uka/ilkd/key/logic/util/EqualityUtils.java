@@ -3,21 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.util;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
-import de.uka.ilkd.key.logic.equality.TermProperty;
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
+import de.uka.ilkd.key.logic.equality.Property;
 
 public class EqualityUtils {
 
     /**
-     * Computes the hashcode of an iterable of terms modulo a given property using the elements'
-     * {@link TermEqualsModProperty} implementation.
+     * Computes the hashcode modulo a given property of an iterable of elements that implement
+     * {@link EqualsModProperty}.
      *
      * @param iter iterable of terms
      * @return combined hashcode
      */
-    public static int hashCodeModPropertyOfIterable(TermProperty property,
-            Iterable<? extends Term> iter) {
+    public static <T extends EqualsModProperty<T>> int hashCodeModPropertyOfIterable(
+            Property<T> property,
+            Iterable<? extends T> iter) {
         // adapted from Arrays.hashCode
         if (iter == null) {
             return 0;
@@ -25,7 +25,7 @@ public class EqualityUtils {
 
         int result = 1;
 
-        for (Term element : iter) {
+        for (T element : iter) {
             result = 31 * result + (element == null ? 0
                     : element.hashCodeModProperty(property));
         }

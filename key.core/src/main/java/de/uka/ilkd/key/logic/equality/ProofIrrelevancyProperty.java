@@ -14,6 +14,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
+
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
@@ -105,7 +106,8 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        int hashcode = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+        int hashcode = Objects.hash(term.op(),
+            EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY, term.subs()),
             EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
 
         // part from LabeledTermImpl
