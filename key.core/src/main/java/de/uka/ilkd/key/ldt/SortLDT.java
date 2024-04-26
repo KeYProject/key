@@ -15,8 +15,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -48,12 +48,14 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, Term left, Term right, Services services,
+            ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, Term sub, TermServices services,
+            ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
@@ -81,11 +83,11 @@ public final class SortLDT extends LDT {
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
         if (t.op() instanceof SortDependingFunction sf && sf.isSimilar(ssort)) {
-            //TODO
+            // TODO
         }
 
         throw new IllegalArgumentException(
-                "Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
+            "Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }
 
     @Override

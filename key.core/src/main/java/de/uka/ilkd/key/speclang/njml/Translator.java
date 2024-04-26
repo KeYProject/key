@@ -38,7 +38,6 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -644,7 +643,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (left.isTerm()) {
                 leftSort = left.getTerm();
             } else {
-                JFunction ssortFunc = sortLDT.getSsort(left.getType().getSort(),services);
+                JFunction ssortFunc = sortLDT.getSsort(left.getType().getSort(), services);
                 leftSort = tb.func(ssortFunc);
             }
 
@@ -652,7 +651,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (right.isTerm()) {
                 rightSort = right.getTerm();
             } else {
-                JFunction ssortFunc = sortLDT.getSsort(right.getType().getSort(),services);
+                JFunction ssortFunc = sortLDT.getSsort(right.getType().getSort(), services);
                 rightSort = tb.func(ssortFunc);
             }
 
