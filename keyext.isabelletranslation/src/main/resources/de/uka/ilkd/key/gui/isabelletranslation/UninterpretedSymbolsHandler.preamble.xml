@@ -18,8 +18,6 @@ lift_definition typeof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;boo
 lift_definition subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset_eq.
 lift_definition strict_subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset.
 
-
-
 consts
   int_Image::"any set"
   int2any::"int\&lt;Rightarrow&gt;any"
@@ -27,6 +25,10 @@ consts
 
 axiomatization where int_sub_any[simp]:"type_definition int2any any2int (int_Image)"
 declare [[coercion int2any]]
+
+interpretation int:type_definition int2any any2int int_Image
+  by simp
+
 
 definition int_type::"javaDL_type" where "int_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::int set)"
 
@@ -37,6 +39,10 @@ consts
 
 axiomatization where bool_sub_any[simp]:"type_definition bool2any any2bool (bool_Image)"
 declare [[coercion bool2any]]
+
+interpretation bool:type_definition bool2any any2bool bool_Image
+  by simp
+
 
 definition bool_type::"javaDL_type" where "bool_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::bool set)"
 
@@ -117,6 +123,10 @@ axiomatization where LocSet_sub_any:"type_definition LocSet2any any2LocSet LocSe
 
 declare [[coercion LocSet2any]]
 
+interpretation LocSet:type_definition LocSet2any any2LocSet LocSet_Image
+  by (rule LocSet_sub_any)
+
+
 definition LocSet_type::"javaDL_type" where "LocSet_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::LocSet set)"
 
 
@@ -134,6 +144,10 @@ consts
 axiomatization where Heap_sub_any:"type_definition Heap2any any2Heap Heap_Image"
 
 declare [[coercion Heap2any]]
+
+interpretation Heap:type_definition Heap2any any2Heap Heap_Image
+  by (rule Heap_sub_any)
+
 
 definition Heap_type::"javaDL_type" where "Heap_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::Heap set)"
 
@@ -219,6 +233,10 @@ axiomatization Seq2any any2Seq Seq_UNIV
   where Seq_sub_any:"type_definition (Seq2any::Seq\&lt;Rightarrow&gt;any) (any2Seq::any\&lt;Rightarrow&gt;Seq) (Seq_UNIV::any set)"
 
 declare [[coercion Seq2any]]
+
+interpretation Seq:type_definition Seq2any any2Seq Seq_UNIV
+  by (rule Seq_sub_any)
+
 
 instantiation Seq::any
 begin
