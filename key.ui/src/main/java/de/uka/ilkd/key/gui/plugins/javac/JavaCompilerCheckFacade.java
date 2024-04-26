@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -94,7 +93,8 @@ public class JavaCompilerCheckFacade {
         }
         if (classPath != null && !classPath.isEmpty()) {
             options.add("-classpath");
-            options.add(classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
+            options.add(
+                classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
         }
         ArrayList<Path> files = new ArrayList<>();
         if (javaPath.isDirectory()) {
@@ -113,7 +113,7 @@ public class JavaCompilerCheckFacade {
             fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
-                options, classes, compilationUnits);
+            options, classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
