@@ -248,11 +248,10 @@ fun seqNPerm::"Seq\&lt;Rightarrow&gt;bool"
 fun seqSub::"Seq\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;Seq" where
   "seqSub s i j = seqDef i j (\&lt;lambda&gt;x. seqGet s x)"
 
-primrec listIndexOf::"'a list\&lt;Rightarrow&gt;'a\&lt;Rightarrow&gt;nat" where
-  "listIndexOf [] a = undefined" |
-  "listIndexOf (x#xs) a = (if (x=a) then 0 else Suc (listIndexOf xs a))"
+primrec (nonexhaustive) listIndexOf::"'a list\&lt;Rightarrow&gt;'a\&lt;Rightarrow&gt;int" where
+  "listIndexOf (x#xs) a = (if (x=a) then 0 else 1+(listIndexOf xs a))"
 
-definition seqIndexOf::"Seq\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;int" where "listIndexOf (Rep_Seq (s::Seq)) x \&lt;noteq&gt; undefined \&lt;Longrightarrow&gt; seqIndexOf s x \&lt;equiv&gt; int (listIndexOf (Rep_Seq (s::Seq)) x)"
+lift_definition seqIndexOf::"Seq\&lt;Rightarrow&gt;any\&lt;Rightarrow&gt;int" is "listIndexOf".
 
 fun listSwap::"'a list\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;'a list"
   where "listSwap l i j = 
