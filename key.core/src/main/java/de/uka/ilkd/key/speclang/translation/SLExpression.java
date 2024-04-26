@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,7 +20,7 @@ public final class SLExpression {
 
 
     public SLExpression(@NonNull Term term, @NonNull KeYJavaType type, boolean isTerm) {
-        if (term.sort() != Sort.ANY && term.sort() != type.getSort()) {
+        if (term.sort() != JavaDLTheory.ANY && term.sort() != type.getSort()) {
             throw new IllegalArgumentException(
                 String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
         }

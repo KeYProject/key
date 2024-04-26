@@ -6,15 +6,17 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -52,16 +54,30 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
+        var dtNamespace = new Namespace<JFunction>();
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
             Sort[] args = new Sort[constructorContext.sortId().size()];
+            var argNames = constructorContext.argName;
             for (int i = 0; i < args.length; i++) {
-                args[i] = accept(constructorContext.sortId(i));
+                Sort argSort = accept(constructorContext.sortId(i));
+                args[i] = argSort;
+                var argName = argNames.get(i).getText();
+                var alreadyDefinedFn = dtNamespace.lookup(argName);
+                if (alreadyDefinedFn != null
+                        && (!alreadyDefinedFn.sort().equals(argSort)
+                                || !alreadyDefinedFn.argSort(0).equals(sort))) {
+                    throw new RuntimeException("Name already in namespace: " + argName);
+                }
+                JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+                    false, false);
+                dtNamespace.add(fn);
             }
-            Function function = new Function(name, sort, args, null, true, false);
-            namespaces().functions().add(function);
+            JFunction function = new JFunction(name, sort, args, null, true, false);
+            namespaces().functions().addSafely(function);
         }
+        namespaces().functions().addSafely(dtNamespace.allElements());
         return null;
     }
 
@@ -74,7 +90,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        Function p = null;
+        JFunction p = null;
 
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -84,13 +100,14 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
+                    new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
+            p = new JFunction(new Name(pred_name), JavaDLTheory.FORMULA,
+                argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 
@@ -116,7 +133,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        Function f = null;
+        JFunction f = null;
         assert funcName != null;
         int separatorIndex = funcName.indexOf("::");
         if (separatorIndex > 0) {
@@ -130,7 +147,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         if (f == null) {
-            f = new Function(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
+            f = new JFunction(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 
@@ -151,7 +168,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
-        Sort retSort = ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId());
+        Sort retSort = ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId());
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =

@@ -10,13 +10,14 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.operator.Subtype;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 
@@ -25,7 +26,7 @@ public final class SortLDT extends LDT {
     public static final Name NAME = new Name("SORT");
 
     private final SortDependingFunction ssort;
-    private final Function ssubsort;
+    private final JFunction ssubsort;
 
     public SortLDT(TermServices services) {
         super(NAME, services);
@@ -37,7 +38,7 @@ public final class SortLDT extends LDT {
         return ssort.getInstanceFor(instanceSort, services);
     }
 
-    public Function getSsubsort() {
+    public JFunction getSsubsort() {
         return ssubsort;
     }
 
@@ -63,7 +64,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         if (op instanceof Subtype) {
             return ssubsort;
         }
@@ -73,7 +74,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return f instanceof SortDependingFunction sf && sf.isSimilar(ssort);
     }
 

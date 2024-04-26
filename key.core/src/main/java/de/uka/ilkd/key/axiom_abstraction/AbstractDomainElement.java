@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.logic.Named;
 
 /**
  * An element of an abstract domain. Elements are described by defining axioms; the main function of

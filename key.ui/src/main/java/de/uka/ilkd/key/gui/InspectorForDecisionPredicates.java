@@ -8,10 +8,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -60,7 +60,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         // return NO_USER_INPUT;
         // }
 
-        if (term == null || term.sort() != Sort.FORMULA) {
+        if (term == null || term.sort() != JavaDLTheory.FORMULA) {
             return "Not a formula.";
         }
         for (ApplicationCheck check : additionalChecks) {

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
@@ -156,8 +156,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected Modality getTerminationMarker() {
-        return Modality.BOX;
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return Modality.JavaModalityKind.BOX;
     }
 
     @Override

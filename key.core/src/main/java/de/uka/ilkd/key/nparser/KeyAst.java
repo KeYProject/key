@@ -10,9 +10,11 @@ import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.java.StringUtil;
@@ -51,6 +53,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     @Override
     public String toString() {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
+    }
+
+    public Location getStartLocation() {
+        return Location.fromToken(ctx.start);
+    }
+
+    public String getText() {
+        var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
+        return ctx.start.getInputStream().getText(interval);
     }
 
     public static class File extends KeyAst<KeYParser.FileContext> {
@@ -146,6 +157,26 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 return (Configuration) res.get(0);
             else
                 throw new RuntimeException();
+        }
+    }
+
+    public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {
+        public SetStatementContext(JmlParser.@NonNull Set_statementContext ctx) {
+            super(ctx);
+        }
+
+        public Expression getAssignee() {
+            return new Expression(ctx.assignee);
+        }
+
+        public Expression getValue() {
+            return new Expression(ctx.value);
+        }
+    }
+
+    public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
+            super(ctx);
         }
     }
 

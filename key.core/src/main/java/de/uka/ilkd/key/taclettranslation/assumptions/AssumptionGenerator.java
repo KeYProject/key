@@ -6,11 +6,12 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -18,6 +19,8 @@ import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -102,8 +105,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-            JavaBlock.EMPTY_JAVABLOCK);
+        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, null);
 
         term = changeTerm(term);
 
@@ -374,7 +376,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         TermBuilder tb = services.getTermBuilder();
 
         // translate schema variables into logical variables
-        if (term.op() instanceof SchemaVariable && !term.sort().equals(Sort.FORMULA)) {
+        if (term.op() instanceof SchemaVariable && !term.sort().equals(JavaDLTheory.FORMULA)) {
             term = tb.var(getLogicVariable(term.op().name(), term.sort()));
         }
 
@@ -392,7 +394,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             ImmutableArray<QuantifiableVariable> array = new ImmutableArray<>(list);
 
             term = services.getTermFactory().createTerm(term.op(), term.subs(), array,
-                JavaBlock.EMPTY_JAVABLOCK, term.getLabels());
+                term.getLabels());
 
         }
 
