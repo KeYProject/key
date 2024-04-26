@@ -6,10 +6,11 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -22,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
  * after the NullSort object itself has to be created; and immutability prevents us from filling in
  * this information later.
  */
-public final class NullSort implements Sort {
+public final class NullSort extends SortImpl {
 
     public static final Name NAME = new Name("Null");
 
@@ -34,14 +35,9 @@ public final class NullSort implements Sort {
 
 
     public NullSort(Sort objectSort) {
+        super(NAME, null, false, "", "");
         assert objectSort != null;
         this.objectSort = objectSort;
-    }
-
-
-    @Override
-    public Name name() {
-        return NAME;
     }
 
 
@@ -52,7 +48,8 @@ public final class NullSort implements Sort {
 
 
     @Override
-    public ImmutableSet<Sort> extendsSorts(Services services) {
+    public <S extends LogicServices> ImmutableSet<Sort> extendsSorts(S p_services) {
+        final Services services = (Services) p_services;
         assert services != null;
         assert objectSort == services.getJavaInfo().objectSort();
 
@@ -61,9 +58,8 @@ public final class NullSort implements Sort {
             result = DefaultImmutableSet.nil();
 
             for (Sort n : services.getNamespaces().sorts().allElements()) {
-                Sort s = n;
-                if (s != this && s.extendsTrans(objectSort)) {
-                    result = result.add(s);
+                if (n != this && n.extendsTrans(objectSort)) {
+                    result = result.add(n);
                 }
             }
 
@@ -74,49 +70,9 @@ public final class NullSort implements Sort {
         return result;
     }
 
-
     @Override
     public boolean extendsTrans(Sort sort) {
-        return sort == this || sort == Sort.ANY || sort.extendsTrans(objectSort);
-    }
-
-
-    @Override
-    public boolean isAbstract() {
-        return false;
-    }
-
-
-    @Override
-    public SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction result = SortDependingFunction.getFirstInstance(CAST_NAME, services)
-                .getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this && result.sort() == this;
-        return result;
-    }
-
-
-    @Override
-    public SortDependingFunction getInstanceofSymbol(TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(INSTANCE_NAME, services).getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this;
-        return result;
-    }
-
-
-    @Override
-    public SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(EXACT_INSTANCE_NAME, services).getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this;
-        return result;
-    }
-
-
-    @Override
-    public String toString() {
-        return NAME.toString();
+        return sort == this || sort == JavaDLTheory.ANY || sort.extendsTrans(objectSort);
     }
 
     @Override

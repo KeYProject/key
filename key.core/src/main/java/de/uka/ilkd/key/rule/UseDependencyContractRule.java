@@ -22,14 +22,17 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
 public final class UseDependencyContractRule implements BuiltInRule {
@@ -207,7 +210,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
+            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), IRRELEVANT_TERM_LABELS_PROPERTY)
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }

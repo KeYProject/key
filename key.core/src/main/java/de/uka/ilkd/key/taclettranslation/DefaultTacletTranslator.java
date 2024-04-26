@@ -5,11 +5,11 @@ package de.uka.ilkd.key.taclettranslation;
 
 
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -173,7 +173,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 list = list.append(translateReplaceAndAddSequent(template, SUCC, services));
 
             } else if (taclet instanceof RewriteTaclet rwTaclet) {
-                if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
+                if (rwTaclet.find().sort().equals(JavaDLTheory.FORMULA)) {
                     int polarity = getPolarity(rwTaclet);
                     list = list.append(
                         translateReplaceAndAddFormula(template, find, polarity, services));

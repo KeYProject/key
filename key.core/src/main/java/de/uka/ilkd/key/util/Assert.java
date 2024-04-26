@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * Special assert statements intended for use with KeY. Raises

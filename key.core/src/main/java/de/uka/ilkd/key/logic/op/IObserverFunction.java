@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public interface IObserverFunction extends SortedOperator {
+public interface IObserverFunction extends org.key_project.logic.op.SortedOperator, Operator {
 
     /**
      * Returns the result type of this symbol.

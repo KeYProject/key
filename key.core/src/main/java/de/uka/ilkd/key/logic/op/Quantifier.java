@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 /**
  * The two objects of this class represent the universal and the existential quantifier,
@@ -31,6 +33,7 @@ public final class Quantifier extends AbstractSortedOperator {
 
 
     private Quantifier(Name name) {
-        super(name, new Sort[] { Sort.FORMULA }, Sort.FORMULA, new Boolean[] { true }, true);
+        super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA,
+            new Boolean[] { true }, true);
     }
 }

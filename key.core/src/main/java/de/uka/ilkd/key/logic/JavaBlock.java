@@ -4,16 +4,16 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
+import org.key_project.logic.Program;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock implements EqualsModProofIrrelevancy {
+public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
@@ -88,31 +88,6 @@ public final class JavaBlock implements EqualsModProofIrrelevancy {
                 return block.program().equals(program());
             }
         }
-    }
-
-    /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    public boolean equalsModRenaming(Object o, NameAbstractionTable nat) {
-        if (!(o instanceof JavaBlock)) {
-            return false;
-        }
-        return equalsModRenaming(((JavaBlock) o).program(), nat);
-    }
-
-
-    /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    private boolean equalsModRenaming(JavaProgramElement pe, NameAbstractionTable nat) {
-        if (pe == null && program() == null) {
-            return true;
-        } else if (pe != null && program() != null) {
-            return program().equalsModRenaming(pe, nat);
-        }
-        return false;
     }
 
     /**

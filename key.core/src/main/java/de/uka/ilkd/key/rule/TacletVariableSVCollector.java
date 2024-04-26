@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.key_project.logic.Visitor;
+
 /**
  * This class is used to collect all appearing SchemaVariables that are bound in a Taclet.
  * Duplicates are not removed becaues the use of persistent datastructure and up to now we just have
@@ -16,15 +18,15 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 
     /**
-     * visits term t in post order ({@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)}) and
+     * visits term t in post order ({@link Term#execPostOrder(Visitor)}) and
      * collects all bound schema variables
      *
-     * @param t the Term to be visited (<code>t</code> must not be <code>null</code>
+     * @param visited the Term to be visited (<code>t</code> must not be <code>null</code>
      */
-    public void visit(Term t) {
-        for (int j = 0; j < t.arity(); j++) {
-            for (int i = 0; i < t.varsBoundHere(j).size(); i++) {
-                QuantifiableVariable boundVar = t.varsBoundHere(j).get(i);
+    public void visit(Term visited) {
+        for (int j = 0; j < visited.arity(); j++) {
+            for (int i = 0; i < visited.varsBoundHere(j).size(); i++) {
+                QuantifiableVariable boundVar = visited.varsBoundHere(j).get(i);
                 if (boundVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) boundVar);
                 }

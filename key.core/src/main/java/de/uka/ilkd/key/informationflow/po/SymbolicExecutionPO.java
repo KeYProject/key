@@ -12,7 +12,6 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -152,8 +152,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return getContract().getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return getContract().getModalityKind();
     }
 
 
