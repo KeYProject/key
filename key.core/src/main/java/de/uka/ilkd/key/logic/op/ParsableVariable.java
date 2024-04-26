@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-
 /**
  * This interface represents the variables that can be recognized by one of the parsers.
  */
-public interface ParsableVariable extends SortedOperator {
+public interface ParsableVariable extends org.key_project.logic.op.SortedOperator, Operator {
 }

@@ -6,12 +6,14 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+
+import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
 
@@ -99,8 +101,8 @@ public class OverloadedOperatorHandler {
         this.integerHandler = new IntegerHandler(services, specMathMode);
 
         handlers.add(new BinaryBooleanHandler(services));
-        // handlers.add(new SequenceHandler(services));
-        // handlers.add(new LocSetHandler(services));
+        handlers.add(new SequenceHandler(services));
+        handlers.add(new LocSetHandler(services));
         handlers.add(this.integerHandler);
         handlers.add(new FloatHandler(services));
         handlers.add(new DoubleHandler(services));
@@ -150,6 +152,9 @@ public class OverloadedOperatorHandler {
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             if (left.getTerm().sort() == ldtSequence.targetSort()
                     && right.getTerm().sort() == ldtSequence.targetSort()) {
                 if (op == JMLOperator.ADD) {
@@ -173,17 +178,20 @@ public class OverloadedOperatorHandler {
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 return switch (op) {
                 case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
                 case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
-                case BITWISE_AND -> new SLExpression(tb.intersect(l, r));
-                case LT -> new SLExpression(tb.subset(l, r));
-                case LTE -> new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                case GT -> new SLExpression(tb.subset(r, l));
-                case GTE -> new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
+                case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
+                case LTE -> new SLExpression(tb.subset(l, r));
+                case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
+                case GTE -> new SLExpression(tb.subset(r, l));
                 default -> null;
                 };
             }
@@ -203,9 +211,10 @@ public class OverloadedOperatorHandler {
         @Nullable
         @Override
         public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
-            if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
+            if ((left.getTerm().sort() == sortBoolean
+                    || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean
-                            || right.getTerm().sort() == Sort.FORMULA)) {
+                            || right.getTerm().sort() == JavaDLTheory.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 return switch (op) {

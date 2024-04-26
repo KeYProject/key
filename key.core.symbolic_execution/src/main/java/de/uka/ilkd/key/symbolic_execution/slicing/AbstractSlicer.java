@@ -12,11 +12,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -26,13 +26,16 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -521,10 +524,10 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        Function newPredicate = new Function(
+                        JFunction newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
+                            JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         Term newTerm =
                             sideProofEnv.getServicesForEnvironment().getTermBuilder().func(
@@ -588,10 +591,10 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        Function newPredicate = new Function(
+                        JFunction newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
+                            JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
                         Term newTerm = tb.func(newPredicate,

@@ -5,8 +5,8 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -37,7 +37,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
             if (type == null) {
                 final Term term = expr.getTerm();
                 if (term != null) {
-                    if (term.sort() == Sort.FORMULA) {
+                    if (term.sort() == JavaDLTheory.FORMULA) {
                         type = services.getTypeConverter().getBooleanType();
                     }
                 }

@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.util.collection.Pair;
 
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).

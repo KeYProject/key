@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -32,10 +31,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -126,7 +126,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         }
 
         final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
-        final Modality modality = (Modality) progPost.op();
+        final var kind = ((Modality) progPost.op()).<Modality.JavaModalityKind>kind();
 
         return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn() // TODO: Remove
                                                                                  // when wd goal is
@@ -136,7 +136,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                                                                                  // would be unsound
                                                                                  // w.r.t.
                                                                                  // well-definedness
-                && !(modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION);
+                && !(kind.transaction());
     }
 
     @NonNull
@@ -400,7 +400,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // in general; probably, something involving the TermLabelManager should
         // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-            tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
+            tb.prog(modality.kind(), newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 
