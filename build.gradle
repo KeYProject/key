@@ -82,6 +82,7 @@ subprojects {
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
         compileOnly("org.jspecify:jspecify:0.3.0")
+        testCompileOnly("org.jspecify:jspecify:0.3.0")
         def eisop_version = "3.42.0-eisop2"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
