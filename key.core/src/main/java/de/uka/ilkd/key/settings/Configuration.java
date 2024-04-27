@@ -129,7 +129,7 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link java.lang.Long}
-     * @throws NoSuchElementException if no such value entry exists
+     * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name) {
         return (int) getLong(name);
@@ -140,7 +140,7 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Long}
-     * @throws NoSuchElementException if no such value entry exists
+     * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name, int defaultValue) {
         return (int) getLong(name, defaultValue);
@@ -151,14 +151,10 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Long}
-     * @throws NoSuchElementException if no such value entry exists
+     * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        Long result = get(name, Long.class);
-        if (result == null) {
-            throw new NoSuchElementException();
-        }
-        return result;
+        return get(name, Long.class);
     }
 
     /**
@@ -166,7 +162,6 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Long}
-     * @throws NoSuchElementException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
         Long value = get(name, Long.class);
@@ -178,14 +173,10 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Boolean}
-     * @throws NoSuchElementException if no such value entry exists
+     * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
-        Boolean result = get(name, Boolean.class);
-        if (result == null) {
-            throw new NoSuchElementException();
-        }
-        return result;
+        return get(name, Boolean.class);
     }
 
     /**
@@ -204,14 +195,10 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not an {@link Double}
-     * @throws NoSuchElementException if no such value entry exists
+     * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        Double result = get(name, Double.class);
-        if (result == null) {
-            throw new NoSuchElementException();
-        }
-        return result;
+        return get(name, Double.class);
     }
 
     /**
@@ -219,15 +206,10 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link String}
-     * @throws NoSuchElementException if no such value entry exists
      */
     @Nullable
     public String getString(String name) {
-        String s = get(name, String.class);
-        if (s == null) {
-            throw new NoSuchElementException();
-        }
-        return s;
+        return get(name, String.class);
     }
 
     /**
@@ -245,15 +227,10 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Configuration}
-     * @throws NoSuchElementException if no such value entry exists
      */
     @Nullable
     public Configuration getTable(String name) {
-        Configuration result = get(name, Configuration.class);
-        if (result == null) {
-            throw new NoSuchElementException();
-        }
-        return result;
+        return get(name, Configuration.class);
     }
 
     /**
@@ -261,7 +238,6 @@ public class Configuration {
      *
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link List}
-     * @throws NoSuchElementException if no such value entry exists
      */
     @Nullable
     public List<Object> getList(String name) {
@@ -277,13 +253,12 @@ public class Configuration {
      * @param clazz the class type of the elements
      * @throws ClassCastException if the entry is not a {@link List} or contains elements of the
      *         wrong type
-     * @throws NoSuchElementException if no such value entry exists
      */
     @SuppressWarnings("unchecked")
     public <T> @Nullable List<T> getList(String name, Class<T> clazz) {
         List<?> result = get(name, List.class);
         if (result == null) {
-            throw new NoSuchElementException();
+            return null;
         }
         if (!result.stream().allMatch(clazz::isInstance)) {
             throw new ClassCastException();
@@ -345,6 +320,10 @@ public class Configuration {
             throw new IllegalArgumentException(clazz + " is not an enum type.");
         }
         var idx = getString(name);
+        if(idx == null) {
+            return defaultValue;
+        }
+
         try {
             return Enum.valueOf(clazz, idx);
         } catch (IllegalArgumentException | NullPointerException e) {
@@ -371,7 +350,6 @@ public class Configuration {
     /**
      * @see #getTable(String)
      */
-    // TODO Why are there two methods for the same thing?
     public Configuration getSection(String name) {
         return getTable(name);
     }
@@ -391,8 +369,6 @@ public class Configuration {
         return data.put(name, obj);
     }
 
-    // TODO Why do these setters exist? They delegate to set(String, Object) and do not add any
-    // value.
     public Object set(String name, Boolean obj) {
         return set(name, (Object) obj);
     }
