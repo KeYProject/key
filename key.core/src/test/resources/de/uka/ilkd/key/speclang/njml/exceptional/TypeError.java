@@ -1,7 +1,8 @@
 // exceptionClass: RuntimeException
 // msgContains: Error in equality-expression
-// position: 11/19
+// position: 12/19
 // verbose: true
+
 
 // It's not the best of error messages ...
 // and there is no file location information

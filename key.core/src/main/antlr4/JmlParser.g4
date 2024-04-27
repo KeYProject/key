@@ -347,8 +347,7 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
-  | LOCSET LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN                   #primaryCreateLocset
+  | (LOCSET|STOREREF) LPAREN storeRefUnion RPAREN                                     #primaryStoreRef
   | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
@@ -362,14 +361,6 @@ jmlprimary
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
   ;
-
-fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
-fieldarrayaccess_suffix
-    : DOT (ident | inv | inv_free | this_ | super_ | TRANSIENT | INV | INV_FREE)
-    | LBRACKET (expression) RBRACKET
-;
-
-super_: SUPER;
 
 sequence
   : SEQEMPTY                                                              #sequenceEmpty

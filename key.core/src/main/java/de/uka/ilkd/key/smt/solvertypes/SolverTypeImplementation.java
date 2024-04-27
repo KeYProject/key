@@ -5,6 +5,9 @@ package de.uka.ilkd.key.smt.solvertypes;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -255,61 +258,78 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     /**
-     * Returns false whenever cmd is null or empty, otherwise the environment variables are checked
-     * for the command and if no file with the command's name is found in any of those paths, the
-     * cmd itself is used as the pathname. If all of these fail, the cmd is also not installed.
+     * Returns false whenever cmd is null or empty, otherwise if the command is an absolute path
+     * it is checked, if not the environment variables are checked
+     * for the command whether there is a file with the command's name in any of those paths.
+     * If all of these fail, the cmd is also not installed.
      *
      * @param cmd the command whose existence will be checked
      * @return true iff the command is a non-empty String and a file with the command's name or with
      *         the command as pathname can be found in the file system.
      */
     public static boolean isInstalled(@Nullable String cmd) {
+
         if (cmd == null || cmd.isEmpty()) {
             return false;
         }
-        if (checkEnvVariable(cmd)) {
-            return true;
-        } else {
-            File file = new File(cmd);
-            return file.exists() && !file.isDirectory();
+        try {
+            Path cmdPath = Paths.get(cmd);
+            if (cmdPath.isAbsolute()) {
+                return checkPath(cmdPath);
+            }
+            return checkEnvVariable(cmd + getOSDefaultExtension());
+
+        } catch (InvalidPathException e) {
+            return false;
         }
     }
 
-    private static boolean checkFile(String parent, String child) {
-        File file = Paths.get(parent, child).toFile();
-        return file.exists() && file.canExecute();
+    private static boolean checkPath(Path path) {
+        return Files.exists(path) && Files.isExecutable(path);
     }
 
     private static boolean checkEnvVariable(String cmd) {
-        String pathExt = System.getenv("PATHEXT");
-
-        // Build all possible children exes (add extensions)
-        String[] exes;
-        if (pathExt == null) {
-            // No PATHEXT, just use cmd
-            exes = new String[] { cmd };
-        } else {
-            String[] pathExtensions = pathExt.split(File.pathSeparator);
-            exes = new String[pathExtensions.length + 1];
-
-            // Append all extensions to cmd
-            for (int i = 0; i < pathExtensions.length; i++) {
-                exes[i] = cmd + pathExtensions[i];
-            }
-            // Add unchanged cmd to be sure (e.g. cmd = bla.exe)
-            exes[pathExtensions.length] = cmd;
-        }
-
         String path = System.getenv("PATH");
         String[] paths = path.split(File.pathSeparator);
         for (String parent : paths) {
-            for (String children : exes) {
-                if (checkFile(parent, children)) {
-                    return true;
-                }
+            Path parentPath = Paths.get(parent);
+            Path childPath = Paths.get(cmd);
+            Path completePath = parentPath.resolve(childPath);
+            if (checkPath(completePath)) {
+                return true;
             }
         }
+
         return false;
+    }
+
+
+
+    private static String getOSDefaultExtension() {
+        final String windowsDefaultExt = ".exe";
+        final String linuxDefaultExt = "";
+        final String maxDefaultExt = "";
+
+        if (osIsWindows()) {
+            return windowsDefaultExt;
+        }
+
+        if (osIsLinux()) {
+            return linuxDefaultExt;
+        }
+        return maxDefaultExt;
+    }
+
+    private static String getOperatingSystem() {
+        return System.getProperty("os.name");
+    }
+
+    private static boolean osIsWindows() {
+        return getOperatingSystem().startsWith("Windows");
+    }
+
+    private static boolean osIsLinux() {
+        return getOperatingSystem().startsWith("Linux");
     }
 
     @Override
