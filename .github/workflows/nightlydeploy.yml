@@ -40,14 +40,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete nightly
-
+          gh release delete nightly --yes --cleanup-tag 
 
       - name: Create nightly release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
+        run: |          
           gh release create --generate-notes --title "Nightly Release" \
              --prerelease \
              nightly key.ui/build/libs/key-*-exe.jar
