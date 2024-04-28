@@ -50,7 +50,7 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
         final Contract contract = initConfig.getServices().getSpecificationRepository()
                 .getContractByName(baseContractName);
         if (contract == null) {
-            throw new IOException("Contract not found: " + baseContractName);
+            throw new IllegalStateException("Contract not found: " + baseContractName);
         } else {
             ProofOblInput po;
             boolean addUninterpretedPredicate =
