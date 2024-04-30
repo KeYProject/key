@@ -675,7 +675,11 @@ public final class IssueDialog extends JDialog {
                 String source = StringUtil.replaceNewlines(
                     fileContentsCache.computeIfAbsent(uri, fn -> {
                         try {
-                            return IOUtil.readFrom(finalUri).orElseThrow();
+                            String result = IOUtil.readFrom(finalUri);
+                            if (result == null) {
+                                throw new NullPointerException();
+                            }
+                            return result;
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
                             return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();

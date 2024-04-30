@@ -35,8 +35,7 @@ public final class Immutables {
      * @param list any list, must not be <code>null</code>
      * @return true iff every
      */
-    public static <T> boolean isDuplicateFree(ImmutableList<T> list) {
-
+    public static <T extends @Nullable Object> boolean isDuplicateFree(ImmutableList<T> list) {
         HashSet<T> set = new HashSet<>();
         for (T element : list) {
             if (set.contains(element)) {

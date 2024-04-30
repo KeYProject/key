@@ -33,14 +33,12 @@ public final class ArrayUtil {
      */
     public static <T extends @Nullable Object> @Nullable T search(T[] array, Predicate<T> filter) {
         T result = null;
-        if (array != null && filter != null) {
-            int i = 0;
-            while (result == null && i < array.length) {
-                if (filter.test(array[i])) {
-                    result = array[i];
-                }
-                i++;
+        int i = 0;
+        while (result == null && i < array.length) {
+            if (filter.test(array[i])) {
+                result = array[i];
             }
+            i++;
         }
         return result;
     }
@@ -61,33 +59,13 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array,
-            T @Nullable [] toAdd) {
-        if (array != null) {
-            if (toAdd != null) {
-                T[] result =
-                    (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
+    public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd) {
+        T[] result =
+                (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
                         array.length + toAdd.length);
-                System.arraycopy(array, 0, result, 0, array.length);
-                System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
-                return result;
-            } else {
-                T[] result = (T[]) java.lang.reflect.Array
-                        .newInstance(getComponentType(array), array.length);
-                System.arraycopy(array, 0, result, 0, array.length);
-                return result;
-            }
-        } else {
-            if (toAdd != null) {
-                T[] result = (T[]) java.lang.reflect.Array
-                        .newInstance(getComponentType(toAdd), toAdd.length);
-                System.arraycopy(toAdd, 0, result, 0, toAdd.length);
-                return result;
-            } else {
-                throw new IllegalArgumentException(
-                    "Can not create an array if both paramters are null.");
-            }
-        }
+        System.arraycopy(array, 0, result, 0, array.length);
+        System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
+        return result;
     }
 
     private static <T extends @Nullable Object> Class<? extends T> getComponentType(T[] array) {
@@ -113,29 +91,12 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array,
-            T @Nullable [] toAdd, Class<?> newArrayType) {
-        if (array != null) {
-            if (toAdd != null) {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
-                    array.length + toAdd.length);
-                System.arraycopy(array, 0, result, 0, array.length);
-                System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
-                return result;
-            } else {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType, array.length);
-                System.arraycopy(array, 0, result, 0, array.length);
-                return result;
-            }
-        } else {
-            if (toAdd != null) {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType, toAdd.length);
-                System.arraycopy(toAdd, 0, result, 0, toAdd.length);
-                return result;
-            } else {
-                return (T[]) java.lang.reflect.Array.newInstance(newArrayType, 0);
-            }
-        }
+    public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd, Class<?> newArrayType) {
+        T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
+                array.length + toAdd.length);
+        System.arraycopy(array, 0, result, 0, array.length);
+        System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
+        return result;
     }
 
     /**
@@ -154,25 +115,12 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> @Nullable T[] add(T @Nullable [] array,
-            @Nullable T toAdd) {
-        if (array != null) {
-            @Nullable
-            T[] result = (@Nullable T[]) java.lang.reflect.Array
-                    .newInstance(getComponentType(array), array.length + 1);
-            System.arraycopy(array, 0, result, 0, array.length);
-            result[array.length] = toAdd;
-            return result;
-        } else {
-            if (toAdd != null) {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(toAdd.getClass(), 1);
-                result[0] = toAdd;
-                return result;
-            } else {
-                throw new IllegalArgumentException(
-                    "Can not create an array if both paramters are null.");
-            }
-        }
+    public static <T extends @Nullable Object> T[] add(T[] array, T toAdd) {
+        T[] result = (T[]) java.lang.reflect.Array
+                .newInstance(getComponentType(array), array.length + 1);
+        System.arraycopy(array, 0, result, 0, array.length);
+        result[array.length] = toAdd;
+        return result;
     }
 
     /**
@@ -186,14 +134,10 @@ public final class ArrayUtil {
      * @return The new created array with one more element.
      */
     public static int[] add(int[] array, int toAdd) {
-        if (array != null) {
-            int[] result = new int[array.length + 1];
-            System.arraycopy(array, 0, result, 0, array.length);
-            result[array.length] = toAdd;
-            return result;
-        } else {
-            return new int[] { toAdd };
-        }
+        int[] result = new int[array.length + 1];
+        System.arraycopy(array, 0, result, 0, array.length);
+        result[array.length] = toAdd;
+        return result;
     }
 
     /**
@@ -208,26 +152,15 @@ public final class ArrayUtil {
      * @return The new created array with one more element.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] insert(T[] array, T toInsert, int index) {
-        if (array != null) {
-            T[] result = (T[]) java.lang.reflect.Array
-                    .newInstance(getComponentType(array), array.length + 1);
-            if (index >= 1) {
-                System.arraycopy(array, 0, result, 0, index);
-            }
-            result[index] = toInsert;
-            System.arraycopy(array, index, result, index + 1, array.length - index);
-            return result;
-        } else {
-            if (toInsert != null) {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(toInsert.getClass(), 1);
-                result[0] = toInsert;
-                return result;
-            } else {
-                throw new IllegalArgumentException(
-                    "Can not create an array if array and element to insert are null.");
-            }
+    public static <T extends @Nullable Object> T[] insert(T[] array, T toInsert, int index) {
+        T[] result = (T[]) java.lang.reflect.Array
+                .newInstance(getComponentType(array), array.length + 1);
+        if (index >= 1) {
+            System.arraycopy(array, 0, result, 0, index);
         }
+        result[index] = toInsert;
+        System.arraycopy(array, index, result, index + 1, array.length - index);
+        return result;
     }
 
     /**
@@ -239,7 +172,7 @@ public final class ArrayUtil {
      * @return {@code true} if the array contains the element or {@code false} if not or if the
      *         array is {@code null}.
      */
-    public static <T> boolean contains(T[] array, T toSearch) {
+    public static <T extends @Nullable Object> boolean contains(T[] array, T toSearch) {
         return indexOf(array, toSearch) >= 0;
     }
 
@@ -252,13 +185,11 @@ public final class ArrayUtil {
      * @return The first index in the array that contains the element to search or {@code -1} if the
      *         elment is not containd in the array.
      */
-    public static <T> int indexOf(T[] array, T toSearch) {
+    public static <T extends @Nullable Object> int indexOf(T[] array, T toSearch) {
         int index = -1;
-        if (array != null) {
-            for (int i = 0; i < array.length; i++) {
-                if (Objects.equals(array[i], toSearch)) {
-                    return i;
-                }
+        for (int i = 0; i < array.length; i++) {
+            if (Objects.equals(array[i], toSearch)) {
+                return i;
             }
         }
         return index;
@@ -270,24 +201,18 @@ public final class ArrayUtil {
      *
      * @param array The array to remove from.
      * @param toRemove The element to remove.
-     * @return A copy of the array without the element toRemove or {@code null} if the given array
-     *         was {@code null}.
+     * @return A copy of the array without the element toRemove.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T @Nullable [] remove(T @Nullable [] array,
-            @Nullable T toRemove) {
-        if (array != null) {
-            List<T> result = new LinkedList<>();
-            for (T element : array) {
-                if (!Objects.equals(element, toRemove)) {
-                    result.add(element);
-                }
+    public static <T extends @Nullable Object> T[] remove(T[] array, T toRemove) {
+        List<T> result = new LinkedList<>();
+        for (T element : array) {
+            if (!Objects.equals(element, toRemove)) {
+                result.add(element);
             }
-            return (T[]) result.toArray((T[]) java.lang.reflect.Array
-                    .newInstance(getComponentType(array), result.size()));
-        } else {
-            return null;
         }
+        return (T[]) result.toArray((T[]) java.lang.reflect.Array
+                .newInstance(getComponentType(array), result.size()));
     }
 
     /**
@@ -296,7 +221,7 @@ public final class ArrayUtil {
      * @param array The array to convert.
      * @return The array as {@link String}.
      */
-    public static <T> String toString(T[] array) {
+    public static <T extends @Nullable Object> String toString(T[] array) {
         return toString(array, ", ");
     }
 
@@ -307,18 +232,16 @@ public final class ArrayUtil {
      * @param separator The separator between to array elements.
      * @return The array as {@link String}.
      */
-    public static <T> String toString(T[] array, String separator) {
+    public static <T extends @Nullable Object> String toString(T[] array, String separator) {
         StringBuilder sb = new StringBuilder();
-        if (array != null) {
-            boolean afterFirst = false;
-            for (T element : array) {
-                if (afterFirst) {
-                    sb.append(separator);
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(element);
+        boolean afterFirst = false;
+        for (T element : array) {
+            if (afterFirst) {
+                sb.append(separator);
+            } else {
+                afterFirst = true;
             }
+            sb.append(element);
         }
         return sb.toString();
     }
@@ -342,16 +265,14 @@ public final class ArrayUtil {
      */
     public static String toString(int[] array, String separator) {
         StringBuilder sb = new StringBuilder();
-        if (array != null) {
-            boolean afterFirst = false;
-            for (int element : array) {
-                if (afterFirst) {
-                    sb.append(separator);
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(element);
+        boolean afterFirst = false;
+        for (int element : array) {
+            if (afterFirst) {
+                sb.append(separator);
+            } else {
+                afterFirst = true;
             }
+            sb.append(element);
         }
         return sb.toString();
     }
@@ -362,7 +283,7 @@ public final class ArrayUtil {
      * @param array The array to check.
      * @return {@code true} array is empty or {@code null}, {@code false} array is not empty.
      */
-    public static <T> boolean isEmpty(T[] array) {
-        return array == null || array.length == 0;
+    public static <T extends @Nullable Object> boolean isEmpty(T[] array) {
+        return array.length == 0;
     }
 }

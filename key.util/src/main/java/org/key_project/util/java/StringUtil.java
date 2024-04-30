@@ -123,7 +123,7 @@ public final class StringUtil {
      *
      * @return The created {@link Comparator}.
      */
-    public static Comparator<String> createIgnoreCaseComparator() {
+    public static Comparator<@Nullable String> createIgnoreCaseComparator() {
         return (o1, o2) -> {
             if (o1 != null && o2 != null) {
                 return o1.compareToIgnoreCase(o2);

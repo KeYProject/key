@@ -287,9 +287,8 @@ public class SendFeedbackAction extends AbstractAction {
             URI url = ExceptionTools.getLocation(throwable)
                     .flatMap(Location::getFileURI)
                     .orElse(null);
-            Optional<String> content = IOUtil.readFrom(url);
-            return content.map(s -> s.getBytes(Charset.defaultCharset()))
-                    .orElse(new byte[0]);
+            String content = IOUtil.readFrom(url);
+            return content != null ? content.getBytes(Charset.defaultCharset()) : new byte[0];
         }
     }
 

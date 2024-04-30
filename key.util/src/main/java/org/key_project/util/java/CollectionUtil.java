@@ -32,23 +32,19 @@ public class CollectionUtil {
      * @param toSearch The element to search.
      * @return The index of the element or {@code -1} if it was not found.
      */
-    public static <T> int indexOf(Iterator<T> iter, T toSearch) {
-        if (iter != null) {
-            int i = 0;
-            boolean found = false;
-            while (!found && iter.hasNext()) {
-                T next = iter.next();
-                if (Objects.equals(next, toSearch)) {
-                    found = true;
-                } else {
-                    i++;
-                }
-            }
-            if (found) {
-                return i;
+    public static <T extends @Nullable Object> int indexOf(Iterator<T> iter, T toSearch) {
+        int i = 0;
+        boolean found = false;
+        while (!found && iter.hasNext()) {
+            T next = iter.next();
+            if (Objects.equals(next, toSearch)) {
+                found = true;
             } else {
-                return -1;
+                i++;
             }
+        }
+        if (found) {
+            return i;
         } else {
             return -1;
         }
@@ -74,40 +70,18 @@ public class CollectionUtil {
      */
     public static String toString(Collection<?> collection, String separator) {
         StringBuilder sb = new StringBuilder();
-        if (collection != null) {
-            boolean afterFirst = false;
-            for (Object object : collection) {
-                if (afterFirst) {
-                    if (separator != null) {
-                        sb.append(separator);
-                    }
-                } else {
-                    afterFirst = true;
+        boolean afterFirst = false;
+        for (Object object : collection) {
+            if (afterFirst) {
+                if (separator != null) {
+                    sb.append(separator);
                 }
-                sb.append(object);
+            } else {
+                afterFirst = true;
             }
+            sb.append(object);
         }
         return sb.toString();
-    }
-
-    /**
-     * Nullpointersave execution of {@link Collection#isEmpty()}.
-     *
-     * @param collection The given {@link Collection}.
-     * @return {@code true} = is empty or {@code null}, {@code false} = is not empty.
-     */
-    public static boolean isEmpty(Collection<?> collection) {
-        return collection == null || collection.isEmpty();
-    }
-
-    /**
-     * Nullpointersave execution of {@link Map#isEmpty()}.
-     *
-     * @param map The given {@link Map}.
-     * @return {@code true} = is empty or {@code null}, {@code false} = is not empty.
-     */
-    public static boolean isEmpty(Map<?, ?> map) {
-        return map == null || map.isEmpty();
     }
 
     /**
@@ -118,10 +92,8 @@ public class CollectionUtil {
      * @param iterable The elements to add.
      */
     public static <T> void addAll(Collection<T> collection, Iterable<T> iterable) {
-        if (collection != null && iterable != null) {
-            for (T toAdd : iterable) {
-                collection.add(toAdd);
-            }
+        for (T toAdd : iterable) {
+            collection.add(toAdd);
         }
     }
 
@@ -133,20 +105,16 @@ public class CollectionUtil {
      * @return {@code true} if at least one element was removed, {@code false} if the
      *         {@link Collection} was not modified.
      */
-    public static <T> boolean removeComplete(Collection<T> collection, T toRemove) {
-        if (collection != null) {
-            Iterator<T> iter = collection.iterator();
-            boolean changed = false;
-            while (iter.hasNext()) {
-                if (Objects.equals(iter.next(), toRemove)) {
-                    iter.remove();
-                    changed = true;
-                }
+    public static <T extends @Nullable Object> boolean removeComplete(Collection<T> collection, T toRemove) {
+        Iterator<T> iter = collection.iterator();
+        boolean changed = false;
+        while (iter.hasNext()) {
+            if (Objects.equals(iter.next(), toRemove)) {
+                iter.remove();
+                changed = true;
             }
-            return changed;
-        } else {
-            return false;
         }
+        return changed;
     }
 
     /**
@@ -156,13 +124,11 @@ public class CollectionUtil {
      * @param filter The {@link IFilter} to use.
      * @return The elements accepted by the given {@link Predicate}.
      */
-    public static <T> List<T> searchAll(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> List<T> searchAll(Iterable<T> iterable, Predicate<T> filter) {
         List<T> result = new ArrayList<>();
-        if (iterable != null && filter != null) {
-            for (T element : iterable) {
-                if (filter.test(element)) {
-                    result.add(element);
-                }
+        for (T element : iterable) {
+            if (filter.test(element)) {
+                result.add(element);
             }
         }
         return result;
@@ -175,15 +141,13 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> @Nullable T search(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> @Nullable T search(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
-        if (iterable != null && filter != null) {
-            Iterator<T> iter = iterable.iterator();
-            while (result == null && iter.hasNext()) {
-                T next = iter.next();
-                if (filter.test(next)) {
-                    result = next;
-                }
+        Iterator<T> iter = iterable.iterator();
+        while (result == null && iter.hasNext()) {
+            T next = iter.next();
+            if (filter.test(next)) {
+                result = next;
             }
         }
         return result;
@@ -197,16 +161,14 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> @Nullable T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> @Nullable T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
-        if (iterable != null && filter != null) {
-            Iterator<T> iter = iterable.iterator();
-            while (result == null && iter.hasNext()) {
-                T next = iter.next();
-                if (filter.test(next)) {
-                    result = next;
-                    iter.remove();
-                }
+        Iterator<T> iter = iterable.iterator();
+        while (result == null && iter.hasNext()) {
+            T next = iter.next();
+            if (filter.test(next)) {
+                result = next;
+                iter.remove();
             }
         }
         return result;
@@ -220,18 +182,16 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T, E extends Throwable> @Nullable T searchAndRemoveWithException(
+    public static <T extends @Nullable Object, E extends Throwable> @Nullable T searchAndRemoveWithException(
             Iterable<T> iterable,
             IFilterWithException<T, E> filter) throws E {
         T result = null;
-        if (iterable != null && filter != null) {
-            Iterator<T> iter = iterable.iterator();
-            while (result == null && iter.hasNext()) {
-                T next = iter.next();
-                if (filter.select(next)) {
-                    result = next;
-                    iter.remove();
-                }
+        Iterator<T> iter = iterable.iterator();
+        while (result == null && iter.hasNext()) {
+            T next = iter.next();
+            if (filter.select(next)) {
+                result = next;
+                iter.remove();
             }
         }
         return result;
@@ -244,13 +204,11 @@ public class CollectionUtil {
      * @param element The element to search.
      * @return {@code true} = contained, {@code false} = not contained
      */
-    public static <T> boolean contains(Iterable<T> iterable, T element) {
+    public static <T extends @Nullable Object> boolean contains(Iterable<T> iterable, T element) {
         boolean found = false;
-        if (iterable != null) {
-            Iterator<T> iter = iterable.iterator();
-            while (!found && iter.hasNext()) {
-                found = Objects.equals(iter.next(), element);
-            }
+        Iterator<T> iter = iterable.iterator();
+        while (!found && iter.hasNext()) {
+            found = Objects.equals(iter.next(), element);
         }
         return found;
     }
@@ -263,13 +221,11 @@ public class CollectionUtil {
      * @param filter The {@link IFilter} to select elements.
      * @return The number of elements selected by the {@link IFilter} in the given {@link Iterable}.
      */
-    public static <T> int count(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> int count(Iterable<T> iterable, Predicate<T> filter) {
         int count = 0;
-        if (iterable != null && filter != null) {
-            for (T element : iterable) {
-                if (filter.test(element)) {
-                    count++;
-                }
+        for (T element : iterable) {
+            if (filter.test(element)) {
+                count++;
             }
         }
         return count;
@@ -288,26 +244,21 @@ public class CollectionUtil {
      * @return {@code true} both {@link Collection}s contains same elements, {@code false}
      *         {@link Collection}s are different.
      */
-    public static <T> boolean containsSame(Collection<T> first, Collection<T> second) {
-        if (first != null) {
-            if (second != null) {
-                if (first.size() == second.size()) {
-                    Collection<T> firstCopy = new LinkedList<>(first);
-                    boolean same = true;
-                    Iterator<T> secondIter = second.iterator();
-                    while (same && secondIter.hasNext()) {
-                        T secondNext = secondIter.next();
-                        same = firstCopy.remove(secondNext);
-                    }
-                    return same;
-                } else {
-                    return false;
-                }
-            } else {
-                return first.size() == 0;
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    // Checker Framework conservatively disallows passing null to Collection.remove, but if we have a collection of type
+    // Collection<@Nullable C>, it's probably fine.
+    public static <T extends @Nullable Object> boolean containsSame(Collection<T> first, Collection<T> second) {
+        if (first.size() == second.size()) {
+            Collection<T> firstCopy = new LinkedList<>(first);
+            boolean same = true;
+            Iterator<T> secondIter = second.iterator();
+            while (same && secondIter.hasNext()) {
+                T secondNext = secondIter.next();
+                same = firstCopy.remove(secondNext);
             }
+            return same;
         } else {
-            return second == null || second.size() == 0;
+            return false;
         }
     }
 
@@ -317,16 +268,12 @@ public class CollectionUtil {
      * @param iterable The {@link Iterable} to remove first element from.
      * @return The removed first element or {@code null} if no element was removed.
      */
-    public static <T> @Nullable T removeFirst(Iterable<T> iterable) {
+    public static <T extends @Nullable Object> @Nullable T removeFirst(Iterable<T> iterable) {
         try {
-            if (iterable != null) {
-                Iterator<T> iter = iterable.iterator();
-                T next = iter.next();
-                iter.remove();
-                return next;
-            } else {
-                return null;
-            }
+            Iterator<T> iter = iterable.iterator();
+            T next = iter.next();
+            iter.remove();
+            return next;
         } catch (NoSuchElementException e) {
             return null; // Iterable must be empty.
         }
@@ -339,7 +286,7 @@ public class CollectionUtil {
      * @param toInsert The element to insert.
      * @param comparator The {@link Comparator} to use.
      */
-    public static <T> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
+    public static <T extends @Nullable Object> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
         if (list.isEmpty()) {
             list.add(toInsert);
         } else {

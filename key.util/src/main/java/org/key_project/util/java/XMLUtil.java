@@ -37,42 +37,37 @@ public final class XMLUtil {
      * @param replacer The {@link ITagReplacer} to use.
      * @return The new created text.
      */
-    public static @Nullable String replaceTags(@Nullable String text,
-            @Nullable ITagReplacer replacer) {
-        if (text != null && replacer != null) {
-            StringBuilder sb = new StringBuilder();
-            char[] signs = text.toCharArray();
-            boolean inTag = false;
-            boolean inAttribute = false;
-            StringBuilder tagSB = null;
-            for (char sign : signs) {
-                if (!inTag) {
-                    if (sign == '<') {
-                        inTag = true;
-                        tagSB = new StringBuilder();
-                        tagSB.append(sign);
-                    } else {
-                        sb.append(sign);
-                    }
-                } else {
-                    assert tagSB != null
-                            : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+    public static String replaceTags(String text, ITagReplacer replacer) {
+        StringBuilder sb = new StringBuilder();
+        char[] signs = text.toCharArray();
+        boolean inTag = false;
+        boolean inAttribute = false;
+        StringBuilder tagSB = null;
+        for (char sign : signs) {
+            if (!inTag) {
+                if (sign == '<') {
+                    inTag = true;
+                    tagSB = new StringBuilder();
                     tagSB.append(sign);
-                    if (sign == '>' && !inAttribute) {
-                        inTag = false;
-                        String replacement = replacer.replaceTag(tagSB.toString());
-                        if (replacement != null) {
-                            sb.append(replacement);
-                        }
-                    } else if (sign == '\'' || sign == '"') {
-                        inAttribute = !inAttribute;
+                } else {
+                    sb.append(sign);
+                }
+            } else {
+                assert tagSB != null
+                        : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+                tagSB.append(sign);
+                if (sign == '>' && !inAttribute) {
+                    inTag = false;
+                    String replacement = replacer.replaceTag(tagSB.toString());
+                    if (replacement != null) {
+                        sb.append(replacement);
                     }
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
                 }
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**
@@ -126,31 +121,27 @@ public final class XMLUtil {
      * @param text The text to remove tags from.
      * @return The text without tags.
      */
-    public static @Nullable String removeTags(@Nullable String text) {
-        if (text != null) {
-            StringBuilder sb = new StringBuilder();
-            char[] signs = text.toCharArray();
-            boolean inTag = false;
-            boolean inAttribute = false;
-            for (char sign : signs) {
-                if (!inTag) {
-                    if (sign == '<') {
-                        inTag = true;
-                    } else {
-                        sb.append(sign);
-                    }
+    public static String removeTags(String text) {
+        StringBuilder sb = new StringBuilder();
+        char[] signs = text.toCharArray();
+        boolean inTag = false;
+        boolean inAttribute = false;
+        for (char sign : signs) {
+            if (!inTag) {
+                if (sign == '<') {
+                    inTag = true;
                 } else {
-                    if (sign == '>' && !inAttribute) {
-                        inTag = false;
-                    } else if (sign == '\'' || sign == '"') {
-                        inAttribute = !inAttribute;
-                    }
+                    sb.append(sign);
+                }
+            } else {
+                if (sign == '>' && !inAttribute) {
+                    inTag = false;
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
                 }
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**
@@ -175,24 +166,20 @@ public final class XMLUtil {
      * @param text The text to encode.
      * @return The encoded text.
      */
-    public static @Nullable String encodeText(@Nullable String text) {
-        if (text != null) {
-            char[] signs = text.toCharArray();
-            StringBuilder sb = new StringBuilder();
-            for (char sign : signs) {
-                switch (sign) {
-                case '"' -> sb.append("&quot;");
-                case '&' -> sb.append("&amp;");
-                case '\'' -> sb.append("&apos;");
-                case '<' -> sb.append("&lt;");
-                case '>' -> sb.append("&gt;");
-                default -> sb.append(sign);
-                }
+    public static String encodeText(String text) {
+        char[] signs = text.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char sign : signs) {
+            switch (sign) {
+            case '"' -> sb.append("&quot;");
+            case '&' -> sb.append("&amp;");
+            case '\'' -> sb.append("&apos;");
+            case '<' -> sb.append("&lt;");
+            case '>' -> sb.append("&gt;");
+            default -> sb.append(sign);
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**
