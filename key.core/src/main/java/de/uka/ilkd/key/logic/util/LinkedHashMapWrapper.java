@@ -10,34 +10,38 @@ import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.key_project.util.collection.Pair;
+
 /**
- * This class is a wrapper for {@link LinkedHashMap} where the keys are {@link Term}s.
- * <p>
- * Internally, the {@link Term}s are wrapped so that {@link EqualsModProperty} can be used for
- * equality checks and
- * hash codes instead of the usual {@code equals} and {@code hashCode} methods of {@link Term}.
+ * This class is a wrapper for {@link LinkedHashMap} where the keys are elements that implement
+ * {@link EqualsModProperty}.
  *
+ * @param <K> the type of the keys in the wrapped LinkedHashMap
  * @param <V> the type of the values in the wrapped LinkedHashMap
  */
-public class LinkedHashMapWrapper<V> {
+public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
+    /*
+     * Internally, the elements are wrapped so that EqualsModProperty can be used for equality
+     * checks and hash codes instead of the usual equals and hashCode methods.
+     */
+
     /**
      * The wrapped {@link LinkedHashMap}.
      */
-    private final LinkedHashMap<TermWrapper, V> map;
+    private final LinkedHashMap<ElementWrapper<K>, V> map;
 
     /**
-     * The {@link Property<Term>} that is used for equality checks and hash codes.
+     * The {@link Property<K>} that is used for equality checks and hash codes.
      */
-    private final Property<Term> property;
+    private final Property<K> property;
 
     /**
      * Constructs a new empty {@link LinkedHashMapWrapper}.
      *
      * @param property the {@link Property<Term>} that is used internally for equality checks and
-     *        hash
-     *        codes
+     *        hash codes
      */
-    public LinkedHashMapWrapper(Property<Term> property) {
+    public LinkedHashMapWrapper(Property<K> property) {
         this.property = property;
         map = new LinkedHashMap<>();
     }
@@ -48,10 +52,9 @@ public class LinkedHashMapWrapper<V> {
      * @param key the key to be inserted
      * @param value the value corresponding to {@code key}
      * @param property the {@link Property<Term>} that is used internally for equality checks and
-     *        hash
-     *        codes
+     *        hash codes
      */
-    public LinkedHashMapWrapper(Term key, V value, Property<Term> property) {
+    public LinkedHashMapWrapper(K key, V value, Property<K> property) {
         this(property);
         put(key, value);
     }
@@ -66,10 +69,9 @@ public class LinkedHashMapWrapper<V> {
      * @param keys the array of keys to be inserted
      * @param values the array of values corresponding to the keys
      * @param property the {@link Property<Term>} that is used internally for equality checks and
-     *        hash
-     *        codes
+     *        hash codes
      */
-    public LinkedHashMapWrapper(Term[] keys, V[] values, Property<Term> property) {
+    public LinkedHashMapWrapper(K[] keys, V[] values, Property<K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -84,10 +86,9 @@ public class LinkedHashMapWrapper<V> {
      * @param keys the iterable of keys to be inserted
      * @param values the iterable of values corresponding to the keys
      * @param property the {@link Property<Term>} that is used internally for equality checks and
-     *        hash
-     *        codes
+     *        hash codes
      */
-    public LinkedHashMapWrapper(Iterable<Term> keys, Iterable<V> values, Property<Term> property) {
+    public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values, Property<K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -116,8 +117,8 @@ public class LinkedHashMapWrapper<V> {
      * @param key the key whose presence in this map is to be tested
      * @return true if this map contains a mapping for the specified key
      */
-    public boolean containsKey(Term key) {
-        return map.containsKey(wrapTerm(key));
+    public boolean containsKey(K key) {
+        return map.containsKey(wrapKey(key));
     }
 
     /**
@@ -127,8 +128,8 @@ public class LinkedHashMapWrapper<V> {
      * @param key the key whose associated value is to be returned
      * @return the value to which the specified key is mapped
      */
-    public V get(Term key) {
-        return map.get(wrapTerm(key));
+    public V get(K key) {
+        return map.get(wrapKey(key));
     }
 
     /**
@@ -142,8 +143,8 @@ public class LinkedHashMapWrapper<V> {
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
-    public V put(Term key, V value) {
-        return map.put(wrapTerm(key), value);
+    public V put(K key, V value) {
+        return map.put(wrapKey(key), value);
     }
 
     /**
@@ -156,7 +157,7 @@ public class LinkedHashMapWrapper<V> {
      * @param keys the array of keys to be inserted
      * @param vals the array of values corresponding to the keys
      */
-    public void putAll(Term[] keys, V[] vals) {
+    public void putAll(K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
             if (i < vals.length) {
                 put(keys[i], vals[i]);
@@ -176,9 +177,9 @@ public class LinkedHashMapWrapper<V> {
      * @param keys the iterable of keys to be inserted
      * @param vals the iterable of values corresponding to the keys
      */
-    public void putAll(Iterable<Term> keys, Iterable<V> vals) {
+    public void putAll(Iterable<K> keys, Iterable<V> vals) {
         Iterator<V> itVals = vals.iterator();
-        for (Term key : keys) {
+        for (K key : keys) {
             if (itVals.hasNext()) {
                 put(key, itVals.next());
             } else {
@@ -195,8 +196,8 @@ public class LinkedHashMapWrapper<V> {
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
-    public V remove(Term key) {
-        return map.remove(wrapTerm(key));
+    public V remove(K key) {
+        return map.remove(wrapKey(key));
     }
 
     /**
@@ -216,86 +217,104 @@ public class LinkedHashMapWrapper<V> {
      *
      * @return an iterator over the key-value pairs in this map
      */
-    public Iterator<TermPair<V>> iterator() {
+    public Iterator<Pair<K, V>> iterator() {
         return new PairIterator<>(map);
     }
 
     /**
-     * This helper method wraps a term in a {@link TermWrapper} with the {@link Property<Term>} of
-     * this map.
+     * This helper method wraps an element in an {@link ElementWrapper} with the {@link Property<K>}
+     * of this map.
      * <p>
-     * This is done so that {@link EqualsModProperty} can be used for equality checks and hash
-     * codes instead of the
-     * usual {@code equals} and {@code hashCode} methods of {@link Term} in the internal
+     * This is done so that {@link EqualsModProperty} can be used for equality checks and hash codes
+     * instead of the usual {@code equals} and {@code hashCode} methods in the internal
      * {@link LinkedHashMap}.
      *
-     * @param term the term to be wrapped
-     * @return the wrapped term
+     * @param key the key to be wrapped
+     * @return the wrapped key
      */
-    private TermWrapper wrapTerm(Term term) {
-        return new TermWrapper(term, property);
+    private ElementWrapper<K> wrapKey(K key) {
+        return new ElementWrapper<K>(key, property);
     }
 
 
-    // ------------- wrapper class for terms
+    // ------------- wrapper class for keys in the internal map
     /**
-     * This class is used to wrap a term and override the {@code equals} and {@code hashCode} methods for use in a
-     * {@link LinkedHashMap}.
+     * This class is used to wrap an element and override the {@code equals} and {@code hashCode}
+     * methods for use in a map.
      * <p>
-     * The wrapped term is equipped with a {@link Property<Term>} that is used for
+     * The wrapped element is equipped with a {@link Property<K>} that is used for
      * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} and
-     * {@link EqualsModProperty#hashCodeModProperty(Property)} )}.
+     * {@link EqualsModProperty#hashCodeModProperty(Property)} instead of the normal
+     * {@code equals} implementation.
      *
-     * @param term     The term to be wrapped
-     * @param property The {@link Property<Term>} that is used in the {@code equals} and {@code hashCode} methods
+     * @param <K> the type of the wrapped element
      */
-    private record TermWrapper(Term term, Property<Term> property) {
+    private static class ElementWrapper<K extends EqualsModProperty<K>> {
+        /**
+         * The wrapped element.
+         */
+        K key;
 
-    @Override
-    public boolean equals(Object obj) {
-        return term.equalsModProperty(obj, property);
+        /**
+         * The {@link Property<K>} that is used for equality checks and hash codes.
+         */
+        Property<K> property;
+
+        /**
+         * Creates a new wrapper for the given element.
+         *
+         * @param key the element to be wrapped
+         * @param property the {@link Property<K>} that is used for equality checks and hash codes
+         */
+        public ElementWrapper(K key, Property<K> property) {
+            this.key = key;
+            this.property = property;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return key.equalsModProperty(obj, property);
+        }
+
+        @Override
+        public int hashCode() {
+            return key.hashCodeModProperty(property);
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return term.hashCodeModProperty(property);
-    }}
-
-    // ------------- record for term-value mapping
-    public record TermPair<V>(Term term, V value)
-    {
-    }
 
     // ------------- class to iterate over internal map and unwrap terms
     /**
      * This class is used to iterate over the key-value pairs in the {@link LinkedHashMapWrapper}.
      * <p>
-     * The terms in the pairs are unwrapped before returning them.
+     * The keys in the pairs are unwrapped before returning them.
      *
+     * @param <K> the type of the keys in the {@link LinkedHashMapWrapper}
      * @param <V> the type of the values in the {@link LinkedHashMapWrapper}
      */
-    private static class PairIterator<V> implements Iterator<TermPair<V>> {
+    private static class PairIterator<K extends EqualsModProperty<K>, V>
+            implements Iterator<Pair<K, V>> {
         /**
          * The iterator over the keys of the internal map.
          */
-        private final Iterator<TermWrapper> keyIt;
+        private final Iterator<ElementWrapper<K>> keyIt;
 
         /**
          * The internal map.
          */
-        private final LinkedHashMap<TermWrapper, V> map;
+        private final LinkedHashMap<ElementWrapper<K>, V> map;
 
         /**
          * The last key-value pair that was returned by {@link #next()}.
          */
-        private TermWrapper last = null;
+        private ElementWrapper<K> last = null;
 
         /**
          * Creates a new iterator over the key-value pairs in the {@link LinkedHashMapWrapper}.
          *
          * @param map the internal map of the {@link LinkedHashMapWrapper} to iterate over
          */
-        public PairIterator(final LinkedHashMap<TermWrapper, V> map) {
+        public PairIterator(final LinkedHashMap<ElementWrapper<K>, V> map) {
             this.map = map;
             keyIt = map.keySet().iterator();
         }
@@ -306,9 +325,9 @@ public class LinkedHashMapWrapper<V> {
         }
 
         @Override
-        public TermPair<V> next() {
+        public Pair<K, V> next() {
             last = keyIt.next();
-            return new TermPair<>(last.term(), map.get(last));
+            return new Pair<>(last.key, map.get(last));
         }
 
         @Override
