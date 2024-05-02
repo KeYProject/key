@@ -81,7 +81,8 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    public static Optional<LoopSpecification> getSpecForTermWithLoopStmt(final Term loopTerm,
+    @Nullable
+    public static LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
             final Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
@@ -93,7 +94,7 @@ public final class MiscTools {
 
         final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
-        return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
+        return services.getSpecificationRepository().getLoopSpec(loop);
     }
 
     /**

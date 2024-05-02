@@ -64,7 +64,7 @@ public class Modifier implements Named {
     /**
      * Creates a new combined modifier.
      *
-     * @param that The midifier to add to the current one.
+     * @param that The modifier to add to the current one.
      * @return A modifier that has all properties of `this` and `that`.
      */
     public Modifier combine(Modifier that) {

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +53,7 @@ public final class ExceptionTools {
      * @param throwable a throwable
      * @return message for the exception
      */
-    public static String getMessage(Throwable throwable) {
+    public static String getMessage(@Nullable Throwable throwable) {
         if (throwable == null) {
             return "";
         } else if (throwable instanceof ParseCancellationException
@@ -119,25 +118,26 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static Optional<Location> getLocation(@NonNull Throwable exc)
+    @Nullable
+    public static Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
-            return Optional.ofNullable(((HasLocation) exc).getLocation());
+            return ((HasLocation) exc).getLocation();
         } else if (exc instanceof ParseException) {
-            return Optional.ofNullable(getLocation((ParseException) exc));
+            return getLocation((ParseException) exc);
         } else if (exc instanceof TokenMgrError) {
-            return Optional.ofNullable(getLocation((TokenMgrError) exc));
+            return getLocation((TokenMgrError) exc);
         } else if (exc instanceof InputMismatchException ime) {
-            return Optional.ofNullable(getLocation(ime));
+            return getLocation(ime);
         } else if (exc instanceof NoViableAltException nvae) {
-            return Optional.ofNullable(getLocation(nvae));
+            return getLocation(nvae);
         }
 
         if (exc.getCause() != null) {
             return getLocation(exc.getCause());
         }
 
-        return Optional.empty();
+        return null;
     }
 
     @Nullable
@@ -148,6 +148,7 @@ public final class ExceptionTools {
                 : new Location(null, Position.fromToken(token.next));
     }
 
+    @Nullable
     private static Location getLocation(NoViableAltException exc) {
         var token = exc.getOffendingToken();
 
@@ -158,6 +159,7 @@ public final class ExceptionTools {
                     Position.fromToken(token));
     }
 
+    @Nullable
     private static Location getLocation(InputMismatchException exc) {
         var token = exc.getOffendingToken();
 
@@ -168,6 +170,7 @@ public final class ExceptionTools {
                     Position.fromToken(token));
     }
 
+    @Nullable
     private static Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
         if (m.find()) {

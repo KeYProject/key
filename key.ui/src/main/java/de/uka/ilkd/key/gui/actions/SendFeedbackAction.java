@@ -266,7 +266,7 @@ public class SendFeedbackAction extends AbstractAction {
             if (throwable != null) {
                 try {
                     var location = ExceptionTools.getLocation(throwable);
-                    return location.isPresent() && location.get().getFileURI().isPresent();
+                    return location != null && location.getFileURI().isPresent();
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
                     LOGGER.warn("Failed to extract location", e);
@@ -283,11 +283,12 @@ public class SendFeedbackAction extends AbstractAction {
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            URI url = ExceptionTools.getLocation(throwable)
-                    .flatMap(Location::getFileURI)
-                    .orElse(null);
-            String content = IOUtil.readFrom(url);
-            return content != null ? content.getBytes(Charset.defaultCharset()) : new byte[0];
+            Location url = ExceptionTools.getLocation(throwable);
+            if (url != null) {
+                String content = IOUtil.readFrom(url.fileUri());
+                return content.getBytes(Charset.defaultCharset());
+            }
+            return new byte[0];
         }
     }
 
