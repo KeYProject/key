@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Simple value object to hold two values.

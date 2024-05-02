@@ -6,10 +6,10 @@ package org.key_project.util.testcase.collection;
 import java.util.Iterator;
 import java.util.Objects;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -42,8 +42,10 @@ public class TestSLListOfString {
         b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
         c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
         d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B").prepend("A");
-        e1 = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B").prepend("A");
+        e = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
+        e1 = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
     }
 
     // tests prepend and implicitly iterator, size

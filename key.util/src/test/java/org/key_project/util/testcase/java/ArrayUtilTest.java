@@ -5,10 +5,10 @@ package org.key_project.util.testcase.java;
 
 import java.util.function.Predicate;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ArrayUtilTest {
     @Test
     public void testInsert() {
-        @Nullable String[] array = { "A", "B", "C" };
+        @Nullable
+        String[] array = { "A", "B", "C" };
         // Test possible indices
         assertArray(ArrayUtil.insert(array, "X", 0), "X", "A", "B", "C");
         assertArray(ArrayUtil.insert(array, "X", 1), "A", "X", "B", "C");
@@ -56,7 +57,8 @@ public class ArrayUtilTest {
      */
     @Test
     public void testSearch() {
-        @Nullable String[] array = { "A", "B", "C", "D" };
+        @Nullable
+        String[] array = { "A", "B", "C", "D" };
         assertEquals("A", ArrayUtil.<@Nullable String>search(array, "A"::equals));
         assertEquals("B", ArrayUtil.<@Nullable String>search(array, "B"::equals));
         assertEquals("C", ArrayUtil.<@Nullable String>search(array, "C"::equals));
@@ -127,7 +129,8 @@ public class ArrayUtilTest {
     @Test
     public void testRemove() {
         // Test remove on array
-        @Nullable String[] array = new @Nullable String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
+        @Nullable
+        String[] array = new @Nullable String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
         array = ArrayUtil.remove(array, "B"); // Remove B
         assertArrayEquals(array, "A", "C", null, "D", null, null, "C", "A");
         array = ArrayUtil.remove(array, "B"); // Remove B again
@@ -168,7 +171,8 @@ public class ArrayUtilTest {
     public void testAddAll() {
         String[] first = new String[] { "A", "B", "C" };
         String[] second = new String[] { "D", "E" };
-        @Nullable String[] combined = ArrayUtil.addAll(first, second);
+        @Nullable
+        String[] combined = ArrayUtil.addAll(first, second);
         assertEquals(5, combined.length);
         assertEquals("A", combined[0]);
         assertEquals("B", combined[1]);
@@ -184,7 +188,8 @@ public class ArrayUtilTest {
     public void testAddAll_newType() {
         String[] first = new String[] { "A", "B", "C" };
         String[] second = new String[] { "D", "E" };
-        @Nullable Object[] combined = ArrayUtil.addAll(first, second, Object.class);
+        @Nullable
+        Object[] combined = ArrayUtil.addAll(first, second, Object.class);
         assertEquals(Object.class, combined.getClass().getComponentType());
         assertEquals(5, combined.length);
         assertEquals("A", combined[0]);
@@ -237,8 +242,10 @@ public class ArrayUtilTest {
     @Test
     public void testAdd_Object() {
         // Test empty array
-        @Nullable String[] array = new String[] {};
-        @Nullable String[] result = ArrayUtil.add(array, "A");
+        @Nullable
+        String[] array = new String[] {};
+        @Nullable
+        String[] result = ArrayUtil.add(array, "A");
         assertNotNull(result);
         assertEquals(1, result.length);
         assertEquals("A", result[0]);
@@ -288,7 +295,8 @@ public class ArrayUtilTest {
         assertTrue(ArrayUtil.contains(array, "B"));
         assertTrue(ArrayUtil.contains(array, "C"));
         assertFalse(ArrayUtil.contains(array, "D"));
-        @Nullable String[] arrayWithNull = { "A", "B", null, "D" };
+        @Nullable
+        String[] arrayWithNull = { "A", "B", null, "D" };
         assertTrue(ArrayUtil.contains(arrayWithNull, null));
         assertTrue(ArrayUtil.contains(arrayWithNull, "A"));
         assertTrue(ArrayUtil.contains(arrayWithNull, "B"));
@@ -314,7 +322,8 @@ public class ArrayUtilTest {
         assertEquals(1, ArrayUtil.indexOf(array, "B"));
         assertEquals(2, ArrayUtil.indexOf(array, "C"));
         assertEquals(-1, ArrayUtil.indexOf(array, "D"));
-        @Nullable String[] arrayWithNull = { "A", "B", null, "D" };
+        @Nullable
+        String[] arrayWithNull = { "A", "B", null, "D" };
         assertEquals(2, ArrayUtil.indexOf(arrayWithNull, null));
         assertEquals(0, ArrayUtil.indexOf(arrayWithNull, "A"));
         assertEquals(1, ArrayUtil.indexOf(arrayWithNull, "B"));

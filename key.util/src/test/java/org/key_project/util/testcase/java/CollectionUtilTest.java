@@ -6,10 +6,10 @@ package org.key_project.util.testcase.java;
 import java.util.*;
 import java.util.function.Predicate;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilterWithException;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

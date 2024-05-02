@@ -105,7 +105,8 @@ public class CollectionUtil {
      * @return {@code true} if at least one element was removed, {@code false} if the
      *         {@link Collection} was not modified.
      */
-    public static <T extends @Nullable Object> boolean removeComplete(Collection<T> collection, T toRemove) {
+    public static <T extends @Nullable Object> boolean removeComplete(Collection<T> collection,
+            T toRemove) {
         Iterator<T> iter = collection.iterator();
         boolean changed = false;
         while (iter.hasNext()) {
@@ -124,7 +125,8 @@ public class CollectionUtil {
      * @param filter The {@link IFilter} to use.
      * @return The elements accepted by the given {@link Predicate}.
      */
-    public static <T extends @Nullable Object> List<T> searchAll(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> List<T> searchAll(Iterable<T> iterable,
+            Predicate<T> filter) {
         List<T> result = new ArrayList<>();
         for (T element : iterable) {
             if (filter.test(element)) {
@@ -141,7 +143,8 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T extends @Nullable Object> @Nullable T search(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> @Nullable T search(Iterable<T> iterable,
+            Predicate<T> filter) {
         T result = null;
         Iterator<T> iter = iterable.iterator();
         while (result == null && iter.hasNext()) {
@@ -161,7 +164,8 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T extends @Nullable Object> @Nullable T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> @Nullable T searchAndRemove(Iterable<T> iterable,
+            Predicate<T> filter) {
         T result = null;
         Iterator<T> iter = iterable.iterator();
         while (result == null && iter.hasNext()) {
@@ -221,7 +225,8 @@ public class CollectionUtil {
      * @param filter The {@link IFilter} to select elements.
      * @return The number of elements selected by the {@link IFilter} in the given {@link Iterable}.
      */
-    public static <T extends @Nullable Object> int count(Iterable<T> iterable, Predicate<T> filter) {
+    public static <T extends @Nullable Object> int count(Iterable<T> iterable,
+            Predicate<T> filter) {
         int count = 0;
         for (T element : iterable) {
             if (filter.test(element)) {
@@ -245,9 +250,11 @@ public class CollectionUtil {
      *         {@link Collection}s are different.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
-    // Checker Framework conservatively disallows passing null to Collection.remove, but if we have a collection of type
+    // Checker Framework conservatively disallows passing null to Collection.remove, but if we have
+    // a collection of type
     // Collection<@Nullable C>, it's probably fine.
-    public static <T extends @Nullable Object> boolean containsSame(Collection<T> first, Collection<T> second) {
+    public static <T extends @Nullable Object> boolean containsSame(Collection<T> first,
+            Collection<T> second) {
         if (first.size() == second.size()) {
             Collection<T> firstCopy = new LinkedList<>(first);
             boolean same = true;
@@ -286,7 +293,8 @@ public class CollectionUtil {
      * @param toInsert The element to insert.
      * @param comparator The {@link Comparator} to use.
      */
-    public static <T extends @Nullable Object> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
+    public static <T extends @Nullable Object> void binaryInsert(List<T> list, T toInsert,
+            Comparator<T> comparator) {
         if (list.isEmpty()) {
             list.add(toInsert);
         } else {

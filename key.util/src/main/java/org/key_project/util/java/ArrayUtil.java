@@ -61,8 +61,8 @@ public final class ArrayUtil {
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd) {
         T[] result =
-                (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
-                        array.length + toAdd.length);
+            (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
+                array.length + toAdd.length);
         System.arraycopy(array, 0, result, 0, array.length);
         System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
         return result;
@@ -91,9 +91,10 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd, Class<?> newArrayType) {
+    public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd,
+            Class<?> newArrayType) {
         T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
-                array.length + toAdd.length);
+            array.length + toAdd.length);
         System.arraycopy(array, 0, result, 0, array.length);
         System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
         return result;

@@ -5,9 +5,9 @@ package org.key_project.util.testcase.java;
 
 import java.util.Comparator;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

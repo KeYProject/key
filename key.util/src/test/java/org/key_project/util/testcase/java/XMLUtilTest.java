@@ -13,7 +13,6 @@ import org.key_project.util.java.XMLUtil.ITagReplacer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for {@link XMLUtil}.

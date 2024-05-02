@@ -14,13 +14,13 @@ import java.util.function.Predicate;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.helper.HelperClassForUtilityTests;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.IFileVisitor;
 import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.java.XMLUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -585,7 +585,8 @@ public class IOUtilTest {
      */
     protected void assertLineInformation(String text, LineInformation... expectedInfos)
             throws IOException {
-        LineInformation[] result = IOUtil.computeLineInformation(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
+        LineInformation[] result = IOUtil.computeLineInformation(
+            new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
         assertNotNull(result, text);
         assertEquals(expectedInfos.length, result.length, text);
         for (int i = 0; i < expectedInfos.length; i++) {
@@ -743,7 +744,7 @@ public class IOUtilTest {
 
     protected void doTestReadFrom(String text) throws IOException {
         assertEquals(text,
-                IOUtil.readFrom(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))));
+            IOUtil.readFrom(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))));
     }
 
     /**

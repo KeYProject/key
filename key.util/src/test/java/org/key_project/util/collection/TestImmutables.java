@@ -35,13 +35,16 @@ public class TestImmutables {
     @Test
     public void testRemoveDuplicates() {
 
-        @Nullable String[][] a = { { "a", "b", "a", "c", "d", "d", "a", "e" }, { null, "a", null },
+        @Nullable
+        String[][] a = { { "a", "b", "a", "c", "d", "d", "a", "e" }, { null, "a", null },
             { "1", "1", "1", "1", "1" } };
 
-        @Nullable String[][] expected = { { "a", "b", "c", "d", "e" }, { null, "a" }, { "1" } };
+        @Nullable
+        String[][] expected = { { "a", "b", "c", "d", "e" }, { null, "a" }, { "1" } };
 
         for (int i = 0; i < a.length; i++) {
-            ImmutableList<@Nullable String> l = ImmutableSLList.<@Nullable String>nil().prepend(a[i]).reverse();
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(a[i]).reverse();
 
             assertFalse(Immutables.isDuplicateFree(l));
 
@@ -66,18 +69,24 @@ public class TestImmutables {
 
     @Test
     public void testIsDuplicateFree() {
-        @Nullable String[][] a = { { "a", "b", "c", "d", "e" }, {}, { "a" }, { null }, { null, "a" } };
+        @Nullable
+        String[][] a = { { "a", "b", "c", "d", "e" }, {}, { "a" }, { null }, { null, "a" } };
 
-        for (@Nullable String[] strings : a) {
-            ImmutableList<@Nullable String> l = ImmutableSLList.<@Nullable String>nil().prepend(strings);
+        for (@Nullable
+        String[] strings : a) {
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(strings);
             assertTrue(Immutables.isDuplicateFree(l));
         }
 
-        @Nullable String[][] b = { { "a", "a" }, { "a", "b", "c", "d", "a" }, { "a", "b", "a", "d", "e" },
+        @Nullable
+        String[][] b = { { "a", "a" }, { "a", "b", "c", "d", "a" }, { "a", "b", "a", "d", "e" },
             { "a", "b", "d", "d", "e" }, { "a", "b", "c", "d", "d" }, { null, "a", null } };
 
-        for (@Nullable String[] strings : b) {
-            ImmutableList<@Nullable String> l = ImmutableSLList.<@Nullable String>nil().prepend(strings);
+        for (@Nullable
+        String[] strings : b) {
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(strings);
             assertFalse(Immutables.isDuplicateFree(l));
         }
 

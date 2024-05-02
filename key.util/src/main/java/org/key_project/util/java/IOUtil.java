@@ -16,7 +16,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
-import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -595,7 +594,8 @@ public final class IOUtil {
      */
     public static boolean contains(File parent, File child) {
         boolean contains = false;
-        @Nullable File current = child;
+        @Nullable
+        File current = child;
         while (!contains && current != null) {
             if (parent.equals(current)) {
                 contains = true;
