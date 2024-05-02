@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.equality.RenamingProperty;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -112,9 +113,11 @@ public class TestTerm {
     public void testProgramElementEqualsModRenaming() {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
-        assertTrue(match1.sub(0).equalsModRenaming(match2),
+        assertTrue(
+            match1.sub(0).equalsModProperty(match2, RenamingProperty.RENAMING_PROPERTY),
             "Terms should be equalModRenaming (0).");
-        assertTrue(match1.sub(0).equalsModRenaming(match1.sub(1)),
+        assertTrue(
+            match1.sub(0).equalsModProperty(match1.sub(1), RenamingProperty.RENAMING_PROPERTY),
             "Terms should be equalModRenaming (1).");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
         assertNotEquals(match1, match3, "Terms should not be equal.");
@@ -125,13 +128,16 @@ public class TestTerm {
     public void testEqualsModRenamingWithLabels() {
         Term match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
-        assertTrue(match1.equalsModRenaming(match2), "Terms should be equalModRenaming.");
+        assertTrue(match1.equalsModProperty(match2, RenamingProperty.RENAMING_PROPERTY),
+            "Terms should be equalModRenaming.");
         Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");
-        assertTrue(match3.equalsModRenaming(match4), "Terms should be equalModRenaming.");
+        assertTrue(match3.equalsModProperty(match4, RenamingProperty.RENAMING_PROPERTY),
+            "Terms should be equalModRenaming.");
         Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-        assertTrue(match5.equalsModRenaming(match6), "Terms should be equalModRenaming.");
+        assertTrue(match5.equalsModProperty(match6, RenamingProperty.RENAMING_PROPERTY),
+            "Terms should be equalModRenaming.");
     }
 
     @Test
@@ -143,7 +149,7 @@ public class TestTerm {
         final Term pz = tf.createTerm(p, new Term[] { tf.createTerm(z) }, null, null);
         final Term quant2 = tb.all(z, tb.all(z, tb.all(z, pz)));
 
-        assertTrue(quant1.equalsModRenaming(quant2),
+        assertTrue(quant1.equalsModProperty(quant2, RenamingProperty.RENAMING_PROPERTY),
             "Terms " + quant1 + " and " + quant2 + " should be equal mod renaming");
 
     }

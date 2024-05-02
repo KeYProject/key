@@ -67,7 +67,7 @@ public class RingBuffer {
         first = modulo(first + 1);
 
         len--;
-        //@ set list = \seq_sub(list,1,\seq_length(list));
+        //@ set list = \seq_sub(list,1,list.length);
         return r;
     }
 

@@ -52,6 +52,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
@@ -226,6 +227,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
                 LOGGER.error("", result);
+                if (result instanceof ParseCancellationException) {
+                    result = result.getCause();
+                }
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");

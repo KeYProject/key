@@ -333,7 +333,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         PositionedString ps = new PositionedString(condition);
 
         var context = Context.inMethodWithSelfVar(pm, selfVar);
-        JmlIO io = new JmlIO().services(getProof().getServices()).context(context)
+        JmlIO io = new JmlIO(getProof().getServices()).context(context)
                 .parameters(varsForCondition);
 
         return io.parseExpression(ps);

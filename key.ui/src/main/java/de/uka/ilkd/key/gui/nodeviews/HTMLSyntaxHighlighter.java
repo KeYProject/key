@@ -121,10 +121,15 @@ public class HTMLSyntaxHighlighter {
     private static final String PROGVAR_REPLACEMENT =
         "$1<span class=\"progvar_highlight\">$2</span>$3";
 
-    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
+    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//[^@].*?)<br>");
+
+    private static final Pattern SINGLE_LINE_JML_PATTERN = Pattern.compile("(//@.*?)<br>");
+
     private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
         "<span class=\"comment_highlight\">$1</span><br>";
 
+    private static final String SINGLE_LINE_JML_REPLACEMENT =
+        "<span class=\"jml_highlight\">$1</span><br>";
     private static final Pattern SEQUENT_ARROW_PATTERN = Pattern.compile("(==>|⟹)");
     private static final String SEQUENT_ARROW_REPLACEMENT =
         "<span class=\"sequent_arrow_highlight\">$1</span>";
@@ -136,22 +141,15 @@ public class HTMLSyntaxHighlighter {
      * @param document The {@link HTMLDocument}
      */
     public static void addCSSRulesTo(HTMLDocument document) {
-        final String propLogicHighlightRule =
-            ".prop_logic_highlight { color: #000000; font-weight: bold; }";
-        final String foLogicHighlightRule =
-            ".dynamic_logic_highlight { color: #0000C0; font-weight: bold; }";
-        final String javaHighlightRule = ".java_highlight { color: #7F0055; font-weight: bold; }";
-        final String progVarHighlightRule = ".progvar_highlight { color: #6A3E3E; }";
-        final String commentHighlightRule = ".comment_highlight { color: #3F7F5F; }";
-        final String sequentArrowHighlightRule =
-            ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
-
-        document.getStyleSheet().addRule(propLogicHighlightRule);
-        document.getStyleSheet().addRule(progVarHighlightRule);
-        document.getStyleSheet().addRule(javaHighlightRule);
-        document.getStyleSheet().addRule(foLogicHighlightRule);
-        document.getStyleSheet().addRule(commentHighlightRule);
-        document.getStyleSheet().addRule(sequentArrowHighlightRule);
+        document.getStyleSheet().addRule("""
+                .prop_logic_highlight { color: #000000; font-weight: bold; }
+                .dynamic_logic_highlight { color: #0000C0; font-weight: bold; }
+                .java_highlight { color: #7F0055; font-weight: bold; }
+                .progvar_highlight { color: #6A3E3E; }
+                .comment_highlight { color: #3F7F5F; }
+                .jml_highlight { color: #5553c2; }
+                .sequent_arrow_highlight { color: #000000; font-size: 1.7em }
+                """);
     }
 
     /**
@@ -234,6 +232,9 @@ public class HTMLSyntaxHighlighter {
 
             modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
                     .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
+
+            modality = SINGLE_LINE_JML_PATTERN.matcher(modality)
+                    .replaceAll(SINGLE_LINE_JML_REPLACEMENT);
 
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }

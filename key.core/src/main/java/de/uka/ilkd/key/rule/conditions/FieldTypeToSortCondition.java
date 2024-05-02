@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -53,33 +54,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
             if (op instanceof JFunction) {
-                String name = op.name().toString();
-
-                String className;
-                String attributeName;
-
-                // check for normal attribute
-                int endOfClassName = name.indexOf("::$");
-
-                int startAttributeName = endOfClassName + 3;
-
-
-                if (endOfClassName < 0) {
-                    // not a normal attribute, maybe an implicit attribute like <created>?
-                    endOfClassName = name.indexOf("::<");
-                    startAttributeName = endOfClassName + 2;
-                }
-
-                if (endOfClassName < 0) {
+                HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
+                if (split == null) {
                     return null;
                 }
 
-
-                className = name.substring(0, endOfClassName);
-                attributeName = name.substring(startAttributeName);
-
                 ProgramVariable attribute =
-                    services.getJavaInfo().getAttribute(attributeName, className);
+                    services.getJavaInfo().getAttribute(split.attributeName(), split.className());
 
                 if (attribute == null) {
                     return null;

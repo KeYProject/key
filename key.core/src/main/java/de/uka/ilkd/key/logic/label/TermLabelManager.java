@@ -30,6 +30,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * <p>
  * This class provides access to the functionality of term labels.
@@ -2011,7 +2013,8 @@ public class TermLabelManager {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
             SequentFormula existingSF = CollectionUtil.search(s,
-                element -> element.formula().equalsModRenaming(rejectedTerm));
+                element -> element.formula().equalsModProperty(rejectedTerm,
+                    RENAMING_PROPERTY));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();

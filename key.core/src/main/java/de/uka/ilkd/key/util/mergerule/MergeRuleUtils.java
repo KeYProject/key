@@ -45,6 +45,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
  * organized into different sections (see comments):
@@ -1719,7 +1721,7 @@ public class MergeRuleUtils {
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModRenaming(term)) {
+                if (existingTerm.equalsModProperty(term, RENAMING_PROPERTY)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
@@ -1750,7 +1752,7 @@ public class MergeRuleUtils {
         @Override
             public boolean equals(Object obj) {
                 return obj instanceof TermWrapper
-                        && term.equalsModRenaming(((TermWrapper) obj).term());
+                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_PROPERTY);
             }
 
             @Override
