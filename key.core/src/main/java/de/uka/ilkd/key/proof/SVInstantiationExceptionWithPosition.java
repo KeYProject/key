@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-
 import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.java.Position;

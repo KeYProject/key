@@ -12,7 +12,6 @@ import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.Nullable;
 
-
 public class SLTranslationException extends ProofInputException implements HasLocation {
     protected final Location location;
 

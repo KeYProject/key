@@ -1169,8 +1169,9 @@ public class JMLSpecFactory {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            dep = textualDep.getDepends(heap.name()).head();
-            if (dep != null) {
+            ImmutableList<LabeledParserRuleContext> depends = textualDep.getDepends(heap.name());
+            if (!depends.isEmpty()) {
+                dep = textualDep.getDepends(heap.name()).head();
                 targetHeap = heap;
                 break;
             }

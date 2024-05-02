@@ -494,11 +494,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         } else {
             ImmutableList<SequentFormula> if1 = ifSequent.asList();
             ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
-            while (if1.head() != null && if1.head().equalsModProofIrrelevancy(if2.head())) {
+            while (!if1.isEmpty() && !if2.isEmpty()
+                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
                 if1 = if1.tail();
                 if2 = if2.tail();
             }
-            if (if1.head() != null || if2.head() != null) {
+            if (!if1.isEmpty() || !if2.isEmpty()) {
                 return false;
             }
         }

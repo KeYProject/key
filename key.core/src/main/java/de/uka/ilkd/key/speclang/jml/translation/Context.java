@@ -66,7 +66,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param tb              term builder
      */
     public static Context inClass(@NonNull KeYJavaType classType, boolean isStaticContext,
-                                  TermBuilder tb) {
+            TermBuilder tb) {
         var selfVar = createSelfVar(tb, classType, isStaticContext);
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(classType);
         return new Context(mode, classType, selfVar);

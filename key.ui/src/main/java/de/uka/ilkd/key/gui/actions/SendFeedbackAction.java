@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.*;
@@ -287,9 +286,8 @@ public class SendFeedbackAction extends AbstractAction {
             URI url = ExceptionTools.getLocation(throwable)
                     .flatMap(Location::getFileURI)
                     .orElse(null);
-            Optional<String> content = IOUtil.readFrom(url);
-            return content.map(s -> s.getBytes(Charset.defaultCharset()))
-                    .orElse(new byte[0]);
+            String content = IOUtil.readFrom(url);
+            return content != null ? content.getBytes(Charset.defaultCharset()) : new byte[0];
         }
     }
 

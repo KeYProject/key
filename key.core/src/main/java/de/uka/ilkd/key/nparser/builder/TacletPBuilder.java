@@ -27,11 +27,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -740,7 +736,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
-        return ImmutableSet.fromSet(new HashSet<>(Objects.requireNonNull(accept)));
+        return Immutables.<SchemaVariable>createSetFrom(Objects.requireNonNull(accept));
     }
 
     @Override
