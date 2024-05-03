@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
@@ -169,7 +170,7 @@ public final class IntegerLDT extends LDT {
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
-        assert sharp.sort() == numbers.argSort(0);
+        if (sharp.sort() != numbers.argSort(0)) throw new AssertionError();
         charID = addFunction(services, CHAR_ID_NAME.toString());
         add = addFunction(services, "add");
         neg = addFunction(services, "neg");
@@ -290,7 +291,7 @@ public final class IntegerLDT extends LDT {
         return false;
     }
 
-    private Term makeDigit(int digit, TermBuilder tb) {
+    private Term makeDigit(@UnknownInitialization IntegerLDT this, int digit, TermBuilder tb) {
         return tb.func(getNumberSymbol(),
             tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
     }
@@ -300,12 +301,12 @@ public final class IntegerLDT extends LDT {
     // public interface
     // -------------------------------------------------------------------------
 
-    public JFunction getNumberTerminator() {
+    public JFunction getNumberTerminator(@UnknownInitialization IntegerLDT this) {
         return sharp;
     }
 
 
-    public JFunction getNumberLiteralFor(int number) {
+    public JFunction getNumberLiteralFor(@UnknownInitialization IntegerLDT this, int number) {
         if (number < 0 || number > 9) {
             throw new IllegalArgumentException(
                 "Number literal symbols range from 0 to 9. Requested was:" + number);
@@ -320,7 +321,7 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public JFunction getNumberSymbol() {
+    public JFunction getNumberSymbol(@UnknownInitialization IntegerLDT this) {
         return numbers;
     }
 
@@ -631,15 +632,13 @@ public final class IntegerLDT extends LDT {
     /**
      * Placeholder for the loop index variable in an enhanced for loop over arrays. Follows the
      * proposal by David Cok to adapt JML to Java5.
-     *
-     * @return
      */
     public JFunction getIndex() {
         return index;
     }
 
 
-    public JFunction getInBounds(Type t) {
+    public @Nullable JFunction getInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -661,7 +660,7 @@ public final class IntegerLDT extends LDT {
      * @param t the type
      * @return in range function
      */
-    public JFunction getSpecInBounds(Type t) {
+    public @Nullable JFunction getSpecInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inRangeByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -683,7 +682,7 @@ public final class IntegerLDT extends LDT {
      * @param t the type
      * @return the cast
      */
-    public JFunction getSpecCast(Type t) {
+    public @Nullable JFunction getSpecCast(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return moduloByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -712,7 +711,7 @@ public final class IntegerLDT extends LDT {
     public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     @Nullable
@@ -791,7 +790,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(Term t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -811,11 +810,8 @@ public final class IntegerLDT extends LDT {
 
     @Override
     public Type getType(Term t) {
-        assert false : "IntegerLDT: Cannot get Java type for term: " + t;
-        return null;
+        throw new AssertionError("IntegerLDT: Cannot get Java type for term: " + t);
     }
-
-
 
     /**
      * returns the function symbol used to represent java-like division of the arithmetical integers

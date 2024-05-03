@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
@@ -47,8 +48,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
-            ExecutionContext ec) {
+    public boolean isResponsible(Operator op, @Nullable Term sub, TermServices services, ExecutionContext ec) {
         return false;
     }
 
@@ -60,8 +60,7 @@ public final class MapLDT extends LDT {
 
     @Override
     public JFunction getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
@@ -74,14 +73,12 @@ public final class MapLDT extends LDT {
         if (t.op().equals(mapEmpty)) {
             return EmptyMapLiteral.INSTANCE;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     public Function getMapEmpty() {

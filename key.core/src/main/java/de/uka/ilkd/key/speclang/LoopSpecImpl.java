@@ -525,8 +525,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public VisibilityModifier getVisibility() {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override

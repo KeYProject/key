@@ -50,14 +50,12 @@ public class PermissionLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        assert false : "PermissionLDT: there are no permission literals: " + lit;
-        return null;
+        throw new AssertionError("PermissionLDT: there are no permission literals: " + lit);
     }
 
     @Override
     public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        assert false : "PermissionLDT: there are no permission operators: " + op;
-        return null;
+        throw new AssertionError("PermissionLDT: there are no permission operators: " + op);
     }
 
     @Override
@@ -67,13 +65,11 @@ public class PermissionLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        assert false : "PermissionLDT: Cannot convert term to program: " + t;
-        return null;
+        throw new AssertionError("PermissionLDT: Cannot convert term to program: " + t);
     }
 
     @Override
     public Type getType(Term t) {
-        assert false : "PermissionLDT: there are no types associated with permissions " + t;
-        return null;
+        throw new AssertionError("PermissionLDT: there are no types associated with permissions " + t);
     }
 }

@@ -1028,8 +1028,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return new SLExpression(tb.allFields(receiver.getTerm()),
                 javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override

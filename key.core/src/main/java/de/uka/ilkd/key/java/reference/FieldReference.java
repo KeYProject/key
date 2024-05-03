@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
 
@@ -28,7 +29,7 @@ public class FieldReference extends VariableReference
         this.prefix = prefix;
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix) {
         this(pv, prefix, PositionInfo.UNDEFINED);
     }
 

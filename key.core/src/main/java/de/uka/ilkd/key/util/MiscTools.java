@@ -81,7 +81,6 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    @Nullable
     public static LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
             final Services services) {
         assert loopTerm.op() instanceof Modality;
@@ -146,7 +145,7 @@ public final class MiscTools {
     }
 
     // TODO Is rp always a program variable?
-    public static ProgramVariable getSelf(MethodFrame mf) {
+    public static @Nullable ProgramVariable getSelf(MethodFrame mf) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
@@ -165,7 +164,7 @@ public final class MiscTools {
      * @return the receiver term of the passed method frame, or null if the frame belongs to a
      *         static method.
      */
-    public static Term getSelfTerm(MethodFrame mf, Services services) {
+    public static @Nullable Term getSelfTerm(MethodFrame mf, Services services) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
@@ -439,7 +438,7 @@ public final class MiscTools {
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
-    public static String getRuleDisplayName(Node node) {
+    public static @Nullable String getRuleDisplayName(@Nullable Node node) {
         String name = null;
         if (node != null) {
             name = getRuleDisplayName(node.getAppliedRuleApp());
@@ -459,7 +458,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleDisplayName(RuleApp ruleApp) {
+    public static @Nullable String getRuleDisplayName(@Nullable RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
@@ -483,7 +482,7 @@ public final class MiscTools {
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
-    public static String getRuleName(Node node) {
+    public static @Nullable String getRuleName(@Nullable Node node) {
         String name = null;
         if (node != null) {
             name = getRuleName(node.getAppliedRuleApp());
@@ -503,7 +502,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleName(RuleApp ruleApp) {
+    public static @Nullable String getRuleName(@Nullable RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
@@ -520,7 +519,7 @@ public final class MiscTools {
      * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
-    public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
+    public static @Nullable OneStepSimplifier findOneStepSimplifier(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed() && proof.getInitConfig() != null) {
             Profile profile = proof.getInitConfig().getProfile();
             return findOneStepSimplifier(profile);
@@ -535,7 +534,7 @@ public final class MiscTools {
      * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
-    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
+    public static @Nullable OneStepSimplifier findOneStepSimplifier(Profile profile) {
         if (profile instanceof JavaProfile) {
             return ((JavaProfile) profile).getOneStepSimpilifier();
         } else {
@@ -549,7 +548,7 @@ public final class MiscTools {
      * @param node the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */
-    public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
+    public static ProgramVariable findActualVariable(ProgramVariable originalVar, @Nullable Node node) {
         if (node != null) {
             do {
                 if (node.getRenamingTable() != null) {
@@ -656,10 +655,8 @@ public final class MiscTools {
     public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list, TermBuilder tb) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable pv : list) {
-            if (pv != null) {
-                Term t = tb.var(pv);
-                result = result.append(t);
-            }
+            Term t = tb.var(pv);
+            result = result.append(t);
         }
         return result;
     }
@@ -725,10 +722,6 @@ public final class MiscTools {
      * @return an URI identifying the resource of the DataLocation
      */
     public static Optional<URI> extractURI(DataLocation loc) {
-        if (loc == null) {
-            throw new IllegalArgumentException("The given DataLocation is null!");
-        }
-
         try {
             return switch (loc.getType()) {
                 case "URL" -> // URLDataLocation
@@ -805,13 +798,11 @@ public final class MiscTools {
         // }
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(TokenSource source) {
+    public static @Nullable URI getURIFromTokenSource(TokenSource source) {
         return getURIFromTokenSource(source.getSourceName());
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(String source) {
+    public static @Nullable URI getURIFromTokenSource(String source) {
         if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
             return null;
         }
@@ -858,7 +849,7 @@ public final class MiscTools {
      * @throws MalformedURLException if the string can not be converted to URL because of an unknown
      *         protocol or illegal format
      */
-    public static URL parseURL(final String input) throws MalformedURLException {
+    public static URL parseURL(@Nullable String input) throws MalformedURLException {
         if (input == null) {
             throw new NullPointerException("No URL can be created from null!");
         }

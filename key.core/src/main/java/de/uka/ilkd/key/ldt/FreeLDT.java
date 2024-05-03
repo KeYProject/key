@@ -64,9 +64,7 @@ public final class FreeLDT extends LDT {
 
     @Override
     public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        // TODO Auto-generated method stub
-        assert false;
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
@@ -79,14 +77,12 @@ public final class FreeLDT extends LDT {
         if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
             return FreeLiteral.INSTANCE;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public Function getAtom() {

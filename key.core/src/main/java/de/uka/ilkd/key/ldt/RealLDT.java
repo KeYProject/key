@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -81,8 +82,7 @@ public final class RealLDT extends LDT {
     public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services,
             ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
@@ -93,13 +93,13 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(Term t, ExtList children, Services services) {
         return null;
     }
 
 
     @Override
-    public Type getType(Term t) {
+    public @Nullable Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
@@ -35,14 +36,11 @@ import org.jspecify.annotations.NonNull;
 public class EngineState {
     private final Proof proof;
     private final AbbrevMap abbrevMap = new AbbrevMap();
-    /**
-     * nullable
-     */
-    private Consumer<ProofScriptEngine.Message> observer;
+    private @Nullable Consumer<ProofScriptEngine.Message> observer;
     private File baseFileName = new File(".");
     private final ValueInjector valueInjector = ValueInjector.createDefault();
-    private Goal goal;
-    private Node lastSetGoalNode;
+    private @Nullable Goal goal;
+    private @Nullable Node lastSetGoalNode;
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -91,7 +89,7 @@ public class EngineState {
      * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
-    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }

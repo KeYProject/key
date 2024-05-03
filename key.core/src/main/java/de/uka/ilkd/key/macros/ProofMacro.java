@@ -14,6 +14,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -91,7 +92,7 @@ public interface ProofMacro {
      *
      * @return a constant string, or <code>null</code>
      */
-    String getCategory();
+    @Nullable String getCategory();
 
     /**
      * Gets the description of this macro.
