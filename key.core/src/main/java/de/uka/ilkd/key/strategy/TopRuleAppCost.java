@@ -49,9 +49,8 @@ public class TopRuleAppCost implements RuleAppCost {
      * @param cost - non-null {@link RuleAppCost}
      * @return this instance
      */
-    @NonNull
     @Override
-    public RuleAppCost mul(@NonNull RuleAppCost cost) {
+    public @NonNull RuleAppCost mul(@NonNull RuleAppCost cost) {
         return this;
     }
 

@@ -81,8 +81,7 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    @Nullable
-    public static LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
+    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
             final Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
@@ -805,13 +804,11 @@ public final class MiscTools {
         // }
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(TokenSource source) {
+    public static @Nullable URI getURIFromTokenSource(TokenSource source) {
         return getURIFromTokenSource(source.getSourceName());
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(String source) {
+    public static @Nullable URI getURIFromTokenSource(String source) {
         if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
             return null;
         }

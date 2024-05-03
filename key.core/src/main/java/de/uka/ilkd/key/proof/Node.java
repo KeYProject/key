@@ -53,8 +53,7 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    @Nullable
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
@@ -111,8 +110,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -277,8 +275,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    @Nullable
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 
