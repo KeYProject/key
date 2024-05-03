@@ -19,15 +19,14 @@ public abstract class AbstractSort implements Sort {
      * Documentation for this sort given by the associated documentation comment.
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
-    @Nullable
-    private String documentation;
+    private @Nullable String documentation;
 
     public AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof AbstractSort sort) {
             // TODO: Potential bug should check for sort identity not name equality
             return sort.name().equals(name());
@@ -59,9 +58,8 @@ public abstract class AbstractSort implements Sort {
         this.documentation = documentation;
     }
 
-    @Nullable
     @Override
-    public String getDocumentation() {
+    public @Nullable String getDocumentation() {
         return documentation;
     }
 }

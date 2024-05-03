@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract operator class offering some common functionality.
@@ -16,13 +15,12 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
-    @Nullable
-    private final ImmutableArray<Boolean> whereToBind;
+    private final @Nullable ImmutableArray<Boolean> whereToBind;
     private final Modifier modifier;
 
     protected AbstractOperator(Name name, int arity,
-            @Nullable ImmutableArray<Boolean> whereToBind,
-            Modifier modifier) {
+                               @Nullable ImmutableArray<Boolean> whereToBind,
+                               Modifier modifier) {
         assert arity >= 0;
         assert whereToBind == null || whereToBind.size() == arity;
         this.name = name;
@@ -32,12 +30,11 @@ public abstract class AbstractOperator implements Operator {
     }
 
     protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
-            boolean isRigid) {
+                               boolean isRigid) {
         this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
-    protected AbstractOperator(Name name, int arity, @Nullable Boolean[] whereToBind,
-            boolean isRigid) {
+    protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {
         this(name, arity, new ImmutableArray<>(whereToBind), isRigid);
     }
 
@@ -45,8 +42,7 @@ public abstract class AbstractOperator implements Operator {
         this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
 
-    @Nullable
-    public final ImmutableArray<Boolean> whereToBind() {
+    public final @Nullable ImmutableArray<Boolean> whereToBind() {
         return whereToBind;
     }
 

@@ -5,6 +5,7 @@ package org.key_project.logic.op;
 
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Program;
@@ -60,7 +61,7 @@ public abstract class Modality extends AbstractSortedOperator {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o)
                 return true;
             if (!(o instanceof Kind kind))
