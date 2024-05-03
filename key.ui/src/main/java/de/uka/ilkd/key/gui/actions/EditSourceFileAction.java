@@ -274,11 +274,10 @@ public class EditSourceFileAction extends KeyAction {
         }
 
         try {
-            final Location location = ExceptionTools.getLocation(exception)
-                    .filter(l -> l.getFileURI().isPresent())
-                    .orElseThrow(
-                        () -> new IOException("Cannot recover file location from exception."));
-            final URI uri = location.getFileURI().orElseThrow();
+            final Location location = ExceptionTools.getLocation(exception);
+            if (location == null)
+                throw new IOException("Cannot recover file location from exception.");
+            final URI uri = location.fileUri();
 
             // indicate edit/readonly in dialog title
             String prefix;

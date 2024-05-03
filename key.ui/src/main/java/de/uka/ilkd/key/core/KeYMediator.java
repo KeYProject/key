@@ -429,8 +429,7 @@ public class KeYMediator {
      *
      * @return the current selected proof
      */
-    @Nullable
-    public Proof getSelectedProof() {
+    public @Nullable Proof getSelectedProof() {
         return keySelectionModel.getSelectedProof();
     }
 
@@ -579,8 +578,7 @@ public class KeYMediator {
         return inAutoMode;
     }
 
-    @Nullable
-    private Lookup userData;
+    private @Nullable Lookup userData;
 
     /**
      * Retrieves a user-defined data.

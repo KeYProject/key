@@ -29,8 +29,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param classType       class
      * @param isStaticContext whether this is a static context
      */
-    @Nullable
-    private static ProgramVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
+    private static @Nullable ProgramVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
                                                  boolean isStaticContext) {
         return isStaticContext ? null : tb.selfVar(classType, false);
     }

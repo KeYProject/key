@@ -248,9 +248,8 @@ public final class CharListLDT extends LDT {
         return null;
     }
 
-    @Nullable
     @Override
-    public JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
         if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");

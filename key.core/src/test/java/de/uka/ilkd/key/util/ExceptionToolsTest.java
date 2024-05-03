@@ -42,12 +42,12 @@ class ExceptionToolsTest {
             String resultMessage = ExceptionTools.getNiceMessage(ime);
             assertEquals(message, resultMessage);
 
-            Location loc = ExceptionTools.getLocation(ime).get();
+            Location loc = ExceptionTools.getLocation(ime);
             assertEquals(6, loc.getPosition().line());
             assertEquals(1, loc.getPosition().column());
             assertEquals(fileToRead.toUri(), loc.fileUri());
         } catch (SyntaxErrorReporter.ParserException exception) {
-            Location loc = ExceptionTools.getLocation(exception).get();
+            Location loc = ExceptionTools.getLocation(exception);
             assertEquals(6, loc.getPosition().line());
             assertEquals(1, loc.getPosition().column());
         }

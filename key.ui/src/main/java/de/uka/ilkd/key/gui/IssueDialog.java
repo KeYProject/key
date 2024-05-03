@@ -624,9 +624,9 @@ public final class IssueDialog extends JDialog {
 
             URI resourceLocation = null;
             Position pos = Position.UNDEFINED;
-            Optional<Location> location = ExceptionTools.getLocation(exception);
-            if (location.isPresent()) {
-                var loc = location.get();
+            Location location = ExceptionTools.getLocation(exception);
+            if (location != null) {
+                var loc = location;
                 if (!loc.getPosition().isNegative()) {
                     pos = loc.getPosition();
                 }
