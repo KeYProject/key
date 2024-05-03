@@ -63,7 +63,7 @@ public class IsabelleTranslator {
         masterHandler.getPredefinedSorts().forEach((Sort sort) -> sortImplemented.put(sort, true));
 
         Queue<Sort> sortImplementationQueue = new LinkedList<>(sortParentsMap.keySet());
-        implementSorts(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
+        addSortsDefinitions(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
 
 
         sequentTranslation.append("locale varsAndFunctions");
@@ -99,6 +99,8 @@ public class IsabelleTranslator {
             sequentTranslation.append(LINE_ENDING);
         }
 
+        sequentTranslation.append(getDistinctExtraSortsAssumptions(masterHandler));
+
         sequentTranslation.append("begin").append(LINE_ENDING);
 
         sequentTranslation.append("theorem solve: ");
@@ -123,6 +125,31 @@ public class IsabelleTranslator {
         return new IsabelleProblem(goal, translationPreamble.toString(), sequentTranslation.toString());
     }
 
+    private StringBuilder getDistinctExtraSortsAssumptions(IsabelleMasterHandler masterHandler) {
+        Set<Sort> sorts = masterHandler.getExtraSorts();
+        Queue<Sort> sortsCheckQueue = new LinkedList<>(sorts);
+        StringBuilder sortsAssumptions = new StringBuilder();
+
+        while (!sortsCheckQueue.isEmpty()) {
+            Sort s = sortsCheckQueue.remove();
+            if (s == Sort.ANY) {
+                continue;
+            }
+            String sType = masterHandler.translateSortName(s) + "_type";
+            for (Sort s2 : sortsCheckQueue) {
+                if (s2 == Sort.ANY) {
+                    continue;
+                }
+                if (!s.extendsTrans(s2) && !s2.extendsTrans(s)) {
+                    String s2Type = masterHandler.translateSortName(s2) + "_type";
+                    //Sorts are unrelated need to add distinctness assumption
+                    sortsAssumptions.append("assumes \"disjointTypes ").append(sType).append(" ").append(s2Type).append("\"").append(LINE_ENDING);
+                }
+            }
+        }
+        return sortsAssumptions;
+    }
+
     private StringBuilder getDistinctFieldLemma(Collection<StringBuilder> newFields) {
         if (newFields.isEmpty())
             return new StringBuilder();
@@ -136,8 +163,8 @@ public class IsabelleTranslator {
         return distinctFieldLemma;
     }
 
-    private void implementSorts(StringBuilder sequentTranslation, Queue<Sort> sortImplementationQueue, Map<Sort, Boolean> sortImplemented,
-                                Map<Sort, Set<Sort>> sortParentsMap, IsabelleMasterHandler masterHandler) {
+    private void addSortsDefinitions(StringBuilder sequentTranslation, Queue<Sort> sortImplementationQueue, Map<Sort, Boolean> sortImplemented,
+                                     Map<Sort, Set<Sort>> sortParentsMap, IsabelleMasterHandler masterHandler) {
         if (sortImplementationQueue.isEmpty()) {
             return;
         }
@@ -146,13 +173,13 @@ public class IsabelleTranslator {
         for (Sort parent : sortParentsMap.get(sort)) {
             if (!sortImplemented.get(parent)) {
                 sortImplementationQueue.add(sort);
-                implementSorts(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
+                addSortsDefinitions(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
                 return;
             }
         }
         if ((sort instanceof ArraySort) && !sortImplemented.get(((ArraySort) sort).elementSort())) {
             sortImplementationQueue.add(sort);
-            implementSorts(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
+            addSortsDefinitions(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
             return;
         }
         String sortName = masterHandler.translateSortName(sort);
@@ -249,7 +276,7 @@ public class IsabelleTranslator {
         sequentTranslation.append(LINE_ENDING).append(LINE_ENDING);
 
         sortImplemented.put(sort, true);
-        implementSorts(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
+        addSortsDefinitions(sequentTranslation, sortImplementationQueue, sortImplemented, sortParentsMap, masterHandler);
     }
 
     private static String getUnivSpec(IsabelleMasterHandler masterHandler, Set<Sort> parents, String insert) {
