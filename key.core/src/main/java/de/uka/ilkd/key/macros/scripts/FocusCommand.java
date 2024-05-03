@@ -41,19 +41,14 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         super(Parameters.class);
     }
 
-    static class Parameters {
+    public static class Parameters {
         @Option("#2")
         public Sequent toKeep;
     }
 
     @Override
     public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) {
-            throw new ScriptException("Missing 'sequent' argument for focus");
-        }
-
         Sequent toKeep = s.toKeep;
-
         hideAll(toKeep);
     }
 

@@ -266,3 +266,20 @@ task generateRAPUnitTests(type: JavaExec) {
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(ldt|macros|settings)",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}

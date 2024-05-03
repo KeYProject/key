@@ -358,8 +358,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String proofToString(Services services) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 

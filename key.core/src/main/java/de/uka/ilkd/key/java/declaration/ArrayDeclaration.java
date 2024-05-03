@@ -207,8 +207,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         } else if (javaBasetype instanceof PrimitiveType) {
             return ((PrimitiveType) javaBasetype).getArrayElementName();
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 

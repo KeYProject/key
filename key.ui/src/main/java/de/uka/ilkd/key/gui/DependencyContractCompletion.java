@@ -101,8 +101,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                 return step;
             }
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     public static void extractHeaps(List<LocationVariable> heapContext, List<PosInOccurrence> steps,

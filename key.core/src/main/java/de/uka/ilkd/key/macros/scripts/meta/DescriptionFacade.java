@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public final class DescriptionFacade {
      *
      * @see #getProperties
      */
-    private static Properties properties = null;
+    private static @Nullable Properties properties = null;
 
     private DescriptionFacade() {
     }

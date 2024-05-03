@@ -4,4 +4,6 @@
  * programming interface to access the entities declared in these
  * rule files.
  */
-package de.uka.ilkd.key.ldt;
+@NullMarked package de.uka.ilkd.key.ldt;
+
+import org.jspecify.annotations.NullMarked;

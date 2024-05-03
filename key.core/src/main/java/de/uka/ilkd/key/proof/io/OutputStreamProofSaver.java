@@ -47,6 +47,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -813,11 +814,11 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(Term t, Services serv) {
+    public static String printTerm(Term t, @Nullable Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(Term t, @Nullable Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
@@ -854,7 +855,7 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv, boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo();
 
