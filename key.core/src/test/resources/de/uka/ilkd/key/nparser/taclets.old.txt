@@ -2430,14 +2430,14 @@ bitwiseNegationInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = ~#seCharByteShortInt;
 ... }\] (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#se)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#seCharByteShortInt)),#normalassign(post)))
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
 == bitwiseNegationLong (invertBits) =========================================
 bitwiseNegationLong {
 \find(#normalassign ( (modal operator))\[{ ..
-  #loc = ~#se;
+  #loc = ~#seLong;
 ... }\] (post))
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
