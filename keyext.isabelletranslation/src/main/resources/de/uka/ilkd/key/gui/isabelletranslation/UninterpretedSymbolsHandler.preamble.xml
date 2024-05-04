@@ -8,6 +8,15 @@ declare [[coercion_enabled]]
 declare [[coercion_map image]]
 typedecl any
 
+consts
+  bottom::"any"
+
+specification (bottom) "bottom = bottom"
+  by simp
+
+lemma bottom_in_any:"bottom \&lt;in&gt; (UNIV::any set)"
+  by simp
+
 typedef javaDL_type = "(UNIV::any set set)"
   by auto
 
@@ -16,6 +25,9 @@ lift_definition typeof::"any\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;boo
 lift_definition subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset_eq.
 lift_definition strict_subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset.
 lift_definition disjointTypes::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.disjnt.
+
+fun disjointModNullTypes::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" where
+  "disjointModNullTypes a b = ((Rep_javaDL_type a) \&lt;inter&gt; (Rep_javaDL_type b) = {bottom})"
 
 consts
   int_UNIV::"any set"
@@ -46,14 +58,7 @@ interpretation bool:type_definition bool2any any2bool bool_UNIV
 definition bool_type::"javaDL_type" where "bool_type \&lt;equiv&gt; Abs_javaDL_type (UNIV::bool set)"
 
 
-consts
-  bottom::"any"
 
-specification (bottom) "bottom = bottom"
-  by simp
-
-lemma bottom_in_any:"bottom \&lt;in&gt; (UNIV::any set)"
-  by simp
 
 
 consts
