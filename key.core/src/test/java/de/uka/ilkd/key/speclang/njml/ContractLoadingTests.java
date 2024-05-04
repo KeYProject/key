@@ -40,7 +40,7 @@ public class ContractLoadingTests {
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ContractLoadingTests {
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1717/UnderscoreZero.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
         var proof = file.startProof(file.getProofContracts().get(0));
         Assertions.assertNotNull(proof);
     }
@@ -60,7 +60,7 @@ public class ContractLoadingTests {
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
@@ -69,6 +69,6 @@ public class ContractLoadingTests {
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 }

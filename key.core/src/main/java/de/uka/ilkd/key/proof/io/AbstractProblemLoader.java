@@ -678,10 +678,17 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
+    /**
+     * Tries to load a proof script entry from the given input.
+     * @return null if no proof script could not be found.
+     * @throws ProofInputException for some reason I do not know
+     */
     public @Nullable ProofScriptEntry readProofScript() throws ProofInputException {
-        assert envInput instanceof KeYUserProblemFile;
-        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-        return kupf.readProofScript();
+        if (envInput instanceof KeYUserProblemFile kupf) {
+            return kupf.readProofScript();
+        }else{
+            return null;
+        }
     }
 
     public @Nullable ProofScriptEntry getProofScript() throws ProblemLoaderException {
