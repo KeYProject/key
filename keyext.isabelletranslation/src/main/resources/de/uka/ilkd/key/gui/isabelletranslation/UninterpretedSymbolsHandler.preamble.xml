@@ -26,9 +26,6 @@ lift_definition subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarr
 lift_definition strict_subtype::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.subset.
 lift_definition disjointTypes::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" is Set.disjnt.
 
-fun disjointModNullTypes::"javaDL_type\&lt;Rightarrow&gt;javaDL_type\&lt;Rightarrow&gt;bool" where
-  "disjointModNullTypes a b = ((Rep_javaDL_type a) \&lt;inter&gt; (Rep_javaDL_type b) = {bottom})"
-
 consts
   int_UNIV::"any set"
   int2any::"int\&lt;Rightarrow&gt;any"
@@ -383,5 +380,5 @@ proof -
   finally show ?thesis
     using \&lt;open&gt;{upper-1..&lt;upper} = {upper - 1}\&lt;close&gt; by auto
 qed
-    </entry>
+  </entry>
 </properties>
