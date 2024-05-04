@@ -136,14 +136,16 @@ public class IsabelleTranslator {
                 continue;
             }
             String sType = masterHandler.translateSortName(s) + "_type";
+            String sVal = "(s::" + masterHandler.translateSortName(s) + ")";
             for (Sort s2 : sortsCheckQueue) {
                 if (s2 == Sort.ANY) {
                     continue;
                 }
                 if (!s.extendsTrans(s2) && !s2.extendsTrans(s)) {
                     String s2Type = masterHandler.translateSortName(s2) + "_type";
+                    String s2Val = "(s2::" + masterHandler.translateSortName(s2) + ")";
                     if (nullSort.extendsTrans(s) && nullSort.extendsTrans(s2)) {
-                        sortsAssumptions.append("assumes \"disjointModNullTypes ").append(sType).append(" ").append(s2Type).append("\"").append(LINE_ENDING);
+                        sortsAssumptions.append("assumes \"").append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> s = null\"").append(LINE_ENDING);
                     } else {
                         //Sorts are unrelated. need to add distinctness assumption
                         sortsAssumptions.append("assumes \"disjointTypes ").append(sType).append(" ").append(s2Type).append("\"").append(LINE_ENDING);
