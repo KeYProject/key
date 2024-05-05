@@ -156,7 +156,9 @@ public class Filenames {
         if (!a[a.length - 1].equals("..")) {
             newa[k++] = a[a.length - 1];
         }
-        return Arrays.copyOf(newa, k);
+        // @ assert (\forall int i; 0 <= i < k; newa[i] != null);
+        // TODO: nullness. This cast cannot be checked, can it? But there is no error message
+        return (String[]) Arrays.copyOf(newa, k);
     }
 
     public static String toValidFileName(String s) {
