@@ -320,7 +320,7 @@ public class Configuration {
             throw new IllegalArgumentException(clazz + " is not an enum type.");
         }
         var idx = getString(name);
-        if(idx == null) {
+        if (idx == null) {
             return defaultValue;
         }
 

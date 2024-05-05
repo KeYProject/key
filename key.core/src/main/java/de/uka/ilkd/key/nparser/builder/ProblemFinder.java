@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -10,12 +14,9 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Properties;
 
 /**
  * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation) of
@@ -45,10 +46,12 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     /**
-     * Try to find a problem defined in the {@link de.uka.ilkd.key.proof.init.KeYUserProblemFile} located in the
+     * Try to find a problem defined in the {@link de.uka.ilkd.key.proof.init.KeYUserProblemFile}
+     * located in the
      * given AST.
      * <p>
-     * After this method is called, you can retrieve the chosen contract via {@link #getChooseContract()} or the
+     * After this method is called, you can retrieve the chosen contract via
+     * {@link #getChooseContract()} or the
      * proof obligation information via {@link #getProofObligation()}.
      *
      * @param ctx the parse tree
@@ -78,14 +81,15 @@ public class ProblemFinder extends ExpressionBuilder {
                     p.forEach((k, v) -> proofObligation.set(k.toString(), v.toString()));
                 } catch (IOException e) {
                     throw new BuildingException(ctx,
-                            "Could not load the proof obligation given " +
-                                    "as a property file due to an error in the properties format", e);
+                        "Could not load the proof obligation given " +
+                            "as a property file due to an error in the properties format",
+                        e);
                 }
             } else if (obl instanceof KeYParser.TableContext tbl) {
                 proofObligation = ParsingFacade.getConfiguration(tbl);
             } else {
                 throw new BuildingException(ctx,
-                        "Found a proof obligation entry, but the value is not a string or a JSON object");
+                    "Found a proof obligation entry, but the value is not a string or a JSON object");
             }
         }
         if (ctx.PROBLEM() != null) {
