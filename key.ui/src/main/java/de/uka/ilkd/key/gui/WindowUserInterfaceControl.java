@@ -241,7 +241,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
                         ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.script(), scriptAndLoc.location());
+                            scriptAndLoc.content(), scriptAndLoc.location());
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {

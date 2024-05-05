@@ -3,10 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.parser.Location;
+
 /**
+ * This data class represents a raw proof script entry in a {@link de.uka.ilkd.key.proof.init.KeYUserProblemFile}.
  *
+ * @param content  the content of the script
+ * @param location the start position of the script
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
-public record ProofScriptEntry(String script, de.uka.ilkd.key.parser.Location location) {
+public record ProofScriptEntry(String content, Location location) {
 }

@@ -69,7 +69,7 @@ public class ProveRulesTest {
 
         var script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
+            ProofScriptEngine pse = new ProofScriptEngine(script.content(), script.location());
             pse.execute(env.getUi(), proof);
         }
 

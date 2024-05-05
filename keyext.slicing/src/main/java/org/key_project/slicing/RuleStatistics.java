@@ -86,10 +86,7 @@ public class RuleStatistics {
      */
     public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
         return map.entrySet().stream()
-                .map(entry -> new RuleStatisticEntry(entry.getKey(),
-                    entry.getValue().numberOfApplications,
-                    entry.getValue().numberOfUselessApplications,
-                    entry.getValue().numberOfInitialUselessApplications))
+                .map(entry -> new RuleStatisticEntry(entry.getKey(), entry.getValue()))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
@@ -103,27 +100,22 @@ public class RuleStatistics {
     }
 
     /**
-     * Usage statistic of a rule.
+     * Named usage statistic of a rule.
      * <p>
-     * TODO weigl: refactoring task, combine {@link RuleStatisticEntry} with {@link StatisticEntry}
-     * to avoid repetition.
-     *
-     * @param ruleName
-     * @param numberOfApplications
-     * @param numberOfUselessApplications
-     * @param numberOfInitialUselessApplications
+     * @param ruleName name of the rule
+     * @param values statistics for rule
      */
-    public record RuleStatisticEntry(String ruleName, int numberOfApplications,
-            int numberOfUselessApplications, int numberOfInitialUselessApplications) {
+    public record RuleStatisticEntry(String ruleName, StatisticEntry values) {
     }
 
     /**
      * Usage statistic of a rule.
      *
-     * @param numberOfApplications
-     * @param numberOfUselessApplications
-     * @param numberOfInitialUselessApplications
+     * @param numberOfApplications    counted number of applications
+     * @param numberOfUselessApplications counted number of useless applications
+     * @param numberOfInitialUselessApplications weigl: ???
      */
-    public record StatisticEntry(int numberOfApplications, int numberOfUselessApplications,
-            int numberOfInitialUselessApplications) {}
+    public record StatisticEntry(int numberOfApplications,
+                                 int numberOfUselessApplications,
+                                 int numberOfInitialUselessApplications) {}
 }

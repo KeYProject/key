@@ -381,14 +381,14 @@ public final class KeYFacade {
             // pass false here to keep the intermediate tree (may be needed for later checkers)!
             replayResult = replayer.replay(null, null, false);
 
-            Goal lastGoal = replayResult.getLastSelectedGoal();
+            Goal lastGoal = replayResult.lastSelectedGoal();
             lastTouchedNode = lastGoal != null ? lastGoal.node() : proof.root();
 
         } catch (Exception e) {
             if (parserResult == null || parserResult.errors() == null
                     || parserResult.errors().isEmpty() ||
-                    replayer == null || replayResult == null || replayResult.getErrors() == null
-                    || replayResult.getErrors().isEmpty()) {
+                    replayer == null || replayResult == null || replayResult.errors() == null
+                    || replayResult.errors().isEmpty()) {
                 // this exception was something unexpected
                 errors.add(e);
             }
@@ -399,10 +399,10 @@ public final class KeYFacade {
                 errors.addAll(parserResult.errors());
             }
             status +=
-                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
+                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.status()
                         : "Error while loading proof.");
             if (replayResult != null) {
-                errors.addAll(replayResult.getErrors());
+                errors.addAll(replayResult.errors());
             }
 
             // reset OSS

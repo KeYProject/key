@@ -110,9 +110,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first();
-            ifForm = distFormAndRightSidesForITEUpd.second();
-            elseForm = distFormAndRightSidesForITEUpd.third();
+            cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            elseForm = distFormAndRightSidesForITEUpd.elseTerm();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -255,6 +255,13 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         return DISPLAY_NAME;
     }
 
-    public record DistanceFormRightSide(Term first, Term second, Term third, boolean fourth) {
+    /**
+     *
+     * @param distinguishingFormula
+     * @param ifTerm
+     * @param elseTerm
+     * @param commuteSides
+     */
+    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm, boolean commuteSides) {
     }
 }

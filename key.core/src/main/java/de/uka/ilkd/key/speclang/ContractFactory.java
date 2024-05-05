@@ -194,21 +194,21 @@ public class ContractFactory {
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
             TranslatedDependencyContract dep, ProgramVariable selfVar) {
-        final ImmutableList<ProgramVariable> paramVars = tb.paramVars(dep.first(), false);
-        assert (selfVar == null) == dep.first().isStatic();
+        final ImmutableList<ProgramVariable> paramVars = tb.paramVars(dep.observer(), false);
+        assert (selfVar == null) == dep.observer().isStatic();
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             if (heap == targetHeap) {
-                accessibles.put(heap, dep.second());
+                accessibles.put(heap, dep.rhs());
             } else {
                 accessibles.put(heap, tb.allLocs());
             }
         }
         // TODO: insert static invariant??
-        return dep(kjt, dep.first(), dep.first().getContainerType(), pres, dep.third(), accessibles,
+        return dep(kjt, dep.observer(), dep.observer().getContainerType(), pres, dep.measuredBy(), accessibles,
             selfVar, paramVars, null, null);
     }
 

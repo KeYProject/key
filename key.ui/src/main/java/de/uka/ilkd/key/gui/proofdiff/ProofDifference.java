@@ -19,8 +19,10 @@ import de.uka.ilkd.key.proof.Node;
  */
 public class ProofDifference {
     private static final Integer THRESHOLD = 25;
-    private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
-            rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
+    private List<String> leftAntec = new LinkedList<>();
+    private List<String> rightAntec = new LinkedList<>();
+    private List<String> rightSucc = new LinkedList<>();
+    private List<String> leftSucc = new LinkedList<>();
 
     private final Set<String> exclusiveAntec = new HashSet<>();
     private final Set<String> commonSucc = new HashSet<>();
@@ -82,8 +84,6 @@ public class ProofDifference {
         right.remove(current);
         return current;
     }
-
-    public record QueueEntry(int idxLeft, int idxRight, int distance) {}
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
@@ -204,11 +204,26 @@ public class ProofDifference {
         }
     }
 
+    /**
+     * Represents the matching between two texts {@link #left} and {@link #right} with a levenshtein distance
+     * @param left    the first text
+     * @param right   the second text
+     * @param distance levenshtein distance
+     */
     record Matching(String left, String right, int distance) {
-
         @Override
             public String toString() {
                 return String.format("(%s, %s)", left, right);
             }
         }
+
+    /**
+     * Entry in the search queue for generating the best matching between two formula sets.
+     *
+     * @param idxLeft index of the formula on the left side
+     * @param idxRight index of the formula on the right side
+     * @param distance levenshtein distances
+     */
+    public record QueueEntry(int idxLeft, int idxRight, int distance) {}
+
 }

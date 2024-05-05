@@ -161,7 +161,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                 ProofScriptEntry script = problemLoader.readProofScript();
                 if (script != null) {
                     ProofScriptEngine pse =
-                        new ProofScriptEngine(script.script(), script.location());
+                        new ProofScriptEngine(script.content(), script.location());
                     this.taskStarted(
                         new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                     pse.execute(this, proof);

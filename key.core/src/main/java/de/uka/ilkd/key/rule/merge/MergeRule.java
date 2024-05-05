@@ -186,10 +186,10 @@ public class MergeRule implements BuiltInRule {
             MergeStateEntry mergeResult =
                 mergeStates(mergeRule, mergedState, state, thisSEState.programCounter(),
                     mergeRuleApp.getDistinguishingFormula(), services);
-            newNames.addAll(mergeResult.second);
-            sideConditionsToProve.addAll(mergeResult.third);
+            newNames.addAll(mergeResult.newNames);
+            sideConditionsToProve.addAll(mergeResult.sideConditionsToProve);
 
-            mergedState = mergeResult.first;
+            mergedState = mergeResult.state;
             mergedState.setCorrespondingNode(newGoal.node());
         }
 
@@ -715,6 +715,14 @@ public class MergeRule implements BuiltInRule {
         void signalProgress(int progress);
     }
 
-    public record MergeStateEntry(SymbolicExecutionState first, LinkedHashSet<Name> second,
-            LinkedHashSet<Term> third) {}
+    /**
+     * An entry to be merged, covering the symbolic execution state, new variable names, and side conditions.
+     * @param state
+     * @param newNames
+     * @param sideConditionsToProve
+     */
+    public record MergeStateEntry(
+            SymbolicExecutionState state,
+            LinkedHashSet<Name> newNames,
+            LinkedHashSet<Term> sideConditionsToProve) {}
 }

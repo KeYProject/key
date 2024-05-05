@@ -194,6 +194,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
+    /**
+     * Represents an abbreviation defined inside JML.
+     * @param typeName   class in which the abbreviation appeared
+     * @param abbrevName name of the abbreviation
+     * @param abbreviatedTerm abbreviated term
+     */
     public record Abbreviation(LabeledParserRuleContext typeName,
             LabeledParserRuleContext abbrevName,
             LabeledParserRuleContext abbreviatedTerm) {}

@@ -269,7 +269,7 @@ public class TestFile implements Serializable {
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
+            ProofScriptEngine pse = new ProofScriptEngine(script.content(), script.location());
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }

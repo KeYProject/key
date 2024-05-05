@@ -127,7 +127,7 @@ public class TestLocalSymbols {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
-        String script = env.getProofScript().script();
+        String script = env.getProofScript().content();
 
         ProofScriptEngine pse =
             new ProofScriptEngine(script, new Location(null, Position.newOneBased(1, 1)));
