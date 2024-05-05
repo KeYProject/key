@@ -22,6 +22,9 @@ plugins {
 
     // Code formatting
     id "com.diffplug.spotless" version "6.25.0"
+
+    // EISOP Checker Framework
+    id "org.checkerframework" version "0.6.28"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -53,6 +56,7 @@ subprojects {
     apply plugin: "com.diffplug.spotless"
     apply plugin: "checkstyle"
     apply plugin: "pmd"
+    apply plugin: "org.checkerframework"
 
     group = rootProject.group
     version = rootProject.version
@@ -71,6 +75,19 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.13")
+        implementation("org.slf4j:slf4j-api:2.0.12")
+        testImplementation("ch.qos.logback:logback-classic:1.4.8")
+
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
+
+        compileOnly("org.jspecify:jspecify:0.3.0")
+        testCompileOnly("org.jspecify:jspecify:0.3.0")
+        def eisop_version = "3.42.0-eisop2"
+        compileOnly "io.github.eisop:checker-qual:$eisop_version"
+        compileOnly "io.github.eisop:checker-util:$eisop_version"
+        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
+        checkerFramework "io.github.eisop:checker:$eisop_version"
 
         testImplementation("ch.qos.logback:logback-classic:1.5.6")
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
@@ -80,8 +97,6 @@ subprojects {
         testCompileOnly 'junit:junit:4.13.2'
         testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
-
-        implementation("org.jspecify:jspecify:0.3.0")
     }
 
     tasks.withType(JavaCompile) {
@@ -345,6 +360,19 @@ subprojects {
             }
         }
     }
+
+//    checkerFramework {
+//        checkers = [
+//            "org.checkerframework.checker.nullness.NullnessChecker",
+//        ]
+//        extraJavacArgs = [
+//            "-AonlyDefs=^org\\.key_project\\.util",
+//            "-Xmaxerrs", "10000",
+//            "-Astubs=$projectDir/src/main/checkerframework",
+//            "-Werror",
+//            "-Aversion",
+//        ]
+//    }
 
     afterEvaluate { // required so project.description is non-null as set by sub build.gradle
         publishing {

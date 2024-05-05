@@ -44,8 +44,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
         return sanitizeStringLiteral(text);
     }
 
-    @NonNull
-    private static String sanitizeStringLiteral(String text) {
+    private static @NonNull String sanitizeStringLiteral(String text) {
         return text.substring(1, text.length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");

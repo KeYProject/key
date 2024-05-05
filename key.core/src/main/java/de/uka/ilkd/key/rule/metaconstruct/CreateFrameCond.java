@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -50,7 +49,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final ProgramVariable permissionsHeapBeforePV = //
             (ProgramVariable) term.sub(3).op();
 
-        final Optional<LoopSpecification> loopSpec = //
+        final LoopSpecification loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
         final boolean isTransaction = MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
@@ -61,7 +60,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
                 permissionsHeapBeforePV, services);
 
         final Term frameCondition =
-            createFrameCondition(loopSpec.get(), isTransaction, heapToBeforeLoopMap, services);
+            createFrameCondition(loopSpec, isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
     }

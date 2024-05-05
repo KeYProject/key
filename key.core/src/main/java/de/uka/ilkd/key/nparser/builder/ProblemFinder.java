@@ -104,19 +104,15 @@ public class ProblemFinder extends ExpressionBuilder {
         return null;
     }
 
-    @Nullable
-    public String getChooseContract() {
+    public @Nullable String getChooseContract() {
         return chooseContract;
     }
 
-    @Nullable
-    public Configuration getProofObligation() {
+    public @Nullable Configuration getProofObligation() {
         return proofObligation;
     }
 
-    @Nullable
-    public Sequent getProblem() {
+    public @Nullable Sequent getProblem() {
         return problem;
     }
-
 }

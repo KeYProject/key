@@ -30,7 +30,7 @@ public abstract class AbstractSV extends AbstractSortedOperator implements Schem
 
 
     protected AbstractSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
-        this(name, (ImmutableArray<Sort>) null, sort, isRigid, isStrict);
+        this(name, new ImmutableArray<>(), sort, isRigid, isStrict);
     }
 
 
