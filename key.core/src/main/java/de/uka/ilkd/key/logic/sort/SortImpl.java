@@ -88,15 +88,13 @@ public class SortImpl extends AbstractSort {
         return name().toString();
     }
 
-    @Nullable
     @Override
-    public String getDocumentation() {
+    public @Nullable String getDocumentation() {
         return documentation;
     }
 
-    @Nullable
     @Override
-    public String getOrigin() {
+    public @Nullable String getOrigin() {
         return origin;
     }
 

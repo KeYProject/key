@@ -161,8 +161,10 @@ public abstract class ParserExceptionTest {
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
-                    Location actLoc = ExceptionTools.getLocation(error).orElseThrow(
-                        () -> new Exception("there is no location in the exception"));
+                    Location actLoc = ExceptionTools.getLocation(error);
+                    if (actLoc == null) {
+                        throw new Exception("there is no location in the exception");
+                    }
                     assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
                         "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());

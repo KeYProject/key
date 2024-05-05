@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
@@ -26,6 +27,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
@@ -186,9 +188,9 @@ public class DeclarationBuilder extends DefaultBuilder {
             boolean isParametricSort = typeParams != null && !typeParams.isEmpty();
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortExt);
+                    : Immutables.createSetFrom(sortExt);
             ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortOneOf);
+                    : Immutables.createSetFrom(sortOneOf);
 
             // attention: no expand to java.lang here!
             Sort existingSort = sorts().lookup(sortName);

@@ -72,6 +72,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
+    private final SortLDT sortLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory termFactory;
     private final ProgramVariable selfVar;
@@ -98,6 +99,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
+        this.sortLDT = services.getTypeConverter().getSortLDT();
         this.exc = new SLExceptionFactory(null, 1, 0);
 
         this.selfVar = self;
@@ -569,11 +571,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (floatResult != null) {
                 return floatResult;
             }
+
+            SLExpression other = expr.get(i);
+            if (other.isType() && !result.isType()) {
+                JFunction ssortFunc = sortLDT.getSsort(other.getType().getSort(), services);
+                other = new SLExpression(tb.func(ssortFunc));
+            }
+
             exc.updatePosition(ctx.getStart());
             if (tok.getText().equals("==")) {
-                result = termFactory.eq(result, expr.get(i));
+                result = termFactory.eq(result, other);
             } else {
-                result = termFactory.neq(result, expr.get(i));
+                result = termFactory.neq(result, other);
             }
         }
         return result;
@@ -621,33 +630,35 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-        SLExpression result = accept(ctx.shiftexpr(0));
+        SLExpression left = accept(ctx.shiftexpr(0));
         SLExpression right = accept(ctx.shiftexpr(1));
-        assert result != null && right != null;
+        assert left != null && right != null;
 
-        if (result.isTerm() || right.isTerm()) {
-            raiseError("Cannot build subtype expression from terms.", ctx);
-        }
-        assert result.isType();
-        assert right.isType();
-        if (result.getTerm() == null) {
-            exc.addIgnoreWarning("subtype expression <: only supported for"
-                + " \\typeof() arguments on the left side.", ctx.ST().getSymbol());
-            final Namespace<JFunction> fns = services.getNamespaces().functions();
-            int x = -1;
-            Name name;
-            do {
-                name = new Name("subtype_" + ++x);
-            } while (fns.lookup(name) != null);
-            final JFunction z = new JFunction(name, JavaDLTheory.FORMULA);
-            fns.add(z);
-            result = new SLExpression(tb.func(z));
+        if (left.isType() && left.getTerm() != null && right.isType()) {
+            Sort os = right.getType().getSort();
+            JFunction ioFunc = services.getJavaDLTheory().getInstanceofSymbol(os, services);
+            left = new SLExpression(tb.equals(tb.func(ioFunc, left.getTerm()), tb.TRUE()));
         } else {
-            final JFunction ioFunc =
-                services.getJavaDLTheory().getInstanceofSymbol(right.getType().getSort(), services);
-            result = new SLExpression(tb.equals(tb.func(ioFunc, result.getTerm()), tb.TRUE()));
+            Term leftSort;
+            if (left.isTerm()) {
+                leftSort = left.getTerm();
+            } else {
+                JFunction ssortFunc = sortLDT.getSsort(left.getType().getSort(), services);
+                leftSort = tb.func(ssortFunc);
+            }
+
+            Term rightSort;
+            if (right.isTerm()) {
+                rightSort = right.getTerm();
+            } else {
+                JFunction ssortFunc = sortLDT.getSsort(right.getType().getSort(), services);
+                rightSort = tb.func(ssortFunc);
+            }
+
+            left = new SLExpression(tb.func(sortLDT.getSsubsort(), leftSort, rightSort));
         }
-        return result;
+
+        return left;
     }
 
 
@@ -917,8 +928,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getThisReceiver();
     }
 
-    @NonNull
-    private SLExpression getThisReceiver() {
+    private @NonNull SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
 
@@ -1558,8 +1568,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ctx.predicate(), ctx.storeref());
     }
 
-    @NonNull
-    private Object createInfiniteUnion(JmlParser.BoundvarmodifiersContext boundvarmodifiers,
+    private @NonNull Object createInfiniteUnion(
+            JmlParser.BoundvarmodifiersContext boundvarmodifiers,
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls,
             JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
         Boolean nullable = accept(boundvarmodifiers);
@@ -1861,7 +1871,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public KeYJavaType visitType(JmlParser.TypeContext ctx) {
         if (ctx.TYPE() != null) {
-            raiseError("Only the function \\TYPE is supported", ctx);
+            return javaInfo.getKeYJavaType(PrimitiveType.JAVA_TYPE);
         }
         return oneOf(ctx.builtintype(), ctx.referencetype());
     }

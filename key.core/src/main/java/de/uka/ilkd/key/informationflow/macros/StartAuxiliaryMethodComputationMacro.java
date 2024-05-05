@@ -52,7 +52,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null) {
+        if (goals == null || goals.isEmpty()) {
             return false;
         }
         if (posInOcc == null || posInOcc.subTerm() == null) {

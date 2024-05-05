@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
-import java.util.Objects;
-
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -16,20 +14,14 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator {
-    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
-
-    private static ImmutableArray<Sort> getEmptySortList() {
-        return EMPTY_SORT_LIST;
-    }
-
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
 
-    protected AbstractSortedOperator(Name name, @Nullable ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
-        super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, modifier);
-        this.argSorts = argSorts == null ? getEmptySortList() : argSorts;
-        this.sort = Objects.requireNonNull(sort);
+    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+            @Nullable ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+        super(name, argSorts.size(), whereToBind, modifier);
+        this.argSorts = argSorts;
+        this.sort = sort;
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
@@ -48,7 +40,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
 
     protected AbstractSortedOperator(Name name, Sort sort, Modifier modifier) {
-        this(name, (ImmutableArray<Sort>) null, sort, null, modifier);
+        this(name, new ImmutableArray<>(), sort, null, modifier);
     }
 
     @Override

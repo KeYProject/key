@@ -38,6 +38,5 @@ public interface Sort extends Named, HasOrigin {
      * This field is typically set by the
      * parser, who captures the documentation comments.
      */
-    @Nullable
-    default String getDocumentation() { return null; }
+    default @Nullable String getDocumentation() { return null; }
 }

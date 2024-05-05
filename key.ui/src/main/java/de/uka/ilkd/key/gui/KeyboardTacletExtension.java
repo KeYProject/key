@@ -58,9 +58,8 @@ import org.slf4j.LoggerFactory;
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -96,11 +95,9 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets =
         new OnlyCompleteTacletsAction();
     private final MainWindow mainWindow;
-    @Nullable
-    private KeyboardTacletModel model;
+    private @Nullable KeyboardTacletModel model;
     private final Box pCenter = new Box(BoxLayout.Y_AXIS);
-    @Nullable
-    private Goal lastGoal;
+    private @Nullable Goal lastGoal;
     private final PropertyChangeListener updateListener = (f) -> {
         updateCurrentPrefix();
         relayout();

@@ -15,15 +15,13 @@ public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 
-    @Nullable
-    private final String origin;
+    private final @Nullable String origin;
 
     /**
      * Documentation for this sort given by the associated documentation comment.
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
-    @Nullable
-    private String documentation;
+    private @Nullable String documentation;
 
     public AbstractSort(Name name, boolean isAbstract) {
         this(name, isAbstract, null, null);
@@ -37,33 +35,7 @@ public abstract class AbstractSort implements Sort {
         this.documentation = documentation;
     }
 
-    // @Override
-    // public final ImmutableSet<S> extendsSorts() {
-    // if (this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY) {
-    // return DefaultImmutableSet.nil();
-    // } else {
-    // if (ext.isEmpty()) {
-    // ext = DefaultImmutableSet.<S>nil().add((S)ANY);
-    // }
-    // return ext;
-    // }
-    // }
-
-    // @Override
-    // public final boolean extendsTrans(S sort) {
-    // if (sort == this) {
-    // return true;
-    // } else if (this == Sort.FORMULA || this == Sort.UPDATE) {
-    // return false;
-    // } else if (sort == Sort.ANY) {
-    // return true;
-    // }
-    //
-    // return extendsSorts()
-    // .exists((S superSort) -> superSort == sort || superSort.extendsTrans(sort));
-    // }
-
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof AbstractSort sort) {
             // TODO: Potential bug should check for sort identity not name equality
             return sort.name().equals(name());
@@ -95,9 +67,8 @@ public abstract class AbstractSort implements Sort {
         this.documentation = documentation;
     }
 
-    @Nullable
     @Override
-    public String getDocumentation() {
+    public @Nullable String getDocumentation() {
         return documentation;
     }
 

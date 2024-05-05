@@ -140,8 +140,7 @@ public class TestTacletEquality {
         Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
     }
 
-    @NonNull
-    private String normalise(String expected) {
+    private @NonNull String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
     }
 

@@ -91,8 +91,7 @@ public class Configuration {
      * @param name property name
      * @param clazz data type because of missing reified generics.
      */
-    @Nullable
-    public <T> T get(String name, Class<T> clazz) {
+    public <T> @Nullable T get(String name, Class<T> clazz) {
         if (exists(name, clazz))
             return (T) data.get(name);
         else
@@ -107,8 +106,7 @@ public class Configuration {
      * @param name property name
      * @param defaultValue the returned instead of {@code null}.
      */
-    @NonNull
-    public <T> T get(String name, @NonNull T defaultValue) {
+    public <T> @NonNull T get(String name, @NonNull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
             return (T) data.get(name);
         else
@@ -120,8 +118,7 @@ public class Configuration {
      *
      * @see #exists(String)
      */
-    @Nullable
-    public Object get(String name) {
+    public @Nullable Object get(String name) {
         return data.get(name);
     }
 
@@ -210,8 +207,7 @@ public class Configuration {
      *
      * @param name property name
      */
-    @Nullable
-    public String getString(String name) {
+    public @Nullable String getString(String name) {
         return get(name, String.class);
     }
 
@@ -229,8 +225,7 @@ public class Configuration {
      *
      * @param name property name
      */
-    @Nullable
-    public Configuration getTable(String name) {
+    public @Nullable Configuration getTable(String name) {
         return get(name, Configuration.class);
     }
 
@@ -239,8 +234,7 @@ public class Configuration {
      *
      * @param name property name
      */
-    @Nullable
-    public List<Object> getList(String name) {
+    public @Nullable List<Object> getList(String name) {
         return get(name, List.class);
     }
 
@@ -250,8 +244,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the list contains non-strings
      */
-    @NonNull
-    public List<String> getStringList(String name) {
+    public @NonNull List<String> getStringList(String name) {
         var seq = get(name, List.class);
         if (seq == null)
             return Collections.emptyList();
@@ -268,8 +261,7 @@ public class Configuration {
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
-    @NonNull
-    public String[] getStringArray(String name, @NonNull String[] defaultValue) {
+    public @NonNull String[] getStringArray(String name, @NonNull String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(new String[0]);
         } else
@@ -279,16 +271,14 @@ public class Configuration {
     /**
      * Returns the meta data corresponding to the given entry.
      */
-    @Nullable
-    public ConfigurationMeta getMeta(String name) {
+    public @Nullable ConfigurationMeta getMeta(String name) {
         return meta.get(name);
     }
 
     /**
      * Returns the meta data corresponding to the given entry, creates the entry if not existing.
      */
-    @NonNull
-    private ConfigurationMeta getOrCreateMeta(String name) {
+    private @NonNull ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }
 

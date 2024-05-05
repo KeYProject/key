@@ -312,8 +312,7 @@ public class MergeRuleTests {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @NonNull
-    public static Proof loadProof(File directory, String proofFileName) {
+    public static @NonNull Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");

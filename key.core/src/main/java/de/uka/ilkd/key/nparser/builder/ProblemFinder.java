@@ -73,18 +73,15 @@ public class ProblemFinder extends ExpressionBuilder {
         return null;
     }
 
-    @Nullable
-    public String getChooseContract() {
+    public @Nullable String getChooseContract() {
         return chooseContract;
     }
 
-    @Nullable
-    public String getProofObligation() {
+    public @Nullable String getProofObligation() {
         return proofObligation;
     }
 
-    @Nullable
-    public Sequent getProblem() {
+    public @Nullable Sequent getProblem() {
         return problem;
     }
 }
