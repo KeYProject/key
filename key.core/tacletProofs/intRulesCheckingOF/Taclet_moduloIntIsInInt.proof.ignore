@@ -39,11 +39,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Feb 11 11:56:06 CET 2015
-name=moduloIntIsInInt
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "moduloIntIsInInt",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
 (keyLog "0" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

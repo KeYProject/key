@@ -39,11 +39,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Feb 11 12:20:29 CET 2015
-name=moduloLongFixpoint
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "moduloLongFixpoint",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
 (keyLog "0" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
