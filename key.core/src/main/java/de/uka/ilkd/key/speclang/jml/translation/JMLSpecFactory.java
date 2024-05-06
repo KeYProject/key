@@ -545,8 +545,7 @@ public class JMLSpecFactory {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    @NonNull
-    private LabeledParserRuleContext getAssignableNothing() {
+    private @NonNull LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
@@ -555,8 +554,7 @@ public class JMLSpecFactory {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    @NonNull
-    private LabeledParserRuleContext getAssignableFreeNothing() {
+    private @NonNull LabeledParserRuleContext getAssignableFreeNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
@@ -1201,8 +1199,9 @@ public class JMLSpecFactory {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
-            dep = textualDep.getDepends(heap.name()).head();
-            if (dep != null) {
+            ImmutableList<LabeledParserRuleContext> depends = textualDep.getDepends(heap.name());
+            if (!depends.isEmpty()) {
+                dep = textualDep.getDepends(heap.name()).head();
                 targetHeap = heap;
                 break;
             }

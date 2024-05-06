@@ -376,8 +376,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type
      */
-    @Nullable
-    public static SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
+    public static @Nullable SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
@@ -385,24 +384,21 @@ public final class JMLInfoExtractor {
         }
     }
 
-    @NonNull
-    private static SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
+    private static @NonNull SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
         return mode == null ? SpecMathMode.defaultMode() : mode;
     }
 
     /**
      * Returns the spec math mode of this type or the default
      */
-    @NonNull
-    public static SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
         return modeOrDefault(getSpecMathMode(t));
     }
 
     /**
      * Returns the spec math mode of this method
      */
-    @Nullable
-    public static SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
+    public static @Nullable SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
         var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
@@ -410,8 +406,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this method
      */
-    @NonNull
-    public static SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
         return modeOrDefault(getSpecMathMode(pm));
     }
 }

@@ -49,8 +49,7 @@ public class KeyIO {
 
     private final Services services;
     private final NamespaceSet nss;
-    @Nullable
-    private Namespace<SchemaVariable> schemaNamespace;
+    private @Nullable Namespace<SchemaVariable> schemaNamespace;
     private List<BuildingIssue> warnings = new LinkedList<>();
     private AbbrevMap abbrevMap;
 
@@ -207,8 +206,7 @@ public class KeyIO {
         return warnings;
     }
 
-    @Nullable
-    public List<BuildingIssue> resetWarnings() {
+    public @Nullable List<BuildingIssue> resetWarnings() {
         var w = warnings;
         warnings = new LinkedList<>();
         return w;

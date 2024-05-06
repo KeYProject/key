@@ -138,10 +138,10 @@ public class EditSourceFileAction extends KeyAction {
             }
         };
         Optional<URI> file = location.getFileURI();
-        String source = IOUtil.readFrom(file.orElse(null)).orElse("");
+        String source = IOUtil.readFrom(file.orElse(null));
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them
-        source = source.replace("\r", "");
+        source = source != null ? source.replace("\r", "") : "";
 
         if (file.isPresent() && file.get().toString().endsWith(".java")) {
             JavaDocument doc = new JavaDocument();
@@ -274,11 +274,10 @@ public class EditSourceFileAction extends KeyAction {
         }
 
         try {
-            final Location location = ExceptionTools.getLocation(exception)
-                    .filter(l -> l.getFileURI().isPresent())
-                    .orElseThrow(
-                        () -> new IOException("Cannot recover file location from exception."));
-            final URI uri = location.getFileURI().orElseThrow();
+            final Location location = ExceptionTools.getLocation(exception);
+            if (location == null)
+                throw new IOException("Cannot recover file location from exception.");
+            final URI uri = location.fileUri();
 
             // indicate edit/readonly in dialog title
             String prefix;

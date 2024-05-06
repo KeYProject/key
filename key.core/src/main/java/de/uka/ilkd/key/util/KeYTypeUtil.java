@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy of
  * {@link KeYJavaType} instances with help of given {@link Services}.
@@ -59,7 +61,7 @@ public final class KeYTypeUtil {
      * @param type The type.
      * @return The parent package/type or {@code null} if it has no one.
      */
-    public static String getParentName(Services services, KeYJavaType type) {
+    public static @Nullable String getParentName(Services services, @Nullable KeYJavaType type) {
         return type != null ? getParentName(services, type.getFullName()) : null;
     }
 
@@ -70,7 +72,7 @@ public final class KeYTypeUtil {
      * @param fullName The name of the current package/type.
      * @return The parent package/type or {@code null} if it has no one.
      */
-    private static String getParentName(Services services, String fullName) {
+    private static @Nullable String getParentName(Services services, String fullName) {
         int lastSeparator = fullName.lastIndexOf(PACKAGE_SEPARATOR);
         if (lastSeparator >= 0) {
             String parentName = fullName.substring(0, lastSeparator);
@@ -106,7 +108,7 @@ public final class KeYTypeUtil {
      * @param fullName The full name of the requested {@link KeYJavaType}.
      * @return The found {@link KeYJavaType} or {@code null} if no type exist with the given name.
      */
-    public static KeYJavaType getType(Services services, String fullName) {
+    public static @Nullable KeYJavaType getType(Services services, String fullName) {
         try {
             return services.getJavaInfo().getKeYJavaType(fullName);
         } catch (Exception e) {
@@ -145,7 +147,7 @@ public final class KeYTypeUtil {
      * @param implicitConstructor The implicit constructor.
      * @return The found explicit constructor or {@code null} if not available.
      */
-    public static IProgramMethod findExplicitConstructor(Services services,
+    public static @Nullable IProgramMethod findExplicitConstructor(Services services,
             final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
             ImmutableList<IProgramMethod> pms =

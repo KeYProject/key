@@ -27,10 +27,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
     private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
-    @Nullable
-    private TextualJMLSpecCase methodContract;
-    @Nullable
-    private TextualJMLLoopSpec loopContract;
+    private @Nullable TextualJMLSpecCase methodContract;
+    private @Nullable TextualJMLLoopSpec loopContract;
 
     /**
      * Translates a token to a JMLModifier

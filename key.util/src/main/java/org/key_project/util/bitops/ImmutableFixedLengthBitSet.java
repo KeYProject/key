@@ -6,16 +6,19 @@ package org.key_project.util.bitops;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents a non-negative number with access to single bits; the length of the bit set is fixed.
  * Comparable to {@link BitSet} with fixed length. Objects of this class are immutable.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class ImmutableFixedLengthBitSet {
 
-    private boolean[] bitSet = null;
-    private int value = -1;
+    private final boolean[] bitSet;
+    private int value;
 
     /**
      * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length. All bits are set to
