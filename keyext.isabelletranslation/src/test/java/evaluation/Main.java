@@ -100,7 +100,8 @@ public class Main {
         UNKNOWN,
         ERROR,
         OPEN,
-        CLOSED
+        CLOSED,
+        TRANSLATION_FAIL
     }
 
     public static void main(String[] args) {
@@ -525,6 +526,10 @@ public class Main {
                 Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
                 UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
+                StrategyProperties properties = new StrategyProperties();
+                Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
+                proof.setActiveStrategy(strategy);
+
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
                 PropositionalExpansionWithSimplificationMacro expansionMacro = new PropositionalExpansionWithSimplificationMacro();
                 if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
@@ -581,6 +586,11 @@ public class Main {
 
         Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
+
+
+        StrategyProperties properties = new StrategyProperties();
+        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
+        proof.setActiveStrategy(strategy);
 
         String contractName = proof.name().toString();
         LOGGER.info("Processing contract " + contractName + " of " + input);
@@ -889,6 +899,7 @@ public class Main {
                 problem = translator.translateProblem(goal);
             } catch (IllegalFormulaException e) {
                 flaggedTranslations.add(input);
+                updateIsabelleState(input, contractName, goal, ProofState.TRANSLATION_FAIL);
                 LOGGER.error("Translation failed: {}", e.getMessage());
                 return;
             }
