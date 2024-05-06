@@ -39,11 +39,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Thu Oct 27 13:34:28 CEST 2016
-name=schiffl_lemma_2
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "schiffl_lemma_2",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proofScript "
 macro split-prop;
