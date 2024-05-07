@@ -133,18 +133,18 @@ public class IsabelleTranslator {
 
         while (!sortsCheckQueue.isEmpty()) {
             Sort s = sortsCheckQueue.remove();
-            if (s == Sort.ANY) {
+            if (s == Sort.ANY || s == Sort.FORMULA) {
                 continue;
             }
             String sType = masterHandler.translateSortName(s) + "_type";
-            String sVal = "(s::" + masterHandler.translateSortName(s) + ")";
+            String sVal = "(" + masterHandler.translateSortName(s) + "_val::" + masterHandler.translateSortName(s) + ")";
             for (Sort s2 : sortsCheckQueue) {
-                if (s2 == Sort.ANY) {
+                if (s2 == Sort.ANY || s2 == Sort.FORMULA) {
                     continue;
                 }
                 if (!s.extendsTrans(s2) && !s2.extendsTrans(s)) {
                     String s2Type = masterHandler.translateSortName(s2) + "_type";
-                    String s2Val = "(s2::" + masterHandler.translateSortName(s2) + ")";
+                    String s2Val = "("+ masterHandler.translateSortName(s2) + "_val::" + masterHandler.translateSortName(s2) + ")";
                     if (nullSort.extendsTrans(s) && nullSort.extendsTrans(s2)) {
                         sortsAssumptions.append("assumes disjointModNull_").append(masterHandler.translateSortName(s)).append("_").append(masterHandler.translateSortName(s2))
                                 .append(":\"").append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> s=null\"").append(LINE_ENDING);
