@@ -185,7 +185,7 @@ public class Main {
         Map<String, Map<Goal, StatEntry>> contractMap = STATS.get(input);
 
         contractMap.forEach((String c, Map<Goal, StatEntry> entryMap) -> entryMap.forEach((Goal goal, StatEntry entry) -> {
-            sb.append(entry.p);
+            sb.append(entry.p.getParent().getFileName());
             sb.append(",");
             sb.append(c.replace(",", "_"));
             sb.append(",");
@@ -271,7 +271,7 @@ public class Main {
 
         for (Map<String, Map<Goal, StatEntry>> contractMap : STATS.values()) {
             contractMap.forEach((String c, Map<Goal, StatEntry> entryMap) -> entryMap.forEach((Goal goal, StatEntry entry) -> {
-                sb.append(entry.p);
+                sb.append(entry.p.getParent().getFileName());
                 sb.append(",");
                 sb.append(c.replace(",", "_"));
                 sb.append(",");
