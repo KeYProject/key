@@ -355,7 +355,7 @@ axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
 axiomatization where wellFormedStoreArray:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; (select h x created \&lt;and&gt; (typeof x (element_type obj))))
       \&lt;Longrightarrow&gt; wellFormed (store h (cast (to_any (obj::'a::{array, any}))) (arr idx) x)"
 
-lemma induct_sum_upper_limit[simp]:
+lemma induct_sum_upper_limit:
   fixes f::"int\&lt;Rightarrow&gt;int"
   fixes lower::int
   fixes upper::int
