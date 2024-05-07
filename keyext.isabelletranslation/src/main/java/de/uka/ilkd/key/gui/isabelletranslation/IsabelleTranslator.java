@@ -127,6 +127,7 @@ public class IsabelleTranslator {
 
     private StringBuilder getDistinctExtraSortsAssumptions(IsabelleMasterHandler masterHandler) {
         Set<Sort> sorts = masterHandler.getExtraSorts();
+        sorts.addAll(masterHandler.getPredefinedSorts());
         Queue<Sort> sortsCheckQueue = new LinkedList<>(sorts);
         StringBuilder sortsAssumptions = new StringBuilder();
 
