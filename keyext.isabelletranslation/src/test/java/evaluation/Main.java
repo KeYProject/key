@@ -525,10 +525,6 @@ public class Main {
                 Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
                 UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
-                StrategyProperties properties = new StrategyProperties();
-                Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
-                proof.setActiveStrategy(strategy);
-
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
                 PropositionalExpansionWithSimplificationMacro expansionMacro = new PropositionalExpansionWithSimplificationMacro();
                 if (smtMacro.canApplyTo(proof, ImmutableList.of(proof.getOpenGoal(papi.getFirstOpenGoal().getProofNode())), null)) {
@@ -585,11 +581,6 @@ public class Main {
 
         Proof proof = papi.getFirstOpenGoal().getProofNode().proof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
-
-
-        StrategyProperties properties = new StrategyProperties();
-        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
-        proof.setActiveStrategy(strategy);
 
         String contractName = proof.name().toString();
         LOGGER.info("Processing contract " + contractName + " of " + input);
