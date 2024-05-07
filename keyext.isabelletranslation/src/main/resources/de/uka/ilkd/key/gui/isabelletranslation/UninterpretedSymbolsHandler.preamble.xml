@@ -355,11 +355,6 @@ axiomatization wellFormed::"Heap\&lt;Rightarrow&gt;bool" where
 axiomatization where wellFormedStoreArray:"wellFormed h \&lt;and&gt; ((x::java_lang_Object)=null \&lt;or&gt; (select h x created \&lt;and&gt; (typeof x (element_type obj))))
       \&lt;Longrightarrow&gt; wellFormed (store h (cast (to_any (obj::'a::{array, any}))) (arr idx) x)"
 
-definition "setOfStandardAnySubtypes\&lt;equiv&gt;{int_type, bool_type, java_lang_Object_type, Field_type, Heap_type, LocSet_type, Seq_type}"
-
-(*ensure types are distinct where necessary*)
-axiomatization where distinctStandardTypes[simp]:"\&lt;forall&gt;x\&lt;in&gt;setOfStandardAnySubtypes. (\&lt;forall&gt;y\&lt;in&gt;setOfStandardAnySubtypes. disjointTypes x y)"
-
 lemma induct_sum_upper_limit[simp]:
   fixes f::"int\&lt;Rightarrow&gt;int"
   fixes lower::int
