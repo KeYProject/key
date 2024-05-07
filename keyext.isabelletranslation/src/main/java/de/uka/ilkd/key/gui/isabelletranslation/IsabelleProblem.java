@@ -188,7 +188,7 @@ public class IsabelleProblem {
             Boolean tryResultSuccess = false;
             try {
                 tryResultSuccess = (Boolean) Await.result(tryResultSuccessF, Duration.create(timeout_seconds, TimeUnit.SECONDS));
-            } catch (TimeoutException e){
+            } catch (TimeoutException e) {
                 tryResultSuccess = false;
             }
             if (tryResultSuccess) {
@@ -295,7 +295,7 @@ public class IsabelleProblem {
                            val ctxt = Proof.context_of p_state;
                            val params =\s""" + Sledgehammer_Commands + """
                 .default_params thy
-                                [("timeout",\"""" + (timeout_seconds - 5) + """
+                                [("timeout",\"""" + (timeout_seconds) + """
                 "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
                 val results =\s""" + sledgehammer + """
                 .run_sledgehammer params\s""" + Sledgehammer_Prover + """
@@ -323,7 +323,7 @@ public class IsabelleProblem {
             Boolean tryResultSuccess;
             try {
                 tryResultSuccess = (Boolean) Await.result(tryResultSuccessF, Duration.create(timeout_seconds, TimeUnit.SECONDS));
-            } catch (TimeoutException e){
+            } catch (TimeoutException e) {
                 tryResultSuccess = false;
             }
             if (tryResultSuccess) {
@@ -361,9 +361,14 @@ public class IsabelleProblem {
             }
         }
 
-        notifySledgehammerFinished();
+        if (result.isTimeout()) {
+            notifyProcessTimeout();
 
-        notifyProcessFinished();
+            notifySledgehammerFinished();
+
+            notifyProcessFinished();
+        }
+
 
         LOGGER.debug("Sledgehammer result: " + this.result);
         return this.result;

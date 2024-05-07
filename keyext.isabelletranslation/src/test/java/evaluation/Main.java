@@ -11,7 +11,6 @@ import de.uka.ilkd.key.gui.isabelletranslation.IllegalFormulaException;
 import de.uka.ilkd.key.gui.isabelletranslation.*;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.PropositionalExpansionWithSimplificationMacro;
 import de.uka.ilkd.key.macros.SMTPreparationMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -856,6 +855,8 @@ public class Main {
                     updateIsabelleState(input, contractName, goal, ProofState.CLOSED);
                     String isabelleProof = problem.getResult().getSuccessfulTactic();
                     updateIsabelleProof(input, contractName, goal, isabelleProof);
+                } else {
+                    updateIsabelleState(input, contractName, goal, ProofState.OPEN);
                 }
 
                 LOGGER.info("Result: {}", problem.getResult());
