@@ -76,7 +76,8 @@ public class Main {
         final Path p;
         ProofState keyState = ProofState.UNKNOWN;
         long keyTime;
-        int keyNodes;
+        long keyNodes;
+        int goalNr;
         long z3TranslationLines;
         long translationAndZ3Time;
         long z3ProofLines;
@@ -148,7 +149,7 @@ public class Main {
         sb.append(",");
         sb.append("contractName");
         sb.append(",");
-        sb.append("goalNodeName");
+        sb.append("goalNr");
         sb.append(",");
         sb.append("KeY_state");
         sb.append(",");
@@ -188,7 +189,7 @@ public class Main {
             sb.append(",");
             sb.append(c.replace(",", "_"));
             sb.append(",");
-            sb.append(goal.node().getStepIndex());
+            sb.append(entry.goalNr);
             sb.append(",");
             sb.append(entry.keyState);
             sb.append(",");
@@ -237,7 +238,7 @@ public class Main {
         sb.append(",");
         sb.append("contractName");
         sb.append(",");
-        sb.append("goalNodeName");
+        sb.append("goalNr");
         sb.append(",");
         sb.append("KeY_state");
         sb.append(",");
@@ -274,7 +275,7 @@ public class Main {
                 sb.append(",");
                 sb.append(c.replace(",", "_"));
                 sb.append(",");
-                sb.append(goal.node().getStepIndex());
+                sb.append(entry.goalNr);
                 sb.append(",");
                 sb.append(entry.keyState);
                 sb.append(",");
@@ -545,6 +546,8 @@ public class Main {
                 proof.setStepIndices();
                 ImmutableList<Goal> goals = proof.openGoals();
 
+                goals.forEach((Goal goal) -> updateGoalNr(input, "", goal, goal.node().getStepIndex()));
+
 
                 STATS.put(input, new HashMap<>());
                 STATS.get(input).put("", new HashMap<>());
@@ -605,6 +608,8 @@ public class Main {
         }
         proof.setStepIndices();
         ImmutableList<Goal> goals = proof.openGoals();
+
+        goals.forEach((Goal goal) -> updateGoalNr(input, proof.name().toString(), goal, goal.node().getStepIndex()));
 
         STATS.computeIfAbsent(input, k -> new HashMap<>());
         STATS.get(input).put(proof.name().toString(), new HashMap<>());
@@ -909,6 +914,15 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void updateGoalNr(Path input, String contractName, Goal goal, int goalNr) {
+        StatEntry stats = STATS.get(input).get(contractName).get(goal);
+        if (stats == null) {
+            stats = new StatEntry(input);
+        }
+        stats.goalNr = goalNr;
+        STATS.get(input).get(contractName).put(goal, stats);
     }
 
     private static void updateIsabelleProof(Path input, String contractName, Goal goal, String isabelleProof) {
