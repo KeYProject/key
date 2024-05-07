@@ -363,11 +363,11 @@ public class IsabelleProblem {
 
         if (result.isTimeout()) {
             notifyProcessTimeout();
-
-            notifySledgehammerFinished();
-
-            notifyProcessFinished();
         }
+
+        notifySledgehammerFinished();
+
+        notifyProcessFinished();
 
 
         LOGGER.debug("Sledgehammer result: " + this.result);
