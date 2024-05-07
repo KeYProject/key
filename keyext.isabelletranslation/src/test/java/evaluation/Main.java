@@ -546,11 +546,10 @@ public class Main {
                 proof.setStepIndices();
                 ImmutableList<Goal> goals = proof.openGoals();
 
-                goals.forEach((Goal goal) -> updateGoalNr(input, "", goal, goal.node().getStepIndex()));
-
-
                 STATS.put(input, new HashMap<>());
                 STATS.get(input).put("", new HashMap<>());
+
+                goals.forEach((Goal goal) -> updateGoalNr(input, "", goal, goal.node().getStepIndex()));
 
                 if (runIsabelle) {
                     runIsabelleToFile(input, "", goals);
@@ -609,10 +608,10 @@ public class Main {
         proof.setStepIndices();
         ImmutableList<Goal> goals = proof.openGoals();
 
-        goals.forEach((Goal goal) -> updateGoalNr(input, proof.name().toString(), goal, goal.node().getStepIndex()));
-
         STATS.computeIfAbsent(input, k -> new HashMap<>());
         STATS.get(input).put(proof.name().toString(), new HashMap<>());
+
+        goals.forEach((Goal goal) -> updateGoalNr(input, proof.name().toString(), goal, goal.node().getStepIndex()));
 
         if (runIsabelle) {
             runIsabelleToFile(input, proof.name().toString(), goals);
