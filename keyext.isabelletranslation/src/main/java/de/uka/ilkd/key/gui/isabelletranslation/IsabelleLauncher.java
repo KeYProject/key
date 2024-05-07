@@ -88,7 +88,7 @@ public class IsabelleLauncher {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            shutdownResources.start();
+            shutdownResources.run();
             Runtime.getRuntime().removeShutdownHook(shutdownResources);
         }
     }
