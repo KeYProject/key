@@ -529,11 +529,11 @@ public class Main {
 
                 // this should initialize with the default properties,
                 // necessary to enable quantifier instantiation
-                StrategyProperties properties = new StrategyProperties();
+                /*StrategyProperties properties = new StrategyProperties();
                 Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
                 proof.setActiveStrategy(strategy);
                 proof.getSettings().getStrategySettings().setMaxSteps(Integer.MAX_VALUE);
-                proof.getSettings().getStrategySettings().setTimeout(Long.MAX_VALUE);
+                proof.getSettings().getStrategySettings().setTimeout(Long.MAX_VALUE);*/
 
                 SMTPreparationMacro smtMacro = new SMTPreparationMacro();
                 PropositionalExpansionWithSimplificationMacro expansionMacro = new PropositionalExpansionWithSimplificationMacro();
@@ -598,11 +598,11 @@ public class Main {
 
         // this should initialize with the default properties,
         // necessary to enable quantifier instantiation
-        StrategyProperties properties = new StrategyProperties();
+        /*StrategyProperties properties = new StrategyProperties();
         Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
         proof.setActiveStrategy(strategy);
         proof.getSettings().getStrategySettings().setMaxSteps(Integer.MAX_VALUE);
-        proof.getSettings().getStrategySettings().setTimeout(Long.MAX_VALUE);
+        proof.getSettings().getStrategySettings().setTimeout(Long.MAX_VALUE);*/
 
 
         SMTPreparationMacro smtMacro = new SMTPreparationMacro();
