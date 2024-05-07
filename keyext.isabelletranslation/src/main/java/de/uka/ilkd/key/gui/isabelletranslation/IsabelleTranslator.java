@@ -99,7 +99,7 @@ public class IsabelleTranslator {
             sequentTranslation.append(LINE_ENDING);
         }
 
-        sequentTranslation.append(getDistinctExtraSortsAssumptions(masterHandler));
+        sequentTranslation.append(getDistinctSortsAssumptions(masterHandler));
 
         sequentTranslation.append("begin").append(LINE_ENDING);
 
@@ -125,7 +125,7 @@ public class IsabelleTranslator {
         return new IsabelleProblem(goal, translationPreamble.toString(), sequentTranslation.toString());
     }
 
-    private StringBuilder getDistinctExtraSortsAssumptions(IsabelleMasterHandler masterHandler) {
+    private StringBuilder getDistinctSortsAssumptions(IsabelleMasterHandler masterHandler) {
         Set<Sort> sorts = masterHandler.getExtraSorts();
         sorts.addAll(masterHandler.getPredefinedSorts());
         Queue<Sort> sortsCheckQueue = new LinkedList<>(sorts);
@@ -150,7 +150,8 @@ public class IsabelleTranslator {
                                 .append(":\"").append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> s=null\"").append(LINE_ENDING);
                     } else {
                         //Sorts are unrelated. need to add distinctness assumption
-                        sortsAssumptions.append("assumes \"disjointTypes ").append(sType).append(" ").append(s2Type).append("\"").append(LINE_ENDING);
+                        sortsAssumptions.append("assumes disjointTypes_").append(masterHandler.translateSortName(s)).append("_").append(masterHandler.translateSortName(s2))
+                                .append(":\"").append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> False\"").append(LINE_ENDING);
                     }
                 }
             }
