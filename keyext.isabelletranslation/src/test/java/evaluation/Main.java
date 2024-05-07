@@ -855,8 +855,6 @@ public class Main {
                     updateIsabelleState(input, contractName, goal, ProofState.CLOSED);
                     String isabelleProof = problem.getResult().getSuccessfulTactic();
                     updateIsabelleProof(input, contractName, goal, isabelleProof);
-                } else {
-                    updateIsabelleState(input, contractName, goal, ProofState.OPEN);
                 }
 
                 LOGGER.info("Result: {}", problem.getResult());
