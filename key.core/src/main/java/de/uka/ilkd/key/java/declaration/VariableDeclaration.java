@@ -95,7 +95,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
     }
 
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(getSyntaxChildCount() - 1).getLastElement();
     }
 
     /**

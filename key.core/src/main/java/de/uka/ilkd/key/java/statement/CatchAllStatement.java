@@ -44,7 +44,7 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int i = 0;
         if (body != null) {
             i++;

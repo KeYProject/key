@@ -110,12 +110,12 @@ public class ProgramContextAdder {
     private final StatementBlock createWrapperBody(JavaNonTerminalProgramElement wrapper,
             StatementBlock putIn, PosInProgram suffix) {
 
-        final int putInLength = putIn.getChildCount();
+        final int putInLength = putIn.getSyntaxChildCount();
 
         // ATTENTION: may be -1
         final int lastChild = suffix.last();
 
-        final int childLeft = wrapper.getChildCount() - lastChild;
+        final int childLeft = wrapper.getSyntaxChildCount() - lastChild;
 
         final int childrenToAdd = putInLength + childLeft;
 
@@ -182,7 +182,7 @@ public class ProgramContextAdder {
     protected LabeledStatement createLabeledStatementWrapper(LabeledStatement old,
             JavaNonTerminalProgramElement body) {
         return new LabeledStatement(old.getLabel(),
-            body instanceof StatementBlock && body.getChildCount() == 1
+            body instanceof StatementBlock && body.getSyntaxChildCount() == 1
                     && !(body.getChildAt(0) instanceof LocalVariableDeclaration)
                             ? (Statement) body.getChildAt(0)
                             : (Statement) body,

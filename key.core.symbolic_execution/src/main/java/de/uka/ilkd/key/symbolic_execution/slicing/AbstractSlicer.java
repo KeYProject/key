@@ -792,7 +792,7 @@ public abstract class AbstractSlicer {
      */
     protected ReferencePrefix toReferencePrefix(SourceElement sourceElement) {
         if (sourceElement instanceof PassiveExpression) {
-            if (((PassiveExpression) sourceElement).getChildCount() != 1) {
+            if (((PassiveExpression) sourceElement).getSyntaxChildCount() != 1) {
                 throw new IllegalStateException(
                     "PassiveExpression '" + sourceElement + "' has not exactly one child.");
             }

@@ -39,7 +39,7 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return 1;
     }
 

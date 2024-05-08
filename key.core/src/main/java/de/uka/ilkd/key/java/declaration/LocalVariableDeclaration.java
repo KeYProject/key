@@ -121,7 +121,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * @return an int giving the number of children of this node
      */
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (modArray != null) {
             result += modArray.size();

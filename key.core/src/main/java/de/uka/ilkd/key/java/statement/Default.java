@@ -54,7 +54,7 @@ public class Default extends BranchImp {
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (body != null) {
             result += body.size();

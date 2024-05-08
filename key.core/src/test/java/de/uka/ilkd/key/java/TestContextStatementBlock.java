@@ -43,7 +43,7 @@ public class TestContextStatementBlock {
     public void testContextTermInstantiation() {
         ExtList statementList = new ExtList();
         StatementBlock stContainer = (StatementBlock) blockOne.program();
-        int size = stContainer.getChildCount();
+        int size = stContainer.getSyntaxChildCount();
         assertEquals(3, size, "Wrong size. Should have only 3 children");
         PosInProgram prefixEnd = PosInProgram.TOP.down(0);
         assertTrue(

@@ -72,12 +72,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
 
     public SourceElement getFirstElement() {
-        return (getChildCount() > 0) ? getChildAt(0).getFirstElement() : this;
+        return (getSyntaxChildCount() > 0) ? getChildAt(0).getFirstElement() : this;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        return (getChildCount() > 0) ? getChildAt(0).getFirstElementIncludingBlocks() : this;
+        return (getSyntaxChildCount() > 0) ? getChildAt(0).getFirstElementIncludingBlocks() : this;
     }
 
     public SourceElement getLastElement() {
@@ -101,7 +101,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * @return an int giving the number of children of this node
      */
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (packageSpec != null) {
             result++;

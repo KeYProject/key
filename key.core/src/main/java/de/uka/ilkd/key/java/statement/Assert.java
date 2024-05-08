@@ -41,7 +41,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
         return getExpressionAt(index);
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return getExpressionCount();
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
 import java.util.ArrayDeque;
@@ -19,18 +22,20 @@ public class SyntaxElementCursor {
     }
 
     public boolean gotoFirstChild() {
-        if (node.getChildCount() <= 0) return false;
+        if (node.getSyntaxChildCount() <= 0)
+            return false;
         path.push(new ParentAndPosition(node, 0));
         node = node.getChild(0);
         return true;
     }
 
     public boolean gotoNextSibling() {
-        if (path.isEmpty()) return false;
+        if (path.isEmpty())
+            return false;
         var pnp = path.pop();
         SyntaxElement parent = pnp.parent;
-        int index =pnp.index+1;
-        if (index > parent.getChildCount()) {
+        int index = pnp.index + 1;
+        if (index > parent.getSyntaxChildCount()) {
             return false;
         }
         path.push(new ParentAndPosition(parent, index));
@@ -39,7 +44,8 @@ public class SyntaxElementCursor {
     }
 
     public boolean gotoParent() {
-        if (path.isEmpty()) return false;
+        if (path.isEmpty())
+            return false;
         node = path.pop().parent;
         return true;
     }

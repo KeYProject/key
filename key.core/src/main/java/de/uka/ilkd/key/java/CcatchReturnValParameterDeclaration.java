@@ -43,7 +43,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
      * @return an int giving the number of children of this node
      */
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return delegate != null ? 1 : 0;
     }
 

@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Program;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
@@ -41,10 +42,25 @@ public abstract class Modality extends AbstractSortedOperator {
      */
     public abstract Program program();
 
+    @Override
+    public int getSyntaxChildCount() {
+        return 2;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        return switch (n) {
+        case 0 -> kind;
+        case 1 -> program();
+        default -> throw new IndexOutOfBoundsException(
+            "Modality " + name() + " has only two children");
+        };
+    }
+
     /**
      * Modality kinds like box and diamond.
      */
-    public abstract static class Kind implements Named {
+    public abstract static class Kind implements Named, SyntaxElement {
         private final Name name;
 
         public Kind(Name name) {
@@ -73,6 +89,16 @@ public abstract class Modality extends AbstractSortedOperator {
         @Override
         public int hashCode() {
             return Objects.hash(name());
+        }
+
+        @Override
+        public int getSyntaxChildCount() {
+            return 0;
+        }
+
+        @Override
+        public SyntaxElement getChild(int n) {
+            throw new IndexOutOfBoundsException("Modality kind " + name() + " has no children");
         }
     }
 }

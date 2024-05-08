@@ -66,7 +66,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int count = 0;
         if (prefix != null) {
             count++;

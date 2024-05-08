@@ -71,7 +71,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (modArray != null) {
             result += modArray.size();

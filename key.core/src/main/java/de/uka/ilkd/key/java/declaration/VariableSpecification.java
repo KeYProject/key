@@ -100,7 +100,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (var != null) {
             result++;
@@ -280,10 +280,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
             }
         }
         nat.add(var, vs.getProgramVariable());
-        if (vs.getChildCount() != getChildCount()) {
+        if (vs.getSyntaxChildCount() != getSyntaxChildCount()) {
             return false;
         }
-        for (int i = 0, cc = getChildCount(); i < cc; i++) {
+        for (int i = 0, cc = getSyntaxChildCount(); i < cc; i++) {
             if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
                 return false;
             }

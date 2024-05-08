@@ -28,7 +28,7 @@ public class SuperArrayDeclaration extends TypeDeclaration {
         this(new ProgramElementName("SuperArray"), length);
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return 0;
     }
 

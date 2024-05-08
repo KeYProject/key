@@ -815,7 +815,7 @@ public final class SourceView extends JComponent {
 
             PositionInfo pos = se.getPositionInfo();
 
-            for (int i = 0; i < ntpe.getChildCount(); i++) {
+            for (int i = 0; i < ntpe.getSyntaxChildCount(); i++) {
                 ProgramElement pe2 = ntpe.getChildAt(i);
                 pos = PositionInfo.join(pos, joinPositionsRec(pe2));
             }

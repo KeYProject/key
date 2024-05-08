@@ -33,7 +33,7 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
         v.performActionOnGuard(this);
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (expr != null) ? 1 : 0;
     }
 

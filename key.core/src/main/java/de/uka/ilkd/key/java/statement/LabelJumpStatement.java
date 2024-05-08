@@ -93,7 +93,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (name != null) ? 1 : 0;
     }
 

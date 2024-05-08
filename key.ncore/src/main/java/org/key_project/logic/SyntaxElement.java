@@ -10,6 +10,7 @@ package org.key_project.logic;
 public interface SyntaxElement {
     /**
      * Get the {@code n}-th child of this syntax element.
+     *
      * @param n index of the child.
      * @return the {@code n}-th child of this syntax element.
      * @throws IndexOutOfBoundsException if there is no {@code n}-th child.
@@ -20,5 +21,5 @@ public interface SyntaxElement {
      *
      * @return the number of children of this syntax element.
      */
-    int getChildCount();
+    int getSyntaxChildCount();
 }

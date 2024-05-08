@@ -82,7 +82,7 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (identifier != null) {
             result++;

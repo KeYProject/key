@@ -88,12 +88,12 @@ public class ContextStatementBlock extends StatementBlock {
      * @return an int giving the number of children of this node
      */
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int count = 0;
         if (executionContext != null) {
             count++;
         }
-        count += super.getChildCount();
+        count += super.getSyntaxChildCount();
         return count;
     }
 

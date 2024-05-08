@@ -39,7 +39,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return 0;
     }
 

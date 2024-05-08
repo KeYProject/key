@@ -21,7 +21,7 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
     }
 
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (label != null) ? 1 : 0;
     }
 

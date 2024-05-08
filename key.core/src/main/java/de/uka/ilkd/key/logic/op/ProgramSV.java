@@ -142,7 +142,7 @@ public final class ProgramSV extends OperatorSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return 0;
     }
 

@@ -543,11 +543,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 pi = PositionInfo.UNDEFINED;
             }
 
-            if (x.getChildCount() == 3) {
+            if (x.getSyntaxChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
                     (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2), pi));
 
-            } else if (x.getChildCount() == 2) {
+            } else if (x.getSyntaxChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
                     (StatementBlock) changeList.get(1), pi));
             } else {
@@ -1527,7 +1527,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      * @return pe2's position in pe1
      */
     protected static int getPosition(NonTerminalProgramElement pe1, ProgramElement pe2) {
-        int n = pe1.getChildCount();
+        int n = pe1.getSyntaxChildCount();
         int i = 0;
         while ((i < n) && (pe1.getChildAt(i) != pe2)) {
             i++;

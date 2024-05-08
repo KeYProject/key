@@ -54,7 +54,7 @@ public class Else extends BranchImp {
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (body != null) ? 1 : 0;
     }
 

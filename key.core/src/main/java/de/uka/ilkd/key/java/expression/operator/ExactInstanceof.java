@@ -43,7 +43,7 @@ public class ExactInstanceof extends TypeOperator {
      * @return an int giving the number of children of this node
      */
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (children != null) {
             result += children.size();

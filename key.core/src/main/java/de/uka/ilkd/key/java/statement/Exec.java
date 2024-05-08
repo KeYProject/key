@@ -131,7 +131,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(getSyntaxChildCount() - 1).getLastElement();
     }
 
     /**
@@ -140,7 +140,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      * @return an int giving the number of children of this node
      */
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (body != null) {
             result++;

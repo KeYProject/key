@@ -285,11 +285,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getChildCount() == 3) {
+            if (x.getSyntaxChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
                     (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
                     PositionInfo.UNDEFINED));
-            } else if (x.getChildCount() == 2) {
+            } else if (x.getSyntaxChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
                     (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {

@@ -85,7 +85,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (expression != null) ? 1 : 0;
     }
 

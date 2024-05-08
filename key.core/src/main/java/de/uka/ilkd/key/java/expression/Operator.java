@@ -143,7 +143,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @return an int giving the number of children of this node
      */
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (children != null) ? children.size() : 0;
     }
 

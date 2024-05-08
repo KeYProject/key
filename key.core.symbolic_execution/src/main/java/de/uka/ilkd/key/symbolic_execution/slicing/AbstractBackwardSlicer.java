@@ -120,7 +120,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             Location normalizedElement = normalizeAlias(services, relevantElement, info);
             relevantLocations.add(normalizedElement);
         } else if (read instanceof NonTerminalProgramElement ntpe) {
-            for (int i = 0; i < ntpe.getChildCount(); i++) {
+            for (int i = 0; i < ntpe.getSyntaxChildCount(); i++) {
                 updateRelevantLocations(ntpe.getChildAt(i), relevantLocations, info, services);
             }
         }

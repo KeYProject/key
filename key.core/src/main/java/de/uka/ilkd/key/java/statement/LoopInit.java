@@ -74,7 +74,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
         v.performActionOnLoopInit(this);
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return getStatementCount();
     }
 

@@ -69,7 +69,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         v.performActionOnForUpdates(this);
     }
 
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return getExpressionCount();
     }
 

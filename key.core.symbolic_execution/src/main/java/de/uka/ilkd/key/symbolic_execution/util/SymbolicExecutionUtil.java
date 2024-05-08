@@ -3951,10 +3951,10 @@ public final class SymbolicExecutionUtil {
             }
             // Compute second statement
             StatementBlock block = null;
-            while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) {
+            while (!blocks.isEmpty() && (block == null || block.getSyntaxChildCount() < 2)) {
                 block = blocks.removeFirst();
             }
-            if (block != null && block.getChildCount() >= 2) {
+            if (block != null && block.getSyntaxChildCount() >= 2) {
                 return new Pair<>(methodFrameCount, block.getChildAt(1));
             } else {
                 return new Pair<>(methodFrameCount, null);

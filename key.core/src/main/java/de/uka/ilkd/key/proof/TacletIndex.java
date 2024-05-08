@@ -314,7 +314,7 @@ public abstract class TacletIndex {
         if (pe instanceof ProgramPrefix) {
             int next = prefixOccurrences.occurred(pe);
             NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
-            if (next < nt.getChildCount()) {
+            if (next < nt.getSyntaxChildCount()) {
                 return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);
             }
         } else {

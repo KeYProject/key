@@ -21,7 +21,7 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
     }
 
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return (label != null) ? 1 : 0;
     }
 

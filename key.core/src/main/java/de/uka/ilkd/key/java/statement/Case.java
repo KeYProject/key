@@ -76,7 +76,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         int result = 0;
         if (expression != null) {
             result++;

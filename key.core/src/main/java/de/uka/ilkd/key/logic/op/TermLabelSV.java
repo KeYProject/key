@@ -34,7 +34,7 @@ public final class TermLabelSV extends OperatorSV implements SchemaVariable, Ter
     }
 
     @Override
-    public int getChildCount() {
+    public int getSyntaxChildCount() {
         return 0;
     }
 }
