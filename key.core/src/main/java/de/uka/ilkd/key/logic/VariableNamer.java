@@ -46,6 +46,13 @@ import org.slf4j.LoggerFactory;
  * Responsible for program variable naming issues.
  */
 public abstract class VariableNamer implements InstantiationProposer {
+    /**
+     * Separator used for {@link TempIndProgramElementName} instances.
+     * This will separate the name and the index of the "temporary"
+     * program element name.
+     */
+    public static final char TEMP_INDEX_SEPARATOR = '#';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableNamer.class);
 
     // -------------------------------------------------------------------------
@@ -507,7 +514,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             Comment[] comments) {
         ProgramElementName result;
 
-        int sepPos = name.lastIndexOf(TempIndProgramElementName.SEPARATOR);
+        int sepPos = name.lastIndexOf(TEMP_INDEX_SEPARATOR);
         if (sepPos > 0) {
             String basename = name.substring(0, sepPos);
             int index = Integer.parseInt(name.substring(sepPos + 1));
@@ -663,15 +670,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * temporary indexed ProgramElementName
      */
     private static class TempIndProgramElementName extends IndProgramElementName {
-        static final char SEPARATOR = '#';
-
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo);
         }
 
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo, comments);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo,
+                comments);
         }
     }
 

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.RenamingProperty;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -413,7 +414,8 @@ public class EqualityConstraint implements Constraint {
 
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
             nat = checkNat(nat);
-            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+            if (RenamingProperty.javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(),
+                nat)) {
                 return FAILED;
             }
         }

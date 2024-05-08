@@ -92,7 +92,7 @@ public class ParserMessageTest {
             exception = e;
         }
 
-        location = ExceptionTools.getLocation(exception).orElse(null);
+        location = ExceptionTools.getLocation(exception);
 
         assertNotNull(location, "Cannot recover error location from Exception: " + exception);
 

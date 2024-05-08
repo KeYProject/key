@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Creates the anonymizing update for the heap. Expects as arguments the loop formula (for
@@ -39,10 +40,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
-        final Optional<LoopSpecification> loopSpec = //
-            MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-
-        if (!loopSpec.isPresent()) {
+        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+        if (loopSpec == null) {
             return null;
         }
 
@@ -50,7 +49,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
 
-        return createHeapAnonUpdate(loopSpec.get(),
+        return createHeapAnonUpdate(loopSpec,
             MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
@@ -126,7 +125,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        return tb.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? tb.skip()
+        return tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)
+                ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }
 

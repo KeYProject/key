@@ -13,6 +13,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 
 /**
  * Some generally useful tools for dealing with arrays of bound variables
@@ -206,7 +208,7 @@ public class BoundVariableTools {
             return false;
         }
         if (vars0.size() == 0) {
-            return term0.equalsModRenaming(term1);
+            return term0.equalsModProperty(term1, RENAMING_PROPERTY);
         }
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
@@ -215,7 +217,7 @@ public class BoundVariableTools {
         final Term renamedTerm0 = renameVariables(term0, vars0, unifiedVars, services);
         final Term renamedTerm1 = renameVariables(term1, vars1, unifiedVars, services);
 
-        return renamedTerm0.equalsModRenaming(renamedTerm1);
+        return renamedTerm0.equalsModProperty(renamedTerm1, RENAMING_PROPERTY);
     }
 
     /**

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Name;
@@ -26,10 +27,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
     private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
-    @Nullable
-    private TextualJMLSpecCase methodContract;
-    @Nullable
-    private TextualJMLLoopSpec loopContract;
+    private @Nullable TextualJMLSpecCase methodContract;
+    private @Nullable TextualJMLLoopSpec loopContract;
 
     /**
      * Translates a token to a JMLModifier
@@ -492,8 +491,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSUME, attachOriginLabel));
+                new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }
@@ -501,10 +499,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b =
-            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSERT, attachOriginLabel));
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+            TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }

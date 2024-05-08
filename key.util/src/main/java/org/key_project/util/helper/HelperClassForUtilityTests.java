@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("nullness")
 public class HelperClassForUtilityTests {
     public static final File RESOURCE_DIRECTORY = FindResources.getTestResourcesDirectory();
 

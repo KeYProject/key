@@ -77,6 +77,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     private PrimitiveType mapType;
     private PrimitiveType bigintType;
     private PrimitiveType realType;
+    private PrimitiveType typeType;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -106,6 +107,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         mapType = new PrimitiveType("\\map", this);
         bigintType = new PrimitiveType("\\bigint", this);
         realType = new PrimitiveType("\\real", this);
+        typeType = new PrimitiveType("\\TYPE", this);
 
         // HEAP
         name2primitiveType.put(locsetType.getName(), locsetType);
@@ -118,6 +120,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         // JML's primitive types
         name2primitiveType.put(bigintType.getName(), bigintType);
         name2primitiveType.put(realType.getName(), realType);
+        name2primitiveType.put(typeType.getName(), typeType);
     }
 
     @Override

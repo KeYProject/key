@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.jspecify.annotations.Nullable;
@@ -33,9 +32,8 @@ public final class ParserException extends Exception implements HasLocation {
     /**
      * @return The location may be null.
      */
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 
