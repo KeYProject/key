@@ -99,7 +99,8 @@ public class IsabelleTranslator {
             sequentTranslation.append(LINE_ENDING);
         }
 
-        sequentTranslation.append(getDistinctExtraSortsAssumptions(masterHandler));
+        //This did not seem helpful from my testing
+        //sequentTranslation.append(getDistinctExtraSortsAssumptions(masterHandler));
 
         sequentTranslation.append("begin").append(LINE_ENDING);
 
