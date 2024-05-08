@@ -99,7 +99,7 @@ public class IsabelleTranslator {
             sequentTranslation.append(LINE_ENDING);
         }
 
-        sequentTranslation.append(getDistinctSortsAssumptions(masterHandler));
+        sequentTranslation.append(getDistinctExtraSortsAssumptions(masterHandler));
 
         sequentTranslation.append("begin").append(LINE_ENDING);
 
@@ -125,9 +125,8 @@ public class IsabelleTranslator {
         return new IsabelleProblem(goal, translationPreamble.toString(), sequentTranslation.toString());
     }
 
-    private StringBuilder getDistinctSortsAssumptions(IsabelleMasterHandler masterHandler) {
-        Set<Sort> sorts = new HashSet<>(masterHandler.getExtraSorts());
-        sorts.addAll(masterHandler.getPredefinedSorts());
+    private StringBuilder getDistinctExtraSortsAssumptions(IsabelleMasterHandler masterHandler) {
+        Set<Sort> sorts = masterHandler.getExtraSorts();
         Queue<Sort> sortsCheckQueue = new LinkedList<>(sorts);
         StringBuilder sortsAssumptions = new StringBuilder();
 
@@ -137,23 +136,20 @@ public class IsabelleTranslator {
                 continue;
             }
             String sType = masterHandler.translateSortName(s) + "_type";
-            String sVal = "(" + masterHandler.translateSortName(s) + "_val::" + masterHandler.translateSortName(s) + ")";
+            String sVal = "(" + masterHandler.translateSortName(s) + "\\<^sub>v\\<^sub>a\\<^sub>l::" + masterHandler.translateSortName(s) + ")";
             for (Sort s2 : sortsCheckQueue) {
                 if (s2 == Sort.ANY || s2 == Sort.FORMULA) {
                     continue;
                 }
                 if (!s.extendsTrans(s2) && !s2.extendsTrans(s)) {
                     String s2Type = masterHandler.translateSortName(s2) + "_type";
-                    String s2Val = "("+ masterHandler.translateSortName(s2) + "_val::" + masterHandler.translateSortName(s2) + ")";
+                    String s2Val = "(" + masterHandler.translateSortName(s2) + "\\<^sub>v\\<^sub>a\\<^sub>l::" + masterHandler.translateSortName(s2) + ")";
                     if (nullSort.extendsTrans(s) && nullSort.extendsTrans(s2)) {
                         sortsAssumptions.append("assumes disjointModNull_").append(masterHandler.translateSortName(s)).append("_").append(masterHandler.translateSortName(s2))
-                                .append(":\"\\<forall>(").append(sVal).append(") (").append(s2Val).append("). ")
-                                .append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> s=null\"").append(LINE_ENDING);
+                                .append(":\"").append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> s=null\"").append(LINE_ENDING);
                     } else {
                         //Sorts are unrelated. need to add distinctness assumption
-                        sortsAssumptions.append("assumes disjointTypes_").append(masterHandler.translateSortName(s)).append("_").append(masterHandler.translateSortName(s2))
-                                .append(":\"\\<forall>(").append(sVal).append(") (").append(s2Val).append("). ")
-                                .append(sVal).append(" = ").append(s2Val).append("\\<Longrightarrow> False\"").append(LINE_ENDING);
+                        sortsAssumptions.append("assumes \"disjointTypes ").append(sType).append(" ").append(s2Type).append("\"").append(LINE_ENDING);
                     }
                 }
             }

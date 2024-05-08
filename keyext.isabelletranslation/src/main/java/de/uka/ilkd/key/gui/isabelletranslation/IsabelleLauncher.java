@@ -20,7 +20,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class IsabelleLauncher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
@@ -70,7 +73,7 @@ public class IsabelleLauncher {
             Theory thy0 = beginTheory(settings.getTranslationPath(), isabelle);
             resourceInstances.add(new Pair<>(isabelle, thy0));
 
-            tasks.add(()-> {
+            tasks.add(() -> {
                 IsabelleProblem problem;
                 Pair<Isabelle, Theory> resources;
                 while ((problem = problemsQueue.poll()) != null && (resources = resourceInstances.poll()) != null) {
