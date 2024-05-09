@@ -14,10 +14,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * LDT for maps.
@@ -48,7 +49,8 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, @Nullable Term sub, TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, @Nullable Term sub, TermServices services,
+            ExecutionContext ec) {
         return false;
     }
 

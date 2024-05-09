@@ -14,9 +14,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 

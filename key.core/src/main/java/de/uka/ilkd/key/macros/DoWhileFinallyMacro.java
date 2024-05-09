@@ -11,8 +11,9 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the
@@ -59,8 +60,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          @Nullable PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(proof);

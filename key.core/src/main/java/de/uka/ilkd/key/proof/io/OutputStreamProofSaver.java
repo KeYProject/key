@@ -47,12 +47,12 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -850,7 +850,8 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(@Nullable Services serv, boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
+            boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo();
 

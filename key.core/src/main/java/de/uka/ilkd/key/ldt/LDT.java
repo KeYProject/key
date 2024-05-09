@@ -18,14 +18,13 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
-import org.checkerframework.checker.initialization.qual.UnderInitialization;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -84,7 +83,8 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final JFunction addFunction(@UnknownInitialization LDT this, TermServices services, String funcName) {
+    protected final JFunction addFunction(@UnknownInitialization LDT this, TermServices services,
+            String funcName) {
         final Namespace<JFunction> funcNS = services.getNamespaces().functions();
         final JFunction f = funcNS.lookup(new Name(funcName));
         if (f == null) {
@@ -95,7 +95,7 @@ public abstract class LDT implements Named {
     }
 
     protected final SortDependingFunction addSortDependingFunction(@UnknownInitialization LDT this,
-                                                                   TermServices services, String kind) {
+            TermServices services, String kind) {
         final SortDependingFunction f =
             SortDependingFunction.getFirstInstance(new Name(kind), services);
         assert f != null : "LDT: Sort depending function " + kind + " not found";

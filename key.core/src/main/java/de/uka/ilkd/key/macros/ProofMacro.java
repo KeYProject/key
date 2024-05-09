@@ -14,8 +14,9 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension system.
@@ -92,7 +93,8 @@ public interface ProofMacro {
      *
      * @return a constant string, or <code>null</code>
      */
-    @Nullable String getCategory();
+    @Nullable
+    String getCategory();
 
     /**
      * Gets the description of this macro.

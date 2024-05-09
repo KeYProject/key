@@ -3,15 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.*;
-import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,6 +10,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.*;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An ANTLR4 error listener that stores the errors internally. You can disable the additional
@@ -54,21 +56,21 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line,
-                            int charPositionInLine, String msg, RecognitionException e) {
+            int charPositionInLine, String msg, RecognitionException e) {
 
         Parser parser = (Parser) recognizer;
         String stack = String.join(", ", parser.getRuleInvocationStack());
         Token tok = (Token) offendingSymbol;
         if (tok == null) {
             throw new IllegalArgumentException(
-                    "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
+                "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-                MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
+            MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
-                    msg, tok, stack);
+                msg, tok, stack);
         }
         errors.add(se);
 
@@ -140,7 +142,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                           int charPositionInLine, String msg, URI source, String stack) {
+                int charPositionInLine, String msg, URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -152,13 +154,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String getBeatifulErrorMessage(String[] lines) {
             return ("syntax-error in " + positionAsUrl() + "\n" + msg + "\n" + showInInput(lines)
-                    + "\n");
+                + "\n");
         }
 
         public String showInInput(String[] lines) {
             String line = lines[this.line];
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
-                    + StringUtil.repeat("^", (offendingSymbol.getText().length()));
+                + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {
@@ -196,7 +198,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
                 return new Location(e.source,
-                        Position.fromOneZeroBased(e.line, e.charPositionInLine));
+                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
             return null;
         }

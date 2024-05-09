@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -21,8 +23,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 
 public final class CharListLDT extends LDT {
@@ -58,7 +58,8 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, Objects.requireNonNull(services.getNamespaces().sorts().lookup(SeqLDT.NAME)), services);
+        super(NAME, Objects.requireNonNull(services.getNamespaces().sorts().lookup(SeqLDT.NAME)),
+            services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");

@@ -33,7 +33,7 @@ public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvi
         pCenter.removeAll(); // start fresh
         checkboxes.clear();
         var fs = ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings();
-        for (FeatureSettings.Feature feature : FeatureSettings.Feature.FEATURES) {
+        for (FeatureSettings.Feature feature : FeatureSettings.FEATURES) {
             var cb =
                 addCheckBox(feature.id(), feature.documentation(), fs.isActivated(feature), null);
             checkboxes.put(feature, cb);

@@ -13,9 +13,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Complete this class if you want to add support for the JML \real type.

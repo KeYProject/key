@@ -13,6 +13,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
 import org.jspecify.annotations.Nullable;
 
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {

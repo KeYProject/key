@@ -30,7 +30,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
         offendingSymbol = null;
     }
 
-    public BuildingException(@Nullable ParserRuleContext ctx, String message, @Nullable Throwable e) {
+    public BuildingException(@Nullable ParserRuleContext ctx, String message,
+            @Nullable Throwable e) {
         this(ctx == null ? null : ctx.start, message, e);
     }
 

@@ -70,6 +70,7 @@ public class PermissionLDT extends LDT {
 
     @Override
     public Type getType(Term t) {
-        throw new AssertionError("PermissionLDT: there are no types associated with permissions " + t);
+        throw new AssertionError(
+            "PermissionLDT: there are no types associated with permissions " + t);
     }
 }
