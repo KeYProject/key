@@ -164,6 +164,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 .replace(" +", " ");
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * Macro name parameter

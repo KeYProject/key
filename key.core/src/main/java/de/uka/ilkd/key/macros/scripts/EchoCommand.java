@@ -36,6 +36,7 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
         }
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The message to show.

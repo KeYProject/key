@@ -38,6 +38,7 @@ public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedComma
         state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "on".

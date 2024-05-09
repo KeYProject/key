@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -40,18 +41,9 @@ import org.key_project.util.collection.ImmutableList;
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
-
-    private HashSet<ProgramElement> blockElems = new HashSet<>();
+    private final HashSet<ProgramElement> blockElems = new HashSet<>();
     private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
-
-    private UserInterfaceControl uic = null;
-
-    public FinishSymbolicExecutionUntilMergePointMacro() {
-    }
-
-    public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
-        this.blockElems = blockElems;
-    }
+    private @Nullable UserInterfaceControl uic = null;
 
     @Override
     public String getName() {
@@ -73,7 +65,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws InterruptedException {
-        this.uic = uic;
+        this.uic = uic; // weigl: It is not appropriate to store uic in a macro.
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 

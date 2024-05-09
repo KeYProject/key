@@ -3,21 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.io.File;
-
 import org.key_project.util.java.IOUtil;
 
+import java.io.File;
+
 /**
- * <p>
  * Keeps some central paths to files and directories.
- * </p>
  * <p>
  * By default all KeY configurations are stored in a directory named ".key" inside the user's home
  * directory. In Microsoft windows operating systems this is directly the hard disc that contains
- * the KeY code. But the eclipse integration requires to change the default location. This is
- * possible via {@link #setKeyConfigDir(String)} which should be called once before something is
- * done with KeY (e.g. before the {@code MainWindow} is opened).
- * </p>
+ * the KeY code. But the eclipse integration requires to change the default location.
  */
 public final class PathConfig {
 
@@ -33,33 +28,28 @@ public final class PathConfig {
     public static final String KEY_DIRECTORY_NAME = ".key";
 
     /**
+     * directory where to find the KeY configuration files
+     */
+    private static String keyConfigDir = IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME;
+
+
+    /**
      * In which file to store the recent files.
      */
-    private static String recentFileStorage;
+    private static String recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
 
     /**
      * In which file to store the proof-independent settings.
      */
-    private static String proofIndependentSettings;
+    private static String proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
 
-    /**
-     * directory where to find the KeY configuration files
-     */
-    private static String keyConfigDir;
 
     /**
      * Directory in which the log files are stored.
      */
-    private static File logDirectory;
+    private static File logDirectory = new File(keyConfigDir, "logs");
 
     private PathConfig() {
-    }
-
-    /*
-     * Initializes the instance variables with the default settings.
-     */
-    static {
-        setKeyConfigDir(IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME);
     }
 
     /**
@@ -69,19 +59,6 @@ public final class PathConfig {
      */
     public static String getKeyConfigDir() {
         return keyConfigDir;
-    }
-
-    /**
-     * Sets the path to the directory that contains KeY configuration files.
-     *
-     * @param keyConfigDir The new directory to use.
-     */
-    public static void setKeyConfigDir(String keyConfigDir) {
-        PathConfig.keyConfigDir = keyConfigDir;
-        PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
-        PathConfig.proofIndependentSettings =
-            getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.logDirectory = new File(keyConfigDir, "logs");
     }
 
     /**

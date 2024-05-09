@@ -14,6 +14,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -110,7 +111,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      * @see de.uka.ilkd.key.macros.ProofMacro#getCategory()
      */
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 

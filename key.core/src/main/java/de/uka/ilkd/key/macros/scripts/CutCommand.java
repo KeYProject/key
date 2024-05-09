@@ -57,6 +57,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Term formula;

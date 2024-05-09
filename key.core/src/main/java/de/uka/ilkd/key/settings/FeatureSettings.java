@@ -91,7 +91,7 @@ public class FeatureSettings extends AbstractSettings {
      *
      * @return true, if {@code value} feels like a feature activation.
      */
-    private boolean isTrue(Object value) {
+    private boolean isTrue(@UnknownInitialization FeatureSettings this, Object value) {
         return switch (value.toString().toLowerCase()) {
         case "true", "yes", "on" -> true;
         default -> false;
@@ -153,7 +153,7 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Activates the given feature by {@code id}.
      */
-    private void activate(String id) {
+    private void activate(@UnknownInitialization FeatureSettings this, String id) {
         if (!isActivated(id)) {
             activatedFeatures.add(id);
             firePropertyChange(id, false, isActivated(id));
