@@ -26,6 +26,7 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -263,14 +264,17 @@ public class ProgramMethodPO extends AbstractOperationPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
-        properties.setProperty("method", getProgramMethodSignature(getProgramMethod(), true));
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("method", getProgramMethodSignature(getProgramMethod(), true));
         if (getPrecondition() != null && !getPrecondition().isEmpty()) {
-            properties.setProperty("precondition", getPrecondition());
+            c.set("precondition", getPrecondition());
         }
+        return c;
     }
 
     /**
@@ -295,33 +299,18 @@ public class ProgramMethodPO extends AbstractOperationPO {
     }
 
     /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        return new LoadedPOContainer(new ProgramMethodPO(initConfig, getName(properties),
-            getProgramMethod(initConfig, properties), getPrecondition(properties),
-            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
-    }
-
-    /**
      * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
      *
-     * @param initConfig The already load {@link InitConfig}.
+     * @param initConfig The already loaded {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The found {@link IProgramMethod}.
      * @throws IOException Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
-    public static IProgramMethod getProgramMethod(InitConfig initConfig, Properties properties)
+    public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
             throws IOException {
         // Get container class and method signature
-        String value = properties.getProperty("method");
+        String value = properties.getString("method");
         if (value == null) {
             throw new IOException("Property \"method\" is not defined.");
         }
@@ -380,8 +369,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param properties The proof obligation settings to read from.
      * @return The precondition or {@code null} if not available.
      */
-    public static String getPrecondition(Properties properties) {
-        return properties.getProperty("precondition");
+    public static String getPrecondition(Configuration properties) {
+        return properties.getString("precondition");
     }
 
     @Override

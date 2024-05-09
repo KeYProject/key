@@ -220,8 +220,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(p, new CC().span().newline());
     }
 
-    @NonNull
-    private JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
+    private @NonNull JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new BorderLayout());
 

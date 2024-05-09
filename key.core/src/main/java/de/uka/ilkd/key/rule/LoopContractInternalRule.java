@@ -258,9 +258,8 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new LoopContractInternalBuiltInRuleApp(this, occurrence);
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =

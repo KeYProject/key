@@ -41,12 +41,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Dec 03 15:06:52 CET 2015
-name=Matrix22[Matrix22\\:\\:strassen(Matrix22,Matrix22)].JML normal_behavior operation contract.0
-contract=Matrix22[Matrix22\\:\\:strassen(Matrix22,Matrix22)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "Matrix22[Matrix22::strassen(Matrix22,Matrix22)].JML normal_behavior operation contract.0",
+	"contract": "Matrix22[Matrix22::strassen(Matrix22,Matrix22)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "daniel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

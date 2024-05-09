@@ -530,14 +530,12 @@ public class JMLSpecFactory {
 
     }
 
-    @NonNull
-    private LabeledParserRuleContext getAssignableNothing() {
+    private @NonNull LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
-    @NonNull
-    private LabeledParserRuleContext getAssignableFreeNothing() {
+    private @NonNull LabeledParserRuleContext getAssignableFreeNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }

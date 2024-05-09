@@ -54,8 +54,7 @@ public class PositionedIssueString extends PositionedString
         return kind;
     }
 
-    @NonNull
-    public String getAdditionalInfo() {
+    public @NonNull String getAdditionalInfo() {
         return additionalInfo;
     }
 

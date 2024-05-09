@@ -5,11 +5,12 @@ package org.key_project.logic.op;
 
 import java.util.Objects;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Program;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box for a target

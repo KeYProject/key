@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract operator class offering some common functionality.
@@ -19,8 +20,8 @@ public abstract class AbstractOperator implements Operator {
     private final Modifier modifier;
 
     protected AbstractOperator(Name name, int arity,
-                               @Nullable ImmutableArray<Boolean> whereToBind,
-                               Modifier modifier) {
+            @Nullable ImmutableArray<Boolean> whereToBind,
+            Modifier modifier) {
         assert arity >= 0;
         assert whereToBind == null || whereToBind.size() == arity;
         this.name = name;
@@ -30,7 +31,7 @@ public abstract class AbstractOperator implements Operator {
     }
 
     protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
-                               boolean isRigid) {
+            boolean isRigid) {
         this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 

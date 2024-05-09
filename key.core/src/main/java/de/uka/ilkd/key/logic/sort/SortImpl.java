@@ -87,15 +87,13 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
         return name().toString();
     }
 
-    @Nullable
     @Override
-    public String getDocumentation() {
+    public @Nullable String getDocumentation() {
         return documentation;
     }
 
-    @Nullable
     @Override
-    public String getOrigin() {
+    public @Nullable String getOrigin() {
         return origin;
     }
 

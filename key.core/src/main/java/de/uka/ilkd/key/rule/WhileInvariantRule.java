@@ -702,9 +702,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;

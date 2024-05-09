@@ -45,13 +45,12 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Oct 04 18:18:29 CEST 2012
-name=complicatedInnerMethod
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
-method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.packageName.TheClass, int, boolean, java.lang.String, java.lang.Object[], my.packageName.sub.AnotherClass)
-";
+\proofObligation {
+	"name": "complicatedInnerMethod",
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO",
+	"method": "my.packageName.TheClass.TheInnerClass#complicatedInnerMethod(my.packageName.TheClass, int, boolean, java.lang.String, java.lang.Object[], my.packageName.sub.AnotherClass)",
+ }
 
 \proof {
 (keyLog "0" (keyUser "IStudent" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

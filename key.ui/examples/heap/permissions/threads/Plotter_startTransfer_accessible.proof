@@ -44,12 +44,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Sat Oct 29 22:46:07 CEST 2022
-contract=Plotter[ThreadSpec2\\:\\:startTransfer()].JML accessible clause.0
-name=Plotter[ThreadSpec2\\:\\:startTransfer()].JML accessible clause.0
-class=de.uka.ilkd.key.proof.init.DependencyContractPO
-";
+\proofObligation {
+	"contract": "Plotter[ThreadSpec2::startTransfer()].JML accessible clause.0",
+	"name": "Plotter[ThreadSpec2::startTransfer()].JML accessible clause.0",
+	"class": "de.uka.ilkd.key.proof.init.DependencyContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "lukas" ) (keyVersion "4044cf2700"))

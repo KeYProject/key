@@ -35,15 +35,13 @@ public class PositionInfo {
     /**
      * The URI of the resource this location refers to. Either a meaningful value or null.
      */
-    @Nullable
-    private final URI fileURI;
+    private final @Nullable URI fileURI;
 
     /**
      * The URI of the parent class of this location (the class the statement originates from). May
      * be null.
      */
-    @Nullable
-    private URI parentClassURI;
+    private @Nullable URI parentClassURI;
 
     private PositionInfo() {
         this.relPos = SourceElement.Position.UNDEFINED;
@@ -111,8 +109,7 @@ public class PositionInfo {
         return null;
     }
 
-    @Nullable
-    public URI getParentClassURI() {
+    public @Nullable URI getParentClassURI() {
         return parentClassURI;
     }
 

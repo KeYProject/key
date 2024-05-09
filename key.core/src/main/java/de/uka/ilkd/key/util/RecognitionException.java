@@ -30,9 +30,8 @@ public class RecognitionException extends Exception implements HasLocation {
         return position;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

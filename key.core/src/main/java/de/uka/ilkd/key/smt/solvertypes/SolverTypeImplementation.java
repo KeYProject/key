@@ -165,8 +165,7 @@ public final class SolverTypeImplementation implements SolverType {
     /**
      * The preamble String for the created {@link SMTTranslator}, may be null.
      */
-    @Nullable
-    private final String preamble;
+    private final @Nullable String preamble;
 
     /**
      * Used for creation of new sockets as well as modifying problem Strings. Should not be returned
@@ -493,9 +492,8 @@ public final class SolverTypeImplementation implements SolverType {
         return supportHasBeenChecked;
     }
 
-    @NonNull
     @Override
-    public AbstractSolverSocket getSocket(ModelExtractor query) {
+    public @NonNull AbstractSolverSocket getSocket(ModelExtractor query) {
         AbstractSolverSocket socket = solverSocket.copy();
         socket.setQuery(query);
         return socket;

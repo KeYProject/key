@@ -54,8 +54,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @NonNull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
+    public static <T extends ParserRuleContext> @NonNull T getParseRuleContext(
+            @NonNull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -192,8 +192,7 @@ public final class ParsingFacade {
         return p.id_declaration();
     }
 
-    @Nullable
-    public static String getValueDocumentation(@Nullable TerminalNode docComment) {
+    public static @Nullable String getValueDocumentation(@Nullable TerminalNode docComment) {
         if (docComment == null) {
             return null;
         }
@@ -276,6 +275,11 @@ public final class ParsingFacade {
      */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
+    }
+
+    public static Configuration getConfiguration(KeYParser.TableContext ctx) {
+        final var cfg = new ConfigurationBuilder();
+        return cfg.visitTable(ctx);
     }
     // endregion
 }

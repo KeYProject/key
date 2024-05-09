@@ -341,9 +341,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return c;
     }
 
-    @NonNull
     @Override
-    public Collection<CAction> getTitleCActions() {
+    public @NonNull Collection<CAction> getTitleCActions() {
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
     }
 
@@ -514,9 +513,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
-    @NonNull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Proof Slicing";
     }
 
@@ -525,9 +523,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return INFO_ICON;
     }
 
-    @NonNull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return this;
     }
 

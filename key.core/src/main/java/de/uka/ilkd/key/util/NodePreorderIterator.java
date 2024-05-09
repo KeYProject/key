@@ -34,8 +34,7 @@ public class NodePreorderIterator {
     /**
      * The next element or {@code null} if no more elements exists.
      */
-    @Nullable
-    private Node next;
+    private @Nullable Node next;
 
     /**
      * The child index of {@link #next} on its parent.
@@ -78,8 +77,7 @@ public class NodePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    @Nullable
-    public Node next() {
+    public @Nullable Node next() {
         Node oldNext = next;
         updateNext();
         return oldNext;
@@ -130,8 +128,7 @@ public class NodePreorderIterator {
      * @param node The visited {@link Node}.
      * @return The next {@link Node} to visit.
      */
-    @Nullable
-    protected Node getNextOnParent(Node node) {
+    protected @Nullable Node getNextOnParent(Node node) {
         Node parent = node.parent();
         while (parent != null) {
             boolean nodeFound = false; // Indicates that node was found on the parent.

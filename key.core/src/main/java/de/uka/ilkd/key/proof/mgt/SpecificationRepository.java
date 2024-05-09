@@ -1860,8 +1860,7 @@ public final class SpecificationRepository {
     // region Support SetStatement and JmlAssert
     private final Map<Statement, JmlStatementSpec> statementMap = new IdentityHashMap<>();
 
-    @Nullable
-    public JmlStatementSpec getStatementSpec(Statement statement) {
+    public @Nullable JmlStatementSpec getStatementSpec(Statement statement) {
         return statementMap.get(statement);
     }
 

@@ -745,8 +745,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         return ImmutableList.fromList(taclets);
     }
 
-    @NonNull
-    private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction,
+    private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
+            int applicationRestriction,
             ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();
@@ -828,8 +828,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return varId(ctx, id);
     }
 
-    @Nullable
-    private Operator varId(ParserRuleContext ctx, String id) {
+    private @Nullable Operator varId(ParserRuleContext ctx, String id) {
         Name name = new Name(id);
         Operator v = variables().lookup(name);
         if (v == null) {

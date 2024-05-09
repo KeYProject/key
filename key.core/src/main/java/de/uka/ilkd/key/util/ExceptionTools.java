@@ -118,8 +118,7 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    @Nullable
-    public static Location getLocation(@NonNull Throwable exc)
+    public static @Nullable Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
@@ -140,16 +139,14 @@ public final class ExceptionTools {
         return null;
     }
 
-    @Nullable
-    private static Location getLocation(ParseException exc) {
+    private static @Nullable Location getLocation(ParseException exc) {
         // JavaCC has 1-based column numbers
         Token token = exc.currentToken;
         return token == null ? null
                 : new Location(null, Position.fromToken(token.next));
     }
 
-    @Nullable
-    private static Location getLocation(NoViableAltException exc) {
+    private static @Nullable Location getLocation(NoViableAltException exc) {
         var token = exc.getOffendingToken();
 
         return token == null ? null
@@ -159,8 +156,7 @@ public final class ExceptionTools {
                     Position.fromToken(token));
     }
 
-    @Nullable
-    private static Location getLocation(InputMismatchException exc) {
+    private static @Nullable Location getLocation(InputMismatchException exc) {
         var token = exc.getOffendingToken();
 
         return token == null ? null
@@ -170,8 +166,7 @@ public final class ExceptionTools {
                     Position.fromToken(token));
     }
 
-    @Nullable
-    private static Location getLocation(TokenMgrError exc) {
+    private static @Nullable Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
         if (m.find()) {
             int line = Integer.parseInt(m.group(1));

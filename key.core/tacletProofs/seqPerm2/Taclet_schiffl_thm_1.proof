@@ -39,11 +39,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Thu Oct 27 16:09:31 CEST 2016
-name=schiffl_thm_1
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "schiffl_thm_1",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 
 \proofScript "

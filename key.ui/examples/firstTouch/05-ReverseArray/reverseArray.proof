@@ -44,12 +44,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Dec 08 19:30:36 CET 2022
-contract=ReverseArray[ReverseArray\\:\\:reverse()].JML normal_behavior operation contract.0
-name=ReverseArray[ReverseArray\\:\\:reverse()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0",
+	"name": "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "008f011f15"))

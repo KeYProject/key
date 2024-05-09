@@ -54,13 +54,11 @@ public class PrettyPrinter implements Visitor {
     private final PosTableLayouter layouter;
 
     private boolean startAlreadyMarked;
-    @Nullable
-    private Object firstStatement;
+    private @Nullable Object firstStatement;
     private boolean endAlreadyMarked;
 
     private final SVInstantiations instantiations;
-    @Nullable
-    private final Services services;
+    private final @Nullable Services services;
     private boolean usePrettyPrinting;
     private boolean useUnicodeSymbols;
 

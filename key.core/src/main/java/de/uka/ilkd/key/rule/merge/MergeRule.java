@@ -130,9 +130,9 @@ public class MergeRule implements BuiltInRule {
         return displayName();
     }
 
-    @NonNull
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, final Services services, RuleApp ruleApp)
+    public final @NonNull ImmutableList<Goal> apply(Goal goal, final Services services,
+            RuleApp ruleApp)
             throws RuleAbortException {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;

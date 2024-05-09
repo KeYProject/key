@@ -207,9 +207,8 @@ public final class LocSetLDT extends LDT {
         throw new RuntimeException("Not Implemented");
     }
 
-    @Nullable
     @Override
-    public JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
         return switch (operationName) {
         case "add" -> getUnion();
         case "sub" -> getSetMinus();

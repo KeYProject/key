@@ -45,11 +45,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Aug 02 14:34:25 CEST 2023
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-name=seqPermForall
-";
+\proofObligation {
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+	"name": "seqPermForall",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Wolfram" ) (keyVersion "802791f53995f75600352ac8d6929fd89f529c86"))

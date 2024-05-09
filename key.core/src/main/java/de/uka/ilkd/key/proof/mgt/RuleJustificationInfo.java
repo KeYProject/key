@@ -36,13 +36,11 @@ public class RuleJustificationInfo {
         }
     }
 
-    @Nullable
-    public RuleJustification getJustification(Rule r) {
+    public @Nullable RuleJustification getJustification(Rule r) {
         return rule2Justification.get(new RuleKey(r));
     }
 
-    @Nullable
-    public RuleJustification getJustification(RuleApp r, TermServices services) {
+    public @Nullable RuleJustification getJustification(RuleApp r, TermServices services) {
         RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);

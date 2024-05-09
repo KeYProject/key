@@ -41,12 +41,11 @@
 
 \javaSource "..";
 
-\proofObligation "#Proof Obligation Settings
-#Mon Sep 14 10:33:14 CEST 2015
-name=truthValueEvaluation.And[truthValueEvaluation.And\\:\\:doNothing(boolean,boolean)].JML normal_behavior operation contract.0
-contract=truthValueEvaluation.And[truthValueEvaluation.And\\:\\:doNothing(boolean,boolean)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "truthValueEvaluation.And[truthValueEvaluation.And::doNothing(boolean,boolean)].JML normal_behavior operation contract.0",
+	"contract": "truthValueEvaluation.And[truthValueEvaluation.And::doNothing(boolean,boolean)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

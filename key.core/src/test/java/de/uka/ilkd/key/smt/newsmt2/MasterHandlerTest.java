@@ -108,8 +108,8 @@ public class MasterHandlerTest {
     }
 
     public record TestData(String name, Path path, LineProperties props, String translation) {
-        @Nullable
-            public static TestData create(Path path) throws IOException, ProblemLoaderException {
+
+            public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
                 var name = path.getFileName().toString();
                 var props = new LineProperties();
                 try (BufferedReader reader = Files.newBufferedReader(path)) {

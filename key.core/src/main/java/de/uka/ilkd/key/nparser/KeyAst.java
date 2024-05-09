@@ -39,8 +39,8 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @NonNull
-    final T ctx;
+
+    final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;

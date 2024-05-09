@@ -111,9 +111,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
         setMediator(mediator);
     }
 
-    @NonNull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Goals";
     }
 
@@ -122,9 +121,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
         return GOAL_LIST_ICON;
     }
 
-    @NonNull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return new JScrollPane(this);
     }
 

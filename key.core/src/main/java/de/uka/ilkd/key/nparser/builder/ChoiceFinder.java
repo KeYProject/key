@@ -23,8 +23,8 @@ import org.jspecify.annotations.NonNull;
  * @see ChoiceInformation
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
-    @NonNull
-    private final ChoiceInformation choiceInformation;
+
+    private final @NonNull ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
         choiceInformation = new ChoiceInformation();
@@ -82,8 +82,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return c;
     }
 
-    @NonNull
-    public ChoiceInformation getChoiceInformation() {
+    public @NonNull ChoiceInformation getChoiceInformation() {
         return choiceInformation;
     }
 

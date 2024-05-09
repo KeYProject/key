@@ -8,7 +8,7 @@ package org.key_project.util.collection;
  * second one is of type <T> and named value
  */
 
-public interface ImmutableMapEntry<S, T> extends java.io.Serializable {
+public interface ImmutableMapEntry<S, T> {
 
     /** @return the first part of the tupel */
     S key();

@@ -67,9 +67,8 @@ public class PosConvertException extends ConvertException implements HasLocation
         return position;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         Throwable cause = getCause();
         if (this.file == null) {
             if (cause instanceof UnresolvedReferenceException ure) {

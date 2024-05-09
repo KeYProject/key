@@ -43,9 +43,8 @@ public class LocatableException extends RuntimeException implements HasLocation 
         this.location = location;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         return location;
     }
 }

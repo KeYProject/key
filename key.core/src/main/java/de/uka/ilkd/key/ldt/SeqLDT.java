@@ -169,9 +169,8 @@ public final class SeqLDT extends LDT {
         throw new RuntimeException("Not Implemented");
     }
 
-    @Nullable
     @Override
-    public JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
         if (operationName.equals("add")) {
             return getSeqConcat();
         }

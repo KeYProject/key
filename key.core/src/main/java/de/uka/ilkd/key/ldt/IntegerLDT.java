@@ -714,9 +714,8 @@ public final class IntegerLDT extends LDT {
         throw new RuntimeException("Not implemented");
     }
 
-    @Nullable
     @Override
-    public JFunction getFunctionFor(String op, Services services) {
+    public @Nullable JFunction getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();

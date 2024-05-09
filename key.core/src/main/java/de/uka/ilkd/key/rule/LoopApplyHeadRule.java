@@ -62,9 +62,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
      */
     public static final Name NAME = new Name("Loop Apply Head");
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;

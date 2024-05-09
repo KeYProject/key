@@ -4,14 +4,10 @@
 package org.key_project.slicing;
 
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.helper.FindResources;
@@ -24,8 +20,7 @@ public class Issue3437Test {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
-    void loadsAndSlicesCorrectly() throws ProblemLoaderException, ProofInputException, IOException,
-            IntermediateProofReplayer.BuiltInConstructionException {
+    void loadsAndSlicesCorrectly() throws Exception {
         GeneralSettings.noPruningClosed = false;
 
         var file = new File(testCaseDirectory,

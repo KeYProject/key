@@ -32,9 +32,8 @@ public final class ParserException extends Exception implements HasLocation {
     /**
      * @return The location may be null.
      */
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 

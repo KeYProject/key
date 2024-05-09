@@ -576,8 +576,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
-    @Nullable
-    public final TacletApp tryToInstantiate(Services services) {
+    public final @Nullable TacletApp tryToInstantiate(Services services) {
         /*
          * TODO (DS, 2019-02-22): It should be possible to unify this with
          * tryToInstantiateAsMuchAsPossible: Apply that method, check whether the result is

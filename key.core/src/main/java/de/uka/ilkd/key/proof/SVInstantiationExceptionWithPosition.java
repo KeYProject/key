@@ -59,9 +59,8 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
         return getMessage();
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         return new Location(null, position);
     }
 }

@@ -14,11 +14,6 @@ import org.key_project.util.Strings;
 @SuppressWarnings("nullness")
 public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
-    /**
-     * generated serial
-     */
-    private static final long serialVersionUID = 3268346732418187405L;
-
     /** the empty map */
 
     @SuppressWarnings("unchecked")
