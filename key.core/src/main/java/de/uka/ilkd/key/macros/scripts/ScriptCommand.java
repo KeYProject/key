@@ -19,6 +19,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         super(Parameters.class);
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public String filename;

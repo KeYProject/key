@@ -95,6 +95,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
         }
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "#2", required = true)
         public String abbreviation;

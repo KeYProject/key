@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
@@ -62,7 +63,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
-    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
+    private static @Nullable Goal getFirstSubtreeGoal(Node node, Proof proof) {
         Goal goal;
         if (node.leaf() && //
                 (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
@@ -147,6 +148,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return "select";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)

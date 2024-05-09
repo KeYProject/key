@@ -49,6 +49,7 @@ public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter>
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class FormulaParameter {
         @Option("#2")
         public Term formula;

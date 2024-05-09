@@ -19,6 +19,7 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -130,6 +131,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "all", required = false)
         public boolean onAllOpenGoals = false;
@@ -138,11 +140,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         public int maxSteps = -1;
 
         /** Run on formula matching the given regex */
-        @Option(value = "matches", required = false)
+        @Option(value = "matches", required = false) @Nullable
         public String matches = null;
 
         /** Run on formula matching the given regex */
-        @Option(value = "breakpoint", required = false)
+        @Option(value = "breakpoint", required = false) @Nullable
         public String breakpoint = null;
 
         public boolean isOnAllOpenGoals() {

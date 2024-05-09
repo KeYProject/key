@@ -67,6 +67,7 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
         return "schemaVar";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public String type;

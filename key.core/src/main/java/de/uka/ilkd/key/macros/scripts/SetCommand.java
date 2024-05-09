@@ -96,6 +96,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         return "set";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /** One Step Simplification parameter */
         @Option(value = "oss", required = false)

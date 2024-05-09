@@ -13,6 +13,7 @@ import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -36,9 +37,9 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     /**
      * ...
      */
-    private final Class<T> parameterClazz;
+    private final @Nullable Class<T> parameterClazz;
 
-    public AbstractCommand(Class<T> clazz) {
+    public AbstractCommand(@Nullable Class<T> clazz) {
         this.parameterClazz = clazz;
     }
 
@@ -51,7 +52,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
 
     @Override
-    public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
+    public @Nullable T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);

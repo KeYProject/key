@@ -33,6 +33,7 @@ public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
         state.setEchoOn("on".equalsIgnoreCase(args.command));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "off".

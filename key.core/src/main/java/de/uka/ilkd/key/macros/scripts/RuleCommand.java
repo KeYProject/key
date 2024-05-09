@@ -370,6 +370,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return matchingApps;
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "#2")
         public String rulename;
